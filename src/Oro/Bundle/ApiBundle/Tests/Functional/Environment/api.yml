@@ -1,4 +1,18 @@
 api:
+    entity_aliases:
+        Extend\Entity\TestApiE1:
+            alias: testapientity1
+            plural_alias: testapientity1
+        Extend\Entity\TestApiE2:
+            alias: testapientity2
+            plural_alias: testapientity2
+        Extend\Entity\EV_Api_Enum1:
+            alias: testapienum1
+            plural_alias: testapienum1
+        Extend\Entity\EV_Api_Enum2:
+            alias: testapienum2
+            plural_alias: testapienum2
+
     entities:
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
             fields:
@@ -134,3 +148,5 @@ api:
                     fieldDuration: ~
                     fieldMoneyValue: ~
                     fieldCurrency: ~
+        Extend\Entity\TestApiE1: ~
+        Extend\Entity\TestApiE2: ~

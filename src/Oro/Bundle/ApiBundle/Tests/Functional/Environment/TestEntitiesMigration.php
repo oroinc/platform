@@ -3,12 +3,28 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
 
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class TestEntitiesMigration implements Migration
+class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
 {
+    /** @var ExtendExtension */
+    private $extendExtension;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExtendExtension(ExtendExtension $extendExtension)
+    {
+        $this->extendExtension = $extendExtension;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -22,6 +38,7 @@ class TestEntitiesMigration implements Migration
         $this->createTestCompositeIdentifierTable($schema);
         $this->createTestCustomIdentifierTables($schema);
         $this->createTestAllDataTypesTable($schema);
+        $this->createTestCustomEntityTables($schema);
     }
 
     /**
@@ -281,5 +298,206 @@ class TestEntitiesMigration implements Migration
         $table->addColumn('field_money_value', 'money_value', ['notnull' => false]);
         $table->addColumn('field_currency', 'currency', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
+    }
+
+    /**
+     * Create custom entity tables
+     *
+     * @param Schema $schema
+     */
+    protected function createTestCustomEntityTables(Schema $schema)
+    {
+        if ($schema->hasTable('oro_ext_testapie1') || $schema->hasTable('oro_ext_testapie2')) {
+            return;
+        }
+
+        $customOwner = ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]];
+        $withoutDefault = ['extend' => ['without_default' => true]];
+
+        $t1 = $this->extendExtension->createCustomEntityTable($schema, 'TestApiE1');
+        $t1->addColumn('name', 'string', ['length' => 255, OroOptions::KEY => $customOwner]);
+        $this->addEnumField($schema, $t1, 'enumField', 'api_enum1');
+        $this->addEnumField($schema, $t1, 'multiEnumField', 'api_enum2', true);
+        $t2 = $this->extendExtension->createCustomEntityTable($schema, 'TestApiE2');
+        $t2->addColumn('name', 'string', ['length' => 255, OroOptions::KEY => $customOwner]);
+
+        // unidirectional many-to-one
+        $this->addManyToOneRelation($schema, $t1, 'uniM2O', $t2);
+        // bidirectional many-to-one
+        $this->addManyToOneRelation($schema, $t1, 'biM2O', $t2);
+        $this->addManyToOneInverseRelation($schema, $t1, 'biM2O', $t2, 'biM2OOwners');
+
+        // unidirectional many-to-many
+        $this->addManyToManyRelation($schema, $t1, 'uniM2M', $t2);
+        // unidirectional many-to-many without default
+        $this->addManyToManyRelation($schema, $t1, 'uniM2MnD', $t2, $withoutDefault);
+        // bidirectional many-to-many
+        $this->addManyToManyRelation($schema, $t1, 'biM2M', $t2);
+        $this->addManyToManyInverseRelation($schema, $t1, 'biM2M', $t2, 'biM2MOwners');
+        // bidirectional many-to-many without default
+        $this->addManyToManyRelation($schema, $t1, 'biM2MnD', $t2, $withoutDefault);
+        $this->addManyToManyInverseRelation($schema, $t1, 'biM2MnD', $t2, 'biM2MnDOwners');
+
+        // unidirectional one-to-many
+        $this->addOneToManyRelation($schema, $t1, 'uniO2M', $t2);
+        // unidirectional one-to-many without default
+        $this->addOneToManyRelation($schema, $t1, 'uniO2MnD', $t2, $withoutDefault);
+        // bidirectional one-to-many
+        $this->addOneToManyRelation($schema, $t1, 'biO2M', $t2);
+        $this->addOneToManyInverseRelation($schema, $t1, 'biO2M', $t2, 'biO2MOwner');
+        // bidirectional one-to-many without default
+        $this->addOneToManyRelation($schema, $t1, 'biO2MnD', $t2, $withoutDefault);
+        $this->addOneToManyInverseRelation($schema, $t1, 'biO2MnD', $t2, 'biO2MnDOwner');
+    }
+
+    /**
+     * @param Schema $s
+     * @param Table  $t
+     * @param string $name
+     * @param string $code
+     * @param bool   $isMultiple
+     */
+    protected function addEnumField($s, $t, $name, $code, $isMultiple = false)
+    {
+        $this->extendExtension->addEnumField(
+            $s,
+            $t,
+            $name,
+            $code,
+            $isMultiple,
+            false,
+            ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
+        );
+    }
+
+    /**
+     * @param Schema $s
+     * @param Table  $t
+     * @param string $name
+     * @param Table  $tt
+     * @param array  $options
+     */
+    protected function addManyToOneRelation($s, $t, $name, $tt, $options = [])
+    {
+        $options = array_merge_recursive(
+            [
+                'extend' => [
+                    'owner'        => ExtendScope::OWNER_CUSTOM,
+                    'target_field' => 'id'
+                ]
+            ],
+            $options
+        );
+        $this->extendExtension->addManyToOneRelation($s, $t, $name, $tt, 'name', $options);
+    }
+
+    /**
+     * @param Schema $s
+     * @param Table  $t
+     * @param string $name
+     * @param Table  $tt
+     * @param string $targetName
+     */
+    protected function addManyToOneInverseRelation($s, $t, $name, $tt, $targetName)
+    {
+        $this->extendExtension->addManyToOneInverseRelation(
+            $s,
+            $t,
+            $name,
+            $tt,
+            $targetName,
+            ['name'],
+            ['name'],
+            ['name'],
+            ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
+        );
+    }
+
+    /**
+     * @param Schema $s
+     * @param Table  $t
+     * @param string $name
+     * @param Table  $tt
+     * @param array  $options
+     */
+    protected function addManyToManyRelation($s, $t, $name, $tt, $options = [])
+    {
+        $options = array_merge_recursive(
+            [
+                'extend' => [
+                    'owner'           => ExtendScope::OWNER_CUSTOM,
+                    'target_title'    => ['id'],
+                    'target_detailed' => ['id'],
+                    'target_grid'     => ['id']
+                ]
+            ],
+            $options
+        );
+        $this->extendExtension->addManyToManyRelation($s, $t, $name, $tt, ['name'], ['name'], ['name'], $options);
+    }
+
+    /**
+     * @param Schema $s
+     * @param Table  $t
+     * @param string $name
+     * @param Table  $tt
+     * @param string $targetName
+     */
+    protected function addManyToManyInverseRelation($s, $t, $name, $tt, $targetName)
+    {
+        $this->extendExtension->addManyToManyInverseRelation(
+            $s,
+            $t,
+            $name,
+            $tt,
+            $targetName,
+            ['name'],
+            ['name'],
+            ['name'],
+            ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
+        );
+    }
+
+    /**
+     * @param Schema $s
+     * @param Table  $t
+     * @param string $name
+     * @param Table  $tt
+     * @param array  $options
+     */
+    protected function addOneToManyRelation($s, $t, $name, $tt, $options = [])
+    {
+        $options = array_merge_recursive(
+            [
+                'extend' => [
+                    'owner'           => ExtendScope::OWNER_CUSTOM,
+                    'target_title'    => ['id'],
+                    'target_detailed' => ['id'],
+                    'target_grid'     => ['id']
+                ]
+            ],
+            $options
+        );
+        $this->extendExtension->addOneToManyRelation($s, $t, $name, $tt, ['name'], ['name'], ['name'], $options);
+    }
+
+    /**
+     * @param Schema $s
+     * @param Table  $t
+     * @param string $name
+     * @param Table  $tt
+     * @param string $targetName
+     */
+    protected function addOneToManyInverseRelation($s, $t, $name, $tt, $targetName)
+    {
+        $this->extendExtension->addOneToManyInverseRelation(
+            $s,
+            $t,
+            $name,
+            $tt,
+            $targetName,
+            'name',
+            ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
+        );
     }
 }
