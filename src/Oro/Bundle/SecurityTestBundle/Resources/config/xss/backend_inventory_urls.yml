@@ -1,0 +1,9 @@
+urls:
+    # Manage Inventory
+    - { route: 'oro_inventory_level_index' }
+
+    # Warehouse
+    - { route: 'oro_warehouse_index' }
+    - { route: 'oro_warehouse_create' }
+    - { route: 'oro_warehouse_view', parameters: { id: '@warehouse.id' } }
+    - { route: 'oro_warehouse_update', parameters: { id: '@warehouse.id' }, options: { disable_select2_checks: true } }

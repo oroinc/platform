@@ -1,0 +1,28 @@
+Oro\Bundle\WarehouseBundle\Entity\Warehouse:
+    warehouse:
+        owner: '@xss_business_unit'
+        organization: '@xss_organization'
+        name: '<xss("Warehouse.name")>'
+
+Oro\Bundle\InventoryBundle\Entity\InventoryLevel:
+    inventory_level:
+        product: '@simple_product'
+        productUnitPrecision: '@precision1'
+        warehouse: '@warehouse'
+
+Oro\Bundle\WarehouseBundle\Entity\WarehouseAddress:
+    warehouse_address:
+        warehouse: '@warehouse'
+        country: 'US'
+        label: '<xss("CustomerUserAddress.label")>'
+        street: '<xss("CustomerUserAddress.street")>'
+        street2: '<xss("CustomerUserAddress.street2")>'
+        city: '<xss("CustomerUserAddress.city")>'
+        postalCode: '<xss("CustomerUserAddress.postalCode")>'
+        organization: '<xss("CustomerUserAddress.organization")>'
+        regionText: '<xss("CustomerUserAddress.regionText")>'
+        namePrefix: '<xss("CustomerUserAddress.namePrefix")>'
+        firstName: '<xss("CustomerUserAddress.firstName")>'
+        middleName: '<xss("CustomerUserAddress.middleName")>'
+        lastName: '<xss("CustomerUserAddress.lastName")>'
+        nameSuffix: '<xss("CustomerUserAddress.nameSuffix")>'
