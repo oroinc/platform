@@ -17,12 +17,20 @@ urls:
     - { route: 'oro_promotion_coupon_view', parameters: { id: '@coupon_1.id' } }
     - { route: 'oro_promotion_coupon_update', parameters: { id: '@coupon_1.id' }, options: { disable_select2_checks: true } }
 
-#    # Web Catalogs
-#    - { route: 'oro_rfp_request_index' }
-#    - { route: 'oro_rfp_request_view', parameters: { id: '@rfp_request.id' } }
-#    - { route: 'oro_rfp_request_update', parameters: { id: '@rfp_request.id' } }
-#    - { route: 'oro_rfp_request_create_order', parameters: { id: '@rfp_request.id' } }
-#
+     # Web Catalogs
+    - { route: 'oro_web_catalog_index' }
+    - { route: 'oro_web_catalog_create' }
+    - { route: 'oro_web_catalog_view', parameters: { id: '@xss_web_catalog.id' } }
+    - { route: 'oro_web_catalog_update', parameters: { id: '@xss_web_catalog.id' } }
+
+    # Web Catalogs/Content Nodes
+    - { route: 'oro_content_node_update_root', parameters: { id: '@xss_web_catalog.id' } }
+    - { route: 'oro_content_node_create', parameters: { id: '@content_node_1.id' } }
+    - { route: 'oro_content_node_update', parameters: { id: '@content_node_1.id' } }
+    - { route: 'oro_content_node_update', parameters: { id: '@content_node_2.id' } }
+    - { route: 'oro_content_node_update', parameters: { id: '@content_node_3.id' } }
+    - { route: 'oro_content_node_update', parameters: { id: '@content_node_4.id' } }
+
     # Landing Pages
     - { route: 'oro_cms_page_index' }
     - { route: 'oro_cms_page_create' }

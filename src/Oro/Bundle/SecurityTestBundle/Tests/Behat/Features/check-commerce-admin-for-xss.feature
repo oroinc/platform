@@ -5,6 +5,7 @@
 @fixture-OroSecurityTestBundle:payment-method-rule.yml
 @fixture-OroSecurityTestBundle:commerce-fixtures.yml
 @fixture-OroSecurityTestBundle:order.yml
+@fixture-OroSecurityTestBundle:web-catalog.yml
 Feature: Commerce admin area MUST NOT contain XSS vulnerabilities on all accessible pages
 
   Scenario: Create admin session
