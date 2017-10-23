@@ -128,7 +128,7 @@ define(function(require) {
          * @inheritDoc
          */
         listen: {
-            'backgrid:metadata-loaded mediator': 'updateFilters'
+            'datagrid:metadata-loaded mediator': 'updateFilters'
         },
 
         /**
