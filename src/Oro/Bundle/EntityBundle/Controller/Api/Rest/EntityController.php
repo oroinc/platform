@@ -15,7 +15,6 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 
@@ -93,32 +92,6 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;
             $result     = array('message' => $ex->getMessage());
-        }
-
-        return $this->handleView($this->view($result, $statusCode));
-    }
-
-    /**
-     * Returns structure of entities with fields
-     *
-     * @ApiDoc(
-     *      description="Returns structure of entities with fields",
-     *      resource=true
-     * )
-     *
-     * @return Response
-     */
-    public function cgetStructureAction()
-    {
-        /** @var EntityStructureDataProvider $provider */
-        $provider = $this->get('oro_entity.provider.structure_data');
-
-        $statusCode = Codes::HTTP_OK;
-        try {
-            $result = $provider->getData();
-        } catch (\Exception $ex) {
-            $statusCode = Codes::HTTP_NOT_FOUND;
-            $result = array('message' => $ex->getMessage());
         }
 
         return $this->handleView($this->view($result, $statusCode));

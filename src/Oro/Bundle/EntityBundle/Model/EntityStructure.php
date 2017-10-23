@@ -6,6 +6,13 @@ use Oro\Bundle\EntityBundle\Exception\OptionNotFoundException;
 
 class EntityStructure
 {
+    /**
+     * This field required for JSON API
+     *
+     * @var string
+     */
+    protected $id;
+
     /** @var string */
     protected $label;
 
@@ -32,6 +39,14 @@ class EntityStructure
 
     /** @var array */
     protected $routes = [];
+
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
     /**
      * @return string
@@ -89,6 +104,8 @@ class EntityStructure
     public function setClassName($className)
     {
         $this->className = $className;
+        /** build id from class name */
+        $this->id = str_replace('\\', '_', $className);
 
         return $this;
     }
@@ -124,7 +141,7 @@ class EntityStructure
      */
     public function addField(EntityFieldStructure $field)
     {
-        $this->fields[$field->getName()] = $field;
+        $this->fields[] = $field;
 
         return $this;
     }

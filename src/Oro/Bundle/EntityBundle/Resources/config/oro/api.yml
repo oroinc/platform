@@ -1,7 +1,67 @@
 api:
+    entity_aliases:
+        Oro\Bundle\EntityBundle\Model\EntityStructure:
+            alias:        entitystructure
+            plural_alias: entitystructures
+
+        Oro\Bundle\EntityBundle\Model\EntityFieldStructure:
+            alias:        entityfieldstructure
+            plural_alias: entityfieldstructures
+
     entities:
         Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue:
             documentation_resource: '@OroEntityBundle/Resources/doc/api/entity_field_fallback_value.md'
             actions:
                 delete_list: false
                 delete: false
+
+        Oro\Bundle\EntityBundle\Model\EntityStructure:
+            documentation_resource:  '@OroEntityBundle/Resources/doc/api/entity_structure.md'
+            disable_meta_properties: true
+            identifier_field_names: [id]
+            fields:
+                id:
+                    data_type: string
+                label:
+                    data_type: string
+                pluralLabel:
+                    data_type: string
+                alias:
+                    data_type: string
+                pluralAlias:
+                    data_type: string
+                className:
+                    data_type: string
+                icon:
+                    data_type: string
+                fields:
+                    data_type: array
+                    target_class: Oro\Bundle\EntityBundle\Model\EntityFieldStructure
+                    target_type: collection
+                    fields:
+                        label:
+                            data_type: string
+                        name:
+                            data_type: string
+                        type:
+                            data_type: string
+                        relationType:
+                            data_type: string
+                        relatedEntityName:
+                            data_type: string
+                        options:
+                            data_type: array
+                options:
+                    data_type: array
+                routes:
+                    data_type: array
+            actions:
+                get_list:
+                    page_size: -1 # disable paging
+                    disable_sorting: true
+                create: false
+                update: false
+                delete: false
+                delete_list: false
+                get_subresource: false
+                get_relationship: false
