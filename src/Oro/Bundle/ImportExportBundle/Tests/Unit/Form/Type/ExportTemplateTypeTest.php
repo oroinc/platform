@@ -50,7 +50,7 @@ class ExportTemplateTypeTest extends FormIntegrationTestCase
         $form = $this->factory->create($this->exportTemplateType, null, ['entityName' => $entityName]);
 
         $processorAliasConfig = $form->get('processorAlias')->getConfig();
-        $this->assertEquals('oro.importexport.export.processor', $processorAliasConfig->getOption('label'));
+        $this->assertEquals('oro.importexport.export.popup.options.label', $processorAliasConfig->getOption('label'));
 
         $this->assertEquals(
             $expectedChoices,

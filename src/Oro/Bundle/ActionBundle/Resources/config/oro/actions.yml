@@ -11,7 +11,7 @@ operations:
                     - '@blank': $.requestRoute # for operation execute route
                     - '@and':
                         - '@not_blank': $.routes[name]
-                        - '@eq':
+                        - '@eq': # $.routes[name] - index route, display CRUD operations in grid only for index route
                             - $.routes[name]
                             - $.requestRoute
         preactions:

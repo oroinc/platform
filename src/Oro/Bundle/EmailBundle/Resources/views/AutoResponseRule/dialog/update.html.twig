@@ -1,23 +1,23 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
 
-<div class="widget-content">
-    {% if saved %}
-        <script type="text/javascript">
-            require(['oroui/js/widget-manager', 'oroui/js/mediator'],
-            function(widgetManager, mediator) {
-                widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
-                    mediator.trigger('auto_response_rule:save', {{ form.vars.value.id }});
-                    mediator.trigger('widget_success:' + widget.getWid());
-                    mediator.trigger('widget_success:' + widget.getAlias());
-                    widget.remove();
-                });
-            });
-        </script>
-    {% else %}
+{% if saved %}
+    {% set widgetResponse = {
+        widget: {
+            triggerSuccess: true,
+            trigger: [{
+                name: 'auto_response_rule:save',
+                args: [form.vars.value.id],
+            }],
+            remove: true
+        }
+    } %}
+
+    {{ widgetResponse|json_encode|raw }}
+{% else %}
+    <div class="widget-content">
         {% set pageComponent = {
-            'module': 'oroui/js/app/components/view-component',
-            'options': {'view': 'oroemail/js/app/views/email-template-editor-view'},
+            'view': 'oroemail/js/app/views/email-template-editor-view',
             'layout': 'separate'
         } %}
         <div class="form-container" {{ UI.renderPageComponentAttributes(pageComponent) }}>
@@ -33,7 +33,14 @@
                     )
                 }
             ) }}
-                <fieldset class="form form-horizontal">
+                {% set autoResponseRuleComponent = {
+                    'module': 'oroemail/js/app/components/auto-response-rule-component',
+                    'options': {
+                        data: data,
+                        metadata: metadata
+                    }
+                } %}
+                <fieldset class="form form-horizontal" {{ UI.renderPageComponentAttributes(autoResponseRuleComponent) }}>
                     <div>
                         {{ form_row(form.active) }}
                         {{ form_row(form.name) }}
@@ -60,15 +67,5 @@
             {{ form_end(form) }}
             {{ oro_form_js_validation(form) }}
         </div>
-        <script>
-            require([
-                'oroemail/js/app/components/auto-response-rule-component',
-            ], function(AutoResponseRuleComponent) {
-                new AutoResponseRuleComponent({{ {
-                    data: data,
-                    metadata: metadata,
-                }|json_encode|raw }});
-            });
-        </script>
-    {% endif %}
-</div>
+    </div>
+{% endif %}

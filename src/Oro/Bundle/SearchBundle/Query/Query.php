@@ -24,6 +24,7 @@ class Query
     const KEYWORD_OR          = 'or';
     const KEYWORD_OFFSET      = 'offset';
     const KEYWORD_MAX_RESULTS = 'max_results';
+    const KEYWORD_AGGREGATE   = 'aggregate';
     const KEYWORD_ORDER_BY    = 'order_by';
     const KEYWORD_AS          = 'as';
 
@@ -51,6 +52,12 @@ class Query
     const INFINITY = 10000000;
     const FINITY   = 0.000001;
 
+    const AGGREGATE_FUNCTION_COUNT = 'count';
+    const AGGREGATE_FUNCTION_SUM   = 'sum';
+    const AGGREGATE_FUNCTION_MAX   = 'max';
+    const AGGREGATE_FUNCTION_MIN   = 'min';
+    const AGGREGATE_FUNCTION_AVG   = 'avg';
+
     const DELIMITER = ' ';
 
     /** @var array */
@@ -71,8 +78,9 @@ class Query
     /** @var Criteria */
     protected $criteria;
 
-    /**
-     */
+    /** @var array */
+    protected $aggregations = [];
+
     public function __construct()
     {
         $this->maxResults = 0;
@@ -600,6 +608,27 @@ class Query
         return $result;
     }
 
+    /**
+     * @param string $name
+     * @param string $field
+     * @param string $function
+     *
+     * @return $this
+     */
+    public function addAggregate($name, $field, $function)
+    {
+        $this->aggregations[$name] = ['field' => $field, 'function' => $function];
+
+        return $this;
+    }
+
+    /**
+     * @return array ['<name>' => ['field' => <field>, 'function' => '<function>']]
+     */
+    public function getAggregations()
+    {
+        return $this->aggregations;
+    }
 
     /**
      * @param      $fieldName
