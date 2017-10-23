@@ -93,6 +93,7 @@ define(function(require) {
 
         dispose: function() {
             this.callbackListener.dispose();
+            delete this.callbackListener;
 
             MultipleEntityComponent.__super__.dispose.apply(this, arguments);
         }

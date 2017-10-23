@@ -23,6 +23,8 @@
     <div {{ UI.renderPageComponentAttributes({
         view: {
             view: 'orointegration/js/channel-view',
+        },
+        options: {
             formSelector: '#' ~ formSelector|default(form.vars.id),
             typeSelector: '#' ~ form.type.vars.id,
             transportTypeSelector: '#' ~ form.transportType.vars.id,

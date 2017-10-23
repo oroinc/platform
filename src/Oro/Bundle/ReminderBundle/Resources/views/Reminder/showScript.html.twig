@@ -2,8 +2,8 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
-        view: {
-            view: 'ororeminder/js/app/components/reminder-show-component',
+        module: 'ororeminder/js/app/components/reminder-show-component',
+        options: {
             reminderData: oro_reminder_get_requested_reminders_data()
         }
     }) }}></div>

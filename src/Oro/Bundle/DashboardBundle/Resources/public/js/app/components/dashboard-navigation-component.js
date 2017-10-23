@@ -9,6 +9,12 @@ define(function(require) {
     DashboardNavigationComponent = BaseComponent.extend({
         optionNames: BaseComponent.prototype.optionNames.concat(['gridName']),
 
+        listen: function() {
+            var listenTo = {};
+            listenTo['datagrid:beforeRemoveRow:' + this.gridName + ' mediator'] = 'onBeforeRemoveRow';
+            return listenTo;
+        },
+
         initialize: function() {
             DashboardNavigationComponent.__super__.initialize.apply(this, arguments);
 
