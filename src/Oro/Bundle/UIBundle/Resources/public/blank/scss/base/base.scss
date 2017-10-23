@@ -64,6 +64,26 @@
 }
 
 @include breakpoint('print') {
+    thead {
+        display: table-header-group;
+    }
+
+    tr,
+    img {
+        page-break-inside: avoid;
+    }
+
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+
+    tr {
+        page-break-inside: avoid
+    }
+
     img {
         max-width: 100% !important;
         page-break-inside: avoid
