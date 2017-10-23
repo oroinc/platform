@@ -55,21 +55,27 @@ class ValueNormalizer
      * @param string      $dataType       The data-type.
      * @param RequestType $requestType    The request type, for example "rest", "soap", etc.
      * @param bool        $isArrayAllowed Whether a value can be an array.
+     * @param bool        $isRangeAllowed Whether a value can be a pair of "from" and "to" values.
      *
      * @return mixed
      */
-    public function normalizeValue($value, $dataType, RequestType $requestType, $isArrayAllowed = false)
-    {
+    public function normalizeValue(
+        $value,
+        $dataType,
+        RequestType $requestType,
+        $isArrayAllowed = false,
+        $isRangeAllowed = false
+    ) {
         if (!isset($this->cachedData[$dataType])) {
-            return $this->getNormalizedValue($dataType, $requestType, $value, $isArrayAllowed);
+            return $this->getNormalizedValue($dataType, $requestType, $value, $isArrayAllowed, $isRangeAllowed);
         }
 
-        $cacheKey = (string)$value  . '|' . (string)$requestType . '|' . ($isArrayAllowed ? '+' : '-');
+        $cacheKey = (string)$value . '|' . $this->buildCacheKey($requestType, $isArrayAllowed, $isRangeAllowed);
         if (array_key_exists($cacheKey, $this->cachedData[$dataType])) {
             return $this->cachedData[$dataType][$cacheKey];
         }
 
-        $result = $this->getNormalizedValue($dataType, $requestType, $value, $isArrayAllowed);
+        $result = $this->getNormalizedValue($dataType, $requestType, $value, $isArrayAllowed, $isRangeAllowed);
 
         $this->cachedData[$dataType][$cacheKey] = $result;
 
@@ -82,14 +88,19 @@ class ValueNormalizer
      * @param string      $dataType       The data-type.
      * @param RequestType $requestType    The request type, for example "rest", "soap", etc.
      * @param bool        $isArrayAllowed Whether a value can be an array.
+     * @param bool        $isRangeAllowed Whether a value can be a pair of "from" and "to" values.
      *
      * @return string
      */
-    public function getRequirement($dataType, RequestType $requestType, $isArrayAllowed = false)
-    {
-        $requirementKey = $dataType . '|' . (string)$requestType . ($isArrayAllowed ? '|arr' : '');
+    public function getRequirement(
+        $dataType,
+        RequestType $requestType,
+        $isArrayAllowed = false,
+        $isRangeAllowed = false
+    ) {
+        $requirementKey = $dataType . '|' . $this->buildCacheKey($requestType, $isArrayAllowed, $isRangeAllowed);
         if (!array_key_exists($requirementKey, $this->requirements)) {
-            $context = $this->doNormalization($dataType, $requestType, null, $isArrayAllowed);
+            $context = $this->doNormalization($dataType, $requestType, null, $isArrayAllowed, $isRangeAllowed);
 
             $this->requirements[$requirementKey] = $context->getRequirement() ?: self::DEFAULT_REQUIREMENT;
         }
@@ -100,20 +111,27 @@ class ValueNormalizer
     /**
      * @param string      $dataType
      * @param RequestType $requestType
-     * @param mixed|null  $value
+     * @param mixed       $value
      * @param bool        $isArrayAllowed
+     * @param bool        $isRangeAllowed
      *
      * @return NormalizeValueContext
      * @throws \Exception
      */
-    protected function doNormalization($dataType, RequestType $requestType, $value = null, $isArrayAllowed = false)
-    {
+    protected function doNormalization(
+        $dataType,
+        RequestType $requestType,
+        $value,
+        $isArrayAllowed,
+        $isRangeAllowed
+    ) {
         /** @var NormalizeValueContext $context */
         $context = $this->processor->createContext();
         $context->getRequestType()->set($requestType);
         $context->setDataType($dataType);
         $context->setResult($value);
         $context->setArrayAllowed($isArrayAllowed);
+        $context->setRangeAllowed($isRangeAllowed);
         try {
             $this->processor->process($context);
         } catch (\Exception $e) {
@@ -128,11 +146,38 @@ class ValueNormalizer
      * @param RequestType $requestType
      * @param mixed       $value
      * @param bool        $isArrayAllowed
+     * @param bool        $isRangeAllowed
      *
      * @return mixed
      */
-    protected function getNormalizedValue($dataType, RequestType $requestType, $value, $isArrayAllowed)
+    protected function getNormalizedValue(
+        $dataType,
+        RequestType $requestType,
+        $value,
+        $isArrayAllowed,
+        $isRangeAllowed
+    ) {
+        return $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed, $isRangeAllowed)
+            ->getResult();
+    }
+
+    /**
+     * @param RequestType $requestType
+     * @param bool        $isArrayAllowed
+     * @param bool        $isRangeAllowed
+     *
+     * @return string
+     */
+    protected function buildCacheKey(RequestType $requestType, $isArrayAllowed, $isRangeAllowed)
     {
-        return $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed)->getResult();
+        $result = (string)$requestType;
+        if ($isArrayAllowed) {
+            $result .= '|[]';
+        }
+        if ($isRangeAllowed) {
+            $result .= '|..';
+        }
+
+        return $result;
     }
 }

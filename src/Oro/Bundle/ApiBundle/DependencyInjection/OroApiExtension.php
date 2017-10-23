@@ -209,6 +209,29 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $testEntityAliasProviderDef->setPublic(false);
         $testEntityAliasProviderDef->addTag('oro_entity.alias_provider');
         $container->setDefinition('oro_api.tests.entity_alias_provider', $testEntityAliasProviderDef);
+
+        // oro_api.config_bag
+        $configBagDef = $container->getDefinition(self::CONFIG_BAG_SERVICE_ID);
+        $configBagDef->setClass('Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigBag');
+        $configBagDef->addMethodCall(
+            'setExtensionRegistry',
+            [new Reference(self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID)]
+        );
+
+        // oro_api.tests.config_registry
+        $container->setDefinition(
+            'oro_api.tests.config_registry',
+            new Definition(
+                'Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry',
+                [
+                    new Reference(self::CONFIG_BAG_SERVICE_ID),
+                    new Reference('oro_api.config_provider'),
+                    new Reference('oro_api.relation_config_provider'),
+                    new Reference('oro_api.metadata_provider'),
+                    new Reference('oro_api.resources_cache')
+                ]
+            )
+        );
     }
 
     /**

@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Criteria;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
+use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue as Processor;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValueProcessor;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -124,6 +125,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
         foreach ($processorMap as $val) {
             if ($val[1] instanceof StandaloneFilter) {
                 $val[1]->setArrayAllowed(true);
+                $val[1]->setRangeAllowed(true);
             }
         }
         $processorFactory->expects($this->any())
@@ -269,6 +271,216 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getRangeRequirementProvider
+     */
+    public function testGetRangeRequirement($expectedValue, $dataType, $requestType)
+    {
+        $result = $this->valueNormalizer->getRequirement($dataType, new RequestType($requestType), false, true);
+        $this->assertSame($expectedValue, $result);
+    }
+
+    public function getRangeRequirementProvider()
+    {
+        return [
+            [
+                ValueNormalizer::DEFAULT_REQUIREMENT,
+                'unknownType',
+                [RequestType::REST]
+            ],
+            [
+                ValueNormalizer::DEFAULT_REQUIREMENT,
+                DataType::STRING,
+                [RequestType::REST]
+            ],
+            [
+                $this->getRangeRequirement(Processor\NormalizeInteger::REQUIREMENT),
+                DataType::INTEGER,
+                [RequestType::REST]
+            ],
+            [
+                $this->getRangeRequirement(Processor\NormalizeInteger::REQUIREMENT),
+                DataType::SMALLINT,
+                [RequestType::REST]
+            ],
+            [
+                $this->getRangeRequirement(Processor\NormalizeBigint::REQUIREMENT),
+                DataType::BIGINT,
+                [RequestType::REST]
+            ],
+            [
+                $this->getRangeRequirement(Processor\NormalizeUnsignedInteger::REQUIREMENT),
+                DataType::UNSIGNED_INTEGER,
+                [RequestType::REST]
+            ],
+            [
+                $this->getRangeRequirement(Processor\NormalizeInteger::REQUIREMENT),
+                DataType::DURATION,
+                [RequestType::REST]
+            ],
+            [
+                $this->getRangeRequirement(Processor\NormalizeBoolean::REQUIREMENT),
+                DataType::BOOLEAN,
+                [RequestType::REST]
+            ],
+            [
+                $this->getRangeRequirement(Processor\NormalizeDecimal::REQUIREMENT),
+                DataType::DECIMAL,
+                [RequestType::REST]
+            ],
+            [
+                $this->getRangeRequirement(Processor\NormalizeDecimal::REQUIREMENT),
+                DataType::MONEY,
+                [RequestType::REST]
+            ],
+            [
+                $this->getRangeRequirement(Processor\NormalizeNumber::REQUIREMENT),
+                DataType::FLOAT,
+                [RequestType::REST]
+            ],
+            [
+                $this->getRangeRequirement(Processor\NormalizeNumber::REQUIREMENT),
+                DataType::PERCENT,
+                [RequestType::REST]
+            ],
+            [
+                $this->getRangeRequirement(Processor\Rest\NormalizeDateTime::REQUIREMENT),
+                DataType::DATETIME,
+                [RequestType::REST]
+            ],
+            [
+                $this->getRangeRequirement(Processor\Rest\NormalizeDate::REQUIREMENT),
+                DataType::DATE,
+                [RequestType::REST]
+            ],
+            [
+                $this->getRangeRequirement(Processor\Rest\NormalizeTime::REQUIREMENT),
+                DataType::TIME,
+                [RequestType::REST]
+            ],
+            [
+                ValueNormalizer::DEFAULT_REQUIREMENT,
+                DataType::GUID,
+                [RequestType::REST]
+            ],
+            [
+                Processor\Rest\NormalizeOrderBy::REQUIREMENT,
+                DataType::ORDER_BY,
+                [RequestType::REST]
+            ],
+        ];
+    }
+
+    protected function getRangeRequirement($requirement)
+    {
+        return sprintf('%1$s|%1$s..%1$s', $requirement);
+    }
+
+    /**
+     * @dataProvider getArrayRangeRequirementProvider
+     */
+    public function testGetArrayRangeRequirement($expectedValue, $dataType, $requestType)
+    {
+        $result = $this->valueNormalizer->getRequirement($dataType, new RequestType($requestType), true, true);
+        $this->assertSame($expectedValue, $result);
+    }
+
+    public function getArrayRangeRequirementProvider()
+    {
+        return [
+            [
+                ValueNormalizer::DEFAULT_REQUIREMENT,
+                'unknownType',
+                [RequestType::REST]
+            ],
+            [
+                ValueNormalizer::DEFAULT_REQUIREMENT,
+                DataType::STRING,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRangeRequirement(Processor\NormalizeInteger::REQUIREMENT),
+                DataType::INTEGER,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRangeRequirement(Processor\NormalizeInteger::REQUIREMENT),
+                DataType::SMALLINT,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRangeRequirement(Processor\NormalizeBigint::REQUIREMENT),
+                DataType::BIGINT,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRangeRequirement(Processor\NormalizeUnsignedInteger::REQUIREMENT),
+                DataType::UNSIGNED_INTEGER,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRangeRequirement(Processor\NormalizeInteger::REQUIREMENT),
+                DataType::DURATION,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRangeRequirement(Processor\NormalizeBoolean::REQUIREMENT),
+                DataType::BOOLEAN,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRangeRequirement(Processor\NormalizeDecimal::REQUIREMENT),
+                DataType::DECIMAL,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRangeRequirement(Processor\NormalizeDecimal::REQUIREMENT),
+                DataType::MONEY,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRangeRequirement(Processor\NormalizeNumber::REQUIREMENT),
+                DataType::FLOAT,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRangeRequirement(Processor\NormalizeNumber::REQUIREMENT),
+                DataType::PERCENT,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRangeRequirement(Processor\Rest\NormalizeDateTime::REQUIREMENT),
+                DataType::DATETIME,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRangeRequirement(Processor\Rest\NormalizeDate::REQUIREMENT),
+                DataType::DATE,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRangeRequirement(Processor\Rest\NormalizeTime::REQUIREMENT),
+                DataType::TIME,
+                [RequestType::REST]
+            ],
+            [
+                ValueNormalizer::DEFAULT_REQUIREMENT,
+                DataType::GUID,
+                [RequestType::REST]
+            ],
+            [
+                Processor\Rest\NormalizeOrderBy::REQUIREMENT,
+                DataType::ORDER_BY,
+                [RequestType::REST]
+            ],
+        ];
+    }
+
+    protected function getArrayRangeRequirement($requirement)
+    {
+        return sprintf('%1$s|%2$s..%2$s', $this->getArrayRequirement($requirement), $requirement);
+    }
+
+    /**
      * @dataProvider normalizeValueProvider
      */
     public function testNormalizeValue($expectedValue, $value, $dataType, $requestType, $isArrayAllowed = false)
@@ -279,15 +491,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             new RequestType($requestType),
             $isArrayAllowed
         );
-        if (is_object($expectedValue)) {
-            $this->assertInstanceOf(get_class($expectedValue), $result);
-            $this->assertEquals(get_class($expectedValue), get_class($result));
-            $this->assertEquals($expectedValue, $result);
-        } elseif (is_array($expectedValue)) {
-            $this->assertEquals($expectedValue, $result);
-        } else {
-            $this->assertSame($expectedValue, $result);
-        }
+        self::assertNormalizedValue($expectedValue, $result);
     }
 
     /**
@@ -731,6 +935,145 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider normalizeRangeValueProvider
+     */
+    public function testNormalizeRangeValue($expectedValue, $value, $dataType)
+    {
+        $result = $this->valueNormalizer->normalizeValue(
+            $value,
+            $dataType,
+            new RequestType([RequestType::REST]),
+            true,
+            true
+        );
+        self::assertNormalizedValue($expectedValue, $result);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
+     * @return array
+     */
+    public function normalizeRangeValueProvider()
+    {
+        return [
+            [new Range('test1', 'test2'), new Range('test1', 'test2'), DataType::STRING],
+            [new Range('test1', 'test2'), 'test1..test2', DataType::STRING],
+            [new Range(123, 456), new Range(123, 456), DataType::INTEGER],
+            [new Range(123, 456), '123..456', DataType::INTEGER],
+            [new Range(-456, -123), '-456..-123', DataType::INTEGER],
+            [new Range(123, 456), new Range(123, 456), DataType::SMALLINT],
+            [new Range(123, 456), '123..456', DataType::SMALLINT],
+            [new Range(-456, -123), '-456..-123', DataType::SMALLINT],
+            [new Range(123, 456), new Range(123, 456), DataType::DURATION],
+            [new Range(123, 456), '123..456', DataType::DURATION],
+            [new Range(-456, -123), '-456..-123', DataType::DURATION],
+            [new Range(123, 456), new Range(123, 456), DataType::BIGINT],
+            [
+                new Range('123456789013245', '234567890132456'),
+                '123456789013245..234567890132456',
+                DataType::BIGINT
+            ],
+            [
+                new Range('-234567890132456', '-123456789013245'),
+                '-234567890132456..-123456789013245',
+                DataType::BIGINT
+            ],
+            [new Range(123, 456), new Range(123, 456), DataType::UNSIGNED_INTEGER],
+            [new Range(123, 456), '123..456', DataType::UNSIGNED_INTEGER],
+            [new Range(false, true), new Range(false, true), DataType::BOOLEAN],
+            [new Range(false, true), '0..1', DataType::BOOLEAN],
+            [new Range(false, true), 'false..true', DataType::BOOLEAN],
+            [new Range(false, true), 'no..yes', DataType::BOOLEAN],
+            [new Range(123, 456), new Range(123, 456), DataType::DECIMAL],
+            [new Range('0.123', '0.456'), '0.123..0.456', DataType::DECIMAL],
+            [new Range('0.123', '0.456'), '.123...456', DataType::DECIMAL],
+            [new Range('-0.456', '-0.123'), '-0.456..-0.123', DataType::DECIMAL],
+            [new Range('-0.456', '-0.123'), '-.456..-.123', DataType::DECIMAL],
+            [new Range(123, 456), new Range(123, 456), DataType::MONEY],
+            [new Range('0.123', '0.456'), '0.123..0.456', DataType::MONEY],
+            [new Range('0.123', '0.456'), '.123...456', DataType::MONEY],
+            [new Range('-0.456', '-0.123'), '-0.456..-0.123', DataType::MONEY],
+            [new Range('-0.456', '-0.123'), '-.456..-.123', DataType::MONEY],
+            [new Range(123, 456), new Range(123, 456), DataType::FLOAT],
+            [new Range(0.123, 0.456), '0.123..0.456', DataType::FLOAT],
+            [new Range(0.123, 0.456), '.123...456', DataType::FLOAT],
+            [new Range(-0.456, -0.123), '-0.456..-0.123', DataType::FLOAT],
+            [new Range(-0.456, -0.123), '-.456..-.123', DataType::FLOAT],
+            [new Range(123, 456), new Range(123, 456), DataType::PERCENT],
+            [new Range(0.123, 0.456), '0.123..0.456', DataType::PERCENT],
+            [new Range(0.123, 0.456), '.123...456', DataType::PERCENT],
+            [new Range(-0.456, -0.123), '-0.456..-0.123', DataType::PERCENT],
+            [new Range(-0.456, -0.123), '-.456..-.123', DataType::PERCENT],
+            [
+                new Range(
+                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T15:00:01', new \DateTimeZone('UTC'))
+                ),
+                new Range(
+                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T15:00:01', new \DateTimeZone('UTC'))
+                ),
+                DataType::DATETIME
+            ],
+            [
+                new Range(
+                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T15:00:01', new \DateTimeZone('UTC'))
+                ),
+                '2010-01-28T15:00:00..2010-01-28T15:00:01',
+                DataType::DATETIME
+            ],
+            [
+                new Range(
+                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-29T00:00:00', new \DateTimeZone('UTC'))
+                ),
+                '2010-01-28..2010-01-29',
+                DataType::DATETIME
+            ],
+            [
+                new Range(
+                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T15:00:01', new \DateTimeZone('UTC'))
+                ),
+                new Range(
+                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T15:00:01', new \DateTimeZone('UTC'))
+                ),
+                DataType::DATE
+            ],
+            [
+                new Range(
+                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-29T00:00:00', new \DateTimeZone('UTC'))
+                ),
+                '2010-01-28..2010-01-29',
+                DataType::DATE
+            ],
+            [
+                new Range(
+                    new \DateTime('1970-01-01T00:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('1970-01-01T00:00:01', new \DateTimeZone('UTC'))
+                ),
+                new Range(
+                    new \DateTime('1970-01-01T00:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('1970-01-01T00:00:01', new \DateTimeZone('UTC'))
+                ),
+                DataType::TIME
+            ],
+            [
+                new Range(
+                    new \DateTime('1970-01-01T00:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('1970-01-01T00:00:01', new \DateTimeZone('UTC'))
+                ),
+                '00:00:00..00:00:01',
+                DataType::TIME
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider normalizeInvalidValueProvider
      */
     public function testNormalizeInvalidValue($expectedExceptionMessage, $value, $dataType, $requestType)
@@ -1034,6 +1377,273 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider normalizeInvalidRangeValueProvider
+     */
+    public function testNormalizeInvalidRangeValue($expectedExceptionMessage, $value, $dataType, $requestType)
+    {
+        $this->expectException('\UnexpectedValueException');
+        $this->expectExceptionMessage($expectedExceptionMessage);
+        $this->valueNormalizer->normalizeValue($value, $dataType, new RequestType($requestType), true, true);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
+     * @return array
+     */
+    public function normalizeInvalidRangeValueProvider()
+    {
+        return [
+            [
+                'Expected integer value. Given "1a"',
+                '1a',
+                DataType::INTEGER,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of integers (integer..integer). Given "1a..2".',
+                '1a..2',
+                DataType::INTEGER,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of integers (integer..integer). Given "1..2a".',
+                '1..2a',
+                DataType::INTEGER,
+                [RequestType::REST]
+            ],
+            [
+                'Expected integer value. Given "1a"',
+                '1a',
+                DataType::SMALLINT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of integers (integer..integer). Given "1a..2".',
+                '1a..2',
+                DataType::SMALLINT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of integers (integer..integer). Given "1..2a".',
+                '1..2a',
+                DataType::SMALLINT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected big integer value. Given "1a"',
+                '1a',
+                DataType::BIGINT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of big integers (big integer..big integer). Given "1a..2".',
+                '1a..2',
+                DataType::BIGINT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of big integers (big integer..big integer). Given "1..2a".',
+                '1..2a',
+                DataType::BIGINT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected unsigned integer value. Given "1a"',
+                '1a',
+                DataType::UNSIGNED_INTEGER,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of unsigned integers (unsigned integer..unsigned integer). Given "1a..2".',
+                '1a..2',
+                DataType::UNSIGNED_INTEGER,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of unsigned integers (unsigned integer..unsigned integer). Given "1..2a".',
+                '1..2a',
+                DataType::UNSIGNED_INTEGER,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of unsigned integers (unsigned integer..unsigned integer). Given "-1..2".',
+                '-1..2',
+                DataType::UNSIGNED_INTEGER,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of unsigned integers (unsigned integer..unsigned integer). Given "1..-2".',
+                '1..-2',
+                DataType::UNSIGNED_INTEGER,
+                [RequestType::REST]
+            ],
+            [
+                'Expected integer value. Given "1a"',
+                '1a',
+                DataType::DURATION,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of integers (integer..integer). Given "1a..2".',
+                '1a..2',
+                DataType::DURATION,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of integers (integer..integer). Given "1..2a".',
+                '1..2a',
+                DataType::DURATION,
+                [RequestType::REST]
+            ],
+            [
+                'Expected boolean value. Given "test"',
+                'test',
+                DataType::BOOLEAN,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of booleans (boolean..boolean). Given "false..test".',
+                'false..test',
+                DataType::BOOLEAN,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of booleans (boolean..boolean). Given "test..true".',
+                'test..true',
+                DataType::BOOLEAN,
+                [RequestType::REST]
+            ],
+            [
+                'Expected decimal value. Given "test"',
+                'test',
+                DataType::DECIMAL,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of decimals (decimal..decimal). Given "test..1.1".',
+                'test..1.1',
+                DataType::DECIMAL,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of decimals (decimal..decimal). Given "1.1..test".',
+                '1.1..test',
+                DataType::DECIMAL,
+                [RequestType::REST]
+            ],
+            [
+                'Expected decimal value. Given "test"',
+                'test',
+                DataType::MONEY,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of decimals (decimal..decimal). Given "test..1.1".',
+                'test..1.1',
+                DataType::MONEY,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of decimals (decimal..decimal). Given "1.1..test".',
+                '1.1..test',
+                DataType::MONEY,
+                [RequestType::REST]
+            ],
+            [
+                'Expected number value. Given "test"',
+                'test',
+                DataType::FLOAT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of numbers (number..number). Given "test..1.1".',
+                'test..1.1',
+                DataType::FLOAT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of numbers (number..number). Given "1.1..test".',
+                '1.1..test',
+                DataType::FLOAT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected number value. Given "test"',
+                'test',
+                DataType::PERCENT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of numbers (number..number). Given "test..0.1".',
+                'test..0.1',
+                DataType::PERCENT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of numbers (number..number). Given "0.1..test".',
+                '0.1..test',
+                DataType::PERCENT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected datetime value. Given "test"',
+                'test',
+                DataType::DATETIME,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of datetimes (datetime..datetime). Given "test..2010-01-28T15:00:00".',
+                'test..2010-01-28T15:00:00',
+                DataType::DATETIME,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of datetimes (datetime..datetime). Given "2010-01-28T15:00:00..test".',
+                '2010-01-28T15:00:00..test',
+                DataType::DATETIME,
+                [RequestType::REST]
+            ],
+            [
+                'Expected date value. Given "test"',
+                'test',
+                DataType::DATE,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of dates (date..date). Given "test..2010-01-28".',
+                'test..2010-01-28',
+                DataType::DATE,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of dates (date..date). Given "2010-01-28..test".',
+                '2010-01-28..test',
+                DataType::DATE,
+                [RequestType::REST]
+            ],
+            [
+                'Expected time value. Given "test"',
+                'test',
+                DataType::TIME,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of times (time..time). Given "test..15:00:00".',
+                'test..15:00:00',
+                DataType::TIME,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of times (time..time). Given "15:00:00..test".',
+                '15:00:00..test',
+                DataType::TIME,
+                [RequestType::REST]
+            ],
+        ];
+    }
+
+    /**
      * @param ProcessorBag         $processorBag
      * @param string               $processorId
      * @param string|null          $dataType
@@ -1053,5 +1663,28 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
         $processorBag->addProcessor($processorId, $attributes, 'normalize_value', null, -10);
 
         return $processorId;
+    }
+
+    /**
+     * @param mixed  $expected
+     * @param mixed  $actual
+     * @param string $message
+     */
+    private static function assertNormalizedValue($expected, $actual, $message = '')
+    {
+        if (is_object($expected)) {
+            self::assertInstanceOf(get_class($expected), $actual, $message);
+            self::assertEquals(get_class($expected), get_class($actual), $message);
+            if ($expected instanceof Range) {
+                self::assertNormalizedValue($expected->getFromValue(), $actual->getFromValue(), 'Range.fromValue');
+                self::assertNormalizedValue($expected->getToValue(), $actual->getToValue(), 'Range.toValue');
+            } else {
+                self::assertEquals($expected, $actual, $message);
+            }
+        } elseif (is_array($expected)) {
+            self::assertEquals($expected, $actual, $message);
+        } else {
+            self::assertSame($expected, $actual, $message);
+        }
     }
 }

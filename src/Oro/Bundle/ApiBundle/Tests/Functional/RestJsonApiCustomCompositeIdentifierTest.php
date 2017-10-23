@@ -484,6 +484,39 @@ class RestJsonApiCustomCompositeIdentifierTest extends RestJsonApiTestCase
         );
     }
 
+    public function testExcludeDatabasePrimaryKey()
+    {
+        $this->appendEntityConfig(
+            TestEntity::class,
+            [
+                'fields' => [
+                    'databaseId' => [
+                        'exclude' => true
+                    ]
+                ]
+            ]
+        );
+
+        $entityType = $this->getEntityType(TestEntity::class);
+
+        $response = $this->get(['entity' => $entityType, 'id' => $this->getEntityId('item 3', 3)]);
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type'       => $entityType,
+                    'id'         => $this->getEntityId('item 3', 3),
+                    'attributes' => [
+                        'name' => 'Item 3'
+                    ],
+                ],
+            ],
+            $response
+        );
+        $content = self::jsonToArray($response->getContent());
+        self::assertFalse(isset($content['data']['attributes']['databaseId']));
+    }
+
     public function testGetWithTitles()
     {
         $entityType = $this->getEntityType(TestEntity::class);

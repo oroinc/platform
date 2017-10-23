@@ -18,8 +18,14 @@ class NormalizeValueContext extends ApiContext
     /** determines if a value can be an array */
     const ARRAY_ALLOWED = 'arrayAllowed';
 
+    /** determines if a value can be a pair of "from" and "to" values */
+    const RANGE_ALLOWED = 'rangeAllowed';
+
     /** @var string */
     private $arrayDelimiter;
+
+    /** @var string */
+    private $rangeDelimiter;
 
     /** @var bool */
     private $processed = false;
@@ -31,6 +37,7 @@ class NormalizeValueContext extends ApiContext
     {
         parent::initialize();
         $this->arrayDelimiter = ',';
+        $this->rangeDelimiter = '..';
     }
 
     /**
@@ -132,6 +139,26 @@ class NormalizeValueContext extends ApiContext
     }
 
     /**
+     * Gets a flag determines if a value can be a pair of "from" and "to" values.
+     *
+     * @return bool|null
+     */
+    public function isRangeAllowed()
+    {
+        return $this->get(self::RANGE_ALLOWED);
+    }
+
+    /**
+     * Sets a flag determines if a value can be a pair of "from" and "to" values.
+     *
+     * @param bool|null $flag
+     */
+    public function setRangeAllowed($flag)
+    {
+        $this->set(self::RANGE_ALLOWED, $flag);
+    }
+
+    /**
      * Gets a delimiter that should be used to split a string to separate elements.
      *
      * @return string
@@ -149,5 +176,25 @@ class NormalizeValueContext extends ApiContext
     public function setArrayDelimiter($delimiter)
     {
         $this->arrayDelimiter = $delimiter;
+    }
+
+    /**
+     * Gets a delimiter that should be used to split a string to a pair of "from" and "to" values.
+     *
+     * @return string
+     */
+    public function getRangeDelimiter()
+    {
+        return $this->rangeDelimiter;
+    }
+
+    /**
+     * Sets a delimiter that should be used to split a string to a pair of "from" and "to" values.
+     *
+     * @param string $delimiter
+     */
+    public function setRangeDelimiter($delimiter)
+    {
+        $this->rangeDelimiter = $delimiter;
     }
 }

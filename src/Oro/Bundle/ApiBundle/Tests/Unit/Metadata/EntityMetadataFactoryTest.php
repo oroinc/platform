@@ -7,12 +7,11 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 
 class EntityMetadataFactoryTest extends OrmRelatedTestCase
 {
-    const ENTITY_NAMESPACE = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\\';
-
     /** @var EntityMetadataFactory */
     protected $metadataFactory;
 
@@ -26,13 +25,13 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
     public function testCreateEntityMetadata()
     {
         $expectedMetadata = new EntityMetadata();
-        $expectedMetadata->setClassName(self::ENTITY_NAMESPACE . 'Product');
+        $expectedMetadata->setClassName(Entity\Product::class);
         $expectedMetadata->setIdentifierFieldNames(['id']);
         $expectedMetadata->setHasIdentifierGenerator(true);
         $expectedMetadata->setInheritedType(false);
 
         $metadata = $this->metadataFactory->createEntityMetadata(
-            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'Product')
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class)
         );
 
         $this->assertEquals($expectedMetadata, $metadata);
@@ -41,13 +40,13 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
     public function testCreateEntityMetadataForEntityWithCompositeIdentifier()
     {
         $expectedMetadata = new EntityMetadata();
-        $expectedMetadata->setClassName(self::ENTITY_NAMESPACE . 'CompositeKeyEntity');
+        $expectedMetadata->setClassName(Entity\CompositeKeyEntity::class);
         $expectedMetadata->setIdentifierFieldNames(['id', 'title']);
         $expectedMetadata->setHasIdentifierGenerator(false);
         $expectedMetadata->setInheritedType(false);
 
         $metadata = $this->metadataFactory->createEntityMetadata(
-            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'CompositeKeyEntity')
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\CompositeKeyEntity::class)
         );
 
         $this->assertEquals($expectedMetadata, $metadata);
@@ -60,8 +59,22 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $expectedMetadata->setDataType('string');
 
         $metadata = $this->metadataFactory->createMetaPropertyMetadata(
-            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'Product'),
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class),
             'name'
+        );
+
+        $this->assertEquals($expectedMetadata, $metadata);
+    }
+
+    public function testCreateMetaPropertyMetadataByPropertyPath()
+    {
+        $expectedMetadata = new MetaPropertyMetadata();
+        $expectedMetadata->setName('id');
+        $expectedMetadata->setDataType('integer');
+
+        $metadata = $this->metadataFactory->createMetaPropertyMetadata(
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class),
+            'owner.id'
         );
 
         $this->assertEquals($expectedMetadata, $metadata);
@@ -74,7 +87,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $expectedMetadata->setDataType('integer');
 
         $metadata = $this->metadataFactory->createMetaPropertyMetadata(
-            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'Product'),
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class),
             'name',
             'integer'
         );
@@ -88,7 +101,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $expectedMetadata->setName('unmanageableField');
 
         $metadata = $this->metadataFactory->createMetaPropertyMetadata(
-            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'Product'),
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class),
             'unmanageableField'
         );
 
@@ -103,7 +116,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $expectedMetadata->setIsNullable(false);
 
         $metadata = $this->metadataFactory->createFieldMetadata(
-            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'Product'),
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class),
             'id'
         );
 
@@ -119,8 +132,24 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $expectedMetadata->setMaxLength(50);
 
         $metadata = $this->metadataFactory->createFieldMetadata(
-            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'Product'),
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class),
             'name'
+        );
+
+        $this->assertEquals($expectedMetadata, $metadata);
+    }
+
+    public function testCreateFieldMetadataByPropertyPath()
+    {
+        $expectedMetadata = new FieldMetadata();
+        $expectedMetadata->setName('label');
+        $expectedMetadata->setDataType('string');
+        $expectedMetadata->setIsNullable(false);
+        $expectedMetadata->setMaxLength(255);
+
+        $metadata = $this->metadataFactory->createFieldMetadata(
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class),
+            'category.label'
         );
 
         $this->assertEquals($expectedMetadata, $metadata);
@@ -135,7 +164,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $expectedMetadata->setMaxLength(50);
 
         $metadata = $this->metadataFactory->createFieldMetadata(
-            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'Product'),
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class),
             'name',
             'integer'
         );
@@ -151,7 +180,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $expectedMetadata->setIsNullable(true);
 
         $metadata = $this->metadataFactory->createFieldMetadata(
-            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'Product'),
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class),
             'updatedAt'
         );
 
@@ -166,12 +195,31 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $expectedMetadata->setIsNullable(true);
         $expectedMetadata->setAssociationType('manyToOne');
         $expectedMetadata->setIsCollection(false);
-        $expectedMetadata->setTargetClassName(self::ENTITY_NAMESPACE . 'Category');
-        $expectedMetadata->setAcceptableTargetClassNames([self::ENTITY_NAMESPACE . 'Category']);
+        $expectedMetadata->setTargetClassName(Entity\Category::class);
+        $expectedMetadata->setAcceptableTargetClassNames([Entity\Category::class]);
 
         $metadata = $this->metadataFactory->createAssociationMetadata(
-            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'Product'),
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class),
             'category'
+        );
+
+        $this->assertEquals($expectedMetadata, $metadata);
+    }
+
+    public function testCreateAssociationMetadataForManyToOneByPropertyPath()
+    {
+        $expectedMetadata = new AssociationMetadata();
+        $expectedMetadata->setName('category');
+        $expectedMetadata->setDataType('string');
+        $expectedMetadata->setIsNullable(false);
+        $expectedMetadata->setAssociationType('manyToOne');
+        $expectedMetadata->setIsCollection(false);
+        $expectedMetadata->setTargetClassName(Entity\Category::class);
+        $expectedMetadata->setAcceptableTargetClassNames([Entity\Category::class]);
+
+        $metadata = $this->metadataFactory->createAssociationMetadata(
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class),
+            'owner.category'
         );
 
         $this->assertEquals($expectedMetadata, $metadata);
@@ -185,11 +233,11 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $expectedMetadata->setIsNullable(false);
         $expectedMetadata->setAssociationType('manyToOne');
         $expectedMetadata->setIsCollection(false);
-        $expectedMetadata->setTargetClassName(self::ENTITY_NAMESPACE . 'Category');
-        $expectedMetadata->setAcceptableTargetClassNames([self::ENTITY_NAMESPACE . 'Category']);
+        $expectedMetadata->setTargetClassName(Entity\Category::class);
+        $expectedMetadata->setAcceptableTargetClassNames([Entity\Category::class]);
 
         $metadata = $this->metadataFactory->createAssociationMetadata(
-            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'User'),
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\User::class),
             'category'
         );
 
@@ -204,12 +252,31 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $expectedMetadata->setIsNullable(true);
         $expectedMetadata->setAssociationType('manyToMany');
         $expectedMetadata->setIsCollection(true);
-        $expectedMetadata->setTargetClassName(self::ENTITY_NAMESPACE . 'User');
-        $expectedMetadata->setAcceptableTargetClassNames([self::ENTITY_NAMESPACE . 'User']);
+        $expectedMetadata->setTargetClassName(Entity\User::class);
+        $expectedMetadata->setAcceptableTargetClassNames([Entity\User::class]);
 
         $metadata = $this->metadataFactory->createAssociationMetadata(
-            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'Role'),
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Role::class),
             'users'
+        );
+
+        $this->assertEquals($expectedMetadata, $metadata);
+    }
+
+    public function testCreateAssociationMetadataForManyToManyByPropertyPath()
+    {
+        $expectedMetadata = new AssociationMetadata();
+        $expectedMetadata->setName('groups');
+        $expectedMetadata->setDataType('integer');
+        $expectedMetadata->setIsNullable(true);
+        $expectedMetadata->setAssociationType('manyToMany');
+        $expectedMetadata->setIsCollection(true);
+        $expectedMetadata->setTargetClassName(Entity\Group::class);
+        $expectedMetadata->setAcceptableTargetClassNames([Entity\Group::class]);
+
+        $metadata = $this->metadataFactory->createAssociationMetadata(
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class),
+            'owner.groups'
         );
 
         $this->assertEquals($expectedMetadata, $metadata);
@@ -223,11 +290,11 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $expectedMetadata->setIsNullable(true);
         $expectedMetadata->setAssociationType('manyToOne');
         $expectedMetadata->setIsCollection(false);
-        $expectedMetadata->setTargetClassName(self::ENTITY_NAMESPACE . 'Category');
-        $expectedMetadata->setAcceptableTargetClassNames([self::ENTITY_NAMESPACE . 'Category']);
+        $expectedMetadata->setTargetClassName(Entity\Category::class);
+        $expectedMetadata->setAcceptableTargetClassNames([Entity\Category::class]);
 
         $metadata = $this->metadataFactory->createAssociationMetadata(
-            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'Product'),
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class),
             'category',
             'integer'
         );

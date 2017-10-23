@@ -8,14 +8,20 @@
 * Added a possibility to specify **documentation_resource** option for the same entity in different `Resources/config/oro/api.yml` files. It can be helpful when some bundle needs to add a field to an entity declared in another bundle.
 * Added a possibility to configure own identifier field(s) instead of the database primary key. For details see [how_to.md](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#using-a-non-primary-key-to-identify-entity)
 * Added filters for the following data types: `smallint`, `date`, `time`, `guid`, `percent`, `money` and `duration`
+* Added a range filter and option `allow_range` that allow to enable or disable this filter. An example of usage of this filter `/api/leads?filter[createdAt]=2017-10-19T10:00:00..2017-10-19T10:30:00`
 #### DataAuditBundle
 * Added `DataAuditConditionView` as substitution for removed `oroauditquerydesigner.dataAuditCondition` jQuery widget.
 #### EntityConfigBundle
 * Added interface `Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface` that should be implemented in case new type of arguments added.
 #### MessageQueue Component
 * Added method `onPreCreateDelayed` to `Oro\Component\MessageQueue\Job\ExtensionInterface` interface.
+* Added Stale Jobs functionality
+    * Added method `setJobConfigurationProvider` to `Oro\Component\MessageQueue\Job\JobProcessor`
+    * Added new state oro.message_queue_job.status.stale
+    * Added new interface `Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface` 
 #### MessageQueueBundle
 * Added interface `Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearerInterface`. For details see [container_in_consumer.md](./src/Oro/Bundle/MessageQueueBundle/Resources/doc/container_in_consumer.md#container-reset)
+* Added configuration for Stale Jobs
 #### QueryDesignerBundle
 * Added `ConditionBuilderView` as substitution for removed `oroquerydesigner.conditionBuilder` jQuery widget.
 * Added `AbstractConditionView` and `FieldConditionView`  as substitution for removed `oroquerydesigner.fieldCondition` jQuery widget.
@@ -68,6 +74,10 @@
     * `Oro/Bundle/WorkflowBundle/Resources/views/Widget/widget/buttons.html.twig`
 #### OroBehatExtension
 * Removed --show-execution-time and --log-feature-execution-time parameters along the MeasureExecutionTimeController
+
+#### FormBundle
+* Class `OroTextareaType`<sup>[[?]](https://github.com/oroinc/platform/blob/2.3.11/src/Oro/Bundle/FormBundle/Form/Type/OroTextareaType.php "Oro\Bundle\FormBundle\Form\Type\OroTextareaType")</sup> was removed. The `strip_tags` form option should be used instead.
+* service `oro_form.type.textarea` was removed.
 
 ## 2.4.0 (2017-09-29)
 

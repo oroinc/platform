@@ -1,0 +1,24 @@
+Extend\Entity\TestApiE2:
+    entity2_1:
+        name: 'Entity 2 (1)'
+    entity2_2:
+        name: 'Entity 2 (2)'
+Extend\Entity\TestApiE1:
+    entity1_1:
+        name: 'Entity 1 (1)'
+        enumField: '@enum1_1'
+        multiEnumField: ['@enum2_1', '@enum2_2']
+        uniM2O: '@entity2_1'
+        biM2O: '@entity2_1'
+        uniM2M: ['@entity2_1', '@entity2_2']
+        default_uniM2M: '@entity2_1'
+        uniM2MnD: ['@entity2_1', '@entity2_2']
+        biM2M: ['@entity2_1', '@entity2_2']
+        default_biM2M: '@entity2_1'
+        biM2MnD: ['@entity2_1', '@entity2_2']
+        uniO2M: ['@entity2_1', '@entity2_2']
+        default_uniO2M: '@entity2_1'
+        uniO2MnD: ['@entity2_1', '@entity2_2']
+        biO2M: ['@entity2_1', '@entity2_2']
+        default_biO2M: '@entity2_1'
+        biO2MnD: ['@entity2_1', '@entity2_2']
