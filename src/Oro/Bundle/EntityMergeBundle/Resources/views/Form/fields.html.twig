@@ -42,9 +42,7 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
-        view: {
-            view: 'oroentitymerge/js/merge-view'
-        },
+        view: 'oroentitymerge/js/merge-view',
         options: {
             _sourceElement: '#' ~ form.vars.id ~ ' .form-horizontal'
         }
