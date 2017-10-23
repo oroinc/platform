@@ -3,7 +3,6 @@ define(function(require) {
 
     var DashboardNavigationComponent;
     var BaseComponent = require('oroui/js/app/components/base/component');
-    var mediator = require('oroui/js/mediator');
     var dashboardUtil = require('orodashboard/js/dashboard-util');
 
     DashboardNavigationComponent = BaseComponent.extend({
