@@ -4,14 +4,15 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
-        module: 'orodatagrid/js/app/components/datagrid-row-select-widget-component',
+        view: 'orodatagrid/js/app/views/datagrid-row-select-widget-view',
         options: {
             wid: app.request.get('_wid'),
             gridName: gridName,
             multiSelect: false
-        }
-    }) }}></div>
-
-    {% set renderParams = renderParams|merge({'routerEnabled': false}) %}
-    {{ parent() }}
+        },
+        layout: 'separate'
+    }) }}>
+        {% set renderParams = renderParams|merge({'routerEnabled': false}) %}
+        {{ parent() }}
+    </div>
 {% endblock %}

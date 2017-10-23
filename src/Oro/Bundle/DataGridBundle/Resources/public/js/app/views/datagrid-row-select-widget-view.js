@@ -1,19 +1,25 @@
 define(function(require) {
     'use strict';
 
-    var DataGridRowSelectWidgetComponent;
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    var DataGridRowSelectWidgetView;
+    var BaseView = require('oroui/js/app/views/base/view');
     var widgetManager = require('oroui/js/widget-manager');
 
-    DataGridRowSelectWidgetComponent = BaseComponent.extend({
-        optionNames: BaseComponent.prototype.optionNames.concat(['wid', 'multiSelect', 'gridName']),
+    DataGridRowSelectWidgetView = BaseView.extend({
+        optionNames: BaseView.prototype.optionNames.concat(['wid', 'multiSelect', 'gridName']),
+
+        autoRender: true,
 
         listen: {
             'datagrid_create_before mediator': 'onDataGridCreateBefore'
         },
 
-        initialize: function(options) {
-            DataGridRowSelectWidgetComponent.__super__.initialize.apply(this, arguments);
+        render: function() {
+            DataGridRowSelectWidgetView.__super__.render.apply(this, arguments);
+
+            this.initLayout();
+
+            return this;
         },
 
         onDataGridCreateBefore: function(options) {
@@ -40,5 +46,5 @@ define(function(require) {
 
     });
 
-    return DataGridRowSelectWidgetComponent;
+    return DataGridRowSelectWidgetView;
 });
