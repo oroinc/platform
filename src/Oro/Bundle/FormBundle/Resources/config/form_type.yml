@@ -359,3 +359,8 @@ services:
             - '@oro_form.related_entity_collection.form.type.api'
         tags:
             - { name: form.type, alias: oro_related_entity_standalone_collection_api }
+
+    oro_form.type.text_integer:
+        class: 'Oro\Bundle\FormBundle\Form\Type\OroTextIntegerType'
+        tags:
+            - { name: form.type, alias: oro_text_integer }
