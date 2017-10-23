@@ -3,6 +3,8 @@ Oro\Bundle\CustomerBundle\Entity\CustomerGroup:
         name: '<xss("CustomerGroup.name")>'
         owner: '@xss_user'
         organization: '@xss_organization'
+        taxCode: '@customer_tax_code'
+        payment_term_7c4f1e8e: '@paymentTerm'
 
 Oro\Bundle\CustomerBundle\Entity\Customer:
     company_root:
@@ -11,6 +13,7 @@ Oro\Bundle\CustomerBundle\Entity\Customer:
         owner: '@admin'
         group: '@all_customers'
         vatId: '<xss("Customer.vatId")>'
+        taxCode: '@customer_tax_code'
     company_a:
         name: '<xss("Customer.name")>'
         parent: '@company_root'
@@ -19,7 +22,7 @@ Oro\Bundle\CustomerBundle\Entity\Customer:
         group: '@all_customers'
         payment_term_7c4f1e8e: '@paymentTerm'
         vatId: '<xss("Customer.vatId")>'
-        #taxCode: '@taxCode'
+        taxCode: '@customer_tax_code'
 
 Oro\Bundle\CustomerBundle\Entity\CustomerAddress:
     customerAddress1:

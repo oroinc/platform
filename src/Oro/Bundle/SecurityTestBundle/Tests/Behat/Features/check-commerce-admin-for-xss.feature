@@ -10,6 +10,7 @@ Feature: Commerce admin area MUST NOT contain XSS vulnerabilities on all accessi
 
   Scenario: Create admin session
     Given I login to admin area as fixture user "xss_user"
+    Then I should not get XSS vulnerabilities
 
   Scenario: Check backend sales pages for XSS vulnerability
     When I visiting pages listed in "backend sales urls"
@@ -21,4 +22,8 @@ Feature: Commerce admin area MUST NOT contain XSS vulnerabilities on all accessi
 
   Scenario: Check backend marketing pages for XSS vulnerability
     When I visiting pages listed in "backend marketing urls"
+    Then I should not get XSS vulnerabilities
+
+  Scenario: Check backend taxes pages for XSS vulnerability
+    When I visiting pages listed in "backend taxes urls"
     Then I should not get XSS vulnerabilities
