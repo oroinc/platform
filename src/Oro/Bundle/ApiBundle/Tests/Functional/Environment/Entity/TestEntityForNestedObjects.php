@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
@@ -54,6 +56,38 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
     protected $relatedId;
 
     /**
+     * @var TestEntityForNestedObjects|null
+     *
+     * @ORM\ManyToOne(targetEntity="TestEntityForNestedObjects", inversedBy="children")
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
+     */
+    protected $parent;
+
+    /**
+     * @var Collection
+     *
+     * @ORM\OneToMany(targetEntity="TestEntityForNestedObjects", mappedBy="parent")
+     */
+    protected $children;
+
+    /**
+     * @var Collection
+     *
+     * @ORM\ManyToMany(targetEntity="TestCustomIdentifier", cascade="ALL")
+     * @ORM\JoinTable(name="test_api_nested_objects_links",
+     *      joinColumns={@ORM\JoinColumn(name="owner_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="link_id", referencedColumnName="id")}
+     * )
+     */
+    protected $links;
+
+    public function __construct()
+    {
+        $this->children = new ArrayCollection();
+        $this->links = new ArrayCollection();
+    }
+
+    /**
      * @return int
      */
     public function getId()
@@ -81,6 +115,7 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
         if (!$this->name) {
             $this->name = new TestNestedName($this->firstName, $this->lastName);
         }
+
         return $this->name;
     }
 
@@ -176,5 +211,73 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
         $this->relatedId = $relatedId;
 
         return $this;
+    }
+
+    /**
+     * @return TestEntityForNestedObjects|null
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @param TestEntityForNestedObjects $item
+     */
+    public function setParent($item)
+    {
+        $this->parent = $item;
+    }
+
+    /**
+     * @return Collection|TestEntityForNestedObjects[]
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
+     * @param TestEntityForNestedObjects $item
+     */
+    public function addChild(TestEntityForNestedObjects $item)
+    {
+        if (!$this->children->contains($item)) {
+            $this->children->add($item);
+        }
+    }
+
+    /**
+     * @param TestEntityForNestedObjects $item
+     */
+    public function removeChild(TestEntityForNestedObjects $item)
+    {
+        if ($this->children->contains($item)) {
+            $this->children->removeElement($item);
+        }
+    }
+
+    /**
+     * @return Collection|TestCustomIdentifier[]
+     */
+    public function getLinks()
+    {
+        return $this->links;
+    }
+
+    /**
+     * @param TestCustomIdentifier $link
+     */
+    public function addLink(TestCustomIdentifier $link)
+    {
+        $this->links->add($link);
+    }
+
+    /**
+     * @param TestCustomIdentifier $link
+     */
+    public function removeLink(TestCustomIdentifier $link)
+    {
+        $this->links->removeElement($link);
     }
 }

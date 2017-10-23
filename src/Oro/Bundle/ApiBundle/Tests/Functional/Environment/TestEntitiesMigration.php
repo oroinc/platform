@@ -33,10 +33,10 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
         $this->createTestDepartmentTable($schema);
         $this->createTestPersonTable($schema);
         $this->createTestDefaultAndNullTable($schema);
-        $this->createTestNestedObjectsTable($schema);
         $this->createTestWithoutIdGeneratorTable($schema);
         $this->createTestCompositeIdentifierTable($schema);
         $this->createTestCustomIdentifierTables($schema);
+        $this->createTestNestedObjectsTable($schema);
         $this->createTestAllDataTypesTable($schema);
         $this->createTestCustomEntityTables($schema);
     }
@@ -64,13 +64,13 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
             $schema->getTable('oro_business_unit'),
             ['business_unit_owner_id'],
             ['id'],
-            ['onUpdate' => null, 'onDelete' => 'SET NULL']
+            ['onDelete' => 'SET NULL']
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],
             ['id'],
-            ['onUpdate' => null, 'onDelete' => 'SET NULL']
+            ['onDelete' => 'SET NULL']
         );
     }
 
@@ -94,26 +94,25 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('position', 'string', ['notnull' => false, 'length' => 255]);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['department_id'], 'IDX_C91820CFAE80F5DF', []);
+        $table->addIndex(['department_id']);
         $table->addIndex(['business_unit_owner_id']);
         $table->addIndex(['organization_id']);
         $table->addForeignKeyConstraint(
             $schema->getTable('test_api_department'),
             ['department_id'],
-            ['id'],
-            ['onDelete' => null, 'onUpdate' => null]
+            ['id']
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_business_unit'),
             ['business_unit_owner_id'],
             ['id'],
-            ['onUpdate' => null, 'onDelete' => 'SET NULL']
+            ['onDelete' => 'SET NULL']
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],
             ['id'],
-            ['onUpdate' => null, 'onDelete' => 'SET NULL']
+            ['onDelete' => 'SET NULL']
         );
     }
 
@@ -160,7 +159,19 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
         $table->addColumn('last_name', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('related_class', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('related_id', 'integer', ['notnull' => false]);
+        $table->addColumn('parent_id', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['parent_id']);
+        $table->addForeignKeyConstraint($table, ['parent_id'], ['id']);
+
+        $tableLinks = $schema->createTable('test_api_nested_objects_links');
+        $tableLinks->addColumn('owner_id', 'integer', []);
+        $tableLinks->addColumn('link_id', 'integer', []);
+        $tableLinks->setPrimaryKey(['owner_id', 'link_id']);
+        $tableLinks->addIndex(['owner_id']);
+        $tableLinks->addIndex(['link_id']);
+        $tableLinks->addForeignKeyConstraint($table, ['owner_id'], ['id']);
+        $tableLinks->addForeignKeyConstraint($schema->getTable('test_api_custom_id'), ['link_id'], ['id']);
     }
 
     /**

@@ -44,6 +44,14 @@ api:
                     exclude: true
                 lastName:
                     exclude: true
+                links:
+                    data_type: array
+                    exclusion_policy: all
+                    fields:
+                        firstName:
+                            property_path: name
+                        lastName:
+                            property_path: key
                 relatedEntity:
                     data_type: nestedAssociation
                     fields:
@@ -55,8 +63,6 @@ api:
                     exclude: true
                 relatedId:
                     exclude: true
-
-
         Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
             filters:
                 fields:
