@@ -12,6 +12,7 @@
 
 @include breakpoint('print') {
     .page-container {
+        display: block;
         min-height: initial;
     }
 }
