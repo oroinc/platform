@@ -95,3 +95,13 @@ Oro\Bundle\CustomerBundle\Entity\CustomerUserSettings:
         customerUser: '@amanda'
         __construct: ['<{website}>']
         currency: 'USD'
+
+Oro\Bundle\PricingBundle\Entity\PriceAttributePriceList:
+    price_attribute:
+        name: '<xss("PriceAttributePriceList.name")>'
+        fieldName: 'price_attribute'
+
+Oro\Bundle\PricingBundle\Entity\PriceAttributeCurrency:
+    price_attribute_currency:
+        priceList: '@price_attribute'
+        currency: 'USD'

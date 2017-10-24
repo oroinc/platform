@@ -27,20 +27,30 @@ Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
         text: '<xss("LocalizedFallbackValue.text(Product.description)")>'
     configurable_product_short_description:
         text: '<xss("LocalizedFallbackValue.text(Product.shortDescription)")>'
-    brandName:
-        string: '<xss("LocalizedFallbackValue.string(Brand.name)")>'
-    brandDescription:
-        text: '<xss("LocalizedFallbackValue.string(Brand.brandDescription)")>'
-    brandShortDescription:
-        text: '<xss("LocalizedFallbackValue.string(Brand.brandShortDescription)")>'
     tshirt_family_label:
         string: '<xss("LocalizedFallbackValue.string(AttributeFamily.label)")>'
     product_meta_title_{1..3}:
-        string: '<xss("LocalizedFallbackValue.string(ContentNode.metaTitle)")>'
+        string: '<xss("LocalizedFallbackValue.string(Product.metaTitle)")>'
     product_meta_description_{1..3}:
-        text: '<xss("LocalizedFallbackValue.string(ContentNode.metaDescription)")>'
+        text: '<xss("LocalizedFallbackValue.string(Product.metaDescription)")>'
     product_meta_keywords_{1..3}:
-        text: '<xss("LocalizedFallbackValue.string(ContentNode.metaKeyword)")>'
+        text: '<xss("LocalizedFallbackValue.string(Product.metaKeyword)")>'
+    product_slug_prototype_{1..3}:
+        string: '<xss("LocalizedFallbackValue.string(Product.slugPrototype)")>'
+    brand_name:
+        string: '<xss("LocalizedFallbackValue.string(Brand.name)")>'
+    brand_description:
+        text: '<xss("LocalizedFallbackValue.string(Brand.brandDescription)")>'
+    brand_short_description:
+        text: '<xss("LocalizedFallbackValue.string(Brand.brandShortDescription)")>'
+    brand_meta_title:
+        string: '<xss("LocalizedFallbackValue.string(Brand.metaTitle)")>'
+    brand_meta_description:
+        text: '<xss("LocalizedFallbackValue.string(Brand.metaDescription)")>'
+    brand_meta_keywords:
+        text: '<xss("LocalizedFallbackValue.string(Brand.metaKeyword)")>'
+    brand_slug_prototype:
+        string: '<xss("LocalizedFallbackValue.string(Brand.slugPrototype)")>'
 
 Oro\Bundle\ProductBundle\Entity\ProductUnitPrecision:
     precision{1..3}:
@@ -55,13 +65,24 @@ Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily:
         code: 'T_shirt'
         addLabel: ['@tshirt_family_label']
 
+Oro\Bundle\RedirectBundle\Entity\Slug:
+    product_slug_{1..4}:
+        url: '<xss("Slug.url")>'
+        slugPrototype: '<xss("Slug.slugPrototype")>'
+        routeName: '<xss("Slug.routeName")>'
+
 Oro\Bundle\ProductBundle\Entity\Brand:
     brand:
         owner: '@xss_business_unit'
         organization: '@xss_organization'
-        addName: ['@brandName']
-        addDescription: ['@brandDescription']
-        addShortDescription: ['@brandShortDescription']
+        addName: ['@brand_name']
+        addDescription: ['@brand_short_description']
+        addShortDescription: ['@brand_short_description']
+        metaTitles: ['@brand_meta_title']
+        metaDescriptions: ['@brand_meta_description']
+        metaKeywords: ['@brand_meta_keywords']
+        slugPrototypes: ['@brand_slug_prototype']
+        slugs: ['@product_slug_4']
 
 Oro\Bundle\ProductBundle\Entity\Product:
     simple_product:
@@ -83,6 +104,8 @@ Oro\Bundle\ProductBundle\Entity\Product:
         metaTitles: ['@product_meta_title_1']
         metaDescriptions: ['@product_meta_description_1']
         metaKeywords: ['@product_meta_keywords_1']
+        slugPrototypes: ['@product_slug_prototype_1']
+        slugs: ['@product_slug_1']
         taxCode: '@product_tax_code'
     configurable_product_variant_1:
         type: 'simple'
@@ -103,6 +126,8 @@ Oro\Bundle\ProductBundle\Entity\Product:
         metaTitles: ['@product_meta_title_2']
         metaDescriptions: ['@product_meta_description_2']
         metaKeywords: ['@product_meta_keywords_2']
+        slugPrototypes: ['@product_slug_prototype_2']
+        slugs: ['@product_slug_2']
         taxCode: '@product_tax_code'
     configurable_product:
         type: 'configurable'
@@ -123,4 +148,6 @@ Oro\Bundle\ProductBundle\Entity\Product:
         metaTitles: ['@product_meta_title_3']
         metaDescriptions: ['@product_meta_description_3']
         metaKeywords: ['@product_meta_keywords_3']
+        slugPrototypes: ['@product_slug_prototype_3']
+        slugs: ['@product_slug_3']
         taxCode: '@product_tax_code'

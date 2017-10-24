@@ -1,0 +1,34 @@
+urls:
+    # Master Catalog
+    - { route: 'oro_catalog_category_index' }
+    - { route: 'oro_catalog_category_create', parameters: { id: '@category1.id' } }
+    - { route: 'oro_catalog_category_update', parameters: { id: '@category1.id' } }
+
+#    # Products
+#    - { route: 'oro_sale_quote_index' }
+#    - { route: 'oro_sale_quote_create' }
+#    - { route: 'oro_sale_quote_view', parameters: { id: '@quote.id' } }
+#    - { route: 'oro_sale_quote_update', parameters: { id: '@quote.id' }, options: { disable_select2_checks: true } }
+#
+#    # Product Families
+#    - { route: 'oro_rfp_request_index' }
+#    - { route: 'oro_rfp_request_view', parameters: { id: '@rfp_request.id' } }
+#    - { route: 'oro_rfp_request_update', parameters: { id: '@rfp_request.id' } }
+#    - { route: 'oro_rfp_request_create_order', parameters: { id: '@rfp_request.id' } }
+#
+#    # Product Attributes
+#    - { route: 'oro_order_index' }
+#    - { route: 'oro_order_create' }
+#    - { route: 'oro_order_view', parameters: { id: '@order1.id' } }
+#    - { route: 'oro_order_update', parameters: { id: '@order1.id' } }
+#
+    # Product Brands
+    - { route: 'oro_product_brand_index' }
+    - { route: 'oro_product_brand_create' }
+    - { route: 'oro_product_brand_update', parameters: { id: '@brand.id' }, options: { disable_select2_checks: true } }
+
+    # Price Attributes
+    - { route: 'oro_pricing_price_attribute_price_list_index' }
+    - { route: 'oro_pricing_price_attribute_price_list_create' }
+    - { route: 'oro_pricing_price_attribute_price_list_view', parameters: { id: '@price_attribute.id' } }
+    - { route: 'oro_pricing_price_attribute_price_list_update', parameters: { id: '@price_attribute.id' }, options: { disable_select2_checks: true } }
