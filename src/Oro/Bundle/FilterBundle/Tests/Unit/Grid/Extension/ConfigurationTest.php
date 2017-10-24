@@ -8,6 +8,9 @@ use Symfony\Component\Config\Definition\Processor;
 
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+ */
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -89,6 +92,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                             'visible' => true,
                             'translatable' => true,
                             'force_like' => false,
+                            'case_insensitive' => true,
                             'min_length' => 0,
                             'max_length' => PHP_INT_MAX,
                         ],
@@ -119,6 +123,105 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                             'visible' => true,
                             'translatable' => true,
                             'force_like' => true,
+                            'case_insensitive' => true,
+                            'min_length' => 3,
+                            'max_length' => 99,
+                        ],
+                    ],
+                    'default' => [],
+                ],
+            ],
+            'valid case sensitive' => [
+                'configs' => [
+                    'filters' => [
+                        'columns' => [
+                            'sku' => [
+                                'type' => 'string',
+                                'data_name' => 'test',
+                                'force_like' => true,
+                                'case_insensitive' => false,
+                                'min_length' => 3,
+                                'max_length' => 99,
+                            ],
+                        ],
+                    ],
+                ],
+                'expected' => [
+                    'columns' => [
+                        'sku' => [
+                            'type' => 'string',
+                            'data_name' => 'test',
+                            'enabled' => true,
+                            'visible' => true,
+                            'translatable' => true,
+                            'force_like' => true,
+                            'case_insensitive' => false,
+                            'min_length' => 3,
+                            'max_length' => 99,
+                        ],
+                    ],
+                    'default' => [],
+                ],
+            ],
+            'valid value conversion' => [
+                'configs' => [
+                    'filters' => [
+                        'columns' => [
+                            'sku' => [
+                                'type' => 'string',
+                                'data_name' => 'test',
+                                'force_like' => true,
+                                'value_conversion' => 'mb_strtoupper',
+                                'min_length' => 3,
+                                'max_length' => 99,
+                            ],
+                        ],
+                    ],
+                ],
+                'expected' => [
+                    'columns' => [
+                        'sku' => [
+                            'type' => 'string',
+                            'data_name' => 'test',
+                            'enabled' => true,
+                            'visible' => true,
+                            'translatable' => true,
+                            'force_like' => true,
+                            'case_insensitive' => true,
+                            'value_conversion' => 'mb_strtoupper',
+                            'min_length' => 3,
+                            'max_length' => 99,
+                        ],
+                    ],
+                    'default' => [],
+                ],
+            ],
+            'valid value conversion' => [
+                'configs' => [
+                    'filters' => [
+                        'columns' => [
+                            'sku' => [
+                                'type' => 'string',
+                                'data_name' => 'test',
+                                'force_like' => true,
+                                'value_conversion' => ['SomeClass', 'someCallbackMethod'],
+                                'min_length' => 3,
+                                'max_length' => 99,
+                            ],
+                        ],
+                    ],
+                ],
+                'expected' => [
+                    'columns' => [
+                        'sku' => [
+                            'type' => 'string',
+                            'data_name' => 'test',
+                            'enabled' => true,
+                            'visible' => true,
+                            'translatable' => true,
+                            'force_like' => true,
+                            'case_insensitive' => true,
+                            'value_conversion' => ['SomeClass', 'someCallbackMethod'],
                             'min_length' => 3,
                             'max_length' => 99,
                         ],
@@ -205,6 +308,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                             'max_length' => 'string'
                         ],
                     ],
+
                 ],
             ]],
             'invalid max_length value' => [[
@@ -221,6 +325,17 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'invalid `default` type' => [[
                 'filters' => [
                     'default' => 123,
+                ],
+            ]],
+            'invalid case insensitive' => [[
+                'filters' => [
+                    'columns' => [
+                        'sku' => [
+                            'type' => 'string',
+                            'data_name' => 'test',
+                            'case_insensitive' => 'string'
+                        ],
+                    ],
                 ],
             ]],
         ];

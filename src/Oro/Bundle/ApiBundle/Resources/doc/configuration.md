@@ -247,6 +247,9 @@ As described above, the **data_type** attribute can be used to specify a data ty
 
 | Data Type | Description |
 | --- | --- |
+| scalar | Used to represent a field of to-one association as a field of parent entity. In JSON.API it means that the association's field should be in "attributes" section instead of "relationships" section. |
+| object | Used to represent to-one association as a field. In JSON.API it means that the association should be in "attributes" section instead of "relationships" section. |
+| array | Used to represent to-many association as a field. In JSON.API it means that the association should be in "attributes" section instead of "relationships" section. |
 | nestedObject | Used to configure nested objects. For details see [Configure nested object](./how_to.md#configure-nested-object). |
 | nestedAssociation | Used to configure nested associations. For details see [Configure nested association](./how_to.md#configure-nested-association). |
 | association:relationType\[:associationKind\] | Used to configure extended associations. For details see [Configure Extended Many-To-One Association](./how_to.md#configure-extended-many-to-one-association), [Configure Extended Many-To-Many Association](./how_to.md#configure-extended-many-to-many-association) and [Configure Extended Multiple Many-To-One Association](./how_to.md#configure-extended-multiple-many-to-one-association). |
@@ -574,4 +577,4 @@ api:
 "relations" configuration section
 ---------------------------------
 
-The `relations` configuration section describes a configuration of an entity if it is used in a relationship. This section is not used for JSON.API, but can be helpfull for other types of API. This section is similar to the [entities](#entities-configuration-section) section.
+The `relations` configuration section describes a configuration of an entity if it is used in a relationship. This section is not used for JSON.API, but can be helpful for other types of API. This section is similar to the [entities](#entities-configuration-section) section.

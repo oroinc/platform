@@ -2,6 +2,6 @@
 
 namespace Oro\Component\Action\Exception;
 
-class InvalidParameterException extends \Exception
+class InvalidParameterException extends InvalidArgumentException
 {
 }

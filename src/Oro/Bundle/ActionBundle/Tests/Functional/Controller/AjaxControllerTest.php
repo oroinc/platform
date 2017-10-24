@@ -81,19 +81,21 @@ class AjaxControllerTest extends WebTestCase
 
         $this->assertEquals(self::MESSAGE_DEFAULT, $this->entity->getMessage());
 
+        $operationName = 'oro_action_test_action';
+        $entityId = $entityId ? $this->entity->getId() : null;
         $this->client->request(
-            'GET',
+            'POST',
             $this->getUrl(
                 'oro_action_operation_execute',
                 [
-                    'operationName' => 'oro_action_test_action',
+                    'operationName' => $operationName,
                     'route' => $route,
                     'datagrid' => $datagrid,
-                    'entityId' => $entityId ? $this->entity->getId() : null,
+                    'entityId' => $entityId,
                     'entityClass' => $entityClass,
                 ]
             ),
-            [],
+            $this->getOperationExecuteParams($operationName, $entityId, $entityClass, $datagrid),
             [],
             $headers
         );
@@ -299,5 +301,31 @@ class AjaxControllerTest extends WebTestCase
                 'headers' => [],
             ],
         ];
+    }
+
+    /**
+     * @param $operationName
+     * @param $entityId
+     * @param $entityClass
+     * @param $datagrid
+     *
+     * @return array
+     */
+    protected function getOperationExecuteParams($operationName, $entityId, $entityClass, $datagrid)
+    {
+        $actionContext = [
+            'entityId'    => $entityId,
+            'entityClass' => $entityClass,
+            'datagrid'    => $datagrid
+        ];
+        $container = self::getContainer();
+        $operation = $container->get('oro_action.operation_registry')->findByName($operationName);
+        $actionData = $container->get('oro_action.helper.context')->getActionData($actionContext);
+
+        $tokenData = $container->get('oro_action.operation.execution.form_provider')
+            ->createTokenData($operation, $actionData);
+        $container->get('session')->save();
+
+        return $tokenData;
     }
 }

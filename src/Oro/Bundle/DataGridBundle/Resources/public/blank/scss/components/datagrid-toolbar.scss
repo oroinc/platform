@@ -189,3 +189,18 @@
         }
     }
 }
+
+@include breakpoint('print') {
+    .datagrid-toolbar {
+        display: block;
+
+        &__side {
+            float: right;
+        }
+
+        &__rightside,
+        &__base {
+            display: none !important;
+        }
+    }
+}

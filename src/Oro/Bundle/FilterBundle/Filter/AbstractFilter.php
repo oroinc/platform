@@ -280,6 +280,16 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
+     * @param string $paramName
+     *
+     * @return bool
+     */
+    protected function has($paramName)
+    {
+        return isset($this->params[$paramName]);
+    }
+
+    /**
      * Get param if exists or default value
      *
      * @param string $paramName
@@ -487,5 +497,25 @@ abstract class AbstractFilter implements FilterInterface
         list($joinAlias) = explode('.', $fieldName);
 
         return QueryBuilderUtil::isToOne($ds->getQueryBuilder(), $joinAlias);
+    }
+
+    /**
+     * @param mixed $data
+     *
+     * @return mixed
+     */
+    protected function convertData($data)
+    {
+        if ($this->has(FilterUtility::VALUE_CONVERSION_KEY)) {
+            if (($callback = $this->get(FilterUtility::VALUE_CONVERSION_KEY)) && is_callable($callback)) {
+                return call_user_func($callback, $data);
+            } else {
+                throw new \BadFunctionCallException(
+                    sprintf('\'%s\' is not callable', json_encode($callback))
+                );
+            }
+        }
+
+        return $data;
     }
 }

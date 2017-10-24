@@ -6,6 +6,7 @@ use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
+use Oro\Component\MessageQueue\Exception\StaleJobRuntimeException;
 use Oro\Component\MessageQueue\Tests\Unit\Consumption\Mock\BreakCycleExtension;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -139,6 +140,31 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $queueConsumer = new QueueConsumer($connectionStub, new BreakCycleExtension(5), 0);
         $queueConsumer->bind('aQueueName', $messageProcessorMock);
+
+        $queueConsumer->consume();
+    }
+
+    public function testThrowIfProcessorThrowsStaleException()
+    {
+        $messageMock = $this->createMessageMock();
+        $messageConsumerStub = $this->createMessageConsumerStub($messageMock);
+
+        $sessionStub = $this->createSessionStub($messageConsumerStub);
+
+        $messageProcessorMock = $this->createMessageProcessorMock();
+        $messageProcessorMock
+            ->expects($this->exactly(1))
+            ->method('process')
+            ->willThrowException(StaleJobRuntimeException::create())
+        ;
+
+        $connectionStub = $this->createConnectionStub($sessionStub);
+
+        $queueConsumer = new QueueConsumer($connectionStub, new BreakCycleExtension(1), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
+
+        $this->expectException(StaleJobRuntimeException::class);
+        $this->expectExceptionMessage('Stale Jobs cannot be run');
 
         $queueConsumer->consume();
     }

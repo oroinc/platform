@@ -21,3 +21,9 @@
         padding: $page-sidebar-tablet-s-inner-offset;
     }
 }
+
+@include breakpoint('print') {
+    .page-sidebar {
+        display: none !important;
+    }
+}
