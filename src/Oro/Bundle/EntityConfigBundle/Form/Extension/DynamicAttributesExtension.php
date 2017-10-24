@@ -9,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamilyAwareInterface;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
+use Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper;
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 use Oro\Component\PhpUtils\ArrayUtil;
 
@@ -17,6 +18,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 class DynamicAttributesExtension extends AbstractTypeExtension
 {
@@ -48,6 +50,11 @@ class DynamicAttributesExtension extends AbstractTypeExtension
     private $attributeConfigHelper;
 
     /**
+     * @var DynamicFieldsHelper
+     */
+    private $dynamicFieldsHelper;
+
+    /**
      * @param ConfigManager $configManager
      * @param DoctrineHelper $doctrineHelper
      * @param AttributeManager $attributeManager
@@ -63,6 +70,17 @@ class DynamicAttributesExtension extends AbstractTypeExtension
         $this->doctrineHelper = $doctrineHelper;
         $this->attributeManager = $attributeManager;
         $this->attributeConfigHelper = $attributeConfigHelper;
+    }
+
+    /**
+     * @param DynamicFieldsHelper $dynamicFieldsHelper
+     * @return $this
+     */
+    public function setDynamicFieldsHelper(DynamicFieldsHelper $dynamicFieldsHelper)
+    {
+        $this->dynamicFieldsHelper = $dynamicFieldsHelper;
+
+        return $this;
     }
 
     /**
@@ -87,6 +105,51 @@ class DynamicAttributesExtension extends AbstractTypeExtension
             ArrayUtil::sortBy($this->fields[$dataClass], true);
             $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'onPreSetData']);
             $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPreSubmit']);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        if ($this->dynamicFieldsHelper === null) {
+            throw new \LogicException(
+                'Missing DynamicFieldsHelper. You need to call DynamicAttributesExtension::setDynamicFieldsHelper()'
+            );
+        }
+
+        if (!$this->isApplicable($options)) {
+            return;
+        }
+
+        $className = $options['data_class'];
+
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        $attributeConfigProvider  = $this->configManager->getProvider('attribute');
+
+        $formConfigs = $this->configManager->getProvider('form')->getConfigs($className);
+        foreach ($formConfigs as $formConfig) {
+            if (!$formConfig->is('is_enabled')) {
+                continue;
+            }
+
+            /** @var FieldConfigId $fieldConfigId */
+            $fieldConfigId = $formConfig->getId();
+            $fieldName     = $fieldConfigId->getFieldName();
+
+            $attributeConfig = $attributeConfigProvider->getConfig($className, $fieldName);
+            if (!$attributeConfig->is('is_attribute')) {
+                continue;
+            }
+
+            if (!$this->dynamicFieldsHelper->shouldBeInitialized($className, $formConfig, $view)) {
+                continue;
+            }
+
+            $extendConfig = $extendConfigProvider->getConfig($className, $fieldName);
+
+            $this->dynamicFieldsHelper->addInitialElements($view, $form, $extendConfig);
         }
     }
 

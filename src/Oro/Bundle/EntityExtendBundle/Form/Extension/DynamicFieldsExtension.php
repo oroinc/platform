@@ -29,7 +29,7 @@ use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 class DynamicFieldsExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
-    
+
     /** @var ConfigManager */
     protected $configManager;
 
@@ -173,6 +173,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      * @param FormView        $view
      * @param FormInterface   $form
      * @param ConfigInterface $extendConfig
+     * @deprecated please use \Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper::addInitialElements()
      */
     protected function addInitialElements(FormView $view, FormInterface $form, ConfigInterface $extendConfig)
     {
@@ -256,6 +257,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      * @param ConfigProvider  $extendConfigProvider
      *
      * @return bool
+     * @deprecated please use \Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper::isApplicableField()
      */
     protected function isApplicableField(ConfigInterface $extendConfig, ConfigProvider $extendConfigProvider)
     {
@@ -283,6 +285,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      * @param ConfigInterface $extendConfig
      *
      * @return array
+     * @deprecated please use \Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper::getInitialElements()
      */
     protected function getInitialElements($entities, $defaultEntity, ConfigInterface $extendConfig)
     {
@@ -342,6 +345,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      * @param string $className
      *
      * @return string
+     * @deprecated please use \Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper::getIdColumnName()
      */
     protected function getIdColumnName($className)
     {
