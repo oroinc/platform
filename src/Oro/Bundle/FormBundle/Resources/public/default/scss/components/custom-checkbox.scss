@@ -2,25 +2,26 @@
 
 .custom-checkbox {
     &__input {
-        &:focus {
-            ~ .custom-checkbox__icon {
-                outline: $checkbox-outline-checked-focus-state;
-                outline-offset: $checkbox-outline-offset-checked-focus-state;
+        @include element-state('hover') {
+            & ~ .custom-checkbox__icon {
+                box-shadow: $checkbox-icon-box-shadow-hover-state;
+            }
+        }
+
+        @include element-state('focus') {
+            & ~ .custom-checkbox__icon {
+                box-shadow: $checkbox-icon-box-shadow-focus-state;
             }
         }
 
         &:checked {
             ~ .custom-checkbox__icon {
-                color: get-color('ui', 'focus');
-
                 @include fa-icon($checkbox-icon-checked);
             }
         }
 
         &:indeterminate {
             ~ .custom-checkbox__icon {
-                color: get-color('ui', 'focus');
-
                 @include fa-icon($checkbox-icon-indeterminate);
             }
         }
@@ -28,6 +29,10 @@
         @include element-state('disabled') {
             & ~ .custom-checkbox__icon {
                 @include base-disabled-style(.55);
+                background: $checkbox-icon-bg-color-disabled-state;
+                color: $checkbox-icon-color-disabled-state;
+                box-shadow: none;
+                border: $checkbox-icon-border-disabled-state;
             }
             & ~ .custom-checkbox__text {
                 @include base-disabled-style(.35);
@@ -36,18 +41,19 @@
     }
 
     &__icon {
-        color: get-color('additional', 'middle');
+        position: relative;
+
+        color: get-color('additional', 'ultra');
 
         &:before {
-            display: inline-block;
+            position: absolute;
+            top: $checkbox-icon-check-top;
+            left: $checkbox-icon-check-left;
+            transform: $checkbox-icon-check-transform;
 
-            min-width: $checkbox-icon-min-width;
-
-            font-size: 17px;
+            font-size: $checkbox-icon-check-size;
             line-height: 1;
         }
-
-        @include fa-icon($checkbox-icon-unchecked);
     }
 
     &__text {
