@@ -22,6 +22,8 @@ class FilterUtility
     const DIVISOR_KEY       = 'divisor';
     const TYPE_EMPTY        = 'filter_empty_option';
     const TYPE_NOT_EMPTY    = 'filter_not_empty_option';
+    const CASE_INSENSITIVE_KEY = 'case_insensitive';
+    const VALUE_CONVERSION_KEY = 'value_conversion';
 
     public function getParamMap()
     {
