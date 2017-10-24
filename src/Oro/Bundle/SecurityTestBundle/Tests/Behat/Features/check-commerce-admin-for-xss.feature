@@ -15,29 +15,29 @@ Feature: Commerce admin area MUST NOT contain XSS vulnerabilities on all accessi
     Given I login to admin area as fixture user "xss_user"
     Then I should not get XSS vulnerabilities
 
-#  Scenario: Check backend sales pages for XSS vulnerability
-#    When I visiting pages listed in "backend sales urls"
-#    Then I should not get XSS vulnerabilities
-#
-#  Scenario: Check backend customers pages for XSS vulnerability
-#    When I visiting pages listed in "backend customers urls"
-#    Then I should not get XSS vulnerabilities
-#
-#  Scenario: Check backend marketing pages for XSS vulnerability
-#    When I visiting pages listed in "backend marketing urls"
-#    Then I should not get XSS vulnerabilities
-#
-#  Scenario: Check backend taxes pages for XSS vulnerability
-#    When I visiting pages listed in "backend taxes urls"
-#    Then I should not get XSS vulnerabilities
-#
-#  Scenario: Check backend inventory pages for XSS vulnerability
-#    When I visiting pages listed in "backend inventory urls"
-#    Then I should not get XSS vulnerabilities
-#
-#  Scenario: Check backend system pages for XSS vulnerability
-#    When I visiting pages listed in "backend system urls"
-#    Then I should not get XSS vulnerabilities
+  Scenario: Check backend sales pages for XSS vulnerability
+    When I visiting pages listed in "backend sales urls"
+    Then I should not get XSS vulnerabilities
+
+  Scenario: Check backend customers pages for XSS vulnerability
+    When I visiting pages listed in "backend customers urls"
+    Then I should not get XSS vulnerabilities
+
+  Scenario: Check backend marketing pages for XSS vulnerability
+    When I visiting pages listed in "backend marketing urls"
+    Then I should not get XSS vulnerabilities
+
+  Scenario: Check backend taxes pages for XSS vulnerability
+    When I visiting pages listed in "backend taxes urls"
+    Then I should not get XSS vulnerabilities
+
+  Scenario: Check backend inventory pages for XSS vulnerability
+    When I visiting pages listed in "backend inventory urls"
+    Then I should not get XSS vulnerabilities
+
+  Scenario: Check backend system pages for XSS vulnerability
+    When I visiting pages listed in "backend system urls"
+    Then I should not get XSS vulnerabilities
 
   Scenario: Check backend products pages for XSS vulnerability
     When I visiting pages listed in "backend products urls"

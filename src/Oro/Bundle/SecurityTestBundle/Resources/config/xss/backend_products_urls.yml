@@ -4,17 +4,21 @@ urls:
     - { route: 'oro_catalog_category_create', parameters: { id: '@category1.id' } }
     - { route: 'oro_catalog_category_update', parameters: { id: '@category1.id' } }
 
-#    # Products
-#    - { route: 'oro_sale_quote_index' }
-#    - { route: 'oro_sale_quote_create' }
-#    - { route: 'oro_sale_quote_view', parameters: { id: '@quote.id' } }
-#    - { route: 'oro_sale_quote_update', parameters: { id: '@quote.id' }, options: { disable_select2_checks: true } }
-#
-#    # Product Families
-#    - { route: 'oro_rfp_request_index' }
-#    - { route: 'oro_rfp_request_view', parameters: { id: '@rfp_request.id' } }
-#    - { route: 'oro_rfp_request_update', parameters: { id: '@rfp_request.id' } }
-#    - { route: 'oro_rfp_request_create_order', parameters: { id: '@rfp_request.id' } }
+    # Products
+    - { route: 'oro_product_index' }
+    - { route: 'oro_product_create' }
+    - { route: 'oro_product_update', parameters: { id: '@simple_product.id' } }
+    - { route: 'oro_product_update', parameters: { id: '@configurable_product_variant_1.id' } }
+    - { route: 'oro_product_update', parameters: { id: '@configurable_product.id' } }
+    - { route: 'oro_product_view', parameters: { id: '@simple_product.id' } }
+    - { route: 'oro_product_view', parameters: { id: '@configurable_product_variant_1.id' } }
+    - { route: 'oro_product_view', parameters: { id: '@configurable_product.id' } }
+
+    # Product Families
+    - { route: 'oro_attribute_family_index', parameters: { alias: 'product' } }
+    - { route: 'oro_attribute_family_create', parameters: { alias: 'product' }  }
+    - { route: 'oro_attribute_family_view', parameters: { id: '@tshirt_family.id' } }
+    - { route: 'oro_attribute_family_update', parameters: { id: '@tshirt_family.id' } }
 #
 #    # Product Attributes
 #    - { route: 'oro_order_index' }

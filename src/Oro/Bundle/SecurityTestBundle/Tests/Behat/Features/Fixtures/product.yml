@@ -29,6 +29,8 @@ Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
         text: '<xss("LocalizedFallbackValue.text(Product.shortDescription)")>'
     tshirt_family_label:
         string: '<xss("LocalizedFallbackValue.string(AttributeFamily.label)")>'
+    attribute_group_label:
+        string: '<xss("LocalizedFallbackValue.string(AttributeGroup.label)")>'
     product_meta_title_{1..3}:
         string: '<xss("LocalizedFallbackValue.string(Product.metaTitle)")>'
     product_meta_description_{1..3}:
@@ -64,6 +66,29 @@ Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily:
         entityClass: 'Oro\Bundle\ProductBundle\Entity\Product'
         code: 'T_shirt'
         addLabel: ['@tshirt_family_label']
+
+Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup:
+    attribute_group:
+        addLabel: ['@attribute_group_label']
+        code: 'attribute_group'
+        attributeFamily: '@tshirt_family'
+
+Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation:
+    attribute_group_relation_sku:
+        attributeGroup: '@attribute_group'
+        entityConfigFieldId: '@field_config_product_sku->id'
+    attribute_group_relation_name:
+        attributeGroup: '@attribute_group'
+        entityConfigFieldId: '@field_config_product_names->id'
+    attribute_group_relation_description:
+        attributeGroup: '@attribute_group'
+        entityConfigFieldId: '@field_config_product_descriptions->id'
+    attribute_group_relation_short_description:
+        attributeGroup: '@attribute_group'
+        entityConfigFieldId: '@field_config_product_shortDescriptions->id'
+    attribute_group_relation_short_brand:
+        attributeGroup: '@attribute_group'
+        entityConfigFieldId: '@field_config_product_brand->id'
 
 Oro\Bundle\RedirectBundle\Entity\Slug:
     product_slug_{1..4}:
