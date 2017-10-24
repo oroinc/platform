@@ -9,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
@@ -16,6 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamilyAwareInterface;
 use Oro\Bundle\EntityConfigBundle\Form\Extension\DynamicAttributesExtension;
+use Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,6 +25,7 @@ use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\TypeTestCase;
 
 class DynamicAttributesExtensionTest extends TypeTestCase
@@ -55,6 +58,11 @@ class DynamicAttributesExtensionTest extends TypeTestCase
     private $attributeEntityConfig;
 
     /**
+     * @var DynamicFieldsHelper|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $dynamicFieldsHelper;
+
+    /**
      * @var DynamicAttributesExtension
      */
     private $extension;
@@ -83,11 +91,16 @@ class DynamicAttributesExtensionTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->dynamicFieldsHelper = $this->getMockBuilder(DynamicFieldsHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->extension = new DynamicAttributesExtension(
             $this->configManager,
             $this->doctrineHelper,
             $this->attributeManager,
-            $this->attributeConfigHelper
+            $this->attributeConfigHelper,
+            $this->dynamicFieldsHelper
         );
     }
 
@@ -324,6 +337,57 @@ class DynamicAttributesExtensionTest extends TypeTestCase
         $this->extension->onPreSubmit($event);
     }
 
+    public function testFinishView()
+    {
+        $formView = $this->getFormView();
+        $form = $this->getForm();
+
+        $this->expectsApplicable();
+        $formConfigProvider = $this->getFormConfigProvider();
+
+        $attributeConfigProvider = $this->getMockBuilder(ConfigProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $attributeConfigProvider->expects($this->exactly(2))
+            ->method('getConfig')
+            ->willReturnMap([
+                [self::DATA_CLASS, 'no_attribute', new Config(
+                    $this->getMockBuilder(ConfigIdInterface::class)->getMock(),
+                    ['is_attribute' => false]
+                )],
+                [self::DATA_CLASS, 'attribute',  new Config(
+                    $this->getMockBuilder(ConfigIdInterface::class)->getMock(),
+                    ['is_attribute' => true]
+                )],
+            ]);
+
+        $extendConfigProvider = $this->getMockBuilder(ConfigProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $extendConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($this->getMockBuilder(ConfigInterface::class)->getMock());
+
+        $this->configManager->expects($this->exactly(3))
+            ->method('getProvider')
+            ->willReturnMap(
+                [
+                    ['extend', $extendConfigProvider],
+                    ['attribute', $attributeConfigProvider],
+                    ['form', $formConfigProvider],
+                ]
+            );
+
+        $this->dynamicFieldsHelper->expects($this->once())
+            ->method('shouldBeInitialized')
+            ->willReturn(true);
+
+        $this->dynamicFieldsHelper->expects($this->once())
+            ->method('addInitialElements');
+
+        $this->extension->finishView($formView, $form, ['data_class' => self::DATA_CLASS, 'enable_attributes' => true]);
+    }
+
     private function expectsApplicable()
     {
         $this->attributeConfigHelper->expects($this->once())
@@ -404,6 +468,18 @@ class DynamicAttributesExtensionTest extends TypeTestCase
             ->willReturn(self::DATA_CLASS);
 
         return $form;
+    }
+
+    /**
+     * @return FormView|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getFormView()
+    {
+        $formView = $this->getMockBuilder(FormView::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        return $formView;
     }
 
     /**
