@@ -41,6 +41,16 @@ class DbalMessageConsumer implements MessageConsumerInterface
     private $pollingInterval = 1000000;
 
     /**
+     * @var DbalMessage[]
+     */
+    private $prefetchMessages = [];
+
+    /**
+     * @var int
+     */
+    private $prefetchSize = 1;
+
+    /**
      * @param DbalSession     $session
      * @param DbalDestination $queue
      */
@@ -69,6 +79,16 @@ class DbalMessageConsumer implements MessageConsumerInterface
     public function setPollingInterval($msec)
     {
         $this->pollingInterval = $msec * 1000;
+    }
+
+    /**
+     * Prefetch count for each consumer.
+     *
+     * @param int $prefetchSize
+     */
+    public function setPrefetchSize($prefetchSize)
+    {
+        $this->prefetchSize = $prefetchSize;
     }
 
     /**
@@ -264,6 +284,10 @@ class DbalMessageConsumer implements MessageConsumerInterface
      */
     protected function receiveMessage()
     {
+        if ($this->prefetchMessages) {
+            return array_shift($this->prefetchMessages);
+        }
+
         /*
          * Why this query is so terrible.
          * We need to update only one record ordered by priority and id
@@ -280,11 +304,12 @@ class DbalMessageConsumer implements MessageConsumerInterface
             $sql = sprintf(
                 'SELECT id FROM %s WHERE queue=:queue AND consumer_id IS NULL AND ' .
                 '(delayed_until IS NULL OR delayed_until<=:delayedUntil) ' .
-                'ORDER BY priority DESC, id ASC LIMIT 1 FOR UPDATE',
-                $this->connection->getTableName()
+                'ORDER BY priority DESC, id ASC LIMIT %s FOR UPDATE',
+                $this->connection->getTableName(),
+                $this->prefetchSize
             );
 
-            $row = $this->dbal->executeQuery(
+            $rows = $this->dbal->executeQuery(
                 $sql,
                 [
                     'queue' => $this->queue->getQueueName(),
@@ -294,34 +319,34 @@ class DbalMessageConsumer implements MessageConsumerInterface
                     'queue' => Type::STRING,
                     'delayedUntil' => Type::INTEGER,
                 ]
-            )->fetch();
+            )->fetchAll();
 
-            if ($row) {
-                $messageId = $row['id'];
+            if ($rows) {
+                $messageIds = array_column($rows, 'id');;
 
                 $sql = sprintf(
-                    'UPDATE %s SET consumer_id=:consumerId  WHERE id = :messageId',
+                    'UPDATE %s SET consumer_id=:consumerId  WHERE id IN (:messageIds)',
                     $this->connection->getTableName()
                 );
 
                 $this->dbal->executeUpdate(
                     $sql,
                     [
-                        'messageId' => $messageId,
+                        'messageIds' => $messageIds,
                         'consumerId' => $this->consumerId
                     ],
                     [
-                        'messageId' => Type::STRING,
+                        'messageIds' => Connection::PARAM_STR_ARRAY,
                         'consumerId' => Type::STRING
                     ]
                 );
 
                 $sql = sprintf(
-                    'SELECT * FROM %s WHERE consumer_id=:consumerId AND queue=:queue LIMIT 1',
+                    'SELECT * FROM %s WHERE consumer_id=:consumerId AND queue=:queue',
                     $this->connection->getTableName()
                 );
 
-                $dbalMessage = $this->dbal->executeQuery(
+                $dbalMessages = $this->dbal->executeQuery(
                     $sql,
                     [
                         'consumerId' => $this->consumerId,
@@ -331,9 +356,9 @@ class DbalMessageConsumer implements MessageConsumerInterface
                         'consumerId' => Type::STRING,
                         'queue' => Type::STRING,
                     ]
-                )->fetch();
+                )->fetchAll();
 
-                if (false == $dbalMessage) {
+                if (false == $dbalMessages) {
                     throw new \LogicException(sprintf(
                         'Expected one record but got nothing. consumer_id: "%s"',
                         $this->consumerId
@@ -341,7 +366,11 @@ class DbalMessageConsumer implements MessageConsumerInterface
                 }
                 $this->dbal->commit();
 
-                return $this->convertMessage($dbalMessage);
+                foreach ($dbalMessages as $dbalMessage) {
+                    $this->prefetchMessages[] = $this->convertMessage($dbalMessage);
+                }
+
+                return array_shift($this->prefetchMessages);
             }
 
             $this->dbal->commit();

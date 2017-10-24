@@ -64,8 +64,13 @@ class DbalSession implements SessionInterface
 
         $consumer = new DbalMessageConsumer($this, $destination);
 
-        if (isset($this->connection->getOptions()['polling_interval'])) {
-            $consumer->setPollingInterval($this->connection->getOptions()['polling_interval']);
+        $options = $this->connection->getOptions();
+        if (isset($options['polling_interval'])) {
+            $consumer->setPollingInterval($options['polling_interval']);
+        }
+
+        if (isset($options['prefetch_size'])) {
+            $consumer->setPrefetchSize($options['prefetch_size']);
         }
 
         return $consumer;

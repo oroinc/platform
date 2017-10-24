@@ -43,6 +43,7 @@ class DbalTransportFactory implements TransportFactoryInterface
                     ->cannotBeEmpty()
                     ->end()
                 ->integerNode('polling_interval')->min(50)->defaultValue(1000)->cannotBeEmpty()->end()
+                ->integerNode('prefetch_size')->min(1)->defaultValue(1)->end()
         ;
     }
 
@@ -87,7 +88,10 @@ class DbalTransportFactory implements TransportFactoryInterface
             new Reference('doctrine'),
             $config['connection'],
             $config['table'],
-            ['polling_interval' => $config['polling_interval']]
+            [
+                'polling_interval' => $config['polling_interval'],
+                'prefetch_size' =>  $config['prefetch_size']
+            ]
         ]);
         $connectionId = sprintf('oro_message_queue.transport.%s.connection', $this->getName());
         $container->setDefinition($connectionId, $connection);
