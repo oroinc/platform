@@ -84,6 +84,20 @@ class ImportExportControllerTest extends WebTestCase
         ]);
     }
 
+    public function testDownloadNonExistentFileThrows404()
+    {
+        $this->client->followRedirects(true);
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_importexport_export_download', [
+                'fileName' =>'non_existent_file.txt'
+            ])
+        );
+
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 404);
+    }
+
     public function testImportProcessAction()
     {
         $options = [
