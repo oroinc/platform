@@ -10,20 +10,8 @@ define(['underscore', 'orotranslation/js/translator', 'jquery'
     return [
         'Oro\\Bundle\\QueryDesignerBundle\\Validator\\NotBlankFilters',
         function(value, element) {
-            var $conditionBuilder = $(element)
-                .closest('[data-role="query-designer-container"]')
-                .find('.ui-widget-oroquerydesigner-condition-builder');
-
-            if ($conditionBuilder.length === 0) {
-                return true;
-            }
-
-            var filters = $conditionBuilder.conditionBuilder('getValue');
-            var isFiltersDefined = filters && _.isArray(filters) && filters.length > 0;
-
-            var data = {result: isFiltersDefined};
-            $conditionBuilder.trigger('query-designer:validate:not-blank-filters', data);
-
+            var data = {result: false};
+            $(element).trigger('query-designer:validate:not-blank-filters', data);
             return data.result;
         },
         function(param) {

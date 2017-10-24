@@ -379,11 +379,6 @@ To pass constraints there are two ways:
 
 Pay attention to the fact that all constraints defined here applied to all extended fields with corresponding type.
 
-Another point to keep in mind - integer fields should be rendered as text. Because html5 validation works only in case 
-when form submitted directly by user, and platform use javascript to submit forms. 
-Platform relates on jQuery validation, but due to the nature of input[type=number] - it's not possible to get it's raw value when it's not number.
-
-
 Extend Fields View
 ---------------------
 

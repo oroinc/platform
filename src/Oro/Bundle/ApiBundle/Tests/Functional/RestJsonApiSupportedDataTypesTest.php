@@ -526,4 +526,145 @@ class RestJsonApiSupportedDataTypesTest extends RestJsonApiTestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider rangeFilterDataProvider
+     */
+    public function testRangeFilter(array $filter, array $expectedRows)
+    {
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+        foreach ($expectedRows as &$row) {
+            $row['type'] = $entityType;
+        }
+
+        $response = $this->cget(['entity' => $entityType], ['filter' => $filter]);
+
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+    }
+
+    public function rangeFilterDataProvider()
+    {
+        return [
+            'by integer field'     => [
+                ['fieldInt' => '2..3'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by smallint field'    => [
+                ['fieldSmallInt' => '2..3'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by bigint field'      => [
+                ['fieldBigInt' => '234567890123456..345678901234567'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by decimal field'     => [
+                ['fieldDecimal' => '2.2..3.5'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by float field'       => [
+                ['fieldFloat' => '2.2..3.5'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by datetime field'    => [
+                ['fieldDateTime' => '2010-11-01T10:12:13..2010-12-01T10:13:14'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by date field'        => [
+                ['fieldDate' => '2010-11-01..2010-12-01'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by time field'        => [
+                ['fieldTime' => '10:12:13..10:13:14'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by percent field'     => [
+                ['fieldPercent' => '0.2..0.3'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by money field'       => [
+                ['fieldMoney' => '2.3456..3.4567'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by duration field'    => [
+                ['fieldDuration' => '22..33'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by money_value field' => [
+                ['fieldMoneyValue' => '2.3456..3.4567'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider notInRangeFilterDataProvider
+     */
+    public function testNotInRangeFilter(array $filter, array $expectedRows)
+    {
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+        foreach ($expectedRows as &$row) {
+            $row['type'] = $entityType;
+        }
+
+        $key = key($filter);
+        $filter[$key] = ['neq' => $filter[$key]];
+
+        $response = $this->cget(['entity' => $entityType], ['filter' => $filter]);
+
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+    }
+
+    public function notInRangeFilterDataProvider()
+    {
+        return [
+            'by integer field'     => [
+                ['fieldInt' => '2..3'],
+                [['id' => '<toString(@TestItem1->id)>']]
+            ],
+            'by smallint field'    => [
+                ['fieldSmallInt' => '2..3'],
+                [['id' => '<toString(@TestItem1->id)>']]
+            ],
+            'by bigint field'      => [
+                ['fieldBigInt' => '123456789012346..345678901234566'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by decimal field'     => [
+                ['fieldDecimal' => '1.234568..3.456788'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by float field'       => [
+                ['fieldFloat' => '1.1001..3.2999'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by datetime field'    => [
+                ['fieldDateTime' => '2010-10-01T10:11:13..2010-12-01T10:13:13'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by date field'        => [
+                ['fieldDate' => '2010-10-02..2010-11-30'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by time field'        => [
+                ['fieldTime' => '10:11:13..10:13:13'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by percent field'     => [
+                ['fieldPercent' => '0.101..0.299'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by money field'       => [
+                ['fieldMoney' => '1.2346..3.4566'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by duration field'    => [
+                ['fieldDuration' => '12..32'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by money_value field' => [
+                ['fieldMoneyValue' => '1.2346..3.4566'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+        ];
+    }
 }

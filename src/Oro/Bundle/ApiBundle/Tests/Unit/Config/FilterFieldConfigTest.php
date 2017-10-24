@@ -156,6 +156,23 @@ class FilterFieldConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
+    public function testRangeAllowed()
+    {
+        $config = new FilterFieldConfig();
+        $this->assertFalse($config->hasRangeAllowed());
+        $this->assertFalse($config->isRangeAllowed());
+
+        $config->setRangeAllowed();
+        $this->assertTrue($config->hasRangeAllowed());
+        $this->assertTrue($config->isRangeAllowed());
+        $this->assertEquals(['allow_range' => true], $config->toArray());
+
+        $config->setRangeAllowed(false);
+        $this->assertTrue($config->hasRangeAllowed());
+        $this->assertFalse($config->isRangeAllowed());
+        $this->assertEquals([], $config->toArray());
+    }
+
     public function testType()
     {
         $config = new FilterFieldConfig();

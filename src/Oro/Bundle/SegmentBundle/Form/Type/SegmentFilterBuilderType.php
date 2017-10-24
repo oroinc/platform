@@ -15,6 +15,7 @@ use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -82,6 +83,14 @@ class SegmentFilterBuilderType extends AbstractType
         $resolver->setDefault('name_field_required', false);
         $resolver->setDefault('attr', ['data-role' => 'query-designer-container']);
         $resolver->setDefault('field_event_listeners', null);
+        $resolver->setDefault('condition_builder_validation', [
+            'condition-item' => [
+                'NotBlank' => ['message' => 'oro.query_designer.condition_builder.condition_item.not_blank'],
+            ],
+            'conditions-group' => [
+                'NotBlank' => ['message' => 'oro.query_designer.condition_builder.conditions_group.not_blank'],
+            ],
+        ]);
         $resolver->setRequired('segment_entity');
 
         $resolver->setAllowedTypes('segment_entity', 'string');
@@ -265,5 +274,15 @@ class SegmentFilterBuilderType extends AbstractType
         if ($segmentName) {
             $segment->setName($segmentName);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['condition_builder_options'] = [
+            'validation' => $options['condition_builder_validation'],
+        ];
     }
 }

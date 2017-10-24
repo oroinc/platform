@@ -1,19 +1,18 @@
-<ul class="criteria-list" id="criteria-list">
-    <li class="option" data-criteria="condition-item"
-        data-module="mock/condition-builder/condition-item"
-        data-widget="conditionItem"
-        data-options="{&quot;name&quot;:&quot;The Condition Item&quot;}">
-        Condition Item
-    </li>
-    <li class="option" data-criteria="matrix-condition"
-        data-module="mock/condition-builder/matrix-condition"
-        data-widget="matrixCondition"
-        data-options="{&quot;name&quot;:&quot;The Matrix Condition&quot;}">
-        Condition Item
-    </li>
-    <li class="option" data-criteria="conditions-group">
-        Conditions Group
-    </li>
-</ul>
-<div class="condition-builder" id="condition-builder"></div>
-<input type="hidden" id="condition-value" name="conditions" value="[]"/>
+<div class="condition-builder">
+    <ul class="criteria-list">
+        <li data-criteria="condition-item"
+            data-module="condition-builder/condition-item-stub-view"
+            data-options="{&quot;name&quot;:&quot;The Condition Item&quot;}">
+            Condition Item
+        </li>
+        <li data-criteria="matrix-condition"
+            data-module="condition-builder/matrix-condition-stub-view"
+            data-options="{&quot;name&quot;:&quot;The Matrix Condition&quot;}">
+            Matrix Condition
+        </li>
+        <li data-criteria="conditions-group">
+            Conditions Group
+        </li>
+    </ul>
+    <div class="condition-container"></div>
+</div>

@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -328,5 +329,38 @@ abstract class ApiTestCase extends WebTestCase
     protected function getEntityManager()
     {
         return $this->getContainer()->get('doctrine')->getManager();
+    }
+
+    /**
+     * @return TestConfigRegistry
+     */
+    protected function getConfigRegistry()
+    {
+        return $this->getContainer()->get('oro_api.tests.config_registry');
+    }
+
+    /**
+     * Appends a configuration of an API resource.
+     * This method may be helpful if you create some general functionality
+     * and need to test it for different configurations without creating a test entity
+     * for each configuration.
+     * Please note that the configuration is restored after each test and you do not need to do it manually.
+     *
+     * @param string $entityClass
+     * @param array  $config
+     */
+    public function appendEntityConfig($entityClass, array $config)
+    {
+        $this->getConfigRegistry()->appendEntityConfig($entityClass, $config);
+    }
+
+    /**
+     * Restored default configuration of API resources.
+     *
+     * @after
+     */
+    protected function restoreConfigs()
+    {
+        $this->getConfigRegistry()->restoreConfigs();
     }
 }

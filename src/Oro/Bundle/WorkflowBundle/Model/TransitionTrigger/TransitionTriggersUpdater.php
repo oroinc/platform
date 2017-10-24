@@ -52,9 +52,16 @@ class TransitionTriggersUpdater
      */
     public function updateTriggers(TriggersBag $triggersBag)
     {
-        $definition = $triggersBag->getDefinition();
+        $this->updateTransitionTriggers($triggersBag);
+        $this->updateCronSchedules($triggersBag->getDefinition());
+    }
 
-        $existingTriggers = $this->getStoredDefinitionTriggers($definition);
+    /**
+     * @param TriggersBag $triggersBag
+     */
+    private function updateTransitionTriggers(TriggersBag $triggersBag)
+    {
+        $existingTriggers = $this->getStoredDefinitionTriggers($triggersBag->getDefinition());
 
         list($add, $remove) = $this->updateDecider->decide($existingTriggers, $triggersBag->getTriggers());
 
@@ -72,15 +79,28 @@ class TransitionTriggersUpdater
     }
 
     /**
+     * @param WorkflowDefinition $definition
+     */
+    private function updateCronSchedules(WorkflowDefinition $definition)
+    {
+        $cronTriggers = $this->getStoredDefinitionCronTriggers($definition);
+        if (empty($cronTriggers)) {
+            return;
+        }
+
+        foreach ($cronTriggers as $trigger) {
+            $this->cronScheduler->addSchedule($trigger);
+        }
+
+        $this->cronScheduler->flush();
+    }
+
+    /**
      * @param BaseTransitionTrigger $trigger
      */
     private function persist(BaseTransitionTrigger $trigger)
     {
         $this->getEntityManager()->persist($trigger);
-
-        if ($trigger instanceof TransitionCronTrigger) {
-            $this->cronScheduler->addSchedule($trigger);
-        }
     }
 
     /**
@@ -128,6 +148,19 @@ class TransitionTriggersUpdater
         return $this->doctrineHelper->getEntityRepositoryForClass(BaseTransitionTrigger::class)->findBy(
             [
                 'workflowDefinition' => $workflowDefinition->getName()
+            ]
+        );
+    }
+
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @return array|BaseTransitionTrigger[]
+     */
+    private function getStoredDefinitionCronTriggers(WorkflowDefinition $workflowDefinition)
+    {
+        return $this->doctrineHelper->getEntityRepositoryForClass(TransitionCronTrigger::class)->findBy(
+            [
+                'workflowDefinition' => $workflowDefinition->getName(),
             ]
         );
     }
