@@ -80,6 +80,20 @@ class JobStorage
     }
 
     /**
+     * @param string $ownerId
+     *
+     * @return Job|null
+     */
+    public function findJobByOwnerId($ownerId)
+    {
+        return $this->createQueryBuilder('job')
+            ->where('job.ownerId = :ownerId')
+            ->setParameter('ownerId', $ownerId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
      * Finds root non interrupted job by name and given statuses.
      *
      * @param string $jobName

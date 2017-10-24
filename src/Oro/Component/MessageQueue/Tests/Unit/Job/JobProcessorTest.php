@@ -559,4 +559,17 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
     {
         return $this->createMock(MessageProducer::class);
     }
+
+    public function testMarkJobFailedByMessageIdNoJob()
+    {
+        $storage = $this->createJobStorage();
+        $storage
+            ->expects($this->once())
+            ->method('findJobByOwnerId')
+            ->with('no_job')
+            ->willReturn(null);
+
+        $processor = new JobProcessor($storage, $this->createMessageProducerMock());
+        $processor->markJobFailedByMessageId('no_job');
+    }
 }

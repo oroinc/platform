@@ -5,6 +5,9 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class JobProcessor
 {
     /**
@@ -249,7 +252,7 @@ class JobProcessor
     }
 
     /**
-     * @param Job  $job
+     * @param Job $job
      * @param bool $force
      */
     public function interruptRootJob(Job $job, $force = false)
@@ -262,7 +265,9 @@ class JobProcessor
             return;
         }
 
-        $this->jobStorage->saveJob($job, function (Job $job) use ($force) {
+        $jobStatus = $job->getStatus();
+
+        $this->jobStorage->saveJob($job, function (Job $job) use ($force, $jobStatus) {
             if ($job->isInterrupted()) {
                 return;
             }
@@ -271,6 +276,11 @@ class JobProcessor
 
             if ($force) {
                 $job->setStoppedAt(new \DateTime());
+            }
+
+            //Forces to set status from passed job to callback if it differs
+            if ($jobStatus && $job->getStatus() !== $jobStatus) {
+                $job->setStatus($jobStatus);
             }
         });
     }
@@ -282,5 +292,23 @@ class JobProcessor
     {
         $message = new Message(['jobId' => $job->getId()], MessagePriority::HIGH);
         $this->producer->send(Topics::CALCULATE_ROOT_JOB_PROGRESS, $message);
+    }
+
+    /**
+     * @param $messageId
+     */
+    public function markJobFailedByMessageId($messageId)
+    {
+        $job = $this->jobStorage->findJobByOwnerId($messageId);
+
+        if ($job) {
+            if ($job->isRoot()) {
+                $job->setStatus(Job::STATUS_FAILED);
+                $this->interruptRootJob($job, true);
+            } else {
+                $job->setStatus(Job::STATUS_RUNNING); //Only running jobs can be failed
+                $this->failChildJob($job);
+            }
+        }
     }
 }

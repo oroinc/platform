@@ -418,4 +418,19 @@ class JobStorageTest extends WebTestCase
         // the job should not be found because we updated a record that does not exist in DB
         $this->assertNull($this->jobStorage->findJobById($job->getId()));
     }
+
+    public function testFindJobByOwnerId()
+    {
+        $job = $this->getJobReference(LoadJobData::JOB_1);
+
+        $this->getEntityManager()->clear();
+        $foundJob = $this->jobStorage->findJobByOwnerId($job->getOwnerId());
+        $this->assertEquals($job->getId(), $foundJob->getId());
+    }
+
+    public function testFindJobByOwnerIdNotExist()
+    {
+        $foundJob = $this->jobStorage->findJobByOwnerId('foo_br');
+        $this->assertNull($foundJob);
+    }
 }

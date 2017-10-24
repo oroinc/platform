@@ -8,7 +8,7 @@ use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 
 /**
- * @SuppressWarnings(PHPMD.NPathComplexity)
+ * Should be refactored in scope of - #BAP-15729
  */
 class QueueConsumer
 {
@@ -78,6 +78,7 @@ class QueueConsumer
     }
 
     /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * Runtime extension - is an extension or a collection of extensions which could be set on runtime.
      * Here's a good example: @see LimitsExtensionsCommandTrait
      *
@@ -153,8 +154,7 @@ class QueueConsumer
      * @param Context $context
      *
      * @throws ConsumptionInterruptedException
-     *
-     * @return bool
+     * @throws \Exception
      */
     protected function doConsume(ExtensionInterface $extension, Context $context)
     {
@@ -168,8 +168,16 @@ class QueueConsumer
         if ($context->isExecutionInterrupted()) {
             throw new ConsumptionInterruptedException();
         }
+
         $logger->debug('Pre receive Message');
-        $message = $messageConsumer->receive(1);
+
+        try {
+            $message = $messageConsumer->receive(1);
+        } catch (\Exception $exception) {
+            $logger->error('Error during receiving message from gueue:' . $exception->getMessage());
+            throw $exception;
+        }
+
         if (null !== $message) {
             $context->setMessage($message);
             $extension->onPreReceived($context);
