@@ -12,14 +12,18 @@ define(function(require) {
     var ColumnModel = require('oroquerydesigner/js/items-manager/column-model');
     var DeleteConfirmation = require('oroui/js/delete-confirmation');
     var EntityFieldsUtil = require('oroentity/js/entity-fields-util');
-    require('oroentity/js/field-choice');
+    var ColumnFormView = require('oroquerydesigner/js/app/views/column-form-view');
+
     require('oroentity/js/fields-loader');
     require('oroui/js/items-manager/editor');
     require('oroui/js/items-manager/table');
 
     SegmentComponent = BaseComponent.extend({
         relatedSiblingComponents: {
-            conditionBuilderComponent: 'condition-builder'
+            conditionBuilderComponent: 'condition-builder',
+            columnFieldChoiceComponent: 'column-field-choice',
+            groupingFieldChoiceComponent: 'grouping-field-choice',
+            dateGroupingFieldChoiceComponent: 'date-grouping-field-choice'
         },
 
         defaults: {
@@ -51,6 +55,8 @@ define(function(require) {
             initEntityChangeEvents: true
         },
 
+        columnFormView: null,
+
         initialize: function(options) {
             require(options.extensions || [], _.bind(function() {
                 var extensions = arguments;
@@ -64,6 +70,7 @@ define(function(require) {
                 this.initEntityFieldsUtil();
                 this.$fieldsLoader = this.initFieldsLoader();
                 this.initGrouping();
+                this.initDateGrouping();
                 this.initColumn();
                 this.configureFilters();
                 if (this.options.initEntityChangeEvents) {
@@ -75,6 +82,17 @@ define(function(require) {
                 this.form = this.$storage.parents('form');
                 this.form.submit(_.bind(this.onBeforeSubmit, this));
             }, this));
+        },
+
+        _getInitFieldsData: function() {
+            var fieldsLoaderOpts = this.options.fieldsLoader;
+            if (fieldsLoaderOpts) {
+                if (_.isString(fieldsLoaderOpts.fieldsData) && !_.isEmpty(fieldsLoaderOpts.fieldsData)) {
+                    return JSON.parse(fieldsLoaderOpts.fieldsData);
+                } else {
+                    return fieldsLoaderOpts.fieldsData;
+                }
+            }
         },
 
         initStorage: function() {
@@ -257,12 +275,6 @@ define(function(require) {
                     formatSelectionTemplate: $(this.options.select2FieldChoiceTemplate).text()
                 }
             };
-
-            // options column's filed choice input
-            if (!this.options.columnFieldChoiceOptions) {
-                this.options.columnFieldChoiceOptions = {};
-            }
-            _.defaults(this.options.columnFieldChoiceOptions, this.options.fieldChoiceOptions);
         },
 
         /**
@@ -318,8 +330,7 @@ define(function(require) {
                     self.save(data);
                 });
 
-            var fieldsData = !_.isEmpty(options.fieldsData) ? JSON.parse(options.fieldsData) : options.fieldsData;
-            $entityChoice.fieldsLoader('setFieldsData', fieldsData);
+            $entityChoice.fieldsLoader('setFieldsData', this._getInitFieldsData());
 
             this.once('dispose:before', function() {
                 loadingMask.dispose();
@@ -338,18 +349,21 @@ define(function(require) {
             var $table = $(options.itemContainer);
             var $editor = $(options.form);
 
-            if (_.isEmpty($table) || _.isEmpty($editor)) {
+            if (_.isEmpty($table) || _.isEmpty($editor) || !this.groupingFieldChoiceComponent) {
                 // there's no grouping
                 return;
             }
 
-            // setup FieldChoice of Items Manager Editor
-            var fieldChoiceOptions = _.extend({}, this.options.fieldChoiceOptions,
-                this.options.metadata.grouping, {select2: {}});
-            var $fieldChoice = $editor.find('[data-purpose=column-selector]');
-            $fieldChoice.fieldChoice(fieldChoiceOptions);
-            this.on('fieldsLoaded', function(entity, data) {
-                $fieldChoice.fieldChoice('updateData', entity, data);
+            var groupingFieldChoiceView = this.groupingFieldChoiceComponent.view;
+
+            if (this.options.metadata.grouping) {
+                groupingFieldChoiceView.setFieldChoiceOptions(this.options.metadata.grouping);
+            }
+            groupingFieldChoiceView.updateData(this.$entityChoice.val(),
+                EntityFieldsUtil.convertData(this._getInitFieldsData()));
+
+            this.listenTo(this.$entityChoice, 'fieldsloaderupdate', function(e, data) {
+                this.groupingFieldChoiceComponent.view.updateData($(e.target).val(), data);
             });
 
             // prepare collection for Items Manager
@@ -430,6 +444,21 @@ define(function(require) {
             }, this);
         },
 
+        initDateGrouping: function() {
+            if (!this.dateGroupingFieldChoiceComponent) {
+                // there's no date grouping
+                return;
+            }
+
+            var fieldsData = EntityFieldsUtil.convertData(this._getInitFieldsData());
+
+            this.dateGroupingFieldChoiceComponent.view.updateData(this.$entityChoice.val(), fieldsData);
+
+            this.listenTo(this.$entityChoice, 'fieldsloaderupdate', function(e, data) {
+                this.groupingFieldChoiceComponent.view.updateData($(e.target).val(), data);
+            });
+        },
+
         /**
          * Initializes Columns component
          */
@@ -438,19 +467,33 @@ define(function(require) {
             var options = this.options.column;
             var metadata = this.options.metadata;
             var $table = $(options.itemContainer);
-            var $editor = $(options.form);
+            var $form = $(options.form);
 
-            if (_.isEmpty($table) || _.isEmpty($editor)) {
+            if (_.isEmpty($form) || !this.columnFieldChoiceComponent) {
                 // there's no columns
                 return;
             }
 
             // setup FieldChoice of Items Manager Editor
-            var fieldChoiceOptions = _.extend({}, this.options.columnFieldChoiceOptions, {select2: {}});
-            var $fieldChoice = $editor.find('[data-purpose=column-selector]');
-            $fieldChoice.fieldChoice(fieldChoiceOptions);
-            this.on('fieldsLoaded', function(entity, data) {
-                $fieldChoice.fieldChoice('updateData', entity, data);
+            var fieldChoiceView = this.columnFieldChoiceComponent.view;
+            fieldChoiceView.updateData(
+                this.$entityChoice.val(), EntityFieldsUtil.convertData(this._getInitFieldsData())
+            );
+
+            this.columnFormView = new ColumnFormView({
+                el: $form,
+                autoRender: true,
+                fieldChoiceView: fieldChoiceView,
+                functionChoiceOptions: {
+                    converters: metadata.converters,
+                    aggregates: metadata.aggregates
+                }
+            });
+
+            var $editor = this.columnFormView.$el;
+
+            this.listenTo(this.$entityChoice, 'fieldsloaderupdate', function(e, data) {
+                this.columnFieldChoiceComponent.view.reset($(e.target).val(), data);
             });
 
             // prepare collection for Items Manager
@@ -471,11 +514,6 @@ define(function(require) {
                 delete this.model;
             });
 
-            // setup Items Manager's editor
-            $editor.find('[data-purpose=function-selector]').functionChoice({
-                converters: metadata.converters,
-                aggregates: metadata.aggregates
-            });
             $editor.itemsManagerEditor($.extend(options.editor, {
                 collection: collection,
                 setter: function($el, name, value) {
@@ -526,7 +564,7 @@ define(function(require) {
                 $editor.itemsManagerEditor('reset');
             });
 
-            var template = _.template(this.options.columnFieldChoiceOptions.select2.formatSelectionTemplate);
+            var template = _.template(this.options.fieldChoiceOptions.select2.formatSelectionTemplate);
             $table.itemsManagerTable({
                 collection: collection,
                 itemTemplate: $(options.itemTemplate).html(),

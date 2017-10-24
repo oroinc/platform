@@ -3,13 +3,13 @@ config:
         'oroquerydesigner/js/app/views/condition-builder/condition-builder-view': 'bundles/oroquerydesigner/js/app/views/condition-builder/condition-builder-view.js'
         'oroquerydesigner/js/app/views/abstract-condition-view': 'bundles/oroquerydesigner/js/app/views/abstract-condition-view.js'
         'oroquerydesigner/js/app/views/field-condition-view': 'bundles/oroquerydesigner/js/app/views/field-condition-view.js'
+        'oroquerydesigner/js/app/views/column-form-view': 'bundles/oroquerydesigner/js/app/views/column-form-view.js'
         'oroquerydesigner/js/app/views/aggregated-field-condition-view': 'bundles/oroquerydesigner/js/app/views/aggregated-field-condition-view.js'
         'oroquerydesigner/js/function-choice': 'bundles/oroquerydesigner/js/function-choice.js'
         'oroquerydesigner/js/items-manager/grouping-model': 'bundles/oroquerydesigner/js/items-manager/grouping-model.js'
         'oroquerydesigner/js/items-manager/column-model': 'bundles/oroquerydesigner/js/items-manager/column-model.js'
         'oroquerydesigner/js/items-manager/entity-field-model': 'bundles/oroquerydesigner/js/items-manager/entity-field-model.js'
 
-        'oroquerydesigner/js/app/components/column-form': 'bundles/oroquerydesigner/js/app/components/column-form.js'
         'oroquerydesigner/js/app/components/condition-builder-component': 'bundles/oroquerydesigner/js/app/components/condition-builder-component.js'
         'oroquerydesigner/js/app/views/date-grouping-view': 'bundles/oroquerydesigner/js/app/views/date-grouping-view.js'
 

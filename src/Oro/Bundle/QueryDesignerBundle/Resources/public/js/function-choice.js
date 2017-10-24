@@ -6,7 +6,6 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
      */
     $.widget('oroquerydesigner.functionChoice', {
         options: {
-            fieldChoiceSelector: '',
             optionTemplate: _.template('<option value="<%- data.name %>" title="<%- data.title %>" ' +
                     'data-group_name="<%- data.group_name %>" data-group_type="<%- data.group_type %>" ' +
                     'data-return_type="<%- data.return_type %>">' +
@@ -20,7 +19,6 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
 
         _create: function() {
             this._disable(true);
-            this._bindFieldChoice();
         },
 
         /**
@@ -123,18 +121,6 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
             var $widgetContainer = this.element.inputWidget('container');
             if ($widgetContainer) {
                 $widgetContainer.toggleClass('disabled', flag);
-            }
-        },
-
-        _bindFieldChoice: function() {
-            var $fields;
-            var self = this;
-            if (this.options.fieldChoiceSelector) {
-                $fields = $(this.options.fieldChoiceSelector);
-                $fields.change(function(e) {
-                    var criteria = $fields.fieldChoice('getApplicableConditions', $(e.target).val());
-                    self.setActiveFunctions(criteria);
-                });
             }
         }
     });

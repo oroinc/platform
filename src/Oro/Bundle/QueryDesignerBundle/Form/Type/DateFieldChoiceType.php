@@ -13,13 +13,13 @@ class DateFieldChoiceType extends FieldChoiceType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        parent::setDefaultOptions($resolver);
+
         $resolver->setDefaults([
             'include_fields' => [
                 ['type' => 'datetime'],
             ],
         ]);
-
-        parent::setDefaultOptions($resolver);
     }
 
     /**

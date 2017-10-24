@@ -56,11 +56,11 @@ class FieldChoiceType extends AbstractType
             'placeholder'            => 'oro.entity.form.choose_entity_field',
             'exclude_fields'         => [],
             'include_fields'         => [],
-            'page_component'         => 'oroui/js/app/components/jquery-widget-component',
+            'page_component'         => 'oroui/js/app/components/view-component',
             'page_component_options' => [
-                'widgetModule' => 'oroentity/js/field-choice',
-                'widgetName'   => 'fieldChoice',
-                'select2'      => [],
+                'view'         => 'oroentity/js/app/views/field-choice-view',
+                'autoRender'   => true,
+                'select2'      => ['dropdownAutoWidth' => true, 'pageableResults' => true],
             ],
         ]);
     }

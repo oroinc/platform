@@ -152,11 +152,9 @@
 {% macro query_designer_column_form(form, attr, params, showItems = ['column', 'label', 'function', 'sorting', 'action']) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set attr = attr|default({})|merge({
-        'class': (attr.class|default('') ~ ' query-designer-form clearfix')|trim,
-        'data-page-component-module': 'oroquerydesigner/js/app/components/column-form',
-        'data-page-component-options': {showItems: showItems}|json_encode
+        'class': (attr.class|default('') ~ ' query-designer-form clearfix')|trim
     }) %}
-    <div{{ UI.attributes(attr) }}>
+    <div {{ UI.attributes(attr) }}>
         {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
         {% if ('column' in showItems) %}
         {{ form_row(form.name, {

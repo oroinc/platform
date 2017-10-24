@@ -1,13 +1,12 @@
-define([
-    'jquery',
-    'underscore',
-    'routing',
-    'orotranslation/js/translator',
-    'oroui/js/messenger',
-    'oroui/js/tools',
-    'jquery-ui'
-], function($, _, routing, __, messenger, tools) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var routing = require('routing');
+    var EntityFieldsUtil = require('oroentity/js/entity-fields-util');
+
+    require('jquery-ui');
 
     /**
      * Widget responsible for loading fields of selected entity
@@ -65,7 +64,7 @@ define([
         },
 
         setFieldsData: function(data) {
-            var fields = this._convertData(data);
+            var fields = EntityFieldsUtil.convertData(data);
             this.element.data('fields', fields);
             this._trigger('update', null, [fields]);
         },
@@ -101,30 +100,6 @@ define([
 
         _onLoaded: function(data) {
             this.setFieldsData(data);
-        },
-
-        /**
-         * Converts data in proper array of fields hierarchy
-         *
-         * @param {Array} data
-         * @returns {Array}
-         * @private
-         */
-        _convertData: function(data) {
-            $.each(data, function() {
-                var entity = this;
-                entity.fieldsIndex = {};
-                $.each(entity.fields, function() {
-                    var field = this;
-                    if (field.relation_type && field.related_entity_name) {
-                        field.related_entity = data[field.related_entity_name];
-                        delete field.related_entity_name;
-                    }
-                    field.entity = entity;
-                    entity.fieldsIndex[field.name] = field;
-                });
-            });
-            return data;
         }
     });
 });

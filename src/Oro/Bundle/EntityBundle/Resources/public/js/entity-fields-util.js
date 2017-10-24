@@ -50,6 +50,28 @@ define(function(require) {
         return _.throttle(handler, 100, {trailing: false});
     }());
 
+    /**
+     * Converts data in proper array of fields hierarchy
+     *
+     * @param {Array} data
+     * @returns {Array}
+     * @private
+     */
+    Util.convertData = function(data) {
+        _.each(data, function(entity) {
+            entity.fieldsIndex = {};
+            _.each(entity.fields, function(field) {
+                if (field.relation_type && field.related_entity_name) {
+                    field.related_entity = data[field.related_entity_name];
+                    delete field.related_entity_name;
+                }
+                field.entity = entity;
+                entity.fieldsIndex[field.name] = field;
+            });
+        });
+        return data;
+    };
+
     Util.prototype = {
 
         init: function(entity, data) {
