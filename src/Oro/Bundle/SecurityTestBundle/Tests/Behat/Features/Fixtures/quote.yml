@@ -5,7 +5,7 @@ Oro\Bundle\SaleBundle\Entity\Quote:
     quote:
         owner: '@xss_user'
         organization: '@xss_organization'
-        website: '@website1'
+        website: '<{website}>'
         customerUser: '@amanda'
         shippingAddress: '@quote_address_1'
         poNumber: '<xss("Quote.poNumber")>'

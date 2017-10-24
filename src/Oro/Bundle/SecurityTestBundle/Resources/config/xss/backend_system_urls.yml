@@ -1,0 +1,24 @@
+urls:
+    # Frontend Menus
+    - { route: 'oro_commerce_menu_global_menu_index' }
+    - { route: 'oro_navigation_global_menu_create', parameters: { menuName: 'frontend_menu' } }
+    - { route: 'oro_navigation_global_menu_view', parameters: { menuName: 'frontend_menu' } }
+    - { route: 'oro_navigation_global_menu_update', parameters: { menuName: 'frontend_menu', key: '@xss_frontend_menu_update_2.key' } }
+
+    # Payment Rules
+    - { route: 'oro_payment_methods_configs_rule_index' }
+    - { route: 'oro_payment_methods_configs_rule_create' }
+    - { route: 'oro_payment_methods_configs_rule_view', parameters: { id: '@paymentMethodsConfigsRule.id' } }
+    - { route: 'oro_payment_methods_configs_rule_update', parameters: { id: '@paymentMethodsConfigsRule.id' }, options: { disable_select2_checks: true } }
+
+    # Shipping Rules
+    - { route: 'oro_shipping_methods_configs_rule_index' }
+    - { route: 'oro_shipping_methods_configs_rule_create' }
+    - { route: 'oro_shipping_methods_configs_rule_view', parameters: { id: '@shippingMethodsConfigsRule.id' } }
+    - { route: 'oro_shipping_methods_configs_rule_update', parameters: { id: '@shippingMethodsConfigsRule.id' }, options: { disable_select2_checks: true } }
+
+    # Websites
+    - { route: 'oro_multiwebsite_index' }
+    - { route: 'oro_multiwebsite_create' }
+    - { route: 'oro_multiwebsite_view', parameters: { id: '@xss_website.id' } }
+    - { route: 'oro_multiwebsite_update', parameters: { id: '@xss_website.id' }, options: { disable_select2_checks: true } }

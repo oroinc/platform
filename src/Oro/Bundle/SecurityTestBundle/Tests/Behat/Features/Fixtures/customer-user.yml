@@ -14,7 +14,7 @@ Oro\Bundle\CustomerBundle\Entity\CustomerUser:
         owner: '@xss_user'
         organization: '@xss_organization'
         role: ['@front_admin', '@buyer', '@xss_role']
-        website: '@website1'
+        website: '<{website}>'
         customer: '@company_a'
         enabled: '1'
         confirmed: '1'

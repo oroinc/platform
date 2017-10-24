@@ -8,3 +8,4 @@ include:
     - login-page.yml
     - content-block.yml
     - tax.yml
+    - frontend-menu.yml

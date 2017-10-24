@@ -1,4 +1,5 @@
 @fixture-OroSecurityTestBundle:user.yml
+@fixture-OroSecurityTestBundle:frontend-parameters.yml
 @fixture-OroSecurityTestBundle:shipping-method.yml
 @fixture-OroSecurityTestBundle:shipping-method-rule.yml
 @fixture-OroSecurityTestBundle:payment-method.yml

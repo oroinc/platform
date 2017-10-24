@@ -46,11 +46,25 @@ Oro\Bundle\PricingBundle\Entity\PriceRule:
         priceList: '@pricelist'
         priority: 2
 
+Oro\Bundle\PricingBundle\Entity\PriceListToWebsite:
+    priceListToWebsite:
+        website: '<{website}>'
+        pricelist: '@pricelist'
+        sortOrder: 200
+
+
+Oro\Bundle\PricingBundle\Entity\PriceListToCustomerGroup:
+    priceListToCustomerGroup:
+        customerGroup: '@all_customers'
+        pricelist: '@pricelist'
+        website: '<{website}>'
+        sortOrder: 200
+
 Oro\Bundle\PricingBundle\Entity\PriceListToCustomer:
     priceListToCustomer:
         customer: '@company_a'
         pricelist: '@pricelist'
-        website: '@website1'
+        website: '<{website}>'
         sortOrder: 200
 
 Oro\Bundle\PricingBundle\Entity\CombinedProductPrice:
@@ -74,10 +88,10 @@ Oro\Bundle\PricingBundle\Entity\CombinedProductPrice:
 Oro\Bundle\PricingBundle\Entity\CombinedPriceListToWebsite:
     combinedPriceListToWebsite:
         pricelist: '@combinedPriceList'
-        website: '@website1'
+        website: '<{website}>'
 
 Oro\Bundle\CustomerBundle\Entity\CustomerUserSettings:
     customerUserSetting:
         customerUser: '@amanda'
-        __construct: ['@website1']
+        __construct: ['<{website}>']
         currency: 'USD'

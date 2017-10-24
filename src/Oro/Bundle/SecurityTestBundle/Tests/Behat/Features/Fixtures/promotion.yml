@@ -52,6 +52,7 @@ Oro\Bundle\PromotionBundle\Entity\DiscountConfiguration:
             get_y: 1
             discount_product_unit_code: 'liter'
             discount_apply_to: 'apply_to_each_y'
+            discount_limit: 1
     shipping_discount_configuration:
         type: 'shipping'
         options:

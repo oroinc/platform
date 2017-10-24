@@ -1,4 +1,6 @@
 @fixture-OroSecurityTestBundle:user.yml
+@fixture-OroSecurityTestBundle:website.yml
+@fixture-OroSecurityTestBundle:backend-parameters.yml
 @fixture-OroSecurityTestBundle:shipping-method.yml
 @fixture-OroSecurityTestBundle:shipping-method-rule.yml
 @fixture-OroSecurityTestBundle:payment-method.yml
@@ -31,4 +33,8 @@ Feature: Commerce admin area MUST NOT contain XSS vulnerabilities on all accessi
 
   Scenario: Check backend taxes pages for XSS vulnerability
     When I visiting pages listed in "backend inventory urls"
+    Then I should not get XSS vulnerabilities
+
+  Scenario: Check backend taxes pages for XSS vulnerability
+    When I visiting pages listed in "backend system urls"
     Then I should not get XSS vulnerabilities
