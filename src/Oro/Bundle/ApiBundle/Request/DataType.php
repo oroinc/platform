@@ -61,9 +61,9 @@ final class DataType
      * and "object" or "scalar" data-type is used for "to-one" associations.
      * The "object" is usually used if a value of such field contains several properties.
      * The "scalar" is usually used if a value of such field contains a scalar value.
-     * Also "nestedObject" data-type, that is used to group several fields in one object, is classified
-     * as an association that should be represented as a field because the behaviour
-     * of the nested object is the same.
+     * Also "nestedObject" data-type, that is used to group several fields in one object,
+     * is classified as an association that should be represented as a field because the behaviour
+     * of it is the same.
      *
      * @param string $dataType
      *

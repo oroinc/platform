@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Metadata;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
@@ -39,13 +40,14 @@ class EntityMetadataFactory
 
     /**
      * @param ClassMetadata $classMetadata
-     * @param string        $fieldName
+     * @param string        $propertyPath
      * @param string|null   $fieldType
      *
      * @return MetaPropertyMetadata
      */
-    public function createMetaPropertyMetadata(ClassMetadata $classMetadata, $fieldName, $fieldType = null)
+    public function createMetaPropertyMetadata(ClassMetadata $classMetadata, $propertyPath, $fieldType = null)
     {
+        list($classMetadata, $fieldName) = $this->getTargetClassMetadata($classMetadata, $propertyPath);
         if (!$fieldType && $classMetadata->hasField($fieldName)) {
             $fieldType = (string)$classMetadata->getTypeOfField($fieldName);
         }
@@ -58,13 +60,14 @@ class EntityMetadataFactory
 
     /**
      * @param ClassMetadata $classMetadata
-     * @param string        $fieldName
+     * @param string        $propertyPath
      * @param string|null   $fieldType
      *
      * @return FieldMetadata
      */
-    public function createFieldMetadata(ClassMetadata $classMetadata, $fieldName, $fieldType = null)
+    public function createFieldMetadata(ClassMetadata $classMetadata, $propertyPath, $fieldType = null)
     {
+        list($classMetadata, $fieldName) = $this->getTargetClassMetadata($classMetadata, $propertyPath);
         if (!$fieldType) {
             $fieldType = (string)$classMetadata->getTypeOfField($fieldName);
         }
@@ -82,16 +85,17 @@ class EntityMetadataFactory
 
     /**
      * @param ClassMetadata $classMetadata
-     * @param string        $associationName
+     * @param string        $propertyPath
      * @param string|null   $associationDataType
      *
      * @return AssociationMetadata
      */
     public function createAssociationMetadata(
         ClassMetadata $classMetadata,
-        $associationName,
+        $propertyPath,
         $associationDataType = null
     ) {
+        list($classMetadata, $associationName) = $this->getTargetClassMetadata($classMetadata, $propertyPath);
         $targetClass = $classMetadata->getAssociationTargetClass($associationName);
 
         $associationMetadata = new AssociationMetadata();
@@ -151,5 +155,42 @@ class EntityMetadataFactory
             default:
                 return null;
         }
+    }
+
+    /**
+     * @param ClassMetadata $classMetadata
+     * @param string        $propertyPath
+     *
+     * @return array [target class metadata, target field name]
+     *
+     * @throws \InvalidArgumentException if the target class metadata cannot be found
+     */
+    protected function getTargetClassMetadata(ClassMetadata $classMetadata, $propertyPath)
+    {
+        $path = ConfigUtil::explodePropertyPath($propertyPath);
+        if (count($path) === 1) {
+            return [$classMetadata, $propertyPath];
+        }
+
+        $fieldName = array_pop($path);
+        $targetClassMetadata = $classMetadata;
+        foreach ($path as $associationName) {
+            if (!$targetClassMetadata->hasAssociation($associationName)) {
+                $targetClassMetadata = null;
+                break;
+            }
+            $targetClassMetadata = $this->doctrineHelper->getEntityMetadataForClass(
+                $targetClassMetadata->getAssociationTargetClass($associationName)
+            );
+        }
+        if (null === $targetClassMetadata) {
+            throw new \InvalidArgumentException(sprintf(
+                'Cannot find metadata by path "%s" starting with class "%s"',
+                implode(ConfigUtil::PATH_DELIMITER, $path),
+                $classMetadata->name
+            ));
+        }
+
+        return [$targetClassMetadata, $fieldName];
     }
 }

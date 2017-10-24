@@ -44,7 +44,8 @@ class RestJsonApiCustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 1'),
                         'attributes'    => [
-                            'name' => 'Item 1'
+                            'databaseId' => '@test_custom_id1->id',
+                            'name'       => 'Item 1'
                         ],
                         'relationships' => [
                             'parent'   => [
@@ -59,7 +60,8 @@ class RestJsonApiCustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 2'),
                         'attributes'    => [
-                            'name' => 'Item 2'
+                            'databaseId' => '@test_custom_id2->id',
+                            'name'       => 'Item 2'
                         ],
                         'relationships' => [
                             'parent'   => [
@@ -74,7 +76,8 @@ class RestJsonApiCustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 3'),
                         'attributes'    => [
-                            'name' => 'Item 3'
+                            'databaseId' => '@test_custom_id3->id',
+                            'name'       => 'Item 3'
                         ],
                         'relationships' => [
                             'parent'   => [
@@ -226,7 +229,8 @@ class RestJsonApiCustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 3'),
                         'attributes'    => [
-                            'name' => 'Item 3'
+                            'databaseId' => '@test_custom_id3->id',
+                            'name'       => 'Item 3'
                         ],
                         'relationships' => [
                             'parent'   => [
@@ -261,7 +265,8 @@ class RestJsonApiCustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 1'),
                         'attributes'    => [
-                            'name' => 'Item 1'
+                            'databaseId' => '@test_custom_id1->id',
+                            'name'       => 'Item 1'
                         ],
                         'relationships' => [
                             'parent'   => [
@@ -276,7 +281,44 @@ class RestJsonApiCustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 3'),
                         'attributes'    => [
-                            'name' => 'Item 3'
+                            'databaseId' => '@test_custom_id3->id',
+                            'name'       => 'Item 3'
+                        ],
+                        'relationships' => [
+                            'parent'   => [
+                                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1')]
+                            ],
+                            'children' => [
+                                'data' => [
+                                    ['type' => $entityType, 'id' => $this->getEntityId('item 2')]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListFilterByDatabasePrimaryKey()
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[databaseId]' => '@test_custom_id3->id']
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type'          => $entityType,
+                        'id'            => $this->getEntityId('item 3'),
+                        'attributes'    => [
+                            'databaseId' => '@test_custom_id3->id',
+                            'name'       => 'Item 3'
                         ],
                         'relationships' => [
                             'parent'   => [
@@ -311,7 +353,8 @@ class RestJsonApiCustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 3'),
                         'attributes'    => [
-                            'name' => 'Item 3'
+                            'databaseId' => '@test_custom_id3->id',
+                            'name'       => 'Item 3'
                         ],
                         'relationships' => [
                             'parent'   => [
@@ -342,7 +385,8 @@ class RestJsonApiCustomIdentifierTest extends RestJsonApiTestCase
                     'type'          => $entityType,
                     'id'            => $this->getEntityId('item 3'),
                     'attributes'    => [
-                        'name' => 'Item 3'
+                        'databaseId' => '@test_custom_id3->id',
+                        'name'       => 'Item 3'
                     ],
                     'relationships' => [
                         'parent'   => [
@@ -358,6 +402,39 @@ class RestJsonApiCustomIdentifierTest extends RestJsonApiTestCase
             ],
             $response
         );
+    }
+
+    public function testExcludeDatabasePrimaryKey()
+    {
+        $this->appendEntityConfig(
+            TestEntity::class,
+            [
+                'fields' => [
+                    'databaseId' => [
+                        'exclude' => true
+                    ]
+                ]
+            ]
+        );
+
+        $entityType = $this->getEntityType(TestEntity::class);
+
+        $response = $this->get(['entity' => $entityType, 'id' => $this->getEntityId('item 3')]);
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type'       => $entityType,
+                    'id'         => $this->getEntityId('item 3'),
+                    'attributes' => [
+                        'name' => 'Item 3'
+                    ],
+                ],
+            ],
+            $response
+        );
+        $content = self::jsonToArray($response->getContent());
+        self::assertFalse(isset($content['data']['attributes']['databaseId']));
     }
 
     public function testGetWithTitles()
@@ -471,6 +548,9 @@ class RestJsonApiCustomIdentifierTest extends RestJsonApiTestCase
             ->findOneBy(['key' => 'new item']);
         self::assertNotNull($createdEntity);
 
+        $result = self::jsonToArray($response->getContent());
+        self::assertSame($createdEntity->id, $result['data']['attributes']['databaseId']);
+
         self::assertSame('New Item', $createdEntity->name);
         self::assertSame($this->getReference('test_custom_id1')->id, $createdEntity->getParent()->id);
         self::assertCount(1, $createdEntity->getChildren());
@@ -486,7 +566,8 @@ class RestJsonApiCustomIdentifierTest extends RestJsonApiTestCase
                 'type'          => $entityType,
                 'id'            => $this->getEntityId('item 1'),
                 'attributes'    => [
-                    'name' => 'Updated Name'
+                    'databaseId' => '@test_custom_id1->id',
+                    'name'       => 'Updated Name'
                 ],
                 'relationships' => [
                     'parent'   => [
@@ -575,7 +656,8 @@ class RestJsonApiCustomIdentifierTest extends RestJsonApiTestCase
                     'type'          => $entityType,
                     'id'            => $this->getEntityId('item 1'),
                     'attributes'    => [
-                        'name' => 'Item 1'
+                        'databaseId' => '@test_custom_id1->id',
+                        'name'       => 'Item 1'
                     ],
                     'relationships' => [
                         'parent'   => [
@@ -629,7 +711,8 @@ class RestJsonApiCustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 2'),
                         'attributes'    => [
-                            'name' => 'Item 2'
+                            'databaseId' => '@test_custom_id2->id',
+                            'name'       => 'Item 2'
                         ],
                         'relationships' => [
                             'parent'   => [

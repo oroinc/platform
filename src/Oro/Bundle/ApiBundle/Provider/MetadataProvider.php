@@ -71,24 +71,32 @@ class MetadataProvider
             $configKey
         );
         if (array_key_exists($cacheKey, $this->cache)) {
-            return clone $this->cache[$cacheKey];
+            $metadata = $this->cache[$cacheKey];
+        } else {
+            $metadata = $this->loadMetadata(
+                $className,
+                $version,
+                $requestType,
+                $config,
+                $extras,
+                $withExcludedProperties
+            );
+            $this->cache[$cacheKey] = $metadata;
         }
-
-        $metadata = $this->loadMetadata(
-            $className,
-            $version,
-            $requestType,
-            $config,
-            $extras,
-            $withExcludedProperties
-        );
-        $this->cache[$cacheKey] = $metadata;
 
         if (null === $metadata) {
             return null;
         }
 
         return clone $metadata;
+    }
+
+    /**
+     * Removes all already built metadatas from the internal cache.
+     */
+    public function clearCache()
+    {
+        $this->cache = [];
     }
 
     /**
