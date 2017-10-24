@@ -5,7 +5,7 @@ namespace Oro\Component\Action\Exception;
 /**
  * Exception thrown if entity is not manageable.
  */
-class NotManageableEntityException extends \Exception
+class NotManageableEntityException extends RuntimeException
 {
     /**
      * @param string $className

@@ -38,6 +38,9 @@ class FilterFieldConfig implements FieldConfigInterface
     /** a flag indicates whether the filter value can be an array */
     const ALLOW_ARRAY = 'allow_array';
 
+    /** a flag indicates whether the filter value can be a pair of "from" and "to" values */
+    const ALLOW_RANGE = 'allow_range';
+
     /** @var array */
     protected $items = [];
 
@@ -51,6 +54,7 @@ class FilterFieldConfig implements FieldConfigInterface
         $result = $this->convertItemsToArray();
         $this->removeItemWithDefaultValue($result, self::EXCLUDE);
         $this->removeItemWithDefaultValue($result, self::ALLOW_ARRAY);
+        $this->removeItemWithDefaultValue($result, self::ALLOW_RANGE);
 
         return $result;
     }
@@ -80,9 +84,11 @@ class FilterFieldConfig implements FieldConfigInterface
      */
     public function getType()
     {
-        return array_key_exists(self::TYPE, $this->items)
-            ? $this->items[self::TYPE]
-            : null;
+        if (!array_key_exists(self::TYPE, $this->items)) {
+            return null;
+        }
+
+        return $this->items[self::TYPE];
     }
 
     /**
@@ -106,9 +112,11 @@ class FilterFieldConfig implements FieldConfigInterface
      */
     public function getOptions()
     {
-        return array_key_exists(self::OPTIONS, $this->items)
-            ? $this->items[self::OPTIONS]
-            : null;
+        if (!array_key_exists(self::OPTIONS, $this->items)) {
+            return null;
+        }
+
+        return $this->items[self::OPTIONS];
     }
 
     /**
@@ -132,9 +140,11 @@ class FilterFieldConfig implements FieldConfigInterface
      */
     public function getOperators()
     {
-        return array_key_exists(self::OPERATORS, $this->items)
-            ? $this->items[self::OPERATORS]
-            : null;
+        if (!array_key_exists(self::OPERATORS, $this->items)) {
+            return null;
+        }
+
+        return $this->items[self::OPERATORS];
     }
 
     /**
@@ -168,9 +178,11 @@ class FilterFieldConfig implements FieldConfigInterface
      */
     public function isArrayAllowed()
     {
-        return array_key_exists(self::ALLOW_ARRAY, $this->items)
-            ? $this->items[self::ALLOW_ARRAY]
-            : false;
+        if (!array_key_exists(self::ALLOW_ARRAY, $this->items)) {
+            return false;
+        }
+
+        return $this->items[self::ALLOW_ARRAY];
     }
 
     /**
@@ -181,5 +193,39 @@ class FilterFieldConfig implements FieldConfigInterface
     public function setArrayAllowed($allowArray = true)
     {
         $this->items[self::ALLOW_ARRAY] = $allowArray;
+    }
+
+    /**
+     * Indicates whether the "range allowed" flag is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasRangeAllowed()
+    {
+        return array_key_exists(self::ALLOW_RANGE, $this->items);
+    }
+
+    /**
+     * Indicates whether the filter value can be a pair of "from" and "to" values.
+     *
+     * @return bool
+     */
+    public function isRangeAllowed()
+    {
+        if (!array_key_exists(self::ALLOW_RANGE, $this->items)) {
+            return false;
+        }
+
+        return $this->items[self::ALLOW_RANGE];
+    }
+
+    /**
+     * Sets a flag indicates whether the filter value can be a pair of "from" and "to" values.
+     *
+     * @param bool $allowRange
+     */
+    public function setRangeAllowed($allowRange = true)
+    {
+        $this->items[self::ALLOW_RANGE] = $allowRange;
     }
 }

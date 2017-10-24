@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Exception;
 
-class OperationNotFoundException extends \Exception
+use Oro\Component\Action\Exception\RuntimeException;
+
+class OperationNotFoundException extends RuntimeException
 {
     /**
      * @param string $name

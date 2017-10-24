@@ -247,6 +247,9 @@ As described above, the **data_type** attribute can be used to specify a data ty
 
 | Data Type | Description |
 | --- | --- |
+| scalar | Used to represent a field of to-one association as a field of parent entity. In JSON.API it means that the association's field should be in "attributes" section instead of "relationships" section. |
+| object | Used to represent to-one association as a field. In JSON.API it means that the association should be in "attributes" section instead of "relationships" section. |
+| array | Used to represent to-many association as a field. In JSON.API it means that the association should be in "attributes" section instead of "relationships" section. |
 | nestedObject | Used to configure nested objects. For details see [Configure nested object](./how_to.md#configure-nested-object). |
 | nestedAssociation | Used to configure nested associations. For details see [Configure nested association](./how_to.md#configure-nested-association). |
 | association:relationType\[:associationKind\] | Used to configure extended associations. For details see [Configure Extended Many-To-One Association](./how_to.md#configure-extended-many-to-one-association), [Configure Extended Many-To-Many Association](./how_to.md#configure-extended-many-to-many-association) and [Configure Extended Multiple Many-To-One Association](./how_to.md#configure-extended-multiple-many-to-one-association). |
@@ -321,6 +324,7 @@ This section describes fields by which the result data can be filtered. It conta
     * **property_path** *string* The property path to reach the fields' value. The same way as above in `fields` configuration section.
     * **data_type** *string* The data type of the filter value. Can be `boolean`, `integer`, `string`, etc.
     * **allow_array** *boolean* A flag indicates whether the filter can contains several values. By default `false`.
+    * **allow_range** *boolean* A flag indicates whether the filter can contains a pair of "from" and "to" values. By default `false`.
     * **type** *string* The filter type. By default the filter type is equal to the **data_type** property.
     * **options** *array* The filter options.
     * **operators** *array* A list of operators supported by the filter. By default the list of operators depends on the filter type. For example a string filter supports **=** and **!=** operators, a number filter supports **=**, **!=**, **<**, **<=**, **>** and **>=** operators, etc. Usually you need to use this parameter in case if you need to make a list of supported operators more limited.
@@ -342,8 +346,9 @@ api:
                         property_path: firstName
                         description: 'My filter description'
                     field3:
-                        data_type: boolean
-                        allow_array: false
+                        data_type: date
+                        allow_array: true
+                        allow_range: true
                     field4:
                         data_type: string
                         type: myFilter
@@ -572,4 +577,4 @@ api:
 "relations" configuration section
 ---------------------------------
 
-The `relations` configuration section describes a configuration of an entity if it is used in a relationship. This section is not used for JSON.API, but can be helpfull for other types of API. This section is similar to the [entities](#entities-configuration-section) section.
+The `relations` configuration section describes a configuration of an entity if it is used in a relationship. This section is not used for JSON.API, but can be helpful for other types of API. This section is similar to the [entities](#entities-configuration-section) section.

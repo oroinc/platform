@@ -252,6 +252,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - ['boolean', 'datetime', 'date', 'time']
+            - ['string', 'boolean', 'guid', 'currency']
         tags:
             - { name: oro.api.processor, action: get_config, extra: filters&definition, priority: -80 }
             - { name: oro.api.processor, action: get_relation_config, extra: filters&definition, priority: -80 }

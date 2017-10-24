@@ -26,7 +26,8 @@ class RootJobStatusCalculator
     public function calculate(Job $job)
     {
         $rootJob = $job->isRoot() ? $job : $job->getRootJob();
-        $stopStatuses = [Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_CANCELLED];
+        $rootJob->setLastActiveAt(new \DateTime());
+        $stopStatuses = [Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_CANCELLED, Job::STATUS_STALE];
 
         if (in_array($rootJob->getStatus(), $stopStatuses, true)) {
             return false;

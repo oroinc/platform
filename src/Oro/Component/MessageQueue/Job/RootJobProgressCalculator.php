@@ -19,7 +19,12 @@ class RootJobProgressCalculator
     /**
      * @var array
      */
-    protected static $stopStatuses = [Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_CANCELLED];
+    protected static $stopStatuses = [
+        Job::STATUS_SUCCESS,
+        Job::STATUS_FAILED,
+        Job::STATUS_CANCELLED,
+        Job::STATUS_STALE
+    ];
 
     /**
      * @param Job $job
@@ -27,6 +32,7 @@ class RootJobProgressCalculator
     public function calculate(Job $job)
     {
         $rootJob = $job->isRoot() ? $job : $job->getRootJob();
+        $rootJob->setLastActiveAt(new \DateTime());
         $children = $rootJob->getChildJobs();
         $numberOfChildren = count($children);
         if (0 === $numberOfChildren) {

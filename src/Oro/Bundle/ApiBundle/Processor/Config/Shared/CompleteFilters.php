@@ -21,14 +21,22 @@ class CompleteFilters extends CompleteSection
     /** @var array [data type => true, ...] */
     protected $disallowArrayDataTypes;
 
+    /** @var array [data type => true, ...] */
+    protected $disallowRangeDataTypes;
+
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param string[]       $disallowArrayDataTypes
+     * @param string[]       $disallowRangeDataTypes
      */
-    public function __construct(DoctrineHelper $doctrineHelper, array $disallowArrayDataTypes)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        array $disallowArrayDataTypes,
+        array $disallowRangeDataTypes
+    ) {
         parent::__construct($doctrineHelper);
         $this->disallowArrayDataTypes = array_fill_keys($disallowArrayDataTypes, true);
+        $this->disallowRangeDataTypes = array_fill_keys($disallowRangeDataTypes, true);
     }
 
     /**
@@ -91,8 +99,13 @@ class CompleteFilters extends CompleteSection
                 $dataType = $metadata->getTypeOfField($propertyPath);
                 $filter->setDataType($dataType);
             }
-            if (!$filter->hasArrayAllowed() && $dataType) {
-                $filter->setArrayAllowed(!isset($this->disallowArrayDataTypes[$dataType]));
+            if ($dataType) {
+                if (!$filter->hasArrayAllowed()) {
+                    $filter->setArrayAllowed(!isset($this->disallowArrayDataTypes[$dataType]));
+                }
+                if (!$filter->hasRangeAllowed()) {
+                    $filter->setRangeAllowed(!isset($this->disallowRangeDataTypes[$dataType]));
+                }
             }
         }
     }
@@ -154,6 +167,9 @@ class CompleteFilters extends CompleteSection
                 }
                 if (!$filter->hasArrayAllowed()) {
                     $filter->setArrayAllowed(!isset($this->disallowArrayDataTypes[$dataType]));
+                }
+                if (!$filter->hasRangeAllowed()) {
+                    $filter->setRangeAllowed(!isset($this->disallowRangeDataTypes[$dataType]));
                 }
             }
         }
