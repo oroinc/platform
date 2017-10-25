@@ -10,7 +10,15 @@ class EntityStructureOptionsEvent extends Event
     const EVENT_NAME = 'oro_entity.structure.options';
 
     /** @var array|EntityStructure[] */
-    protected $data = [];
+    protected $data;
+
+    /**
+     * @param array|EntityStructure[] $data
+     */
+    public function __construct(array $data = [])
+    {
+        $this->data = $data;
+    }
 
     /**
      * @param array $data

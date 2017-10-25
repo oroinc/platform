@@ -41,6 +41,18 @@ class EntityStructure
     protected $routes = [];
 
     /**
+     * @param $id
+     *
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getId()
@@ -104,8 +116,6 @@ class EntityStructure
     public function setClassName($className)
     {
         $this->className = $className;
-        /** build id from class name */
-        $this->id = str_replace('\\', '_', $className);
 
         return $this;
     }

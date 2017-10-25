@@ -47,10 +47,15 @@ class EntityExtendedStructureOptionsListener
      */
     protected function getRelationType($className, $fieldName)
     {
-        //Process field that represents unidirectional relation from other entity to the current
+        //Process field that represents unidirectional relation from other entity to the current.
+        //For example "Oro\Bundle\AccountBundle\Entity\Account::referredBy"
         $data = explode('::', $fieldName);
         if (count($data) === 2) {
             list($className, $fieldName) = $data;
+        }
+
+        if (!$this->doctrineHelper->isManageableEntity($className)) {
+            return null;
         }
 
         $metadata = $this->doctrineHelper->getEntityMetadata($className);

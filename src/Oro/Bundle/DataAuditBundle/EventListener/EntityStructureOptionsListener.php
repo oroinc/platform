@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\EventListener;
 
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
+use Oro\Bundle\EntityBundle\Model\EntityStructure;
 
 class EntityStructureOptionsListener
 {
@@ -27,18 +28,26 @@ class EntityStructureOptionsListener
     {
         $data = $event->getData();
         foreach ($data as $entityStructure) {
+            if (!$entityStructure instanceof EntityStructure) {
+                continue;
+            }
+
             $className = $entityStructure->getClassName();
-            $isAuditableEntity = $this->auditConfigProvider->isAuditableEntity($className);
-            $entityStructure->addOption(self::OPTION_NAME, $isAuditableEntity);
+
+            $entityStructure->addOption(
+                self::OPTION_NAME,
+                $this->auditConfigProvider->isAuditableEntity($className)
+            );
+
             $fields = $entityStructure->getFields();
             foreach ($fields as $field) {
-                $isAuditableField = $this->auditConfigProvider->isAuditableField(
-                    $className,
-                    $field->getName()
+                $field->addOption(
+                    self::OPTION_NAME,
+                    $this->auditConfigProvider->isAuditableField($className, $field->getName())
                 );
-                $field->addOption(self::OPTION_NAME, $isAuditableField);
             }
         }
+
         $event->setData($data);
     }
 }

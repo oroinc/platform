@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Api\Processor;
 
+use Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\EntityBundle\Api\Processor\EntityStructureLoadDataProcessor;
@@ -25,60 +26,22 @@ class EntityStructureLoadDataProcessorTest extends \PHPUnit_Framework_TestCase
         $this->processor = new EntityStructureLoadDataProcessor($this->provider);
     }
 
-    /**
-     * @param string $id
-     * @param bool $expected
-     *
-     * @dataProvider processGetDataProvider
-     */
-    public function testProcessGet($id, $expected)
-    {
-        $context = $this->createMock(GetContext::class);
-        $context->expects($this->once())
-            ->method('getAction')
-            ->willReturn(ApiActions::GET);
-        $context->expects($this->once())
-            ->method('getId')
-            ->willReturn($id);
-        $this->provider->expects($this->once())
-            ->method('getData')
-            ->willReturn([
-                (new EntityStructure())->setClassName(\stdClass::class),
-                (new EntityStructure())->setClassName('Class\Test'),
-            ]);
-        $context->expects($this->exactly((int)$expected))
-            ->method('setResult')
-            ->with($this->isInstanceOf(EntityStructure::class));
-
-        $this->processor->process($context);
-    }
-
-    /**
-     * @return array
-     */
-    public function processGetDataProvider()
-    {
-        return [
-            'positive simple' => ['id' => \stdClass::class, 'expected' => true],
-            'positive with namespace' => ['id' => 'Class_Test', 'expected' => true],
-            'negative simple' => ['id' => 'OtherClass', 'expected' => false],
-            'negative with namespace' => ['id' => 'Class_Test_Other', 'expected' => false],
-        ];
-    }
-
     public function testProcessGetList()
     {
         $context = $this->createMock(GetContext::class);
         $context->expects($this->once())
             ->method('getAction')
             ->willReturn(ApiActions::GET_LIST);
+
         $data = [
             (new EntityStructure())->setClassName(\stdClass::class),
             (new EntityStructure())->setClassName('Class\Test'),
         ];
+
         $this->provider->expects($this->once())
             ->method('getData')
             ->willReturn($data);
+
         $context->expects($this->once())
             ->method('setResult')
             ->with($data);
@@ -89,14 +52,19 @@ class EntityStructureLoadDataProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $action
      *
-     * @dataProvider processGetDataProvider
+     * @dataProvider unsupportedActionDataProvider
      */
     public function testProcessWithUnsupportedActions($action)
     {
+
         $context = $this->createMock(GetContext::class);
         $context->expects($this->once())
             ->method('getAction')
             ->willReturn($action);
+
+        $this->expectException(ActionNotAllowedException::class);
+        $this->expectExceptionMessage('The action is not allowed.');
+
         $this->provider->expects($this->never())
             ->method('getData');
         $context->expects($this->never())
@@ -111,6 +79,7 @@ class EntityStructureLoadDataProcessorTest extends \PHPUnit_Framework_TestCase
     public function unsupportedActionDataProvider()
     {
         return [
+            ApiActions::GET => [ApiActions::GET],
             ApiActions::UPDATE => [ApiActions::UPDATE],
             ApiActions::CREATE => [ApiActions::CREATE],
             ApiActions::DELETE => [ApiActions::DELETE],

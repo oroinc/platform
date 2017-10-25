@@ -40,6 +40,7 @@ api:
         Oro\Bundle\UserBundle\Api\Model\UserProfile:
             fields:
                 id:
+#                    data_type: integer
                     description: The unique identifier of a user.
             actions:
                 get:

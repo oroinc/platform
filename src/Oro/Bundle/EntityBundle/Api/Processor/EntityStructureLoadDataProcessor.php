@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Api\Processor;
 
+use Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
@@ -29,28 +30,11 @@ class EntityStructureLoadDataProcessor implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        $action = $context->getAction();
-
-        if (!$this->isActionSupported($action)) {
-            return;
+        if (!$this->isActionSupported($context->getAction())) {
+            throw new ActionNotAllowedException();
         }
 
-        $data = $this->entityStructureProvider->getData();
-
-        switch ($action) {
-            case ApiActions::GET:
-                $id = $context->getId();
-                foreach ($data as $item) {
-                    if ($item->getId() === $id) {
-                        $context->setResult($item);
-                        break;
-                    }
-                }
-                break;
-            case ApiActions::GET_LIST:
-                $context->setResult($data);
-                break;
-        }
+        $context->setResult($this->entityStructureProvider->getData());
     }
 
     /**
@@ -60,6 +44,6 @@ class EntityStructureLoadDataProcessor implements ProcessorInterface
      */
     protected function isActionSupported($action)
     {
-        return in_array($action, [ApiActions::GET, ApiActions::GET_LIST], true);
+        return ApiActions::GET_LIST === $action;
     }
 }

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\Provider;
 use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
 use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EntityStructureDataProvider
@@ -12,19 +13,43 @@ class EntityStructureDataProvider
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var $entityWithFieldsProvider */
+    /** @var EntityWithFieldsProvider */
     protected $entityWithFieldsProvider;
+
+    /** @var EntityClassNameHelper */
+    protected $classNameHelper;
+
+    /** @var array */
+    protected $entityPropertyMappings = [
+        'name' => 'setClassName',
+        'label' => 'setLabel',
+        'plural_label' => 'setPluralLabel',
+        'icon' => 'setIcon',
+        'routes' => 'setRoutes',
+    ];
+
+    /** @var array */
+    protected $fieldPropertyMappings = [
+        'name' => 'setName',
+        'type' => 'setType',
+        'label' => 'setLabel',
+        'relation_type' => 'setRelationType',
+        'related_entity_name' => 'setRelatedEntityName',
+    ];
 
     /**
      * @param EventDispatcherInterface $eventDispatcher
      * @param EntityWithFieldsProvider $entityWithFieldsProvider
+     * @param EntityClassNameHelper $classNameHelper
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
-        EntityWithFieldsProvider $entityWithFieldsProvider
+        EntityWithFieldsProvider $entityWithFieldsProvider,
+        EntityClassNameHelper $classNameHelper
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->entityWithFieldsProvider = $entityWithFieldsProvider;
+        $this->classNameHelper = $classNameHelper;
     }
 
     /**
@@ -45,33 +70,21 @@ class EntityStructureDataProvider
      */
     protected function processEntities()
     {
-        $entities = $this->entityWithFieldsProvider->getFields(
-            true,
-            true,
-            true,
-            false,
-            true,
-            true
-        );
+        $data = $this->entityWithFieldsProvider->getFields(true, true, true, false, true, true);
         $result = [];
 
-        $mappings = [
-            'name' => 'setClassName',
-            'label' => 'setLabel',
-            'plural_label' => 'setPluralLabel',
-            'icon' => 'setIcon',
-            'routes' => 'setRoutes',
-        ];
-
-        foreach ($entities as $entity) {
+        foreach ($data as $item) {
             $model = new EntityStructure();
-            foreach ($mappings as $name => $method) {
-                if (isset($entity[$name])) {
-                    $model->{$method}($entity[$name]);
+            foreach ($this->entityPropertyMappings as $name => $method) {
+                if (isset($item[$name])) {
+                    $model->{$method}($item[$name]);
                 }
             }
-            if (!empty($entity['fields'])) {
-                $this->processFields($model, $entity['fields']);
+
+            $model->setId($this->classNameHelper->getUrlSafeClassName($model->getClassName()));
+
+            if (!empty($item['fields'])) {
+                $this->processFields($model, $item['fields']);
             }
             $result[$model->getClassName()] = $model;
         }
@@ -85,16 +98,9 @@ class EntityStructureDataProvider
      */
     protected function processFields(EntityStructure $structure, array $fields)
     {
-        $mappings = [
-            'name' => 'setName',
-            'type' => 'setType',
-            'label' => 'setLabel',
-            'relation_type' => 'setRelationType',
-            'related_entity_name' => 'setRelatedEntityName',
-        ];
         foreach ($fields as $field) {
             $model = new EntityFieldStructure();
-            foreach ($mappings as $name => $method) {
+            foreach ($this->fieldPropertyMappings as $name => $method) {
                 if (isset($field[$name])) {
                     $model->{$method}($field[$name]);
                 }

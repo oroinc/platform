@@ -9,9 +9,12 @@ use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\EventListener\EntityExtendedStructureOptionsListener;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class EntityExtendedStructureOptionsListenerTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+
     const CURRENT_RELATION_TYPE = 'CurrentType';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
@@ -47,26 +50,6 @@ class EntityExtendedStructureOptionsListenerTest extends \PHPUnit_Framework_Test
         $type,
         $hasAssociation
     ) {
-
-        $field = $this->createMock(EntityFieldStructure::class);
-        $field->expects($this->once())
-            ->method('getName')
-            ->willReturn($fieldName);
-        $field->expects($this->once())
-            ->method('setRelationType')
-            ->with($expectedRelationType);
-        $field->expects($this->any())
-            ->method('getRelationType')
-            ->willReturn(self::CURRENT_RELATION_TYPE);
-
-        $data = $this->createMock(EntityStructure::class);
-        $data->expects($this->once())
-            ->method('getClassName')
-            ->willReturn(\stdClass::class);
-        $data->expects($this->once())
-            ->method('getFields')
-            ->willReturn([$field]);
-
         $entityMetadata = $this->createMock(ClassMetadata::class);
 
         $entityMetadata->expects($this->once())
@@ -81,21 +64,22 @@ class EntityExtendedStructureOptionsListenerTest extends \PHPUnit_Framework_Test
 
         $this->doctrineHelper
             ->expects($this->once())
+            ->method('isManageableEntity')
+            ->with($expectedClass)
+            ->willReturn(true);
+
+        $this->doctrineHelper
+            ->expects($this->once())
             ->method('getEntityMetadata')
             ->with($expectedClass)
             ->willReturn($entityMetadata);
 
-        $event = $this->createMock(EntityStructureOptionsEvent::class);
-        $event->expects($this->once())
-            ->method('getData')
-            ->willReturn([$data]);
-
-        $event->expects($this->once())
-            ->method('setData')
-            ->with([$data])
-            ->willReturn($event);
+        $event = new EntityStructureOptionsEvent();
+        $event->setData([$this->getEntityStructure($fieldName, self::CURRENT_RELATION_TYPE)]);
 
         $this->listener->onOptionsRequest($event);
+
+        $this->assertEquals([$this->getEntityStructure($fieldName, $expectedRelationType)], $event->getData());
     }
 
     /**
@@ -155,5 +139,58 @@ class EntityExtendedStructureOptionsListenerTest extends \PHPUnit_Framework_Test
                 'hasAssociation' => true
             ],
         ];
+    }
+
+    public function testOnOptionsRequestForNotManageableEntity()
+    {
+        $entityMetadata = $this->createMock(ClassMetadata::class);
+        $entityMetadata->expects($this->never())
+            ->method('hasAssociation')
+            ->with('field1')
+            ->willReturn(false);
+
+        $entityMetadata->expects($this->never())
+            ->method('getAssociationMapping');
+
+        $this->doctrineHelper
+            ->expects($this->once())
+            ->method('isManageableEntity')
+            ->with(\stdClass::class)
+            ->willReturn(false);
+
+        $this->doctrineHelper
+            ->expects($this->never())
+            ->method('getEntityMetadata');
+
+        $event = new EntityStructureOptionsEvent();
+        $event->setData([$this->getEntityStructure('field1', self::CURRENT_RELATION_TYPE)]);
+
+        $this->listener->onOptionsRequest($event);
+
+        $this->assertEquals([$this->getEntityStructure('field1', 'currentType')], $event->getData());
+    }
+
+    /**
+     * @param string $fieldName
+     * @param string $relationType
+     * @return EntityStructure
+     */
+    protected function getEntityStructure($fieldName, $relationType)
+    {
+        return $this->getEntity(
+            EntityStructure::class,
+            [
+                'className' => \stdClass::class,
+                'fields' => [
+                    $this->getEntity(
+                        EntityFieldStructure::class,
+                        [
+                            'name' => $fieldName,
+                            'relationType' => $relationType
+                        ]
+                    )
+                ]
+            ]
+        );
     }
 }

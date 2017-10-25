@@ -13,6 +13,7 @@ class EntityStructureTest extends \PHPUnit_Framework_TestCase
     public function testAccessors()
     {
         static::assertPropertyAccessors(new EntityStructure(), [
+            ['id', 'id'],
             ['label', 'label'],
             ['pluralLabel', 'pluralLabel'],
             ['alias', 'alias'],
@@ -34,33 +35,5 @@ class EntityStructureTest extends \PHPUnit_Framework_TestCase
         $item = new EntityStructure();
         $this->assertFalse($item->hasOption('unknown'));
         $item->getOption('unknown');
-    }
-
-    /**
-     * @param mixed $expected
-     * @param mixed $className
-     *
-     * @dataProvider getIdDataProvider
-     */
-    public function testGetId($expected, $className)
-    {
-        $data = (new EntityStructure())->setClassName($className);
-        $this->assertSame($expected, $data->getId());
-    }
-
-    /**
-     * @return array
-     */
-    public function getIdDataProvider()
-    {
-        return [
-            'null' => ['expected' => '', 'className' => null],
-            'empty' => ['expected' => '', 'className' => ''],
-            'simple' => ['expected' => \stdClass::class, 'className' => \stdClass::class],
-            'with namespace' => [
-                'expected' => 'Oro_Bundle_EntityBundle_Tests_Unit_Model_EntityStructureTest',
-                'className' => __CLASS__
-            ],
-        ];
     }
 }

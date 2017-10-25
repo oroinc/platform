@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
 use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
+use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class EntityConfigStructureOptionsListener
@@ -27,6 +28,10 @@ class EntityConfigStructureOptionsListener
     {
         $data = $event->getData();
         foreach ($data as $entityStructure) {
+            if (!$entityStructure instanceof EntityStructure) {
+                continue;
+            }
+
             $className = $entityStructure->getClassName();
             $fields = $entityStructure->getFields();
             foreach ($fields as $field) {

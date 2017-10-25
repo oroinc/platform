@@ -1,36 +1,37 @@
 <?php
 
-namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
+use Oro\Bundle\EntityBundle\EventListener\EntityVirtualStructureOptionsListener;
 use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
-use Oro\Bundle\EntityConfigBundle\EventListener\EntityConfigStructureOptionsListener;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class EntityConfigStructureOptionsListenerTest extends \PHPUnit_Framework_TestCase
+class EntityVirtualStructureOptionsListenerTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTrait;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
-    protected $entityConfigProvider;
-
-    /** @var EntityConfigStructureOptionsListener */
+    /** @var EntityVirtualStructureOptionsListener */
     protected $listener;
+
+    /** @var EntityAliasProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $virtualFieldProvider;
 
     /**
      * {@inheritDoc}
      */
     protected function setUp()
     {
-        $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
-        $this->listener = new EntityConfigStructureOptionsListener($this->entityConfigProvider);
+        $this->virtualFieldProvider = $this->createMock(ChainVirtualFieldProvider::class);
+        $this->listener = new EntityVirtualStructureOptionsListener($this->virtualFieldProvider);
     }
 
     public function testOnOptionsRequest()
     {
-        $fieldStructure = (new EntityFieldStructure())->setName('field');
+        $fieldStructure = (new EntityFieldStructure())->setName('field1');
         $entityStructure = $this->getEntity(
             EntityStructure::class,
             [
@@ -39,18 +40,15 @@ class EntityConfigStructureOptionsListenerTest extends \PHPUnit_Framework_TestCa
             ]
         );
 
-        $this->entityConfigProvider
+        $this->virtualFieldProvider
             ->expects($this->once())
-            ->method('hasConfig')
-            ->withConsecutive(
-                [\stdClass::class],
-                [\stdClass::class, 'field']
-            )
+            ->method('isVirtualField')
+            ->with($entityStructure->getClassName(), 'field1')
             ->willReturn(true);
 
         $event = $this->getEntity(EntityStructureOptionsEvent::class, ['data' => [$entityStructure]]);
         $expectedFieldStructure = (clone $fieldStructure)->addOption(
-            EntityConfigStructureOptionsListener::OPTION_NAME,
+            EntityVirtualStructureOptionsListener::OPTION_NAME,
             true
         );
         $expectedEntityStructure = $this->getEntity(
@@ -60,7 +58,6 @@ class EntityConfigStructureOptionsListenerTest extends \PHPUnit_Framework_TestCa
                 'fields' => [$expectedFieldStructure],
             ]
         );
-
         $this->listener->onOptionsRequest($event);
         $this->assertEquals([$expectedEntityStructure], $event->getData());
     }

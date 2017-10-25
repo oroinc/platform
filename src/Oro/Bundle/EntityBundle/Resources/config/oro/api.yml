@@ -56,6 +56,8 @@ api:
                 routes:
                     data_type: array
             actions:
+#            TODO: "Get" should be uncommented after BAP-15804
+#                get: false
                 get_list:
                     page_size: -1 # disable paging
                     disable_sorting: true
