@@ -14,6 +14,7 @@
    - [Custom transport](#custom-transport)
    - [Key Classes](#key-classes)
  - [Unit and Functional tests](#unit-and-functional-tests)
+ - [Stale Jobs](#stale-jobs)
  - [Consumer heartbeat](#consumer-heartbeat)
  - [Resetting Symfony Container in consumer](Resources/doc/container_in_consumer.md)
  - [Security Context in consumer](Resources/doc/secutity_context.md)
@@ -319,6 +320,36 @@ class SomeTest extends \PHPUnit_Framework_TestCase
     }
 }
 ```
+
+## Stale Jobs
+
+It is not possible to create two unique jobs with the same name. That's why if one unique job 
+is not able to finish its work, it can block another job. 
+
+To avoid this situation, you can set maximum time for the unique job execution. If the job is still running longer than that, it is 
+possible to create new copy of the unique job (with the same name). The old job is marked as "stale" in this case. 
+See [Stale Jobs](../../Component/MessageQueue/README.md#stale-jobs) for more details.
+
+You can configure the time_before_stale parameter in config.yml file, providing time in seconds:
+ 
+```yaml
+oro_message_queue:
+    time_before_stale:
+        default: 1800
+        jobs:
+            bundle_name.processor_name.entity_name.user: 3600
+            bundle_name.processor_name.entity_name: 2000
+            bundle_name.processor_name: -1
+```
+The parser first searches for job by its full name. If the job is not found by the full name, the parser attempts to match
+the longest part of the job name (reading from the left).
+
+In the example above:
+* **bundle_name.processor_name.entity_name.user** will be *staled* after **3600** seconds
+* **bundle_name.processor_name.entity_name.organisation** will be *staled* after **2000** seconds
+* **bundle_name.processor_name.other_name.some_job** will **never** be *staled*.
+* **bundle_name.other_processor.other_name.some_job** will be *staled* after **1800** seconds
+* **processor_name.entity_name.user** will be *staled* after **1800** seconds
 
 ## Consumer Heartbeat
 

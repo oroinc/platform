@@ -194,6 +194,8 @@ class EmailType extends AbstractType
             $value = $data['origin'];
             $values =  explode('|', $value);
             $data['from'] = $values[1];
+            $this->emailModelBuilderHelper->preciseFullEmailAddress($data['from']);
+
             $event->setData($data);
         }
 

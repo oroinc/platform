@@ -5,6 +5,9 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Job\RootJobStatusCalculator;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class RootJobStatusCalculatorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
@@ -40,6 +43,7 @@ class RootJobStatusCalculatorTest extends \PHPUnit_Framework_TestCase
 
         $case = new RootJobStatusCalculator($storage);
         $case->calculate($notRootJob);
+        $this->assertInstanceOf(\DateTime::class, $rootJob->getLastActiveAt());
     }
 
     public function testShouldCalculateRootJobStatus()

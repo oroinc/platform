@@ -44,7 +44,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
         $this->valueNormalizer->expects($this->once())
             ->method('normalizeValue')
-            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false)
+            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false)
             ->willReturn('Test\Class');
         $this->entityIdTransformer->expects($this->once())
             ->method('reverseTransform')
@@ -103,8 +103,8 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             ->method('normalizeValue')
             ->willReturnMap(
                 [
-                    ['entity1', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, 'Test\Class1'],
-                    ['entity2', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, 'Test\Class2'],
+                    ['entity1', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class1'],
+                    ['entity2', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class2'],
                 ]
             );
         $this->entityIdTransformer->expects($this->exactly(2))
@@ -216,7 +216,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
         $this->valueNormalizer->expects($this->once())
             ->method('normalizeValue')
-            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false)
+            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false)
             ->willReturn('Test\Class');
         $this->entityIdTransformer->expects($this->once())
             ->method('reverseTransform')
@@ -310,8 +310,8 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             ->method('normalizeValue')
             ->willReturnMap(
                 [
-                    ['entity1', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, 'Test\Class1'],
-                    ['entity2', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, 'Test\Class2'],
+                    ['entity1', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class1'],
+                    ['entity2', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class2'],
                 ]
             );
         $this->entityIdTransformer->expects($this->exactly(2))
