@@ -11,9 +11,7 @@
             }
         } %}
         <div {{ UI.renderPageComponentAttributes({
-            view: {
-                view: 'oroworkflow/js/app/views/process-status-toggle-btn-view'
-            }
+            view: 'oroworkflow/js/app/views/process-status-toggle-btn-view'
         }) }}>
             {% if entity.enabled %}
                 {{ UI.button(options|merge({

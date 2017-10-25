@@ -23,9 +23,7 @@
                                     <div class="dashboard-selector-container pull-left">
                                         <label for="dashboard_selector">{{ 'oro.dashboard.entity_plural_label'|trans }}:</label>
                                         <select id="dashboard_selector" {{ UI.renderPageComponentAttributes({
-                                            view: {
-                                                view: 'orodashboard/js/app/views/dashboard-change-view'
-                                            }
+                                            view: 'orodashboard/js/app/views/dashboard-change-view'
                                         }) }}>
                                             <option>{{ 'oro.dashboard.title.chose_dashboard'|trans }}</option>
                                             {% for dashboardModel in dashboards %}
