@@ -40,6 +40,7 @@ To be sure that your REST API resources work properly you can cover them by [fun
 | getResourceId | Extracts JSON.API resource identifier from the response. For details see [JSON.API Specification](http://jsonapi.org/format/#document-resource-objects). |
 | getRequestData | Converts the given request to an array that can be sent to the server. The given request can be a path to a file contains the request data or an array with the request data. If the request is a file name, the file should be located in the `requests` directory near to PHP file contains the test. |
 | getResponseErrors | Extracts the list of errors from JSON.API response. For details see [JSON.API Specification](http://jsonapi.org/format/#errors). |
+| appendEntityConfig | Appends a configuration of an entity. This method may be helpful if you create some general functionality and need to test it for different configurations without creating a test entity for each configuration. Please note that the configuration is restored after each test and you do not need to do it manually. |
 
 Load Fixtures
 -------------

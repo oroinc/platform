@@ -976,11 +976,14 @@ filters:
                             property_path: path1
                             data_type: string
                             allow_array: true
+                            allow_range: true
                             description: description1
                         field4:
                             exclude: false
                         field5:
                             allow_array: false
+                        field6:
+                            allow_range: false
     expected:
         subresources:
             testSubresource:
@@ -994,11 +997,14 @@ filters:
                             property_path: path1
                             data_type: string
                             allow_array: true
+                            allow_range: true
                             description: description1
                         field4:
                             exclude: false
                         field5:
                             allow_array: false
+                        field6:
+                            allow_range: false
 
 invalid_filters_field_exclude:
     config:
@@ -1043,6 +1049,17 @@ invalid_filters_field_allow_array:
                             allow_array: 123
     expected: []
     error: 'Invalid type for path "entity.subresources.testSubresource.filters.fields.field1.allow_array". Expected boolean, but got integer.'
+
+invalid_filters_field_allow_range:
+    config:
+        subresources:
+            testSubresource:
+                filters:
+                    fields:
+                        field1:
+                            allow_range: 123
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.filters.fields.field1.allow_range". Expected boolean, but got integer.'
 
 null_filters_field_description:
     config:

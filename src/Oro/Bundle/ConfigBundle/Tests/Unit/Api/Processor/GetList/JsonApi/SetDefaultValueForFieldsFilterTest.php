@@ -43,12 +43,14 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
                         DataType::ENTITY_TYPE,
                         $this->context->getRequestType(),
                         false,
+                        false,
                         $entityType
                     ],
                     [
                         'Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption',
                         DataType::ENTITY_TYPE,
                         $this->context->getRequestType(),
+                        false,
                         false,
                         'configurationoptions'
                     ],
@@ -97,12 +99,14 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
                         DataType::ENTITY_TYPE,
                         $this->context->getRequestType(),
                         false,
+                        false,
                         $entityType
                     ],
                     [
                         'Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption',
                         DataType::ENTITY_TYPE,
                         $this->context->getRequestType(),
+                        false,
                         false,
                         'configurationoptions'
                     ],
@@ -163,12 +167,14 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
                         DataType::ENTITY_TYPE,
                         $this->context->getRequestType(),
                         false,
+                        false,
                         $entityType
                     ],
                     [
                         'Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption',
                         DataType::ENTITY_TYPE,
                         $this->context->getRequestType(),
+                        false,
                         false,
                         'configurationoptions'
                     ],

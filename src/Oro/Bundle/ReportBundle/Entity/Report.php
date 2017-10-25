@@ -12,7 +12,7 @@ use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 use Oro\Bundle\ReportBundle\Model\ExtendReport;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\ReportBundle\Entity\Repository\ReportRepository")
  * @ORM\Table(name="oro_report")
  * @ORM\HasLifecycleCallbacks()
  * @Config(

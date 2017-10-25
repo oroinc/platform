@@ -6,12 +6,13 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor;
 use Nelmio\ApiDocBundle\Formatter\FormatterInterface;
 
+use Symfony\Component\Routing\Route;
+
 use Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
-use Symfony\Component\Routing\Route;
 
 class RestJsonApiDocumentationTest extends RestJsonApiTestCase
 {
@@ -72,7 +73,7 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
             $association = $route->getDefault('association');
             if ($entityType && $action) {
                 $entityClass = $this->getEntityClass($entityType);
-                if ($entityClass && !$this->isSkippedEntity($entityClass)) {
+                if ($entityClass && !$this->isSkippedEntity($entityClass, $entityType)) {
                     $resourceMissingDocs = $this->checkApiResource($definition, $entityClass, $action, $association);
                     if (!empty($resourceMissingDocs)) {
                         $resource = sprintf('%s %s', $definition['method'], $definition['uri']);
@@ -133,10 +134,11 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
 
     /**
      * @param string $entityClass
+     * @param string $entityType
      *
      * @return bool
      */
-    protected function isSkippedEntity($entityClass)
+    protected function isSkippedEntity($entityClass, $entityType)
     {
         // @todo: remove this variable after https://magecore.atlassian.net/browse/BB-9312 fix
         $temporarySkipEntities = [
@@ -180,6 +182,7 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
         return
             in_array($entityClass, $temporarySkipEntities, true)
             || is_a($entityClass, TestFrameworkEntityInterface::class, true)
+            || 0 === strpos($entityType, 'testapi')
             || (// any entity from "Extend\Entity" namespace, except enums
                 0 === strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE)
                 && 0 !== strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE . 'EV_')

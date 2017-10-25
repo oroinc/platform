@@ -11,7 +11,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
 {
     /** @var Expr */
     protected $expr;
-    
+
     /** @var bool */
     protected $caseInsensitive;
 
@@ -31,7 +31,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
     {
         $this->caseInsensitive = $caseInsensitive;
     }
-    
+
     /**
      * {@inheritdoc}
      */

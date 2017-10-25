@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Exception;
 
-class ForbiddenExecutionException extends \Exception
+use Oro\Component\Action\Exception\InvalidConfigurationException;
+
+class ForbiddenExecutionException extends InvalidConfigurationException
 {
 }
