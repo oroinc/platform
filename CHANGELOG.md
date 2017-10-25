@@ -1,4 +1,4 @@
-## 2.3.12 (Unreleased)
+## 2.3.13 (2017-10-25)
 
 ### Added
 #### MessageQueue Component
