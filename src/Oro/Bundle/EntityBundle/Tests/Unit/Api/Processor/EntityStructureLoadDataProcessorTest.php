@@ -56,7 +56,6 @@ class EntityStructureLoadDataProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessWithUnsupportedActions($action)
     {
-
         $context = $this->createMock(GetContext::class);
         $context->expects($this->once())
             ->method('getAction')
