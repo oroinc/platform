@@ -8,6 +8,7 @@ define(function(require) {
     var module = require('module');
     var config = _.defaults(module.config(), {
         hasSortingOrderButton: true,
+        disableNotSelectedOption: false,
         className: 'sorting-select-control',
         dropdownClassName: 'sorting-select-control'
     });
@@ -44,6 +45,8 @@ define(function(require) {
 
         hasSortingOrderButton:  config.hasSortingOrderButton,
 
+        disableNotSelectedOption:  config.disableNotSelectedOption,
+
         currentColumn: null,
 
         currentDirection: null,
@@ -67,6 +70,7 @@ define(function(require) {
             }
 
             _.extend(this, _.pick(options, ['columns', 'collection', 'hasSortingOrderButton']));
+            _.extend(this, _.pick(options.collection.options.toolbarOptions, ['disableNotSelectedOption']));
 
             this.listenTo(this.columns, 'change:direction', this._selectCurrentSortableColumn);
             this.listenTo(this.columns, 'change:renderable', this._columnRenderableChanged);
@@ -230,7 +234,8 @@ define(function(require) {
                 columns: this._getSelectOptionsData(),
                 selectedValue: this._getCurrentValue(),
                 currentDirection: this.currentDirection,
-                hasSortingOrderButton: this.hasSortingOrderButton
+                hasSortingOrderButton: this.hasSortingOrderButton,
+                disableNotSelectedOption: this.disableNotSelectedOption
             });
             return data;
         },

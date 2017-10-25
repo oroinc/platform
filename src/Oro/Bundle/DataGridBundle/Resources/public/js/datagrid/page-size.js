@@ -139,6 +139,8 @@ define([
                 this.$el.hide();
             }
 
+            this.initControls();
+
             return this;
         }
     });

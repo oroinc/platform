@@ -6,6 +6,8 @@ use Oro\Component\Action\Model\AbstractStorage;
 
 class ActionData extends AbstractStorage implements EntityAwareInterface
 {
+    const OPERATION_TOKEN = '_operation_token';
+
     /**
      * @return object
      */
@@ -28,6 +30,14 @@ class ActionData extends AbstractStorage implements EntityAwareInterface
     public function getRefreshGrid()
     {
         return $this->get('refreshGrid');
+    }
+
+    /**
+     * @return string
+     */
+    public function getOperationToken()
+    {
+        return $this->get(self::OPERATION_TOKEN);
     }
 
     /**

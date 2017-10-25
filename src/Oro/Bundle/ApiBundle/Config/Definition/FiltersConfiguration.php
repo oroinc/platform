@@ -78,7 +78,8 @@ class FiltersConfiguration extends AbstractConfigurationSection
                 ->prototype('scalar')->end()
             ->end()
             ->scalarNode(FilterFieldConfig::DATA_TYPE)->cannotBeEmpty()->end()
-            ->booleanNode(FilterFieldConfig::ALLOW_ARRAY)->end();
+            ->booleanNode(FilterFieldConfig::ALLOW_ARRAY)->end()
+            ->booleanNode(FilterFieldConfig::ALLOW_RANGE)->end();
     }
 
     /**

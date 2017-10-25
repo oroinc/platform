@@ -2,13 +2,25 @@
 
 .validation-failed,
 .validation-error,
-.validation-passed {
+.validation-passed,
+.validation-warning{
     @extend .notification;
 }
 
 .validation-failed,
 .validation-error {
     @extend .notification--error;
+
+    @include fa-icon($fa-var-warning);
+
+    &:before {
+        display: inline-block;
+        margin-right: 6px;
+    }
+}
+
+.validation-warning {
+    @extend .notification--warning;
 
     @include fa-icon($fa-var-warning);
 

@@ -14,14 +14,14 @@
         opacity: 0;
 
         &:hover {
-            ~ .custom-checkbox__icon{
-                border: $checkbox-icon-border-focus-state
+            ~ .custom-checkbox__icon {
+                border: $checkbox-icon-border-hover-state
             }
         }
 
         &:focus {
             ~ .custom-checkbox__icon {
-                border: $checkbox-icon-border-hover-state;
+                border: $checkbox-icon-border-focus-state;
             }
         }
 
@@ -42,6 +42,8 @@
 
         border: $checkbox-icon-border;
         background-color: $checkbox-icon-bg-color;
+
+        border-radius: $checkbox-icon-border-radius;
 
         cursor: pointer;
 

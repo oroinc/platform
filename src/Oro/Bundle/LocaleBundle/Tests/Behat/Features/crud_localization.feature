@@ -1,5 +1,6 @@
 @regression
 @ticket-BAP-14021
+@ticket-BAP-15576
 @automatically-ticket-tagged
 @fixture-OroLocaleBundle:japanese-language.yml
 Feature: Localization Crud
@@ -13,6 +14,29 @@ Feature: Localization Crud
     Then I should see "English" in grid with following data:
       | Title               | English |
       | Parent localization | N/A     |
+
+  Scenario: Verify HTML tags
+    Given I press "Create Localization"
+    And I click "Fallback Status"
+    When I fill "Localization Create Form" with:
+      | Name                | Test <script>alert(1)</script>        |
+      | Title Use           | false                                 |
+      | Title Default Value | TestDefault <script>alert(1)</script> |
+      | Title English       | TestEnglish <script>alert(1)</script> |
+      | Language            | Japanese (Japan)                      |
+      | Formatting          | Japanese (Japan)                      |
+    And I save form
+    And I click "Fallback Status"
+    Then "Localization Create Form" must contains values:
+      | Name                | Test alert(1)        |
+      | Title Default Value | TestDefault alert(1) |
+      | Title English       | TestEnglish alert(1) |
+    When I save and close form
+    Then I should see "Test alert(1)"
+    And I should see "TestDefault alert(1)"
+    And go to System/Localization/Localizations
+    Then I should see "Test alert(1)" in grid with following data:
+      | Title | TestDefault alert(1) |
 
   Scenario: Check required fields
     Given I press "Create Localization"
@@ -56,7 +80,7 @@ Feature: Localization Crud
       | Parent localization | N/A    |
       | Language            | Dutch (Netherlands) - nl_NL |
       | Formatting          | Dutch (Netherlands) - nl_NL |
-    And there are 2 records in grid
+    And there are 3 records in grid
 
   Scenario: Change Localization settings
     Given I should see following actions for Dutch in grid:
@@ -78,7 +102,7 @@ Feature: Localization Crud
   Scenario: Delete new localization but default can't be removed
     Given I click Delete English in grid
     When I confirm deletion
-    Then there is one record in grid
+    Then there is two record in grid
     And there is no "English" in grid
     And I should see Dutch in grid
     But I should not see following actions for Dutch in grid:

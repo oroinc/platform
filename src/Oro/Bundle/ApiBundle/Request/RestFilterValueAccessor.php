@@ -9,6 +9,36 @@ use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * Extracts filters from REST API HTTP Request.
+ * Filters can be sent in the query string or the request body.
+ * If a filter exists in both the query string and the request body,
+ * the filter from the query string will override the filter from the request body.
+ *
+ * Filter syntax for the query string:
+ * * key=value, where "=" is an operator; see getOperators() method to find a list of supported operators
+ * * key[operator name]=value, where "operator name" can be "eq", "neq", etc.; see getOperatorNameMap() method
+ *                             to find a map between operators and their names
+ * Examples:
+ * * /api/users?filter[name]!=John
+ * * /api/users?filter[name][neq]=John
+ * * /api/users?page[number]=10&sort=name
+ *
+ * Filter syntax for the request body:
+ *  * [key => value, ...]
+ *  * [key => [operator, value], ...]
+ *  * [key => [operator name, value], ...]
+ *  * [group => [key => value, ...], ...]
+ * Example:
+ * <code>
+ *  [
+ *      'filter' => [
+ *          'name' => ['neq', 'John']
+ *      ],
+ *      'sort' => 'name'
+ *  ]
+ * </code>
+ */
 class RestFilterValueAccessor implements FilterValueAccessorInterface
 {
     /** @var Request */
@@ -45,9 +75,11 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     {
         $this->ensureRequestParsed();
 
-        return isset($this->parameters[$key])
-            ? $this->parameters[$key]
-            : null;
+        if (!isset($this->parameters[$key])) {
+            return null;
+        }
+
+        return $this->parameters[$key];
     }
 
     /**
@@ -57,9 +89,11 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     {
         $this->ensureRequestParsed();
 
-        return isset($this->groups[$group])
-            ? $this->groups[$group]
-            : [];
+        if (!isset($this->groups[$group])) {
+            return [];
+        }
+
+        return $this->groups[$group];
     }
 
     /**
@@ -88,8 +122,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
             $this->parameters[$key] = $value;
             $this->groups[$group][$key] = $value;
         } else {
-            unset($this->parameters[$key]);
-            unset($this->groups[$group][$key]);
+            unset($this->parameters[$key], $this->groups[$group][$key]);
         }
     }
 
@@ -105,8 +138,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
             ? substr($key, 0, $delimPos)
             : $key;
 
-        unset($this->parameters[$key]);
-        unset($this->groups[$group][$key]);
+        unset($this->parameters[$key], $this->groups[$group][$key]);
     }
 
     /**

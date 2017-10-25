@@ -41,3 +41,14 @@
         }
     }
 }
+
+@include breakpoint('print') {
+    .mCSB_container {
+        // Need to correct table stretching
+        width: 100% !important;
+    }
+
+    .mCSB_scrollTools {
+        display: none !important;
+    }
+}

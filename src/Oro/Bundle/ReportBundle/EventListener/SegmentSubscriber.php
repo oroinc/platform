@@ -47,10 +47,8 @@ class SegmentSubscriber implements EventSubscriberInterface
         $event->setOptions(array_merge_recursive(
             $event->getOptions(),
             [
-                'onFieldsUpdate' => [
-                    'toggleCriteria' => [
-                        'aggregated-condition-item',
-                    ],
+                'fieldsRelatedCriteria' => [
+                    'aggregated-condition-item',
                 ],
             ]
         ));

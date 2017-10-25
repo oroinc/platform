@@ -241,7 +241,7 @@ class NormalizeMetadata implements ProcessorInterface
                 throw new RuntimeException(
                     sprintf(
                         'A configuration of "%s" field does not exist.',
-                        implode('.', $propertyPath)
+                        implode(ConfigUtil::PATH_DELIMITER, $propertyPath)
                     )
                 );
             }
@@ -250,7 +250,7 @@ class NormalizeMetadata implements ProcessorInterface
                 throw new RuntimeException(
                     sprintf(
                         'A configuration of the target entity for "%s" field does not exist.',
-                        implode('.', $propertyPath)
+                        implode(ConfigUtil::PATH_DELIMITER, $propertyPath)
                     )
                 );
             }

@@ -1,4 +1,5 @@
 {% block layout_subtree_update_widget %}
+    {% if block.children is not empty %}
     {% set attr = layout_attr_defaults(attr, {
         'data-page-component-module': 'oroui/js/app/components/view-component',
         '~data-page-component-options': {
@@ -11,6 +12,7 @@
     <div {{ block('block_attributes') }}>
         {{ block_widget(block) }}
     </div>
+    {% endif %}
 {% endblock %}
 
 {% block page_subtitle_widget %}

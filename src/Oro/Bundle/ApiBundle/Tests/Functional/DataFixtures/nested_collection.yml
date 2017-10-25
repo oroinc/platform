@@ -1,0 +1,13 @@
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier:
+    test_link1:
+        key: 'item1'
+        name: 'Item 1'
+    test_link2:
+        key: 'item2'
+        name: 'Item 2'
+    test_link3:
+        key: 'item 3'
+        name: 'Item 3'
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObjects:
+    test_entity:
+        links: ['@test_link1', '@test_link2']

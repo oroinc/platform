@@ -101,6 +101,8 @@ class OrmSorterExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function visitMetadataDataProvider()
     {
@@ -127,6 +129,7 @@ class OrmSorterExtensionTest extends \PHPUnit_Framework_TestCase
                         'multipleSorting' => false,
                         'toolbarOptions' => [
                             'addSorting' => false,
+                            'disableNotSelectedOption' => false
                         ],
                     ],
                     'initialState' => ['sorters' => []],
@@ -156,6 +159,7 @@ class OrmSorterExtensionTest extends \PHPUnit_Framework_TestCase
                         'multipleSorting' => true,
                         'toolbarOptions' => [
                             'addSorting' => false,
+                            'disableNotSelectedOption' => false
                         ],
                     ],
                     'initialState' => ['sorters' => []],
@@ -192,6 +196,112 @@ class OrmSorterExtensionTest extends \PHPUnit_Framework_TestCase
                         'multipleSorting' => false,
                         'toolbarOptions' => [
                             'addSorting' => true,
+                            'disableNotSelectedOption' => false
+                        ],
+                    ],
+                    'initialState' => ['sorters' => []],
+                    'state' => ['sorters' => []],
+                ]
+            ],
+            'toolbar with disable not selected option' => [
+                'sorters' => [
+                    'columns' => [
+                        'name' => ['type' => 'string'],
+                    ],
+                    'default' => [
+                        'name' => 'DESC'
+                    ],
+                    'disable_not_selected_option' => true,
+                    'toolbar_sorting' => true,
+                ],
+                'columns' => [
+                    ['name' => 'name']
+                ],
+                'expectedData' => [
+                    'columns' => [
+                        [
+                            'name' => 'name',
+                            'sortable' => true,
+                            'sortingType' => 'string',
+                        ]
+                    ],
+                    'options' => [
+                        'multipleSorting' => false,
+                        'toolbarOptions' => [
+                            'addSorting' => true,
+                            'disableNotSelectedOption' => true
+                        ],
+                    ],
+                    'initialState' => [
+                        'sorters' => [
+                            'name' => 'DESC'
+                        ]
+                    ],
+                    'state' => [
+                        'sorters' => [
+                            'name' => 'DESC'
+                        ]
+                    ],
+                ]
+            ],
+            'toolbar with disable not selected option and disable default sorting' => [
+                'sorters' => [
+                    'columns' => [
+                        'name' => ['type' => 'string'],
+                    ],
+                    'default' => [
+                        'name' => 'DESC'
+                    ],
+                    'disable_not_selected_option' => true,
+                    'disable_default_sorting' => true,
+                    'toolbar_sorting' => true,
+                ],
+                'columns' => [
+                    ['name' => 'name']
+                ],
+                'expectedData' => [
+                    'columns' => [
+                        [
+                            'name' => 'name',
+                            'sortable' => true,
+                            'sortingType' => 'string',
+                        ]
+                    ],
+                    'options' => [
+                        'multipleSorting' => false,
+                        'toolbarOptions' => [
+                            'addSorting' => true,
+                            'disableNotSelectedOption' => false
+                        ],
+                    ],
+                    'initialState' => ['sorters' => []],
+                    'state' => ['sorters' => []],
+                ]
+            ],
+            'toolbar with disable not selected option and with default sortings' => [
+                'sorters' => [
+                    'columns' => [
+                        'name' => ['type' => 'string'],
+                    ],
+                    'disable_default_sorting' => true,
+                    'toolbar_sorting' => true,
+                ],
+                'columns' => [
+                    ['name' => 'name']
+                ],
+                'expectedData' => [
+                    'columns' => [
+                        [
+                            'name' => 'name',
+                            'sortable' => true,
+                            'sortingType' => 'string',
+                        ]
+                    ],
+                    'options' => [
+                        'multipleSorting' => false,
+                        'toolbarOptions' => [
+                            'addSorting' => true,
+                            'disableNotSelectedOption' => false
                         ],
                     ],
                     'initialState' => ['sorters' => []],

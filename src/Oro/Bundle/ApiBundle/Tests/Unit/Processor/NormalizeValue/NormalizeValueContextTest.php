@@ -28,6 +28,13 @@ class NormalizeValueContextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('-', $this->context->getArrayDelimiter());
     }
 
+    public function testRangeDelimiter()
+    {
+        $this->assertEquals('..', $this->context->getRangeDelimiter());
+        $this->context->setRangeDelimiter('|');
+        $this->assertEquals('|', $this->context->getRangeDelimiter());
+    }
+
     public function testDataType()
     {
         $this->assertFalse($this->context->has('dataType'));
@@ -48,9 +55,17 @@ class NormalizeValueContextTest extends \PHPUnit_Framework_TestCase
 
     public function testArrayAllowed()
     {
-        $this->assertFalse($this->context->has('dataType'));
+        $this->assertFalse($this->context->has('arrayAllowed'));
         $this->context->setArrayAllowed(true);
         $this->assertTrue($this->context->isArrayAllowed());
         $this->assertTrue($this->context->get('arrayAllowed'));
+    }
+
+    public function testRangeAllowed()
+    {
+        $this->assertFalse($this->context->has('rangeAllowed'));
+        $this->context->setRangeAllowed(true);
+        $this->assertTrue($this->context->isRangeAllowed());
+        $this->assertTrue($this->context->get('rangeAllowed'));
     }
 }
