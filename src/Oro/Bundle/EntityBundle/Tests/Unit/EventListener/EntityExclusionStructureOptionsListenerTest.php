@@ -102,7 +102,8 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit_Framework_Tes
             ]
         );
 
-        $event = new EntityStructureOptionsEvent([$entityStructure]);
+        $event = new EntityStructureOptionsEvent();
+        $event->setData([$entityStructure]);
 
         $this->listener->onOptionsRequest($event);
 
@@ -123,7 +124,8 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit_Framework_Tes
             ->expects($this->never())
             ->method($this->anything());
 
-        $event = new EntityStructureOptionsEvent([new \stdClass()]);
+        $event = new EntityStructureOptionsEvent();
+        $event->setData([new \stdClass()]);
 
         $this->listener->onOptionsRequest($event);
 
@@ -174,7 +176,8 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit_Framework_Tes
             ]
         );
 
-        $event = new EntityStructureOptionsEvent([$entityStructure]);
+        $event = new EntityStructureOptionsEvent();
+        $event->setData([$entityStructure]);
 
         $this->listener->onOptionsRequest($event);
 
@@ -238,7 +241,8 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit_Framework_Tes
             ]
         );
 
-        $event = new EntityStructureOptionsEvent([$entityStructure]);
+        $event = new EntityStructureOptionsEvent();
+        $event->setData([$entityStructure]);
 
         $this->listener->onOptionsRequest($event);
 

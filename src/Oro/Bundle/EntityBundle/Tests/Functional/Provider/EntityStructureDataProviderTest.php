@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Functional\Provider;
 
+use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
@@ -30,22 +31,26 @@ class EntityStructureDataProviderTest extends WebTestCase
         $this->assertEquals('testactivities', $entityData->getPluralAlias());
 
         $fields = $entityData->getFields();
-        $this->assertArrayHasKey('owner_id', $fields);
-        $this->assertFalse($fields['owner_id']->getOption('configurable'));
+        $field = $this->getField($fields, 'owner_id');
+
+        $this->assertNotNull($field);
+        $this->assertFalse($field->getOption('configurable'));
 
         // check that labels translated
-        $this->assertEquals('User', $fields['owner_id']->getLabel());
+        $this->assertEquals('User', $field->getLabel());
 
-        $this->assertArrayHasKey('owner', $fields);
-        $field = $fields['owner'];
+        $field = $this->getField($fields, 'owner');
+
+        $this->assertNotNull($field);
         $this->assertTrue($field->getOption('configurable'));
 
         // check extend entity
         $this->assertArrayHasKey('Extend\Entity\TestEntity1', $data);
+
         $fields = $data['Extend\Entity\TestEntity1']->getFields();
-        $this->assertEquals(RelationType::MANY_TO_MANY, $fields['biM2MNDTargets']->getRelationType());
-        $this->assertEquals(RelationType::MANY_TO_ONE, $fields['biM2OTarget']->getRelationType());
-        $this->assertEquals(RelationType::ONE_TO_MANY, $fields['uniO2MTargets']->getRelationType());
+        $this->assertEquals(RelationType::MANY_TO_MANY, $this->getField($fields, 'biM2MNDTargets')->getRelationType());
+        $this->assertEquals(RelationType::MANY_TO_ONE, $this->getField($fields, 'biM2OTarget')->getRelationType());
+        $this->assertEquals(RelationType::ONE_TO_MANY, $this->getField($fields, 'uniO2MTargets')->getRelationType());
 
         // check relation types
         $this->assertEquals(RelationType::TO_ONE, $field->getType());
@@ -53,5 +58,21 @@ class EntityStructureDataProviderTest extends WebTestCase
 
         // Check that we get only configurable entities
         $this->assertArrayNotHasKey(TestProduct::class, $data);
+    }
+
+    /**
+     * @param array $fields
+     * @param string $name
+     * @return EntityFieldStructure
+     */
+    protected function getField(array $fields, $name)
+    {
+        foreach ($fields as $field) {
+            if ($field->getName() === $name) {
+                return $field;
+            }
+        }
+
+        return null;
     }
 }

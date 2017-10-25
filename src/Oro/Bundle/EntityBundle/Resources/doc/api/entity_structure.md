@@ -2,6 +2,12 @@
 
 ## ACTIONS  
 
+### get
+
+Get action is restricted.
+
+{@inheritdoc}
+
 ### get_list
 
 Retrieve a collection of entities structure.
@@ -39,11 +45,11 @@ Entity icon.
 ### fields
 
 Array of entity fields. For every field provided: name, type, label (translated), type of relation (`oneToMany`, 
-`manyToMany` and so on), options (for example `[auditable: true, configurable: false]`)
+`manyToMany` and so on), options (for example `[auditable: true, configurable: false, exclude: false]`)
 
 ### options
 
-Array of entity options (for example `[auditable: true]`).
+Array of entity options (for example `[auditable: true, exclude: false]`).
 
 ### routes
 
