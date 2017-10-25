@@ -3,7 +3,7 @@ Oro\Bundle\RuleBundle\Entity\Rule:
         name: '<xss("Rule.name(Payment)")>'
         enabled: true
         sortOrder: 1
-        expression: true != '<xss("Rule.expression")>'
+        expression: customerUser.username != '<xss("Rule.expression")>'
 
 Oro\Bundle\PaymentBundle\Entity\PaymentMethodConfig:
     paymentMethodConfig:
@@ -18,15 +18,18 @@ Oro\Bundle\PaymentBundle\Entity\PaymentMethodsConfigsRule:
         websites: ['<{website}>']
 
 Oro\Bundle\PaymentBundle\Entity\PaymentMethodsConfigsRuleDestination:
-    paymentMethodsConfigsRuleDestination:
+    paymentMethodsConfigsRuleDestination1:
         methodsConfigsRule: '@paymentMethodsConfigsRule'
         regionText: '<xss("PaymentMethodsConfigsRuleDestination.regionText")>'
+        country: 'US'
+    paymentMethodsConfigsRuleDestination2:
+        methodsConfigsRule: '@paymentMethodsConfigsRule'
         country: 'US'
 
 Oro\Bundle\PaymentBundle\Entity\PaymentMethodsConfigsRuleDestinationPostalCode:
     paymentMethodsConfigsRuleDestinationPostalCode:
         name: '<xss("PaymentMethodsConfigsRuleDestinationPostalCode.name")>'
-        destination: '@paymentMethodsConfigsRuleDestination'
+        destination: '@paymentMethodsConfigsRuleDestination1'
 
 Oro\Bundle\PaymentTermBundle\Entity\PaymentTerm:
     paymentTerm:

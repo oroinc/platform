@@ -3,7 +3,7 @@ Oro\Bundle\RuleBundle\Entity\Rule:
         name: '<xss("Rule.name(Shipping)")>'
         enabled: true
         sortOrder: 1
-        expression: true != '<xss("Rule.expression")>'
+        expression: customerUser.username != '<xss("Rule.expression")>'
 
 Oro\Bundle\ShippingBundle\Entity\ShippingMethodTypeConfig:
     shippingMethodTypeConfig:
@@ -28,12 +28,15 @@ Oro\Bundle\ShippingBundle\Entity\ShippingMethodsConfigsRule:
         websites: ['<{website}>']
 
 Oro\Bundle\ShippingBundle\Entity\ShippingMethodsConfigsRuleDestination:
-    shippingMethodsConfigsRuleDestination:
+    shippingMethodsConfigsRuleDestination1:
         methodConfigsRule: '@shippingMethodsConfigsRule'
         regionText: '<xss("ShippingMethodsConfigsRuleDestination.regionText")>'
+        country: 'US'
+    shippingMethodsConfigsRuleDestination2:
+        methodConfigsRule: '@shippingMethodsConfigsRule'
         country: 'US'
 
 Oro\Bundle\ShippingBundle\Entity\ShippingMethodsConfigsRuleDestinationPostalCode:
     shippingMethodsConfigsRuleDestinationPostalCode:
         name: '<xss("ShippingMethodsConfigsRuleDestinationPostalCode.name")>'
-        destination: '@shippingMethodsConfigsRuleDestination'
+        destination: '@shippingMethodsConfigsRuleDestination1'

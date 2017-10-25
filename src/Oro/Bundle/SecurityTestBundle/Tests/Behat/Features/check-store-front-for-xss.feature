@@ -75,7 +75,7 @@ Feature: Store front MUST NOT contain XSS vulnerabilities on all accessible page
 
   Scenario: Check multi step checkout for XSS vulnerability
     Given I visiting pages listed in "frontend shopping list view url"
-    And I click "Create Order"
+    And I click Create Order button
     And I click "Continue"
     And I click "Continue"
     And I click "Continue"
@@ -89,7 +89,7 @@ Feature: Store front MUST NOT contain XSS vulnerabilities on all accessible page
     And I click "Activate"
     Then I proceed as the User
     And I visiting pages listed in "frontend shopping list view url"
-    And I click "Create Order"
+    And I click Create Order button
     Then I should not get XSS vulnerabilities
 
   Scenario: Check store front order related for XSS vulnerability

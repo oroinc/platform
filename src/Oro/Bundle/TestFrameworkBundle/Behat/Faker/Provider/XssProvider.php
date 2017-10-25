@@ -45,7 +45,7 @@ class XssProvider extends BaseProvider
     public function xss($identifier = 'XSS', $payloadType = 'script')
     {
         $elementId = 'p' . ++self::$idx;
-        $jsPayload = sprintf('_x(\'%s\',\'%s\');', $elementId, $identifier);
+        $jsPayload = sprintf('_x("%s","%s");', $elementId, $identifier);
 
         return sprintf($this->payloadProvider->getPayload($payloadType, $jsPayload, $elementId));
     }

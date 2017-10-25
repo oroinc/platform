@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityTestBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\ORM\EntityManager;
@@ -19,7 +18,6 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
-use WebDriver\Exception\NoAlertOpenError;
 
 /**
  * This context test listed URLs for presence of preloaded XSS string
@@ -104,6 +102,16 @@ class FeatureContext extends OroFeatureContext implements
             self::fail($this->getXssReport());
         }
         $this->foundXss = [];
+    }
+
+    /**
+     * @When /^(?:|I )click Create Order button$/
+     */
+    public function clickCreateOrderButton()
+    {
+        $element = $this->createElement('Create Order');
+        $element->focus();
+        $element->clickForce();
     }
 
     /**
