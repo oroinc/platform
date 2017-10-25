@@ -3,7 +3,6 @@ define(function(require) {
 
     var ColumnFormView;
     var _ = require('underscore');
-    var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
     require('oroquerydesigner/js/function-choice');
 

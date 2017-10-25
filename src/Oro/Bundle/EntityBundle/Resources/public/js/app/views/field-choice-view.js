@@ -36,6 +36,7 @@ define(function(require) {
         },
 
         callbacks: {
+            select2ResultsCallback: null,
             applicableConditionsCallback: null,
             dataFilter: null
         },
@@ -45,6 +46,11 @@ define(function(require) {
         },
 
         initialize: function(options) {
+            // @TODO: remove fetching data from a DOM element after EntitiesFieldsDataProvider is implementing
+            if (!('data' in options) && 'fieldsLoaderSelector' in options) {
+                options.data = $(options.fieldsLoaderSelector).data('fields') || this.defaultOptions.data;
+            }
+
             options = _.defaults({}, options, this.defaultOptions);
             _.extend(this, _.pick(options, _.without(_.keys(this.defaultOptions), 'select2')));
             this.callbacks = _.pick(options, _.keys(this.callbacks));
@@ -54,7 +60,8 @@ define(function(require) {
         },
 
         onChange: function(e) {
-            this.trigger('change', this.$(e.target).val(), e.added);
+            var selectedItem = e.added || this.$el.inputWidget('data');
+            this.trigger('change', selectedItem);
         },
 
         render: function() {
@@ -133,16 +140,15 @@ define(function(require) {
             var select2Opts = _.clone(options.select2);
 
             if (select2Opts.formatSelectionTemplate) {
-                if (_.isFunction(select2Opts.formatSelectionTemplate)) {
-                    template = select2Opts.formatSelectionTemplate;
-                } else {
-                    template = _.template(select2Opts.formatSelectionTemplate);
-                }
+                template = select2Opts.formatSelectionTemplate;
             } else if (select2Opts.formatSelectionTemplateSelector) {
                 template = $(select2Opts.formatSelectionTemplateSelector).text();
             }
 
             if (template) {
+                if (!_.isFunction(template)) {
+                    template = _.template(template);
+                }
                 select2Opts.formatSelection = _.bind(function(item) {
                     var result;
                     if (item !== null) {
@@ -166,6 +172,10 @@ define(function(require) {
 
             this.util.init(entity, data);
             this.$el.inputWidget('refresh');
+        },
+
+        getValue: function() {
+            return this.$el.inputWidget('val');
         },
 
         setValue: function(value) {

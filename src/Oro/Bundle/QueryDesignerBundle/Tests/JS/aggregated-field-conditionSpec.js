@@ -46,13 +46,13 @@ define(function(require) {
                     fieldChoice: {
                         select2: {
                             formatSelectionTemplateSelector: '#format-selection-template'
-                        }
+                        },
+                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account',
+                        data: data
                     }
                 });
                 window.setFixtures(aggregatedFieldConditionView.$el);
                 $.when(aggregatedFieldConditionView.deferredRender).then(function() {
-                    aggregatedFieldConditionView.$choiceInput.fieldChoice('updateData',
-                        'Oro\\Bundle\\AccountBundle\\Entity\\Account', data);
                     done();
                 });
             });
@@ -107,14 +107,14 @@ define(function(require) {
                     fieldChoice: {
                         select2: {
                             formatSelectionTemplateSelector: '#format-selection-template'
-                        }
+                        },
+                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account',
+                        data: data
                     },
                     value: initialValue
                 });
                 window.setFixtures(aggregatedFieldConditionView.$el);
                 $.when(aggregatedFieldConditionView.deferredRender).then(function() {
-                    aggregatedFieldConditionView.$choiceInput.fieldChoice('updateData',
-                        'Oro\\Bundle\\AccountBundle\\Entity\\Account', data);
                     done();
                 });
             });

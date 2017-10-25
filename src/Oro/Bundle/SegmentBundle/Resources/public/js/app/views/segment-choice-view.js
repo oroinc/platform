@@ -69,9 +69,8 @@ define(function(require) {
         },
 
         onChange: function(e) {
-            if (e.added) {
-                this.trigger('change', e.added.id);
-            }
+            var selectedItem = e.added || this.$el.inputWidget('data');
+            this.trigger('change', selectedItem);
         },
 
         render: function() {

@@ -15,24 +15,13 @@ define(function(require) {
             });
         },
 
-        initChoiceInput: function() {
+        initChoiceInputView: function() {
             var choiceInput = new SegmentChoiceView(_.extend({
                 autoRender: true,
                 el: this.$choiceInput,
                 entity: this.options.rootEntity
             }, this.options.segmentChoice));
-            this.listenTo(choiceInput, {
-                change: this._handleChoiceInputChange
-            });
-            this.subview('choiceInput', choiceInput);
-        },
-
-        getChoiceInputView: function() {
-            return this.subview('choiceInput');
-        },
-
-        _setChoiceInputValue: function(value) {
-            this.getChoiceInputView().setValue(value);
+            return choiceInput;
         },
 
         render: function() {
@@ -41,7 +30,7 @@ define(function(require) {
                 var filterValue = this._getFilterValue();
                 var label = this.filter.getSelectedLabel();
                 if (filterValue && label) {
-                    this.getChoiceInputView().setSelectedData({
+                    this.subview('choice-input').setSelectedData({
                         id: 'segment_' + filterValue.value,
                         text: label
                     });
@@ -53,7 +42,7 @@ define(function(require) {
             var segmentId = fieldId.split('_')[1];
             var filterId = this._getSegmentFilterId();
 
-            var data = this.getChoiceInputView().getSelectedData();
+            var data = this.subview('choice-input').getSelectedData();
             if (_.has(data, 'id')) {
                 data.value = segmentId;
                 // pre-set data
@@ -99,7 +88,7 @@ define(function(require) {
         },
 
         getChoiceInputValue: function() {
-            var entity = this.getChoiceInputView().entity;
+            var entity = this.subview('choice-input').entity;
             return this.filter ? _.result(this.filter.entity_ids, entity) : null;
         }
     });

@@ -38,12 +38,14 @@ define(function(require) {
             beforeEach(function(done) {
                 fieldConditionView = new FieldConditionView({
                     autoRender: true,
-                    filters: filters
+                    filters: filters,
+                    fieldChoice: {
+                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account',
+                        data: data
+                    }
                 });
                 window.setFixtures(fieldConditionView.$el);
                 $.when(fieldConditionView.deferredRender).then(function() {
-                    fieldConditionView.$choiceInput.fieldChoice('updateData',
-                        'Oro\\Bundle\\AccountBundle\\Entity\\Account', data);
                     done();
                 });
             });
@@ -57,7 +59,7 @@ define(function(require) {
             });
 
             it('has choiceInput widget', function() {
-                expect(fieldConditionView.getChoiceInputWidget()).toEqual(jasmine.any($.Widget));
+                expect(fieldConditionView.subview('choice-input')).toEqual(jasmine.any(BaseView));
             });
 
             it('has empty value into field choice input', function() {
@@ -116,12 +118,14 @@ define(function(require) {
                 fieldConditionView = new FieldConditionView({
                     autoRender: true,
                     filters: filters,
-                    value: initialValue
+                    value: initialValue,
+                    fieldChoice: {
+                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account',
+                        data: data
+                    }
                 });
                 window.setFixtures(fieldConditionView.$el);
                 $.when(fieldConditionView.deferredRender).then(function() {
-                    fieldConditionView.$choiceInput.fieldChoice('updateData',
-                        'Oro\\Bundle\\AccountBundle\\Entity\\Account', data);
                     done();
                 });
             });

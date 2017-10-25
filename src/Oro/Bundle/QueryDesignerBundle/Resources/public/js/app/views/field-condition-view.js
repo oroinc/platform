@@ -7,8 +7,7 @@ define(function(require) {
     var tools = require('oroui/js/tools');
     var mapFilterModuleName = require('orofilter/js/map-filter-module-name');
     var AbstractConditionView = require('oroquerydesigner/js/app/views/abstract-condition-view');
-
-    require('oroentity/js/field-choice');
+    var FieldChoiceView = require('oroentity/js/app/views/field-choice-view');
 
     FieldConditionView = AbstractConditionView.extend({
         getDefaultOptions: function() {
@@ -44,7 +43,7 @@ define(function(require) {
                 }, this);
                 if (modules.length > 1) {
                     var optionResolver = modules[1];
-                    var promise = optionResolver(filterOptions, this.getChoiceInputWidget().splitFieldId(fieldId));
+                    var promise = optionResolver(filterOptions, this.subview('choice-input').splitFieldId(fieldId));
                     promise.done(appendFilter);
                 } else {
                     appendFilter();
@@ -54,7 +53,7 @@ define(function(require) {
 
         _createFilterOptions: function(fieldId) {
             var filterOptions;
-            var conditions = this.getChoiceInputWidget().getApplicableConditions(fieldId);
+            var conditions = this.subview('choice-input').getApplicableConditions(fieldId);
 
             if (!_.isEmpty(conditions) && !(conditions.entity === 'Oro\\Bundle\\AccountBundle\\Entity\\Account' &&
                 conditions.field === 'lifetimeValue')) {
@@ -73,12 +72,13 @@ define(function(require) {
             return filterOptions;
         },
 
-        initChoiceInput: function() {
-            this.$choiceInput.fieldChoice(this.options.fieldChoice);
-        },
-
-        getChoiceInputWidget: function() {
-            return this.$choiceInput.fieldChoice('instance');
+        initChoiceInputView: function() {
+            var fieldChoiceView = new FieldChoiceView(_.extend({
+                autoRender: true,
+                el: this.$choiceInput,
+                entity: this.options.rootEntity
+            }, this.options.fieldChoice));
+            return fieldChoiceView;
         }
     });
 

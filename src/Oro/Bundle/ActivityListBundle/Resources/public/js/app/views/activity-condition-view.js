@@ -98,14 +98,14 @@ define(function(require) {
             var newEntity = this.TYPE_CHOICE_ENTITY;
 
             if (oldEntity !== newEntity) {
-                this.getChoiceInputWidget().setValue('');
+                this.subview('choice-input').setValue('');
                 this.$filterContainer.empty();
                 if (this.filter) {
                     this.filter.reset();
                 }
             }
 
-            this.getChoiceInputWidget().updateData(newEntity, this.$fieldsLoader.data('fields'));
+            this.subview('choice-input').updateData(newEntity, this.$fieldsLoader.data('fields'));
         },
 
         _updateFieldChoice: function() {
@@ -115,7 +115,7 @@ define(function(require) {
             }
             data[this.TYPE_CHOICE_ENTITY] = this._createTypeChoiceEntityData();
             this.$fieldsLoader.data('fields', data);
-            this.getChoiceInputWidget().updateData(this.TYPE_CHOICE_ENTITY, data);
+            this.subview('choice-input').updateData(this.TYPE_CHOICE_ENTITY, data);
         },
 
         fieldChoiceResultsCallback: function(results) {

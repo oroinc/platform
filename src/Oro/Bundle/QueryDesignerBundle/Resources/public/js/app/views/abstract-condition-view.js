@@ -25,7 +25,6 @@ define(function(require) {
 
         events: function() {
             var events = {};
-            events['changed .' + this.options.choiceInputClass] = '_onChoiceInputChanged';
             events['change .' + this.options.filterContainerClass] = '_onFilterChange';
             return events;
         },
@@ -46,7 +45,9 @@ define(function(require) {
             AbstractConditionView.__super__.render.call(this);
 
             this.$choiceInput = this.$('.' + this.options.choiceInputClass);
-            this.initChoiceInput();
+            var choiceInputView = this.initChoiceInputView();
+            this.subview('choice-input', choiceInputView);
+            this.listenTo(choiceInputView, 'change', this._onChoiceInputChanged);
             this.$filterContainer = this.$('.' + this.options.filterContainerClass);
 
             var choiceInputValue = this._getInitialChoiceInputValue();
@@ -63,20 +64,15 @@ define(function(require) {
             return this;
         },
 
-        _onChoiceInputChanged: function(e, fieldId) {
-            this._handleChoiceInputChange(fieldId);
-            e.stopPropagation();
-        },
-
-        _handleChoiceInputChange: function(fieldId) {
+        _onChoiceInputChanged: function(selectedItem) {
             var choiceInputValue = this._getInitialChoiceInputValue();
-            if (!fieldId) {
+            if (!selectedItem) {
                 this._removeFilter();
-            } else if (choiceInputValue !== fieldId) {
+            } else if (choiceInputValue !== selectedItem.id) {
                 $(':focus').blur();
                 // reset current value on field change
                 this.setValue({});
-                this._renderFilter(fieldId);
+                this._renderFilter(selectedItem.id);
             }
         },
 
@@ -218,9 +214,7 @@ define(function(require) {
         },
 
         _setChoiceInputValue: function(value) {
-            // @todo remove implementation after refactoring and throw the exception
-            this.getChoiceInputWidget().setValue(value);
-            // throw new Error('method `_setChoiceInputValue` should be implemented in a descendant');
+            this.subview('choice-input').setValue(value);
         },
 
         getValue: function() {
@@ -233,27 +227,17 @@ define(function(require) {
         },
 
         getChoiceInputValue: function() {
-            return this.$choiceInput.inputWidget('val');
+            return this.subview('choice-input').getValue();
         },
 
         /**
-         * Inits particular jQuery widget on $choiceInput element
+         * Inits particular view on $choiceInput element
          *
+         * @return {Backbone.View}
          * @abstract
          */
-        initChoiceInput: function() {
-            throw new Error('method `initChoiceInput` should be implemented in a descendant');
-        },
-
-        /**
-         * Returns jQuery widget that was bound to $choiceInput element
-         *
-         * @return {jQuery.Widget}
-         * @abstract
-         */
-        getChoiceInputWidget: function() {
-            // @todo remove method after refactoring
-            throw new Error('method `getChoiceInputWidget` should be implemented in a descendant');
+        initChoiceInputView: function() {
+            throw new Error('method `initChoiceInputView` should be implemented in a descendant');
         },
 
         /**

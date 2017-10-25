@@ -42,13 +42,15 @@ define(function(require) {
                 activityConditionView = new ActivityConditionView({
                     autoRender: true,
                     filters: filters,
+                    listOptions: _.clone(listOptions),
                     fieldsLoaderSelector: '#test-fields-loader',
-                    listOptions: _.clone(listOptions)
+                    fieldChoice: {
+                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account',
+                        data: data
+                    }
                 });
                 $html.append(activityConditionView.$el);
                 $.when(activityConditionView.deferredRender).then(function() {
-                    activityConditionView.$choiceInput.fieldChoice('updateData',
-                        'Oro\\Bundle\\AccountBundle\\Entity\\Account', data);
                     done();
                 });
             });
@@ -122,13 +124,15 @@ define(function(require) {
                     autoRender: true,
                     filters: filters,
                     value: initialValue,
+                    listOptions: listOptions,
                     fieldsLoaderSelector: '#test-fields-loader',
-                    listOptions: listOptions
+                    fieldChoice: {
+                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account',
+                        data: data
+                    }
                 });
                 $html.append(activityConditionView.$el);
                 $.when(activityConditionView.deferredRender).then(function() {
-                    activityConditionView.$choiceInput.fieldChoice('updateData',
-                        'Oro\\Bundle\\AccountBundle\\Entity\\Account', data);
                     done();
                 });
             });
