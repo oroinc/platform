@@ -190,7 +190,7 @@ class Manager implements FunctionProviderInterface
      *
      * @return array
      */
-    protected function getMetadataForGrouping()
+    public function getMetadataForGrouping()
     {
         return $this->config->offsetGet('grouping');
     }
@@ -202,7 +202,7 @@ class Manager implements FunctionProviderInterface
      * @param string $queryType The query type
      * @return array
      */
-    protected function getMetadataForFunctions($groupType, $queryType)
+    public function getMetadataForFunctions($groupType, $queryType)
     {
         $result       = [];
         $groupsConfig = $this->config->offsetGet($groupType);

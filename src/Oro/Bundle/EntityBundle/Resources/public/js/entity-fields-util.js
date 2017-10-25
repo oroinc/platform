@@ -15,7 +15,7 @@ define(function(require) {
      *
      * @param {Array} fields
      * @param {Object} rules
-     * @param {Boolean} include
+     * @param {boolean=} [include=false]
      * @returns {Object}
      * @static
      */

@@ -168,14 +168,6 @@ define(function(require) {
             this.$el.inputWidget('refresh');
         },
 
-        setFieldChoiceOptions: function(options) {
-            var fieldChoiceOptions = _.pick(options, 'exclude', 'include');
-            if (fieldChoiceOptions) {
-                _.extend(this, fieldChoiceOptions);
-                this.$el.inputWidget('refresh');
-            }
-        },
-
         setValue: function(value) {
             this.$el.inputWidget('val', value, true);
         },

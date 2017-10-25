@@ -355,10 +355,6 @@ define(function(require) {
             }
 
             var groupingFieldChoiceView = this.groupingFieldChoiceComponent.view;
-
-            if (this.options.metadata.grouping) {
-                groupingFieldChoiceView.setFieldChoiceOptions(this.options.metadata.grouping);
-            }
             groupingFieldChoiceView.updateData(this.$entityChoice.val(),
                 EntityFieldsUtil.convertData(this._getInitFieldsData()));
 
