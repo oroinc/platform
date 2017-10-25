@@ -51,7 +51,8 @@ class NormalizeFilterValues implements ProcessorInterface
                             $filterValue->getValue(),
                             $filter->getDataType(),
                             $context->getRequestType(),
-                            $filter->isArrayAllowed($filterValue->getOperator())
+                            $filter->isArrayAllowed($filterValue->getOperator()),
+                            $filter->isRangeAllowed($filterValue->getOperator())
                         );
                         $filterValue->setValue($value);
                     } catch (\Exception $e) {

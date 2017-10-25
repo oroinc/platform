@@ -53,6 +53,8 @@ class RestJsonApiSupportedDataTypesTest extends RestJsonApiTestCase
                         'fieldPercent'     => 0.1,
                         'fieldMoney'       => '1.2345',
                         'fieldDuration'    => 11,
+                        'fieldMoneyValue'  => '1.2345',
+                        'fieldCurrency'    => 'USD',
                     ]
                 ]
             ],
@@ -86,6 +88,8 @@ class RestJsonApiSupportedDataTypesTest extends RestJsonApiTestCase
                     //'fieldPercent'     => 0.123, TODO: uncomment after merge BAP-13666
                     'fieldMoney'       => '123.4567',
                     'fieldDuration'    => 123,
+                    'fieldMoneyValue'  => '123.4567',
+                    'fieldCurrency'    => 'USD',
                 ]
             ]
         ];
@@ -118,6 +122,8 @@ class RestJsonApiSupportedDataTypesTest extends RestJsonApiTestCase
                 //'fieldPercent'     => $entity->fieldPercent, TODO: uncomment after merge BAP-13666
                 'fieldMoney'       => $entity->fieldMoney,
                 'fieldDuration'    => $entity->fieldDuration,
+                'fieldMoneyValue'  => $entity->fieldMoneyValue,
+                'fieldCurrency'    => $entity->fieldCurrency,
             ]
         );
     }
@@ -149,6 +155,8 @@ class RestJsonApiSupportedDataTypesTest extends RestJsonApiTestCase
                     //'fieldPercent'     => 0.123, TODO: uncomment after merge BAP-13666
                     'fieldMoney'       => '123.4567',
                     'fieldDuration'    => 123,
+                    'fieldMoneyValue'  => '123.4567',
+                    'fieldCurrency'    => 'UAH',
                 ]
             ]
         ];
@@ -181,6 +189,8 @@ class RestJsonApiSupportedDataTypesTest extends RestJsonApiTestCase
                 //'fieldPercent'     => $entity->fieldPercent, TODO: uncomment after merge BAP-13666
                 'fieldMoney'       => $entity->fieldMoney,
                 'fieldDuration'    => $entity->fieldDuration,
+                'fieldMoneyValue'  => $entity->fieldMoneyValue,
+                'fieldCurrency'    => $entity->fieldCurrency,
             ]
         );
     }
@@ -209,6 +219,33 @@ class RestJsonApiSupportedDataTypesTest extends RestJsonApiTestCase
         self::assertArrayContains(
             $expectedData['data']['attributes'],
             ['fieldMoney' => $entity->fieldMoney]
+        );
+    }
+
+    public function testMoneyValueShouldBeRounded()
+    {
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+
+        $data = [
+            'data' => [
+                'type'       => $entityType,
+                'id'         => '<toString(@TestItem1->id)>',
+                'attributes' => [
+                    'fieldMoneyValue' => '123.456789'
+                ]
+            ]
+        ];
+
+        $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@TestItem1->id)>'], $data);
+
+        $expectedData = $data;
+        $expectedData['data']['attributes']['fieldMoneyValue'] = '123.4568';
+        $this->assertResponseContains($expectedData, $response);
+
+        $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $this->getResourceId($response));
+        self::assertArrayContains(
+            $expectedData['data']['attributes'],
+            ['fieldMoneyValue' => $entity->fieldMoneyValue]
         );
     }
 
@@ -248,60 +285,68 @@ class RestJsonApiSupportedDataTypesTest extends RestJsonApiTestCase
     public function equalFilterDataProvider()
     {
         return [
-            'by string field'   => [
+            'by string field'      => [
                 ['fieldString' => 'String 2'],
                 [['id' => '<toString(@TestItem2->id)>']]
             ],
-            'by integer field'  => [
+            'by integer field'     => [
                 ['fieldInt' => '2'],
                 [['id' => '<toString(@TestItem2->id)>']]
             ],
-            'by smallint field' => [
+            'by smallint field'    => [
                 ['fieldSmallInt' => '2'],
                 [['id' => '<toString(@TestItem2->id)>']]
             ],
-            'by bigint field'   => [
+            'by bigint field'      => [
                 ['fieldBigInt' => '234567890123456'],
                 [['id' => '<toString(@TestItem2->id)>']]
             ],
-            'by boolean field'  => [
+            'by boolean field'     => [
                 ['fieldBoolean' => 'true'],
                 [['id' => '<toString(@TestItem2->id)>']]
             ],
-            'by decimal field'  => [
+            'by decimal field'     => [
                 ['fieldDecimal' => '2.345678'],
                 [['id' => '<toString(@TestItem2->id)>']]
             ],
-            'by float field'    => [
+            'by float field'       => [
                 ['fieldFloat' => '2.2'],
                 [['id' => '<toString(@TestItem2->id)>']]
             ],
-            'by datetime field' => [
+            'by datetime field'    => [
                 ['fieldDateTime' => '2010-11-01T10:12:13+00:00'],
                 [['id' => '<toString(@TestItem2->id)>']]
             ],
-            'by date field'     => [
+            'by date field'        => [
                 ['fieldDate' => '2010-11-01'],
                 [['id' => '<toString(@TestItem2->id)>']]
             ],
-            'by time field'     => [
+            'by time field'        => [
                 ['fieldTime' => '10:12:13'],
                 [['id' => '<toString(@TestItem2->id)>']]
             ],
-            'by guid field'     => [
+            'by guid field'        => [
                 ['fieldGuid' => '12c9746c-f44d-4a84-a72c-bdf750c70568'],
                 [['id' => '<toString(@TestItem2->id)>']]
             ],
-            'by percent field'  => [
+            'by percent field'     => [
                 ['fieldPercent' => '0.2'],
                 [['id' => '<toString(@TestItem2->id)>']]
             ],
-            'by money field'    => [
+            'by money field'       => [
                 ['fieldMoney' => '2.3456'],
                 [['id' => '<toString(@TestItem2->id)>']]
             ],
-            'by duration field' => [
+            'by duration field'    => [
                 ['fieldDuration' => '22'],
+                [['id' => '<toString(@TestItem2->id)>']]
+            ],
+            'by money_value field' => [
+                ['fieldMoneyValue' => '2.3456'],
+                [['id' => '<toString(@TestItem2->id)>']]
+            ],
+            'by currency field'    => [
+                ['fieldCurrency' => 'UAH'],
                 [['id' => '<toString(@TestItem2->id)>']]
             ],
         ];
@@ -346,60 +391,68 @@ class RestJsonApiSupportedDataTypesTest extends RestJsonApiTestCase
     public function notEqualFilterDataProvider()
     {
         return [
-            'by string field'   => [
+            'by string field'      => [
                 ['fieldString' => 'String 2'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by integer field'  => [
+            'by integer field'     => [
                 ['fieldInt' => '2'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by smallint field' => [
+            'by smallint field'    => [
                 ['fieldSmallInt' => '2'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by bigint field'   => [
+            'by bigint field'      => [
                 ['fieldBigInt' => '234567890123456'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by boolean field'  => [
+            'by boolean field'     => [
                 ['fieldBoolean' => 'true'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by decimal field'  => [
+            'by decimal field'     => [
                 ['fieldDecimal' => '2.345678'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by float field'    => [
+            'by float field'       => [
                 ['fieldFloat' => '2.2'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by datetime field' => [
+            'by datetime field'    => [
                 ['fieldDateTime' => '2010-11-01T10:12:13+00:00'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by date field'     => [
+            'by date field'        => [
                 ['fieldDate' => '2010-11-01'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by time field'     => [
+            'by time field'        => [
                 ['fieldTime' => '10:12:13'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by guid field'     => [
+            'by guid field'        => [
                 ['fieldGuid' => '12c9746c-f44d-4a84-a72c-bdf750c70568'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by percent field'  => [
+            'by percent field'     => [
                 ['fieldPercent' => '0.2'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by money field'    => [
+            'by money field'       => [
                 ['fieldMoney' => '2.3456'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by duration field' => [
+            'by duration field'    => [
                 ['fieldDuration' => '22'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by money_value field' => [
+                ['fieldMoneyValue' => '2.3456'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by currency field'    => [
+                ['fieldCurrency' => 'UAH'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
         ];
@@ -423,44 +476,193 @@ class RestJsonApiSupportedDataTypesTest extends RestJsonApiTestCase
     public function equalArrayFilterDataProvider()
     {
         return [
-            'by string field'   => [
+            'by string field'      => [
                 ['fieldString' => 'String 1,String 3'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by integer field'  => [
+            'by integer field'     => [
                 ['fieldInt' => '1,3'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by smallint field' => [
+            'by smallint field'    => [
                 ['fieldSmallInt' => '1,3'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by bigint field'   => [
+            'by bigint field'      => [
                 ['fieldBigInt' => '123456789012345,345678901234567'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by decimal field'  => [
+            'by decimal field'     => [
                 ['fieldDecimal' => '1.234567,3.456789'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by float field'    => [
+            'by float field'       => [
                 ['fieldFloat' => '1.1,3.3'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by guid field'     => [
+            'by guid field'        => [
                 ['fieldGuid' => 'ae404bc5-c9bb-4677-9bad-21144c704734,311e3b02-3cd2-4228-aff3-bafe9b0826de'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by percent field'  => [
+            'by percent field'     => [
                 ['fieldPercent' => '0.1,0.3'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by money field'    => [
+            'by money field'       => [
                 ['fieldMoney' => '1.2345,3.4567'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
-            'by duration field' => [
+            'by duration field'    => [
                 ['fieldDuration' => '11,33'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by money_value field' => [
+                ['fieldMoneyValue' => '1.2345,3.4567'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by currency field'    => [
+                ['fieldCurrency' => 'USD,EUR'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider rangeFilterDataProvider
+     */
+    public function testRangeFilter(array $filter, array $expectedRows)
+    {
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+        foreach ($expectedRows as &$row) {
+            $row['type'] = $entityType;
+        }
+
+        $response = $this->cget(['entity' => $entityType], ['filter' => $filter]);
+
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+    }
+
+    public function rangeFilterDataProvider()
+    {
+        return [
+            'by integer field'     => [
+                ['fieldInt' => '2..3'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by smallint field'    => [
+                ['fieldSmallInt' => '2..3'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by bigint field'      => [
+                ['fieldBigInt' => '234567890123456..345678901234567'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by decimal field'     => [
+                ['fieldDecimal' => '2.2..3.5'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by float field'       => [
+                ['fieldFloat' => '2.2..3.5'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by datetime field'    => [
+                ['fieldDateTime' => '2010-11-01T10:12:13..2010-12-01T10:13:14'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by date field'        => [
+                ['fieldDate' => '2010-11-01..2010-12-01'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by time field'        => [
+                ['fieldTime' => '10:12:13..10:13:14'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by percent field'     => [
+                ['fieldPercent' => '0.2..0.3'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by money field'       => [
+                ['fieldMoney' => '2.3456..3.4567'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by duration field'    => [
+                ['fieldDuration' => '22..33'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by money_value field' => [
+                ['fieldMoneyValue' => '2.3456..3.4567'],
+                [['id' => '<toString(@TestItem2->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider notInRangeFilterDataProvider
+     */
+    public function testNotInRangeFilter(array $filter, array $expectedRows)
+    {
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+        foreach ($expectedRows as &$row) {
+            $row['type'] = $entityType;
+        }
+
+        $key = key($filter);
+        $filter[$key] = ['neq' => $filter[$key]];
+
+        $response = $this->cget(['entity' => $entityType], ['filter' => $filter]);
+
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+    }
+
+    public function notInRangeFilterDataProvider()
+    {
+        return [
+            'by integer field'     => [
+                ['fieldInt' => '2..3'],
+                [['id' => '<toString(@TestItem1->id)>']]
+            ],
+            'by smallint field'    => [
+                ['fieldSmallInt' => '2..3'],
+                [['id' => '<toString(@TestItem1->id)>']]
+            ],
+            'by bigint field'      => [
+                ['fieldBigInt' => '123456789012346..345678901234566'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by decimal field'     => [
+                ['fieldDecimal' => '1.234568..3.456788'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by float field'       => [
+                ['fieldFloat' => '1.1001..3.2999'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by datetime field'    => [
+                ['fieldDateTime' => '2010-10-01T10:11:13..2010-12-01T10:13:13'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by date field'        => [
+                ['fieldDate' => '2010-10-02..2010-11-30'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by time field'        => [
+                ['fieldTime' => '10:11:13..10:13:13'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by percent field'     => [
+                ['fieldPercent' => '0.101..0.299'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by money field'       => [
+                ['fieldMoney' => '1.2346..3.4566'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by duration field'    => [
+                ['fieldDuration' => '12..32'],
+                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+            ],
+            'by money_value field' => [
+                ['fieldMoneyValue' => '1.2346..3.4566'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
             ],
         ];

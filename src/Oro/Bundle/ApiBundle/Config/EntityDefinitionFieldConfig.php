@@ -66,9 +66,11 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
      */
     public function isMetaProperty()
     {
-        return array_key_exists(EntityDefinitionFieldConfig::META_PROPERTY, $this->items)
-            ? $this->items[EntityDefinitionFieldConfig::META_PROPERTY]
-            : false;
+        if (!array_key_exists(EntityDefinitionFieldConfig::META_PROPERTY, $this->items)) {
+            return false;
+        }
+
+        return $this->items[EntityDefinitionFieldConfig::META_PROPERTY];
     }
 
     /**
@@ -94,9 +96,11 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
      */
     public function getMetaPropertyResultName($defaultValue = null)
     {
-        return array_key_exists(EntityDefinitionFieldConfig::META_PROPERTY_RESULT_NAME, $this->items)
-            ? $this->items[EntityDefinitionFieldConfig::META_PROPERTY_RESULT_NAME]
-            : $defaultValue;
+        if (!array_key_exists(EntityDefinitionFieldConfig::META_PROPERTY_RESULT_NAME, $this->items)) {
+            return $defaultValue;
+        }
+
+        return $this->items[EntityDefinitionFieldConfig::META_PROPERTY_RESULT_NAME];
     }
 
     /**
@@ -215,9 +219,11 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
      */
     public function getDependsOn()
     {
-        return array_key_exists(self::DEPENDS_ON, $this->items)
-            ? $this->items[self::DEPENDS_ON]
-            : null;
+        if (!array_key_exists(self::DEPENDS_ON, $this->items)) {
+            return null;
+        }
+
+        return $this->items[self::DEPENDS_ON];
     }
 
     /**

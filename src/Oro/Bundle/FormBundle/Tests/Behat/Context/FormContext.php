@@ -102,6 +102,14 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @When /^(?:|I )save and create new form$/
+     */
+    public function iSaveAndCreateNewForm()
+    {
+        $this->createOroForm()->saveAndCreateNew();
+    }
+
+    /**
      * Find and assert field value
      * It's valid for entity edit or entity view page
      * Example: And Account Name field should has Good Company value
@@ -331,7 +339,6 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         self::assertTrue($field->isVisible(), "Field with '$locator' was found, but it not visible");
 
         $driver->typeIntoInput($field->getXpath(), $value);
-        $driver->blur($field->getXpath());
     }
 
     /**

@@ -1,4 +1,18 @@
 api:
+    entity_aliases:
+        Extend\Entity\TestApiE1:
+            alias: testapientity1
+            plural_alias: testapientity1
+        Extend\Entity\TestApiE2:
+            alias: testapientity2
+            plural_alias: testapientity2
+        Extend\Entity\EV_Api_Enum1:
+            alias: testapienum1
+            plural_alias: testapienum1
+        Extend\Entity\EV_Api_Enum2:
+            alias: testapienum2
+            plural_alias: testapienum2
+
     entities:
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
             fields:
@@ -30,6 +44,14 @@ api:
                     exclude: true
                 lastName:
                     exclude: true
+                links:
+                    data_type: array
+                    exclusion_policy: all
+                    fields:
+                        firstName:
+                            property_path: name
+                        lastName:
+                            property_path: key
                 relatedEntity:
                     data_type: nestedAssociation
                     fields:
@@ -41,8 +63,6 @@ api:
                     exclude: true
                 relatedId:
                     exclude: true
-
-
         Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
             filters:
                 fields:
@@ -84,8 +104,8 @@ api:
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier:
             identifier_field_names: ['key']
             fields:
-                id:
-                    exclude: true
+                databaseId:
+                    property_path: id
             filters:
                 fields:
                     name: ~
@@ -114,6 +134,8 @@ api:
                     fieldPercent: ~
                     fieldMoney: ~
                     fieldDuration: ~
+                    fieldMoneyValue: ~
+                    fieldCurrency: ~
             sorters:
                 fields:
                     fieldString: ~
@@ -130,3 +152,7 @@ api:
                     fieldPercent: ~
                     fieldMoney: ~
                     fieldDuration: ~
+                    fieldMoneyValue: ~
+                    fieldCurrency: ~
+        Extend\Entity\TestApiE1: ~
+        Extend\Entity\TestApiE2: ~

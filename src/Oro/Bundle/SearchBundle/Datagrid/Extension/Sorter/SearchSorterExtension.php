@@ -14,9 +14,10 @@ class SearchSorterExtension extends AbstractSorterExtension
     // data type mapping from configuration type to search engine type
     /** @var array */
     protected static $typeMapping = [
-        'string'  => 'text',
-        'integer' => 'integer',
-        'decimal' => 'decimal',
+        'string'   => 'text',
+        'integer'  => 'integer',
+        'decimal'  => 'decimal',
+        'datetime' => 'datetime',
     ];
 
     /**
