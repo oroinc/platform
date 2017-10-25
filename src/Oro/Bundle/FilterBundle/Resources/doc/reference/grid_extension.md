@@ -31,6 +31,8 @@ For example:
                     force_like: true|false #Different search engines uses different methods for text search. When `force_like` is set to true, text-based filters will use simple `LIKE %%` OR `NOT LIKE %%`statement which depends on a chosen operator
                     min_length: integer #In case of text-based filters this option introduce possibility to ignore filters with less characters then specified. Validation message will also appear
                     divisor: number #In case of number-based filters this option will filter values rendered with datagrid divisor option.
+                    case_insensitive: true|false #When set to 'true' text search filter will be case insensitive [Postgres only].
+                    value_conversion: string #Callback for text search filter used for converting value passed to a query.
 
 ```
 
@@ -44,6 +46,7 @@ For example:
                 fieldName:
                     type:      string
                     data_name: priorityLabel
+                    case_insensitive: true
             default:
                 fieldName: { value: 'someText', type: %oro_filter.form.type.filter.text.class%::TYPE_CONTAINS }
 ```
@@ -81,7 +84,7 @@ Filters
 Provides filtering using string comparison.
 
 `type: string`
-Validated by TextFilterType on backend and rendered by [Oro.Filter.ChoiceFilter](./javascript_widgets.md#orofilterchoicefilter)
+Validated by TextFilterType on backend and rendered by [Oro.Filter.ChoiceFilter](./javascript_widgets.md#orofilterchoicefilter).  When case_insensitive is set to false it's possible to convert value by using callback defined in 'value_conversion'. 
 
 ### Select Row filter
 

@@ -7,12 +7,12 @@
         position: relative;
 
         display: inline-block;
+        margin-left: $datagrid-massaction-toggle-offset-left;
         padding: $datagrid-massaction-toggle-offset-inner;
 
         font-size: $datagrid-massaction-toggle-font-size;
         font-weight: $datagrid-massaction-toggle-font-weight;
         line-height: $datagrid-massaction-toggle-font-size;
-        white-space: nowrap;
 
         color: $datagrid-massaction-toggle-color;
         background-color: $datagrid-massaction-toggle-background-color;
