@@ -149,6 +149,12 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
+    oro_search.extension.mass_action.iterable_result_factory:
+        class: Oro\Bundle\SearchBundle\Datagrid\Extension\MassAction\IterableResultFactory
+        public: false
+        tags:
+            - { name: oro_datagrid.extension.mass_action.iterable_result_factory }
+
     # services used only for ORM search engine
     oro_search.fulltext_index_manager:
         class: %oro_search.fulltext_index_manager.class%

@@ -15,7 +15,7 @@ interface IterableResultInterface extends \Iterator
     public function setBufferSize($size);
 
     /**
-     * @return Query|QueryBuilder
+     * @return Query|QueryBuilder|object
      */
     public function getSource();
 }

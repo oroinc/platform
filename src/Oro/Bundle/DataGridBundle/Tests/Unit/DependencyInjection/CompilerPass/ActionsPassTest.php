@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
+use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\ActionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-
-use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\ActionsPass;
 
 class ActionsPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,6 +23,9 @@ class ActionsPassTest extends \PHPUnit_Framework_TestCase
     /** @var Definition */
     protected $massActionFactory;
 
+    /** @var Definition */
+    protected $iterableResultFactoryRegistry;
+
     protected function setUp()
     {
         $this->actionsPass = new ActionsPass();
@@ -31,11 +33,16 @@ class ActionsPassTest extends \PHPUnit_Framework_TestCase
         $this->actionFactory = new Definition();
         $this->actionExtension = new Definition();
         $this->massActionFactory = new Definition();
+        $this->iterableResultFactoryRegistry = new Definition();
 
         $this->container = new ContainerBuilder();
         $this->container->setDefinition(ActionsPass::ACTION_FACTORY_SERVICE_ID, $this->actionFactory);
         $this->container->setDefinition(ActionsPass::ACTION_EXTENSION_SERVICE_ID, $this->actionExtension);
         $this->container->setDefinition(ActionsPass::MASS_ACTION_FACTORY_SERVICE_ID, $this->massActionFactory);
+        $this->container->setDefinition(
+            ActionsPass::ITERABLE_RESULT_FACTORY_REGISTRY_SERVICE_ID,
+            $this->iterableResultFactoryRegistry
+        );
     }
 
     /**
@@ -66,6 +73,23 @@ class ActionsPassTest extends \PHPUnit_Framework_TestCase
             $attributes['priority'] = $priority;
         }
         $provider->addTag(ActionsPass::ACTION_PROVIDER_TAG, $attributes);
+
+        return $provider;
+    }
+
+    /**
+     * @param int|null $priority
+     *
+     * @return Definition
+     */
+    protected function getIterableResultFactoryDefinition($priority = null)
+    {
+        $provider = new Definition();
+        $attributes = [];
+        if (null !== $priority) {
+            $attributes['priority'] = $priority;
+        }
+        $provider->addTag(ActionsPass::ITERABLE_RESULT_FACTORY_TAG_NAME, $attributes);
 
         return $provider;
     }
@@ -107,6 +131,20 @@ class ActionsPassTest extends \PHPUnit_Framework_TestCase
         self::assertEquals('action_provider1', $providers[1][1][1]);
         self::assertEquals('addActionProvider', $providers[2][0]);
         self::assertEquals('action_provider3', $providers[2][1][1]);
+    }
+
+    public function testProcessIterableResultFactories()
+    {
+        $this->container->setDefinition('factory1', $this->getIterableResultFactoryDefinition());
+        $this->container->setDefinition('factory2', $this->getIterableResultFactoryDefinition());
+
+        $this->actionsPass->process($this->container);
+
+        $factories = $this->iterableResultFactoryRegistry->getMethodCalls();
+        self::assertEquals('addFactory', $factories[0][0]);
+        self::assertEquals('factory1', $factories[0][1][1]);
+        self::assertEquals('addFactory', $factories[1][0]);
+        self::assertEquals('factory2', $factories[1][1][1]);
     }
 
     public function testProcessMassActions()
