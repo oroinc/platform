@@ -19,7 +19,6 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
-
 class DynamicFieldsHelperTest extends \PHPUnit_Framework_TestCase
 {
     const CLASS_NAME = 'MockClass';
