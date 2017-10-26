@@ -17,8 +17,8 @@
         {% block transition_widget %}
             {% if form.vars.errors|length > 0 %}
                 <div class="alert alert-error" {{  UI.renderPageComponentAttributes({
-                    view: {
-                        view: 'oroworkflow/js/app/views/transition/transition-error-view',
+                    view: 'oroworkflow/js/app/views/transition/transition-error-view',
+                    options: {
                         wid: app.request.get('_wid')
                     }
                 }) }}>

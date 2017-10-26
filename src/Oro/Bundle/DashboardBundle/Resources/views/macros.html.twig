@@ -7,7 +7,6 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
     {% set options = {
-        view: viewType,
         _sourceElement: 'div.widget-configuration',
         metadata: form.vars.datetime_range_metadata,
         formName: form.vars.name,
@@ -22,6 +21,7 @@
     {% endif %}
 
     <div {{ UI.renderPageComponentAttributes({
-        view: options
+        view: viewType,
+        options: options
     }) }}></div>
 {% endmacro %}

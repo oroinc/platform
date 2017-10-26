@@ -19,8 +19,8 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
     <div class="widget-title-container" {{ UI.renderPageComponentAttributes({
-        view: {
-            view: 'oroform/js/app/views/default-field-value-view',
+        view: 'oroform/js/app/views/default-field-value-view',
+        options: {
             fieldSelector: 'input#' ~ form.title.vars.id,
             prepareTinymce: false
         }
@@ -71,7 +71,6 @@
 
 {% block oro_type_widget_items_javascript %}
     {% set options = {
-        view: 'orodashboard/js/items/view',
         _sourceElement: '#' ~ form.vars.id ~ 'Row',
         itemsData: form.children.items.vars.value,
         baseName: form.children.items.vars.full_name,
@@ -85,7 +84,8 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
-        view: options
+        view: 'orodashboard/js/items/view',
+        options: options
     }) }}></div>
 {% endblock %}
 
@@ -102,9 +102,9 @@
             {% import 'OroUIBundle::macros.html.twig' as UI %}
 
             <div {{ UI.renderPageComponentAttributes({
-                view: {
+                view: 'orodashboard/js/app/views/widget-date-compare-view',
+                options: {
                     _sourceElement: '.widget-date-compare',
-                    view: 'orodashboard/js/app/views/widget-date-compare-view',
                     useDateSelector: 'input#' ~ form.useDate.vars.id,
                     dateSelector: 'input#' ~ form.date.vars.id,
                 }
