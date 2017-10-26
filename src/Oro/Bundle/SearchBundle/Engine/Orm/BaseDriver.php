@@ -641,18 +641,15 @@ abstract class BaseDriver implements DBALPersisterInterface
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param integer                    $index
-     * @param array                      $searchCondition
+     * @param integer $index
+     * @param array $searchCondition
      *
      * @return string
      */
-    public function addFilteringField(QueryBuilder $qb, $index, $searchCondition)
+    public function addFilteringField($index, $searchCondition)
     {
         $condition = $searchCondition['condition'];
-
         $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
-        $qb->setParameter('field' . $index, $searchCondition['fieldName']);
 
         switch ($condition) {
             case Query::OPERATOR_EXISTS:

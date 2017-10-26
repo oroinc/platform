@@ -35,8 +35,9 @@ class OrmExpressionVisitorTest extends \PHPUnit_Framework_TestCase
      * @dataProvider filteringOperatorProvider
      *
      * @param string $operator
+     * @param string $expected
      */
-    public function testWalkComparisontWalkComparisonFilteringOperator($operator)
+    public function testWalkComparisontWalkComparisonFilteringOperator($operator, $expected)
     {
         $index = 42;
         $type = Query::TYPE_INTEGER;
@@ -67,12 +68,15 @@ class OrmExpressionVisitorTest extends \PHPUnit_Framework_TestCase
             ->method('leftJoin')
             ->with($joinField, $joinAlias, Join::WITH, sprintf('%s.field = :field%s', $joinAlias, $index));
 
+        $this->qb->expects($this->once())
+            ->method('setParameter')
+            ->with(sprintf('field%s', $index), $fieldName);
+
         $expected = 'EXPECTED EXPRESSION';
 
         $this->driver->expects($this->once())
             ->method('addFilteringField')
             ->with(
-                $this->qb,
                 $index,
                 [
                     'fieldName'  => $fieldName,
@@ -94,9 +98,11 @@ class OrmExpressionVisitorTest extends \PHPUnit_Framework_TestCase
         return [
             SearchComparison::EXISTS => [
                 'operator' => SearchComparison::EXISTS,
+                'expectedWhere' => 'IS NOT NULL',
             ],
             SearchComparison::NOT_EXISTS => [
                 'operator' => SearchComparison::NOT_EXISTS,
+                'expectedWhere' => 'IS NULL',
             ],
         ];
     }
