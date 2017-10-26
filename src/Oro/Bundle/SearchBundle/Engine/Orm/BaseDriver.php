@@ -641,47 +641,6 @@ abstract class BaseDriver implements DBALPersisterInterface
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param integer                    $index
-     * @param array                      $searchCondition
-     *
-     * @return string
-     */
-    public function addFilteringField(QueryBuilder $qb, $index, $searchCondition)
-    {
-        $condition = $searchCondition['condition'];
-        $type      = $searchCondition['fieldType'];
-        $fieldName = $searchCondition['fieldName'];
-
-        $joinField = $this->getJoinField($type);
-        $joinAlias = $this->getJoinAlias($type, $index);
-
-        $fieldParameter = 'field' . $index;
-        $qb->setParameter($fieldParameter, $fieldName);
-
-        if (is_array($fieldName)) {
-            $joinCondition = "$joinAlias.field IN (:$fieldParameter)";
-        } else {
-            $joinCondition = "$joinAlias.field = :$fieldParameter";
-        }
-
-        $qb->leftJoin($joinField, $joinAlias, Join::WITH, $joinCondition);
-
-        switch ($condition) {
-            case Query::OPERATOR_EXISTS:
-                return "$joinAlias.id IS NOT NULL";
-
-            case Query::OPERATOR_NOT_EXISTS:
-                return "$joinAlias.id IS NULL";
-
-            default:
-                throw new ExpressionSyntaxError(
-                    sprintf('Unsupported operator "%s"', $condition)
-                );
-        }
-    }
-
-    /**
      * Stores all data taken from Items given by 'writeItem' method
      */
     public function flushWrites()

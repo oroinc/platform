@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Doctrine\Common\Collections\Expr\Value;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison as SearchComparison;
@@ -54,21 +55,28 @@ class OrmExpressionVisitor extends ExpressionVisitor
             'fieldType'  => $type
         ];
 
+        $fieldCondition = $joinAlias . '.field = :field' . $index;
+        $fieldConditionParam = 'field' . $index;
+
         if (in_array($comparison->getOperator(), SearchComparison::$filteringOperators, true)) {
-            return $this->driver->addFilteringField($this->qb, $index, $searchCondition);
+            $this->qb->leftJoin($joinField, $joinAlias, Join::WITH, $fieldCondition);
+            $this->qb->setParameter($fieldConditionParam, $searchCondition['fieldName']);
+
+            return sprintf('%s.id IS %sNULL', $joinAlias, $condition === Query::OPERATOR_EXISTS ? 'NOT ' : '');
         }
+
         if (is_string($searchCondition['fieldName'])) {
-            $this->qb->leftJoin($joinField, $joinAlias, 'WITH', $joinAlias . '.field = :field' . $index);
-            $this->qb->setParameter('field' . $index, $searchCondition['fieldName']);
+            $this->qb->leftJoin($joinField, $joinAlias, Join::WITH, $fieldCondition);
+            $this->qb->setParameter($fieldConditionParam, $searchCondition['fieldName']);
         } else {
             $this->qb->innerJoin($joinField, $joinAlias);
         }
 
         if ($type === Query::TYPE_TEXT && !in_array($condition, [Query::OPERATOR_IN, Query::OPERATOR_NOT_IN], true)) {
             if ($searchCondition['fieldValue'] === '') {
-                $this->qb->setParameter('field' . $index, $searchCondition['fieldName']);
+                $this->qb->setParameter($fieldConditionParam, $searchCondition['fieldName']);
 
-                return $joinAlias . '.field = :field' . $index;
+                return $fieldCondition;
             } else {
                 return $this->driver->addTextField($this->qb, $index, $searchCondition, $this->setOrderBy);
             }
@@ -110,7 +118,7 @@ class OrmExpressionVisitor extends ExpressionVisitor
                 $operator           = $child->getOperator();
                 $value              = $child->getValue()->getValue();
                 $fieldType          = Criteria::explodeFieldTypeName($fieldName)[0];
-                $key                = $this->getExpressionKey($fieldType, $operator, $value);
+                $key                = $this->getExpressionKey($fieldName, $operator, $value);
                 $combinedExpression = $child;
                 if ($fieldType !== Query::TYPE_TEXT && array_key_exists($key, $expressionObjectList)) {
                     $combinedExpression = $expressionObjectList[$key];
@@ -161,16 +169,16 @@ class OrmExpressionVisitor extends ExpressionVisitor
     }
 
     /**
-     * @param string $fieldType
+     * @param string $fieldName
      * @param string $operator
      * @param mixed  $value
      *
      * @return string
      */
-    protected function getExpressionKey($fieldType, $operator, $value)
+    protected function getExpressionKey($fieldName, $operator, $value)
     {
         $value = is_array($value) ? serialize($value) : (string)$value;
-        return md5($fieldType . $operator . $value);
+        return md5($fieldName . '|' . $operator . '|' . $value);
     }
 
     /**
