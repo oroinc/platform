@@ -98,6 +98,7 @@ define(function(request) {
 
         dispose: function() {
             delete this.options;
+            delete this.$choiceElement;
 
             ChartFormView.__super__.dispose.apply(this, arguments);
         }
