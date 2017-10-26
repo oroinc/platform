@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\ImportExport;
 
+use Doctrine\ORM\Query\Expr\OrderBy;
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
@@ -94,6 +96,57 @@ class DatagridExportIdFetcher implements ContextAwareInterface
             ->setFirstResult(null)
             ->setMaxResults(null);
 
+        if ($this->isOrderedByExpressionOrAlias($qb)) {
+            $qb->resetDQLPart('orderBy');
+        }
+
         return array_keys($qb->getQuery()->getArrayResult());
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @return bool
+     */
+    private function isOrderedByExpressionOrAlias(QueryBuilder $queryBuilder): bool
+    {
+        $orderByParts = $queryBuilder->getDQLPart('orderBy');
+        if ($orderByParts === null) {
+            return false;
+        }
+
+        $aliases = $queryBuilder->getAllAliases();
+        /** @var OrderBy $orderByPart */
+        foreach ($orderByParts as $orderByPart) {
+            foreach ($orderByPart->getParts() as $part) {
+                $part = preg_replace('/(ASC|DESC)$/i', '', $part);
+                if (!$this->isOrderedByTableField($part, $aliases)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * This function handles only not quoted(delimited) identifiers (i.e. without special characters).
+     *
+     * @param string $orderBy
+     * @param array $aliases
+     * @return bool
+     */
+    private function isOrderedByTableField(string $orderBy, array $aliases): bool
+    {
+        $parts = explode('.', trim($orderBy));
+        if (count($parts) !== 2) {
+            return false;
+        }
+
+        list($tableName, $fieldName) = $parts;
+        if (!in_array($tableName, $aliases, true)) {
+            return false;
+        }
+
+        return preg_match('/^[\w_\$]+$/', $fieldName);
     }
 }
