@@ -32,8 +32,8 @@
     {% if entity.id %}
         {% if entity.enabled %}
         <div class="btn-group" {{ UI.renderPageComponentAttributes({
-            view: {
-                view: 'orointegration/js/app/views/integration-sync-view',
+            view: 'orointegration/js/app/views/integration-sync-view',
+            options: {
                 integrationName: entity.name
             }
         }) }}>

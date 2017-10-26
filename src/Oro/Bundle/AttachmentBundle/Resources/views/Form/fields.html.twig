@@ -20,8 +20,8 @@
                 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
                 <div id="{{ divId }}" class="well well-small oro_attachment_file" {{ UI.renderPageComponentAttributes({
-                    view: {
-                        view: 'oroattachment/js/app/views/attachment-view',
+                    view: 'oroattachment/js/app/views/attachment-view',
+                    options: {
                         inputSelector: '#' ~ inputId,
                     }
                 }) }}>
@@ -79,8 +79,8 @@
                 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
                 <div id="{{ divId }}" class="attachment_item" {{ UI.renderPageComponentAttributes({
-                    view: {
-                        view: 'oroattachment/js/app/views/attachment-view',
+                    view: 'oroattachment/js/app/views/attachment-view',
+                    options: {
                         inputSelector: '#' ~ inputId,
                     }
                 }) }}>
