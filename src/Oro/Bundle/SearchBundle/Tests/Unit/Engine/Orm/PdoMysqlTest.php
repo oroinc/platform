@@ -4,11 +4,8 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine\Orm;
 
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 
-class PdoMysqlTest extends \PHPUnit_Framework_TestCase
+class PdoMysqlTest extends AbstractPdoTest
 {
-    /** @var PdoMysql */
-    protected $driver;
-
     public function setUp()
     {
         parent::setUp();

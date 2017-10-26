@@ -9,6 +9,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver;
 use Oro\Bundle\SearchBundle\Engine\Orm\OrmExpressionVisitor;
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison as SearchComparison;
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class OrmExpressionVisitorTest extends \PHPUnit_Framework_TestCase
@@ -34,9 +35,8 @@ class OrmExpressionVisitorTest extends \PHPUnit_Framework_TestCase
      * @dataProvider filteringOperatorProvider
      *
      * @param string $operator
-     * @param string $expected
      */
-    public function testWalkComparisontWalkComparisonFilteringOperator($operator, $expected)
+    public function testWalkComparisontWalkComparisonFilteringOperator($operator)
     {
         $index = 42;
         $type = Query::TYPE_INTEGER;
@@ -67,11 +67,23 @@ class OrmExpressionVisitorTest extends \PHPUnit_Framework_TestCase
             ->method('leftJoin')
             ->with($joinField, $joinAlias, Join::WITH, sprintf('%s.field = :field%s', $joinAlias, $index));
 
-        $this->qb->expects($this->once())
-            ->method('setParameter')
-            ->with(sprintf('field%s', $index), $fieldName);
+        $expected = 'EXPECTED EXPRESSION';
 
-        $this->assertEquals(sprintf('%s.id %s', $joinAlias, $expected), $this->visitor->walkComparison($comparison));
+        $this->driver->expects($this->once())
+            ->method('addFilteringField')
+            ->with(
+                $this->qb,
+                $index,
+                [
+                    'fieldName'  => $fieldName,
+                    'condition'  => Criteria::getSearchOperatorByComparisonOperator($operator),
+                    'fieldValue' => null,
+                    'fieldType'  => $type
+                ]
+            )
+            ->willReturn($expected);
+
+        $this->assertEquals($expected, $this->visitor->walkComparison($comparison));
     }
 
     /**
@@ -82,11 +94,9 @@ class OrmExpressionVisitorTest extends \PHPUnit_Framework_TestCase
         return [
             SearchComparison::EXISTS => [
                 'operator' => SearchComparison::EXISTS,
-                'expectedWhere' => 'IS NOT NULL',
             ],
             SearchComparison::NOT_EXISTS => [
                 'operator' => SearchComparison::NOT_EXISTS,
-                'expectedWhere' => 'IS NULL',
             ],
         ];
     }

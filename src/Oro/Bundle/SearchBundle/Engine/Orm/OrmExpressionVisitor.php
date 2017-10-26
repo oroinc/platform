@@ -60,9 +60,8 @@ class OrmExpressionVisitor extends ExpressionVisitor
 
         if (in_array($comparison->getOperator(), SearchComparison::$filteringOperators, true)) {
             $this->qb->leftJoin($joinField, $joinAlias, Join::WITH, $fieldCondition);
-            $this->qb->setParameter($fieldConditionParam, $searchCondition['fieldName']);
 
-            return sprintf('%s.id IS %sNULL', $joinAlias, $condition === Query::OPERATOR_EXISTS ? 'NOT ' : '');
+            return $this->driver->addFilteringField($this->qb, $index, $searchCondition);
         }
 
         if (is_string($searchCondition['fieldName'])) {

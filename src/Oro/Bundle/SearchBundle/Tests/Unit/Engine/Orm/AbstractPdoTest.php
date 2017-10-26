@@ -64,20 +64,7 @@ abstract class AbstractPdoTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expectedWhere, $this->driver->addFilteringField($this->qb, 42, $searchCondition));
         $this->assertEquals(new ArrayCollection([new Parameter('field42', $fieldName)]), $this->qb->getParameters());
-        $this->assertEquals(
-            [
-                static::JOIN_ALIAS => [
-                    new Join(
-                        Join::LEFT_JOIN,
-                        'search.integerFields',
-                        'integerField42',
-                        Join::WITH,
-                        $expectedConditionString
-                    )
-                ]
-            ],
-            $this->qb->getDQLPart('join')
-        );
+        $this->assertEquals([], $this->qb->getDQLPart('join'), 'Should not be any additional joins.');
     }
 
     /**
@@ -86,30 +73,18 @@ abstract class AbstractPdoTest extends \PHPUnit_Framework_TestCase
     public function addFilteringFieldProvider()
     {
         return [
-            'EXISTS with single field' => [
+            Query::OPERATOR_EXISTS => [
                 'condition' => Query::OPERATOR_EXISTS,
                 'fieldName' => 'myTest_value1',
                 'expectedWhere' => 'integerField42.id IS NOT NULL',
                 'expectedConditionString' => 'integerField42.field = :field42'
             ],
-            'EXISTS with multi fields' => [
-                'condition' => Query::OPERATOR_EXISTS,
-                'fieldName' => ['myTest_value1', 'myTest_value2'],
-                'expectedWhere' => 'integerField42.id IS NOT NULL',
-                'expectedConditionString' => 'integerField42.field IN (:field42)'
-            ],
-            'NOT EXISTS with single field' => [
+            Query::OPERATOR_NOT_EXISTS => [
                 'condition' => Query::OPERATOR_NOT_EXISTS,
                 'fieldName' => 'myTest_value1',
                 'expectedWhere' => 'integerField42.id IS NULL',
                 'expectedConditionString' => 'integerField42.field = :field42'
             ],
-            'NOT EXISTS with multi fields' => [
-                'condition' => Query::OPERATOR_NOT_EXISTS,
-                'fieldName' => ['myTest_value1', 'myTest_value2'],
-                'expectedWhere' => 'integerField42.id IS NULL',
-                'expectedConditionString' => 'integerField42.field IN (:field42)'
-            ]
         ];
     }
 }
