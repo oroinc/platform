@@ -43,6 +43,7 @@ entity_config:
                             label:          oro.entity.entity_config.entity.entity.items.label
                             block:          general
                             required:       true
+                            strip_tags:     true
 
                 plural_label:
                     options:
@@ -59,6 +60,7 @@ entity_config:
                             label:          oro.entity.entity_config.entity.entity.items.plural_label
                             block:          general
                             required:       true
+                            strip_tags:     true
 
                 description:
                     options:
@@ -73,6 +75,7 @@ entity_config:
                             label:          oro.entity.entity_config.entity.entity.items.description
                             block:          general
                             required:       false
+                            strip_tags:     true
         field:
             form:
                 block_config:
@@ -106,6 +109,7 @@ entity_config:
                             tooltip:        oro.entity.entity_config.entity.field.items.label.tooltip
                             block:          general
                             required:       true
+                            strip_tags:     true
 
                 description:
                     options:
@@ -121,6 +125,7 @@ entity_config:
                             tooltip:        oro.entity.entity_config.entity.field.items.description.tooltip
                             block:          general
                             required:       false
+                            strip_tags:     true
 
     datagrid:
         field:

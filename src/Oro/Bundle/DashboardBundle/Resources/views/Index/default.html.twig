@@ -40,7 +40,6 @@
 {% endfor %}
 
 {% set dashboardContainerOptions = {
-    view: 'orodashboard/js/app/views/dashboard-container-view',
     widgetIds: widgetIds,
     dashboardId: dashboard.id,
     columnsSelector: '.dashboard-column',
@@ -51,7 +50,8 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 <div class="layout-content dashboard-container-wrapper" {{ UI.renderPageComponentAttributes({
-    view: dashboardContainerOptions
+    view: 'orodashboard/js/app/views/dashboard-container-view',
+    options: dashboardContainerOptions
 }) }}>
     <div class="container-fluid page-title">
         <div class="navigation clearfix navbar-extra navbar-extra-right">

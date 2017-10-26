@@ -31,6 +31,13 @@
                 background-color: $checkbox-icon-bg-color-focus-state;
             }
         }
+
+        &:indeterminate {
+            ~ .custom-checkbox__icon {
+                border: $checkbox-icon-border-focus-state;
+                background-color: $checkbox-icon-bg-color-focus-state;
+            }
+        }
     }
 
     &__icon {
@@ -51,6 +58,6 @@
     }
 
     &__text {
-        vertical-align: baseline;
+        vertical-align: middle;
     }
 }

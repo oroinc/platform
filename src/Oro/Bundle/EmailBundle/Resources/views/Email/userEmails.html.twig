@@ -77,8 +77,8 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
     <div class="btn-group" {{ UI.renderPageComponentAttributes({
-        view: {
-            view: 'oroemail/js/app/views/email-sync-view',
+        view: 'oroemail/js/app/views/email-sync-view',
+        options: {
             syncPath: path('oro_email_user_sync_emails'),
             processingMessage: 'oro.email.action.message.processing'|trans,
             errorHandlerMessage: 'oro.email.action.message.error'|trans,
