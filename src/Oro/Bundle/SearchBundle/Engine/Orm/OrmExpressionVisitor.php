@@ -55,10 +55,13 @@ class OrmExpressionVisitor extends ExpressionVisitor
             'fieldType'  => $type
         ];
 
-        $fieldCondition = $joinAlias . '.field = :field' . $index;
         $fieldConditionParam = 'field' . $index;
 
         if (in_array($comparison->getOperator(), SearchComparison::$filteringOperators, true)) {
+            $fieldCondition = is_array($searchCondition['fieldName'])
+                ? $joinAlias . '.field IN (:field' . $index . ')'
+                : $joinAlias . '.field = :field' . $index;
+
             $this->qb->leftJoin($joinField, $joinAlias, Join::WITH, $fieldCondition);
             $this->qb->setParameter($fieldConditionParam, $searchCondition['fieldName']);
 
@@ -66,7 +69,7 @@ class OrmExpressionVisitor extends ExpressionVisitor
         }
 
         if (is_string($searchCondition['fieldName'])) {
-            $this->qb->leftJoin($joinField, $joinAlias, Join::WITH, $fieldCondition);
+            $this->qb->leftJoin($joinField, $joinAlias, Join::WITH, $joinAlias . '.field = :field' . $index);
             $this->qb->setParameter($fieldConditionParam, $searchCondition['fieldName']);
         } else {
             $this->qb->innerJoin($joinField, $joinAlias);
@@ -76,7 +79,7 @@ class OrmExpressionVisitor extends ExpressionVisitor
             if ($searchCondition['fieldValue'] === '') {
                 $this->qb->setParameter($fieldConditionParam, $searchCondition['fieldName']);
 
-                return $fieldCondition;
+                return $joinAlias . '.field = :field' . $index;
             } else {
                 return $this->driver->addTextField($this->qb, $index, $searchCondition, $this->setOrderBy);
             }
@@ -118,7 +121,14 @@ class OrmExpressionVisitor extends ExpressionVisitor
                 $operator           = $child->getOperator();
                 $value              = $child->getValue()->getValue();
                 $fieldType          = Criteria::explodeFieldTypeName($fieldName)[0];
-                $key                = $this->getExpressionKey($fieldName, $operator, $value);
+
+                if (CompositeExpression::TYPE_AND !== $expr->getType() && $fieldType !== Query::TYPE_TEXT) {
+                    $fieldParam = $fieldType;
+                } else {
+                    $fieldParam = $fieldName;
+                }
+
+                $key                = $this->getExpressionKey($fieldParam, $operator, $value);
                 $combinedExpression = $child;
                 if ($fieldType !== Query::TYPE_TEXT && array_key_exists($key, $expressionObjectList)) {
                     $combinedExpression = $expressionObjectList[$key];
@@ -169,16 +179,16 @@ class OrmExpressionVisitor extends ExpressionVisitor
     }
 
     /**
-     * @param string $fieldName
+     * @param string $fieldParam
      * @param string $operator
      * @param mixed  $value
      *
      * @return string
      */
-    protected function getExpressionKey($fieldName, $operator, $value)
+    protected function getExpressionKey($fieldParam, $operator, $value)
     {
         $value = is_array($value) ? serialize($value) : (string)$value;
-        return md5($fieldName . '|' . $operator . '|' . $value);
+        return md5($fieldParam . '|' . $operator . '|' . $value);
     }
 
     /**

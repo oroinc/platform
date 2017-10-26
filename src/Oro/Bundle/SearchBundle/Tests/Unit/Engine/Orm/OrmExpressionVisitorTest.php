@@ -35,21 +35,19 @@ class OrmExpressionVisitorTest extends \PHPUnit_Framework_TestCase
      * @dataProvider filteringOperatorProvider
      *
      * @param string $operator
+     * @param string $fieldName
      * @param string $expected
      */
-    public function testWalkComparisontWalkComparisonFilteringOperator($operator, $expected)
+    public function testWalkComparisonFilteringOperator($operator, $fieldName, $expected)
     {
         $index = 42;
         $type = Query::TYPE_INTEGER;
-        $fieldName = 'testData';
 
         $joinAliases = [];
         $joinField = 'search.integerFields';
 
-        $field = sprintf('%s.%s', $type, $fieldName);
+        $field = strpos($fieldName, '|') !== false ? explode('|', $fieldName) : $fieldName;
         $joinAlias = sprintf('%sField%s_%s', $type, $fieldName, $index);
-
-        $comparison = new Comparison($field, $operator, new Value(null));
 
         $this->qb->expects($this->once())
             ->method('getAllAliases')
@@ -57,7 +55,7 @@ class OrmExpressionVisitorTest extends \PHPUnit_Framework_TestCase
 
         $this->driver->expects($this->once())
             ->method('getJoinAttributes')
-            ->with($fieldName, $type, $joinAliases)
+            ->with($field, $type, $joinAliases)
             ->willReturn([$joinAlias, $index]);
 
         $this->driver->expects($this->once())
@@ -66,28 +64,33 @@ class OrmExpressionVisitorTest extends \PHPUnit_Framework_TestCase
 
         $this->qb->expects($this->once())
             ->method('leftJoin')
-            ->with($joinField, $joinAlias, Join::WITH, sprintf('%s.field = :field%s', $joinAlias, $index));
+            ->with($joinField, $joinAlias, Join::WITH, sprintf($expected, $joinAlias, $index));
 
         $this->qb->expects($this->once())
             ->method('setParameter')
-            ->with(sprintf('field%s', $index), $fieldName);
+            ->with(sprintf('field%s', $index), $field);
 
-        $expected = 'EXPECTED EXPRESSION';
+        $expression = 'RETURN EXPRESSION';
 
         $this->driver->expects($this->once())
             ->method('addFilteringField')
             ->with(
                 $index,
                 [
-                    'fieldName'  => $fieldName,
+                    'fieldName'  => $field,
                     'condition'  => Criteria::getSearchOperatorByComparisonOperator($operator),
                     'fieldValue' => null,
                     'fieldType'  => $type
                 ]
             )
-            ->willReturn($expected);
+            ->willReturn($expression);
 
-        $this->assertEquals($expected, $this->visitor->walkComparison($comparison));
+        $fieldName = sprintf('%s.%s', $type, $fieldName);
+
+        $this->assertEquals(
+            $expression,
+            $this->visitor->walkComparison(new Comparison($fieldName, $operator, new Value(null)))
+        );
     }
 
     /**
@@ -96,13 +99,25 @@ class OrmExpressionVisitorTest extends \PHPUnit_Framework_TestCase
     public function filteringOperatorProvider()
     {
         return [
-            SearchComparison::EXISTS => [
+            'EXISTS single parameter' => [
                 'operator' => SearchComparison::EXISTS,
-                'expectedWhere' => 'IS NOT NULL',
+                'fieldName' => 'testData',
+                'expected' => '%s.field = :field%s'
             ],
-            SearchComparison::NOT_EXISTS => [
+            'NOT EXISTS single parameter' => [
                 'operator' => SearchComparison::NOT_EXISTS,
-                'expectedWhere' => 'IS NULL',
+                'fieldName' => 'testData',
+                'expected' => '%s.field = :field%s'
+            ],
+            'EXISTS multi parameter' => [
+                'operator' => SearchComparison::EXISTS,
+                'fieldName' => 'testData1|testData2',
+                'expected' => '%s.field IN (:field%s)'
+            ],
+            'NOT EXISTS multi parameter' => [
+                'operator' => SearchComparison::NOT_EXISTS,
+                'fieldName' => 'testData1|testData2',
+                'expected' => '%s.field IN (:field%s)'
             ],
         ];
     }
