@@ -27,8 +27,8 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
-        view: {
-            view: 'orodashboard/js/app/views/widget-tabs-view',
+        view: 'orodashboard/js/app/views/widget-tabs-view',
+        options: {
             _sourceElement: '#' ~ widgetContentId
         }
     }) }}></div>

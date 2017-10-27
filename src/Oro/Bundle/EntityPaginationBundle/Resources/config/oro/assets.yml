@@ -1,4 +1,4 @@
 assets:
     css:
         'oroentitypagination':
-            - 'bundles/oroentitypagination/css/entity-pagination.css'
+            - 'bundles/oroentitypagination/css/less/entity-pagination.less'

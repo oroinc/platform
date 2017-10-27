@@ -2,8 +2,8 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
-        view: {
-            view: 'oroentity/js/app/views/displayable-priority-view',
+        view: 'oroentity/js/app/views/displayable-priority-view',
+        options: {
             prioritySelector: '#' ~ form.parent.children.priority.vars.id
         }
     }) }}>

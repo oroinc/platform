@@ -19,6 +19,15 @@ oro_behat_extension:
           First Name: 'oro_user_user_form[firstName]'
           Last Name: 'oro_user_user_form[lastName]'
           Primary Email: 'oro_user_user_form[email]'
+          First Role:
+            locator: '//label[text()[contains(.,"First Role")]]/../input'
+            type: xpath
+          Second Role:
+            locator: '//label[text()[contains(.,"Second Role")]]/../input'
+            type: xpath
+          OroCRM Organization:
+            locator: '(//div[contains(@class,"organization-structure")]//input[@type="checkbox"][@data-name="organization"])[1]'
+            type: xpath
 
     UserMenu:
       selector: {type: 'xpath', locator: '//li[@id="user-menu"]'}
