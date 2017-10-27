@@ -7,15 +7,19 @@ use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ApplicationBundle\Tests\Behat\Context\CommerceMainContext;
+use Oro\Bundle\CheckoutBundle\Entity\Checkout;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity;
+use Oro\Bundle\PromotionBundle\Entity\AppliedCouponsAwareInterface;
 use Oro\Bundle\SaleBundle\Entity\Quote;
+use Oro\Bundle\ShoppingListBundle\Entity\ShoppingList;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderDictionary;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -45,6 +49,42 @@ class FeatureContext extends OroFeatureContext implements
      * @var OroMainContext
      */
     private $mainContext;
+
+    /**
+     * @When /^(?:|I )add coupon "(?P<coupon>[^"]+)" to checkout created by shopping list "(?P<shoppingList>[^"]+)"$/
+     * @param string $couponReference
+     * @param string $shoppingListReference
+     */
+    public function applyCouponToCheckoutByShoppingList($couponReference, $shoppingListReference)
+    {
+        /** @var ShoppingList $shoppingList */
+        $shoppingList = $this->fixtureLoader->getReference($shoppingListReference);
+        $registry = $this->getContainer()->get('doctrine');
+
+        $workflowDefinitionRepository = $registry->getRepository(WorkflowDefinition::class);
+        $definitions = $workflowDefinitionRepository->findActiveForRelatedEntity(Checkout::class);
+        /** @var WorkflowDefinition $workflowDefinition */
+        $workflowDefinition = reset($definitions);
+
+        $checkoutRepository = $registry->getRepository(Checkout::class);
+        $checkout = $checkoutRepository->findCheckoutByCustomerUserAndSourceCriteria(
+            $shoppingList->getCustomerUser(),
+            ['shoppingList' => $shoppingList, 'deleted' => false],
+            $workflowDefinition->getName()
+        );
+
+        if ($checkout instanceof AppliedCouponsAwareInterface) {
+            $coupon = $this->fixtureLoader->getReference($couponReference);
+            $entityCouponProvider = $this->getContainer()->get('oro_promotion.provider.entity_coupons_provider');
+            $appliedCoupon = $entityCouponProvider->createAppliedCouponByCoupon($coupon);
+            $checkout->addAppliedCoupon($appliedCoupon);
+
+            /** @var EntityManager $em */
+            $em = $registry->getManagerForClass(Checkout::class);
+            $em->persist($appliedCoupon);
+            $em->flush($appliedCoupon);
+        }
+    }
 
     /**
      * @When /^(?:|I )visiting pages listed in "(?P<value>(?:[^"]|\\")*)"$/

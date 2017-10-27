@@ -90,3 +90,68 @@ Oro\Bundle\OrderBundle\Entity\OrderLineItem:
         productUnit: '@item'
         productUnitCode: '<xss("OrderLineItem.productUnitCode")>'
         comment: '<xss("OrderLineItem.comment")>'
+
+Oro\Bundle\OrderBundle\Entity\OrderDiscount:
+    orderDiscount:
+        description: '<xss("OrderDiscount.description")>'
+        amount: 10
+        percent: 2
+        order: '@order1'
+        type: 'oro_order_discount_item_type_amount'
+
+Oro\Bundle\PromotionBundle\Entity\AppliedPromotion:
+    order_orderAppliedPromotion:
+        type: 'order'
+        sourcePromotionId: '@order_promotion->id'
+        promotionName: '<xss("AppliedPromotion.name")>'
+        configOptions: '@order_discount_configuration->options'
+        promotionData:
+            id: '@order_promotion->id'
+            useCoupons: true
+            rule:
+                name: '<xss("AppliedPromotion.name(promotionData.rule)")>'
+                expression: '<xss("AppliedPromotion.expression(promotionData.rule)")>'
+                sortOrder: 1
+                isStopProcessing: false
+            productsSegment:
+                definition: '{"filters":[[{"columnName":"id","criterion":{"filter":"number","data":{"value":0,"type":2}}}]],"columns":[{"name":"id","label":"id","sorting":null,"func":null},{"name":"sku","label":"sku","sorting":null,"func":null}]}'
+            scopes: [{ id: 1 }]
+    order_lineItemAppliedPromotion:
+        type: 'line_item'
+        sourcePromotionId: '@order_promotion->id'
+        promotionName: '<xss("AppliedPromotion.name")>'
+        configOptions: '@line_item_discount_configuration->options'
+        promotionData:
+            id: '@order_promotion->id'
+            useCoupons: true
+            rule:
+                name: '<xss("AppliedPromotion.name(promotionData.rule)")>'
+                expression: '<xss("AppliedPromotion.expression(promotionData.rule)")>'
+                sortOrder: 1
+                isStopProcessing: false
+            productsSegment:
+                definition: '{"filters":[[{"columnName":"id","criterion":{"filter":"number","data":{"value":0,"type":2}}}]],"columns":[{"name":"id","label":"id","sorting":null,"func":null},{"name":"sku","label":"sku","sorting":null,"func":null}]}'
+            scopes: [{ id: 1 }]
+
+Oro\Bundle\PromotionBundle\Entity\AppliedCoupon:
+    order_orderAppliedCoupon:
+        couponCode: '<xss("AppliedCoupon.code")>'
+        sourcePromotionId: '@order_promotion->id'
+        sourceCouponId: '@coupon_1->id'
+        appliedPromotion: '@order_orderAppliedPromotion'
+    order_lineItemAppliedCoupon:
+        couponCode: '<xss("AppliedCoupon.code")>'
+        sourcePromotionId: '@line_item_promotion->id'
+        sourceCouponId: '@coupon_2->id'
+        appliedPromotion: '@order_lineItemAppliedPromotion'
+
+Oro\Bundle\PromotionBundle\Entity\AppliedDiscount:
+    order_orderAppliedDiscount:
+        appliedPromotion: '@order_orderAppliedPromotion'
+        amount: 1
+        currency: 'USD'
+    order_lineItemAppliedDiscount:
+        appliedPromotion: '@order_lineItemAppliedPromotion'
+        amount: 1
+        currency: 'USD'
+        lineItem: '@order_line_item1'
