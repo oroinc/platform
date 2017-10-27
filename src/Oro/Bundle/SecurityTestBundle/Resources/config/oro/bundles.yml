@@ -1,2 +1,2 @@
 bundles:
-    - Oro\Bundle\SecurityTestBundle\OroSecurityTestBundle
+    - { name: Oro\Bundle\SecurityTestBundle\OroSecurityTestBundle, priority: 1000 }
