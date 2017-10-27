@@ -1,0 +1,9 @@
+request:
+    query: "from oro_test_item where text stringValue = 'notExistingValue' and text phone = 'notExistingValue' order_by stringValue max_results 100"
+response:
+    records_count: 0
+    count: 0
+    rest:
+        data: []
+    soap:
+        data: []

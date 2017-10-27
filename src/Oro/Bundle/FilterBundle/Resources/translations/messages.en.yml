@@ -2,12 +2,12 @@ oro:
     filter:
         reset.label: Clear All Filters
         form:
-            label_type_equal:              "="
-            label_type_not_equal:          "<>"
-            label_type_greater_equal:      ">="
-            label_type_greater_than:       ">"
-            label_type_less_equal:         "<="
-            label_type_less_than:          "<"
+            label_type_equal:              equals
+            label_type_not_equal:          not equals
+            label_type_greater_equal:      equals or greater than
+            label_type_greater_than:       greater than
+            label_type_less_equal:         equals or less than
+            label_type_less_than:          less than
             label_type_empty:              is empty
             label_type_not_empty:          is not empty
             label_type_in:                 is any of
