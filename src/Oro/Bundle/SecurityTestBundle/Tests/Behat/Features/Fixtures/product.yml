@@ -1,44 +1,22 @@
-# TODO: upsells, crossels, variants, matrix 1, matrix 2
-# TODO: attribute family with group that contains XSS payload in label
-
-# Test simple product changed attribute family with group containing XSS
-# Test configurable product 1 attribute
-# Test configurable product 2 attributes
-# Test configurable product 3 attributes
-# Each of those products has all products as up sells and cross sells
-# All this products must be checked at all places where them may be rendered (SL, Checkout, RFQ, Order, Catalog, Search)
-
 Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
-    simple_product_name:
+    product_name_{1..11}:
         string: '<xss("LocalizedFallbackValue.string(Product.name)")>'
-    simple_product_description:
+    product_description_{1..11}:
         text: '<xss("LocalizedFallbackValue.text(Product.description)")>'
-    simple_product_short_description:
+    product_short_description_{1..11}:
         text: '<xss("LocalizedFallbackValue.text(Product.shortDescription)")>'
-    configurable_product_variant_1_name:
-        string: '<xss("LocalizedFallbackValue.string(Product.name)")>'
-    configurable_product_variant_1_description:
-        text: '<xss("LocalizedFallbackValue.text(Product.description)")>'
-    configurable_product_variant_1_short_description:
-        text: '<xss("LocalizedFallbackValue.text(Product.shortDescription)")>'
-    configurable_product_name:
-        string: '<xss("LocalizedFallbackValue.string(Product.name)")>'
-    configurable_product_description:
-        text: '<xss("LocalizedFallbackValue.text(Product.description)")>'
-    configurable_product_short_description:
-        text: '<xss("LocalizedFallbackValue.text(Product.shortDescription)")>'
-    tshirt_family_label:
-        string: '<xss("LocalizedFallbackValue.string(AttributeFamily.label)")>'
-    attribute_group_label:
-        string: '<xss("LocalizedFallbackValue.string(AttributeGroup.label)")>'
-    product_meta_title_{1..3}:
+    product_meta_title_{1..11}:
         string: '<xss("LocalizedFallbackValue.string(Product.metaTitle)")>'
-    product_meta_description_{1..3}:
+    product_meta_description_{1..11}:
         text: '<xss("LocalizedFallbackValue.string(Product.metaDescription)")>'
-    product_meta_keywords_{1..3}:
+    product_meta_keywords_{1..11}:
         text: '<xss("LocalizedFallbackValue.string(Product.metaKeyword)")>'
-    product_slug_prototype_{1..3}:
+    product_slug_prototype_{1..11}:
         string: '<xss("LocalizedFallbackValue.string(Product.slugPrototype)")>'
+    attribute_family_label_{1..4}:
+        string: '<xss("LocalizedFallbackValue.string(AttributeFamily.label)")>'
+    attribute_group_label_{1..4}:
+        string: '<xss("LocalizedFallbackValue.string(AttributeGroup.label)")>'
     brand_name:
         string: '<xss("LocalizedFallbackValue.string(Brand.name)")>'
     brand_description:
@@ -55,43 +33,79 @@ Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
         string: '<xss("LocalizedFallbackValue.string(Brand.slugPrototype)")>'
 
 Oro\Bundle\ProductBundle\Entity\ProductUnitPrecision:
-    precision{1..3}:
+    precision{1..11}:
         unit: '@item'
         precision: '1'
 
 Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily:
-    tshirt_family:
+    attribute_family_{1..4}:
         owner: '@xss_user'
         organization: '@xss_organization'
         entityClass: 'Oro\Bundle\ProductBundle\Entity\Product'
-        code: 'T_shirt'
-        addLabel: ['@tshirt_family_label']
+        code: 'family_<current()>'
+        addLabel: ['@attribute_family_label_<current()>']
 
 Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup:
-    attribute_group:
-        addLabel: ['@attribute_group_label']
-        code: 'attribute_group'
-        attributeFamily: '@tshirt_family'
+    attribute_group_{1..4}:
+        addLabel: ['@attribute_group_label_<current()>']
+        code: 'attribute_group_<current()>'
+        attributeFamily: '@attribute_family_<current()>'
 
 Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation:
-    attribute_group_relation_sku:
-        attributeGroup: '@attribute_group'
+    attribute_group_1_relation_sku:
+        attributeGroup: '@attribute_group_1'
         entityConfigFieldId: '@field_config_product_sku->id'
-    attribute_group_relation_name:
-        attributeGroup: '@attribute_group'
+    attribute_group_1_relation_name:
+        attributeGroup: '@attribute_group_1'
         entityConfigFieldId: '@field_config_product_names->id'
-    attribute_group_relation_description:
-        attributeGroup: '@attribute_group'
+    attribute_group_1_relation_description:
+        attributeGroup: '@attribute_group_1'
         entityConfigFieldId: '@field_config_product_descriptions->id'
-    attribute_group_relation_short_description:
-        attributeGroup: '@attribute_group'
+    attribute_group_1_relation_short_description:
+        attributeGroup: '@attribute_group_1'
         entityConfigFieldId: '@field_config_product_shortDescriptions->id'
-    attribute_group_relation_short_brand:
-        attributeGroup: '@attribute_group'
+    attribute_group_1_relation_brand:
+        attributeGroup: '@attribute_group_1'
         entityConfigFieldId: '@field_config_product_brand->id'
+    
+    attribute_group_2_relation_sku:
+        attributeGroup: '@attribute_group_2'
+        entityConfigFieldId: '@field_config_product_sku->id'
+    attribute_group_2_relation_name:
+        attributeGroup: '@attribute_group_2'
+        entityConfigFieldId: '@field_config_product_names->id'
+    attribute_group_2_relation_description:
+        attributeGroup: '@attribute_group_2'
+        entityConfigFieldId: '@field_config_product_descriptions->id'
+    attribute_group_2_relation_short_description:
+        attributeGroup: '@attribute_group_2'
+        entityConfigFieldId: '@field_config_product_shortDescriptions->id'
+    attribute_group_2_relation_brand:
+        attributeGroup: '@attribute_group_2'
+        entityConfigFieldId: '@field_config_product_brand->id'
+    attribute_group_2_relation_size:
+        attributeGroup: '@attribute_group_2'
+        entityConfigFieldId: '@field_config_product_size->id'
+
+    attribute_group_3_relation_size:
+        attributeGroup: '@attribute_group_3'
+        entityConfigFieldId: '@field_config_product_size->id'
+    attribute_group_3_relation_color:
+        attributeGroup: '@attribute_group_3'
+        entityConfigFieldId: '@field_config_product_color->id'
+
+    attribute_group_4_relation_size:
+        attributeGroup: '@attribute_group_4'
+        entityConfigFieldId: '@field_config_product_size->id'
+    attribute_group_4_relation_color:
+        attributeGroup: '@attribute_group_4'
+        entityConfigFieldId: '@field_config_product_color->id'
+    attribute_group_4_relation_material:
+        attributeGroup: '@attribute_group_4'
+        entityConfigFieldId: '@field_config_product_material->id'
 
 Oro\Bundle\RedirectBundle\Entity\Slug:
-    product_slug_{1..4}:
+    product_slug_{1..11}:
         url: '<xss("Slug.url")>'
         slugPrototype: '<xss("Slug.slugPrototype")>'
         routeName: '<xss("Slug.routeName")>'
@@ -107,23 +121,23 @@ Oro\Bundle\ProductBundle\Entity\Brand:
         metaDescriptions: ['@brand_meta_description']
         metaKeywords: ['@brand_meta_keywords']
         slugPrototypes: ['@brand_slug_prototype']
-        slugs: ['@product_slug_4']
+        slugs: ['@product_slug_5']
 
 Oro\Bundle\ProductBundle\Entity\Product:
-    simple_product:
+    simple_product_1:
         type: 'simple'
         organization: '@xss_organization'
         owner: '@xss_business_unit'
-        sku: 'S01<xss("Product.sku")>'
-        skuUppercase: 'S01<xss("Product.skuUppercase")>'
+        sku: '<xss("Product.sku")>'
+        skuUppercase: '<xss("Product.skuUppercase")>'
         brand: '@brand'
         denormalizedDefaultName: '<xss("Product.denormalizedDefaultName")>'
         denormalizedDefaultNameUppercase: '<xss("Product.denormalizedDefaultNameUppercase")>'
         primaryUnitPrecision: '@precision1'
         attributeFamily: '@defaultProductFamily'
-        addName: ['@simple_product_name']
-        addDescription: ['@simple_product_description']
-        addShortDescription: ['@simple_product_short_description']
+        addName: ['@product_name_1']
+        addDescription: ['@product_description_1']
+        addShortDescription: ['@product_short_description_1']
         inventoryStatus: '@enumInventoryStatuses'
         status: 'enabled'
         metaTitles: ['@product_meta_title_1']
@@ -132,20 +146,22 @@ Oro\Bundle\ProductBundle\Entity\Product:
         slugPrototypes: ['@product_slug_prototype_1']
         slugs: ['@product_slug_1']
         taxCode: '@product_tax_code'
-    configurable_product_variant_1:
+        featured: true
+        newArrival: true
+    simple_product_2:
         type: 'simple'
         organization: '@xss_organization'
         owner: '@xss_business_unit'
-        sku: 'S02<xss("Product.sku")>'
-        skuUppercase: 'S02<xss("Product.skuUppercase")>'
+        sku: '<xss("Product.sku")>'
+        skuUppercase: '<xss("Product.skuUppercase")>'
         brand: '@brand'
         denormalizedDefaultName: '<xss("Product.denormalizedDefaultName")>'
         denormalizedDefaultNameUppercase: '<xss("Product.denormalizedDefaultNameUppercase")>'
         primaryUnitPrecision: '@precision2'
-        attributeFamily: '@tshirt_family'
-        addName: ['@configurable_product_variant_1_name']
-        addDescription: ['@configurable_product_variant_1_description']
-        addShortDescription: ['@configurable_product_variant_1_short_description']
+        attributeFamily: '@attribute_family_1'
+        addName: ['@product_name_2']
+        addDescription: ['@product_description_2']
+        addShortDescription: ['@product_short_description_2']
         inventoryStatus: '@enumInventoryStatuses'
         status: 'enabled'
         metaTitles: ['@product_meta_title_2']
@@ -154,20 +170,21 @@ Oro\Bundle\ProductBundle\Entity\Product:
         slugPrototypes: ['@product_slug_prototype_2']
         slugs: ['@product_slug_2']
         taxCode: '@product_tax_code'
-    configurable_product:
+
+    configurable_product_1:
         type: 'configurable'
         organization: '@xss_organization'
         owner: '@xss_business_unit'
-        sku: 'S03<xss("Product.sku")>'
-        skuUppercase: 'S03<xss("Product.skuUppercase")>'
+        sku: '<xss("Product.sku")>'
+        skuUppercase: '<xss("Product.skuUppercase")>'
         brand: '@brand'
         denormalizedDefaultName: '<xss("Product.denormalizedDefaultName")>'
         denormalizedDefaultNameUppercase: '<xss("Product.denormalizedDefaultNameUppercase")>'
-        attributeFamily: '@tshirt_family'
+        attributeFamily: '@attribute_family_2'
         primaryUnitPrecision: '@precision3'
-        addName: ['@configurable_product_name']
-        addDescription: ['@configurable_product_description']
-        addShortDescription: ['@configurable_product_short_description']
+        addName: ['@product_name_3']
+        addDescription: ['@product_description_3']
+        addShortDescription: ['@product_short_description_3']
         inventoryStatus: '@enumInventoryStatuses'
         status: 'enabled'
         metaTitles: ['@product_meta_title_3']
@@ -176,3 +193,260 @@ Oro\Bundle\ProductBundle\Entity\Product:
         slugPrototypes: ['@product_slug_prototype_3']
         slugs: ['@product_slug_3']
         taxCode: '@product_tax_code'
+        variantFields: ['size']
+        featured: true
+        newArrival: true
+    configurable_product_1_variant_1:
+        type: 'simple'
+        organization: '@xss_organization'
+        owner: '@xss_business_unit'
+        sku: '<xss("Product.sku")>'
+        skuUppercase: '<xss("Product.skuUppercase")>'
+        brand: '@brand'
+        denormalizedDefaultName: '<xss("Product.denormalizedDefaultName")>'
+        denormalizedDefaultNameUppercase: '<xss("Product.denormalizedDefaultNameUppercase")>'
+        primaryUnitPrecision: '@precision4'
+        attributeFamily: '@attribute_family_2'
+        addName: ['@product_name_4']
+        addDescription: ['@product_description_4']
+        addShortDescription: ['@product_short_description_4']
+        inventoryStatus: '@enumInventoryStatuses'
+        status: 'enabled'
+        metaTitles: ['@product_meta_title_4']
+        metaDescriptions: ['@product_meta_description_4']
+        metaKeywords: ['@product_meta_keywords_4']
+        slugPrototypes: ['@product_slug_prototype_4']
+        slugs: ['@product_slug_4']
+        taxCode: '@product_tax_code'
+        size: 'test1'
+    configurable_product_1_variant_2:
+        type: 'simple'
+        organization: '@xss_organization'
+        owner: '@xss_business_unit'
+        sku: '<xss("Product.sku")>'
+        skuUppercase: '<xss("Product.skuUppercase")>'
+        brand: '@brand'
+        denormalizedDefaultName: '<xss("Product.denormalizedDefaultName")>'
+        denormalizedDefaultNameUppercase: '<xss("Product.denormalizedDefaultNameUppercase")>'
+        primaryUnitPrecision: '@precision5'
+        attributeFamily: '@attribute_family_2'
+        addName: ['@product_name_5']
+        addDescription: ['@product_description_5']
+        addShortDescription: ['@product_short_description_5']
+        inventoryStatus: '@enumInventoryStatuses'
+        status: 'enabled'
+        metaTitles: ['@product_meta_title_5']
+        metaDescriptions: ['@product_meta_description_5']
+        metaKeywords: ['@product_meta_keywords_5']
+        slugPrototypes: ['@product_slug_prototype_5']
+        slugs: ['@product_slug_5']
+        taxCode: '@product_tax_code'
+        size: 'test2'
+
+    configurable_product_2:
+        type: 'configurable'
+        organization: '@xss_organization'
+        owner: '@xss_business_unit'
+        sku: '<xss("Product.sku")>'
+        skuUppercase: '<xss("Product.skuUppercase")>'
+        brand: '@brand'
+        denormalizedDefaultName: '<xss("Product.denormalizedDefaultName")>'
+        denormalizedDefaultNameUppercase: '<xss("Product.denormalizedDefaultNameUppercase")>'
+        attributeFamily: '@attribute_family_3'
+        primaryUnitPrecision: '@precision6'
+        addName: ['@product_name_6']
+        addDescription: ['@product_description_6']
+        addShortDescription: ['@product_short_description_6']
+        inventoryStatus: '@enumInventoryStatuses'
+        status: 'enabled'
+        metaTitles: ['@product_meta_title_6']
+        metaDescriptions: ['@product_meta_description_6']
+        metaKeywords: ['@product_meta_keywords_6']
+        slugPrototypes: ['@product_slug_prototype_6']
+        slugs: ['@product_slug_6']
+        taxCode: '@product_tax_code'
+        variantFields: ['size', 'color']
+    configurable_product_2_variant_1:
+        type: 'simple'
+        organization: '@xss_organization'
+        owner: '@xss_business_unit'
+        sku: '<xss("Product.sku")>'
+        skuUppercase: '<xss("Product.skuUppercase")>'
+        brand: '@brand'
+        denormalizedDefaultName: '<xss("Product.denormalizedDefaultName")>'
+        denormalizedDefaultNameUppercase: '<xss("Product.denormalizedDefaultNameUppercase")>'
+        primaryUnitPrecision: '@precision7'
+        attributeFamily: '@attribute_family_3'
+        addName: ['@product_name_7']
+        addDescription: ['@product_description_7']
+        addShortDescription: ['@product_short_description_7']
+        inventoryStatus: '@enumInventoryStatuses'
+        status: 'enabled'
+        metaTitles: ['@product_meta_title_7']
+        metaDescriptions: ['@product_meta_description_7']
+        metaKeywords: ['@product_meta_keywords_7']
+        slugPrototypes: ['@product_slug_prototype_7']
+        slugs: ['@product_slug_7']
+        taxCode: '@product_tax_code'
+        size: 'test1'
+        color: 'test1'
+        featured: true
+        newArrival: true
+    configurable_product_2_variant_2:
+        type: 'simple'
+        organization: '@xss_organization'
+        owner: '@xss_business_unit'
+        sku: '<xss("Product.sku")>'
+        skuUppercase: '<xss("Product.skuUppercase")>'
+        brand: '@brand'
+        denormalizedDefaultName: '<xss("Product.denormalizedDefaultName")>'
+        denormalizedDefaultNameUppercase: '<xss("Product.denormalizedDefaultNameUppercase")>'
+        primaryUnitPrecision: '@precision8'
+        attributeFamily: '@attribute_family_3'
+        addName: ['@product_name_8']
+        addDescription: ['@product_description_8']
+        addShortDescription: ['@product_short_description_8']
+        inventoryStatus: '@enumInventoryStatuses'
+        status: 'enabled'
+        metaTitles: ['@product_meta_title_8']
+        metaDescriptions: ['@product_meta_description_8']
+        metaKeywords: ['@product_meta_keywords_8']
+        slugPrototypes: ['@product_slug_prototype_8']
+        slugs: ['@product_slug_8']
+        taxCode: '@product_tax_code'
+        size: 'test2'
+        color: 'test2'
+
+    configurable_product_3:
+        type: 'configurable'
+        organization: '@xss_organization'
+        owner: '@xss_business_unit'
+        sku: '<xss("Product.sku")>'
+        skuUppercase: '<xss("Product.skuUppercase")>'
+        brand: '@brand'
+        denormalizedDefaultName: '<xss("Product.denormalizedDefaultName")>'
+        denormalizedDefaultNameUppercase: '<xss("Product.denormalizedDefaultNameUppercase")>'
+        attributeFamily: '@attribute_family_4'
+        primaryUnitPrecision: '@precision9'
+        addName: ['@product_name_9']
+        addDescription: ['@product_description_9']
+        addShortDescription: ['@product_short_description_9']
+        inventoryStatus: '@enumInventoryStatuses'
+        status: 'enabled'
+        metaTitles: ['@product_meta_title_9']
+        metaDescriptions: ['@product_meta_description_9']
+        metaKeywords: ['@product_meta_keywords_9']
+        slugPrototypes: ['@product_slug_prototype_9']
+        slugs: ['@product_slug_9']
+        taxCode: '@product_tax_code'
+        variantFields: ['size', 'color', 'material']
+    configurable_product_3_variant_1:
+        type: 'simple'
+        organization: '@xss_organization'
+        owner: '@xss_business_unit'
+        sku: '<xss("Product.sku")>'
+        skuUppercase: '<xss("Product.skuUppercase")>'
+        brand: '@brand'
+        denormalizedDefaultName: '<xss("Product.denormalizedDefaultName")>'
+        denormalizedDefaultNameUppercase: '<xss("Product.denormalizedDefaultNameUppercase")>'
+        primaryUnitPrecision: '@precision10'
+        attributeFamily: '@attribute_family_4'
+        addName: ['@product_name_10']
+        addDescription: ['@product_description_10']
+        addShortDescription: ['@product_short_description_10']
+        inventoryStatus: '@enumInventoryStatuses'
+        status: 'enabled'
+        metaTitles: ['@product_meta_title_10']
+        metaDescriptions: ['@product_meta_description_10']
+        metaKeywords: ['@product_meta_keywords_10']
+        slugPrototypes: ['@product_slug_prototype_10']
+        slugs: ['@product_slug_10']
+        taxCode: '@product_tax_code'
+        size: 'test1'
+        color: 'test1'
+        material: 'test1'
+    configurable_product_3_variant_2:
+        type: 'simple'
+        organization: '@xss_organization'
+        owner: '@xss_business_unit'
+        sku: '<xss("Product.sku")>'
+        skuUppercase: '<xss("Product.skuUppercase")>'
+        brand: '@brand'
+        denormalizedDefaultName: '<xss("Product.denormalizedDefaultName")>'
+        denormalizedDefaultNameUppercase: '<xss("Product.denormalizedDefaultNameUppercase")>'
+        primaryUnitPrecision: '@precision11'
+        attributeFamily: '@attribute_family_4'
+        addName: ['@product_name_11']
+        addDescription: ['@product_description_11']
+        addShortDescription: ['@product_short_description_11']
+        inventoryStatus: '@enumInventoryStatuses'
+        status: 'enabled'
+        metaTitles: ['@product_meta_title_11']
+        metaDescriptions: ['@product_meta_description_11']
+        metaKeywords: ['@product_meta_keywords_11']
+        slugPrototypes: ['@product_slug_prototype_11']
+        slugs: ['@product_slug_11']
+        taxCode: '@product_tax_code'
+        size: 'test2'
+        color: 'test2'
+        material: 'test2'
+
+Oro\Bundle\ProductBundle\Entity\ProductVariantLink:
+    configurable_product_1_variant_1_link:
+        parentProduct: '@configurable_product_1'
+        product: '@configurable_product_1_variant_1'
+    configurable_product_1_variant_2_link:
+        parentProduct: '@configurable_product_1'
+        product: '@configurable_product_1_variant_2'
+    configurable_product_2_variant_1_link:
+        parentProduct: '@configurable_product_2'
+        product: '@configurable_product_2_variant_1'
+    configurable_product_2_variant_2_link:
+        parentProduct: '@configurable_product_2'
+        product: '@configurable_product_2_variant_2'
+    configurable_product_3_variant_1_link:
+        parentProduct: '@configurable_product_3'
+        product: '@configurable_product_3_variant_1'
+    configurable_product_3_variant_2_link:
+        parentProduct: '@configurable_product_3'
+        product: '@configurable_product_3_variant_2'
+
+Oro\Bundle\ProductBundle\Entity\RelatedItem\UpsellProduct:
+    upsell_1:
+        product: '@simple_product_1'
+        relatedItem: '@simple_product_2'
+    upsell_2:
+        product: '@simple_product_1'
+        relatedItem: '@configurable_product_1_variant_1'
+    upsell_3:
+        product: '@simple_product_1'
+        relatedItem: '@configurable_product_2'
+    upsell_4:
+        product: '@configurable_product_1'
+        relatedItem: '@simple_product_2'
+    upsell_5:
+        product: '@configurable_product_2'
+        relatedItem: '@configurable_product_1_variant_1'
+    upsell_6:
+        product: '@configurable_product_2'
+        relatedItem: '@configurable_product_3'
+
+Oro\Bundle\ProductBundle\Entity\RelatedItem\RelatedProduct:
+    related_product_1:
+        product: '@simple_product_1'
+        relatedItem: '@simple_product_2'
+    related_product_2:
+        product: '@simple_product_1'
+        relatedItem: '@configurable_product_1_variant_1'
+    related_product_3:
+        product: '@simple_product_1'
+        relatedItem: '@configurable_product_2'
+    related_product_4:
+        product: '@configurable_product_1'
+        relatedItem: '@simple_product_2'
+    related_product_5:
+        product: '@configurable_product_2'
+        relatedItem: '@configurable_product_1_variant_1'
+    related_product_6:
+        product: '@configurable_product_2'
+        relatedItem: '@configurable_product_3'

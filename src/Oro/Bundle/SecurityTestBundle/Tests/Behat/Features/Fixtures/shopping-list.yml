@@ -12,15 +12,34 @@ Oro\Bundle\ShoppingListBundle\Entity\ShoppingList:
 
 Oro\Bundle\ShoppingListBundle\Entity\LineItem:
     lineitem_simple:
-        product: '@simple_product'
+        product: '@simple_product_1'
         quantity: '1'
         unit: '@item'
         customerUser: '@amanda'
         shoppingList: '@shoppinglist1'
         organization: '@xss_organization'
         notes: '<xss("LineItem.notes")>'
-    lineitem_configurable:
-        product: '@configurable_product_variant_1'
+    lineitem_configurable_1:
+        product: '@configurable_product_1_variant_1'
+        parentProduct: '@configurable_product_1'
+        quantity: '1'
+        unit: '@item'
+        customerUser: '@amanda'
+        shoppingList: '@shoppinglist1'
+        organization: '@xss_organization'
+        notes: '<xss("LineItem.notes")>'
+    lineitem_configurable_2:
+        product: '@configurable_product_2_variant_1'
+        parentProduct: '@configurable_product_2'
+        quantity: '1'
+        unit: '@item'
+        customerUser: '@amanda'
+        shoppingList: '@shoppinglist1'
+        organization: '@xss_organization'
+        notes: '<xss("LineItem.notes")>'
+    lineitem_configurable_3:
+        product: '@configurable_product_3_variant_1'
+        parentProduct: '@configurable_product_3'
         quantity: '1'
         unit: '@item'
         customerUser: '@amanda'

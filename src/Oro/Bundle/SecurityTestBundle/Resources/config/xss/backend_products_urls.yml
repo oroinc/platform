@@ -7,25 +7,40 @@ urls:
     # Products
     - { route: 'oro_product_index' }
     - { route: 'oro_product_create' }
-    - { route: 'oro_product_update', parameters: { id: '@simple_product.id' } }
-    - { route: 'oro_product_update', parameters: { id: '@configurable_product_variant_1.id' } }
-    - { route: 'oro_product_update', parameters: { id: '@configurable_product.id' } }
-    - { route: 'oro_product_view', parameters: { id: '@simple_product.id' } }
-    - { route: 'oro_product_view', parameters: { id: '@configurable_product_variant_1.id' } }
-    - { route: 'oro_product_view', parameters: { id: '@configurable_product.id' } }
+    - { route: 'oro_product_update', parameters: { id: '@simple_product_1.id' }, options: { disable_select2_checks: true } }
+    - { route: 'oro_product_update', parameters: { id: '@simple_product_2.id' }, options: { disable_select2_checks: true } }
+    - { route: 'oro_product_update', parameters: { id: '@configurable_product_1_variant_1.id' }, options: { disable_select2_checks: true } }
+    - { route: 'oro_product_update', parameters: { id: '@configurable_product_2_variant_1.id' }, options: { disable_select2_checks: true } }
+    - { route: 'oro_product_update', parameters: { id: '@configurable_product_3_variant_1.id' }, options: { disable_select2_checks: true } }
+    - { route: 'oro_product_update', parameters: { id: '@configurable_product_1.id' }, options: { disable_select2_checks: true } }
+    - { route: 'oro_product_update', parameters: { id: '@configurable_product_2.id' }, options: { disable_select2_checks: true } }
+    - { route: 'oro_product_update', parameters: { id: '@configurable_product_3.id' }, options: { disable_select2_checks: true } }
+    - { route: 'oro_product_view', parameters: { id: '@simple_product_1.id' } }
+    - { route: 'oro_product_view', parameters: { id: '@simple_product_2.id' } }
+    - { route: 'oro_product_view', parameters: { id: '@configurable_product_1_variant_1.id' } }
+    - { route: 'oro_product_view', parameters: { id: '@configurable_product_2_variant_1.id' } }
+    - { route: 'oro_product_view', parameters: { id: '@configurable_product_3_variant_1.id' } }
+    - { route: 'oro_product_view', parameters: { id: '@configurable_product_1.id' } }
+    - { route: 'oro_product_view', parameters: { id: '@configurable_product_2.id' } }
+    - { route: 'oro_product_view', parameters: { id: '@configurable_product_3.id' } }
 
     # Product Families
     - { route: 'oro_attribute_family_index', parameters: { alias: 'product' } }
     - { route: 'oro_attribute_family_create', parameters: { alias: 'product' }  }
-    - { route: 'oro_attribute_family_view', parameters: { id: '@tshirt_family.id' } }
-    - { route: 'oro_attribute_family_update', parameters: { id: '@tshirt_family.id' } }
-#
-#    # Product Attributes
-#    - { route: 'oro_order_index' }
-#    - { route: 'oro_order_create' }
-#    - { route: 'oro_order_view', parameters: { id: '@order1.id' } }
-#    - { route: 'oro_order_update', parameters: { id: '@order1.id' } }
-#
+    - { route: 'oro_attribute_family_view', parameters: { id: '@attribute_family_1.id' } }
+    - { route: 'oro_attribute_family_view', parameters: { id: '@attribute_family_2.id' } }
+    - { route: 'oro_attribute_family_view', parameters: { id: '@attribute_family_3.id' } }
+    - { route: 'oro_attribute_family_view', parameters: { id: '@attribute_family_4.id' } }
+    - { route: 'oro_attribute_family_update', parameters: { id: '@attribute_family_1.id' } }
+    - { route: 'oro_attribute_family_update', parameters: { id: '@attribute_family_2.id' } }
+    - { route: 'oro_attribute_family_update', parameters: { id: '@attribute_family_3.id' } }
+    - { route: 'oro_attribute_family_update', parameters: { id: '@attribute_family_4.id' } }
+
+    # Product Attributes
+    - { route: 'oro_attribute_index', parameters: { alias: 'product' } }
+    - { route: 'oro_attribute_create', parameters: { alias: 'product' } }
+    - { route: 'oro_attribute_update', parameters: { id: '@field_config_product_size.id' } }
+
     # Product Brands
     - { route: 'oro_product_brand_index' }
     - { route: 'oro_product_brand_create' }

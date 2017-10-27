@@ -29,7 +29,18 @@ Oro\Bundle\CatalogBundle\Entity\Category:
         addShortDescription: ['@category_short_description_1']
         addLongDescription: ['@category_long_description_1']
         setParentCategory: [1]
-        addProduct: ['@simple_product']
+        products:
+            - '@simple_product_1'
+            - '@simple_product_2'
+            - '@configurable_product_1'
+            - '@configurable_product_1_variant_1'
+            - '@configurable_product_1_variant_2'
+            - '@configurable_product_2'
+            - '@configurable_product_2_variant_1'
+            - '@configurable_product_2_variant_2'
+            - '@configurable_product_3'
+            - '@configurable_product_3_variant_1'
+            - '@configurable_product_3_variant_2'
         metaTitles: ['@category_meta_title_1']
         metaDescriptions: ['@category_meta_description_1']
         metaKeywords: ['@category_meta_keywords_1']

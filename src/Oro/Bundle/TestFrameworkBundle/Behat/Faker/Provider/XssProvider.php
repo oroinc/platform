@@ -19,10 +19,16 @@ class XssProvider extends BaseProvider
      * @var XssPayloadProvider
      */
     private $payloadProvider;
+
     /**
      * @var PasswordEncoderInterface
      */
     private $passwordEncoder;
+
+    /**
+     * @var string
+     */
+    private $prefix = 'p';
 
     /**
      * @param Generator $generator
@@ -44,7 +50,7 @@ class XssProvider extends BaseProvider
      */
     public function xss($identifier = 'XSS', $payloadType = 'script')
     {
-        $elementId = 'p' . ++self::$idx;
+        $elementId = $this->prefix . ++self::$idx;
         $jsPayload = sprintf('_x("%s","%s");', $elementId, $identifier);
 
         return sprintf($this->payloadProvider->getPayload($payloadType, $jsPayload, $elementId));
@@ -58,5 +64,16 @@ class XssProvider extends BaseProvider
     public function userPassword($password, $salt)
     {
         return $this->passwordEncoder->encodePassword($password, $salt);
+    }
+
+    /**
+     * @param string $prefix
+     * @return XssProvider
+     */
+    public function setPrefix($prefix)
+    {
+        $this->prefix = $prefix;
+
+        return $this;
     }
 }

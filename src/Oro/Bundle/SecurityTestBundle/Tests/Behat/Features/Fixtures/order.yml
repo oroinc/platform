@@ -34,7 +34,7 @@ Oro\Bundle\CurrencyBundle\Entity\Price (local):
 
 Oro\Bundle\OrderBundle\Entity\OrderLineItem:
     order_line_item1:
-        product: '@simple_product'
+        product: '@simple_product_1'
         productSku: '<xss("OrderLineItem.productSku")>'
         order: '@order1'
         price: '@price1'
@@ -43,7 +43,8 @@ Oro\Bundle\OrderBundle\Entity\OrderLineItem:
         productUnitCode: '<xss("OrderLineItem.productUnitCode")>'
         comment: '<xss("OrderLineItem.comment")>'
     order_line_item2:
-        product: '@configurable_product_variant_1'
+        product: '@configurable_product_1_variant_1'
+        parentProduct: '@configurable_product_1'
         productSku: '<xss("OrderLineItem.productSku")>'
         order: '@order1'
         price: '@price1'
@@ -53,6 +54,35 @@ Oro\Bundle\OrderBundle\Entity\OrderLineItem:
         comment: '<xss("OrderLineItem.comment")>'
     order_line_item3:
         freeFormProduct: '<xss("OrderLineItem.freeFormProduct")>'
+        productSku: '<xss("OrderLineItem.productSku")>'
+        order: '@order1'
+        price: '@price1'
+        quantity: 1
+        productUnit: '@item'
+        productUnitCode: '<xss("OrderLineItem.productUnitCode")>'
+        comment: '<xss("OrderLineItem.comment")>'
+    order_line_item4:
+        product: '@configurable_product_2_variant_1'
+        parentProduct: '@configurable_product_2'
+        productSku: '<xss("OrderLineItem.productSku")>'
+        order: '@order1'
+        price: '@price1'
+        quantity: 1
+        productUnit: '@item'
+        productUnitCode: '<xss("OrderLineItem.productUnitCode")>'
+        comment: '<xss("OrderLineItem.comment")>'
+    order_line_item5:
+        product: '@configurable_product_3_variant_1'
+        parentProduct: '@configurable_product_3'
+        productSku: '<xss("OrderLineItem.productSku")>'
+        order: '@order1'
+        price: '@price1'
+        quantity: 1
+        productUnit: '@item'
+        productUnitCode: '<xss("OrderLineItem.productUnitCode")>'
+        comment: '<xss("OrderLineItem.comment")>'
+    order_line_item6:
+        product: '@simple_product_2'
         productSku: '<xss("OrderLineItem.productSku")>'
         order: '@order1'
         price: '@price1'

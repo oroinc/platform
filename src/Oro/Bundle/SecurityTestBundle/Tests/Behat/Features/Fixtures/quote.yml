@@ -16,7 +16,7 @@ Oro\Bundle\SaleBundle\Entity\Quote:
 
 Oro\Bundle\SaleBundle\Entity\QuoteProduct:
     quoteproduct1:
-        product: '@simple_product'
+        product: '@simple_product_1'
         quote: '@quote'
         comment: '<xss("QuoteProduct.comment")>'
         commentCustomer: '<xss("QuoteProduct.commentCustomer")>'
@@ -27,11 +27,11 @@ Oro\Bundle\SaleBundle\Entity\QuoteProduct:
         freeFormProduct: '<xss("QuoteProduct.freeFormProduct")>'
         productSku: '<xss("QuoteProduct.productSku")>'
     quoteproduct3:
-        product: '@simple_product'
+        product: '@simple_product_1'
         quote: '@quote'
         comment: '<xss("QuoteProduct.comment")>'
         commentCustomer: '<xss("QuoteProduct.commentCustomer")>'
-        productReplacement: '@simple_product'
+        productReplacement: '@simple_product_1'
         productReplacementSku: '<xss("QuoteProduct.productReplacementSku")>'
     quoteproduct4:
         freeFormProduct: '<xss("QuoteProduct.freeFormProduct")>'
@@ -41,6 +41,16 @@ Oro\Bundle\SaleBundle\Entity\QuoteProduct:
         commentCustomer: '<xss("QuoteProduct.commentCustomer")>'
         freeFormProductReplacement: '<xss("QuoteProduct.freeFormProductReplacement")>'
         productReplacementSku: '<xss("QuoteProduct.productReplacementSku")>'
+    quoteproduct5:
+        product: '@simple_product_2'
+        quote: '@quote'
+        comment: '<xss("QuoteProduct.comment")>'
+        commentCustomer: '<xss("QuoteProduct.commentCustomer")>'
+    quoteproduct6:
+        product: '@configurable_product_2_variant_1'
+        quote: '@quote'
+        comment: '<xss("QuoteProduct.comment")>'
+        commentCustomer: '<xss("QuoteProduct.commentCustomer")>'
 
 Oro\Bundle\CurrencyBundle\Entity\Price (local):
     price1:
@@ -48,7 +58,7 @@ Oro\Bundle\CurrencyBundle\Entity\Price (local):
         currency: USD
 
 Oro\Bundle\SaleBundle\Entity\QuoteProductOffer:
-    quoteproductoffer{1..4}:
+    quoteproductoffer{1..6}:
         quote_product: '@quoteproduct<current()>'
         product_unit: '@item'
         price: '@price1'
@@ -56,7 +66,7 @@ Oro\Bundle\SaleBundle\Entity\QuoteProductOffer:
         allow_increments: true
 
 Oro\Bundle\SaleBundle\Entity\QuoteProductRequest:
-    quoteproductrequest{1..4}:
+    quoteproductrequest{1..6}:
         quote_product: '@quoteproduct<current()>'
         product_unit: '@item'
         price: '@price1'
@@ -76,5 +86,5 @@ Oro\Bundle\SaleBundle\Entity\QuoteDemand:
         totalCurrency: 'USD'
 
 Oro\Bundle\SaleBundle\Entity\QuoteProductDemand:
-    quoteproductdemand{1..4}:
+    quoteproductdemand{1..6}:
         __construct: ['@quote_demand', '@quoteproductoffer<current()>', 1]

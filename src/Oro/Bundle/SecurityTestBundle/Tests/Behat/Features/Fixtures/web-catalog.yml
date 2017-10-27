@@ -21,7 +21,7 @@ Oro\Bundle\WebCatalogBundle\Entity\ContentVariant:
         systemPageRoute: 'oro_frontend_root'
     content_variant_2:
         type: 'product_page'
-        productPageProduct: '@simple_product'
+        productPageProduct: '@simple_product_1'
     content_variant_3:
         type: 'cms_page'
         cmsPage: '@landing_page'

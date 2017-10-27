@@ -6,7 +6,7 @@ Oro\Bundle\WarehouseBundle\Entity\Warehouse:
 
 Oro\Bundle\InventoryBundle\Entity\InventoryLevel:
     inventory_level:
-        product: '@simple_product'
+        product: '@simple_product_1'
         productUnitPrecision: '@precision1'
         warehouse: '@warehouse'
 
