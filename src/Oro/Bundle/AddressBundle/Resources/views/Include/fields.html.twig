@@ -29,9 +29,9 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
-        view: {
+        view: regionView,
+        options: {
             _sourceElement: '#' ~ country_field.vars.id,
-            view: regionView,
             target: '#' ~ id ,
             simpleEl: '#' ~ region_text_field.vars.id,
             collectionRoute: form.parent.vars.region_route|default('oro_api_country_get_regions'),
@@ -150,9 +150,9 @@
         {% import 'OroUIBundle::macros.html.twig' as UI %}
 
         <div {{ UI.renderPageComponentAttributes({
-            view: {
+            view: 'oroaddress/js/app/views/address-collection-view',
+            options: {
                 _sourceElement: '#' ~ context.id,
-                view: 'oroaddress/js/app/views/address-collection-view',
             }
         }) }}></div>
     {% endif %}
