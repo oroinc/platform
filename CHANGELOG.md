@@ -10,6 +10,8 @@
 * Added configuration for Stale Jobs
 #### SyncBundle
 * Added parameters `websocket_frontend_path` and `websocket_backend_path`. [Usage](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/SyncBundle/README.md)
+#### OroBehatExtension
+* Removed --show-execution-time and --log-feature-execution-time parameters along the MeasureExecutionTimeController
 
 ## 2.4.0 (2017-09-29)
 
