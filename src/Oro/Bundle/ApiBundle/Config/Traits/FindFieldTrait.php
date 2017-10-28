@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Config\Traits;
 
 use Oro\Bundle\ApiBundle\Config\FieldConfigInterface;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @property FieldConfigInterface[] $fields
@@ -54,7 +55,10 @@ trait FindFieldTrait
         if (isset($this->fields[$propertyPath])) {
             $field = $this->fields[$propertyPath];
             $fieldPropertyPath = $field->getPropertyPath();
-            if (!$fieldPropertyPath || $fieldPropertyPath === $propertyPath) {
+            if (!$fieldPropertyPath
+                || $fieldPropertyPath === $propertyPath
+                || ConfigUtil::IGNORE_PROPERTY_PATH === $fieldPropertyPath
+            ) {
                 return $propertyPath;
             }
         }

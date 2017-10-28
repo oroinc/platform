@@ -191,6 +191,8 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 
     /**
      * Finds the name of the field by its property path.
+     * This method can be useful when a field was renamed and you need to find
+     * the name of the result field by the name defined in an entity.
      *
      * @param string $propertyPath
      *
