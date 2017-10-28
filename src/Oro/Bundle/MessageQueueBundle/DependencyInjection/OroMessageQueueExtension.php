@@ -18,6 +18,8 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroMessageQueueExtension extends Extension
 {
+    const HEARTBEAT_UPDATE_PERIOD_PARAMETER_NAME = 'oro_message_queue.consumer_heartbeat_update_period';
+
     /**
      * @var TransportFactoryInterface[]
      */
@@ -98,8 +100,16 @@ class OroMessageQueueExtension extends Extension
             $delayRedeliveredExtension->replaceArgument(1, $config['client']['redelivered_delay_time']);
         }
 
+        if (isset($config['consumer'])) {
+            $container->setParameter(
+                self::HEARTBEAT_UPDATE_PERIOD_PARAMETER_NAME,
+                $config['consumer']['heartbeat_update_period']
+            );
+        }
+
         $this->setPersistenceServicesAndProcessors($config, $container);
         $this->setSecurityAgnosticTopicsAndProcessors($config, $container);
+        $this->setJobConfigurationProvider($config, $container);
     }
 
     /**
@@ -125,14 +135,13 @@ class OroMessageQueueExtension extends Extension
      */
     protected function setPersistenceServicesAndProcessors(array $config, ContainerBuilder $container)
     {
-        $resetExtensionDefinition = $container
-            ->getDefinition('oro_message_queue.consumption.container_reset_extension');
-
         if (!empty($config['persistent_services'])) {
-            $resetExtensionDefinition->addMethodCall('setPersistentServices', [$config['persistent_services']]);
+            $container->getDefinition('oro_message_queue.consumption.container_clearer')
+                ->addMethodCall('setPersistentServices', [$config['persistent_services']]);
         }
         if (!empty($config['persistent_processors'])) {
-            $resetExtensionDefinition->addMethodCall('setPersistentProcessors', [$config['persistent_processors']]);
+            $container->getDefinition('oro_message_queue.consumption.container_reset_extension')
+                ->addMethodCall('setPersistentProcessors', [$config['persistent_processors']]);
         }
     }
 
@@ -151,6 +160,18 @@ class OroMessageQueueExtension extends Extension
             $container
                 ->getDefinition('oro_message_queue.consumption.security_aware_extension')
                 ->replaceArgument(0, $config['security_agnostic_processors']);
+        }
+    }
+
+    /**
+     * @param array $config
+     * @param ContainerBuilder $container
+     */
+    protected function setJobConfigurationProvider(array $config, ContainerBuilder $container)
+    {
+        if (!empty($config['time_before_stale'])) {
+            $jobConfigurationProvider = $container->getDefinition('oro_message_queue.job.configuration_provider');
+            $jobConfigurationProvider->addMethodCall('setConfiguration', [$config['time_before_stale']]);
         }
     }
 }

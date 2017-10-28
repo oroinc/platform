@@ -2,18 +2,19 @@
 
 namespace Oro\Bundle\ApiBundle\Request\Rest;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
-
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
+/**
+ * Transforms entity identifier value to and from a string representation used in REST API.
+ */
 class EntityIdTransformer implements EntityIdTransformerInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    /** A symbol to separate fields inside the composite identifier */
+    const COMPOSITE_ID_SEPARATOR = ';';
 
     /** @var ValueNormalizer */
     protected $valueNormalizer;
@@ -22,37 +23,37 @@ class EntityIdTransformer implements EntityIdTransformerInterface
     protected $requestType;
 
     /**
-     * @param DoctrineHelper  $doctrineHelper
      * @param ValueNormalizer $valueNormalizer
      */
-    public function __construct(DoctrineHelper $doctrineHelper, ValueNormalizer $valueNormalizer)
+    public function __construct(ValueNormalizer $valueNormalizer)
     {
-        $this->doctrineHelper  = $doctrineHelper;
         $this->valueNormalizer = $valueNormalizer;
-        $this->requestType     = new RequestType([RequestType::REST]);
+        $this->requestType = new RequestType([RequestType::REST]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function transform($id)
+    public function transform($id, EntityMetadata $metadata)
     {
         return is_array($id)
-            ? http_build_query($id, '', ',')
+            ? http_build_query($id, '', self::COMPOSITE_ID_SEPARATOR)
             : (string)$id;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function reverseTransform($entityClass, $value)
+    public function reverseTransform($value, EntityMetadata $metadata)
     {
-        if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-            $idFields = $metadata->getIdentifierFieldNames();
-            $value    = count($idFields) === 1
-                ? $this->reverseTransformSingleId($value, $metadata->getTypeOfField(reset($idFields)))
-                : $this->reverseTransformCombinedEntityId($value, $idFields, $metadata);
+        $idFieldNames = $metadata->getIdentifierFieldNames();
+        if (count($idFieldNames) === 1) {
+            $value = $this->reverseTransformSingleId(
+                $value,
+                $metadata->getProperty(reset($idFieldNames))->getDataType()
+            );
+        } else {
+            $value = $this->reverseTransformCompositeEntityId($value, $metadata);
         }
 
         return $value;
@@ -66,54 +67,60 @@ class EntityIdTransformer implements EntityIdTransformerInterface
      */
     protected function reverseTransformSingleId($value, $dataType)
     {
-        return $dataType !== DataType::STRING
-            ? $this->valueNormalizer->normalizeValue($value, $dataType, $this->requestType)
-            : $value;
+        if (DataType::STRING === $dataType) {
+            return $value;
+        }
+
+        return $this->valueNormalizer->normalizeValue($value, $dataType, $this->requestType);
     }
 
     /**
-     * @param string        $entityId
-     * @param string[]      $idFields
-     * @param ClassMetadata $metadata
+     * @param string         $entityId
+     * @param EntityMetadata $metadata
      *
      * @return array
      *
      * @throws \UnexpectedValueException if the given entity id cannot be normalized
      */
-    protected function reverseTransformCombinedEntityId($entityId, $idFields, ClassMetadata $metadata)
+    protected function reverseTransformCompositeEntityId($entityId, EntityMetadata $metadata)
     {
-        $fieldMap   = array_flip($idFields);
+        $fieldMap = [];
+        foreach ($metadata->getIdentifierFieldNames() as $fieldName) {
+            $fieldMap[$fieldName] = $metadata->getProperty($fieldName)->getDataType();
+        }
+
         $normalized = [];
-        foreach (explode(',', $entityId) as $item) {
+        foreach (explode(self::COMPOSITE_ID_SEPARATOR, $entityId) as $item) {
             $val = explode('=', $item);
             if (count($val) !== 2) {
                 throw new \UnexpectedValueException(
                     sprintf(
-                        'Unexpected identifier value "%s" for composite primary key of the entity "%s".',
+                        'Unexpected identifier value "%s" for composite identifier of the entity "%s".',
                         $entityId,
-                        $metadata->getName()
+                        $metadata->getClassName()
                     )
                 );
             }
 
-            $key = $val[0];
-            $val = $val[1];
+            list($key, $val) = $val;
+            $val = urldecode($val);
 
             if (!isset($fieldMap[$key])) {
                 throw new \UnexpectedValueException(
                     sprintf(
                         'The entity identifier contains the key "%s" '
-                        . 'which is not defined in composite primary key of the entity "%s".',
+                        . 'which is not defined in composite identifier of the entity "%s".',
                         $key,
-                        $metadata->getName()
+                        $metadata->getClassName()
                     )
                 );
             }
 
-            $dataType         = $metadata->getTypeOfField($key);
-            $normalized[$key] = $dataType !== DataType::STRING
-                ? $this->valueNormalizer->normalizeValue($val, $dataType, $this->requestType)
-                : $val;
+            $dataType = $fieldMap[$key];
+            if (DataType::STRING !== $dataType) {
+                $val = $this->valueNormalizer->normalizeValue($val, $dataType, $this->requestType);
+            }
+            $normalized[$key] = $val;
 
             unset($fieldMap[$key]);
         }
@@ -121,8 +128,8 @@ class EntityIdTransformer implements EntityIdTransformerInterface
             throw new \UnexpectedValueException(
                 sprintf(
                     'The entity identifier does not contain all keys '
-                    . 'defined in composite primary key of the entity "%s".',
-                    $metadata->getName()
+                    . 'defined in composite identifier of the entity "%s".',
+                    $metadata->getClassName()
                 )
             );
         }

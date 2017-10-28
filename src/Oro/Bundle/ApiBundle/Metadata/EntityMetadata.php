@@ -199,7 +199,7 @@ class EntityMetadata implements ToArrayInterface
     }
 
     /**
-     * Checks whether metadata of the given field or association exists.
+     * Checks whether metadata of the given field, association or meta property exists.
      *
      * @param string $propertyName
      *
@@ -211,6 +211,28 @@ class EntityMetadata implements ToArrayInterface
             $this->hasField($propertyName)
             || $this->hasAssociation($propertyName)
             || $this->hasMetaProperty($propertyName);
+    }
+
+    /**
+     * Gets a property metadata by its name.
+     *
+     * @param string $propertyName
+     *
+     * @return PropertyMetadata|null
+     */
+    public function getProperty($propertyName)
+    {
+        if (isset($this->fields[$propertyName])) {
+            return $this->fields[$propertyName];
+        }
+        if (isset($this->associations[$propertyName])) {
+            return $this->associations[$propertyName];
+        }
+        if (isset($this->metaProperties[$propertyName])) {
+            return $this->metaProperties[$propertyName];
+        }
+
+        return null;
     }
 
     /**

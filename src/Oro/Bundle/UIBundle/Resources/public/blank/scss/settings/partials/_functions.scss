@@ -1,6 +1,6 @@
 // @theme: blank;
 
-// @return the value in a nested map;
+// @return the value with a nested map;
 // $map: (
 //     'main': (
 //         'foo': 'bar',
@@ -79,4 +79,40 @@
 
         @return $var;
     }
+}
+
+// Extended default map-merge
+// Merge two maps together into new map, w/o null keys
+
+@function map-merge-wo-null($map1, $map2) {
+    $result: map-merge($map1, $map2);
+
+    @each $key in map-keys($result) {
+        @if map-get($result, $key) == null {
+            $result: map-remove($result, $key);
+        }
+    }
+
+    @return $result;
+}
+
+// Merge breakpoints
+// $old-breakpoints: (
+//     'desktop': '(min-width: 1100px)',
+//     'tablet': '(max-width: 1099px )'
+// );
+// $new-breakpoints: (
+//     'desktop': '(min-width: 1200px)',
+//     'tablet': null,
+//     'mobile': '(max-width: 640px)'
+// );
+// @return the value with a merged breakpoints;
+// $breakpoints: (
+//     'desktop''(min-width: 1200px)',
+//     'mobile': '(max-width: 640px)'
+// );
+// Use: merge-breakpoints($old-breakpoints, $new-breakpoints);
+
+@function merge-breakpoints($breakpoints1, $news-breakpoint2) {
+    @return  map-merge-wo-null($breakpoints1, $news-breakpoint2);
 }

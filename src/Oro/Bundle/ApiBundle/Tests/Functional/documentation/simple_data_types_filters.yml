@@ -1,0 +1,69 @@
+filters:
+    'filter[fieldBigInt]':
+        requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
+        type: 'bigint or array or range'
+        operators: '=,!=,<,<=,>,>='
+    'filter[fieldBoolean]':
+        requirement: '0|1|true|false|yes|no'
+        type: 'boolean'
+        operators: '=,!='
+    'filter[fieldCurrency]':
+        requirement: '.+'
+        type: 'string or array'
+        operators: '=,!='
+    'filter[fieldDateTime]':
+        requirement: '\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?|\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?..\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?'
+        type: 'datetime or range'
+        operators: '=,!=,<,<=,>,>='
+    'filter[fieldDate]':
+        requirement: '\d{4}(-\d{2}(-\d{2}?)?)?|\d{4}(-\d{2}(-\d{2}?)?)?..\d{4}(-\d{2}(-\d{2}?)?)?'
+        type: 'date or range'
+        operators: '=,!=,<,<=,>,>='
+    'filter[fieldDecimal]':
+        requirement: '-?\d*\.?\d+(,-?\d*\.?\d+)*|-?\d*\.?\d+..-?\d*\.?\d+'
+        type: 'decimal or array or range'
+        operators: '=,!=,<,<=,>,>='
+    'filter[fieldDuration]':
+        requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
+        type: 'integer or array or range'
+        operators: '=,!=,<,<=,>,>='
+    'filter[fieldFloat]':
+        requirement: '-?\d*\.?\d+(,-?\d*\.?\d+)*|-?\d*\.?\d+..-?\d*\.?\d+'
+        type: 'float or array or range'
+        operators: '=,!=,<,<=,>,>='
+    'filter[fieldGuid]':
+        requirement: '.+'
+        type: 'string or array'
+        operators: '=,!='
+    'filter[fieldInt]':
+        requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
+        type: 'integer or array or range'
+        operators: '=,!=,<,<=,>,>='
+    'filter[fieldMoney]':
+        requirement: '-?\d*\.?\d+(,-?\d*\.?\d+)*|-?\d*\.?\d+..-?\d*\.?\d+'
+        type: 'money or array or range'
+        operators: '=,!=,<,<=,>,>='
+    'filter[fieldMoneyValue]':
+        requirement: '-?\d*\.?\d+(,-?\d*\.?\d+)*|-?\d*\.?\d+..-?\d*\.?\d+'
+        type: 'money or array or range'
+        operators: '=,!=,<,<=,>,>='
+    'filter[fieldPercent]':
+        requirement: '-?\d*\.?\d+(,-?\d*\.?\d+)*|-?\d*\.?\d+..-?\d*\.?\d+'
+        type: 'float or array or range'
+        operators: '=,!=,<,<=,>,>='
+    'filter[fieldSmallInt]':
+        requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
+        type: 'smallint or array or range'
+        operators: '=,!=,<,<=,>,>='
+    'filter[fieldString]':
+        requirement: '.+'
+        type: 'string or array'
+        operators: '=,!='
+    'filter[fieldTime]':
+        requirement: '\d{2}:\d{2}(:\d{2}(\.\d+)?)?|\d{2}:\d{2}(:\d{2}(\.\d+)?)?..\d{2}:\d{2}(:\d{2}(\.\d+)?)?'
+        type: 'time or range'
+        operators: '=,!=,<,<=,>,>='
+    'filter[id]':
+        requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
+        type: 'integer or array or range'
+        operators: '=,!=,<,<=,>,>='

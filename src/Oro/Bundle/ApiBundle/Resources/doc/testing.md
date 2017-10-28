@@ -30,15 +30,17 @@ To be sure that your REST API resources work properly you can cover them by [fun
 | getRelationship | Sends GET request for a relationship of a single entity. See [get_relationship action](./actions.md#get_relationship-action). |
 | postRelationship | Sends POST request for a relationship of a single entity. See [add_relationship action](./actions.md#add_relationship-action). |
 | patchRelationship | Sends PATCH request for a relationship of a single entity. See [update_relationship action](./actions.md#update_relationship-action). |
+| deleteRelationship | Sends DELETE request for a relationship of a single entity. See [delete_relationship action](./actions.md#delete_relationship-action). |
 | assertResponseContains | Asserts the response content contains the the given data. If the first parameter is a file name, the file should be located in the `responses` directory near to PHP file contains the test. |
 | assertResponseCount | Asserts the response contains the given number of data items. |
 | assertResponseNotEmpty | Asserts the response data are not empty. |
 | assertResponseValidationError | Asserts the response content contains the the given validation error. |
 | assertResponseValidationErrors | Asserts the response content contains the the given validation errors. |
-| dumpYmlTemplate | Saves a response content to a YAML file. If the first parameter is a file name, the file should be located in the `responses` directory near to PHP file contains the test. |
+| dumpYmlTemplate | Saves a response content to a YAML file. If the first parameter is a file name, the file will be saved in the `responses` directory near to PHP file contains the test. |
 | getResourceId | Extracts JSON.API resource identifier from the response. For details see [JSON.API Specification](http://jsonapi.org/format/#document-resource-objects). |
 | getRequestData | Converts the given request to an array that can be sent to the server. The given request can be a path to a file contains the request data or an array with the request data. If the request is a file name, the file should be located in the `requests` directory near to PHP file contains the test. |
 | getResponseErrors | Extracts the list of errors from JSON.API response. For details see [JSON.API Specification](http://jsonapi.org/format/#errors). |
+| appendEntityConfig | Appends a configuration of an entity. This method may be helpful if you create some general functionality and need to test it for different configurations without creating a test entity for each configuration. Please note that the configuration is restored after each test and you do not need to do it manually. |
 
 Load Fixtures
 -------------

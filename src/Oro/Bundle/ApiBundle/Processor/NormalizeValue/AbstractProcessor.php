@@ -2,9 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
 
+use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Provides a base implementation for different kinds of a value normalization processors.
+ */
 abstract class AbstractProcessor implements ProcessorInterface
 {
     /**
@@ -45,10 +49,18 @@ abstract class AbstractProcessor implements ProcessorInterface
     public function processRequirement(NormalizeValueContext $context)
     {
         if ($context->isArrayAllowed()) {
-            $context->setRequirement($this->getArrayRequirement($context->getArrayDelimiter()));
+            $requirement = $this->getArrayRequirement($context->getArrayDelimiter());
         } else {
-            $context->setRequirement($this->getRequirement());
+            $requirement = $this->getRequirement();
         }
+        if ($context->isRangeAllowed()) {
+            $requirement = sprintf(
+                '%s|%s',
+                $requirement,
+                $this->getRangeRequirement($context->getRangeDelimiter())
+            );
+        }
+        $context->setRequirement($requirement);
     }
 
     /**
@@ -71,6 +83,18 @@ abstract class AbstractProcessor implements ProcessorInterface
     }
 
     /**
+     * Gets a requirement for a pair of "from" and "to" values.
+     *
+     * @param string $rangeDelimiter
+     *
+     * @return string
+     */
+    protected function getRangeRequirement($rangeDelimiter)
+    {
+        return sprintf('%1$s%2$s%1$s', $this->getRequirement(), $rangeDelimiter);
+    }
+
+    /**
      * Does a value normalization (conversion to a concrete data-type) if needed.
      *
      * @param NormalizeValueContext $context
@@ -79,7 +103,9 @@ abstract class AbstractProcessor implements ProcessorInterface
     {
         $value = $context->getResult();
         if (null !== $value && $this->isValueNormalizationRequired($value)) {
-            if ($context->isArrayAllowed() && !is_array($value)) {
+            if ($context->isRangeAllowed() && false !== strpos($value, $context->getRangeDelimiter())) {
+                $context->setResult($this->normalizeRangeValue($value, $context->getRangeDelimiter()));
+            } elseif ($context->isArrayAllowed()) {
                 $context->setResult($this->normalizeArrayValue($value, $context->getArrayDelimiter()));
             } else {
                 $this->validateValue($value);
@@ -106,34 +132,63 @@ abstract class AbstractProcessor implements ProcessorInterface
      * @param string $arrayDelimiter
      *
      * @return mixed
+     * @throws \Exception
      */
     protected function normalizeArrayValue($value, $arrayDelimiter)
     {
-        $normalizedValue = [];
-        $values          = explode($arrayDelimiter, $value);
-        foreach ($values as $val) {
-            try {
-                if ($this->isValueNormalizationRequired($val)) {
-                    $this->validateValue($val);
-                    $val = $this->normalizeValue($val);
-                }
-                $normalizedValue[] = $val;
-            } catch (\Exception $e) {
-                if (count($values) === 1) {
-                    throw $e;
-                } else {
-                    throw new \UnexpectedValueException(
-                        sprintf('Expected an array of %s. Given "%s".', $this->getDataTypePluralString(), $value),
-                        0,
-                        $e
-                    );
-                }
+        $values = explode($arrayDelimiter, $value);
+        try {
+            $normalizedValue = $this->normalizeValues($values);
+        } catch (\Exception $e) {
+            if (count($values) === 1) {
+                throw $e;
+            } else {
+                throw new \UnexpectedValueException(
+                    sprintf('Expected an array of %s. Given "%s".', $this->getDataTypePluralString(), $value),
+                    0,
+                    $e
+                );
             }
         }
 
-        return count($normalizedValue) === 1
-            ? reset($normalizedValue)
-            : $normalizedValue;
+        if (count($normalizedValue) === 1) {
+            $normalizedValue = reset($normalizedValue);
+        }
+
+        return $normalizedValue;
+    }
+
+    /**
+     * @param string $value
+     * @param string $rangeDelimiter
+     *
+     * @return Range
+     * @throws \Exception
+     */
+    protected function normalizeRangeValue($value, $rangeDelimiter)
+    {
+        $delimiterPos = strpos($value, $rangeDelimiter);
+        $values = [
+            substr($value, 0, $delimiterPos),
+            substr($value, $delimiterPos + strlen($rangeDelimiter))
+        ];
+        try {
+            $normalizedValues = $this->normalizeValues($values);
+        } catch (\Exception $e) {
+            throw new \UnexpectedValueException(
+                sprintf(
+                    'Expected a pair of %1$s (%3$s%4$s%3$s). Given "%2$s".',
+                    $this->getDataTypePluralString(),
+                    $value,
+                    $this->getDataTypeString(),
+                    $rangeDelimiter
+                ),
+                0,
+                $e
+            );
+        }
+
+        return new Range($normalizedValues[0], $normalizedValues[1]);
     }
 
     /**
@@ -153,5 +208,24 @@ abstract class AbstractProcessor implements ProcessorInterface
                 sprintf('Expected %s value. Given "%s".', $this->getDataTypeString(), $value)
             );
         }
+    }
+
+    /**
+     * @param array $values
+     *
+     * @return array
+     */
+    protected function normalizeValues(array $values)
+    {
+        $normalizedValues = [];
+        foreach ($values as $key => $val) {
+            if ($this->isValueNormalizationRequired($val)) {
+                $this->validateValue($val);
+                $val = $this->normalizeValue($val);
+            }
+            $normalizedValues[$key] = $val;
+        }
+
+        return $normalizedValues;
     }
 }

@@ -5,10 +5,20 @@ namespace Oro\Bundle\ApiBundle\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 
+use Oro\Bundle\ApiBundle\Model\Range;
+
 /**
  * A filter that can be used to filter data by a field value.
- * Also this filter supports different kind of comparison:
- * "equal", "not equal", "less than", "less than or equal", "greater than", "greater than or equal".
+ * Supported comparison types:
+ * * equal
+ * * not equal
+ * * less than
+ * * less than or equal
+ * * greater than
+ * * greater than or equal
+ * Also the field value can be:
+ * * an array, in this case IN expression will be used
+ * * an instance of Range class, in this case BETWEEN expression will be used
  */
 class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInterface
 {
@@ -46,6 +56,16 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     {
         return
             parent::isArrayAllowed($operator)
+            && (null === $operator || in_array($operator, [self::EQ, self::NEQ], true));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isRangeAllowed($operator = null)
+    {
+        return
+            parent::isRangeAllowed($operator)
             && (null === $operator || in_array($operator, [self::EQ, self::NEQ], true));
     }
 
@@ -124,13 +144,9 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     {
         switch ($operator) {
             case self::EQ:
-                return is_array($value)
-                    ? Criteria::expr()->in($field, $value)
-                    : Criteria::expr()->eq($field, $value);
+                return $this->buildEqualToExpression($field, $value);
             case self::NEQ:
-                return is_array($value)
-                    ? Criteria::expr()->notIn($field, $value)
-                    : Criteria::expr()->neq($field, $value);
+                return $this->buildNotEqualToExpression($field, $value);
             case self::GT:
                 return Criteria::expr()->gt($field, $value);
             case self::LT:
@@ -142,5 +158,53 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
             default:
                 return null;
         }
+    }
+
+    /**
+     * @param string $field
+     * @param mixed  $value
+     *
+     * @return Expression
+     */
+    protected function buildEqualToExpression($field, $value)
+    {
+        if (is_array($value)) {
+            return Criteria::expr()->in($field, $value);
+        }
+        if ($value instanceof Range) {
+            // expression: (field >= fromValue AND field <= toValue)
+            // this expression equals to "field BETWEEN fromValue AND toValue",
+            // but Criteria object does not support BETWEEN expression
+            return Criteria::expr()->andX(
+                Criteria::expr()->gte($field, $value->getFromValue()),
+                Criteria::expr()->lte($field, $value->getToValue())
+            );
+        }
+
+        return Criteria::expr()->eq($field, $value);
+    }
+
+    /**
+     * @param string $field
+     * @param mixed  $value
+     *
+     * @return Expression
+     */
+    protected function buildNotEqualToExpression($field, $value)
+    {
+        if (is_array($value)) {
+            return Criteria::expr()->notIn($field, $value);
+        }
+        if ($value instanceof Range) {
+            // expression: (field < fromValue OR field > toValue)
+            // this expression equals to "NOT field BETWEEN fromValue AND toValue",
+            // but Criteria object does not support NOT and BETWEEN expressions
+            return Criteria::expr()->orX(
+                Criteria::expr()->lt($field, $value->getFromValue()),
+                Criteria::expr()->gt($field, $value->getToValue())
+            );
+        }
+
+        return Criteria::expr()->neq($field, $value);
     }
 }

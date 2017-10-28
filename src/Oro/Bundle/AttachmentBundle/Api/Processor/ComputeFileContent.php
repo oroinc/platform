@@ -43,8 +43,8 @@ class ComputeFileContent implements ProcessorInterface
         if (!is_array($data)) {
             return;
         }
-        $config = $context->getConfig();
 
+        $config = $context->getConfig();
         if (null === $config) {
             return;
         }

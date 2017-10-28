@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\PreloadedExtension;
 
+use Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension;
 use Oro\Bundle\LocaleBundle\Form\Type\FormattingSelectType;
 use Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationType;
@@ -13,6 +14,7 @@ use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub\Localization;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\FormattingSelectTypeStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizedFallbackValueCollectionTypeStub;
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
@@ -156,6 +158,11 @@ class LocalizationTypeTest extends FormIntegrationTestCase
             $languages[$id] = $this->getEntity(Language::class, ['id' => (int)$id, 'code' => (string)$code]);
         }
 
+        $helper = $this->createMock(HtmlTagHelper::class);
+        $helper->expects($this->any())
+            ->method('stripTags')
+            ->willReturnArgument(0);
+
         return [
             new PreloadedExtension(
                 [
@@ -169,7 +176,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
                         LocalizationParentSelectType::NAME
                     ),
                 ],
-                []
+                ['form' => [new StripTagsExtension($helper)]]
             )
         ];
     }

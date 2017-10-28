@@ -4,9 +4,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
+use Doctrine\Common\Collections\Expr\CompositeExpression;
+use Doctrine\Common\Collections\Expr\Value;
 
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
+use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Bundle\ApiBundle\Request\DataType;
 
 class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
@@ -108,20 +111,23 @@ class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string      $fieldName
      * @param bool        $isArrayAllowed
+     * @param bool        $isRangeAllowed
      * @param FilterValue $filterValue
      * @param Criteria    $expectation
      *
      * @dataProvider testCaseProvider
      */
-    public function testFilter($fieldName, $isArrayAllowed, $filterValue, $expectation)
+    public function testFilter($fieldName, $isArrayAllowed, $isRangeAllowed, $filterValue, $expectation)
     {
         $this->assertNull($this->comparisonFilter->getField());
         $this->comparisonFilter->setField($fieldName);
         $this->assertSame($fieldName, $this->comparisonFilter->getField());
 
         $this->comparisonFilter->setArrayAllowed(true); //setting to TRUE due parent should allow own check
+        $this->comparisonFilter->setRangeAllowed(true); //setting to TRUE due parent should allow own check
         if ($filterValue) {
             $this->assertSame($isArrayAllowed, $this->comparisonFilter->isArrayAllowed($filterValue->getOperator()));
+            $this->assertSame($isRangeAllowed, $this->comparisonFilter->isRangeAllowed($filterValue->getOperator()));
         }
 
         $this->assertEquals(['=', '!=', '<', '<=', '>', '>='], $this->comparisonFilter->getSupportedOperators());
@@ -132,57 +138,108 @@ class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectation, $criteria->getWhereExpression());
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testCaseProvider()
     {
         return [
-            'empty filter' => [
+            'empty filter'                 => [
                 'fieldName',  //fieldName
-                true, //isArrayAllowed
-                null, //filter
-                null //expectation
+                true, // isArrayAllowed
+                true, // isRangeAllowed
+                null, // filter
+                null // expectation
             ],
             'filter with default operator' => [
                 'fieldName',
                 true,
+                true,
                 new FilterValue('path', 'value'),
                 new Comparison('fieldName', Comparison::EQ, 'value')
             ],
-            'EQ filter' => [
+            'EQ filter'                    => [
                 'fieldName',
+                true,
                 true,
                 new FilterValue('path', 'value', ComparisonFilter::EQ),
                 new Comparison('fieldName', Comparison::EQ, 'value')
             ],
-            'NEQ filter' => [
+            'NEQ filter'                   => [
                 'fieldName',
+                true,
                 true,
                 new FilterValue('path', 'value', ComparisonFilter::NEQ),
                 new Comparison('fieldName', Comparison::NEQ, 'value')
             ],
-            'LT filter' => [
+            'LT filter'                    => [
                 'fieldName',
+                false,
                 false,
                 new FilterValue('path', 'value', ComparisonFilter::LT),
                 new Comparison('fieldName', Comparison::LT, 'value')
             ],
-            'LTE filter' => [
+            'LTE filter'                   => [
                 'fieldName',
+                false,
                 false,
                 new FilterValue('path', 'value', ComparisonFilter::LTE),
                 new Comparison('fieldName', Comparison::LTE, 'value')
             ],
-            'GT filter' => [
+            'GT filter'                    => [
                 'fieldName',
+                false,
                 false,
                 new FilterValue('path', 'value', ComparisonFilter::GT),
                 new Comparison('fieldName', Comparison::GT, 'value')
             ],
-            'GTE filter' => [
+            'GTE filter'                   => [
                 'fieldName',
+                false,
                 false,
                 new FilterValue('path', 'value', ComparisonFilter::GTE),
                 new Comparison('fieldName', Comparison::GTE, 'value')
-            ]
+            ],
+            'EQ filter for array'          => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue('path', ['value1', 'value2'], ComparisonFilter::EQ),
+                new Comparison('fieldName', Comparison::IN, new Value(['value1', 'value2']))
+            ],
+            'NEQ filter for array'         => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue('path', ['value1', 'value2'], ComparisonFilter::NEQ),
+                new Comparison('fieldName', Comparison::NIN, new Value(['value1', 'value2']))
+            ],
+            'EQ filter for range'          => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue('path', new Range('value1', 'value2'), ComparisonFilter::EQ),
+                new CompositeExpression(
+                    CompositeExpression::TYPE_AND,
+                    [
+                        new Comparison('fieldName', Comparison::GTE, 'value1'),
+                        new Comparison('fieldName', Comparison::LTE, 'value2')
+                    ]
+                )
+            ],
+            'NEQ filter for range'         => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue('path', new Range('value1', 'value2'), ComparisonFilter::NEQ),
+                new CompositeExpression(
+                    CompositeExpression::TYPE_OR,
+                    [
+                        new Comparison('fieldName', Comparison::LT, 'value1'),
+                        new Comparison('fieldName', Comparison::GT, 'value2')
+                    ]
+                )
+            ],
         ];
     }
 }

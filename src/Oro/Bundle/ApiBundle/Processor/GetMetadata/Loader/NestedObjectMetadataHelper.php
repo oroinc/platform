@@ -32,6 +32,7 @@ class NestedObjectMetadataHelper
     /**
      * @param EntityMetadata              $entityMetadata
      * @param string                      $entityClass
+     * @param EntityDefinitionConfig      $config
      * @param string                      $fieldName
      * @param EntityDefinitionFieldConfig $field
      * @param string                      $targetAction

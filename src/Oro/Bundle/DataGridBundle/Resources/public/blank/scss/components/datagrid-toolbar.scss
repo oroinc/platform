@@ -70,7 +70,6 @@
             min-width: 64px;
         }
     }
-
 }
 
 .datagrid-tool {
@@ -82,6 +81,10 @@
 
     &:last-child {
         flex-grow: 0;
+    }
+
+    &__label {
+        vertical-align: middle;
     }
 }
 
@@ -137,6 +140,10 @@
 
     .datagrid-tool {
         margin: $offset-y-s ($offset-x-s/2);
+
+        &__label {
+            display: none;
+        }
     }
 }
 
@@ -179,6 +186,21 @@
 
         .action-selectbox_custom_in-pager {
             margin-right: $offset-x-s;
+        }
+    }
+}
+
+@include breakpoint('print') {
+    .datagrid-toolbar {
+        display: block;
+
+        &__side {
+            float: right;
+        }
+
+        &__rightside,
+        &__base {
+            display: none !important;
         }
     }
 }

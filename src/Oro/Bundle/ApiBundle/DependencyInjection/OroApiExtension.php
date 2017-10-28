@@ -12,10 +12,13 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+use Oro\Component\ChainProcessor\Debug\TraceableProcessorApplicableCheckerFactory;
+use Oro\Component\ChainProcessor\Debug\TraceableProcessorFactory;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
+use Oro\Bundle\ApiBundle\Debug\TraceableActionProcessorBag;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 
 class OroApiExtension extends Extension implements PrependExtensionInterface
@@ -23,23 +26,24 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
     const API_DOC_VIEWS_PARAMETER_NAME = 'oro_api.api_doc.views';
     const API_DOC_PATH_PARAMETER_NAME  = 'oro_api.api_doc.path';
 
-    const ACTION_PROCESSOR_BAG_SERVICE_ID             = 'oro_api.action_processor_bag';
-    const CONFIG_EXTENSION_REGISTRY_SERVICE_ID        = 'oro_api.config_extension_registry';
-    const PROCESSOR_BAG_SERVICE_ID                    = 'oro_api.processor_bag';
-    const PROCESSOR_FACTORY_SERVICE_ID                = 'oro_api.processor_factory';
-    const APPLICABLE_CHECKER_FACTORY_SERVICE_ID       = 'oro_api.processor_applicable_checker_factory';
-    const COLLECT_RESOURCES_PROCESSOR_SERVICE_ID      = 'oro_api.collect_resources.processor';
-    const COLLECT_SUBRESOURCES_PROCESSOR_SERVICE_ID   = 'oro_api.collect_subresources.processor';
-    const CUSTOMIZE_LOADED_DATA_PROCESSOR_SERVICE_ID  = 'oro_api.customize_loaded_data.processor';
-    const CUSTOMIZE_FORM_DATA_PROCESSOR_SERVICE_ID    = 'oro_api.customize_form_data.processor';
-    const GET_CONFIG_PROCESSOR_SERVICE_ID             = 'oro_api.get_config.processor';
-    const GET_RELATION_CONFIG_PROCESSOR_SERVICE_ID    = 'oro_api.get_relation_config.processor';
-    const GET_METADATA_PROCESSOR_SERVICE_ID           = 'oro_api.get_metadata.processor';
-    const NORMALIZE_VALUE_PROCESSOR_SERVICE_ID        = 'oro_api.normalize_value.processor';
-    const CONFIG_BAG_SERVICE_ID                       = 'oro_api.config_bag';
-    const ENTITY_ALIAS_PROVIDER_SERVICE_ID            = 'oro_api.entity_alias_provider';
-    const ENTITY_EXCLUSION_PROVIDER_SERVICE_ID        = 'oro_api.entity_exclusion_provider';
-    const CONFIG_ENTITY_EXCLUSION_PROVIDER_SERVICE_ID = 'oro_api.entity_exclusion_provider.config';
+    const ACTION_PROCESSOR_BAG_SERVICE_ID                 = 'oro_api.action_processor_bag';
+    const CONFIG_EXTENSION_REGISTRY_SERVICE_ID            = 'oro_api.config_extension_registry';
+    const PROCESSOR_BAG_SERVICE_ID                        = 'oro_api.processor_bag';
+    const PROCESSOR_FACTORY_SERVICE_ID                    = 'oro_api.processor_factory';
+    const APPLICABLE_CHECKER_FACTORY_SERVICE_ID           = 'oro_api.processor_applicable_checker_factory';
+    const APPLICABLE_CHECKER_FACTORY_UNGROUPED_SERVICE_ID = 'oro_api.processor_applicable_checker_factory.ungrouped';
+    const COLLECT_RESOURCES_PROCESSOR_SERVICE_ID          = 'oro_api.collect_resources.processor';
+    const COLLECT_SUBRESOURCES_PROCESSOR_SERVICE_ID       = 'oro_api.collect_subresources.processor';
+    const CUSTOMIZE_LOADED_DATA_PROCESSOR_SERVICE_ID      = 'oro_api.customize_loaded_data.processor';
+    const CUSTOMIZE_FORM_DATA_PROCESSOR_SERVICE_ID        = 'oro_api.customize_form_data.processor';
+    const GET_CONFIG_PROCESSOR_SERVICE_ID                 = 'oro_api.get_config.processor';
+    const GET_RELATION_CONFIG_PROCESSOR_SERVICE_ID        = 'oro_api.get_relation_config.processor';
+    const GET_METADATA_PROCESSOR_SERVICE_ID               = 'oro_api.get_metadata.processor';
+    const NORMALIZE_VALUE_PROCESSOR_SERVICE_ID            = 'oro_api.normalize_value.processor';
+    const CONFIG_BAG_SERVICE_ID                           = 'oro_api.config_bag';
+    const ENTITY_ALIAS_PROVIDER_SERVICE_ID                = 'oro_api.entity_alias_provider';
+    const ENTITY_EXCLUSION_PROVIDER_SERVICE_ID            = 'oro_api.entity_exclusion_provider';
+    const CONFIG_ENTITY_EXCLUSION_PROVIDER_SERVICE_ID     = 'oro_api.entity_exclusion_provider.config';
 
     /**
      * {@inheritdoc}
@@ -132,22 +136,22 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         DependencyInjectionUtil::registerDebugService(
             $container,
             self::ACTION_PROCESSOR_BAG_SERVICE_ID,
-            'Oro\Bundle\ApiBundle\Debug\TraceableActionProcessorBag'
-        );
-        DependencyInjectionUtil::registerDebugService(
-            $container,
-            self::PROCESSOR_BAG_SERVICE_ID,
-            'Oro\Component\ChainProcessor\Debug\TraceableProcessorBag'
+            TraceableActionProcessorBag::class
         );
         DependencyInjectionUtil::registerDebugService(
             $container,
             self::PROCESSOR_FACTORY_SERVICE_ID,
-            'Oro\Component\ChainProcessor\Debug\TraceableProcessorFactory'
+            TraceableProcessorFactory::class
         );
         DependencyInjectionUtil::registerDebugService(
             $container,
             self::APPLICABLE_CHECKER_FACTORY_SERVICE_ID,
-            'Oro\Component\ChainProcessor\Debug\TraceableProcessorApplicableCheckerFactory'
+            TraceableProcessorApplicableCheckerFactory::class
+        );
+        DependencyInjectionUtil::registerDebugService(
+            $container,
+            self::APPLICABLE_CHECKER_FACTORY_UNGROUPED_SERVICE_ID,
+            TraceableProcessorApplicableCheckerFactory::class
         );
         DependencyInjectionUtil::registerDebugService(
             $container,
@@ -205,6 +209,29 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $testEntityAliasProviderDef->setPublic(false);
         $testEntityAliasProviderDef->addTag('oro_entity.alias_provider');
         $container->setDefinition('oro_api.tests.entity_alias_provider', $testEntityAliasProviderDef);
+
+        // oro_api.config_bag
+        $configBagDef = $container->getDefinition(self::CONFIG_BAG_SERVICE_ID);
+        $configBagDef->setClass('Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigBag');
+        $configBagDef->addMethodCall(
+            'setExtensionRegistry',
+            [new Reference(self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID)]
+        );
+
+        // oro_api.tests.config_registry
+        $container->setDefinition(
+            'oro_api.tests.config_registry',
+            new Definition(
+                'Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry',
+                [
+                    new Reference(self::CONFIG_BAG_SERVICE_ID),
+                    new Reference('oro_api.config_provider'),
+                    new Reference('oro_api.relation_config_provider'),
+                    new Reference('oro_api.metadata_provider'),
+                    new Reference('oro_api.resources_cache')
+                ]
+            )
+        );
     }
 
     /**

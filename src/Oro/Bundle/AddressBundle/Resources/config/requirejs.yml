@@ -8,4 +8,6 @@ config:
         'oroaddress/js/region/collection': 'bundles/oroaddress/js/region/collection.js'
         'oroaddress/js/region/model': 'bundles/oroaddress/js/region/model.js'
         'oroaddress/js/region/view': 'bundles/oroaddress/js/region/view.js'
+        'oroaddress/js/app/views/address-book-widget-view': 'bundles/oroaddress/js/app/views/address-book-widget-view.js'
         'oro/datagrid/action/map-action': 'bundles/oroaddress/js/datagrid/action/map-action.js'
+        'oroaddress/js/app/views/address-collection-view': 'bundles/oroaddress/js/app/views/address-collection-view.js'

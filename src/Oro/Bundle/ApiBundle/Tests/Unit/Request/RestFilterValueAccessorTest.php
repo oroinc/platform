@@ -160,6 +160,61 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testParseQueryStringWithAlternativeSyntaxOfFilters()
+    {
+        $queryStringValues = [
+            'prm1[eq]=val1'            => ['prm1', '=', 'val1', 'prm1', 'prm1'],
+            'prm2[neq]=val2'           => ['prm2', '!=', 'val2', 'prm2', 'prm2'],
+            'prm3[lt]=val3'            => ['prm3', '<', 'val3', 'prm3', 'prm3'],
+            'prm4[lte]=val4'           => ['prm4', '<=', 'val4', 'prm4', 'prm4'],
+            'prm5[gt]=val5'            => ['prm5', '>', 'val5', 'prm5', 'prm5'],
+            'prm6[gte]=val6'           => ['prm6', '>=', 'val6', 'prm6', 'prm6'],
+            'filter[field1][eq]=val1'  => ['filter[field1]', '=', 'val1', 'field1', 'filter[field1]'],
+            'filter[field2][neq]=val2' => ['filter[field2]', '!=', 'val2', 'field2', 'filter[field2]'],
+            'filter[field3][lt]=val3'  => ['filter[field3]', '<', 'val3', 'field3', 'filter[field3]'],
+            'filter[field4][lte]=val4' => ['filter[field4]', '<=', 'val4', 'field4', 'filter[field4]'],
+            'filter[field5][gt]=val5'  => ['filter[field5]', '>', 'val5', 'field5', 'filter[field5]'],
+            'filter[field6][gte]=val6' => ['filter[field6]', '>=', 'val6', 'field6', 'filter[field6]'],
+        ];
+        $request = Request::create(
+            'http://test.com?' . implode('&', array_keys($queryStringValues))
+        );
+
+        $accessor = new RestFilterValueAccessor($request);
+
+        foreach ($queryStringValues as $itemKey => $itemValue) {
+            list($key, $operator, $value, $path, $sourceKey) = $itemValue;
+            $this->assertTrue($accessor->has($key), sprintf('has - %s', $itemKey));
+            $this->assertEquals(
+                $this->getFilterValue($path, $value, $operator, $sourceKey),
+                $accessor->get($key),
+                $itemKey
+            );
+        }
+
+        $this->assertFalse($accessor->has('unknown'), 'has - unknown');
+        $this->assertNull($accessor->get('unknown'), 'get - unknown');
+
+        $this->assertCount(count($queryStringValues), $accessor->getAll(), 'getAll');
+        $this->assertEquals(
+            [
+                'prm1' => $this->getFilterValue('prm1', 'val1', '=', 'prm1'),
+            ],
+            $accessor->getGroup('prm1')
+        );
+        $this->assertEquals(
+            [
+                'filter[field1]' => $this->getFilterValue('field1', 'val1', '=', 'filter[field1]'),
+                'filter[field2]' => $this->getFilterValue('field2', 'val2', '!=', 'filter[field2]'),
+                'filter[field3]' => $this->getFilterValue('field3', 'val3', '<', 'filter[field3]'),
+                'filter[field4]' => $this->getFilterValue('field4', 'val4', '<=', 'filter[field4]'),
+                'filter[field5]' => $this->getFilterValue('field5', 'val5', '>', 'filter[field5]'),
+                'filter[field6]' => $this->getFilterValue('field6', 'val6', '>=', 'filter[field6]'),
+            ],
+            $accessor->getGroup('filter')
+        );
+    }
+
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
@@ -280,6 +335,130 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
             ],
             $accessor->getGroup('filter')
         );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testRequestBodyWithAlternativeSyntaxOfFilters()
+    {
+        $requestBody = [
+            'prm1'   => ['eq' => 'val1'],
+            'prm2'   => ['neq' => 'val2'],
+            'prm3'   => ['lt' => 'val3'],
+            'prm4'   => ['lte' => 'val4'],
+            'prm5'   => ['gt' => 'val5'],
+            'prm6'   => ['gte' => 'val6'],
+            'filter' => [
+                'field1' => ['eq' => 'val1'],
+                'field2' => ['neq' => 'val2'],
+                'field3' => ['lt' => 'val3'],
+                'field4' => ['lte' => 'val4'],
+                'field5' => ['gt' => 'val5'],
+                'field6' => ['gte' => 'val6'],
+            ]
+        ];
+        $request = Request::create(
+            'http://test.com',
+            'DELETE',
+            $requestBody
+        );
+
+        $accessor = new RestFilterValueAccessor($request);
+
+        $this->assertEquals(
+            $this->getFilterValue('prm1', 'val1', '=', 'prm1'),
+            $accessor->get('prm1'),
+            'prm1'
+        );
+        $this->assertEquals(
+            $this->getFilterValue('prm2', 'val2', '!=', 'prm2'),
+            $accessor->get('prm2'),
+            'prm2'
+        );
+        $this->assertEquals(
+            $this->getFilterValue('prm3', 'val3', '<', 'prm3'),
+            $accessor->get('prm3'),
+            'prm3'
+        );
+        $this->assertEquals(
+            $this->getFilterValue('prm4', 'val4', '<=', 'prm4'),
+            $accessor->get('prm4'),
+            'prm4'
+        );
+        $this->assertEquals(
+            $this->getFilterValue('prm5', 'val5', '>', 'prm5'),
+            $accessor->get('prm5'),
+            'prm5'
+        );
+        $this->assertEquals(
+            $this->getFilterValue('prm6', 'val6', '>=', 'prm6'),
+            $accessor->get('prm6'),
+            'prm6'
+        );
+
+        $this->assertEquals(
+            $this->getFilterValue('field1', 'val1', '=', 'filter[field1]'),
+            $accessor->get('filter[field1]'),
+            'filter[field1]'
+        );
+        $this->assertEquals(
+            $this->getFilterValue('field2', 'val2', '!=', 'filter[field2]'),
+            $accessor->get('filter[field2]'),
+            'filter[field2]'
+        );
+        $this->assertEquals(
+            $this->getFilterValue('field3', 'val3', '<', 'filter[field3]'),
+            $accessor->get('filter[field3]'),
+            'filter[field3]'
+        );
+        $this->assertEquals(
+            $this->getFilterValue('field4', 'val4', '<=', 'filter[field4]'),
+            $accessor->get('filter[field4]'),
+            'filter[field4]'
+        );
+        $this->assertEquals(
+            $this->getFilterValue('field5', 'val5', '>', 'filter[field5]'),
+            $accessor->get('filter[field5]'),
+            'filter[field5]'
+        );
+        $this->assertEquals(
+            $this->getFilterValue('field6', 'val6', '>=', 'filter[field6]'),
+            $accessor->get('filter[field6]'),
+            'filter[field6]'
+        );
+
+        $this->assertCount(12, $accessor->getAll(), 'getAll');
+        $this->assertEquals(
+            [
+                'prm1' => $this->getFilterValue('prm1', 'val1', '=', 'prm1'),
+            ],
+            $accessor->getGroup('prm1')
+        );
+        $this->assertEquals(
+            [
+                'filter[field1]' => $this->getFilterValue('field1', 'val1', '=', 'filter[field1]'),
+                'filter[field2]' => $this->getFilterValue('field2', 'val2', '!=', 'filter[field2]'),
+                'filter[field3]' => $this->getFilterValue('field3', 'val3', '<', 'filter[field3]'),
+                'filter[field4]' => $this->getFilterValue('field4', 'val4', '<=', 'filter[field4]'),
+                'filter[field5]' => $this->getFilterValue('field5', 'val5', '>', 'filter[field5]'),
+                'filter[field6]' => $this->getFilterValue('field6', 'val6', '>=', 'filter[field6]'),
+            ],
+            $accessor->getGroup('filter')
+        );
+    }
+
+    public function testFilterFromQueryStringShouldOverrideFilterFromRequestBody()
+    {
+        $request = Request::create(
+            'http://test.com?prm1=val1',
+            'DELETE',
+            ['prm1' => ['!=' => 'val2']]
+        );
+        $accessor = new RestFilterValueAccessor($request);
+
+        $this->assertCount(1, $accessor->getAll());
+        $this->assertEquals($this->getFilterValue('prm1', 'val1', '=', 'prm1'), $accessor->get('prm1'));
     }
 
     public function testOverrideExistingFilterValue()

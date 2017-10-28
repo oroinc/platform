@@ -4,6 +4,7 @@ namespace Oro\Component\ChainProcessor\Tests\Unit;
 
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorBag;
+use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 
 class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,7 +13,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $factory = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
+        $factory = $this->createMock(ProcessorFactoryInterface::class);
         $factory->expects($this->any())
             ->method('getProcessor')
             ->willReturnCallback(
@@ -54,6 +55,17 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(
             [],
             $this->processorBag->getActionGroups('unknown_action')
+        );
+    }
+
+    public function testActionGroupsForActionWithoutGroups()
+    {
+        $this->processorBag->addProcessor('processor1', [], 'action1');
+        $this->processorBag->addProcessor('processor2', [], 'action1');
+
+        $this->assertSame(
+            [],
+            $this->processorBag->getActionGroups('action1')
         );
     }
 

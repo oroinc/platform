@@ -2,8 +2,16 @@
 
 namespace Oro\Bundle\SyncBundle\Wamp;
 
-class TopicPublisher
+use Oro\Bundle\SyncBundle\Exception\WebSocket\Rfc6455Exception;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
+use Ratchet\Wamp\ServerProtocol;
+
+class TopicPublisher implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * Web socket server host
      *
@@ -19,6 +27,13 @@ class TopicPublisher
     protected $port;
 
     /**
+     * Web socket url path
+     *
+     * @var string
+     */
+    protected $path = '';
+
+    /**
      * @var WebSocket
      */
     protected $ws = null;
@@ -26,23 +41,27 @@ class TopicPublisher
     /**
      *
      * @param string $host Host to connect to. Default is localhost (127.0.0.1).
-     * @param int    $port Port to connect to. Default is 8080.
+     * @param int $port Port to connect to. Default is 8080.
+     * @param string $path Request path. Default is ""
      */
-    public function __construct($host = '127.0.0.1', $port = 8080)
+    public function __construct($host = '127.0.0.1', $port = 8080, $path = '')
     {
-        if ('*' == $host) {
+        if ('*' === $host) {
             $host = '127.0.0.1';
         }
 
         $this->host = $host;
-        $this->port = (int) $port;
+        $this->port = (int)$port;
+        $this->path = $path;
+
+        $this->setLogger(new NullLogger());
     }
 
     /**
      * Publish (broadcast) message
      *
-     * @param  string       $topic Topic id (or channel), for example "acme/demo-channel"
-     * @param  string|array $msg   Message
+     * @param  string $topic Topic id (or channel), for example "acme/demo-channel"
+     * @param  string|array $msg Message
      * @return bool         True on success, false otherwise
      */
     public function send($topic, $msg)
@@ -55,11 +74,11 @@ class TopicPublisher
 
         $ws->sendData(
             json_encode(
-                array(
-                    \Ratchet\Wamp\ServerProtocol::MSG_PUBLISH,
+                [
+                    ServerProtocol::MSG_PUBLISH,
                     $topic,
                     $msg,
-                )
+                ]
             )
         );
 
@@ -74,19 +93,27 @@ class TopicPublisher
     public function check()
     {
         $ws = $this->getWs();
+
         return !is_null($ws) && $ws !== false;
     }
 
     /**
-     * @return WebSocket|null
+     * @return null|WebSocket
+     * @throws \Exception
      */
     protected function getWs()
     {
         if (null === $this->ws) {
             try {
-                $this->ws = new WebSocket($this->host, $this->port);
-            } catch (\Exception $e) {
+                $this->ws = new WebSocket($this->host, $this->port, $this->path);
+            } catch (Rfc6455Exception $e) {
+                $this->logger->warning(
+                    'Websocket backend exception: {message}',
+                    ['exception' => $e, 'message' => $e->getMessage()]
+                );
                 $this->ws = false;
+            } catch (\Exception $e) {
+                throw $e;
             }
         }
 

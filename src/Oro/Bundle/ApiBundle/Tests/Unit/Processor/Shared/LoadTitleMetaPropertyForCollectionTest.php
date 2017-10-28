@@ -7,14 +7,14 @@ use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaProperty;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaPropertyForCollection;
 use Oro\Bundle\ApiBundle\Provider\EntityTitleProvider;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
-class LoadTitleMetaPropertyForCollectionTest extends GetProcessorTestCase
+class LoadTitleMetaPropertyForCollectionTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityTitleProvider */
     protected $entityTitleProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ExpandedAssociationExtractor */
     protected $expandedAssociationExtractor;
 
     /** @var LoadTitleMetaPropertyForCollection */
@@ -24,12 +24,8 @@ class LoadTitleMetaPropertyForCollectionTest extends GetProcessorTestCase
     {
         parent::setUp();
 
-        $this->entityTitleProvider = $this->getMockBuilder(EntityTitleProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->expandedAssociationExtractor = $this->getMockBuilder(ExpandedAssociationExtractor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityTitleProvider = $this->createMock(EntityTitleProvider::class);
+        $this->expandedAssociationExtractor = $this->createMock(ExpandedAssociationExtractor::class);
 
         $this->processor = new LoadTitleMetaPropertyForCollection(
             $this->entityTitleProvider,
@@ -105,7 +101,7 @@ class LoadTitleMetaPropertyForCollectionTest extends GetProcessorTestCase
         ];
 
         $identifierMap = [
-            'Test\Entity' => [123]
+            'Test\Entity' => ['id', [123]]
         ];
 
         $this->expandedAssociationExtractor->expects(self::exactly(2))
@@ -140,7 +136,6 @@ class LoadTitleMetaPropertyForCollectionTest extends GetProcessorTestCase
         $titleField->setMetaProperty(true);
         $titleField->setMetaPropertyResultName('title');
         $associationField = $config->addField('association');
-        $associationField->setDataType('integer');
         $associationField->setTargetClass('Test\TargetEntity1');
         $associationTargetConfig = $associationField->createAndSetTargetEntity();
         $associationTargetConfig->setIdentifierFieldNames(['id']);
@@ -167,8 +162,8 @@ class LoadTitleMetaPropertyForCollectionTest extends GetProcessorTestCase
         ];
 
         $identifierMap = [
-            'Test\Entity'        => [123],
-            'Test\TargetEntity1' => [1],
+            'Test\Entity'        => ['id', [123]],
+            'Test\TargetEntity1' => ['id', [1]],
         ];
 
         $this->expandedAssociationExtractor->expects(self::exactly(4))
@@ -227,7 +222,7 @@ class LoadTitleMetaPropertyForCollectionTest extends GetProcessorTestCase
         ];
 
         $identifierMap = [
-            'Test\ParentEntity' => [123]
+            'Test\ParentEntity' => ['id', [123]]
         ];
 
         $this->expandedAssociationExtractor->expects(self::exactly(2))
@@ -247,6 +242,316 @@ class LoadTitleMetaPropertyForCollectionTest extends GetProcessorTestCase
         self::assertEquals(
             [
                 ['id' => 123, '__title__' => 'title 123']
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForEntitiesWithRenamedIdentifierFields()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['renamedId']);
+        $idField = $config->addField('renamedId');
+        $idField->setDataType('integer');
+        $idField->setPropertyPath('realId');
+        $titleField = $config->addField('__title__');
+        $titleField->setMetaProperty(true);
+        $titleField->setMetaPropertyResultName('title');
+        $associationField = $config->addField('association');
+        $associationField->setTargetClass('Test\TargetEntity1');
+        $associationTargetConfig = $associationField->createAndSetTargetEntity();
+        $associationTargetConfig->setIdentifierFieldNames(['associationRenamedId']);
+        $associationIdField = $associationTargetConfig->addField('associationRenamedId');
+        $associationIdField->setPropertyPath('associationRealId');
+        $associationIdField->setDataType('integer');
+        $associationTargetConfig->addField('name')->setDataType('string');
+
+        $data = [
+            [
+                'renamedId'   => 123,
+                'association' => [
+                    'associationRenamedId' => 1,
+                    'name'                 => 'association 1'
+                ]
+            ]
+        ];
+
+        $expandedAssociations = [
+            'association' => $config->getField('association')
+        ];
+
+        $titles = [
+            ['entity' => 'Test\Entity', 'id' => 123, 'title' => 'title 123'],
+            ['entity' => 'Test\TargetEntity1', 'id' => 1, 'title' => 'association title 1'],
+        ];
+
+        $identifierMap = [
+            'Test\Entity'        => ['realId', [123]],
+            'Test\TargetEntity1' => ['associationRealId', [1]],
+        ];
+
+        $this->expandedAssociationExtractor->expects(self::exactly(4))
+            ->method('getExpandedAssociations')
+            ->willReturnMap(
+                [
+                    [$config, $expandedAssociations],
+                    [$associationTargetConfig, []],
+                ]
+            );
+        $this->entityTitleProvider->expects(self::once())
+            ->method('getTitles')
+            ->with($identifierMap)
+            ->willReturn($titles);
+
+        $this->context->setClassName('Test\Entity');
+        $this->context->setConfig($config);
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            [
+                [
+                    'renamedId'   => 123,
+                    '__title__'   => 'title 123',
+                    'association' => [
+                        'associationRenamedId' => 1,
+                        'name'                 => 'association 1',
+                        '__title__'            => 'association title 1'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForAssociationWithoutConfiguredIdentifierField()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['id']);
+        $config->addField('id')->setDataType('integer');
+        $titleField = $config->addField('__title__');
+        $titleField->setMetaProperty(true);
+        $titleField->setMetaPropertyResultName('title');
+        $associationField = $config->addField('association');
+        $associationField->setTargetClass('Test\TargetEntity1');
+        $associationTargetConfig = $associationField->createAndSetTargetEntity();
+        $associationTargetConfig->setIdentifierFieldNames(['associationId']);
+
+        $data = [
+            [
+                'id'          => 123,
+                'association' => [
+                    'associationId' => 1,
+                    'name'          => 'association 1'
+                ]
+            ]
+        ];
+
+        $expandedAssociations = [
+            'association' => $config->getField('association')
+        ];
+
+        $titles = [
+            ['entity' => 'Test\Entity', 'id' => 123, 'title' => 'title 123'],
+            ['entity' => 'Test\TargetEntity1', 'id' => 1, 'title' => 'association title 1'],
+        ];
+
+        $identifierMap = [
+            'Test\Entity'        => ['id', [123]],
+            'Test\TargetEntity1' => ['associationId', [1]],
+        ];
+
+        $this->expandedAssociationExtractor->expects(self::exactly(4))
+            ->method('getExpandedAssociations')
+            ->willReturnMap(
+                [
+                    [$config, $expandedAssociations],
+                    [$associationTargetConfig, []],
+                ]
+            );
+        $this->entityTitleProvider->expects(self::once())
+            ->method('getTitles')
+            ->with($identifierMap)
+            ->willReturn($titles);
+
+        $this->context->setClassName('Test\Entity');
+        $this->context->setConfig($config);
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            [
+                [
+                    'id'          => 123,
+                    '__title__'   => 'title 123',
+                    'association' => [
+                        'associationId' => 1,
+                        'name'          => 'association 1',
+                        '__title__'     => 'association title 1'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForAssociationWithoutConfiguredIdentifierFieldNames()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['id']);
+        $config->addField('id')->setDataType('integer');
+        $titleField = $config->addField('__title__');
+        $titleField->setMetaProperty(true);
+        $titleField->setMetaPropertyResultName('title');
+        $associationField = $config->addField('association');
+        $associationField->setTargetClass('Test\TargetEntity1');
+        $associationTargetConfig = $associationField->createAndSetTargetEntity();
+        $associationTargetConfig->addField('associationId')->setDataType('integer');
+        $associationTargetConfig->addField('name')->setDataType('string');
+
+        $data = [
+            [
+                'id'          => 123,
+                'association' => [
+                    'associationId' => 1,
+                    'name'          => 'association 1'
+                ]
+            ]
+        ];
+
+        $expandedAssociations = [
+            'association' => $config->getField('association')
+        ];
+
+        $titles = [
+            ['entity' => 'Test\Entity', 'id' => 123, 'title' => 'title 123'],
+        ];
+
+        $identifierMap = [
+            'Test\Entity' => ['id', [123]],
+        ];
+
+        $this->expandedAssociationExtractor->expects(self::exactly(2))
+            ->method('getExpandedAssociations')
+            ->willReturnMap(
+                [
+                    [$config, $expandedAssociations],
+                    [$associationTargetConfig, []],
+                ]
+            );
+        $this->entityTitleProvider->expects(self::once())
+            ->method('getTitles')
+            ->with($identifierMap)
+            ->willReturn($titles);
+
+        $this->context->setClassName('Test\Entity');
+        $this->context->setConfig($config);
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            [
+                [
+                    'id'          => 123,
+                    '__title__'   => 'title 123',
+                    'association' => [
+                        'associationId' => 1,
+                        'name'          => 'association 1'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForEntitiesWithCompositeIdentifier()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['renamedId1', 'id2']);
+        $id1Field = $config->addField('renamedId1');
+        $id1Field->setDataType('integer');
+        $id1Field->setPropertyPath('id1');
+        $id2Field = $config->addField('id2');
+        $id2Field->setDataType('integer');
+        $titleField = $config->addField('__title__');
+        $titleField->setMetaProperty(true);
+        $titleField->setMetaPropertyResultName('title');
+        $associationField = $config->addField('association');
+        $associationField->setTargetClass('Test\TargetEntity1');
+        $associationTargetConfig = $associationField->createAndSetTargetEntity();
+        $associationTargetConfig->setIdentifierFieldNames(['associationRenamedId1', 'associationId2']);
+        $associationId1Field = $associationTargetConfig->addField('associationRenamedId1');
+        $associationId1Field->setPropertyPath('associationId1');
+        $associationId1Field->setDataType('integer');
+        $associationId2Field = $associationTargetConfig->addField('associationId2');
+        $associationId2Field->setDataType('integer');
+        $associationTargetConfig->addField('name')->setDataType('string');
+
+        $data = [
+            [
+                'renamedId1'  => 1,
+                'id2'         => 2,
+                'association' => [
+                    'associationRenamedId1' => 11,
+                    'associationId2'        => 22,
+                    'name'                  => 'association 1'
+                ]
+            ]
+        ];
+
+        $expandedAssociations = [
+            'association' => $config->getField('association')
+        ];
+
+        $titles = [
+            [
+                'entity' => 'Test\Entity',
+                'id'     => ['id1' => 1, 'id2' => 2],
+                'title'  => 'title 123'
+            ],
+            [
+                'entity' => 'Test\TargetEntity1',
+                'id'     => ['associationId1' => 11, 'associationId2' => 22],
+                'title'  => 'association title 1'
+            ],
+        ];
+
+        $identifierMap = [
+            'Test\Entity'        => [['id1', 'id2'], [[1, 2]]],
+            'Test\TargetEntity1' => [['associationId1', 'associationId2'], [[11, 22]]],
+        ];
+
+        $this->expandedAssociationExtractor->expects(self::exactly(4))
+            ->method('getExpandedAssociations')
+            ->willReturnMap(
+                [
+                    [$config, $expandedAssociations],
+                    [$associationTargetConfig, []],
+                ]
+            );
+        $this->entityTitleProvider->expects(self::once())
+            ->method('getTitles')
+            ->with($identifierMap)
+            ->willReturn($titles);
+
+        $this->context->setClassName('Test\Entity');
+        $this->context->setConfig($config);
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            [
+                [
+                    'renamedId1'  => 1,
+                    'id2'         => 2,
+                    '__title__'   => 'title 123',
+                    'association' => [
+                        'associationRenamedId1' => 11,
+                        'associationId2'        => 22,
+                        'name'                  => 'association 1',
+                        '__title__'             => 'association title 1'
+                    ]
+                ]
             ],
             $this->context->getResult()
         );

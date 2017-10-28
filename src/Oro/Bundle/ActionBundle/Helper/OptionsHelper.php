@@ -6,6 +6,8 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
+use Oro\Bundle\ActionBundle\Button\OperationButton;
+use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
 
 class OptionsHelper
 {
@@ -15,14 +17,22 @@ class OptionsHelper
     /** @var Router */
     protected $router;
 
+    /** @var FormProvider */
+    protected $formProvider;
+
     /**
-     * @param Router $router
+     * @param Router              $router
      * @param TranslatorInterface $translator
+     * @param FormProvider        $formProvider
      */
-    public function __construct(Router $router, TranslatorInterface $translator)
-    {
-        $this->router = $router;
-        $this->translator = $translator;
+    public function __construct(
+        Router $router,
+        TranslatorInterface $translator,
+        FormProvider $formProvider
+    ) {
+        $this->router       = $router;
+        $this->translator   = $translator;
+        $this->formProvider = $formProvider;
     }
 
     /**
@@ -34,13 +44,13 @@ class OptionsHelper
     {
         return [
             'options' => $this->createOptions($button),
-            'data' => $this->createData($button)
+            'data'    => $this->createData($button)
         ];
     }
 
     /**
-     * @param array $options
-     * @param array $source
+     * @param array  $options
+     * @param array  $source
      * @param string $sourceKey
      */
     protected function addOption(array &$options, array $source, $sourceKey)
@@ -65,13 +75,16 @@ class OptionsHelper
         $frontendOptions = $data['frontendOptions'];
 
         $options = [
-            'hasDialog' => $data['hasForm'],
-            'showDialog' => !empty($data['showDialog']),
-            'executionUrl' => $executionUrl,
-            'url' => $executionUrl,
+            'hasDialog'      => $data['hasForm'],
+            'showDialog'     => !empty($data['showDialog']),
+            'executionUrl'   => $executionUrl,
+            'url'            => $executionUrl,
             'jsDialogWidget' => $data['jsDialogWidget'],
         ];
-
+        if ($button instanceof OperationButton) {
+            $options['executionTokenData'] =
+                $this->formProvider->createTokenData($button->getOperation(), $button->getData());
+        }
         if ($data['hasForm']) {
             $dialogUrl = $this->router->generate($data['dialogRoute'], $data['routeParams']);
 
@@ -79,11 +92,11 @@ class OptionsHelper
                 $options,
                 [
                     'dialogOptions' => [
-                        'title' => $this->getTitle($button, $frontendOptions),
+                        'title'         => $this->getTitle($button, $frontendOptions),
                         'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
                     ],
-                    'dialogUrl' => $dialogUrl,
-                    'url' => $dialogUrl,
+                    'dialogUrl'     => $dialogUrl,
+                    'url'           => $dialogUrl,
                 ]
             );
         } elseif (null !== ($message = $this->getMessage($button, $frontendOptions))) {
@@ -98,7 +111,7 @@ class OptionsHelper
 
     /**
      * @param ButtonInterface $button
-     * @param array $frontendOptions
+     * @param array           $frontendOptions
      *
      * @return string
      */
@@ -112,7 +125,8 @@ class OptionsHelper
 
     /**
      * @param ButtonInterface $button
-     * @param array $frontendOptions
+     * @param array           $frontendOptions
+     *
      * @return string|null
      */
     protected function getMessage(ButtonInterface $button, array $frontendOptions)
@@ -160,14 +174,14 @@ class OptionsHelper
     {
         return array_merge(
             [
-                'hasForm' => null,
-                'showDialog' => null,
-                'executionRoute' => null,
-                'dialogRoute' => null,
-                'routeParams' => [],
+                'hasForm'         => null,
+                'showDialog'      => null,
+                'executionRoute'  => null,
+                'dialogRoute'     => null,
+                'routeParams'     => [],
                 'frontendOptions' => [],
-                'buttonOptions' => [],
-                'jsDialogWidget' => ButtonInterface::DEFAULT_JS_DIALOG_WIDGET,
+                'buttonOptions'   => [],
+                'jsDialogWidget'  => ButtonInterface::DEFAULT_JS_DIALOG_WIDGET,
             ],
             $data
         );

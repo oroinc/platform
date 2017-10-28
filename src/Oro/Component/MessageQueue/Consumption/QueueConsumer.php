@@ -7,6 +7,7 @@ use Psr\Log\NullLogger;
 use Oro\Component\MessageQueue\Consumption\Exception\ConsumptionInterruptedException;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
+use Oro\Component\MessageQueue\Consumption\Exception\RejectMessageExceptionInterface;
 
 /**
  * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -120,6 +121,11 @@ class QueueConsumer
                 $session->close();
 
                 return;
+            } catch (RejectMessageExceptionInterface $exception) {
+                $context->setException($exception);
+                $context->getMessageConsumer()->reject($context->getMessage());
+                $session->close();
+                throw $exception;
             } catch (\Exception $exception) {
                 $context->setExecutionInterrupted(true);
                 $context->setException($exception);
@@ -168,8 +174,11 @@ class QueueConsumer
                 'properties' => $message->getProperties()
             ]);
 
+            $executionTime = 0;
             if (!$context->getStatus()) {
+                $startTime = (int)(microtime(true) * 1000);
                 $status = $messageProcessor->process($message, $session);
+                $executionTime = (int)(microtime(true) * 1000) - $startTime;
                 $context->setStatus($status);
             }
 
@@ -190,7 +199,10 @@ class QueueConsumer
                     throw new \LogicException(sprintf('Status is not supported: %s', $context->getStatus()));
             }
 
-            $logger->notice(sprintf('Message processed: %s', $statusForLog));
+            $logger->notice('Message processed: {status}. Execution time: {time} ms', [
+                'status' => $statusForLog,
+                'time'   => $executionTime
+            ]);
 
             $extension->onPostReceived($context);
         } else {

@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\Rest\NormalizeRequestData;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class NormalizeRequestDataTest extends FormProcessorTestCase
@@ -22,7 +23,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
     {
         parent::setUp();
 
-        $this->entityIdTransformer = $this->createMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
+        $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
 
         $this->processor = new NormalizeRequestData($this->entityIdTransformer);
     }
@@ -53,6 +54,9 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);
         $associationMetadata->setIsCollection($isCollection);
+        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata->setClassName($targetClass);
+        $associationMetadata->setTargetMetadata($associationTargetMetadata);
 
         return $associationMetadata;
     }
@@ -87,8 +91,8 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->entityIdTransformer->expects($this->any())
             ->method('reverseTransform')
             ->willReturnCallback(
-                function ($entityClass, $value) {
-                    return 'normalized::' . $entityClass . '::' . $value;
+                function ($value, EntityMetadata $metadata) {
+                    return 'normalized::' . $metadata->getClassName() . '::' . $value;
                 }
             );
 

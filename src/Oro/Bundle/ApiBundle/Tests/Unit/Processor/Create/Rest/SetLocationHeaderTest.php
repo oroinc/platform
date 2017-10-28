@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create\Rest;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Create\Rest\SetLocationHeader;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
@@ -61,6 +62,7 @@ class SetLocationHeaderTest extends FormProcessorTestCase
         $entityType = 'test_entity';
         $entityId = 123;
         $transformedEntityId = 'transformed_123';
+        $metadata = new EntityMetadata();
 
         $this->valueNormalizer->expects($this->once())
             ->method('normalizeValue')
@@ -68,7 +70,7 @@ class SetLocationHeaderTest extends FormProcessorTestCase
             ->willReturn($entityType);
         $this->entityIdTransformer->expects($this->once())
             ->method('transform')
-            ->with($entityId)
+            ->with($entityId, self::identicalTo($metadata))
             ->willReturn($transformedEntityId);
         $this->router->expects($this->once())
             ->method('generate')
@@ -81,6 +83,7 @@ class SetLocationHeaderTest extends FormProcessorTestCase
 
         $this->context->setClassName($entityClass);
         $this->context->setId($entityId);
+        $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
         $this->assertEquals(

@@ -11,8 +11,10 @@ define(function(require) {
         contextsView: null,
 
         initialize: function(options) {
+            this._deferredInit();
             this.options = options;
             this.initView();
+            this.listenTo(this.contextsView, 'render', this._resolveDeferredInit.bind(this));
         },
 
         initView: function() {

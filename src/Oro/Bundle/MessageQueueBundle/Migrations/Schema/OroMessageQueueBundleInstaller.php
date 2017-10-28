@@ -23,7 +23,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
      */
     public function getMigrationVersion()
     {
-        return 'v1_5';
+        return 'v1_6';
     }
 
     /**
@@ -87,6 +87,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
         $table->addColumn('`unique`', 'boolean');
         $table->addColumn('created_at', 'datetime');
         $table->addColumn('started_at', 'datetime', ['notnull' => false]);
+        $table->addColumn('last_active_at', 'datetime', ['notnull' => false]);
         $table->addColumn('stopped_at', 'datetime', ['notnull' => false]);
         $table->addIndex(['owner_id'], "owner_id_idx");
         $table->setPrimaryKey(['id']);
@@ -127,6 +128,13 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
             new ParametrizedSqlMigrationQuery(
                 'INSERT INTO oro_message_queue_state (id, updated_at) VALUES (:id, :updated_at)',
                 ['id' => 'cache', 'updated_at' => null],
+                ['id' => Type::STRING, 'updated_at' => Type::DATETIME]
+            )
+        );
+        $queries->addPostQuery(
+            new ParametrizedSqlMigrationQuery(
+                'INSERT INTO oro_message_queue_state (id, updated_at) VALUES (:id, :updated_at)',
+                ['id' => 'consumers', 'updated_at' => null],
                 ['id' => Type::STRING, 'updated_at' => Type::DATETIME]
             )
         );

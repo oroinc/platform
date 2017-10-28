@@ -57,7 +57,7 @@ class MergeEntityConfigHelperTest extends \PHPUnit_Framework_TestCase
 
         self::assertEquals(
             [
-                'documentation_resource' => 'documentation resource',
+                'documentation_resource' => ['parent documentation resource', 'documentation resource'],
                 'exclusion_policy'       => 'all'
             ],
             $this->mergeEntityConfigHelper->mergeConfigs($config, $parentConfig)

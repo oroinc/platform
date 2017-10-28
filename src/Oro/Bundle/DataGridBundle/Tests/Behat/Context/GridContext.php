@@ -807,6 +807,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: But when I filter Created At as not between "25 Jun 2015" and "30 Jun 2015"
      *
      * @When /^(?:|when )(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>(?:|between|not between)) "(?P<start>.+)" and "(?P<end>.+)"$/
+     * @When /^(?:|when )(?:|I )filter "(?P<filterName>[\w\s\/]+)" as (?P<type>(?:|between|not between)) "(?P<start>.+)" and "(?P<end>.+)"$/
      * @When /^(?:|when )(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>(?:|between|not between)) "(?P<start>.+)" and "(?P<end>.+)" in "(?P<filterGridName>[\w\s]+)"$/
      *
      * @param string $filterName
@@ -897,6 +898,38 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterItem = $this->getGridFilters($filterGridName)
             ->getFilterItem($filterGridName . 'FilterItem', $filterName);
         $filterItem->reset();
+    }
+
+    /**
+     * Example: Then I should see grid with filter hints:
+     *            | Any Text: contains "Lamp" |
+     *
+     * @When /^(?:|I )should see grid with filter hints:$/
+     *
+     * @param TableNode $table
+     */
+    public function shouldSeeGridWithFilterHints(TableNode $table)
+    {
+        $hints = array_filter(
+            array_map(
+                function ($item) {
+                    $label = trim($this->createElement('GridFilterHintLabel', $item)->getText());
+                    $text = trim($this->createElement('GridFilterHint', $item)->getText());
+
+                    return $label && $text ? sprintf('%s %s', $label, $text) : '';
+                },
+                $this->findAllElements('GridFilterHintItem')
+            )
+        );
+
+        foreach ($table->getRows() as $row) {
+            list($hint) = $row;
+
+            $this->assertTrue(
+                in_array($hint, $hints, true),
+                sprintf('Hint "%s" not found on page', $hint)
+            );
+        }
     }
 
     /**
@@ -1273,13 +1306,13 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             Example: Then I should see following records in grid:
                        | Alice1  |
                        | Alice10 |
-            
+
             Guess, you can use another method...
-            
+
             And I should see following grid:
                 | First name | Last name | Primary Email     | Enabled | Status |
                 | John       | Doe       | admin@example.com | Enabled | Active |
-                
+
 TEXT;
 
         self::assertCount(1, $table->getRow(0), $errorMessage);
@@ -1673,5 +1706,47 @@ TEXT;
 
         $gridPaginator = $this->elementFactory->createElement('GridToolbarPaginator', $gridPaginatorContainer);
         $gridPaginator->clickLink($lnk);
+    }
+
+    /**
+     * Example: I should see next rows in "Discounts" table:
+     *   | Description | Discount |
+     *   | Amount      | -$2.00   |
+     *
+     * @Then /^(?:|I )should see next rows in "(?P<elementName>[\w\s]+)" table$/
+     * @param TableNode $expectedTableNode
+     * @param string $elementName
+     */
+    public function iShouldSeeNextRowsInTable(TableNode $expectedTableNode, $elementName)
+    {
+        /** @var Table $table */
+        $table = $this->createElement($elementName);
+
+        static::assertInstanceOf(Table::class, $table, sprintf('Element should be of type %s', Table::class));
+
+        $rows = $table->getRows();
+        $expectedRows = $expectedTableNode->getRows();
+        $headers = array_shift($expectedRows);
+
+        foreach ($expectedRows as $rowKey => $expectedRow) {
+            self::assertEquals($expectedRow, $rows[$rowKey]->getCellValues($headers));
+        }
+    }
+
+    /**
+     * Example: I should see no records in "Discounts" table
+     *
+     * @Then /^I should see no records in "(?P<elementName>[\w\s]+)" table$/
+     * @param string $elementName
+     */
+    public function iShouldSeeNoRecordsInTable($elementName)
+    {
+        /** @var Table $table */
+        $table = $this->createElement($elementName);
+
+        static::assertInstanceOf(Table::class, $table, sprintf('Element should be of type %s', Table::class));
+
+        $rows = $table->getRows();
+        self::assertCount(0, $rows);
     }
 }

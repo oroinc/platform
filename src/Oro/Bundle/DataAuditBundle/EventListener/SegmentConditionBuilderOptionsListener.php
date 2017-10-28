@@ -14,10 +14,8 @@ class SegmentConditionBuilderOptionsListener
         $event->setOptions(array_merge_recursive(
             $event->getOptions(),
             [
-                'onFieldsUpdate' => [
-                    'toggleCriteria' => [
-                        'condition-data-audit',
-                    ],
+                'fieldsRelatedCriteria' => [
+                    'condition-data-audit',
                 ],
             ]
         ));

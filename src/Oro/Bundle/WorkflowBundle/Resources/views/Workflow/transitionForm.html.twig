@@ -29,6 +29,8 @@
 {% block pin_button %}
 {% endblock pin_button %}
 
+{% set saveAndTransitButtonId = 'save-and-transit' %}
+
 {% block navButtons %}
     {% if indexPath %}
         {{ UI.cancelButton(indexPath) }}
@@ -38,7 +40,7 @@
         <button
             type="button"
             class="btn btn-success"
-            id="save-and-transit"
+            id="{{ saveAndTransitButtonId }}"
             data-transition-url="{{ transitionUrl }}"
         >{{ 'Submit'|trans }}</button>
     </div>
@@ -64,50 +66,21 @@
 
 {% block content_data %}
     {% set transitionFormWidget %}
-        <div class="form-container">
-        {{ oro_widget_render({
-            'widgetType': 'block',
-            'url': transitionFormUrl,
-            'alias': 'transition-form',
-            'loadingMaskEnabled': false
-        }) }}
-        <script type="text/javascript">
-            require(['jquery', 'oroui/js/mediator', 'oroui/js/widget-manager', 'oroworkflow/js/transition-executor', 'oroworkflow/js/transition-event-handlers'],
-            function($, mediator, widgetManager, performTransition, TransitionEventHandlers) {
-                var saveAndTransitBtn = $('#save-and-transit');
-
-                widgetManager.getWidgetInstanceByAlias('transition-form', function(widget) {
-                    widget.on('beforeContentLoad', function() {
-                        mediator.execute('showLoading');
-                    });
-
-                    widget.on('formSave', function(data) {
-                        performTransition(saveAndTransitBtn, data)
-                    });
-
-                    widget.on('formSaveError', function() {
-                        mediator.execute('hideLoading');
-                    });
-
-                    widget.on('transitionSuccess', function(response) {
-                        var element = $('<div>');
-                        TransitionEventHandlers.getOnSuccess(element)(response);
-                    });
-
-                    widget.on('transitionFailure', function(responseCode) {
-                        var element = $('<div>');
-                        TransitionEventHandlers.getOnFailure(element)({status: responseCode}, '', '');
-                    });
-                });
-
-                saveAndTransitBtn.on('click', function(e) {
-                    e.preventDefault();
-                    widgetManager.getWidgetInstanceByAlias('transition-form', function(widget) {
-                        widget.form.submit();
-                    });
-                });
-            });
-        </script>
+        {% set widgetAlias = 'transition-form' %}
+        {% set workflowFormWidgetViewOptions = {
+            view: {
+                view: 'oroworkflow/js/app/views/workflow-form-widget-view',
+                widgetAlias: widgetAlias,
+                saveAndTransitButtonSelector: '#' ~ saveAndTransitButtonId
+            }
+        } %}
+        <div class="form-container" {{ macros.renderPageComponentAttributes(workflowFormWidgetViewOptions) }}>
+            {{ oro_widget_render({
+                'widgetType': 'block',
+                'url': transitionFormUrl,
+                'alias': widgetAlias,
+                'loadingMaskEnabled': false
+            }) }}
         </div>
     {% endset %}
     {% if transition.hasFormConfiguration() %}

@@ -59,6 +59,14 @@ class RelationConfigProvider extends AbstractConfigProvider
     }
 
     /**
+     * Removes all already built configs from the internal cache.
+     */
+    public function clearCache()
+    {
+        $this->cache = [];
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function buildConfigKey($className, array $extras)

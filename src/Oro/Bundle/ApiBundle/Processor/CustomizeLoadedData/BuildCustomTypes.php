@@ -277,7 +277,7 @@ class BuildCustomTypes implements ProcessorInterface
      */
     protected function getOwnPropertyValue(array $data, $propertyPath)
     {
-        if (false !== strpos($propertyPath, '.')) {
+        if (false !== strpos($propertyPath, ConfigUtil::PATH_DELIMITER)) {
             throw new RuntimeException(
                 sprintf(
                     'The "%s" property path is not supported.',
@@ -303,7 +303,7 @@ class BuildCustomTypes implements ProcessorInterface
     protected function getChildData(array $data, $propertyPath)
     {
         $result = $data;
-        $path = explode(ConfigUtil::PATH_DELIMITER, $propertyPath);
+        $path = ConfigUtil::explodePropertyPath($propertyPath);
         foreach ($path as $fieldName) {
             if (is_array($result) && array_key_exists($fieldName, $result)) {
                 $result = $result[$fieldName];
