@@ -227,7 +227,10 @@ class ConfigUtil
     {
         $result = [];
         foreach ($items as $key => $val) {
-            $result[$key] = is_object($val) ? clone $val : $val;
+            if (is_object($val)) {
+                $val = clone $val;
+            }
+            $result[$key] = $val;
         }
 
         return $result;

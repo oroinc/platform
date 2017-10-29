@@ -28,9 +28,11 @@ trait ConfigTrait
      */
     public function get($key)
     {
-        return array_key_exists($key, $this->items)
-            ? $this->items[$key]
-            : null;
+        if (!array_key_exists($key, $this->items)) {
+            return null;
+        }
+
+        return $this->items[$key];
     }
 
     /**
@@ -75,7 +77,7 @@ trait ConfigTrait
      */
     protected function removeItemWithDefaultValue(array &$config, $key, $defaultValue = false)
     {
-        if (array_key_exists($key, $config) && $defaultValue === $config[$key]) {
+        if (isset($config[$key]) && ($defaultValue === $config[$key] || null === $defaultValue)) {
             unset($config[$key]);
         }
     }

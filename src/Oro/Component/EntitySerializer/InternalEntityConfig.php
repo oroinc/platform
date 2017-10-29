@@ -32,9 +32,11 @@ class InternalEntityConfig extends EntityConfig
      */
     public function get($key)
     {
-        return array_key_exists($key, $this->cache)
-            ? $this->cache[$key]
-            : parent::get($key);
+        if (array_key_exists($key, $this->cache)) {
+            return $this->cache[$key];
+        }
+
+        return parent::get($key);
     }
 
     /**
