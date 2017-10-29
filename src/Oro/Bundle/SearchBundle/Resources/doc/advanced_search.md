@@ -95,6 +95,23 @@ order_by field_type field_name direction
 If field type was not set, then text field will be assigned. Direction - `ASC`, `DESC`.
 If direction is not assigned then will be used `ASC` direction.
 
+### aggregate
+
+Allow to provide aggregated data based on a search query, as an additional "aggregated_data" section in the search
+result. To build aggregated data you need to call separated function of search query.
+
+Syntax:
+```
+aggregate field_type field_name aggregate_function aggregating_name
+```
+
+Supported next aggregation functions:
+* **count**
+* **sum**
+* **max**
+* **min**
+* **avg**
+
 Field types
 -----------
 
