@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Config\Traits;
 
 use Oro\Bundle\ApiBundle\Config\FieldConfigInterface;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @property FieldConfigInterface[] $fields
@@ -26,14 +27,20 @@ trait FindFieldTrait
                 return $field;
             }
             $fieldPropertyPath = $field->getPropertyPath();
-            if (!$fieldPropertyPath || $fieldPropertyPath === $fieldName) {
+            if (!$fieldPropertyPath
+                || $fieldPropertyPath === $fieldName
+                || ConfigUtil::IGNORE_PROPERTY_PATH === $fieldName
+            ) {
                 return $field;
             }
         }
         if ($findByPropertyPath) {
             foreach ($this->fields as $field) {
                 $fieldPropertyPath = $field->getPropertyPath();
-                if ($fieldPropertyPath && $fieldPropertyPath === $fieldName) {
+                if ($fieldPropertyPath
+                    && $fieldPropertyPath === $fieldName
+                    && ConfigUtil::IGNORE_PROPERTY_PATH !== $fieldPropertyPath
+                ) {
                     return $field;
                 }
             }
@@ -52,15 +59,20 @@ trait FindFieldTrait
     protected function doFindFieldNameByPropertyPath($propertyPath)
     {
         if (isset($this->fields[$propertyPath])) {
-            $field = $this->fields[$propertyPath];
-            $fieldPropertyPath = $field->getPropertyPath();
-            if (!$fieldPropertyPath || $fieldPropertyPath === $propertyPath) {
+            $fieldPropertyPath = $this->fields[$propertyPath]->getPropertyPath();
+            if (!$fieldPropertyPath
+                || $fieldPropertyPath === $propertyPath
+                || ConfigUtil::IGNORE_PROPERTY_PATH === $fieldPropertyPath
+            ) {
                 return $propertyPath;
             }
         }
         foreach ($this->fields as $fieldName => $field) {
             $fieldPropertyPath = $field->getPropertyPath();
-            if ($fieldPropertyPath && $fieldPropertyPath === $propertyPath) {
+            if ($fieldPropertyPath
+                && $fieldPropertyPath === $propertyPath
+                && ConfigUtil::IGNORE_PROPERTY_PATH !== $fieldPropertyPath
+            ) {
                 return $fieldName;
             }
         }

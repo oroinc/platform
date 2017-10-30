@@ -31,6 +31,8 @@ class ConfigConverter
         $this->setOrderBy($result, $config);
         $this->setMaxResults($result, $config);
         $this->setPostSerializeHandler($result, $config);
+        $this->setExcludedFields($result, $config);
+        $this->setRenamedFields($result, $config);
 
         if (!empty($config[ConfigUtil::FIELDS])) {
             foreach ($config[ConfigUtil::FIELDS] as $fieldName => $fieldConfig) {
@@ -58,6 +60,8 @@ class ConfigConverter
         if (!$targetEntity->isEmpty()) {
             $result->setTargetEntity($targetEntity);
         }
+
+        $this->setCollapseField($result, $config);
     }
 
     /**
@@ -141,6 +145,32 @@ class ConfigConverter
     }
 
     /**
+     * @param EntityConfig $result
+     * @param array        $config
+     */
+    protected function setExcludedFields(EntityConfig $result, array $config)
+    {
+        if (array_key_exists(ConfigUtil::EXCLUDED_FIELDS, $config)
+            && !empty($config[ConfigUtil::EXCLUDED_FIELDS])
+        ) {
+            $result->set(ConfigUtil::EXCLUDED_FIELDS, $config[ConfigUtil::EXCLUDED_FIELDS]);
+        }
+    }
+
+    /**
+     * @param EntityConfig $result
+     * @param array        $config
+     */
+    protected function setRenamedFields(EntityConfig $result, array $config)
+    {
+        if (array_key_exists(ConfigUtil::RENAMED_FIELDS, $config)
+            && !empty($config[ConfigUtil::RENAMED_FIELDS])
+        ) {
+            $result->set(ConfigUtil::RENAMED_FIELDS, $config[ConfigUtil::RENAMED_FIELDS]);
+        }
+    }
+
+    /**
      * @param FieldConfig $result
      * @param array       $config
      */
@@ -174,6 +204,20 @@ class ConfigConverter
             && $config[ConfigUtil::COLLAPSE]
         ) {
             $result->setCollapsed();
+        }
+    }
+
+    /**
+     * @param FieldConfig $result
+     * @param array        $config
+     */
+    protected function setCollapseField(FieldConfig $result, array $config)
+    {
+        if (array_key_exists(ConfigUtil::COLLAPSE_FIELD, $config)) {
+            $field = $config[ConfigUtil::COLLAPSE_FIELD];
+            if ($field) {
+                $result->getTargetEntity()->set(ConfigUtil::COLLAPSE_FIELD, $field);
+            }
         }
     }
 

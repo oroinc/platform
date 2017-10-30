@@ -26,9 +26,11 @@ trait ExclusionPolicyTrait
      */
     public function getExclusionPolicy()
     {
-        return array_key_exists(EntityConfig::EXCLUSION_POLICY, $this->items)
-            ? $this->items[EntityConfig::EXCLUSION_POLICY]
-            : EntityConfig::EXCLUSION_POLICY_NONE;
+        if (!array_key_exists(EntityConfig::EXCLUSION_POLICY, $this->items)) {
+            return EntityConfig::EXCLUSION_POLICY_NONE;
+        }
+
+        return $this->items[EntityConfig::EXCLUSION_POLICY];
     }
 
     /**

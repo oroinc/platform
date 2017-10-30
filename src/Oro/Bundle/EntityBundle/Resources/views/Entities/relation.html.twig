@@ -22,76 +22,27 @@
         <input type="hidden" name="removeRelation" id="removeRelation" value="{{ app.request.get('removed') }}" />
     {% endblock %}
 
-    <script type="text/javascript">
-        {% set wid = app.request.get('_wid') %}
-        require(['jquery', 'routing', 'orodatagrid/js/datagrid/listener/callback-listener', 'oroui/js/widget-manager',
-            'oroform/js/multiple-entity/model'],
-        function($, routing, CallbackListener, WidgetManager, MultipleEntityModel) {
-            var addedModels = {};
-            WidgetManager.getWidgetInstance({{ wid|json_encode|raw }}, function(widget) {
-                widget.getAction('select', 'adopted', function(selectBtn) {
-                    selectBtn.click(function() {
-                        var addedVal = $('#appendRelation').val();
-                        var removedVal = $('#removeRelation').val();
-                        var appendedIds = addedVal.length ? addedVal.split(',') : [];
-                        var removedIds = removedVal.length ? removedVal.split(',') : [];
-                        widget.trigger('completeSelection', appendedIds, addedModels, removedIds);
-                    });
-                });
-            });
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-            var gridName = {{ gridName|json_encode|raw }};
+    {% set extraData = [] %}
+    {% for fieldName in relation.get('target_grid') %}
+        {% set extraData = extraData|merge([{
+            'label': entity_provider.getConfig(relation.get('target_entity'), fieldName).get('label')|trans,
+            'value': fieldName
+        }]) %}
+    {% endfor %}
 
-            $(function() {
-                /** @type {orodatagrid.datagrid.listener.CallbackListener} */
-                new CallbackListener({
-                    $gridContainer: $('[data-wid="{{ wid }}"]'),
-                    gridName: gridName,
-                    dataField: 'id',
-                    columnName: 'assigned',
-                    processCallback: function (value, model, listener) {
-                        var isActive = model.get(listener.columnName);
-                        var id = model.get('id');
-                        if (isActive) {
-                            var label = '';
-
-                            {% set label = '' %}
-                            {% for fieldName in relation.get('target_title') %}
-                                var field = model.get('{{ fieldName }}');
-                                if (field) {
-                                    label += field + ' ';
-                                }
-                            {% endfor %}
-
-                            addedModels[id] = new MultipleEntityModel({
-                                'id': model.get('id'),
-                                'link': routing.generate(
-                                        'oro_entity_detailed',
-                                        {
-                                            id: model.get('id'),
-                                            entityName: '{{ entity_class|replace('\\', '_') }}',
-                                            fieldName: '{{ field_name }}'
-                                        }
-                                ),
-                                'label': label,
-                                'extraData':
-                                [
-                                    {% for fieldName in relation.get('target_grid') %}
-                                    {
-                                        'label': '{{ entity_provider.getConfig(relation.get('target_entity'), fieldName).get('label')|trans }}',
-                                        'value': model.get('{{ fieldName }}')
-                                    },
-                                    {% endfor %}
-                                ]
-                            });
-                        } else if (addedModels.hasOwnProperty(id)) {
-                            delete addedModels[id];
-                        }
-                    }
-                });
-            });
-        });
-    </script>
+    <div {{ UI.renderPageComponentAttributes({
+        module: 'oroentity/js/app/components/multiple-entity-component',
+        options: {
+            wid: app.request.get('_wid'),
+            gridName: gridName,
+            fieldTitles: relation.get('target_title'),
+            entityName: entity_class|replace('\\', '_'),
+            fieldName: field_name,
+            extraData: extraData
+        }
+    }) }}></div>
 
     <div class="widget-actions">
         <button type="reset" class="btn">{{ 'Cancel'|trans }}</button>

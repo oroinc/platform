@@ -16,9 +16,11 @@ trait AssociationTargetTrait
      */
     public function getTargetClass()
     {
-        return array_key_exists(EntityDefinitionFieldConfig::TARGET_CLASS, $this->items)
-            ? $this->items[EntityDefinitionFieldConfig::TARGET_CLASS]
-            : null;
+        if (!array_key_exists(EntityDefinitionFieldConfig::TARGET_CLASS, $this->items)) {
+            return null;
+        }
+
+        return $this->items[EntityDefinitionFieldConfig::TARGET_CLASS];
     }
 
     /**
@@ -42,9 +44,11 @@ trait AssociationTargetTrait
      */
     public function isCollectionValuedAssociation()
     {
-        return array_key_exists(EntityDefinitionFieldConfig::TARGET_TYPE, $this->items)
-            ? 'to-many' === $this->items[EntityDefinitionFieldConfig::TARGET_TYPE]
-            : null;
+        if (!array_key_exists(EntityDefinitionFieldConfig::TARGET_TYPE, $this->items)) {
+            return null;
+        }
+
+        return 'to-many' === $this->items[EntityDefinitionFieldConfig::TARGET_TYPE];
     }
 
     /**
@@ -64,9 +68,11 @@ trait AssociationTargetTrait
      */
     public function getTargetType()
     {
-        return array_key_exists(EntityDefinitionFieldConfig::TARGET_TYPE, $this->items)
-            ? $this->items[EntityDefinitionFieldConfig::TARGET_TYPE]
-            : null;
+        if (!array_key_exists(EntityDefinitionFieldConfig::TARGET_TYPE, $this->items)) {
+            return null;
+        }
+
+        return $this->items[EntityDefinitionFieldConfig::TARGET_TYPE];
     }
 
     /**

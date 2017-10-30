@@ -16,9 +16,11 @@ trait FormEventSubscriberTrait
      */
     public function getFormEventSubscribers()
     {
-        return array_key_exists(EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER, $this->items)
-            ? $this->items[EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER]
-            : null;
+        if (!array_key_exists(EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER, $this->items)) {
+            return null;
+        }
+
+        return $this->items[EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER];
     }
 
     /**

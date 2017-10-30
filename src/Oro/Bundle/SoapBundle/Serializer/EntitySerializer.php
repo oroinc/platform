@@ -4,6 +4,7 @@ namespace Oro\Bundle\SoapBundle\Serializer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Oro\Component\EntitySerializer\ConfigConverter;
 use Oro\Component\EntitySerializer\ConfigNormalizer;
 use Oro\Component\EntitySerializer\DataAccessorInterface as BaseDataAccessorInterface;
 use Oro\Component\EntitySerializer\DataNormalizer;
@@ -11,6 +12,7 @@ use Oro\Component\EntitySerializer\DataTransformerInterface as BaseDataTransform
 use Oro\Component\EntitySerializer\DoctrineHelper;
 use Oro\Component\EntitySerializer\EntitySerializer as BaseEntitySerializer;
 use Oro\Component\EntitySerializer\FieldAccessor;
+use Oro\Component\EntitySerializer\SerializationHelper;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Serializer\ExtendEntityFieldFilter;
@@ -42,11 +44,12 @@ class EntitySerializer extends BaseEntitySerializer
         );
         parent::__construct(
             $doctrineHelper,
+            new SerializationHelper($dataTransformer),
             $dataAccessor,
-            $dataTransformer,
             $queryFactory,
             $fieldAccessor,
             new ConfigNormalizer(),
+            new ConfigConverter(),
             new DataNormalizer()
         );
     }
