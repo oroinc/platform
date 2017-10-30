@@ -298,9 +298,32 @@ class ACLContext extends OroFeatureContext implements
         foreach ($table->getRows() as $row) {
             $value = current($row);
             self::assertContains(
-                ucfirst(strtolower($value)),
+                ucfirst($value),
                 $permissions,
                 "$value not found in active permissions list: " . print_r($permissions, true)
+            );
+        }
+    }
+
+    /**
+     * Asserts that provided capability permissions disallowed on view page
+     *
+     * Example: And following capability permissions should be unchecked:
+     *           | Manage Abandoned Cart Campaigns |
+     *
+     * @Then /^following capability permissions should be unchecked:$/
+     */
+    public function iShouldSeePermissionsUnchecked(TableNode $table)
+    {
+        $userRoleForm = $this->getRoleViewFormElement();
+        $permissions = $userRoleForm->getEnabledCapabilityPermissions();
+
+        foreach ($table->getRows() as $row) {
+            $value = current($row);
+            self::assertNotContains(
+                ucfirst($value),
+                $permissions,
+                "$value found in active permissions list: " . print_r($permissions, true)
             );
         }
     }
