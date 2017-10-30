@@ -1,8 +1,10 @@
 {% if app.user %}
-    <script type="text/javascript">
-        require(['ororeminder/js/reminder-handler'], function(reminderHandler) {
-            reminderHandler.setReminders({{ oro_reminder_get_requested_reminders_data()|json_encode|raw }});
-            reminderHandler.showReminders();
-        });
-    </script>
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    <div {{ UI.renderPageComponentAttributes({
+        module: 'ororeminder/js/app/components/reminder-show-component',
+        options: {
+            reminderData: oro_reminder_get_requested_reminders_data()
+        }
+    }) }}></div>
 {% endif %}
