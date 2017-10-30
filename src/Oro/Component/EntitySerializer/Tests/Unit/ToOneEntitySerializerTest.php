@@ -308,7 +308,10 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'       => 1,
                     'name'     => 'product_name',
-                    'category' => 'product_category_name',
+                    'category' => [
+                        'name'  => 'product_category_name',
+                        'label' => 'product_category_label'
+                    ],
                     'owner'    => [
                         'id'       => 10,
                         'name'     => 'user_name',

@@ -15,14 +15,11 @@
 
 {% block content %}
     {{ parent() }}
-    <script type="text/javascript">
-        require(
-            ['jquery', 'oroui/js/mediator', 'orodashboard/js/dashboard-util'],
-            function ($, mediator, dashboardUtil) {
-                mediator.on('datagrid:beforeRemoveRow:{{ gridName }}', function(model){
-                    dashboardUtil.onDashboardRemove(model.get('id'));
-                });
-            }
-        );
-    </script>
+
+    <div {{ UI.renderPageComponentAttributes({
+        module: 'orodashboard/js/app/components/dashboard-navigation-component',
+        options: {
+            gridName: gridName
+        }
+    }) }}></div>
 {% endblock %}

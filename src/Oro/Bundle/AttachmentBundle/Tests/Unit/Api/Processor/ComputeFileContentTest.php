@@ -56,6 +56,7 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
     {
         $config = new EntityDefinitionConfig();
         $config->addField('content')->setExcluded();
+        $config->addField('filename')->setExcluded();
 
         $this->context->setResult(['filename' => 'test.txt']);
         $this->context->setConfig($config);
@@ -70,6 +71,7 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
     {
         $config = new EntityDefinitionConfig();
         $config->addField('content')->setPropertyPath('file');
+        $config->addField('filename')->setExcluded();
 
         $this->context->setResult([]);
         $this->context->setConfig($config);
@@ -84,6 +86,7 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
     {
         $config = new EntityDefinitionConfig();
         $config->addField('content')->setPropertyPath('file');
+        $config->addField('filename')->setExcluded();
 
         $this->fileManager->expects($this->once())
             ->method('getContent')
@@ -94,7 +97,7 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
         $this->assertEquals(
-            ['filename' => 'test.txt', 'file' => base64_encode('test')],
+            ['filename' => 'test.txt', 'content' => base64_encode('test')],
             $this->context->getResult()
         );
     }
@@ -103,6 +106,7 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
     {
         $config = new EntityDefinitionConfig();
         $config->addField('content')->setPropertyPath('file');
+        $config->addField('filename')->setExcluded();
 
         $this->fileManager->expects($this->never())
             ->method('getContent');
@@ -120,17 +124,18 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
     {
         $config = new EntityDefinitionConfig();
         $config->addField('content')->setPropertyPath('file');
+        $config->addField('filename')->setExcluded();
 
         $this->fileManager->expects($this->once())
             ->method('getContent')
             ->with('test.txt')
-            ->willReturn('');
+            ->willReturn('test');
 
         $this->context->setResult(['filename' => 'test.txt']);
         $this->context->setConfig($config);
         $this->processor->process($this->context);
         $this->assertEquals(
-            ['filename' => 'test.txt', 'file' => base64_encode('')],
+            ['filename' => 'test.txt', 'content' => base64_encode('test')],
             $this->context->getResult()
         );
     }
@@ -139,6 +144,7 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
     {
         $config = new EntityDefinitionConfig();
         $config->addField('content')->setPropertyPath('file');
+        $config->addField('filename')->setExcluded();
 
         $exception = new FileNotFound('test.txt');
         $this->fileManager->expects($this->once())
@@ -166,6 +172,7 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
     {
         $config = new EntityDefinitionConfig();
         $config->addField('content')->setPropertyPath('file');
+        $config->addField('filename')->setExcluded();
 
         $exception = new \Exception('some error');
         $this->fileManager->expects($this->once())

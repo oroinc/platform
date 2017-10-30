@@ -54,21 +54,17 @@ class ComputePrimaryField implements ProcessorInterface
         }
 
         $config = $context->getConfig();
-        if (null === $config) {
+
+        $primaryFieldName = $config->findFieldNameByPropertyPath($this->primaryFieldName);
+        if (!$primaryFieldName
+            || $config->getField($primaryFieldName)->isExcluded()
+            || array_key_exists($primaryFieldName, $data)
+        ) {
+            // the primary field is undefined, excluded or already added
             return;
         }
 
-        $primaryField = $config->getField($this->primaryFieldName);
-        if (!$primaryField || $primaryField->isExcluded()) {
-            // undefined or excluded primary field
-            return;
-        }
-        if (array_key_exists($this->primaryFieldName, $data)) {
-            // the primary field is already set
-            return;
-        }
-
-        $data[$this->primaryFieldName] = $this->getPrimaryValue($config, $data);
+        $data[$primaryFieldName] = $this->getPrimaryValue($config, $data);
         $context->setResult($data);
     }
 
@@ -81,16 +77,16 @@ class ComputePrimaryField implements ProcessorInterface
     protected function getPrimaryValue(EntityDefinitionConfig $config, array $data)
     {
         $result = null;
-        $association = $config->getField($this->associationName);
-        if (null !== $association) {
-            $associationName = $association->getPropertyPath($this->associationName);
+        $associationName = $config->findFieldNameByPropertyPath($this->associationName);
+        if ($associationName) {
+            $associationName = $config->findFieldNameByPropertyPath($this->associationName);
             if (!empty($data[$associationName]) && is_array($data[$associationName])) {
-                $associationTargetConfig = $association->getTargetEntity();
+                $associationTargetConfig = $config->getField($associationName)->getTargetEntity();
                 if (null !== $associationTargetConfig) {
                     $result = $this->extractPrimaryValue(
                         $data[$associationName],
-                        $this->getPropertyPath($associationTargetConfig, $this->associationDataFieldName),
-                        $this->getPropertyPath($associationTargetConfig, $this->associationPrimaryFlagFieldName)
+                        $associationTargetConfig->findFieldNameByPropertyPath($this->associationDataFieldName),
+                        $associationTargetConfig->findFieldNameByPropertyPath($this->associationPrimaryFlagFieldName)
                     );
                 }
             }
@@ -121,21 +117,5 @@ class ComputePrimaryField implements ProcessorInterface
         }
 
         return $result;
-    }
-
-    /**
-     * @param EntityDefinitionConfig $config
-     * @param string                 $fieldName
-     *
-     * @return string
-     */
-    protected function getPropertyPath(EntityDefinitionConfig $config, $fieldName)
-    {
-        $field = $config->getField($fieldName);
-        if (null === $field) {
-            return $fieldName;
-        }
-
-        return $field->getPropertyPath($fieldName);
     }
 }

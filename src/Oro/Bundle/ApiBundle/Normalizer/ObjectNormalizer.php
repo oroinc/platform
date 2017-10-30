@@ -6,12 +6,12 @@ use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Component\EntitySerializer\ConfigUtil;
 use Oro\Component\EntitySerializer\DataAccessorInterface;
-use Oro\Component\EntitySerializer\DataTransformerInterface;
+use Oro\Component\EntitySerializer\DataNormalizer;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Component\EntitySerializer\SerializationHelper;
 
 class ObjectNormalizer
 {
@@ -23,11 +23,11 @@ class ObjectNormalizer
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var SerializationHelper */
+    protected $serializationHelper;
+
     /** @var DataAccessorInterface */
     protected $dataAccessor;
-
-    /** @var DataTransformerInterface */
-    protected $dataTransformer;
 
     /** @var ConfigNormalizer */
     protected $configNormalizer;
@@ -38,23 +38,23 @@ class ObjectNormalizer
     /**
      * @param ObjectNormalizerRegistry $normalizerRegistry
      * @param DoctrineHelper           $doctrineHelper
+     * @param SerializationHelper      $serializationHelper
      * @param DataAccessorInterface    $dataAccessor
-     * @param DataTransformerInterface $dataTransformer
      * @param ConfigNormalizer         $configNormalizer
      * @param DataNormalizer           $dataNormalizer
      */
     public function __construct(
         ObjectNormalizerRegistry $normalizerRegistry,
         DoctrineHelper $doctrineHelper,
+        SerializationHelper $serializationHelper,
         DataAccessorInterface $dataAccessor,
-        DataTransformerInterface $dataTransformer,
         ConfigNormalizer $configNormalizer,
         DataNormalizer $dataNormalizer
     ) {
         $this->normalizerRegistry = $normalizerRegistry;
         $this->doctrineHelper = $doctrineHelper;
+        $this->serializationHelper = $serializationHelper;
         $this->dataAccessor = $dataAccessor;
-        $this->dataTransformer = $dataTransformer;
         $this->configNormalizer = $configNormalizer;
         $this->dataNormalizer = $dataNormalizer;
     }
@@ -162,31 +162,58 @@ class ObjectNormalizer
         }
 
         $result = [];
+        $referenceFields = [];
         $entityClass = $this->getEntityClass($object);
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
             $propertyPath = $field->getPropertyPath($fieldName);
-            if ($this->isMetadataProperty($propertyPath)) {
-                $result[$propertyPath] = $this->getMetadataProperty($entityClass, $propertyPath);
-            } else {
-                $value = null;
-                if ($this->dataAccessor->tryGetValue($object, $propertyPath, $value)) {
-                    if (null !== $value) {
-                        $targetEntity = $field->getTargetEntity();
-                        if (null !== $targetEntity) {
-                            $value = $this->normalizeValue($value, $level + 1, $context, $targetEntity);
-                        } else {
-                            $value = $this->transformValue($entityClass, $fieldName, $value, $context, $field);
-                        }
-                    }
-                    $result[$propertyPath] = $value;
-                }
+            $path = ConfigUtil::explodePropertyPath($propertyPath);
+            $isReference = count($path) > 1;
+
+            if ($isReference) {
+                $referenceFields[$fieldName] = $path;
+                continue;
             }
+
+            $value = null;
+            if ($this->dataAccessor->tryGetValue($object, $propertyPath, $value)) {
+                if (null !== $value) {
+                    $targetConfig = $field->getTargetEntity();
+                    if (null !== $targetConfig) {
+                        $value = $this->normalizeValue($value, $level + 1, $context, $targetConfig);
+                    } else {
+                        $value = $this->serializationHelper->transformValue(
+                            $entityClass,
+                            $fieldName,
+                            $value,
+                            $context,
+                            $field
+                        );
+                    }
+                }
+                $result[$fieldName] = $value;
+            } elseif ($this->isMetadataProperty($propertyPath)) {
+                $result[$fieldName] = $this->getMetadataProperty($entityClass, $propertyPath);
+            }
+        }
+
+        if (!empty($referenceFields)) {
+            $result = $this->serializationHelper->handleFieldsReferencedToChildFields(
+                $result,
+                $entityClass,
+                $config,
+                $context,
+                $referenceFields
+            );
         }
 
         $postSerializeHandler = $config->getPostSerializeHandler();
         if (null !== $postSerializeHandler) {
-            $result = $this->postSerialize($result, $postSerializeHandler, $context);
+            $result = $this->serializationHelper->postSerialize(
+                $result,
+                $postSerializeHandler,
+                $context
+            );
         }
 
         return $result;
@@ -204,8 +231,8 @@ class ObjectNormalizer
     {
         if (is_array($value)) {
             $nextLevel = $level + 1;
-            foreach ($value as &$val) {
-                $val = $this->normalizeValue($val, $nextLevel, $context, $config);
+            foreach ($value as $key => $val) {
+                $value[$key] = $this->normalizeValue($val, $nextLevel, $context, $config);
             }
         } elseif (is_object($value)) {
             $objectNormalizer = $this->normalizerRegistry->getObjectNormalizer($value);
@@ -256,31 +283,6 @@ class ObjectNormalizer
         }
 
         return $value;
-    }
-
-    /**
-     * @param string                           $entityClass
-     * @param string                           $fieldName
-     * @param mixed                            $fieldValue
-     * @param array                            $context
-     * @param EntityDefinitionFieldConfig|null $fieldConfig
-     *
-     * @return mixed
-     */
-    protected function transformValue(
-        $entityClass,
-        $fieldName,
-        $fieldValue,
-        array $context,
-        EntityDefinitionFieldConfig $fieldConfig = null
-    ) {
-        return $this->dataTransformer->transform(
-            $entityClass,
-            $fieldName,
-            $fieldValue,
-            null !== $fieldConfig ? $fieldConfig->toArray(true) : [],
-            $context
-        );
     }
 
     /**
@@ -344,17 +346,5 @@ class ObjectNormalizer
         $map = array_flip($metadata->discriminatorMap);
 
         return $map[$entityClass];
-    }
-
-    /**
-     * @param array    $item
-     * @param callable $handler
-     * @param array    $context
-     *
-     * @return array
-     */
-    protected function postSerialize(array $item, $handler, array $context)
-    {
-        return call_user_func($handler, $item, $context);
     }
 }

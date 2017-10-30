@@ -94,7 +94,7 @@ class AttachmentApiEntityManager extends ApiEntityManager
     {
         if (!empty($result['file'])) {
             $result['file'] = $this->attachmentManager->getFileRestApiUrl(
-                $result['file'],
+                $result['file']['id'],
                 $this->class,
                 $result['id']
             );
@@ -105,9 +105,10 @@ class AttachmentApiEntityManager extends ApiEntityManager
         $attachmentTargets = $this->getAttachmentTargets();
         foreach ($attachmentTargets as $targetClass => $fieldName) {
             if (null !== $result[$fieldName]) {
+                $targetIdFieldName = $this->doctrineHelper->getSingleEntityIdentifierFieldName($targetClass);
                 $result['target'] = [
                     'entity' => $targetClass,
-                    'id'     => $result[$fieldName]
+                    'id'     => $result[$fieldName][$targetIdFieldName]
                 ];
             }
         }

@@ -13,7 +13,10 @@ function(PageRegionView) {
 
         render: function() {
             PageBeforeContentAdditionView.__super__.render.call(this);
-            this.initLayout();
+
+            if (this.data) {
+                this.initLayout();
+            }
             return this;
         }
     });

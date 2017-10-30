@@ -22,9 +22,13 @@
 
 {% block taggable_datagrid_widget %}
     {{ block_widget(block) }}
-    <script type="text/javascript">
-        require(['orosync/js/content/grid-builder'], function (GridTagBuilder) {
-            GridTagBuilder.allowTracking({{ grid_full_name|json_encode|raw }});
-        });
-    </script>
+
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    <div {{ UI.renderPageComponentAttributes({
+        module: 'orodatagrid/js/app/components/datagrid-allow-tracking-component',
+        options: {
+            gridName: grid_full_name
+        }
+    }) }}></div>
 {% endblock %}
