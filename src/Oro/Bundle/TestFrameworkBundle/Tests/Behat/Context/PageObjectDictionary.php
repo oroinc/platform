@@ -86,4 +86,22 @@ trait PageObjectDictionary
 
         return $this->pageFactory->getPage($name);
     }
+
+    /**
+     * @param string $elementName
+     * @param NodeElement $productItem
+     *
+     * @return bool
+     */
+    public function isElementVisible($elementName, $productItem)
+    {
+        if ($this->hasElement($elementName)) {
+            $element = $this->createElement($elementName, $productItem);
+            if ($element->isValid() && $element->isVisible()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

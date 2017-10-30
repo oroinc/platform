@@ -94,6 +94,11 @@ class Form extends Element
         $this->pressActionButton('Save');
     }
 
+    public function saveAndCreateNew()
+    {
+        $this->pressActionButton('Save and New');
+    }
+
     /**
      * Choose from list Save, Save and Close, Save and New etc. on from element
      * If button is visible it'll pressed

@@ -116,8 +116,8 @@ services:
         arguments:
             - '@oro_api.object_normalizer_registry'
             - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_serializer.serialization_helper'
             - '@oro_api.entity_accessor'
-            - '@oro_api.entity_serializer.data_transformer'
             - '@oro_api.object_normalizer.config_normalizer'
             - '@oro_api.object_normalizer.data_normalizer'
 
@@ -126,7 +126,7 @@ services:
         public: false
 
     oro_api.object_normalizer.data_normalizer:
-        class: Oro\Bundle\ApiBundle\Normalizer\DataNormalizer
+        class: Oro\Component\EntitySerializer\DataNormalizer
         public: false
 
     oro_api.object_normalizer_registry:
@@ -313,13 +313,13 @@ services:
         public: false
         arguments:
             - '@oro_api.entity_serializer.doctrine_helper'
+            - '@oro_api.entity_serializer.serialization_helper'
             - '@oro_api.entity_accessor'
-            - '@oro_api.entity_serializer.data_transformer'
             - '@oro_api.entity_serializer.query_factory'
             - '@oro_api.entity_serializer.field_accessor'
             - '@oro_api.entity_serializer.config_normalizer'
-            - '@oro_api.entity_serializer.data_normalizer'
             - '@oro_api.entity_serializer.config_converter'
+            - '@oro_api.entity_serializer.data_normalizer'
         calls:
             - [setFieldsFilter, ['@oro_security.serializer.filter_chain']]
 
@@ -328,6 +328,12 @@ services:
         public: false
         arguments:
             - '@doctrine'
+
+    oro_api.entity_serializer.serialization_helper:
+        class: Oro\Component\EntitySerializer\SerializationHelper
+        public: false
+        arguments:
+            - '@oro_api.entity_serializer.data_transformer'
 
     oro_api.entity_serializer.query_factory:
         class: Oro\Bundle\ApiBundle\Util\AclProtectedQueryFactory

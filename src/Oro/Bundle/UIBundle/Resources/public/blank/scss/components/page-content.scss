@@ -36,3 +36,9 @@
         }
     }
 }
+
+@include breakpoint('print') {
+    .page-content {
+        width: 100%;
+    }
+}

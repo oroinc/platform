@@ -7,6 +7,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -196,6 +197,8 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $swapField->setPropertyPath('realSwapField');
         $realSwapField = $config->addField('realSwapField');
         $realSwapField->setPropertyPath('swapField');
+        $ignoredField = $config->addField('ignoredField');
+        $ignoredField->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
         $this->assertNull($config->findField('unknown'));
         $this->assertNull($config->findField('unknown', true));
@@ -236,9 +239,20 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('swapField', $config->findFieldNameByPropertyPath('realSwapField'));
         $this->assertSame($realSwapField, $config->findFieldByPath('realSwapField'));
         $this->assertSame($swapField, $config->findFieldByPath('realSwapField', true));
+
+        $this->assertSame($ignoredField, $config->findField('ignoredField'));
+        $this->assertNull($config->findField('ignoredField', true));
+        $this->assertNull($config->findField(ConfigUtil::IGNORE_PROPERTY_PATH));
+        $this->assertNull($config->findField(ConfigUtil::IGNORE_PROPERTY_PATH, true));
+        $this->assertSame('ignoredField', $config->findFieldNameByPropertyPath('ignoredField'));
+        $this->assertNull($config->findFieldNameByPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH));
+        $this->assertSame($ignoredField, $config->findFieldByPath('ignoredField'));
+        $this->assertNull($config->findFieldByPath('ignoredField', true));
+        $this->assertNull($config->findFieldByPath(ConfigUtil::IGNORE_PROPERTY_PATH));
+        $this->assertNull($config->findFieldByPath(ConfigUtil::IGNORE_PROPERTY_PATH, true));
     }
 
-    public function testFindFieldByPath()
+    public function testFindFieldByPathForChildFields()
     {
         $config = new EntityDefinitionConfig();
 
