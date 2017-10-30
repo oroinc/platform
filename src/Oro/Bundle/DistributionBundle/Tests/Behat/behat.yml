@@ -1,0 +1,13 @@
+oro_behat_extension:
+  elements:
+    Get help:
+      selector: a i.fa-question-circle
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  suites:
+    OroDistributionBundle:
+      contexts:
+        - OroDistributionBundle::FeatureContext
+        - Behat\MinkExtension\Context\MinkContext
+      paths:
+        - '@OroDistributionBundle/Tests/Behat/Features'
