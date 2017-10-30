@@ -14,7 +14,6 @@ class Grid extends Table implements GridInterface
 {
     const TABLE_HEADER_ELEMENT = 'GridHeader';
     const TABLE_ROW_ELEMENT = 'GridRow';
-    const GRID_TABLE_ELEMENT = 'GridTable';
     const ERROR_NO_ROW = "Can't get %s row, because there are only %s rows in grid";
     const ERROR_NO_ROW_CONTENT = 'Grid has no record with "%s" content';
 
@@ -24,7 +23,7 @@ class Grid extends Table implements GridInterface
     public function getRows()
     {
         /** @var Table $table */
-        $table = $this->getElement($this->getMappedChildElementName(static::GRID_TABLE_ELEMENT));
+        $table = $this->getElement('GridTable');
         $elementName = $this->getMappedChildElementName(static::TABLE_ROW_ELEMENT);
 
         return $table->getRowElements($elementName);
@@ -36,9 +35,9 @@ class Grid extends Table implements GridInterface
     public function getRowByContent($content)
     {
         /** @var Table $table */
-        $table = $this->getElement($this->getMappedChildElementName(self::GRID_TABLE_ELEMENT));
+        $table = $this->getElement('GridTable');
 
-        return $table->getRowByContentElement($content, $this->getMappedChildElementName(static::TABLE_ROW_ELEMENT));
+        return $table->getRowByContentElement($content, static::TABLE_ROW_ELEMENT);
     }
 
     /**
@@ -47,7 +46,7 @@ class Grid extends Table implements GridInterface
     public function getHeader()
     {
         /** @var Table $table */
-        $table = $this->getElement($this->getMappedChildElementName(static::GRID_TABLE_ELEMENT));
+        $table = $this->getElement('GridTable');
 
         return $table->getHeaderElement(static::TABLE_HEADER_ELEMENT);
     }
@@ -69,8 +68,7 @@ class Grid extends Table implements GridInterface
      */
     public function getMassActionLink($title)
     {
-        return $this->elementFactory->createElement($this->getMappedChildElementName('GridFloatingMenu'))
-            ->findLink($title);
+        return $this->elementFactory->createElement('GridFloatingMenu')->findLink($title);
     }
 
     /**
@@ -156,14 +154,6 @@ class Grid extends Table implements GridInterface
     }
 
     /**
-     * @param $content
-     */
-    public function canCheckRecord($content)
-    {
-        $this->getRowByContent($content)->hasMassActionCheckbox();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function uncheckRecord($content)
@@ -176,10 +166,7 @@ class Grid extends Table implements GridInterface
      */
     public function getMassActionButton()
     {
-        $massActionsButton = $this->elementFactory->createElement(
-            $this->getMappedChildElementName('MassActionButton'),
-            $this
-        );
+        $massActionsButton = $this->elementFactory->createElement('MassActionButton', $this);
 
         if (!$massActionsButton || !$massActionsButton->isVisible()) {
             throw ElementNotVisible::factory(
