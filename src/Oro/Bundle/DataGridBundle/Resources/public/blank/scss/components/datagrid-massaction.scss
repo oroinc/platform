@@ -85,6 +85,18 @@
         }
     }
 
+    &__action-trigger {
+        display: block;
+
+        color: inherit;
+
+        @include hover-focus {
+            text-decoration: inherit;
+
+            color: inherit;
+        }
+    }
+
     .dropdown-menu__placeholder {
         display: none;
     }
