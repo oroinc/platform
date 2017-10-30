@@ -13,6 +13,7 @@ class OroWorkflowExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected $expectedDefinitions = [
         'oro_workflow.configuration.provider.workflow_config',
+        'oro_workflow.data_updater.chain'
     ];
 
     /**
