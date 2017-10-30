@@ -478,6 +478,97 @@ class DatagridExportIdFetcherTest extends OrmTestCase
     }
 
     /**
+     * @dataProvider aliasOrderExpressionDataProvider
+     * @param string $orderExpression
+     */
+    public function testGetGridDataIdsForQueryOrderedByAliasOrExpression(string $orderExpression)
+    {
+        $qb = $this->em
+            ->getRepository('Test:Test')
+            ->createQueryBuilder('e')
+            ->select('e.id as someAlias')
+            ->addOrderBy($orderExpression, 'ASC');
+
+        $gridConfig = $this->createDatagridConfigurationMock();
+
+        $dataSource = $this->createDatasourceMock($qb);
+
+        $grid = $this->createDatagridMock($gridConfig, $dataSource);
+
+        $context = $this->createContextMock();
+        $context
+            ->expects($this->at(0))
+            ->method('hasOption')
+            ->with('gridName')
+            ->willReturn(true);
+
+        $context
+            ->expects($this->any())
+            ->method('getOption')
+            ->willReturnMap([
+                ['gridName', null, 'someGridName'],
+                ['gridParameters', null, 'someGridParameters'],
+            ]);
+
+        $context
+            ->expects($this->at(3))
+            ->method('setValue')
+            ->with('columns', 'SomeColumns');
+
+        $manager = $this->createManagerMock();
+        $manager
+            ->expects($this->once())
+            ->method('getDatagrid')
+            ->with('someGridName', 'someGridParameters')
+            ->willReturn($grid);
+
+        $gridManagerLink = $this->createGridManagerLinkMock();
+        $gridManagerLink
+            ->expects($this->once())
+            ->method('getService')
+            ->willReturn($manager);
+
+        $eventDispatcher = $this->createEventDispatcherMock();
+        $eventDispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with(OrmResultBeforeQuery::NAME);
+
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT t0_.id AS id_0 FROM test_table t0_',
+            [
+                ['id_0'  => 1]
+            ]
+        );
+
+        $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher);
+        $fetcher->setImportExportContext($context);
+
+        $result = $fetcher->getGridDataIds();
+
+        $this->assertEquals([1], $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function aliasOrderExpressionDataProvider()
+    {
+        return [
+            'some alias is used for ordering' => [
+                'orderExpression' => 'someAlias'
+            ],
+            'some expression is used for ordering' => [
+                'orderExpression' => 'e.id+someAlias'
+            ],
+            'another expression is used' => [
+                'orderExpression' => "LOCATE('some', e.name, someAlias)"
+            ]
+        ];
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject | AbstractQuery
      */
     private function createQueryMock()

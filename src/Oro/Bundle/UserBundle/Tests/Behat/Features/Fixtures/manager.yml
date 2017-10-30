@@ -1,0 +1,13 @@
+Oro\Bundle\UserBundle\Entity\User:
+  ethan:
+    firstName: Ethan
+    lastName: Hawke
+    username: ethan
+    organization: '@organization'
+    organizations: ['@organization']
+    roles: ['@managerRole']
+    owner: '@business_unit'
+    businessUnits: ['@business_unit']
+    email: ethan@example.com
+    password: UflJdjd9/mZ9m8qnAcI5I3RHJmS32P52Iiwt5JaWS+0KwxDTenkhmRUM/1SBMeBMVMvJRve1Yt8/bpylMvnTsw==
+    salt: Re3ctTrNMurI4U9wZ76gk2NnNb0si6yCbKwlQUIg

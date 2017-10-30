@@ -16,9 +16,11 @@ trait SortingTrait
      */
     public function isSortingEnabled()
     {
-        return array_key_exists(EntityDefinitionConfig::DISABLE_SORTING, $this->items)
-            ? !$this->items[EntityDefinitionConfig::DISABLE_SORTING]
-            : true;
+        if (!array_key_exists(EntityDefinitionConfig::DISABLE_SORTING, $this->items)) {
+            return true;
+        }
+
+        return !$this->items[EntityDefinitionConfig::DISABLE_SORTING];
     }
 
     /**
