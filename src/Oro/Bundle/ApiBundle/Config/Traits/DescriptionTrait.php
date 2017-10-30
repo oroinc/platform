@@ -27,9 +27,11 @@ trait DescriptionTrait
      */
     public function getDescription()
     {
-        return array_key_exists(EntityDefinitionConfig::DESCRIPTION, $this->items)
-            ? $this->items[EntityDefinitionConfig::DESCRIPTION]
-            : null;
+        if (!array_key_exists(EntityDefinitionConfig::DESCRIPTION, $this->items)) {
+            return null;
+        }
+
+        return $this->items[EntityDefinitionConfig::DESCRIPTION];
     }
 
     /**

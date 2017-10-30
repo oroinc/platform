@@ -26,9 +26,11 @@ trait ExcludeTrait
      */
     public function isExcluded()
     {
-        return array_key_exists(ConfigUtil::EXCLUDE, $this->items)
-            ? $this->items[ConfigUtil::EXCLUDE]
-            : false;
+        if (!array_key_exists(ConfigUtil::EXCLUDE, $this->items)) {
+            return false;
+        }
+
+        return $this->items[ConfigUtil::EXCLUDE];
     }
 
     /**

@@ -6,9 +6,10 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Oro\Component\EntitySerializer\DataNormalizer;
 use Oro\Component\EntitySerializer\EntityDataTransformer;
+use Oro\Component\EntitySerializer\SerializationHelper;
 use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
-use Oro\Bundle\ApiBundle\Normalizer\DataNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
@@ -34,8 +35,10 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->objectNormalizer = new ObjectNormalizer(
             $normalizers,
             new DoctrineHelper($doctrine),
+            new SerializationHelper(
+                new EntityDataTransformer($this->createMock(ContainerInterface::class))
+            ),
             new EntityDataAccessor(),
-            new EntityDataTransformer($this->createMock(ContainerInterface::class)),
             new ConfigNormalizer(),
             new DataNormalizer()
         );
