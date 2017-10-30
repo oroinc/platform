@@ -1,24 +1,24 @@
-define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
+define(function(require) {
     'use strict';
 
-    /**
-     * Widget that represents all query designer functions
-     */
-    $.widget('oroquerydesigner.functionChoice', {
-        options: {
-            optionTemplate: _.template('<option value="<%- data.name %>" title="<%- data.title %>" ' +
-                    'data-group_name="<%- data.group_name %>" data-group_type="<%- data.group_type %>" ' +
-                    'data-return_type="<%- data.return_type %>">' +
-                    '<%- data.label %>' +
-                '</option>'),
-            converters: [],
-            aggregates: []
-        },
+    var FunctionChoiceView;
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var optionTemplate = require('tpl!oroquerydesigner/templates/function-choice.html');
+
+    FunctionChoiceView = BaseView.extend({
+        optionNames: BaseView.prototype.optionNames.concat([
+            'converters', 'aggregates'
+        ]),
+
+        optionTemplate: optionTemplate,
 
         activeFunctionGroupKey: null,
 
-        _create: function() {
+        render: function() {
+            this.$el.inputWidget('create');
             this._disable(true);
+            return this;
         },
 
         /**
@@ -28,25 +28,23 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
          * @param {Boolean} convertersOnly
          */
         setActiveFunctions: function(criteria, convertersOnly) {
-            var self = this;
-            var options = this.options;
             var foundGroups = [];
             var foundGroupKey = null;
             var content = '';
             var functions = [];
 
-            _.each(options.converters, function(item, name) {
-                if (self._matchApplicable(item.applicable, criteria)) {
+            _.each(this.converters, function(item, name) {
+                if (this._matchApplicable(item.applicable, criteria)) {
                     foundGroups.push({group_name: name, group_type: 'converters'});
                 }
-            });
+            }, this);
 
             if (!convertersOnly) {
-                _.each(options.aggregates, function(item, name) {
-                    if (self._matchApplicable(item.applicable, criteria)) {
+                _.each(this.aggregates, function(item, name) {
+                    if (this._matchApplicable(item.applicable, criteria)) {
                         foundGroups.push({group_name: name, group_type: 'aggregates'});
                     }
-                });
+                }, this);
             }
 
             if (!_.isEmpty(foundGroups)) {
@@ -60,7 +58,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
                 this._clearSelect();
 
                 _.each(foundGroups, function(foundGroup) {
-                    _.each(options[foundGroup.group_type][foundGroup.group_name].functions, function(func) {
+                    _.each(this[foundGroup.group_type][foundGroup.group_name].functions, function(func) {
                         var existingFuncIndex = -1;
 
                         _.any(functions, function(val, index) {
@@ -86,14 +84,14 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
                             functions.push(_.extend({}, foundGroup, func));
                         }
                     });
-                });
+                }, this);
 
                 _.each(functions, function(func) {
-                    content += options.optionTemplate({data: func});
-                });
+                    content += this.optionTemplate({data: func});
+                }, this);
 
                 if (content !== '') {
-                    this.element.append(content);
+                    this.$el.append(content);
                 }
 
                 this.activeFunctionGroupKey = foundGroupKey;
@@ -101,7 +99,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
 
             this._disable(!foundGroupKey);
 
-            this.element.val('').trigger('change');
+            this.$el.val('').trigger('change');
         },
 
         _matchApplicable: function(applicable, criteria) {
@@ -113,17 +111,17 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
         },
 
         _clearSelect: function() {
-            this.element.find('option').not('[value=""]').remove();
+            this.$el.find('option').not('[value=""]').remove();
         },
 
         _disable: function(flag) {
-            this.element.prop('disabled', flag).inputWidget('refresh');
-            var $widgetContainer = this.element.inputWidget('container');
+            this.$el.prop('disabled', flag).inputWidget('refresh');
+            var $widgetContainer = this.$el.inputWidget('container');
             if ($widgetContainer) {
                 $widgetContainer.toggleClass('disabled', flag);
             }
         }
     });
 
-    return $;
+    return FunctionChoiceView;
 });

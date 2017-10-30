@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectChoiceType;
 use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
@@ -62,10 +62,13 @@ class AutoResponseRuleType extends AbstractQueryDesignerType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
+        parent::configureOptions($resolver);
+
         $resolver->setDefaults([
             'data_class' => 'Oro\Bundle\EmailBundle\Entity\AutoResponseRule',
+            'query_type' => 'string',
         ]);
     }
 

@@ -17,7 +17,8 @@ class GroupingType extends AbstractType
     /**
      * @param Manager $manager
      */
-    public function __construct(Manager $manager) {
+    public function __construct(Manager $manager)
+    {
         $this->manager = $manager;
     }
 
@@ -40,7 +41,7 @@ class GroupingType extends AbstractType
         }
 
         $builder
-            ->add('columnNames','oro_field_choice', $options);
+            ->add('columnNames', 'oro_field_choice', $options);
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
 
@@ -53,13 +53,16 @@ class SegmentType extends AbstractQueryDesignerType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
+        parent::configureOptions($resolver);
+
         $options = array_merge(
             $this->getDefaultOptions(),
             [
                 'data_class'         => 'Oro\Bundle\SegmentBundle\Entity\Segment',
                 'intention'          => 'segment',
+                'query_type'         => 'segment',
             ]
         );
 

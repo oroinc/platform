@@ -18,7 +18,8 @@ class FieldChoiceType extends AbstractType
     /**
      * @param TranslatorInterface $translator
      */
-    public function __construct(TranslatorInterface $translator) {
+    public function __construct(TranslatorInterface $translator)
+    {
         $this->translator = $translator;
     }
 

@@ -22,6 +22,7 @@ define(function(require) {
         relatedSiblingComponents: {
             conditionBuilderComponent: 'condition-builder',
             columnFieldChoiceComponent: 'column-field-choice',
+            columnFunctionChoiceComponent: 'column-function-choice',
             groupingFieldChoiceComponent: 'grouping-field-choice',
             dateGroupingFieldChoiceComponent: 'date-grouping-field-choice'
         },
@@ -358,8 +359,8 @@ define(function(require) {
             groupingFieldChoiceView.updateData(this.$entityChoice.val(),
                 EntityFieldsUtil.convertData(this._getInitFieldsData()));
 
-            this.listenTo(this.$entityChoice, 'fieldsloaderupdate', function(e, data) {
-                this.groupingFieldChoiceComponent.view.updateData($(e.target).val(), data);
+            this.listenTo(this, 'fieldsLoaded', function(entity, data) {
+                this.groupingFieldChoiceComponent.view.updateData(entity, data);
             });
 
             // prepare collection for Items Manager
@@ -450,8 +451,8 @@ define(function(require) {
 
             this.dateGroupingFieldChoiceComponent.view.updateData(this.$entityChoice.val(), fieldsData);
 
-            this.listenTo(this.$entityChoice, 'fieldsloaderupdate', function(e, data) {
-                this.groupingFieldChoiceComponent.view.updateData($(e.target).val(), data);
+            this.listenTo(this, 'fieldsLoaded', function(entity, data) {
+                this.dateGroupingFieldChoiceComponent.view.updateData(entity, data);
             });
         },
 
@@ -472,6 +473,10 @@ define(function(require) {
 
             // setup FieldChoice of Items Manager Editor
             var fieldChoiceView = this.columnFieldChoiceComponent.view;
+            var functionChoiceView = null;
+            if (this.columnFunctionChoiceComponent) {
+                functionChoiceView = this.columnFunctionChoiceComponent.view;
+            }
             fieldChoiceView.updateData(
                 this.$entityChoice.val(), EntityFieldsUtil.convertData(this._getInitFieldsData())
             );
@@ -480,16 +485,13 @@ define(function(require) {
                 el: $form,
                 autoRender: true,
                 fieldChoiceView: fieldChoiceView,
-                functionChoiceOptions: {
-                    converters: metadata.converters,
-                    aggregates: metadata.aggregates
-                }
+                functionChoiceView: functionChoiceView
             });
 
             var $editor = this.columnFormView.$el;
 
-            this.listenTo(this.$entityChoice, 'fieldsloaderupdate', function(e, data) {
-                this.columnFieldChoiceComponent.view.reset($(e.target).val(), data);
+            this.listenTo(this, 'fieldsLoaded', function(entity, data) {
+                this.columnFieldChoiceComponent.view.updateData(entity, data);
             });
 
             // prepare collection for Items Manager

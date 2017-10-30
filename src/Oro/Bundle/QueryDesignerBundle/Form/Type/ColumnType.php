@@ -25,7 +25,15 @@ class ColumnType extends AbstractType
                 ] + $options['field_choice_options']
             )
             ->add('label', 'text', array('required' => true))
-            ->add('func', 'oro_function_choice', array('required' => false))
+            ->add(
+                'func',
+                'oro_function_choice',
+                [
+                    'required' => false,
+                    'page_component_name' => 'column-function-choice',
+                    'query_type' =>  $options['query_type'],
+                ]
+            )
             ->add('sorting', 'oro_sorting_choice', array('required' => false));
     }
 
@@ -34,6 +42,8 @@ class ColumnType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+        $resolver->setRequired(['query_type']);
+
         $resolver->setDefaults(
             array(
                 'entity'               => null,

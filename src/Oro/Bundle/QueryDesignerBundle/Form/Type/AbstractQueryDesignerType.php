@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 
@@ -54,6 +55,14 @@ abstract class AbstractQueryDesignerType extends AbstractType
                 $that->addFields($form, $factory, $entity);
             }
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setRequired(['query_type']);
     }
 
     /**
@@ -114,6 +123,7 @@ abstract class AbstractQueryDesignerType extends AbstractType
                         'entity'               => $entity,
                         'auto_initialize'      => false,
                         'field_choice_options' => $config->getOption('column_column_field_choice_options'),
+                        'query_type'           => $config->getOption('query_type'),
                     )
                 )
             );

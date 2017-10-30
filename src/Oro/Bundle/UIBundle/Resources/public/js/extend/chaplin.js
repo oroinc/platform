@@ -49,6 +49,9 @@ define([
         original.viewDispose.call(this);
     };
 
+    // keep this flag falsy, but different from the `false`, to distinguish it was set intentionally
+    Chaplin.View.prototype.keepElement = null;
+
     /**
      * Detach all item view elements before render of collection to preserve DOM event handlers bound
      */
