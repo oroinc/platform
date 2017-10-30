@@ -1717,4 +1717,42 @@ TEXT;
         $rows = $table->getRows();
         self::assertCount(0, $rows);
     }
+
+    /**
+     * Example: I should see mass action checkbox in row with "shirt_main" content for grid
+     * Example: I should see mass action checkbox in row with "shirt_main" content for "Frontend Grid"
+     *
+     * @Then /^I should see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for grid$/
+     * @Then /^I should see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for "(?P<gridName>[\w\s]+)"$/
+     *
+     * @param string $content
+     * @param string|null $gridName
+     */
+    public function iShouldSeeMassActionCheckbox(string $content, string $gridName = null)
+    {
+        static::assertTrue(
+            $this->getGrid($gridName)->getRowByContent($content)->hasMassActionCheckbox(),
+            sprintf('Grid row with "%s" content has no mass action checkbox in it', $content)
+        );
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Example: I should not see mass action checkbox in row with "shirt_main" content for grid
+     * Example: I should not see mass action checkbox in row with "shirt_main" content for "Frontend Grid"
+     *
+     * @Then /^I should not see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for grid$/
+     * @Then /^I should not see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for "(?P<gridName>[\w\s]+)"$/
+     *
+     * @param string $content
+     * @param string|null $gridName
+     */
+    //@codingStandardsIgnoreEnd
+    public function iShouldNotSeeMassActionCheckbox(string $content, string $gridName = null)
+    {
+        static::assertFalse(
+            $this->getGrid($gridName)->getRowByContent($content)->hasMassActionCheckbox(),
+            sprintf('Grid row with "%s" content has mass action checkbox in it', $content)
+        );
+    }
 }
