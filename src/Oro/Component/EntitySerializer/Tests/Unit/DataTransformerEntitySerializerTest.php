@@ -3,6 +3,10 @@
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\DataTransformerInterface as FormDataTransformerInterface;
+
+use Oro\Component\EntitySerializer\DataTransformerInterface;
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity;
 
 class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
 {
@@ -120,11 +124,11 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
         );
 
         $context = ['key' => 'context value'];
-        $transformer = $this->createMock('Oro\Component\EntitySerializer\DataTransformerInterface');
+        $transformer = $this->createMock(DataTransformerInterface::class);
         $transformer->expects($this->once())
             ->method('transform')
             ->with(
-                'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group',
+                Entity\Group::class,
                 'name',
                 'group_name',
                 ['data_transformer' => ['data_transformer_service_id']],
@@ -183,7 +187,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
             [1 => \PDO::PARAM_INT]
         );
 
-        $transformer = $this->createMock('Symfony\Component\Form\DataTransformerInterface');
+        $transformer = $this->createMock(FormDataTransformerInterface::class);
         $transformer->expects($this->once())
             ->method('transform')
             ->with('group_name')
@@ -267,7 +271,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testDataTransformerForRenamingField()
+    public function testDataTransformerForRenamedField()
     {
         $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -288,14 +292,14 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
             [1 => \PDO::PARAM_INT]
         );
 
-        $transformer = $this->createMock('Oro\Component\EntitySerializer\DataTransformerInterface');
+        $transformer = $this->createMock(DataTransformerInterface::class);
         $transformer->expects($this->once())
             ->method('transform')
             ->with(
-                'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group',
-                'name',
+                Entity\Group::class,
+                'newName',
                 'group_name',
-                ['data_transformer' => ['data_transformer_service_id']],
+                ['data_transformer' => ['data_transformer_service_id'], 'property_path' => 'name'],
                 []
             )
             ->willReturn('transformed_group_name');
@@ -360,14 +364,14 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
             [1 => \PDO::PARAM_INT]
         );
 
-        $transformer = $this->createMock('Oro\Component\EntitySerializer\DataTransformerInterface');
+        $transformer = $this->createMock(DataTransformerInterface::class);
         $transformer->expects($this->once())
             ->method('transform')
             ->with(
-                'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\User',
-                'name',
+                Entity\Product::class,
+                'ownerName',
                 'user_name',
-                ['data_transformer' => ['data_transformer_service_id']],
+                ['data_transformer' => ['data_transformer_service_id'], 'property_path' => 'owner.name'],
                 []
             )
             ->willReturn('transformed_user_name');
@@ -385,8 +389,8 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
                     'id'        => null,
                     'name'      => null,
                     'ownerName' => [
-                        'property_path'    => 'owner.name',
-                        'data_transformer' => 'data_transformer_service_id'
+                        'data_transformer' => 'data_transformer_service_id',
+                        'property_path'    => 'owner.name'
                     ],
                     'owner'     => [
                         'fields' => 'id'

@@ -71,7 +71,7 @@ class BuildCustomTypes implements ProcessorInterface
             }
 
             if ($this->isNestedObject($dataType)) {
-                $data[$fieldName] = $this->buildNestedObject($data, $field->getTargetEntity());
+                $data[$fieldName] = $this->buildNestedObject($data, $field->getTargetEntity(), $config);
             } elseif (DataType::isExtendedAssociation($dataType)) {
                 list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
                 $associationOwnerPath = $this->getAssociationOwnerPath($field);
@@ -247,11 +247,15 @@ class BuildCustomTypes implements ProcessorInterface
     /**
      * @param array                  $data
      * @param EntityDefinitionConfig $config
+     * @param EntityDefinitionConfig $parentConfig
      *
      * @return array|null
      */
-    protected function buildNestedObject(array $data, EntityDefinitionConfig $config)
-    {
+    protected function buildNestedObject(
+        array $data,
+        EntityDefinitionConfig $config,
+        EntityDefinitionConfig $parentConfig
+    ) {
         $result = [];
         $isEmpty = true;
         $fields = $config->getFields();
@@ -259,7 +263,18 @@ class BuildCustomTypes implements ProcessorInterface
             if ($field->isExcluded()) {
                 continue;
             }
-            $value = $this->getOwnPropertyValue($data, $field->getPropertyPath($fieldName));
+
+            $value = null;
+            $targetPropertyPath = $field->getPropertyPath($fieldName);
+            if (false !== strpos($targetPropertyPath, ConfigUtil::PATH_DELIMITER)) {
+                throw new RuntimeException(
+                    sprintf('The "%s" property path is not supported.', $targetPropertyPath)
+                );
+            }
+            $targetFieldName = $parentConfig->findFieldNameByPropertyPath($targetPropertyPath);
+            if ($targetFieldName && array_key_exists($targetFieldName, $data)) {
+                $value = $data[$targetFieldName];
+            }
             if (null !== $value) {
                 $isEmpty = false;
             }
@@ -267,31 +282,6 @@ class BuildCustomTypes implements ProcessorInterface
         }
 
         return $isEmpty ? null : $result;
-    }
-
-    /**
-     * @param array  $data
-     * @param string $propertyPath
-     *
-     * @return mixed
-     */
-    protected function getOwnPropertyValue(array $data, $propertyPath)
-    {
-        if (false !== strpos($propertyPath, ConfigUtil::PATH_DELIMITER)) {
-            throw new RuntimeException(
-                sprintf(
-                    'The "%s" property path is not supported.',
-                    $propertyPath
-                )
-            );
-        }
-
-        $result = null;
-        if (array_key_exists($propertyPath, $data)) {
-            $result = $data[$propertyPath];
-        }
-
-        return $result;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresource;
 
+use Oro\Bundle\ApiBundle\Provider\EntityTitleProvider;
 use Oro\Component\EntitySerializer\EntitySerializer;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
@@ -16,11 +17,14 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
 class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntitySerializer */
     protected $entitySerializer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationManager */
     protected $associationManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityTitleProvider */
+    protected $entityTitleProvider;
 
     /** @var LoadExtendedAssociation */
     protected $processor;
@@ -29,18 +33,16 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
     {
         parent::setUp();
 
-        $this->entitySerializer = $this->getMockBuilder(EntitySerializer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->associationManager = $this->getMockBuilder(AssociationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entitySerializer = $this->createMock(EntitySerializer::class);
+        $this->associationManager = $this->createMock(AssociationManager::class);
+        $this->entityTitleProvider = $this->createMock(EntityTitleProvider::class);
 
         $this->processor = new LoadExtendedAssociation(
             $this->entitySerializer,
             $this->doctrineHelper,
             new EntityIdHelper(),
-            $this->associationManager
+            $this->associationManager,
+            $this->entityTitleProvider
         );
     }
 
@@ -173,36 +175,12 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
             ->method('serialize')
             ->with($expectedQueryBuilder, $parentConfig)
             ->willReturn($loadedData);
-        $this->associationManager->expects(self::once())
-            ->method('getAssociationTargets')
-            ->with($parentClassName, null, 'manyToOne', 'kind')
-            ->willReturn([Entity\User::class => 'owner', Entity\Role::class => 'role']);
-        $this->associationManager->expects(self::once())
-            ->method('getAssociationSubQueryBuilder')
-            ->with($parentClassName, Entity\User::class, 'owner')
-            ->willReturn(
-                $this->em->getRepository($parentClassName)->createQueryBuilder('e')
-                    ->select(
-                        sprintf(
-                            'e.id AS id, target.id AS entityId, \'%s\' AS entityClass, target.name AS entityTitle',
-                            Entity\User::class
-                        )
-                    )
-                    ->innerJoin('e.owner', 'target')
-            );
-        $this->setQueryExpectation(
-            $this->getDriverConnectionMock($this->em),
-            'SELECT entity.id_1 AS id, entity.sclr_2 AS entity, entity.name_3 AS title '
-            . 'FROM (('
-            . 'SELECT p0_.id AS id_0, u1_.id AS id_1, '
-            . '\'' . Entity\User::class . '\' AS sclr_2, u1_.name AS name_3 '
-            . 'FROM product_table p0_ INNER JOIN user_table u1_ ON p0_.owner_id = u1_.id '
-            . 'WHERE p0_.id = 123 AND u1_.id IN (1)'
-            . ')) entity',
-            [
+        $this->entityTitleProvider->expects(self::once())
+            ->method('getTitles')
+            ->with([Entity\User::class => ['id', [1]]])
+            ->willReturn([
                 ['id' => 1, 'entity' => Entity\User::class, 'title' => 'test user']
-            ]
-        );
+            ]);
 
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
@@ -338,36 +316,12 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
             ->method('serialize')
             ->with($expectedQueryBuilder, $parentConfig)
             ->willReturn($loadedData);
-        $this->associationManager->expects(self::once())
-            ->method('getAssociationTargets')
-            ->with($parentClassName, null, 'manyToMany', 'kind')
-            ->willReturn([Entity\User::class => 'owner', Entity\Role::class => 'role']);
-        $this->associationManager->expects(self::once())
-            ->method('getAssociationSubQueryBuilder')
-            ->with($parentClassName, Entity\User::class, 'owner')
-            ->willReturn(
-                $this->em->getRepository($parentClassName)->createQueryBuilder('e')
-                    ->select(
-                        sprintf(
-                            'e.id AS id, target.id AS entityId, \'%s\' AS entityClass, target.name AS entityTitle',
-                            Entity\User::class
-                        )
-                    )
-                    ->innerJoin('e.owner', 'target')
-            );
-        $this->setQueryExpectation(
-            $this->getDriverConnectionMock($this->em),
-            'SELECT entity.id_1 AS id, entity.sclr_2 AS entity, entity.name_3 AS title '
-            . 'FROM (('
-            . 'SELECT p0_.id AS id_0, u1_.id AS id_1, '
-            . '\'' . Entity\User::class . '\' AS sclr_2, u1_.name AS name_3 '
-            . 'FROM product_table p0_ INNER JOIN user_table u1_ ON p0_.owner_id = u1_.id '
-            . 'WHERE p0_.id = 123 AND u1_.id IN (1)'
-            . ')) entity',
-            [
+        $this->entityTitleProvider->expects(self::once())
+            ->method('getTitles')
+            ->with([Entity\User::class => ['id', [1]]])
+            ->willReturn([
                 ['id' => 1, 'entity' => Entity\User::class, 'title' => 'test user']
-            ]
-        );
+            ]);
 
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);

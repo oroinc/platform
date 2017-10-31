@@ -48,6 +48,13 @@ class ConfigUtil
     const COLLAPSE         = FieldConfig::COLLAPSE;
     const DATA_TRANSFORMER = FieldConfig::DATA_TRANSFORMER;
 
+    /** @internal filled automatically by ConfigNormalizer and used only during serialization */
+    const COLLAPSE_FIELD = '_collapse_field';
+    /** @internal filled automatically by ConfigNormalizer and used only during serialization */
+    const EXCLUDED_FIELDS = '_excluded_fields';
+    /** @internal filled automatically by ConfigNormalizer and used only during serialization */
+    const RENAMED_FIELDS = '_renamed_fields';
+
     /**
      * @param array  $config A config
      * @param string $key    A config key
@@ -110,6 +117,18 @@ class ConfigUtil
         return
             isset($config[self::EXCLUDE])
             && $config[self::EXCLUDE];
+    }
+
+    /**
+     * @param array $config The config of a field
+     *
+     * @return bool
+     */
+    public static function isCollapse(array $config)
+    {
+        return
+            isset($config[self::COLLAPSE])
+            && $config[self::COLLAPSE];
     }
 
     /**
@@ -208,7 +227,10 @@ class ConfigUtil
     {
         $result = [];
         foreach ($items as $key => $val) {
-            $result[$key] = is_object($val) ? clone $val : $val;
+            if (is_object($val)) {
+                $val = clone $val;
+            }
+            $result[$key] = $val;
         }
 
         return $result;

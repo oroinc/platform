@@ -16,9 +16,11 @@ trait FieldsetTrait
      */
     public function isFieldsetEnabled()
     {
-        return array_key_exists(EntityDefinitionConfig::DISABLE_FIELDSET, $this->items)
-            ? !$this->items[EntityDefinitionConfig::DISABLE_FIELDSET]
-            : true;
+        if (!array_key_exists(EntityDefinitionConfig::DISABLE_FIELDSET, $this->items)) {
+            return true;
+        }
+
+        return !$this->items[EntityDefinitionConfig::DISABLE_FIELDSET];
     }
 
     /**
