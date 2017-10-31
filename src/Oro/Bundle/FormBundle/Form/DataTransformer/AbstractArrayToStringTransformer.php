@@ -6,9 +6,15 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 abstract class AbstractArrayToStringTransformer implements DataTransformerInterface
 {
-    protected $delimiter;
-
+    /**
+     * @var bool
+     */
     private $filterUniqueValues;
+
+    /**
+     * @var string
+     */
+    protected $delimiter;
 
     /**
      * @param string $delimiter
