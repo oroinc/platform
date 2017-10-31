@@ -10,7 +10,6 @@ parameters:
     oro_activity_list.event_listener.actitity_list_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
     oro_activity_list.provider.chain.class: Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider
     oro_activity_list.provider.email_recipients.class: Oro\Bundle\ActivityListBundle\Provider\EmailRecipientsProvider
-    oro_activity_list.event_listener.segment_widget_options_listener.class: Oro\Bundle\ActivityListBundle\EventListener\SegmentWidgetOptionsListener
     oro_activity_list.event_listener.segment_condition_builder_options_listener.class: Oro\Bundle\ActivityListBundle\EventListener\SegmentConditionBuilderOptionsListener
 
     oro_activity_list.entity_config_dumper.extension.class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension
@@ -51,6 +50,7 @@ services:
             - "@oro_activity_list.helper.activity_inheritance_targets"
             - "@event_dispatcher"
             - "@oro_workflow.data_helper"
+            - "@oro_ui.html_tag_helper"
 
     oro_activity_list.collect_manager:
         class: %oro_activity_list.collect_manager.class%
@@ -101,11 +101,6 @@ services:
             - "@oro_activity_list.provider.chain"
         tags:
             - { name: oro_email.recipients_provider, priority: 10 }
-
-    oro_activity_list.event_listener.segment_widget_options_listener:
-        class: %oro_activity_list.event_listener.segment_widget_options_listener.class%
-        tags:
-            - { name: kernel.event_listener, event: oro_segment.widget_options_load, method: onLoad }
 
     oro_activity_list.event_listener.segment_condition_builder_options_listener:
         class: %oro_activity_list.event_listener.segment_condition_builder_options_listener.class%

@@ -5,6 +5,8 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var HighlightTextView = require('oroui/js/app/views/highlight-text-view');
+    var mediator = require('oroui/js/mediator');
     var tools = require('oroui/js/tools');
     var Chaplin = require('chaplin');
 
@@ -22,9 +24,40 @@ define(function(require) {
     BaseTreeView = BaseView.extend({
         autoRender: true,
 
+        optionNames: BaseView.prototype.optionNames.concat([
+            'onSelectRoute', 'onSelectRouteParameters', 'onRootSelectRoute',
+            'autoSelectFoundNode',
+            'viewGroup'
+        ]),
+
+        /**
+         * @property {String}
+         */
+        viewGroup: 'jstree',
+
+        /**
+         * @property {String}
+         */
+        onSelectRoute: '',
+
+        /**
+         * @property {Object}
+         */
+        onSelectRouteParameters: {},
+
+        /**
+         * @property {String}
+         */
+        onRootSelectRoute: '',
+
+        autoSelectFoundNode: false,
+
         events: {
-            'input [data-name="search"]': 'onSearch',
-            'change [data-action-type="checkAll"]': 'onCheckAllClick'
+            'keypress [data-name="search"]': 'onSearchKeypress',
+            'input [data-name="search"]': 'onSearchDelay',
+            'change [data-name="search"]': 'onSearchDelay',
+            'change [data-action-type="checkAll"]': 'onCheckAllClick',
+            'click [data-name="clear-search"]': 'clearSearch'
         },
 
         treeEvents: {
@@ -32,13 +65,29 @@ define(function(require) {
             'before_open.jstree':  'onBeforeOpen',
             'after_close.jstree':  'onAfterClose',
             'select_node.jstree': 'onSelect',
-            'search.jstree': 'searchResultsFilter'
+            'search.jstree': 'searchResultsFilter',
+            'open_node.jstree': 'onOpen'
         },
 
         /**
          * @property {Object}
          */
         $tree: null,
+
+        /**
+         * @property {Object}
+         */
+        $searchField: null,
+
+        /**
+         * @property {String}
+         */
+        searchValue: null,
+
+        /**
+         * @property {Object}
+         */
+        $clearSearchButton: null,
 
         /**
          * @property {Object}
@@ -71,6 +120,11 @@ define(function(require) {
         searchTimeout: 250,
 
         /**
+         * @property {Object}
+         */
+        originalSearchEngine: {},
+
+        /**
          * @param {Object} options
          */
         initialize: function(options) {
@@ -80,9 +134,11 @@ define(function(require) {
                 return;
             }
 
-            this.$tree = this.$el.find('[data-role="jstree-container"]');
+            this.$tree = this.$('[data-role="jstree-container"]');
+            this.$searchField = this.$('[data-name="search"]');
+            this.$clearSearchButton = this.$('[data-name="clear-search"]');
             this.$tree.data('treeView', this);
-            this.onSearch = _.debounce(this.onSearch, this.searchTimeout);
+            this.onSearchDelay = _.debounce(this.onSearch, this.searchTimeout);
 
             var config = {
                 'core': {
@@ -92,7 +148,7 @@ define(function(require) {
                     'force_text': true
                 },
                 'state': {
-                    'key': options.key,
+                    'key': this.viewGroup,
                     'filter': _.bind(this.onFilter, this)
                 },
                 'plugins': ['state', 'wholerow']
@@ -100,6 +156,12 @@ define(function(require) {
 
             this.nodeId = options.nodeId;
             this.jsTreeConfig = this.customizeTreeConfig(options, config);
+
+            this.subview('highlight', new HighlightTextView({
+                el: this.el,
+                viewGroup: this.viewGroup,
+                highlightSelectors: ['.jstree-search']
+            }));
 
             this._deferredRender();
         },
@@ -121,10 +183,32 @@ define(function(require) {
                 }
             }, this);
 
-            this.$tree.one('ready.jstree', _.bind(function() {
-                this.initialization = false;
-                this._resolveDeferredRender();
-            }, this));
+            this.$tree.one('ready.jstree', _.bind(this.onReady, this));
+        },
+
+        onReady: function() {
+            this.initialization = false;
+
+            var state = tools.unpackFromQueryString(location.search)[this.viewGroup] || {};
+            if (this.$searchField.length && state.search) {
+                this.$searchField.val(state.search).change();
+            }
+
+            this.openSelectedNode();
+
+            this._resolveDeferredRender();
+        },
+
+        openSelectedNode: function() {
+            var nodes = this.jsTreeInstance.get_selected();
+            var parents = [];
+            _.each(nodes, function(node) {
+                var parent = this.jsTreeInstance.get_parent(node);
+                if (parent) {
+                    parents.push(parent);
+                }
+            }, this);
+            this.jsTreeInstance.open_node(parents.concat(nodes));
         },
 
         /**
@@ -143,16 +227,17 @@ define(function(require) {
                     three_state: false
                 };
 
-                this.$el.find('[data-role="jstree-checkall"]').show();
+                this.$('[data-role="jstree-checkall"]').show();
             }
 
-            if (this.$el.find('[data-name="search"]').length) {
+            if (this.$searchField.length) {
                 config.plugins.push('search');
                 config.search = {
                     close_opened_onclear: true,
                     show_only_matches: true,
                     show_only_matches_children: false,
-                    case_sensitive: false
+                    case_sensitive: false,
+                    search_callback: _.bind(this.searchCallback, this)
                 };
             }
 
@@ -165,8 +250,77 @@ define(function(require) {
             return config;
         },
 
+        isNodeHasHandler: function(node) {
+            return true;
+        },
+
+        isElementHasHandler: function($el) {
+            var node = this.jsTreeInstance.get_node($el);
+            return node ? this.isNodeHasHandler(node) : false;
+        },
+
+        onSearchKeypress: function(e) {
+            if (e.keyCode === 13) {
+                //enter in search field
+                return this.onSearchEnter(e);
+            }
+        },
+
+        onSearchEnter: function(e) {
+            if (this.autoSelectFoundNode) {
+                this.onSearch(e);
+                var $results = this.$('a.jstree-search');
+                if ($results.length === 1 && this.isElementHasHandler($results)) {
+                    $results.click();
+                }
+            }
+
+            e.preventDefault();
+            this.$searchField.focus();
+            return false;
+        },
+
+        onSearchDelay: function(e) {
+            return this.onSearch(e);
+        },
+
+        _getOriginalSearchEngine: function(str) {
+            var callback = this.originalSearchEngine[str];
+            if (!callback) {
+                var settings = this.jsTreeInstance.settings.search;
+                callback = this.originalSearchEngine[str] = new $.vakata.search(str, true, {
+                    caseSensitive: settings.case_sensitive,
+                    fuzzy: settings.fuzzy
+                });
+            }
+
+            return callback;
+        },
+
+        searchCallback: function(str, node) {
+            var original = this._getOriginalSearchEngine(str);
+            if (original.search(node.text).isMatch) {
+                return true;
+            }
+
+            var searchBy = node.original.search_by || [];
+            for (var i = 0, length = searchBy.length; i < length; i++) {
+                if (original.search(searchBy[i]).isMatch) {
+                    return true;
+                }
+            }
+
+            return false;
+        },
+
         onSearch: function(event) {
             var value = $(event.target).val();
+            value = _.trim(value).replace(/\s+/g, ' ');
+            if (this.searchValue === value) {
+                return;
+            }
+            this.searchValue = value;
+
             if (this.jsTreeInstance.allNodesHidden) {
                 this.jsTreeInstance.show_all();
                 this.jsTreeInstance.allNodesHidden = false;
@@ -174,6 +328,26 @@ define(function(require) {
             this.jsTreeInstance.searchValue = value;
             this.jsTreeInstance.settings.autohideNeighbors = tools.isMobile() && _.isEmpty(value);
             this.jsTreeInstance.search(value);
+
+            this._toggleClearSearchButton(value);
+
+            this._changeUrlParam('search', value.length ? value : null);
+            mediator.trigger(this.viewGroup + ':highlight-text:update', value);
+        },
+
+        /**
+         * Show/Hide clear search field button
+         */
+        _toggleClearSearchButton: function(str) {
+            this.$clearSearchButton.toggleClass('hide', str === '');
+        },
+
+        /**
+         * Clear search field value
+         */
+        clearSearch: function() {
+            this.$searchField.val('');
+            this.$searchField.change();
         },
 
         /**
@@ -183,34 +357,61 @@ define(function(require) {
          * @param {Object} data
          */
         searchResultsFilter: function(event, data) {
+            if (!data || !data.instance) {
+                return;
+            }
+
             if (data.res.length) {
-                this.underlineFilter.apply(this, arguments);
+                this.addChildToSearchResults(data.res);
             } else {
                 this.showSearchResultMessage(_.__('oro.ui.jstree.search.search_no_found'));
             }
         },
 
         /**
-         * Underline matches substrings
+         * Show child of found nodes without handler
          *
-         * @param {Object} event
-         * @param {Object} data
+         * @param {Array} nodes
          */
-        underlineFilter: _.debounce(function(event, data) {
-            var pattern = new RegExp(data.instance.searchValue, 'gi');
-            if (!data.nodes) {
+        addChildToSearchResults: function(nodes) {
+            if (this.jsTreeInstance.settings.search.show_only_matches_children) {
                 return;
             }
-            $('.jstree-search', this.$el).each(function(index, item) {
-                var $item = $(item);
-                var sourceText = $item.text().replace(pattern, '<span class="matched-keyword">$&</span>');
-                $item.contents().filter(function(index, node) {
-                    return node.nodeName === '#text' || node.className === 'matched-keyword';
-                }).remove();
 
-                $item.append(sourceText);
-            });
-        }),
+            var additionalNodes = [];
+            var nodesWithAdditional = [];
+
+            _.each(this.$('li.jstree-node:visible'), function(item) {
+                var $item = $(item);
+                var node = this.jsTreeInstance.get_node(item.id);
+                if (!node.children_d.length || this.isNodeHasHandler(node)) {
+                    return;
+                }
+
+                var $child = $item.children('.jstree-children');
+                if ($child.is(':visible')) {
+                    return;
+                }
+
+                additionalNodes = additionalNodes.concat(node.children_d);
+                nodesWithAdditional.push(node.id);
+            }, this);
+
+            if (!additionalNodes.length) {
+                return;
+            }
+
+            nodes = _.uniq(nodes);
+            additionalNodes = _.uniq(additionalNodes);
+            additionalNodes = nodes.slice().concat(additionalNodes);
+            this.jsTreeInstance.show_node(additionalNodes);
+
+            if (nodes.length > 1) {
+                this.jsTreeInstance.close_node(nodesWithAdditional, 0);
+            } else {
+                this.jsTreeInstance.open_node(nodesWithAdditional, 0);
+            }
+        },
 
         /**
          * Show search result message
@@ -282,7 +483,6 @@ define(function(require) {
                     }
                 }, this));
             }
-            this.underlineFilter.apply(this, arguments);
         },
 
         onAfterOpen: function(event, data) {
@@ -365,6 +565,11 @@ define(function(require) {
             return node;
         },
 
+        _changeUrlParam: function(param, value) {
+            param = this.viewGroup + '[' + param + ']';
+            mediator.execute('changeUrlParam', param, value);
+        },
+
         dispose: function() {
             if (this.disposed) {
                 return;
@@ -374,8 +579,11 @@ define(function(require) {
             this.$tree.parent().off();
 
             delete this.$tree;
+            delete this.$searchField;
+            delete this.$clearSearchButton;
             delete this.jsTreeInstance;
             delete this.jsTreeConfig;
+            delete this.originalSearchEngine;
 
             return BaseTreeView.__super__.dispose.call(this);
         }

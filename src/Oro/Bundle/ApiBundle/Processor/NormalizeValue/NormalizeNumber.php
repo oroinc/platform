@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
 
+/**
+ * Converts a string to floating point number (float data type).
+ * Provides a regular expression that can be used to validate that a string represents a number value.
+ */
 class NormalizeNumber extends AbstractProcessor
 {
     const REQUIREMENT = '-?\d*\.?\d+';

@@ -1,13 +1,13 @@
 styles:
     inputs:
         - 'bundles/bowerassets/font-awesome/css/font-awesome.css'
-        - 'bundles/oroui/css/jquery-ui.grid.css'
-        - 'bundles/oroui/css/jquery-ui.custom.css'
         - 'bundles/oroui/blank/scss/settings/global-settings.scss'
         - 'bundles/oroui/blank/scss/variables/base-config.scss'
         - 'bundles/oroui/blank/scss/variables/mCustomScrollbar-config.scss'
+        - 'bundles/oroui/blank/scss/variables/scrollbar-config.scss'
         - 'bundles/oroui/blank/scss/variables/animation-config.scss'
         - 'bundles/oroui/blank/scss/variables/page-container-config.scss'
+        - 'bundles/oroui/blank/scss/variables/page-area-container-config.scss'
         - 'bundles/oroui/blank/scss/variables/page-header-config.scss'
         - 'bundles/oroui/blank/scss/variables/page-main-config.scss'
         - 'bundles/oroui/blank/scss/variables/page-content-config.scss'

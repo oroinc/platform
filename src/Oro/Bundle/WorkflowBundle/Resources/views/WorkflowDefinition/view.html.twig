@@ -352,7 +352,7 @@
                                 </label>
                                 <div class="controls">
                                     <div class="control-label">
-                                        {{ ((variable.value is iterable) ? variable.value|join(', ') : variable.value) }}
+                                        {{ variable|oro_format_workflow_variable_value|default('N/A'|trans) }}
                                         {{ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.variable_definitions.variables[variable.name]) }}
                                     </div>
                                 </div>

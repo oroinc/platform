@@ -146,7 +146,7 @@ class ObjectIdentityFactoryTest extends \PHPUnit_Framework_TestCase
     public static function getProvider()
     {
         return array(
-            \stdClass::class => array(
+            'Entity' => array(
                 'Entity:Test:TestEntity',
                 'entity',
                 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity'

@@ -182,6 +182,8 @@ services:
         arguments:
             - '@oro_integration.manager.types_registry.link'
             - '@doctrine'
+        tags:
+            - { name: doctrine.event_listener, event: onClear }
 
     oro_integration.logger.strategy:
         class: %oro_integration.logger.strategy.class%
@@ -347,3 +349,11 @@ services:
             - [setLogger, ["@oro_integration.logger.strategy"]]
         tags:
            - { name: kernel.event_listener, event: oro_integration.client_created_after, method: onClientCreated }
+
+    oro_integration.event_listener.integration_sync:
+        class: Oro\Bundle\IntegrationBundle\EventListener\IntegrationSyncListener
+        arguments:
+            - '@oro_message_queue.client.driver'
+        tags:
+            - { name: kernel.event_listener, event: oro_integration.event.sync_before, method: syncBefore }
+            - { name: kernel.event_listener, event: oro_integration.event.sync_after, method: syncAfter }

@@ -10,7 +10,6 @@ use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
-use Oro\Bundle\ApiBundle\Filter\RequestAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -19,6 +18,8 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
  */
 class RegisterConfiguredFilters extends RegisterFilters
 {
+    const ASSOCIATION_ALLOWED_OPERATORS = [ComparisonFilter::EQ, ComparisonFilter::NEQ];
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -36,6 +37,8 @@ class RegisterConfiguredFilters extends RegisterFilters
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function process(ContextInterface $context)
     {
@@ -67,11 +70,8 @@ class RegisterConfiguredFilters extends RegisterFilters
                 continue;
             }
             $propertyPath = $field->getPropertyPath($filterKey);
-            $filter = $this->createFilter($field, $propertyPath);
+            $filter = $this->createFilter($field, $propertyPath, $context);
             if (null !== $filter) {
-                if ($filter instanceof RequestAwareFilterInterface) {
-                    $filter->setRequestType($context->getRequestType());
-                }
                 if ($filter instanceof FieldAwareFilterInterface) {
                     // @todo BAP-11881. Update this code when NEQ operator for to-many collection
                     // will be implemented in Oro\Bundle\ApiBundle\Filter\ComparisonFilter
@@ -79,8 +79,10 @@ class RegisterConfiguredFilters extends RegisterFilters
                         $filter->setSupportedOperators([StandaloneFilter::EQ]);
                     }
                     // only EQ and NEQ operators should be available for association filters
-                    if (in_array($propertyPath, $associationNames, true)) {
-                        $filter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+                    if (in_array($propertyPath, $associationNames, true) &&
+                        [] !== array_diff($filter->getSupportedOperators(), self::ASSOCIATION_ALLOWED_OPERATORS)
+                    ) {
+                        $filter->setSupportedOperators(self::ASSOCIATION_ALLOWED_OPERATORS);
                     }
                 }
 

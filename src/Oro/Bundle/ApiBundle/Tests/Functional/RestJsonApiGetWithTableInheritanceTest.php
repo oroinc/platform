@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 
 class RestJsonApiGetWithTableInheritanceTest extends RestJsonApiTestCase
 {
@@ -13,12 +15,16 @@ class RestJsonApiGetWithTableInheritanceTest extends RestJsonApiTestCase
     {
         parent::setUp();
 
-        $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/table_inheritance.yml']);
+        $this->loadFixtures([
+            LoadOrganization::class,
+            LoadBusinessUnit::class,
+            '@OroApiBundle/Tests/Functional/DataFixtures/table_inheritance.yml'
+        ]);
     }
 
     /**
-     * @param array $params
-     * @param array $expects
+     * @param array        $params
+     * @param array|string $expects
      *
      * @dataProvider getParamsAndExpectation
      */
@@ -27,6 +33,7 @@ class RestJsonApiGetWithTableInheritanceTest extends RestJsonApiTestCase
         /** @var TestDepartment $department */
         $department = $this->getReference('test_department');
 
+        $expects = $this->loadResponseData($expects);
         $expects['data'][0]['id'] = (string)$department->getId();
 
         $expects['data'][0]['relationships']['staff']['data'][0]['id'] =
@@ -40,7 +47,7 @@ class RestJsonApiGetWithTableInheritanceTest extends RestJsonApiTestCase
         // test get list request
         $response = $this->cget(['entity' => $entityType, 'page[size]' => 1], $params);
 
-        $this->assertEquals($expects, json_decode($response->getContent(), true));
+        self::assertEquals($expects, json_decode($response->getContent(), true));
     }
 
     /**
@@ -56,7 +63,7 @@ class RestJsonApiGetWithTableInheritanceTest extends RestJsonApiTestCase
                     ],
                     'sort'   => '-id'
                 ],
-                'expects' => $this->loadExpectation('output_inheritance_1.yml')
+                'expects' => 'output_inheritance_1.yml'
             ],
             'Related entity with table inheritance (expanded)' => [
                 'params'  => [
@@ -67,7 +74,7 @@ class RestJsonApiGetWithTableInheritanceTest extends RestJsonApiTestCase
                     ],
                     'sort'    => '-id'
                 ],
-                'expects' => $this->loadExpectation('output_inheritance_2.yml')
+                'expects' => 'output_inheritance_2.yml'
             ],
         ];
     }

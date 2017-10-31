@@ -84,6 +84,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
         $this->assertFalse($resultConfig['grand_total']['per_page']);
         $this->assertFalse($resultConfig['grand_total']['hide_if_one_page']);
         $this->assertEquals('SUM(a.won)', $resultConfig['grand_total']['columns']['wonCount']['expr']);
+        $this->assertEquals(100, $resultConfig['grand_total']['columns']['wonCount']['divisor']);
         $this->assertTrue(isset($resultConfig['total']['columns']['wonCount']));
         $this->assertEquals('SUM(a.won)', $resultConfig['total']['columns']['wonCount']['expr']);
     }
@@ -155,7 +156,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
                         'columns' => [
                             'id' => ['expr' => 'COUNT(a.id)'],
                             'name' => ['label' => 'Grand Total'],
-                            'wonCount' => ['expr' => 'SUM(a.won)']
+                            'wonCount' => ['expr' => 'SUM(a.won)', 'divisor' => 100]
                         ]
                     ]
                 ]

@@ -58,7 +58,6 @@ class Form extends Element
             self::assertNotNull($field, sprintf("Field `%s` not found", $label));
 
             $field = $this->wrapField($label, $field);
-            echo $field->getOuterHtml();
 
             $expectedValue = self::normalizeValue($value);
             $fieldValue = self::normalizeValue($field->getValue());
@@ -93,6 +92,11 @@ class Form extends Element
     public function save()
     {
         $this->pressActionButton('Save');
+    }
+
+    public function saveAndCreateNew()
+    {
+        $this->pressActionButton('Save and New');
     }
 
     /**
@@ -154,12 +158,23 @@ class Form extends Element
                 return $this->elementFactory->wrapElement('DateTimePicker', $field->getParent()->getParent());
             }
 
+            if ($field->hasClass('custom-checkbox__input')) {
+                return $this->elementFactory->wrapElement(
+                    'PrettyCheckbox',
+                    $field->getParent()->find('css', '.custom-checkbox__icon')
+                );
+            }
+
             if ($field->hasAttribute('type') && 'checkbox' === $field->getAttribute('type')) {
                 return $this->elementFactory->wrapElement('Checkbox', $field);
             }
 
             if ($field->hasClass('select2-offscreen')) {
                 return $this->elementFactory->wrapElement('Select2Entity', $field);
+            }
+
+            if ($field->hasClass('select2-input')) {
+                return $this->elementFactory->wrapElement('Select2Entities', $field);
             }
 
             if ('select' === $field->getTagName()) {

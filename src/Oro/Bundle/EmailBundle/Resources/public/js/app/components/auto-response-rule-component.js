@@ -2,16 +2,24 @@ define([
     'jquery',
     'underscore',
     'oroui/js/app/components/base/component',
-    'oroentity/js/fields-loader',
-    'oroquerydesigner/js/condition-builder'
+    'oroentity/js/fields-loader'
 ], function($, _, BaseComponent) {
     'use strict';
 
     var AutoResponseRuleComponent = BaseComponent.extend({
+        relatedSiblingComponents: {
+            conditionBuilderComponent: 'condition-builder'
+        },
+
         initialize: function(options) {
+            this.$storage = $('[data-ftid=oro_email_autoresponserule_definition]');
+
             this._initLoader(options);
-            this._initFieldCondition(options);
-            this._initBuilder(options);
+
+            this.conditionBuilderComponent.view.setValue(this.load('filters'));
+            this.listenTo(this.conditionBuilderComponent.view, 'change', function(value) {
+                this.save(value, 'filters');
+            });
 
             AutoResponseRuleComponent.__super__.initialize.apply(this, arguments);
         },
@@ -20,29 +28,6 @@ define([
             var $entityChoice = $('[data-ftid=oro_email_autoresponserule_entity]');
             $entityChoice.fieldsLoader();
             $entityChoice.fieldsLoader('setFieldsData', options.data);
-        },
-
-        _initFieldCondition: function(options) {
-            var $criteria = $('#filter-criteria-list');
-            var $fieldCondition = $criteria.find('[data-criteria=condition-item]');
-            if (!_.isEmpty($fieldCondition)) {
-                $.extend(true, $fieldCondition.data('options'), {
-                    filters: options.metadata.filters,
-                    hierarchy: options.metadata.hierarchy
-                });
-            }
-        },
-
-        _initBuilder: function(options) {
-            var $builder = $('#oro_email_autoresponserule-condition-builder');
-            this.$storage = $('[data-ftid=oro_email_autoresponserule_definition]');
-            $builder.conditionBuilder({
-                criteriaListSelector: '#filter-criteria-list'
-            });
-            $builder.conditionBuilder('setValue', this.load('filters'));
-            $builder.on('changed', _.bind(function() {
-                this.save($builder.conditionBuilder('getValue'), 'filters');
-            }, this));
         },
 
         load: function(key) {

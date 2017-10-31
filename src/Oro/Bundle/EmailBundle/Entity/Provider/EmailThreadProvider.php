@@ -57,9 +57,8 @@ class EmailThreadProvider
         if ($refs) {
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = $entityManager->getRepository('OroEmailBundle:Email')->createQueryBuilder('e');
-            $criteria = new Criteria();
-            $criteria->where($criteria->expr()->in('messageId', $refs));
-            $queryBuilder->addCriteria($criteria);
+            $queryBuilder->where($queryBuilder->expr()->in('e.messageId', ':messagesIds'))
+                ->setParameter('messagesIds', $refs);
             $result = $queryBuilder->getQuery()->getResult();
         }
 
@@ -136,27 +135,26 @@ class EmailThreadProvider
         if ($thread) {
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = $entityManager->getRepository('OroEmailBundle:Email')->createQueryBuilder('e');
-            $queryBuilder->join('e.emailUsers', 'eu');
-
-            $criteria = new Criteria();
-            $criteria->where($criteria->expr()->eq('thread', $thread));
-            $criteria->orderBy(['sentAt' => Criteria::DESC]);
+            $queryBuilder->join('e.emailUsers', 'eu')
+                ->where($queryBuilder->expr()->eq('e.thread', ':thread'))
+                ->setParameter('thread', $thread)
+                ->orderBy('e.sentAt', Criteria::DESC);
 
             if ($mailboxes) {
-                $criteria->andWhere(
-                    $criteria->expr()->orX(
-                        $criteria->expr()->in('eu.mailboxOwner', $mailboxes),
-                        $criteria->expr()->eq('eu.owner', $user)
+                $queryBuilder->andWhere(
+                    $queryBuilder->expr()->orX(
+                        $queryBuilder->expr()->in('eu.mailboxOwner', ':mailboxes'),
+                        $queryBuilder->expr()->eq('eu.owner', ':user')
                     )
-                );
+                )->setParameter('mailboxes', $mailboxes);
             } else {
-                $criteria->andWhere(
-                    $criteria->expr()->eq('eu.owner', $user)
+                $queryBuilder->andWhere(
+                    $queryBuilder->expr()->eq('eu.owner', ':user')
                 );
             }
+            $queryBuilder->setParameter('user', $user);
 
             $result = $queryBuilder
-                ->addCriteria($criteria)
                 ->getQuery()
                 ->getResult();
         } else {

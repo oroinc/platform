@@ -56,7 +56,7 @@ define(function(require) {
             var loadingMaskView;
             var dialogWidget = new DialogWidget({
                 title: title,
-                el: $('<div><div class="comment-form-container"/></div>'),
+                el: $('<div><div class="comment-form-container" data-layout="separate"></div>'),
                 stateEnabled: false,
                 incrementalPosition: false,
                 dialogOptions: {

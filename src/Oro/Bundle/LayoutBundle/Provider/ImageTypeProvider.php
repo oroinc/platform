@@ -142,4 +142,23 @@ class ImageTypeProvider
 
         return $dimensions;
     }
+
+    /**
+     * Get maximum number by types array
+     *
+     * @return array
+     */
+    public function getMaxNumberByType()
+    {
+        $maxNumbers = [];
+
+        foreach ($this->getImageTypes() as $imageType) {
+            $maxNumbers[$imageType->getName()] = [
+                'max' => $imageType->getMaxNumber(),
+                'label' => $imageType->getLabel()
+            ];
+        }
+
+        return $maxNumbers;
+    }
 }

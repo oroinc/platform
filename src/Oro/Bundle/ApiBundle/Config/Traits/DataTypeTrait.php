@@ -26,9 +26,11 @@ trait DataTypeTrait
      */
     public function getDataType()
     {
-        return array_key_exists(EntityDefinitionFieldConfig::DATA_TYPE, $this->items)
-            ? $this->items[EntityDefinitionFieldConfig::DATA_TYPE]
-            : null;
+        if (!array_key_exists(EntityDefinitionFieldConfig::DATA_TYPE, $this->items)) {
+            return null;
+        }
+
+        return $this->items[EntityDefinitionFieldConfig::DATA_TYPE];
     }
 
     /**

@@ -103,6 +103,7 @@ define(function(require) {
         },
 
         startRedirect: function() {
+            mediator.execute('showLoading');
             var _this = this;
             $.ajax({
                 url: this.element.attr('href'),

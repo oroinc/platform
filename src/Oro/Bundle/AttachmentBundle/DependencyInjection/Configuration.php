@@ -16,6 +16,12 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode    = $treeBuilder->root('oro_attachment');
+        $rootNode
+            ->children()
+                ->booleanNode('debug_images')
+                    ->defaultTrue()
+                ->end()
+            ->end();
 
         /**
          * See file types list -> http://www.freeformatter.com/mime-types-list.html
@@ -35,6 +41,7 @@ EOF;
 image/gif
 image/jpeg
 image/png
+image/svg+xml
 EOF;
 
         SettingsBuilder::append(

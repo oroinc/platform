@@ -10,11 +10,15 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory as MetadataFactory;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 
 class EntityMetadataLoader
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
+
+    /** @var EntityIdHelper */
+    protected $entityIdHelper;
 
     /** @var MetadataFactory */
     protected $metadataFactory;
@@ -33,6 +37,7 @@ class EntityMetadataLoader
 
     /**
      * @param DoctrineHelper                         $doctrineHelper
+     * @param EntityIdHelper                         $entityIdHelper
      * @param MetadataFactory                        $metadataFactory
      * @param ObjectMetadataFactory                  $objectMetadataFactory
      * @param EntityMetadataFactory                  $entityMetadataFactory
@@ -41,6 +46,7 @@ class EntityMetadataLoader
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
+        EntityIdHelper $entityIdHelper,
         MetadataFactory $metadataFactory,
         ObjectMetadataFactory $objectMetadataFactory,
         EntityMetadataFactory $entityMetadataFactory,
@@ -48,6 +54,7 @@ class EntityMetadataLoader
         EntityNestedAssociationMetadataFactory $nestedAssociationMetadataFactory
     ) {
         $this->doctrineHelper = $doctrineHelper;
+        $this->entityIdHelper = $entityIdHelper;
         $this->metadataFactory = $metadataFactory;
         $this->objectMetadataFactory = $objectMetadataFactory;
         $this->entityMetadataFactory = $entityMetadataFactory;
@@ -131,7 +138,15 @@ class EntityMetadataLoader
     protected function createEntityMetadata(ClassMetadata $classMetadata, EntityDefinitionConfig $config)
     {
         $entityMetadata = $this->metadataFactory->createEntityMetadata($classMetadata);
-        if ($config->hasFields()) {
+        $configuredIdFieldNames = $config->getIdentifierFieldNames();
+        if (!empty($configuredIdFieldNames)) {
+            if ($entityMetadata->hasIdentifierGenerator()
+                && !$this->entityIdHelper->isEntityIdentifierEqual($entityMetadata->getIdentifierFieldNames(), $config)
+            ) {
+                $entityMetadata->setHasIdentifierGenerator(false);
+            }
+            $entityMetadata->setIdentifierFieldNames($configuredIdFieldNames);
+        } else {
             $idFieldNames = $entityMetadata->getIdentifierFieldNames();
             if (!empty($idFieldNames)) {
                 $normalizedIdFieldNames = [];
@@ -239,11 +254,8 @@ class EntityMetadataLoader
             }
             if (!$field->isMetaProperty()) {
                 $dataType = $field->getDataType();
-                if ($dataType
-                    && !$entityMetadata->hasField($fieldName)
-                    && !$entityMetadata->hasAssociation($fieldName)
-                ) {
-                    if (DataType::isNestedObject($dataType)) {
+                if (!$entityMetadata->hasField($fieldName) && !$entityMetadata->hasAssociation($fieldName)) {
+                    if ($dataType && DataType::isNestedObject($dataType)) {
                         $this->nestedObjectMetadataFactory->createAndAddNestedObjectMetadata(
                             $entityMetadata,
                             $classMetadata,
@@ -254,7 +266,7 @@ class EntityMetadataLoader
                             $withExcludedProperties,
                             $targetAction
                         );
-                    } elseif (DataType::isNestedAssociation($dataType)) {
+                    } elseif ($dataType && DataType::isNestedAssociation($dataType)) {
                         $this->nestedAssociationMetadataFactory->createAndAddNestedAssociationMetadata(
                             $entityMetadata,
                             $classMetadata,
@@ -273,7 +285,7 @@ class EntityMetadataLoader
                             $field,
                             $targetAction
                         );
-                    } else {
+                    } elseif ($dataType) {
                         $this->objectMetadataFactory->createAndAddFieldMetadata(
                             $entityMetadata,
                             $entityClass,

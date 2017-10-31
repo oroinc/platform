@@ -48,14 +48,14 @@ class SearchNumberFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function testApply($filterType, $comparisonOperator)
     {
-        $fieldName = 'field';
+        $fieldName = 'decimal.field';
         $fieldValue = 100;
 
         $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $restriction = new BaseComparison("decimal.".$fieldName, $comparisonOperator, $fieldValue);
+        $restriction = new BaseComparison($fieldName, $comparisonOperator, $fieldValue);
         $ds->expects($this->once())
             ->method('addRestriction')
             ->with($restriction, FilterUtility::CONDITION_AND);
@@ -99,13 +99,13 @@ class SearchNumberFilterTest extends \PHPUnit_Framework_TestCase
 
     public function testApplyEmpty()
     {
-        $fieldName = 'field';
+        $fieldName = 'decimal.field';
 
         $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $restriction = new Comparison("decimal.".$fieldName, Comparison::NOT_EXISTS, null);
+        $restriction = new Comparison($fieldName, Comparison::NOT_EXISTS, null);
         $ds->expects($this->once())
             ->method('addRestriction')
             ->with($restriction, FilterUtility::CONDITION_AND);
@@ -116,13 +116,13 @@ class SearchNumberFilterTest extends \PHPUnit_Framework_TestCase
 
     public function testApplyNotEmpty()
     {
-        $fieldName = 'field';
+        $fieldName = 'decimal.field';
 
         $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $restriction = new Comparison("decimal.".$fieldName, Comparison::EXISTS, null);
+        $restriction = new Comparison($fieldName, Comparison::EXISTS, null);
         $ds->expects($this->once())
             ->method('addRestriction')
             ->with($restriction, FilterUtility::CONDITION_AND);

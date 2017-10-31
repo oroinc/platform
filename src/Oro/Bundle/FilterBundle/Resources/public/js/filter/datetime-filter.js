@@ -10,6 +10,17 @@ define(function(require) {
     var VariableDateTimePickerView = require('orofilter/js/app/views/datepicker/variable-datetimepicker-view');
     var DateFilter = require('./date-filter');
     var tools = require('oroui/js/tools');
+    var config = require('module').config();
+
+    config = _.extend({
+        inputClass: 'datetime-visual-element',
+        timeInputAttrs: {
+            'class': 'timepicker-input',
+            'placeholder': 'oro.form.choose_time'
+        }
+    }, config);
+
+    config.timeInputAttrs.placeholder = __(config.timeInputAttrs.placeholder);
 
     /**
      * Datetime filter: filter type as option + interval begin and end dates
@@ -20,14 +31,7 @@ define(function(require) {
          *
          * @property
          */
-        inputClass: 'datetime-visual-element',
-
-        /**
-         * View constructor for picker element
-         *
-         * @property
-         */
-        picker: tools.isMobile() ? DateTimePickerView : VariableDateTimePickerView,
+        inputClass: config.inputClass,
 
         /**
          * Selectors for filter data
@@ -52,6 +56,11 @@ define(function(require) {
         events: {
             // timepicker triggers this event on mousedown and hides picker's dropdown
             'hideTimepicker input': '_preventClickOutsideCriteria'
+        },
+
+        _getPickerConstructor: function() {
+            return tools.isMobile() || !this.dateWidgetOptions.showDatevariables ? DateTimePickerView :
+                VariableDateTimePickerView;
         },
 
         _renderCriteria: function() {
@@ -95,10 +104,7 @@ define(function(require) {
             _.extend(options, {
                 backendFormat: [datetimeFormatter.getDateTimeFormat(), this.backendFormat],
                 timezone: 'UTC',
-                timeInputAttrs: {
-                    'class': 'timepicker-input',
-                    'placeholder': __('oro.form.choose_time')
-                }
+                timeInputAttrs: config.timeInputAttrs
             });
             return options;
         },

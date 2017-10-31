@@ -68,15 +68,7 @@ class GridRow extends TableRow
      */
     public function setCellValue($header, $value)
     {
-        $cell = $this->getCell($header);
-        $cell->mouseOver();
-
-        /** @var NodeElement $pencilIcon */
-        $pencilIcon = $cell->find('css', 'i[data-role="edit"]');
-        self::assertNotNull($pencilIcon, "Cell with '$header' is not inline editable");
-        self::assertTrue($pencilIcon->isValid(), "Cell with '$header' is not inline editable");
-        self::assertTrue($pencilIcon->isVisible(), "Cell with '$header' is not inline editable");
-        $pencilIcon->click();
+        $cell = $this->startInlineEditing($header);
 
         $this->getElement('OroForm')->fillField(
             'value',
@@ -89,6 +81,30 @@ class GridRow extends TableRow
     }
 
     /**
+     * Start inline editing on the cell without changing the value and without saving
+     *
+     * @param string $header Column header name
+     * @return NodeElement
+     */
+    public function startInlineEditing($header)
+    {
+        $cell = $this->getCell($header);
+        $cell->mouseOver();
+
+        /** @var NodeElement $pencilIcon */
+        $pencilIcon = $cell->find('css', 'i[data-role="edit"]');
+        self::assertNotNull($pencilIcon, "Cell with '$header' is not inline editable");
+        self::assertTrue(
+            $pencilIcon->isValid() && $pencilIcon->isVisible(),
+            "Cell with '$header' is not inline editable"
+        );
+
+        $pencilIcon->click();
+
+        return $cell;
+    }
+
+    /**
      * Inline edit row cell and save
      *
      * @param string $header Column header name
@@ -96,7 +112,7 @@ class GridRow extends TableRow
      */
     public function setCellValueAndSave($header, $value)
     {
-        $cell = $this->setCellValue($header, $value);
+        $this->setCellValue($header, $value);
 
         $saveButton = $this->spin(function (GridRow $gridRow) {
             return $gridRow->find('css', 'button[title="Save changes"]');

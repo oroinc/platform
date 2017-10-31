@@ -141,6 +141,29 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Start inline editing in grid without changing the value and assert inline editor value
+     *
+     * Example: When I start inline editing on "Test Warehouse" Quantity field I should see "10000000" value
+     *
+     * @param string|null $field
+     * @param string|null $value
+     * @param string|null $entityTitle
+     *
+     * @When /^(?:|I )start inline editing on "(?P<field>[^"]+)" field I should see "(?P<value>.*)" value$/
+     * @codingStandardsIgnoreStart
+     * @When /^(?:|I )start inline editing on "(?P<entityTitle>[^"]+)" "(?P<field>.+)" field I should see "(?P<value>.*)" value$/
+     * @codingStandardsIgnoreEnd
+     */
+    public function startInlineEditingAndAssertEditorValue($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+        $cell = $row->startInlineEditing($field);
+        $inlineEditor = $cell->findField('value');
+
+        self::assertEquals($inlineEditor->getValue(), $value);
+    }
+
+    /**
      * @param string|null $entityTitle
      * @param string|null $gridName
      * @return GridRow
@@ -228,7 +251,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
                 if ($cellValue instanceof \DateTime) {
                     $value = new \DateTime($value);
                 }
-                self::assertEquals($value, $cellValue, sprintf('Unexpected value at %d row in grid', $rowNumber));
+                self::assertEquals(
+                    $value,
+                    $cellValue,
+                    sprintf('Unexpected value at %d row "%s" column in grid', $rowNumber, $columnTitle)
+                );
             }
         }
     }
@@ -299,7 +326,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And number of records should be 34
      *
      * @Given number of records should be :number
-     * @Given /^number of records in "(?P<gridName>[\w\s]+)" should be (?P<number>[\d]+)$/
+     * @Given /^number of records in "(?P<gridName>[\w\s]+)" should be (?P<number>(?:|zero|one|two|\d+))$/
      * @Given /^there (?:|are|is) (?P<number>(?:|zero|one|two|\d+)) record(?:|s) in grid$/
      */
     public function numberOfRecordsShouldBe($number, $gridName = null)
@@ -569,6 +596,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @When /^(?:|when )(?:|I )sort grid by (?P<field>(?:|[\w\s]*(?<!again)))(?:| again)$/
      * @When /^(?:|when )(?:|I )sort "(?P<gridName>[\w\s]+)" by (?P<field>(?:|[\w\s]*(?<!again)))(?:| again)$/
+     * @When /^(?:|I )sort grid by "(?P<field>.*)"(?:| again)$/
      */
     public function sortGridBy($field, $gridName = null)
     {
@@ -779,6 +807,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: But when I filter Created At as not between "25 Jun 2015" and "30 Jun 2015"
      *
      * @When /^(?:|when )(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>(?:|between|not between)) "(?P<start>.+)" and "(?P<end>.+)"$/
+     * @When /^(?:|when )(?:|I )filter "(?P<filterName>[\w\s\/]+)" as (?P<type>(?:|between|not between)) "(?P<start>.+)" and "(?P<end>.+)"$/
      * @When /^(?:|when )(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>(?:|between|not between)) "(?P<start>.+)" and "(?P<end>.+)" in "(?P<filterGridName>[\w\s]+)"$/
      *
      * @param string $filterName
@@ -869,6 +898,38 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterItem = $this->getGridFilters($filterGridName)
             ->getFilterItem($filterGridName . 'FilterItem', $filterName);
         $filterItem->reset();
+    }
+
+    /**
+     * Example: Then I should see grid with filter hints:
+     *            | Any Text: contains "Lamp" |
+     *
+     * @When /^(?:|I )should see grid with filter hints:$/
+     *
+     * @param TableNode $table
+     */
+    public function shouldSeeGridWithFilterHints(TableNode $table)
+    {
+        $hints = array_filter(
+            array_map(
+                function ($item) {
+                    $label = trim($this->createElement('GridFilterHintLabel', $item)->getText());
+                    $text = trim($this->createElement('GridFilterHint', $item)->getText());
+
+                    return $label && $text ? sprintf('%s %s', $label, $text) : '';
+                },
+                $this->findAllElements('GridFilterHintItem')
+            )
+        );
+
+        foreach ($table->getRows() as $row) {
+            list($hint) = $row;
+
+            $this->assertTrue(
+                in_array($hint, $hints, true),
+                sprintf('Hint "%s" not found on page', $hint)
+            );
+        }
     }
 
     /**
@@ -1238,6 +1299,23 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iShouldSeeFollowingRecordsInGrid(TableNode $table, $gridName = null)
     {
+        $errorMessage = <<<TEXT
+            ---
+            You can't use more then one column in this method
+            It just asserts that given strings are in the grid
+            Example: Then I should see following records in grid:
+                       | Alice1  |
+                       | Alice10 |
+
+            Guess, you can use another method...
+
+            And I should see following grid:
+                | First name | Last name | Primary Email     | Enabled | Status |
+                | John       | Doe       | admin@example.com | Enabled | Active |
+
+TEXT;
+
+        self::assertCount(1, $table->getRow(0), $errorMessage);
         foreach ($table->getRows() as list($value)) {
             $this->iShouldSeeRecordInGrid($value, $gridName);
         }
@@ -1590,10 +1668,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             $gridToolbarActions = $this->elementFactory->createElement($gridName . 'ToolbarActions');
             if ($gridToolbarActions->isVisible()) {
                 $gridToolbarActions->getActionByTitle('Filters')->click();
-            } else {
-                $filterState = $this->elementFactory->createElement($gridName . 'FiltersState');
-                self::assertNotNull($filterState);
+            }
 
+            $filterState = $this->elementFactory->createElement($gridName . 'FiltersState');
+            if ($filterState->isValid()) {
                 $filterState->click();
             }
         }
@@ -1628,5 +1706,47 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
         $gridPaginator = $this->elementFactory->createElement('GridToolbarPaginator', $gridPaginatorContainer);
         $gridPaginator->clickLink($lnk);
+    }
+
+    /**
+     * Example: I should see next rows in "Discounts" table:
+     *   | Description | Discount |
+     *   | Amount      | -$2.00   |
+     *
+     * @Then /^(?:|I )should see next rows in "(?P<elementName>[\w\s]+)" table$/
+     * @param TableNode $expectedTableNode
+     * @param string $elementName
+     */
+    public function iShouldSeeNextRowsInTable(TableNode $expectedTableNode, $elementName)
+    {
+        /** @var Table $table */
+        $table = $this->createElement($elementName);
+
+        static::assertInstanceOf(Table::class, $table, sprintf('Element should be of type %s', Table::class));
+
+        $rows = $table->getRows();
+        $expectedRows = $expectedTableNode->getRows();
+        $headers = array_shift($expectedRows);
+
+        foreach ($expectedRows as $rowKey => $expectedRow) {
+            self::assertEquals($expectedRow, $rows[$rowKey]->getCellValues($headers));
+        }
+    }
+
+    /**
+     * Example: I should see no records in "Discounts" table
+     *
+     * @Then /^I should see no records in "(?P<elementName>[\w\s]+)" table$/
+     * @param string $elementName
+     */
+    public function iShouldSeeNoRecordsInTable($elementName)
+    {
+        /** @var Table $table */
+        $table = $this->createElement($elementName);
+
+        static::assertInstanceOf(Table::class, $table, sprintf('Element should be of type %s', Table::class));
+
+        $rows = $table->getRows();
+        self::assertCount(0, $rows);
     }
 }

@@ -20,7 +20,7 @@ class RestJsonApiRelationshipsTest extends RestJsonApiTestCase
             return;
         }
 
-        $entityId = $this->getRestApiEntityId($entityId);
+        $entityId = $this->getRestApiEntityId($entityClass, $entityId);
         $entityType = $this->getEntityType($entityClass);
 
         $resourceObjectId = $this->checkGetRelationshipRequest(
@@ -100,18 +100,18 @@ class RestJsonApiRelationshipsTest extends RestJsonApiTestCase
         );
 
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
-        $this->assertApiResponseStatusCodeEquals($response, [200, 404, 405], $resourceKey, 'get relationship');
+        self::assertApiResponseStatusCodeEquals($response, [200, 404, 405], $resourceKey, 'get relationship');
 
         if (200 !== $response->getStatusCode()) {
             return null;
         }
 
-        $responseContent = $this->jsonToArray($response->getContent());
-        $this->assertArrayHasKey('data', $responseContent, sprintf('"get relationship" for %s', $resourceKey));
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertArrayHasKey('data', $responseContent, sprintf('"get relationship" for %s', $resourceKey));
         $data = $responseContent['data'];
         $resourceObjectId = null;
         if ($subresource->isCollection()) {
-            $this->assertTrue(
+            self::assertTrue(
                 is_array($data),
                 sprintf('The "data" should be an array for "get relationship" for %s', $resourceKey)
             );
@@ -119,7 +119,7 @@ class RestJsonApiRelationshipsTest extends RestJsonApiTestCase
                 $resourceObjectId = reset($data);
             }
         } else {
-            $this->assertTrue(
+            self::assertTrue(
                 null === $data || is_array($data),
                 sprintf('The "data" should be NULL or an array for "get relationship" for %s', $resourceKey)
             );
@@ -167,7 +167,7 @@ class RestJsonApiRelationshipsTest extends RestJsonApiTestCase
         );
 
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
-        $this->assertUpdateApiResponseStatusCodeEquals(
+        self::assertUpdateApiResponseStatusCodeEquals(
             $response,
             [204, 404, 405],
             $resourceKey,
@@ -210,7 +210,7 @@ class RestJsonApiRelationshipsTest extends RestJsonApiTestCase
         );
 
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
-        $this->assertUpdateApiResponseStatusCodeEquals(
+        self::assertUpdateApiResponseStatusCodeEquals(
             $response,
             [204, 404, 405],
             $resourceKey,
@@ -253,7 +253,7 @@ class RestJsonApiRelationshipsTest extends RestJsonApiTestCase
         );
 
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
-        $this->assertApiResponseStatusCodeEquals(
+        self::assertApiResponseStatusCodeEquals(
             $response,
             [204, 400, 404, 405],
             $resourceKey,

@@ -1,14 +1,4 @@
 services:
-    oro_test.listener.step_duration_measure_subscriber:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\StepDurationMeasureSubscriber'
-        arguments:
-            - '@definition.finder'
-
-    oro_test.listener.feature_duration_subscriber:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\FeatureDurationSubscriber'
-        arguments:
-            - '%kernel.log_dir%'
-
     oro_test.listener.interactive_execution_subscriber:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\InteractiveExecutionSubscriber'
 
@@ -80,8 +70,6 @@ services:
             - '@oro_test.entity_class_resolver'
             - '@oro_test.entity_supplement'
             - '@oro_test.alice_loader'
-        tags:
-            - { name: 'message_queue_isolator_aware' }
 
     oro_test.entity_class_resolver:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntityClassResolver
@@ -97,12 +85,6 @@ services:
     oro_test.reference_repository:
         class: Nelmio\Alice\Instances\Collection
         factory: ['@oro_test.alice_loader', getReferenceRepository]
-
-    oro_test.reference_repository_initializer:
-        class: '%oro_test.reference_initializer_class%'
-        arguments:
-            - '@symfony2_extension.kernel'
-            - '@oro_test.reference_repository'
 
     oro_behat_extension.fixtures.doctrine_entity_populator:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\DoctrineEntityPopulator

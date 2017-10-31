@@ -117,11 +117,11 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(0));
 
         $exception = new \Exception('exception message');
-        $event->expects($this->once())
+        $event->expects($this->exactly(2))
             ->method('getException')
             ->will($this->returnValue($exception));
 
-        $context = ['exit_code' => 0];
+        $context = ['exit_code' => 0, 'exception' => $exception];
 
         if ($arguments) {
             $context['arguments'] = $arguments;
@@ -156,7 +156,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
                 'arguments' => [
                     'command' => 'test:command'
                 ],
-                'options' => []
+                'options' => [],
             ],
             'with arguments' => [
                 'arguments' => [

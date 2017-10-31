@@ -123,9 +123,7 @@ class DbalTransportFactoryTest extends \PHPUnit_Framework_TestCase
 
         $expectedTags = [
             'oro_message_queue.consumption.extension' => [
-                [
-                    'priority' => 20,
-                ]
+                ['priority' => -20]
             ]
         ];
 

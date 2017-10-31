@@ -1,17 +1,20 @@
-define([
-    'underscore',
-    'oroui/js/messenger',
-    './../base/page-region-view'
-], function(_, messenger, PageRegionView) {
+define(function(require) {
     'use strict';
 
-    var PageMainMenuView;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var messenger = require('oroui/js/messenger');
+    var PageRegionView = require('oroui/js/app/views/base/page-region-view');
 
-    PageMainMenuView = PageRegionView.extend({
+    var MessagesView;
+
+    MessagesView = PageRegionView.extend({
         /**
          * @type {Array}
          */
         pageItems: ['flashMessages'],
+
+        pageIsGoingToReload: false,
 
         listen: {
             'page:afterChange mediator': 'onPageAfterChange'
@@ -24,11 +27,25 @@ define([
          */
         route: null,
 
+        delegateEvents: function() {
+            MessagesView.__super__.delegateEvents.call(this);
+            $(window).on('beforeunload' + this.eventNamespace(), this.onBeforePageReload.bind(this));
+        },
+
+        undelegateEvents: function() {
+            MessagesView.__super__.undelegateEvents.call(this);
+            $(window).off('beforeunload' + this.eventNamespace());
+        },
+
         /**
          * @inheritDoc
          */
         render: function() {
             return this;
+        },
+
+        onBeforePageReload: function() {
+            this.pageIsGoingToReload = true;
         },
 
         /**
@@ -68,13 +85,17 @@ define([
          * @param {Object} messages
          */
         _addMessages: function(messages) {
+            var options;
+            if (this.pageIsGoingToReload) {
+                options = {afterReload: true};
+            }
             _.each(messages, function(messages, type) {
                 _.each(messages, function(message) {
-                    messenger.notificationFlashMessage(type, message);
+                    messenger.notificationFlashMessage(type, message, options);
                 });
             });
         }
     });
 
-    return PageMainMenuView;
+    return MessagesView;
 });

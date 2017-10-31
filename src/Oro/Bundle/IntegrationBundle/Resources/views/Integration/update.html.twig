@@ -31,7 +31,12 @@
 
     {% if entity.id %}
         {% if entity.enabled %}
-        <div class="btn-group">
+        <div class="btn-group" {{ UI.renderPageComponentAttributes({
+            view: 'orointegration/js/app/views/integration-sync-view',
+            options: {
+                integrationName: entity.name
+            }
+        }) }}>
             {% set buttonsHtml %}
                 {% placeholder oro_integration_sync_button with {'entity': entity} %}
                 {% placeholder oro_integration_force_sync_button with {'entity': entity} %}
@@ -132,58 +137,4 @@
         'dataBlocks': dataBlocks,
     } %}
     {{ parent() }}
-    <script type="text/javascript">
-        require(['jquery', 'orotranslation/js/translator', 'routing', 'oroui/js/messenger', 'oroui/js/mediator', 'oroui/js/modal'],
-        function ($, __, routing, messenger, mediator, Modal) {
-            $(function () {
-                var scheduleSync = function (url) {
-                    mediator.execute('showLoading');
-
-                    $.ajax(url, {
-                        success: function (response) {
-                            messenger.notificationMessage(
-                                response.successful ? 'success' : 'warning',
-                                response.message
-                            );
-                        },
-                        error: function(response) {
-                            messenger.notificationMessage(
-                                'error',
-                                response.responseJSON && response.responseJSON.message
-                                    ? response.responseJSON.message
-                                    : __('oro.integration.error')
-                            );
-                        },
-                        errorHandlerMessage: false
-                    }).always(function () {
-                        mediator.execute('hideLoading');
-                    });
-                };
-
-                $('.schedule-button').click(function (e) {
-                    e.preventDefault();
-                    var url = $(this).data('url');
-
-                    if ($(this).data('force')) {
-                        var confirmation = new Modal({
-                            title: __('oro.integration.force_sync.title'),
-                            okText: __('oro.integration.force_sync.ok'),
-                            cancelText: __("oro.integration.force_sync.cancel"),
-                            content: __('oro.integration.force_sync.message', {'integration_name': {{ entity.name|json_encode|raw }} }),
-                            className: 'modal oro-modal-danger',
-                            handleClose: true
-                        });
-
-                        confirmation.on('ok', function () {
-                            scheduleSync(url);
-                        });
-
-                        confirmation.open();
-                    } else {
-                        scheduleSync(url);
-                    }
-                });
-            });
-        });
-    </script>
 {% endblock content_data %}

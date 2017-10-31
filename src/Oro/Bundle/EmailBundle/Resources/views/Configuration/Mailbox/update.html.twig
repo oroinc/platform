@@ -1,6 +1,7 @@
 {% extends 'OroConfigBundle::configPage.html.twig' %}
 
 {% import 'OroEmailBundle::macros.html.twig' as emailUI %}
+{% import 'OroConfigBundle::macros.html.twig' as configUI %}
 
 {% if form.vars.data.id %}
     {% set mailboxTitle = form.vars.data.label %}
@@ -76,7 +77,7 @@
     {% set buttons = buttons ~ UI.dropdownSaveButton({'html': html}) %}
 
     {% set options = {
-        el: '#' ~ form.vars.id,
+        view: 'oroconfig/js/form/config-form'
     } %}
 
     <form
@@ -86,79 +87,58 @@
         action="{{ formAction }}"
         method="post"
         data-collect="true"
-        data-page-component-module="oroconfig/js/form/config-form"
-        data-page-component-options="{{ options|json_encode }}"
+        data-page-component-view="{{ options|json_encode }}"
     >
-        {{ emailUI.renderMailboxConfigTitleAndButtons(pageTitle, buttons) }}
-        <div class="system-configuration-container left-panel-container">
-            <div class="placeholder">
-                <div class="scrollable-container">
-                    {{ configUI.renderTabs(data, activeGroup, activeSubGroup, routeName, routeParameters) }}
-                    <div class="system-configuration-content content form-container" id="configuration-options-block">
-                        <div class="pull-right">
-                            <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.id }}"/>
-                        </div>
-                        {% set fromErrors = form_errors(form) %}
-                        {% if formErrors is defined and formErrors | length %}
-                            <div class="customer-info-actions container-fluid well-small alert-wrap">
-                                <div class="alert alert-error">
-                                    <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap">×</button>
-                                    {{ formErrors|raw }}
-                                </div>
-                            </div>
-                        {% endif %}
-                        {% set accordionId = 'system-configuration-collapse' %}
-                        <div class="accordion">
-                            <div class="accordion-group">
-                                <div class="accordion-heading">
-                                    <div class="pull-right">
-                                        {{ configUI.renderCollapseExpandActions('#configuration-options-block') }}
-                                    </div>
-                                    <a href="#{{ accordionId }}" data-toggle="collapse" class="accordion-toggle">
-                                        {{ 'oro.email.system_configuration.mailbox_configuration.label'|trans }}
-                                    </a>
-                                </div>
-                                <div class="accordion-body in collapse" id="{{ accordionId }}" >
-                                    <div class="accordion-inner">
-                                        {{ form(form) }}
-                                        {% set mailboxId = form.vars.value.id %}
-                                        <fieldset class="form-horizontal form-horizontal-large auto-response-rules">
-                                            <div class="auto-response-rule-header">
-                                                <h5>{{ 'oro.email.autoresponserule.entity_plural_label'|trans }}</h5>
-                                                {{ UI.clientLink({
-                                                    'dataUrl': path('oro_email_autoresponserule_create', {mailbox: mailboxId}),
-                                                    'aCss': 'pull-right no-hash btn btn-primary',
-                                                    'label' : 'oro.email.autoresponserule.action.add.label'|trans,
-                                                    'widget' : {
-                                                        'type' : 'dialog',
-                                                        'multiple' : false,
-                                                        'reload-grid-name' : 'email-auto-response-rules',
-                                                        'options' : {
-                                                            'alias': 'auto-response-rules-dialog',
-                                                            'dialogOptions' : {
-                                                                'title' : 'oro.email.autoresponserule.action.add.title'|trans,
-                                                                'allowMaximize': false,
-                                                                'allowMinimize': false,
-                                                                'modal': true,
-                                                                'dblclick': 'maximize',
-                                                                'maximizedHeightDecreaseBy': 'minimize-bar',
-                                                                'width': 1000,
-                                                            }
-                                                        }
-                                                    },
-                                                }) }}
-                                            </div>
-                                            {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-                                            {{ dataGrid.renderGrid('email-auto-response-rules', {mailbox: mailboxId}) }}
-                                        </fieldset>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        {% set autoResponseRules %}
+            {% set mailboxId = form.vars.value.id %}
+            <fieldset class="form-horizontal form-horizontal-large auto-response-rules">
+                <div class="auto-response-rule-header">
+                    <h5>{{ 'oro.email.autoresponserule.entity_plural_label'|trans }}</h5>
+                    {{ UI.clientLink({
+                        'dataUrl': path('oro_email_autoresponserule_create', {mailbox: mailboxId}),
+                        'aCss': 'pull-right no-hash btn btn-primary',
+                        'label' : 'oro.email.autoresponserule.action.add.label'|trans,
+                        'widget' : {
+                            'type' : 'dialog',
+                            'multiple' : false,
+                            'reload-grid-name' : 'email-auto-response-rules',
+                            'options' : {
+                                'alias': 'auto-response-rules-dialog',
+                                'dialogOptions' : {
+                                    'title' : 'oro.email.autoresponserule.action.add.title'|trans,
+                                    'allowMaximize': false,
+                                    'allowMinimize': false,
+                                    'modal': true,
+                                    'dblclick': 'maximize',
+                                    'maximizedHeightDecreaseBy': 'minimize-bar',
+                                    'width': 1000,
+                                }
+                            }
+                        },
+                    }) }}
                 </div>
-            </div>
-        </div>
+                {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+                {{ dataGrid.renderGrid('email-auto-response-rules', {mailbox: mailboxId}) }}
+            </fieldset>
+        {% endset %}
+        {{ emailUI.renderMailboxConfigTitleAndButtons(pageTitle, buttons) }}
+        {{ configUI.renderConfigurationScrollData({
+            configTree: data,
+            form: form,
+            content: {
+                dataBlocks: [{
+                    title: 'oro.email.system_configuration.mailbox_configuration.label'|trans,
+                    subblocks: [
+                        form(form),
+                        autoResponseRules
+                    ]
+                }]
+            },
+            activeTabName: activeGroup,
+            activeSubTabName: activeSubGroup,
+            routeName: routeName,
+            routeParameters: routeParameters
+        }) }}
     </form>
     {{ oro_form_js_validation(form) }}
     {{ syncMacro.syncContentTags({name: 'system_configuration', params: [activeGroup, activeSubGroup]}) }}

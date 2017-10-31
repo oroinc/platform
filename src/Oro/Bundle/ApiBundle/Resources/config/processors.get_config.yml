@@ -51,6 +51,7 @@ services:
         public: false
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_id_helper'
             - '@oro_api.complete_definition_helper.association'
             - '@oro_api.complete_definition_helper.custom_association'
             - '@oro_api.entity_exclusion_provider'
@@ -160,6 +161,13 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: descriptions&definition, requestType: rest, priority: -200 }
 
+    oro_api.get_config.json_api.complete_status_codes:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\JsonApi\CompleteStatusCodes
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: descriptions&definition, requestType: rest&json_api, priority: -205 }
+
     oro_api.get_config.complete_descriptions:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDescriptions
         arguments:
@@ -243,6 +251,8 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteFilters
         arguments:
             - '@oro_api.doctrine_helper'
+            - ['boolean', 'datetime', 'date', 'time']
+            - ['string', 'boolean', 'guid', 'currency']
         tags:
             - { name: oro.api.processor, action: get_config, extra: filters&definition, priority: -80 }
             - { name: oro.api.processor, action: get_relation_config, extra: filters&definition, priority: -80 }
@@ -254,6 +264,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: sorters&definition, priority: -80 }
             - { name: oro.api.processor, action: get_relation_config, extra: sorters&definition, priority: -80 }
+
+    oro_api.get_config.complete_composite_identifier_filter:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteCompositeIdentifierFilter
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: filters&definition, priority: -85 }
 
     oro_api.get_config.normalize_filters:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\NormalizeFilters

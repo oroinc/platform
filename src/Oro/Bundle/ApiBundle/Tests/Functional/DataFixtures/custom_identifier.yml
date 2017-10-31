@@ -1,0 +1,12 @@
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier:
+    test_custom_id1:
+        key: 'item 1'
+        name: 'Item 1'
+    test_custom_id2:
+        key: 'item 2'
+        name: 'Item 2'
+    test_custom_id3:
+        key: 'item 3'
+        name: 'Item 3'
+        parent: '@test_custom_id1'
+        children: ['@test_custom_id2']

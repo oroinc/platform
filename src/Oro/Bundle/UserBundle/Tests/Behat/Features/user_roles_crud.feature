@@ -30,7 +30,7 @@ Feature: Managing users roles
       | Language    | View:Business Unit | Create:User          | Edit:User | Assign:User | Translate:User |
       | Task        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User |
     And following capability permissions should be checked:
-      | Manage Abandoned Cart Campaigns |
+      | Manage abandoned cart campaigns |
 
   Scenario: Edit user role
     Given I press "Edit"
@@ -54,7 +54,7 @@ Feature: Managing users roles
       | Lead           | View:Division      | Create:User          | Edit:User     | Delete:User       | Assign:User    |
       | Language       | View:Business Unit | Create:User          | Edit:User     | Assign:User       | Translate:User |
     And following capability permissions should be checked:
-      | Manage Abandoned Cart Campaigns |
+      | Manage abandoned cart campaigns |
       | Access job queue                |
       | Access entity management        |
 

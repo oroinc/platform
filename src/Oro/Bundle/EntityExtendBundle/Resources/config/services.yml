@@ -45,6 +45,13 @@ parameters:
     validator.builder.factory.class: Oro\Bundle\EntityExtendBundle\Validator\Validation
 
 services:
+    # the metadata factory for default entity manager
+    # it is declared as a service to allow make it as the persistent service for MQ consumer
+    # see Oro/Bundle/EntityExtendBundle/Resources/config/oro/app.yml
+    # and Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass
+    oro_entity_extend.orm.metadata_factory:
+        class: Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory
+
     oro_entity_extend.entity.cache.warmer:
         public: true
         class: Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer
@@ -82,14 +89,22 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
+    oro_entity_extend.form.extension.dynamic_fields_helper:
+        class: Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper
+        public: false
+        arguments:
+            - '@oro_entity_config.config_manager'
+            - '@oro_featuretoggle.checker.feature_checker'
+            - '@oro_entity.doctrine_helper'
+            - "@router"
+            - "@translator"
+
     oro_entity_extend.form.extension.dynamic_fields:
         class: %oro_entity_extend.form.extension.dynamic_fields.class%
         arguments:
             - "@oro_entity_config.config_manager"
-            - "@router"
-            - "@translator"
             - "@oro_entity.doctrine_helper"
-            - "@oro_featuretoggle.checker.feature_checker"
+            - '@oro_entity_extend.form.extension.dynamic_fields_helper'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 

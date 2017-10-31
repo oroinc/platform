@@ -1,7 +1,8 @@
 define([
     'underscore',
+    'oroui/js/tools',
     './filters-manager'
-], function(_, FiltersManager) {
+], function(_, tools, FiltersManager) {
     'use strict';
 
     var CollectionFiltersManager;
@@ -130,7 +131,7 @@ define([
             var state = {};
             _.each(this.filters, function(filter, name) {
                 var shortName = '__' + name;
-                if (_.has(this.collection.initialState.filters, name)) {
+                if (_.has(this.collection.initialState.filters, name) && !filter.isEmptyValue()) {
                     state[name] = filter.getValue();
                 } else if (filter.enabled) {
                     if (!filter.isEmptyValue()) {
@@ -172,7 +173,7 @@ define([
                     this.enableFilter(filter);
                 }
 
-                if (_.has(state, name)) {
+                if (_.has(state, name) && !tools.isEqualsLoosely(state[name], filter.emptyValue)) {
                     filterState = state[name];
                     if (!_.isObject(filterState)) {
                         filterState = {

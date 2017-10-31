@@ -376,6 +376,65 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
         }
     }
 
+    public function testProcessForAssociationDoesNotExistInEntityAndConfiguredByTargetClassAndTargetType()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association' => [
+                    'target_class' => 'Test\AssociationTargetClass',
+                    'target_type'  => 'to-one'
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('hasAssociation')
+            ->willReturn(false);
+
+        $associationTargetEntityMetadata = $this->getClassMetadataMock('Test\AssociationTargetClass');
+
+        $this->doctrineHelper->expects($this->exactly(2))
+            ->method('isManageableEntityClass')
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true],
+                ['Test\AssociationTargetClass', true]
+            ]);
+        $this->doctrineHelper->expects($this->exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\AssociationTargetClass', true, $associationTargetEntityMetadata],
+            ]);
+
+        /** @var EntityDefinitionConfig $configObject */
+        $configObject = $this->createConfigObject($config);
+        $this->context->setResult($configObject);
+        $this->processor->process($this->context);
+
+        $this->assertNotNull(
+            $configObject->getPostSerializeHandler()
+        );
+        $this->assertNotNull(
+            $configObject
+                ->getField('association')
+                ->getTargetEntity()
+                ->getPostSerializeHandler()
+        );
+
+        $rootAssert = $this->getRootHandlerAssertion($configObject);
+        $associationAssert = $this->getChildHandlerAssertion(
+            $configObject,
+            $configObject->getField('association')->getTargetEntity(),
+            'Test\AssociationTargetClass',
+            'association'
+        );
+        foreach ([$rootAssert, $associationAssert] as $assert) {
+            $assert();
+        }
+    }
+
     /**
      * @param EntityDefinitionConfig $configObject
      *

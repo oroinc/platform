@@ -7,9 +7,11 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\ApiBundle\Config\EntityConfigInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Makes sure that the filters configuration contains all supported filters
@@ -17,6 +19,27 @@ use Oro\Bundle\ApiBundle\Request\DataType;
  */
 class CompleteFilters extends CompleteSection
 {
+    /** @var array [data type => true, ...] */
+    protected $disallowArrayDataTypes;
+
+    /** @var array [data type => true, ...] */
+    protected $disallowRangeDataTypes;
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     * @param string[]       $disallowArrayDataTypes
+     * @param string[]       $disallowRangeDataTypes
+     */
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        array $disallowArrayDataTypes,
+        array $disallowRangeDataTypes
+    ) {
+        parent::__construct($doctrineHelper);
+        $this->disallowArrayDataTypes = array_fill_keys($disallowArrayDataTypes, true);
+        $this->disallowRangeDataTypes = array_fill_keys($disallowRangeDataTypes, true);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -39,6 +62,7 @@ class CompleteFilters extends CompleteSection
 
         /** @var FiltersConfig $section */
         $this->completePreConfiguredFieldFilters($section, $metadata, $definition);
+        $this->completeIdentifierFieldFilters($section, $metadata, $definition);
         $this->completeIndexedFieldFilters($section, $metadata, $definition);
         $this->completeAssociationFilters($section, $metadata, $definition);
         $this->completeExtendedAssociationFilters($section, $metadata, $definition);
@@ -57,24 +81,58 @@ class CompleteFilters extends CompleteSection
         $filtersFields = $filters->getFields();
         foreach ($filtersFields as $fieldName => $filter) {
             $propertyPath = $filter->getPropertyPath();
-            if (!$propertyPath) {
-                $field = $definition->getField($fieldName);
-                if ($field) {
-                    $propertyPath = $field->getPropertyPath();
+            $field = $definition->getField($fieldName);
+            if (null !== $field) {
+                $propertyPath = $field->getPropertyPath();
+                if (!$filter->hasDataType()) {
+                    $dataType = $field->getDataType();
+                    if ($dataType) {
+                        $filter->setDataType($dataType);
+                    }
                 }
             }
             if (!$propertyPath) {
                 $propertyPath = $fieldName;
             }
-            if (!$metadata->hasField($propertyPath)) {
-                continue;
-            }
 
-            if (!$filter->hasDataType()) {
+            if (!$filter->hasDataType() && $metadata->hasField($propertyPath)) {
                 $filter->setDataType($metadata->getTypeOfField($propertyPath));
             }
-            if (!$filter->hasArrayAllowed()) {
-                $filter->setArrayAllowed();
+            $this->setFilterArrayAllowed($filter);
+            $this->setFilterRangeAllowed($filter);
+        }
+    }
+
+    /**
+     * @param FiltersConfig          $filters
+     * @param ClassMetadata          $metadata
+     * @param EntityDefinitionConfig $definition
+     */
+    protected function completeIdentifierFieldFilters(
+        FiltersConfig $filters,
+        ClassMetadata $metadata,
+        EntityDefinitionConfig $definition
+    ) {
+        $idFieldNames = $definition->getIdentifierFieldNames();
+        foreach ($idFieldNames as $fieldName) {
+            $field = $definition->getField($fieldName);
+            if (null !== $field) {
+                $filter = $filters->getOrAddField($fieldName);
+                if (!$filter->hasDataType()) {
+                    $dataType = $field->getDataType();
+                    if (!$dataType) {
+                        $dataType = $this->doctrineHelper->getFieldDataType(
+                            $metadata,
+                            $field->getPropertyPath($fieldName)
+                        );
+                        if (!$dataType) {
+                            $dataType = DataType::STRING;
+                        }
+                    }
+                    $filter->setDataType($dataType);
+                }
+                $this->setFilterArrayAllowed($filter);
+                $this->setFilterRangeAllowed($filter);
             }
         }
     }
@@ -97,9 +155,8 @@ class CompleteFilters extends CompleteSection
                 if (!$filter->hasDataType()) {
                     $filter->setDataType($dataType);
                 }
-                if (!$filter->hasArrayAllowed()) {
-                    $filter->setArrayAllowed();
-                }
+                $this->setFilterArrayAllowed($filter);
+                $this->setFilterRangeAllowed($filter);
             }
         }
     }
@@ -122,9 +179,8 @@ class CompleteFilters extends CompleteSection
                 if (!$filter->hasDataType()) {
                     $filter->setDataType($dataType);
                 }
-                if (!$filter->hasArrayAllowed()) {
-                    $filter->setArrayAllowed();
-                }
+                $this->setFilterArrayAllowed($filter);
+                $this->setFilterRangeAllowed($filter);
             }
         }
     }
@@ -156,9 +212,8 @@ class CompleteFilters extends CompleteSection
             if (!$filter->hasType()) {
                 $filter->setType('association');
             }
-            if (!$filter->hasArrayAllowed()) {
-                $filter->setArrayAllowed();
-            }
+            $this->setFilterArrayAllowed($filter);
+            $this->setFilterRangeAllowed($filter);
             $options = $filter->getOptions();
             if (null === $options) {
                 $options = [];
@@ -170,6 +225,32 @@ class CompleteFilters extends CompleteSection
                 'associationKind'       => $associationKind
             ]);
             $filter->setOptions($options);
+        }
+    }
+
+    /**
+     * @param FilterFieldConfig $filter
+     */
+    protected function setFilterArrayAllowed(FilterFieldConfig $filter)
+    {
+        if (!$filter->hasArrayAllowed()) {
+            $dataType = $filter->getDataType();
+            if ($dataType && !isset($this->disallowArrayDataTypes[$dataType])) {
+                $filter->setArrayAllowed();
+            }
+        }
+    }
+
+    /**
+     * @param FilterFieldConfig $filter
+     */
+    protected function setFilterRangeAllowed(FilterFieldConfig $filter)
+    {
+        if (!$filter->hasRangeAllowed()) {
+            $dataType = $filter->getDataType();
+            if ($dataType && !isset($this->disallowRangeDataTypes[$dataType])) {
+                $filter->setRangeAllowed();
+            }
         }
     }
 }

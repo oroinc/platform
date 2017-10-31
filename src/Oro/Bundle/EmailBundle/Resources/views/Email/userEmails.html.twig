@@ -72,73 +72,23 @@
             'oro.email.action.processing'|trans ~
         '</i>' ~
         'oro.email.action.processing'|trans ~
-        '&nbsp;<span class="dots">.</span>'
+        '&nbsp;<span class="loading-dots"></span>'
     %}
-    <div class="btn-group">
-        <a type="button" class="btn sync-btn icons-holder-text no-hash" href="javascript: void(0);">
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    <div class="btn-group" {{ UI.renderPageComponentAttributes({
+        view: 'oroemail/js/app/views/email-sync-view',
+        options: {
+            syncPath: path('oro_email_user_sync_emails'),
+            processingMessage: 'oro.email.action.message.processing'|trans,
+            errorHandlerMessage: 'oro.email.action.message.error'|trans,
+            actionProcessing: actionProcessing,
+            actionSync: actionSync
+        }
+    }) }}>
+        <a type="button" class="btn sync-btn icons-holder-text no-hash" href="javascript: void(0);" data-role="sync">
             {{ actionSync|raw }}
         </a>
-        <script type="text/javascript">
-            require(['jquery', 'oroui/js/mediator', 'oroui/js/messenger'],
-                function($, mediator, messenger) {
-                    var buttonSyncSelector = 'a[type=button].sync-btn';
-                    var _sync = function (e) {
-                        var button = $(e.currentTarget);
-                        if (button.attr('disabled')) {
-                            return;
-                        }
-
-                        var loader;
-                        var dotsLoader = function () {
-                            var dots = button.find('span.dots');
-                            if(dots.html() == '....') {
-                                dots.html('.');
-                            } else {
-                                dots.html(dots.html() + '.');
-                            }
-                        };
-
-                        $.ajax({
-                            type: 'GET',
-                            dataType: 'json',
-                            url: '{{ path('oro_email_user_sync_emails') }}',
-                            beforeSend: function () {
-                                button.html('{{ actionProcessing|raw }}');
-                                button.attr('disabled', 'disabled');
-
-                                loader = setInterval(function() { dotsLoader() }, 500);
-                            },
-                            success: function (response) {
-                                clearInterval(loader);
-
-                                button.html('{{ actionSync|raw }}');
-                                button.removeAttr('disabled');
-
-                                if (response.error !== undefined) {
-                                    messenger.notificationFlashMessage('error', response.error);
-                                } else {
-                                    messenger.notificationFlashMessage(
-                                        'info',
-                                        {{ 'oro.email.action.message.processing'|trans|json_encode|raw }}
-                                    );
-                                }
-                            },
-                            errorHandlerMessage: '{{ 'oro.email.action.message.error'|trans }}',
-                            error: function () {
-                                clearInterval(loader);
-
-                                button.html('{{ actionSync|raw }}');
-                                button.removeAttr('disabled');
-                            }
-                        })
-                    };
-
-                    $(buttonSyncSelector).on('click.syncEmails', _sync);
-                    mediator.once('page:beforeChange', function () {
-                        $(buttonSyncSelector).off('click.syncEmails', _sync);
-                    });
-                });
-        </script>
     </div>
 {% endblock %}
 

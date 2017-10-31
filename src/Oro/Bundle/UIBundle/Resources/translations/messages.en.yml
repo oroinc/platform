@@ -121,6 +121,7 @@ oro:
             by: Filter By
         jstree:
             move:
+                success.label: '%nodes% was successfully moved'
                 source.label: 'Selected items'
                 target.label: 'Move to'
                 confirm_slug_change.title: 'Create 301 Redirect from old to new URLs'

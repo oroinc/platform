@@ -269,6 +269,9 @@ class OperationListConfiguration implements ConfigurationDefinitionInterface
         $node = $builder->root('form_options');
         $node
             ->children()
+                ->arrayNode('validation_groups')
+                    ->prototype('scalar')->end()
+                ->end()
                 ->arrayNode('attribute_fields')
                     ->useAttributeAsKey('name')
                     ->prototype('array')

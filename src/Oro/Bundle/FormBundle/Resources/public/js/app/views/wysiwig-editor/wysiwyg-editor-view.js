@@ -13,7 +13,6 @@ define(function(require) {
     WysiwygEditorView = BaseView.extend({
         TINYMCE_UI_HEIGHT: 3,
         TEXTAREA_UI_HEIGHT: 22,
-        TINYMCE_TIMEOUT: 30000, //after this time view promise will be resolved anyway
 
         autoRender: true,
         firstRender: true,
@@ -145,6 +144,7 @@ define(function(require) {
                             }
                         });
                     }
+                    self.trigger('TinyMCE:initialized');
                     _.delay(function() {
                         /**
                          * fixes jumping dialog on refresh page
@@ -155,23 +155,12 @@ define(function(require) {
                 }
             }, options));
             this.tinymceConnected = true;
-
-            /**
-             * In case when TinyMCE in some reason wasn't initialized we resolve the view anyway
-             */
-            _.delay(function() {
-                if ('deferredRender' in self === false) {
-                    return;
-                }
-                if (window.console && window.console.warn) {
-                    window.console.warn('TinyMCE initialization fault');
-                }
+            this.deferredRender.fail(function() {
                 self.removeSubview('loadingMask');
                 self.tinymceInstance = null;
                 self.tinymceConnected = false;
                 self.$el.css('visibility', '');
-                self._resolveDeferredRender();
-            }, this.TINYMCE_TIMEOUT);
+            });
         },
 
         setEnabled: function(enabled) {

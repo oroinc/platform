@@ -216,6 +216,13 @@ services:
         tags:
             - { name: form.type, alias: oro_enum_choice }
 
+    oro_entity_extend.type.enum_choice_with_transformer:
+        class: Oro\Bundle\EntityExtendBundle\Form\Type\EnumIdChoiceType
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: form.type, alias: oro_enum_id_choice }
+
     oro_entity_extend.type.enum_select:
         class: %oro_entity_extend.type.enum_select.class%
         arguments:
@@ -234,7 +241,7 @@ services:
             - '@oro_entity_config.provider.enum'
         calls:
             - [addExtendTypeMapping, ["string", "text"]]
-            - [addExtendTypeMapping, ["integer", "text"]] # integers should be text to make validation work
+            - [addExtendTypeMapping, ["integer", "integer"]]
             - [addExtendTypeMapping, ["smallint", "integer", { precision: 0 }]]
             - [addExtendTypeMapping, ["bigint", "integer", { precision: 0 }]]
             - [addExtendTypeMapping, ["decimal", "number"]]

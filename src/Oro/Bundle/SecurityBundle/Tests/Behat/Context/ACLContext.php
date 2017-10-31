@@ -13,8 +13,6 @@ use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -27,28 +25,12 @@ use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm;
  */
 class ACLContext extends OroFeatureContext implements
     OroPageObjectAware,
-    KernelAwareContext,
-    MessageQueueIsolatorAwareInterface
+    KernelAwareContext
 {
     use PageObjectDictionary, KernelDictionary;
 
-    /**
-     * @var OroMainContext
-     */
+    /** @var OroMainContext */
     private $oroMainContext;
-
-    /**
-     * @var MessageQueueIsolatorInterface
-     */
-    protected $messageQueueIsolator;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
-    {
-        $this->messageQueueIsolator = $messageQueueIsolator;
-    }
 
     /**
      * @BeforeScenario
@@ -90,7 +72,8 @@ class ACLContext extends OroFeatureContext implements
     public function iHavePermissionsForEntity($entity, $action, $accessLevel, $user)
     {
         $role = $this->getRole($user);
-        $this->getMink()->setDefaultSessionName('second_session');
+        self::assertFalse($this->getMink()->isSessionStarted('system_session'));
+        $this->getMink()->setDefaultSessionName('system_session');
         $this->getSession()->resizeWindow(1920, 1080, 'current');
 
         $singularizedEntities = array_map(function ($element) {
@@ -108,7 +91,7 @@ class ACLContext extends OroFeatureContext implements
         $userRoleForm->saveAndClose();
         $this->waitForAjax();
 
-        $this->getSession('second_session')->stop();
+        $this->getSession('system_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
     }
 
@@ -119,7 +102,8 @@ class ACLContext extends OroFeatureContext implements
     public function userHasFollowingPermissions($user, TableNode $table)
     {
         $role = $this->getRole($user);
-        $this->getMink()->setDefaultSessionName('second_session');
+        self::assertFalse($this->getMink()->isSessionStarted('system_session'));
+        $this->getMink()->setDefaultSessionName('system_session');
         $this->getSession()->resizeWindow(1920, 1080, 'current');
 
         $this->loginAsAdmin();
@@ -137,7 +121,7 @@ class ACLContext extends OroFeatureContext implements
         $userRoleForm->saveAndClose();
         $this->waitForAjax();
 
-        $this->getSession('second_session')->stop();
+        $this->getSession('system_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
     }
 
@@ -146,7 +130,8 @@ class ACLContext extends OroFeatureContext implements
      */
     public function userHasFollowingEntityPermissionsEnabled($user, TableNode $table)
     {
-        $this->getMink()->setDefaultSessionName('second_session');
+        self::assertFalse($this->getMink()->isSessionStarted('system_session'));
+        $this->getMink()->setDefaultSessionName('system_session');
         $this->getSession()->resizeWindow(1920, 1080, 'current');
 
         $this->loginAsAdmin();
@@ -162,7 +147,7 @@ class ACLContext extends OroFeatureContext implements
         $userRoleForm->saveAndClose();
         $this->waitForAjax();
 
-        $this->getSession('second_session')->stop();
+        $this->getSession('system_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
     }
 
@@ -180,7 +165,8 @@ class ACLContext extends OroFeatureContext implements
     public function iHaveSeveralPermissionsForEntity($user, $entity, $action1, $accessLevel1, $action2, $accessLevel2)
     {
         $role = $this->getRole($user);
-        $this->getMink()->setDefaultSessionName('second_session');
+        self::assertFalse($this->getMink()->isSessionStarted('system_session'));
+        $this->getMink()->setDefaultSessionName('system_session');
         $this->getSession()->resizeWindow(1920, 1080, 'current');
 
         $singularizedEntity = ucfirst(Inflector::singularize($entity));
@@ -192,7 +178,7 @@ class ACLContext extends OroFeatureContext implements
         $userRoleForm->saveAndClose();
         $this->waitForAjax();
 
-        $this->getSession('second_session')->stop();
+        $this->getSession('system_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
     }
 
@@ -312,9 +298,32 @@ class ACLContext extends OroFeatureContext implements
         foreach ($table->getRows() as $row) {
             $value = current($row);
             self::assertContains(
-                ucfirst(strtolower($value)),
+                ucfirst($value),
                 $permissions,
                 "$value not found in active permissions list: " . print_r($permissions, true)
+            );
+        }
+    }
+
+    /**
+     * Asserts that provided capability permissions disallowed on view page
+     *
+     * Example: And following capability permissions should be unchecked:
+     *           | Manage Abandoned Cart Campaigns |
+     *
+     * @Then /^following capability permissions should be unchecked:$/
+     */
+    public function iShouldSeePermissionsUnchecked(TableNode $table)
+    {
+        $userRoleForm = $this->getRoleViewFormElement();
+        $permissions = $userRoleForm->getEnabledCapabilityPermissions();
+
+        foreach ($table->getRows() as $row) {
+            $value = current($row);
+            self::assertNotContains(
+                ucfirst($value),
+                $permissions,
+                "$value found in active permissions list: " . print_r($permissions, true)
             );
         }
     }
@@ -333,9 +342,6 @@ class ACLContext extends OroFeatureContext implements
             $this->waitForAjax();
         } catch (\Exception $e) {
             throw $e;
-        } finally {
-            $this->messageQueueIsolator->stopMessageQueue();
-            $this->messageQueueIsolator->startMessageQueue();
         }
     }
 

@@ -69,6 +69,8 @@ define([
                 success: function(r) {
                     collection.reset();
                     collection.add(r);
+                },
+                complete: function() {
                     self.render();
                 }
             });

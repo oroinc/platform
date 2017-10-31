@@ -11,12 +11,20 @@
 <script type="text/javascript">
     handleResourceLinks = function ($el, apiPrefix) {
         var value = $el.text(),
-            arrayOfPrefix = 'array of ',
-            isArrayOf = (0 === value.indexOf(arrayOfPrefix)),
-            links = [], elements, i, resourceId;
-        if (value && value.substr((isArrayOf ? arrayOfPrefix.length : 0), 2) !== '<a') {
+            prefix = '', suffix = '', links = [], elements, i, j, resourceId;
+        i = value.indexOf(' (');
+        if (-1 !== i) {
+            j = value.indexOf(')', i);
+            if (-1 !== j) {
+                prefix = value.substr(0, i + 2);
+                suffix = value.substr(j);
+            }
+        } else if (0 === value.indexOf('array of ')) {
+            prefix = 'array of ';
+        }
+        if (value && value.substr(prefix.length, 2) !== '<a') {
             $el.text('');
-            elements = (isArrayOf ? value.substr(arrayOfPrefix.length) : value).split(',');
+            elements = value.substr(prefix.length, value.length - prefix.length - suffix.length).split(',');
             for (i = 0; i < elements.length; i++) {
                 resourceId = 'get-' + apiPrefix + '-api-' + elements[i].trim();
                 if ($('#' + resourceId).length) {
@@ -27,7 +35,7 @@
                     links.push(elements[i]);
                 }
             }
-            $el.append((isArrayOf ? arrayOfPrefix : '') + links.join(', '));
+            $el.append(prefix + links.join(', ') + suffix);
         }
     };
     gotoResource = function (resourceId) {
@@ -112,7 +120,9 @@
          */
         $('#sandbox_configuration').prepend(
             (wsseAllowed ? '' : '<span class="authentication-warning"' +
-            ' title="To use WSSE authentication you need to generate API key"' +
+            ' title="To use WSSE authentication you need to generate API key for the current logged-in user.' +
+            ' To do this, go to the My User page and click Generate Key near to API Key.' +
+            ' After that reload this page."' +
             '>{{ include('@OroApi/ApiDoc/warning.svg') }}</span>') +
             'authentication: ' +
             '<select id="authentication_type">' +
@@ -120,6 +130,9 @@
                 '<option value="wsse"' + (wsseAllowed ? ' selected=""' : ' disabled=""') + '>WSSE</option>' +
             '</select>'
         );
+        if (!wsseAllowed) {
+            $('#header').css('background-color', '#F7FE2E');
+        }
 
         /**
          * Make JSON as default body format for JSON.API sandbox
@@ -384,7 +397,7 @@
     });
 </script>
 
-{% if documentationPath is not null%}
+{% if documentationPath is defined and documentationPath %}
     <div class="motd">
         <div class="documentation">
             <a href="{{ asset(documentationPath) }}" target="_blank">The documentation</a>

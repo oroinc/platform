@@ -27,6 +27,13 @@ interface ProviderInterface
     public function getTree();
 
     /**
+     * Return specified tree for js-tree component
+     *
+     * @return []
+     */
+    public function getJsTree();
+
+    /**
      * Retrieve slice of specified tree in point of subtree
      *
      * @param string $subTreeName

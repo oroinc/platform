@@ -122,6 +122,20 @@ class ExpandRelatedEntities implements ProcessorInterface
                         )
                     );
                 }
+            } elseif ($definition->hasField($fieldName)) {
+                $field = $definition->getField($fieldName);
+                $targetClass = $field->getTargetClass();
+                if ($targetClass && $field->hasTargetType() && !$field->hasDataType()) {
+                    $this->completeAssociation(
+                        $definition,
+                        $fieldName,
+                        $targetClass,
+                        $targetExpandedEntities,
+                        $version,
+                        $requestType,
+                        $extras
+                    );
+                }
             }
         }
     }

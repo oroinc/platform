@@ -1,72 +1,49 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
+
+use Symfony\Component\DependencyInjection\Container;
 
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Client\ContainerAwareMessageProcessorRegistry;
-use Symfony\Component\DependencyInjection\Container;
 
 class ContainerAwareMessageProcessorRegistryTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCouldBeConstructedWithoutAnyArgument()
-    {
-        new ContainerAwareMessageProcessorRegistry();
-    }
-
     public function testShouldThrowExceptionIfProcessorIsNotSet()
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('MessageProcessor was not found. processorName: "processor-name"');
-        $registry = new ContainerAwareMessageProcessorRegistry();
-        $registry->get('processor-name');
-    }
-
-    public function testShouldThrowExceptionIfContainerIsNotSet()
-    {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Container was not set');
-
-        $registry = new ContainerAwareMessageProcessorRegistry();
-        $registry->set('processor-name', 'processor-id');
-
+        $registry = new ContainerAwareMessageProcessorRegistry([], new Container());
         $registry->get('processor-name');
     }
 
     public function testShouldThrowExceptionIfInstanceOfMessageProcessorIsInvalid()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Container was not set');
+        $this->expectExceptionMessage(sprintf(
+            'Invalid instance of message processor. expected: "%s", got: "%s"',
+            MessageProcessorInterface::class,
+            \stdClass::class
+        ));
         $processor = new \stdClass();
 
         $container = new Container();
         $container->set('processor-id', $processor);
 
-        $registry = new ContainerAwareMessageProcessorRegistry();
-        $registry->set('processor-name', 'processor-id');
+        $registry = new ContainerAwareMessageProcessorRegistry(['processor-name' => 'processor-id'], $container);
 
         $registry->get('processor-name');
     }
 
     public function testShouldReturnInstanceOfMessageProcessor()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Container was not set');
-
-        $processor = $this->createMessageProcessorMock();
+        $processor = $this->createMock(MessageProcessorInterface::class);
 
         $container = new Container();
         $container->set('processor-id', $processor);
 
-        $registry = new ContainerAwareMessageProcessorRegistry();
-        $registry->set('processor-name', 'processor-id');
+        $registry = new ContainerAwareMessageProcessorRegistry(['processor-name' => 'processor-id'], $container);
 
         $this->assertSame($processor, $registry->get('processor-name'));
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProcessorInterface
-     */
-    protected function createMessageProcessorMock()
-    {
-        return $this->createMock(MessageProcessorInterface::class);
     }
 }

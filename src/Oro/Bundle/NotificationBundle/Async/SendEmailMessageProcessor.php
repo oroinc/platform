@@ -137,9 +137,7 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $emailTemplate = $this->findEmailTemplateByName($templateName);
 
         if (! $emailTemplate instanceof EmailTemplateInterface) {
-            throw new \RuntimeException(
-                sprintf('[SendEmailMessageProcessor] EmailTemplate not found by name "%s"', $templateName)
-            );
+            throw new \RuntimeException(sprintf('EmailTemplate not found by name "%s"', $templateName));
         }
 
         return $this->emailRenderer->compileMessage($emailTemplate, $data);

@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Behat\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
+use Behat\Mink\Session;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
@@ -18,15 +19,15 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ImportExportContext extends OroFeatureContext implements
     KernelAwareContext,
-    OroPageObjectAware,
-    MessageQueueIsolatorAwareInterface
+    OroPageObjectAware
 {
     use KernelDictionary, PageObjectDictionary;
 
@@ -44,11 +45,6 @@ class ImportExportContext extends OroFeatureContext implements
      * @var OroMainContext
      */
     private $oroMainContext;
-
-    /**
-     * @var MessageQueueIsolatorInterface
-     */
-    private $messageQueueIsolator;
 
     /**
      * @param EntityAliasResolver $aliasResolver
@@ -117,34 +113,30 @@ class ImportExportContext extends OroFeatureContext implements
             'import_template_'
         );
 
-        $cookies = $this->getSession()->getDriver()->getWebDriverSession()->getCookie()[0];
-        $cookie = new Cookie();
-        $cookie->setName($cookies['name']);
-        $cookie->setValue($cookies['value']);
-        $cookie->setDomain($cookies['domain']);
-
-        $jar = new ArrayCookieJar();
-        $jar->add($cookie);
-
+        $cookieJar = $this->getCookieJar($this->getSession());
         $client = new Client($this->getSession()->getCurrentUrl());
-        $client->addSubscriber(new CookiePlugin($jar));
+        $client->addSubscriber(new CookiePlugin($cookieJar));
         $request = $client->get($url, null, ['save_to' => $this->template]);
         $response = $request->send();
 
         self::assertEquals(200, $response->getStatusCode());
     }
 
+    //@codingStandardsIgnoreStart
     /**
      * This method strictly compares data from the downloaded file
      *
      * @Given /^Exported file for "(?P<entity>([\w\s]+))" contains the following data:$/
+     * @Given /^Exported file for "(?P<entity>([\w\s]+))" with processor "(?P<processorName>([\w\s\.]+))" contains the following data:$/
      *
-     * @param string    $entity
+     * @param string $entity
+     * @param string $processorName
      * @param TableNode $expectedEntities
      */
-    public function exportedFileContainsFollowingData($entity, TableNode $expectedEntities)
+    //@codingStandardsIgnoreEnd
+    public function exportedFileContainsFollowingData($entity, TableNode $expectedEntities, $processorName = null)
     {
-        $filePath = $this->performExport($entity);
+        $filePath = $this->performExport($entity, $processorName);
 
         try {
             $handler = fopen($filePath, 'rb');
@@ -183,10 +175,14 @@ class ImportExportContext extends OroFeatureContext implements
      *
      * @param string    $entity
      * @param TableNode $expectedEntities
+     * @param string    $processorName
      */
-    public function exportedFileContainsAtLeastFollowingColumns($entity, TableNode $expectedEntities)
-    {
-        $filePath = $this->performExport($entity);
+    public function exportedFileContainsAtLeastFollowingColumns(
+        $entity,
+        TableNode $expectedEntities,
+        $processorName = null
+    ) {
+        $filePath = $this->performExport($entity, $processorName);
 
         try {
             $exportedFile = new \SplFileObject($filePath, 'rb');
@@ -303,7 +299,6 @@ class ImportExportContext extends OroFeatureContext implements
 
         $flashMessage = 'Import started successfully. You will receive email notification upon completion.';
         $this->oroMainContext->iShouldSeeFlashMessage($flashMessage);
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     /**
@@ -383,21 +378,24 @@ class ImportExportContext extends OroFeatureContext implements
 
     /**
      * @param string $entity Entity class alias.
+     * @param string $processorName export processor name.
      *
      * @return string Filepath to exported file.
      */
-    private function performExport($entity)
+    private function performExport($entity, $processorName = null)
     {
         $entityClass = $this->aliasResolver->getClassByAlias($this->convertEntityNameToAlias($entity));
-        $processors = $this->processorRegistry->getProcessorAliasesByEntity('export', $entityClass);
 
-        self::assertCount(1, $processors, sprintf(
-            'Too many processors ("%s") for export "%s" entity',
-            implode(', ', $processors),
-            $entity
-        ));
+        if (!$processorName) {
+            $processors = $this->processorRegistry->getProcessorAliasesByEntity('export', $entityClass);
+            self::assertCount(1, $processors, sprintf(
+                'Too many processors ("%s") for export "%s" entity',
+                implode(', ', $processors),
+                $entity
+            ));
+            $processorName = array_shift($processors);
+        }
 
-        $processorName = array_shift($processors);
         $jobExecutor = $this->getContainer()->get('oro_importexport.job_executor');
         $filePath = FileManager::generateTmpFilePath(
             FileManager::generateFileName($processorName, 'csv')
@@ -421,10 +419,18 @@ class ImportExportContext extends OroFeatureContext implements
     }
 
     /**
-     * {@inheritdoc}
+     * @param Session $session
+     *
+     * @return ArrayCookieJar
      */
-    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
+    private function getCookieJar(Session $session)
     {
-        $this->messageQueueIsolator = $messageQueueIsolator;
+        $cookies = $session->getDriver()->getWebDriverSession()->getCookie();
+        $cookieJar = new ArrayCookieJar();
+        foreach ($cookies as $cookie) {
+            $cookieJar->add(new Cookie($cookie));
+        }
+
+        return $cookieJar;
     }
 }

@@ -29,6 +29,9 @@ class Datagrid implements DatagridInterface
     /** @var Acceptor */
     protected $acceptor;
 
+    /** @var ResultsObject */
+    protected $cachedResult = null;
+
     /**
      * @param string                $name
      * @param DatagridConfiguration $config
@@ -83,13 +86,16 @@ class Datagrid implements DatagridInterface
      */
     public function getData()
     {
+        if ($this->cachedResult !== null) {
+            return $this->cachedResult;
+        }
         /** @var ResultRecordInterface $rows */
         $rows = $this->getAcceptedDatasource()->getResults();
 
-        $result = ResultsObject::create(['data' => $rows]);
-        $this->acceptor->acceptResult($result);
+        $this->cachedResult = ResultsObject::create(['data' => $rows]);
+        $this->acceptor->acceptResult($this->cachedResult);
 
-        return $result;
+        return $this->cachedResult;
     }
 
     /**

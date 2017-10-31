@@ -1,0 +1,70 @@
+user_configuration:
+    fields:
+        some_field:
+            data_type: string
+            type: text
+            options:
+                tooltip: tooltip some field
+                label: title some field
+        some_another_field:
+            data_type: string
+            type: choice
+            options:
+                label: title some other field
+        some_ui_only_field:
+            ui_only: true
+            type: text
+        some_api_only_field:
+            data_type: integer
+
+    groups:
+        first_group:
+            title: 'First group'
+            icon: 'fa-file'
+
+        second_group:
+            title: 'Second group'
+            icon: 'fa-file'
+
+        third_group:
+            title: 'Third group'
+            icon: 'fa-file'
+
+        fourth_group:
+            title: 'Fourth group'
+            icon: 'fa-file'
+
+        another_branch_first:
+            title: 'Another branch first group'
+            icon: 'fa-file'
+
+        another_branch_second:
+            title: 'Another branch second group'
+            icon: 'fa-file'
+
+    tree:
+        user_configuration:
+            first_group:
+                children:
+                    second_group:
+                        children:
+                            # HORIZONTAL TAB DEFINITION
+                            # WILL BE USED FOR FORM CONFIGURING IN TEST
+                            third_group:
+                                priority: 254
+                                children:
+                                    fourth_group:
+                                        children:
+                                            - some_field
+                                            - some_another_field
+                            another_branch_first:
+                                children:
+                                    another_branch_second:
+                                        children: []
+
+    api_tree:
+        section1:
+            some_field: ~
+            some_api_only_field: ~
+            section11:
+                some_another_field: ~

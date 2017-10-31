@@ -9,6 +9,8 @@ use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
 use Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -92,7 +94,10 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
         return function (JobRunner $jobRunner, Job $child) use ($body) {
             $this->producer->send(
                 Topics::EXPORT,
-                array_merge($body, ['jobId' => $child->getId()])
+                new Message(
+                    array_merge($body, ['jobId' => $child->getId()]),
+                    MessagePriority::LOW
+                )
             );
         };
     }
@@ -112,17 +117,10 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
                 FormatterProvider::FORMAT_TYPE => 'excel',
             ],
             'exportType' => ProcessorRegistry::TYPE_EXPORT,
-            'securityToken' => null,
         ], $body);
 
-        if (! isset($body['securityToken'], $body['parameters']['gridName'], $body['format'])) {
+        if (! isset($body['parameters']['gridName'], $body['format'])) {
             $this->logger->critical('Got invalid message');
-
-            return false;
-        }
-
-        if (! $this->setSecurityToken($body['securityToken'])) {
-            $this->logger->critical('Cannot set security token');
 
             return false;
         }

@@ -45,33 +45,28 @@ class ReplaceNamespaces implements Migration, ConnectionAwareInterface, OrderedM
 
     public function resolveVersions()
     {
-        $platform = $this->connection->getDatabasePlatform();
-
-        if ($platform instanceof PostgreSqlPlatform) {
-            $this->connection->exec('CREATE TEMPORARY SEQUENCE seq_temp_version START 1');
+        if ($this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
+            $this->resolveVersionsPostgres();
+        } else {
+            $this->resolveVersionsMysql();
         }
+    }
 
+    private function resolveVersionsMysql()
+    {
         while (true) {
-            $sql = 'SELECT object_id, REPLACE(object_class, \'OroCRM\', \'Oro\') AS object_class FROM oro_audit ' .
-                'GROUP BY object_id, REPLACE(object_class, \'OroCRM\', \'Oro\'), version HAVING COUNT(*) > 1 LIMIT 25';
+            $sql = 'SELECT object_id, REPLACE(object_class, \'OroCRM\', \'Oro\') AS object_class FROM oro_audit '.
+                'GROUP BY object_id, REPLACE(object_class, \'OroCRM\', \'Oro\'), version HAVING COUNT(*) > 1 LIMIT 100';
             $rows = $this->connection->fetchAll($sql);
             if (!$rows) {
                 break;
             }
 
             foreach ($rows as $row) {
-                if ($platform instanceof PostgreSqlPlatform) {
-                    $sql = 'SELECT setval(\'seq_temp_version\', 1);' .
-                        'UPDATE oro_audit SET version = nextval(\'seq_temp_version\') - 2 FROM (' .
-                        'SELECT id FROM oro_audit WHERE object_id = :object_id AND '.
-                        'REPLACE(object_class, \'OroCRM\', \'Oro\') = :object_class ORDER BY id) AS q ' .
-                        'WHERE oro_audit.id = q.id;';
-                } else {
-                    $sql = 'SET @version = -1;'.
-                        'UPDATE oro_audit SET version = @version:=@version+1 '.
-                        'WHERE object_id = :object_id AND '.
-                        'REPLACE(object_class, \'OroCRM\', \'Oro\') = :object_class ORDER BY id ASC;';
-                }
+                $sql = 'SET @version = -1;'.
+                    'UPDATE oro_audit SET version = @version:=@version+1 '.
+                    'WHERE object_id = :object_id AND '.
+                    'REPLACE(object_class, \'OroCRM\', \'Oro\') = :object_class ORDER BY id ASC;';
 
                 $this->connection->executeUpdate(
                     $sql,
@@ -86,10 +81,61 @@ class ReplaceNamespaces implements Migration, ConnectionAwareInterface, OrderedM
                 );
             }
         }
+    }
 
-        if ($platform instanceof PostgreSqlPlatform) {
-            $this->connection->exec('DROP SEQUENCE seq_temp_version');
+    private function resolveVersionsPostgres()
+    {
+        $this->connection->exec('CREATE TEMPORARY SEQUENCE seq_temp_version START 1');
+
+        while (true) {
+            $rowsFound = $this->connection->executeQuery(
+                "SELECT object_id, REPLACE(object_class, 'OroCRM', 'Oro') AS object_class
+                            FROM oro_audit
+                            GROUP BY object_id, REPLACE(object_class, 'OroCRM', 'Oro'), version 
+                            HAVING COUNT(*) > 1 LIMIT 1"
+            )
+                ->fetchColumn();
+
+            if (!$rowsFound) {
+                break;
+            }
+            $this->connection->exec(
+                <<<'EOD'
+                                DO $$
+                    DECLARE
+                        r RECORD;
+                        seq_temp INTEGER;   
+                    BEGIN
+                        FOR r IN SELECT object_id, REPLACE(object_class, 'OroCRM', 'Oro') AS object_class
+                            FROM oro_audit
+                            GROUP BY object_id, REPLACE(object_class, 'OroCRM', 'Oro'), version 
+                            HAVING COUNT(*) > 1 LIMIT 100
+                        LOOP           
+                            seq_temp := (SELECT setval('seq_temp_version', 1));
+                        
+                            IF r.object_id IS NULL THEN                                
+                                UPDATE oro_audit  
+                                    SET version = nextval('seq_temp_version') - 2 
+                                    FROM (
+                                            SELECT id FROM oro_audit WHERE object_id IS NULL AND 
+                                            REPLACE(object_class, 'OroCRM', 'Oro') = r.object_class ORDER BY id
+                                        ) AS q 
+                                    WHERE oro_audit.id IS NULL;
+                            ELSE
+                                UPDATE oro_audit  
+                                    SET version = nextval('seq_temp_version') - 2 
+                                    FROM (
+                                            SELECT id FROM oro_audit WHERE object_id = r.object_id AND 
+                                            REPLACE(object_class, 'OroCRM', 'Oro') = r.object_class ORDER BY id
+                                        ) AS q 
+                                    WHERE oro_audit.id = q.id;
+                            END IF;
+                        END LOOP;
+                END $$;
+EOD
+            );
         }
+        $this->connection->exec('DROP SEQUENCE seq_temp_version');
     }
 
     /**

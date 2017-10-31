@@ -23,7 +23,7 @@ class RestJsonApiGetSubresourcesTest extends RestJsonApiTestCase
             return;
         }
 
-        $entityId = $this->getRestApiEntityId($entityId);
+        $entityId = $this->getRestApiEntityId($entityClass, $entityId);
         $entityType = $this->getEntityType($entityClass);
 
         $parameters = [
@@ -39,7 +39,7 @@ class RestJsonApiGetSubresourcesTest extends RestJsonApiTestCase
             'GET',
             $this->getUrl('oro_rest_api_get_subresource', $parameters)
         );
-        $this->assertApiResponseStatusCodeEquals(
+        self::assertApiResponseStatusCodeEquals(
             $response,
             [200, 404],
             sprintf('%s(%s)->%s', $entityType, $entityId, $associationName),
