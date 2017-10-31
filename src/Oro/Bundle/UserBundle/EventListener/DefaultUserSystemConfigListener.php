@@ -56,11 +56,11 @@ class DefaultUserSystemConfigListener
      */
     public function onFormPreSetData(ConfigSettingsUpdateEvent $event)
     {
+        $settingsKey = $this->getSettingsKey();
         $settings = $event->getSettings();
 
-        $settingsKey = $this->getSettingsKey();
         $settings[$settingsKey]['value'] = $this->defaultUserProvider
-                ->getDefaultUser($this->alias, $this->configKey);
+            ->getDefaultUser($this->alias, $this->configKey);
 
         $event->setSettings($settings);
     }
@@ -72,19 +72,17 @@ class DefaultUserSystemConfigListener
     {
         $settings = $event->getSettings();
 
-        $settingsKey = $this->getSettingsKey();
-
-        if (!isset($settings[$settingsKey]['value'])) {
+        if (!isset($settings['value'])) {
             return;
         }
 
-        if (!is_a($settings[$settingsKey]['value'], User::class)) {
+        if (!is_a($settings['value'], User::class)) {
             return;
         }
 
         /** @var User $owner */
-        $owner = $settings[$settingsKey]['value'];
-        $settings[$settingsKey]['value'] = $owner->getId();
+        $owner = $settings['value'];
+        $settings['value'] = $owner->getId();
         $event->setSettings($settings);
     }
 

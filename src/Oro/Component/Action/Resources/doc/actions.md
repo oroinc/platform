@@ -6,7 +6,7 @@ Table of Contents
  - [Assign Value](#assign-value)
  - [Assign Active User](#assign-active-user)
  - [Unset Value](#unset-value)
- - [Count] (#count)
+ - [Count](#count)
  - [Create Object](#create-object)
  - [Create Entity](#create-entity)
  - [Remove Entity](#remove-entity)
@@ -79,7 +79,7 @@ OR
 ```
 
 Unset Value
-------------
+-----------
 
 **Class:** Oro\Component\Action\Action\UnsetValue
 
@@ -109,6 +109,7 @@ OR
 
 Count
 -----
+
 **Class** \Oro\Component\Action\Action\Count
 
 **Alias** count

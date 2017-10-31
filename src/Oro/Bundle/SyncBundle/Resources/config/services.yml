@@ -6,15 +6,19 @@ parameters:
     # set 0 or false to disable pinging
     oro_wamp.client_ping.interval: 45000 # 45 seconds
 
-    oro_wamp.publisher.class:             Oro\Bundle\SyncBundle\Wamp\TopicPublisher
     oro_wamp.listener.maintenance.class:  Oro\Bundle\SyncBundle\EventListener\MaintenanceListener
 
 services:
     oro_wamp.publisher:
-        class: %oro_wamp.publisher.class%
+        class: Oro\Bundle\SyncBundle\Wamp\TopicPublisher
         arguments:
             - "%websocket_backend_host%"
             - "%websocket_backend_port%"
+            - "%websocket_backend_path%"
+        calls:
+            - ['setLogger', ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: oro_wamp }
 
     # this service is used as a workaround for "2006 MySQL server has gone away" error
     # do not rename it because "oro_wamp.ping.{session_handler_type}" naming convention

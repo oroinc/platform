@@ -26,9 +26,11 @@ trait DocumentationTrait
      */
     public function getDocumentation()
     {
-        return array_key_exists(EntityDefinitionConfig::DOCUMENTATION, $this->items)
-            ? $this->items[EntityDefinitionConfig::DOCUMENTATION]
-            : null;
+        if (!array_key_exists(EntityDefinitionConfig::DOCUMENTATION, $this->items)) {
+            return null;
+        }
+
+        return $this->items[EntityDefinitionConfig::DOCUMENTATION];
     }
 
     /**

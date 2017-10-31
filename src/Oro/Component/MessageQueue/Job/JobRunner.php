@@ -2,6 +2,8 @@
 
 namespace Oro\Component\MessageQueue\Job;
 
+use Oro\Component\MessageQueue\Exception\StaleJobRuntimeException;
+
 class JobRunner
 {
     /** @var JobProcessor */
@@ -38,6 +40,7 @@ class JobRunner
         if (!$rootJob) {
             return null;
         }
+        $this->throwIfJobIsStale($rootJob);
 
         $childJob = $this->jobProcessor->findOrCreateChildJob($name, $rootJob);
 
@@ -76,11 +79,12 @@ class JobRunner
     {
         $childJob = $this->jobProcessor->findOrCreateChildJob($name, $this->rootJob);
 
-        $jobRunner = $this->getJobRunnerForChildJob($this->rootJob);
+        $this->jobExtension->onPreCreateDelayed($childJob);
 
+        $jobRunner = $this->getJobRunnerForChildJob($this->rootJob);
         $createResult = call_user_func($startCallback, $jobRunner, $childJob);
 
-        $this->jobExtension->onCreateDelayed($childJob, $createResult);
+        $this->jobExtension->onPostCreateDelayed($childJob, $createResult);
 
         return $createResult;
     }
@@ -99,6 +103,7 @@ class JobRunner
         if (! $job) {
             throw new \LogicException(sprintf('Job was not found. id: "%s"', $jobId));
         }
+        $this->throwIfJobIsStale($job);
 
         if ($job->getRootJob()->isInterrupted()) {
             if (! $job->getStoppedAt()) {
@@ -125,6 +130,19 @@ class JobRunner
         $this->jobExtension->onPostRunDelayed($job, $result);
 
         return $result;
+    }
+
+    /**
+     * @param Job $job
+     */
+    private function throwIfJobIsStale($job)
+    {
+        if ($job->getStatus() === Job::STATUS_STALE) {
+            throw new StaleJobRuntimeException(sprintf(
+                'Cannot run jobs in status stale, id: "%s"',
+                $job->getId()
+            ));
+        }
     }
 
     /**

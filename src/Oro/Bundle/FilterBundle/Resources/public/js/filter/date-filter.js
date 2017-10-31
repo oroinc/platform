@@ -17,6 +17,11 @@ define(function(require) {
     var datetimeFormatter = require('orolocale/js/formatter/datetime');
     var localeSettings = require('orolocale/js/locale-settings');
     var layout = require('oroui/js/layout');
+    var config = require('module').config();
+
+    config = _.extend({
+        inputClass: 'date-visual-element'
+    }, config);
 
     require('orofilter/js/datevariables-widget');
 
@@ -63,12 +68,18 @@ define(function(require) {
             }
         },
 
+        selectors: {
+            startContainer: '.filter-start-date',
+            separator: '.filter-separator',
+            endContainer: '.filter-end-date'
+        },
+
         /**
          * CSS class for visual date input elements
          *
          * @property
          */
-        inputClass: 'date-visual-element',
+        inputClass: config.inputClass,
 
         /**
          * Date widget options
@@ -90,7 +101,14 @@ define(function(require) {
          *
          * @property
          */
-        picker: tools.isMobile() ? DatePickerView : VariableDatePickerView,
+        pickerConstructor: null,
+
+        /**
+         * View constructor for picker element
+         *
+         * @property
+         */
+        variablePickerConstructor: null,
 
         /**
          * Additional date widget options that might be passed to filter
@@ -230,6 +248,11 @@ define(function(require) {
             DateFilter.__super__.dispose.call(this);
         },
 
+        _getPickerConstructor: function() {
+            return tools.isMobile() || !this.dateWidgetOptions.showDatevariables ? DatePickerView :
+                VariableDatePickerView;
+        },
+
         onChangeFilterType: function(e) {
             var select = this.$el.find(e.currentTarget);
             var value = select.val();
@@ -245,10 +268,14 @@ define(function(require) {
         },
 
         changeFilterType: function(value) {
+            var startSeparatorEndSelector =
+                [this.selectors.startContainer, this.selectors.separator, this.selectors.endContainer].join(',');
+            var startSeparatorSelector = [this.selectors.startContainer, this.selectors.separator].join(',');
+            var separatorEndSelector = [this.selectors.separator, this.selectors.endContainer].join(',');
             var type = parseInt(value, 10);
             if (!isNaN(type)) {
                 // it's type
-                this.$('.filter-separator, .filter-start-date, .filter-end-date').css('display', '');
+                this.$(startSeparatorEndSelector).css('display', '');
                 var typeDefinedValues = [
                     this.typeDefinedValues.today,
                     this.typeDefinedValues.this_week,
@@ -258,20 +285,20 @@ define(function(require) {
                     this.typeDefinedValues.all_time,
                 ];
                 if (typeDefinedValues.indexOf(type) > -1) {
-                    this.$('.filter-separator, .filter-start-date, .filter-end-date').hide();
+                    this.$(startSeparatorEndSelector).hide();
                     this.subview('start').setValue('');
                     this.subview('end').setValue('');
                 } else if (this.typeValues.moreThan === type) {
-                    this.$('.filter-separator, .filter-end-date').hide();
+                    this.$(separatorEndSelector).hide();
                     this.subview('end').setValue('');
                 } else if (this.typeValues.lessThan === type) {
-                    this.$('.filter-separator, .filter-start-date').hide();
+                    this.$(startSeparatorSelector).hide();
                     this.subview('start').setValue('');
                 } else if (this.typeValues.equal === type) {
-                    this.$('.filter-separator, .filter-end-date').hide();
+                    this.$(separatorEndSelector).hide();
                     this.subview('end').setValue('');
                 } else if (this.typeValues.notEqual === type) {
-                    this.$('.filter-separator, .filter-start-date').hide();
+                    this.$(startSeparatorSelector).hide();
                     this.subview('start').setValue('');
                 }
 
@@ -310,7 +337,8 @@ define(function(require) {
                     inputClass: this.inputClass,
                     value: displayValue,
                     parts: this._getParts(),
-                    popoverContent: __('oro.filter.date.info')
+                    popoverContent: __('oro.filter.date.info'),
+                    renderMode: this.renderMode
                 })
             );
 
@@ -351,7 +379,8 @@ define(function(require) {
                         choices: this.dateParts,
                         selectedChoice: value.part,
                         selectedChoiceLabel: selectedPartLabel,
-                        selectedChoiceTooltip: this._getPartTooltip(value.part)
+                        selectedChoiceTooltip: this._getPartTooltip(value.part),
+                        renderMode: this.renderMode
                     })
                 );
             }
@@ -362,7 +391,8 @@ define(function(require) {
                     choices: this.choices,
                     selectedChoice: value.type,
                     selectedChoiceLabel: selectedChoiceLabel,
-                    popoverContent: __('oro.filter.date.info')
+                    popoverContent: __('oro.filter.date.info'),
+                    renderMode: this.renderMode
                 })
             );
 
@@ -380,6 +410,7 @@ define(function(require) {
             var pickerView;
             var options;
             var value = this.criteriaValueSelectors.value;
+            var Picker = this._getPickerConstructor();
             for (name in value) {
                 if (!value.hasOwnProperty(name)) {
                     continue;
@@ -388,7 +419,7 @@ define(function(require) {
                 options = this._getPickerConfigurationOptions({
                     el: this.$(selector)
                 });
-                pickerView = new this.picker(options);
+                pickerView = new Picker(options);
                 this.subview(name, pickerView);
             }
         },
@@ -679,6 +710,18 @@ define(function(require) {
             } else {
                 this.$('.field-condition-date-popover').addClass('hide');
             }
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _isDOMValueChanged: function() {
+            var thisDOMValue = this._readDOMValue();
+            return (
+                !_.isUndefined(thisDOMValue.value) &&
+                !_.isUndefined(thisDOMValue.type) &&
+                !_.isEqual(this.value, thisDOMValue)
+            );
         }
     });
 

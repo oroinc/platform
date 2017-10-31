@@ -13,6 +13,15 @@ class GridFilterStringItem extends AbstractGridFilterItem
      */
     public function selectType($filterType)
     {
+        /* Try find select and choice filterType */
+        $typeSelect = $this->find('css', 'div.choice-filter select[data-choice-value-select]');
+
+        if (!is_null($typeSelect)) {
+            $typeSelect->selectOption($filterType);
+            return;
+        }
+
+        /* Else try choice filterType in bootstrap dropdown */
         $this->find('css', 'div.choice-filter div.btn-group .dropdown-toggle')->click();
         /** @var NodeElement[] $types */
         $types = $this->findAll('css', 'ul.dropdown-menu li a.choice-value');

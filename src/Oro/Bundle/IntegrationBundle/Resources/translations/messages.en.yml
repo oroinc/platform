@@ -114,9 +114,6 @@ oro:
                 deactivated: 'Integration has been deactivated successfully'
                 deleted: 'Integration has been deleted successfully'
 
-        action:
-            assign.label: Select the assignee of the integration
-
         operation:
             attribute:
                 actionAllowed.label: 'Action is allowed'

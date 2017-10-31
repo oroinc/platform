@@ -1,0 +1,68 @@
+Oro\Bundle\EmailBundle\Entity\EmailBody:
+  emailBody:
+    bodyContent: '<script>alert("x");</script>This is content'
+    bodyIsText: false
+    textBody: 'This is content'
+    persistent: true
+
+OroEntityProxy\OroEmailBundle\EmailAddressProxy:
+  userAddress{1..3}:
+    email: '<script>alert("x");</script>user<current()>@example.com'
+    hasOwner: false
+
+Oro\Bundle\EmailBundle\Entity\EmailRecipient:
+  emailRecipientTo:
+    name: '<script>alert("x");</script>User Name1 <user1@example.com>'
+    type: 'to'
+    emailAddress: '@userAddress1'
+    email: '@email'
+  emailRecipientCc:
+    name: '<script>alert("x");</script>User Name2 <user2@example.com>'
+    type: 'cc'
+    emailAddress: '@userAddress2'
+    email: '@email'
+  emailRecipientBcc:
+    name: '<script>alert("x");</script>User Name3 <user3@example.com>'
+    type: 'bcc'
+    emailAddress: '@userAddress3'
+    email: '@email'
+
+Oro\Bundle\EmailBundle\Entity\Email:
+  email:
+    subject: 'Merry Christmas<script>alert("x");</script>'
+    emailBody: '@emailBody'
+    sentAt: '<dateTimeBetween("-1 day", "now")>'
+    fromName: '<script>alert("x");</script>John Doe <admin@example.com>'
+    fromEmailAddress: '@adminEmailAddress'
+    internalDate: '<dateTimeBetween("-1 day", "now")>'
+    messageId: 'fsdfasdf'
+    emailUsers: ['@adminEmailUser']
+    head: true
+
+Oro\Bundle\EmailBundle\Entity\EmailUser:
+  adminEmailUser:
+    email: '@email'
+    receivedAt: '@email->sentAt'
+    seen: true
+    owner: '@admin'
+    organization: '@organization'
+    origin: '@adminEmailOrigin'
+    folders: ['@adminEmailFolder']
+
+Oro\Bundle\EmailBundle\Entity\EmailFolder:
+  adminEmailFolder:
+    name: 'sent'
+    fullName: 'sent'
+    type: 'sent'
+    origin: '@adminEmailOrigin'
+    emailUsers: ['@adminEmailUser']
+
+Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin:
+  adminEmailOrigin:
+    active: true
+    name: 'internalemailorigin'
+    internalName: 'BAP_User_1'
+    mailboxName: 'Local'
+    emailUsers: ['@adminEmailUser']
+    owner: '@admin'
+    organization: '@organization'

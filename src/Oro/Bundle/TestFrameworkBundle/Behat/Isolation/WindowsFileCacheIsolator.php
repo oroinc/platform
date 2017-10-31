@@ -5,7 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Process\Process;
 
-final class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implements IsolatorInterface
+class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implements IsolatorInterface
 {
     /** @var array */
     protected $cacheDirectories = [
@@ -45,9 +45,15 @@ final class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator 
         $commands = [];
 
         foreach ($this->cacheDirectories as $directory) {
+            $cacheTempDirPath = $this->cacheTempDir.'\\'.$directory;
+
+            if (!is_dir($cacheTempDirPath)) {
+                continue;
+            }
+
             $commands[] = sprintf(
                 "move %s %s",
-                $this->cacheTempDir.'\\'.$directory,
+                $cacheTempDirPath,
                 $this->cacheDir.'\\'.$directory
             );
         }
@@ -79,9 +85,15 @@ final class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator 
         $commands = [];
 
         foreach ($this->cacheDirectories as $directory) {
+            $cacheDirPath = $this->cacheDir.'\\'.$directory;
+
+            if (!is_dir($cacheDirPath)) {
+                continue;
+            }
+
             $commands[] = sprintf(
                 'xcopy %s %s /E /R /H /I /K /Y',
-                $this->cacheDir.'\\'.$directory,
+                $cacheDirPath,
                 $this->cacheDumpDir.'\\'.$directory
             );
         }
@@ -109,6 +121,12 @@ final class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator 
         $commands = [];
 
         foreach ($this->cacheDirectories as $directory) {
+            $cacheDirPath = $this->cacheDir.'\\'.$directory;
+
+            if (!is_dir($cacheDirPath)) {
+                continue;
+            }
+
             $commands[] = sprintf('rd /s /q %s', $this->cacheDir.'\\'.$directory);
         }
 

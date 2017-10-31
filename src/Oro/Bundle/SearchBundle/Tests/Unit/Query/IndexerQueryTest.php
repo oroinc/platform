@@ -9,6 +9,9 @@ use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_VALUE = 'test_value';
@@ -62,9 +65,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->searchIndexer);
-        unset($this->innerQuery);
-        unset($this->query);
+        unset($this->searchIndexer, $this->innerQuery, $this->query);
     }
 
     /**
@@ -245,5 +246,41 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEST_VALUE);
 
         $this->assertEquals($this->query, $this->query->setFrom(self::TEST_VALUE));
+    }
+
+    public function testAggregationAccessors()
+    {
+        $this->assertEquals([], $this->query->getAggregations());
+
+        $this->query->addAggregate('test_name1', 'test_field1', 'test_function1');
+        $this->query->addAggregate('test_name2', 'test_field2', 'test_function2');
+
+        $this->assertEquals(
+            [
+                'test_name1' => ['field' => 'test_field1', 'function' => 'test_function1'],
+                'test_name2' => ['field' => 'test_field2', 'function' => 'test_function2'],
+            ],
+            $this->query->getAggregations()
+        );
+    }
+
+    public function testClone()
+    {
+        $result1 = $this->prepareResult();
+        $result2 = $this->prepareResult();
+
+        $this->searchIndexer->expects($this->exactly(2))
+            ->method('query')
+            ->with($this->innerQuery)
+            ->willReturnOnConsecutiveCalls($result1, $result2);
+
+        $this->assertSame($result1, $this->query->getResult());
+        $this->assertSame($this->innerQuery, $this->query->getQuery());
+
+        $newQuery = clone $this->query;
+
+        $this->assertSame($result2, $newQuery->getResult());
+        $this->assertNotSame($this->innerQuery, $newQuery->getQuery());
+        $this->assertEquals($this->innerQuery, $newQuery->getQuery());
     }
 }

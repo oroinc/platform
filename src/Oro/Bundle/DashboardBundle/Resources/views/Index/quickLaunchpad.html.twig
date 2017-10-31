@@ -18,9 +18,13 @@
 
                             {% block navButtons %}
                                 {% if dashboards|length > 1 %}
+                                    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
                                     <div class="dashboard-selector-container pull-left">
                                         <label for="dashboard_selector">{{ 'oro.dashboard.entity_plural_label'|trans }}:</label>
-                                        <select id="dashboard_selector">
+                                        <select id="dashboard_selector" {{ UI.renderPageComponentAttributes({
+                                            view: 'orodashboard/js/app/views/dashboard-change-view'
+                                        }) }}>
                                             <option>{{ 'oro.dashboard.title.chose_dashboard'|trans }}</option>
                                             {% for dashboardModel in dashboards %}
                                                 <option value="{{ dashboardModel.id }}">
@@ -29,16 +33,6 @@
                                             {% endfor %}
                                         </select>
                                     </div>
-
-                                    <script type="text/javascript">
-                                        require(['jquery', 'routing', 'oroui/js/mediator'],
-                                        function($, routing, mediator){
-                                            $('#dashboard_selector').on('change', function (e) {
-                                                var url = routing.generate('oro_dashboard_view', {id: $(e.currentTarget).val(), change_dashboard: true});
-                                                mediator.execute('redirectTo', {url: url}, {redirect: true});
-                                            });
-                                        });
-                                    </script>
                                 {% endif %}
                             {% endblock navButtons %}
                             {% placeholder dashboard_navButtons_after %}

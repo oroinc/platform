@@ -51,11 +51,13 @@ oro_behat_extension:
       route: 'oro_shortcut_actionslist'
 
   suites:
-    OroCommerceMenuBundle:
+    OroNavigationBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\FixturesContext
         - OroDataGridBundle::GridContext
-        - Oro\Bundle\NavigationBundle\Tests\Behat\Context\FeatureContext
-        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - OroNavigationBundle::FeatureContext
+        - OroFormBundle::FormContext
+        - OroConfigBundle::FeatureContext
       paths:
-        - '@OroCommerceMenuBundle/Tests/Behat/Features'
+        - '@OroNavigationBundle/Tests/Behat/Features'

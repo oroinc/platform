@@ -35,11 +35,31 @@ class StringFilter extends AbstractFilter
         if (!in_array($comparisonType, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
             $ds->setParameter(
                 $parameterName,
-                is_array($data['value']) ? array_map('strtolower', $data['value']) : $data['value']
+                $this->convertValue($data['value'])
             );
         }
 
         return $expr;
+    }
+
+    /**
+     * @param array $data
+     * @return array|mixed|string
+     */
+    protected function convertValue($data)
+    {
+        if (is_array($data) && !$this->isCaseInsensitive()) {
+            // used when e.g. we have type TextFilterType::TYPE_IN and search is case-sensitive
+            return array_map(array($this, 'convertData'), $data);
+        } elseif (is_array($data)) {
+            // used when e.g. we have type TextFilterType::TYPE_IN and search is case-insensitive
+            return array_map('mb_strtolower', $data);
+        } elseif (!$this->isCaseInsensitive()) {
+            // used when e.g. we have type other then TextFilterType::TYPE_IN and search is case sensitive
+            return $this->convertData($data);
+        }
+
+        return $data;
     }
 
     /**
@@ -64,7 +84,7 @@ class StringFilter extends AbstractFilter
             return false;
         }
 
-        $data['type']  = $type;
+        $data['type'] = $type;
         $data['value'] = $this->parseValue($data['type'], $data['value']);
 
         return $data;
@@ -165,7 +185,7 @@ class StringFilter extends AbstractFilter
     protected function setCaseSensitivity(FilterDatasourceAdapterInterface $ds)
     {
         $platform = $ds->getDatabasePlatform();
-        if ($platform instanceof PostgreSQL92Platform) {
+        if ($platform instanceof PostgreSQL92Platform && $this->isCaseInsensitive()) {
             $ds->expr()->setCaseInsensitive(true);
         }
     }
@@ -176,5 +196,14 @@ class StringFilter extends AbstractFilter
     protected function resetCaseSensitivity(FilterDatasourceAdapterInterface $ds)
     {
         $ds->expr()->setCaseInsensitive(false);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isCaseInsensitive()
+    {
+        // if param doesn't exists it means case insensitive search (backward compatibility)
+        return (!$this->has(FilterUtility::CASE_INSENSITIVE_KEY) || $this->get(FilterUtility::CASE_INSENSITIVE_KEY));
     }
 }

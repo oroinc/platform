@@ -23,14 +23,22 @@ class RestDocFiltersHandler
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
+    /** @var ApiDocDataTypeConverter */
+    protected $dataTypeConverter;
+
     /**
-     * @param RestDocViewDetector $docViewDetector
-     * @param ValueNormalizer     $valueNormalizer
+     * @param RestDocViewDetector     $docViewDetector
+     * @param ValueNormalizer         $valueNormalizer
+     * @param ApiDocDataTypeConverter $dataTypeConverter
      */
-    public function __construct(RestDocViewDetector $docViewDetector, ValueNormalizer $valueNormalizer)
-    {
+    public function __construct(
+        RestDocViewDetector $docViewDetector,
+        ValueNormalizer $valueNormalizer,
+        ApiDocDataTypeConverter $dataTypeConverter
+    ) {
         $this->docViewDetector = $docViewDetector;
         $this->valueNormalizer = $valueNormalizer;
+        $this->dataTypeConverter = $dataTypeConverter;
     }
 
     /**
@@ -88,16 +96,18 @@ class RestDocFiltersHandler
     {
         $dataType = $filter->getDataType();
         $isArrayAllowed = $filter->isArrayAllowed();
+        $isRangeAllowed = $filter->isRangeAllowed();
         $options = [
             'description' => $this->getFilterDescription($filter->getDescription()),
             'requirement' => $this->valueNormalizer->getRequirement(
                 $dataType,
                 $this->docViewDetector->getRequestType(),
-                $isArrayAllowed
+                $isArrayAllowed,
+                $isRangeAllowed
             )
         ];
         if ($filter instanceof FieldAwareFilterInterface) {
-            $options['type'] = $this->getFilterType($dataType, $isArrayAllowed);
+            $options['type'] = $this->getFilterType($dataType, $isArrayAllowed, $isRangeAllowed);
         }
         $operators = $filter->getSupportedOperators();
         if (!empty($operators) && !(count($operators) === 1 && $operators[0] === StandaloneFilter::EQ)) {
@@ -131,22 +141,29 @@ class RestDocFiltersHandler
      */
     protected function getFilterDescription($description)
     {
-        return null !== $description
-            ? $description
-            : '';
+        return $description ?? '';
     }
 
     /**
      * @param string $dataType
      * @param bool   $isArrayAllowed
+     * @param bool   $isRangeAllowed
      *
      * @return string
      */
-    protected function getFilterType($dataType, $isArrayAllowed)
+    protected function getFilterType($dataType, $isArrayAllowed, $isRangeAllowed)
     {
-        return $isArrayAllowed
-            ? sprintf('%1$s or array of %1$s', $dataType)
-            : $dataType;
+        $dataType = $this->dataTypeConverter->convertDataType($dataType);
+
+        $result = '%1$s';
+        if ($isArrayAllowed) {
+            $result .= ' or array';
+        }
+        if ($isRangeAllowed) {
+            $result .= ' or range';
+        }
+
+        return sprintf($result, $dataType);
     }
 
     /**

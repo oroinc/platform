@@ -81,24 +81,17 @@ class UpdateTableFieldQuery extends ParametrizedMigrationQuery
         $column = $this->column;
         $from = $this->from;
         $to = $this->to;
-        $columnId = $this->columnId;
 
         $preparedFrom = str_replace('\\', '\\\\', $from);
         if ($this->connection->getDatabasePlatform()->getName() === DatabasePlatformInterface::DATABASE_MYSQL) {
             $preparedFrom = str_replace('\\', '\\\\', $preparedFrom);
+            $from = str_replace('\\', '\\\\', $from);
+            $to = str_replace('\\', '\\\\', $to);
         }
 
-        $rows = $this->connection
-            ->fetchAll("SELECT $columnId, $column as field FROM $table WHERE $column LIKE '%$preparedFrom%'");
-        foreach ($rows as $row) {
-            $id = $row[$columnId];
-            $originalValue = $row['field'];
-            $alteredValue = $this->replaceStringValue($originalValue, $from, $to);
-            if ($alteredValue !== $originalValue) {
-                $this->connection
-                    ->executeQuery("UPDATE $table SET $column = ? WHERE $columnId = ?", [$alteredValue, $id]);
-            }
-        }
+        $this->connection
+            ->exec("UPDATE $table SET $column = REPLACE($column, '$from', '$to') 
+                    WHERE $column LIKE '%$preparedFrom%'");
     }
 
     /**

@@ -1,0 +1,5 @@
+oro_message_queue:
+    persistent_services:
+        # `oro_logger.cache` can be persistent because it depends only on 'oro_config.cache'
+        # that is persistent as well
+        - 'oro_logger.cache'

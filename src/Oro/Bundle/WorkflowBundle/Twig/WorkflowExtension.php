@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Twig;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Oro\Bundle\WorkflowBundle\Formatter\WorkflowVariableFormatter;
+use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowExtension extends \Twig_Extension
@@ -43,6 +45,20 @@ class WorkflowExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
+    public function getFilters()
+    {
+        return [
+            new \Twig_SimpleFilter(
+                'oro_format_workflow_variable_value',
+                [$this, 'formatWorkflowVariableValue'],
+                ['is_safe' => ['html']]
+            ),
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return self::NAME;
@@ -66,5 +82,23 @@ class WorkflowExtension extends \Twig_Extension
     public function hasWorkflowItemsByEntity($entity)
     {
         return $this->getWorkflowManager()->hasWorkflowItemsByEntity($entity);
+    }
+
+    /**
+     * @param Variable $variable
+     *
+     * @return string
+     */
+    public function formatWorkflowVariableValue(Variable $variable)
+    {
+        return $this->getWorkflowVariableFormatter()->formatWorkflowVariableValue($variable);
+    }
+
+    /**
+     * @return WorkflowVariableFormatter
+     */
+    protected function getWorkflowVariableFormatter()
+    {
+        return $this->container->get('oro_workflow.formatter.workflow_variable');
     }
 }

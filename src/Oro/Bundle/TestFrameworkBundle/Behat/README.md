@@ -29,6 +29,7 @@
   - [Inline fixtures](#inline-fixtures)
   - [Alice fixtures](#alice-fixtures)
   - [Entity references](#entity-references)
+- [Health Checkers](#health-checkers)
 - [Write your first feature](#write-your-first-feature)
 - [Troubleshooting](#troubleshooting)
   - [Increase application performance (Ubuntu)](#increase-application-performance-ubuntu)
@@ -613,12 +614,34 @@ include:
 
 You can use references to the entities in both inline and alice fixtures.
 [See Alice documentation about References](https://github.com/nelmio/alice/blob/2.x/doc/relations-handling.md#handling-relations).
-You can use default references that were created by ```ReferenceRepositoryInitializer``` before the tests run:
+```{Bundle}\Tests\Behat\ReferenceRepositoryInitializer``` used for create references for objects that already exist in database.
+It is prohibited to modify or add new entities within Initializer.
+It should implement ```ReferenceRepositoryInitializerInterface``` and should not have dependencies.
+For show all references use ```bin/behat --available-references``` command.
+
+The most common used references:
 
 - ```@admin``` - Admin user
 - ```@adminRole``` - Administrator role
 - ```@organization``` - Default organization
 - ```@business_unit``` - Default business unit
+
+## Health Checkers
+
+There is native behat posiblitiy to invokes formatters without executing the tests and hooks.
+You can try:
+
+```bash
+bin/behat --dry-run
+```
+
+This can be useful in case when you are not sure that you declare all needed context for your feature.
+OroBehatExtension enhances this feature and add some extra functionality.
+
+### FixturesChecker
+
+Each feature can have alice fixtures, add by tags [see documentation](#alice-fixtures)
+**FixturesChecker** will check every feacher for ability of fixture loading, without actually load the fixture.
 
 ## Write your first feature
 

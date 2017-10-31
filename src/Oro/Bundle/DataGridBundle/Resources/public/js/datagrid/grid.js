@@ -45,6 +45,10 @@ define(function(require) {
         /** @property {String} */
         tagName: 'div',
 
+        attributes: {
+            'data-layout': 'separate'
+        },
+
         /** @property {int} */
         requestsCount: 0,
 
@@ -942,6 +946,12 @@ define(function(require) {
             this.listenTo(mediator, 'datagrid:changeColumnParam:' + this.name, function(columnName, option, value) {
                 this.changeColumnParam(columnName, option, value);
             });
+
+            this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, function() {
+                if (!this.refreshAction) {
+                    this._onDatagridRefresh();
+                }
+            });
         },
 
         /**
@@ -1125,6 +1135,8 @@ define(function(require) {
         _processLoadedMetadata: function(metadata) {
             _.extend(this.metadata, metadata);
             this.metadataModel.set(metadata);
+
+            mediator.trigger('datagrid:metadata-loaded', this);
         },
 
         /**
@@ -1168,6 +1180,12 @@ define(function(require) {
             }
 
             mediator.trigger('datagrid:afterRemoveRow:' + this.name);
+        },
+
+        _onDatagridRefresh: function() {
+            this.setAdditionalParameter('refresh', true);
+            this.collection.fetch({reset: true});
+            this.removeAdditionalParameter('refresh');
         },
 
         /**

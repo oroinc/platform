@@ -1,7 +1,7 @@
 OroApiBundle Documentation
 ==========================
 
- - [Debug Commands](./debug_commands.md)
+ - [CLI Commands](./commands.md)
  - [Configure Stateless Security Firewalls](./security.md)
  - [Configuration Reference](./configuration.md)
    - [**exclude** option](./configuration.md#exclude-option)
@@ -67,6 +67,8 @@ OroApiBundle Documentation
    - [Configure Extended Many-To-One Association](./how_to.md#configure-extended-many-to-one-association)
    - [Configure Extended Many-To-Many Association](./how_to.md#configure-extended-many-to-many-association)
    - [Configure Extended Multiple Many-To-One Association](./how_to.md#configure-extended-multiple-many-to-one-association)
+   - [Add custom controller](./how_to.md#add-custom-controller)
+   - [Using a non-primary key to identify entity](./how_to.md#using-a-non-primary-key-to-identify-entity)
  - [Testing](./testing.md)
    - [Overview](./testing.md#overview)
    - [Load Fixtures](./testing.md#load-fixtures)

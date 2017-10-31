@@ -16,6 +16,8 @@ Table of Contents
  - [Configure Extended Many-To-One Association](#configure-extended-many-to-one-association)
  - [Configure Extended Many-To-Many Association](#configure-extended-many-to-many-association)
  - [Configure Extended Multiple Many-To-One Association](#configure-extended-multiple-many-to-one-association)
+ - [Add custom controller](#add-custom-controller)
+ - [Using a non-primary key to identify entity](#using-a-non-primary-key-to-identify-entity)
 
 
 Turn on API for entity
@@ -366,3 +368,134 @@ The `data_type` parameter has format: `association:relationType:associationKind`
 
  - `relationType` part should have 'multipleManyToOne' value for extended Multiple Many-To-One association;
  - `associationKind` - optional part. The association kind.
+
+Add custom controller
+---------------------
+
+By default, all REST API resources are handled by the following controllers:
+
+ - [RestApiController](../../Controller/RestApiController.php) - handles [get_list](./actions.md#get_list-action), [get](./actions.md#get-action), [delete](./actions.md#delete-action), [delete_list](./actions.md#delete_list-action), [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
+ - [RestApiSubresourceController](../../Controller/RestApiSubresourceController.php) - handles [get_subresource](./actions.md#get_subresource-action) action.
+ - [RestApiRelationshipController](../../Controller/RestApiRelationshipController.php) - handles [get_relationship](./actions.md#get_relationship-action), [update_relationship](./actions.md#update_relationship-action), [add_relationship](./actions.md#add_relationship-action) and [delete_relationship](./actions.md#delete_relationship-action) actions.
+
+If by some reasons your REST API resource cannot be implemented to be handled by one of these controllers you can register own controller. Please note that this way is not recommended and should be used only in a very special cases, because a lot of logic should be implemented from the scratch, including:
+
+ - extracting and validation of input data
+ - building and formatting output document
+ - error handling
+ - loading data from the database
+ - saving data to the database
+ - implementing relationships with other API resources
+ - documenting such API resources
+
+If you are ok with these disadvantages, the two simple steps need to be done to register a custom controller:
+
+ 1. Create a controller.
+ 2. Register the created controller using `Resources/oro/routing.yml` configuration file.
+
+Here is an example of the controller:
+
+```php
+<?php
+
+namespace Acme\Bundle\AppBundle\Controller\Api;
+
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+
+class MyResourceController extends Controller
+{
+    /**
+     * Retrieve a specific record.
+     *
+     * @param Request $request
+     *
+     * @ApiDoc(
+     *     resource=true,
+     *     description="Get a resource",
+     *     views={"rest_json_api"},
+     *     section="myresources",
+     *     requirements={
+     *          {
+     *              "name"="id",
+     *              "dataType"="integer",
+     *              "requirement"="\d+",
+     *              "description"="The 'id' requirement description."
+     *          }
+     *     },
+     *     filters={
+     *          {
+     *              "name"="aFilter",
+     *              "dataType"="string",
+     *              "requirement"=".+",
+     *              "description"="The 'aFilter' filter description."
+     *          }
+     *     },
+     *     output={
+     *          "class"="Your\Namespace\Class",
+     *          "fields"={
+     *              {
+     *                  "name"="aField",
+     *                  "dataType"="string",
+     *                  "description"="The 'aField' field description."
+     *              }
+     *          }
+     *     },
+     *     statusCodes={
+     *          200="Returned when successful",
+     *          500="Returned when an unexpected error occurs"
+     *     }
+     * )
+     *
+     * @return Response
+     */
+    public function getAction(Request $request)
+    {
+        // @todo: add an implementaution here
+    }
+}
+```
+
+An example of `Resources/oro/routing.yml` configuration file:
+
+```yaml
+acme_api_get_my_resource:
+    path: /api/myresources/{id}
+    methods: [GET]
+    defaults:
+        _controller: AcmeAppBundle:Api\MyResource:get
+    options:
+        group: rest_api
+```
+
+An information about `ApiDoc` annotation can be found in [Symfony documentation](https://symfony.com/doc/current/bundles/NelmioApiDocBundle/the-apidoc-annotation.html). To find all possible properties of `fields` option take a look at [AbstractFormatter class in NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle/blob/2.x/Formatter/AbstractFormatter.php). Please note that `fields` option can be used inside `input` and `output` options.
+
+Use [oro:api:doc:cache:clear](./commands.md#oroapidoccacheclear) command to apply changes in `ApiDoc` annotation to [API Sandbox](https://www.orocrm.com/documentation/current/book/data-api#api-sandbox).
+
+Using a non-primary key to identify entity
+------------------------------------------
+
+By default the primary key is used to identify ORM entities in API. But, if by some reasons you want to change this, you can use `identifier_field_names` option.
+
+For example, if your entity has `id` field that is the primary key and `uuid` field that contains unique value for each entity, and you want to use `uuid` field to identify the entity, add the following in `Resources/config/oro/api.yml`:
+
+```yml
+api:
+    entities:
+        Acme\Bundle\AppBundle\Entity\SomeEntity:
+            identifier_field_names: ['uuid']
+```
+
+Also you can exclude `id` field if you do not want to expose it via API at all:
+
+```yml
+api:
+    entities:
+        Acme\Bundle\AppBundle\Entity\SomeEntity:
+            identifier_field_names: ['uuid']
+            fields:
+                id:
+                    exclude: true
+```

@@ -1,0 +1,30 @@
+parameters:
+    id:
+        dataType: 'integer'
+        required: true
+        readonly: true
+    owner:
+        dataType: 'integer'
+        required: false
+        actualType: ~
+        subType: 'businessunits'
+    staff:
+        dataType: 'integer'
+        required: false
+        actualType: 'collection'
+        subType: 'testapipeople'
+response:
+    id:
+        dataType: 'integer'
+        required: true
+        readonly: true
+    owner:
+        dataType: 'integer'
+        required: false
+        actualType: ~
+        subType: 'businessunits'
+    staff:
+        dataType: 'integer'
+        required: false
+        actualType: 'collection'
+        subType: 'testapipeople'

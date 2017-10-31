@@ -81,9 +81,11 @@ class StatusCodesConfig
      */
     public function getCode($code)
     {
-        return isset($this->codes[$code])
-            ? $this->codes[$code]
-            : null;
+        if (!isset($this->codes[$code])) {
+            return null;
+        }
+
+        return $this->codes[$code];
     }
 
     /**

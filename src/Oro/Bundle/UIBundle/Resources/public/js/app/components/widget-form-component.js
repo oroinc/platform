@@ -25,6 +25,10 @@ define(
                         }
                     }
 
+                    if (options.reloadLayout) {
+                        mediator.trigger('layout:adjustReloaded');
+                    }
+
                     if (!options.preventRemove && !widget.disposed) {
                         widget.remove();
                     }

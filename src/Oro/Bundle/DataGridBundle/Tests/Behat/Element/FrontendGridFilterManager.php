@@ -97,7 +97,7 @@ class FrontendGridFilterManager extends Element
     {
         $filterCheckbox = $this->find(
             'css',
-            'li.datagrid-manager__checkboxes-item label[title="' . $title . '"] input[type=checkbox]'
+            'li.datagrid-manager__list-item label[title="' . $title . '"] input[type=checkbox]'
         );
 
         self::assertNotNull($filterCheckbox, 'Can not find filter: ' . $title);

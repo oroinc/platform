@@ -66,21 +66,7 @@ class OroSelenium2Driver extends Selenium2Driver
         }
 
         if ('input' === $elementName) {
-            $classes = explode(' ', $element->attribute('class'));
-
-            if (true === in_array('select2-input', $classes, true)) {
-                $parent = $this->findElement($this->xpathManipulator->prepend('/../../..', $xpath));
-
-                if (in_array('select2-container-multi', explode(' ', $parent->attribute('class')), true)) {
-                    $this->fillSelect2Entities($xpath, $value);
-
-                    return;
-                }
-
-                $this->findElement($xpath)->postValue(['value' => [$value]]);
-
-                return;
-            } elseif ('text' === $element->attribute('type')) {
+            if ('text' === $element->attribute('type')) {
                 $this->setTextInputElement($element, $value);
                 $this->triggerEvent($xpath, 'keyup');
 
@@ -152,73 +138,6 @@ JS;
     }
 
     /**
-     * Fill field with many entities
-     * See contexts field in send email form
-     * It will remove all existed entities in field
-     *
-     * @param string $xpath
-     * @param string|array $values Any string(s) for search entity
-     */
-    protected function fillSelect2Entities($xpath, $values)
-    {
-        $input = $this->findElement($xpath);
-
-        // Remove all existing entities
-        $results = $this->findElementXpaths($this->xpathManipulator->prepend(
-            '/../../li/a[contains(@class, "select2-search-choice-close")]',
-            $xpath
-        ));
-
-        foreach ($results as $result) {
-            $this->executeJsOnXpath($result, '{{ELEMENT}}.click()');
-        }
-
-        $this->waitForAjax();
-
-        $values = true === is_array($values) ? $values : [$values];
-
-        foreach ($values as $value) {
-            $input->postValue(['value' => [$value]]);
-            $this->wait(30000, "0 == $('ul.select2-results li.select2-searching').length");
-
-            $results = $this->getEntitiesSearchResultXpaths();
-            $firstResult = $this->findElement(array_shift($results));
-
-            self::assertNotEquals(
-                'select2-no-results',
-                $firstResult->attribute('class'),
-                sprintf('Not found result for "%s"', $value)
-            );
-
-            $firstResult->click();
-            $this->waitForAjax();
-        }
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function getEntitiesSearchResultXpaths()
-    {
-        $resultsHoldersXpaths = [
-            '//ul[contains(@class, "select2-result-sub")]',
-            '//ul[contains(@class, "select2-result")]',
-        ];
-
-        while ($resultsHoldersXpath = array_shift($resultsHoldersXpaths)) {
-            foreach ($this->findElementXpaths($resultsHoldersXpath) as $xpath) {
-                $resultsHolder = $this->findElement($xpath);
-
-                if ($resultsHolder->displayed()) {
-                    return $this->findElementXpaths($xpath.'/li');
-                }
-            }
-        }
-
-        return [];
-    }
-
-    /**
      * Wait PAGE load
      * @param int $time Time should be in milliseconds
      * @return bool
@@ -234,9 +153,9 @@ JS;
             if (document.title === "Loading...") {
                 return false;
             }
-        
-            if (typeof(jQuery) == "undefined" || jQuery == null) {
-                return false;
+            
+            if (typeof(jQuery) == "undefined" || jQuery == null) {		
+                return false;		
             }
             
             if (jQuery(document.body).hasClass('loading')) {

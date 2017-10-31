@@ -1,16 +1,17 @@
 {% if isDesktopVersion() and oro_config_value('oro_ui.navbar_position') == placement %}
-{% use 'OroUIBundle:Default/navbar:blocks.html.twig' %}
-<div class="main-menu-sided minimized">
-    <div class="scroller" id="main-menu">
-        {{ block('application_menu') }}
-    </div>
-    <div id="main-menu-toggler" class="menu-toggler"></div>
-</div>
-<script type="text/javascript">
-    require(['oroui/js/desktop/side-menu'], function ($) {
-        $('.main-menu-sided').desktopSideMenu({
+    {% use 'OroUIBundle:Default/navbar:blocks.html.twig' %}
+
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    <div class="main-menu-sided minimized" {{ UI.renderPageComponentAttributes({
+        jquery: {
+            widgetModule: 'oroui/js/desktop/side-menu',
             toggleSelector: '#main-menu-toggler'
-        });
-    });
-</script>
+        }
+    }) }}>
+        <div class="scroller" id="main-menu">
+            {{ block('application_menu') }}
+        </div>
+        <div id="main-menu-toggler" class="menu-toggler" ></div>
+    </div>
 {% endif %}

@@ -8,7 +8,7 @@ services:
         arguments:
             - '@oro_message_queue.log.consumer_state'
         tags:
-            - { name: oro_message_queue.consumption.extension }
+            - { name: oro_message_queue.consumption.extension, persistent: true }
 
     oro_message_queue.log.job_extension:
         class: Oro\Bundle\MessageQueueBundle\Log\JobExtension
@@ -17,6 +17,11 @@ services:
             - '@oro_message_queue.log.consumer_state'
         tags:
             - { name: oro_message_queue.job.extension }
+
+    oro_message_queue.log.message_processor_class_provider:
+        class: Oro\Bundle\MessageQueueBundle\Log\MessageProcessorClassProvider
+        arguments:
+            - '@oro_message_queue.client.message_processor_registry'
 
     oro_message_queue.log.message_to_array_converter:
         class: Oro\Bundle\MessageQueueBundle\Log\Converter\ChainMessageToArrayConverter

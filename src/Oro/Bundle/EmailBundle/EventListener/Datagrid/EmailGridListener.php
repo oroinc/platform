@@ -116,7 +116,8 @@ class EmailGridListener
             if (!is_array($emailIds)) {
                 $emailIds = explode(',', $emailIds);
             }
-            $queryBuilder->andWhere($queryBuilder->expr()->in('e.id', $emailIds));
+            $queryBuilder->andWhere($queryBuilder->expr()->in('e.id', ':emailIds'))
+                ->setParameter('emailIds', $emailIds);
         }
 
         $this->prepareQueryToFilter($parameters, $queryBuilder, $countQb);

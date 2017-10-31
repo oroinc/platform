@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
@@ -36,12 +37,15 @@ class NormalizeEntityIdTest extends GetProcessorTestCase
 
     public function testProcess()
     {
+        $metadata = new EntityMetadata();
+
         $this->context->setClassName('Test\Class');
         $this->context->setId('123');
+        $this->context->setMetadata($metadata);
 
         $this->entityIdTransformer->expects($this->once())
             ->method('reverseTransform')
-            ->with($this->context->getClassName(), $this->context->getId())
+            ->with($this->context->getId(), self::identicalTo($metadata))
             ->willReturn(123);
 
         $this->processor->process($this->context);
@@ -51,12 +55,15 @@ class NormalizeEntityIdTest extends GetProcessorTestCase
 
     public function testProcessForInvalidId()
     {
+        $metadata = new EntityMetadata();
+
         $this->context->setClassName('Test\Class');
         $this->context->setId('123');
+        $this->context->setMetadata($metadata);
 
         $this->entityIdTransformer->expects($this->once())
             ->method('reverseTransform')
-            ->with($this->context->getClassName(), $this->context->getId())
+            ->with($this->context->getId(), self::identicalTo($metadata))
             ->willThrowException(new \Exception('some error'));
 
         $this->processor->process($this->context);

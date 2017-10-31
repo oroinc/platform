@@ -7,7 +7,6 @@ use Gaufrette\Filesystem;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler;
@@ -17,8 +16,6 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
-use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -39,9 +36,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createLoggerMock(),
             $this->createFileManagerMock(),
             $this->createHttpImportHandlerMock(),
-            $this->createMock(PostponedRowsHandler::class),
-            $this->createTokenSerializerMock(),
-            $this->createTokenStorageInterfaceMock()
+            $this->createMock(PostponedRowsHandler::class)
         );
         $this->assertInstanceOf(MessageProcessorInterface::class, $chunkHttpImportMessageProcessor);
         $this->assertInstanceOf(ImportMessageProcessor::class, $chunkHttpImportMessageProcessor);
@@ -62,9 +57,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $logger,
             $this->createFileManagerMock(),
             $this->createHttpImportHandlerMock(),
-            $this->createMock(PostponedRowsHandler::class),
-            $this->createTokenSerializerMock(),
-            $this->createTokenStorageInterfaceMock()
+            $this->createMock(PostponedRowsHandler::class)
         );
 
         $message = $this->createMessageMock();
@@ -74,74 +67,6 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->willReturn('[]');
 
         $result = $processor->process($message, $this->createSessionMock());
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    public function testShouldLogErrorAndRejectMessageIfTokenCannotBeSet()
-    {
-        $tokenSerializer = $this->createTokenSerializerMock();
-        $tokenSerializer
-            ->expects($this->once())
-            ->method('deserialize')
-            ->with($this->equalTo('security_token'))
-            ->willReturn(null);
-
-        $tokenStorage = $this->createTokenStorageInterfaceMock();
-        $tokenStorage
-            ->expects($this->never())
-            ->method('setToken');
-
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
-            ->method('critical');
-
-        $job = new Job();
-        $job->setId(1);
-        $jobRunner = $this->createJobRunnerMock();
-        $jobRunner
-            ->expects($this->once())
-            ->method('runDelayed')
-            ->with(1)
-            ->will(
-                $this->returnCallback(
-                    function ($jobId, $callback) use ($jobRunner, $job) {
-                        return $callback($jobRunner, $job);
-                    }
-                )
-            );
-
-        $processor = new HttpImportMessageProcessor(
-            $jobRunner,
-            $this->createImportExportResultSummarizerMock(),
-            $this->createJobStorageMock(),
-            $logger,
-            $this->createFileManagerMock(),
-            $this->createHttpImportHandlerMock(),
-            $this->createMock(PostponedRowsHandler::class),
-            $tokenSerializer,
-            $tokenStorage
-        );
-
-        $message = new NullMessage();
-        $message->setBody(
-            json_encode(
-                [
-                    'fileName' => '123456.csv',
-                    'originFileName' => 'test.csv',
-                    'userId' => '1',
-                    'securityToken' => 'security_token',
-                    'jobId' => '1',
-                    'jobName' => 'test',
-                    'processorAlias' => 'test',
-                    'process' => 'import',
-                    'options' => [],
-                ]
-            )
-        );
-
-        $result = $processor->process($message, $this->createSessionMock());
-
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
@@ -254,23 +179,6 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('getFileSystem')
             ->willReturn($filesystem);
 
-        $token = $this->createMock(UsernamePasswordOrganizationToken::class);
-
-        $tokenSerializer = $this->createTokenSerializerMock();
-        $tokenSerializer
-            ->expects($this->once())
-            ->method('deserialize')
-            ->with($this->equalTo('security_token'))
-            ->willReturn($token)
-        ;
-
-        $tokenStorage = $this->createTokenStorageInterfaceMock();
-        $tokenStorage
-            ->expects($this->once())
-            ->method('setToken')
-            ->with($this->equalTo($token))
-        ;
-
         $processor = new HttpImportMessageProcessor(
             $jobRunner,
             $importExportResultSummarizer,
@@ -278,9 +186,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $logger,
             $fileManager,
             $httpImportHandler,
-            $this->createMock(PostponedRowsHandler::class),
-            $tokenSerializer,
-            $tokenStorage
+            $this->createMock(PostponedRowsHandler::class)
         );
 
         $message = new NullMessage();
@@ -288,7 +194,6 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             'fileName' => '123456.csv',
             'originFileName' => 'test.csv',
             'userId' => '1',
-            'securityToken' => 'security_token',
             'jobId' => '1',
             'jobName' => 'test',
             'processorAlias' => 'test',
@@ -334,13 +239,6 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface
-     */
-    protected function createTokenStorageInterfaceMock()
-    {
-        return $this->createMock(TokenStorageInterface::class);
-    }
-
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
      */
@@ -387,13 +285,5 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     private function createFileManagerMock()
     {
         return $this->createMock(FileManager::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TokenSerializerInterface
-     */
-    private function createTokenSerializerMock()
-    {
-        return $this->createMock(TokenSerializerInterface::class);
     }
 }

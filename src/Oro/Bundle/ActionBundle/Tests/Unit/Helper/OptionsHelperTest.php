@@ -7,6 +7,9 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
+use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
+use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\Operation;
 
 class OptionsHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -15,6 +18,9 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
 
     /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
+
+    /** @var FormProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $formProvider;
 
     /** @var OptionsHelper */
     protected $helper;
@@ -34,9 +40,11 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                 return $id === 'untranslated' ? 'untranslated' : '[trans]'.$id.'[/trans]';
             });
 
+        $this->formProvider = $this->createMock(FormProvider::class);
         $this->helper = new OptionsHelper(
             $this->router,
-            $this->translator
+            $this->translator,
+            $this->formProvider
         );
     }
 

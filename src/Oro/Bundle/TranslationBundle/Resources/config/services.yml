@@ -159,7 +159,6 @@ services:
         public: false
         arguments:
             - '@service_container'
-            - '%oro_translation.debug_translator%'
         tags:
             - { name: twig.extension }
 
@@ -187,6 +186,8 @@ services:
         parent: oro_translation.extension.transtation_packages_provider.abstract
         calls:
             - ['addPackage', ['Oro', 'oro/platform', '/src']]
+            - ['addPackage', ['Oro', 'oro/calendar-bundle']]
+            - ['addPackage', ['Oro', 'oro/platform-serialised-fields']]
         tags:
             - {name: oro_translation.extension.packages_provider}
 

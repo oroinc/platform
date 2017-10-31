@@ -3,12 +3,14 @@
 
 namespace Oro\Bundle\ImapBundle\Connector;
 
-use Oro\Bundle\ImapBundle\Mail\Protocol\Exception\InvalidEmailFormatException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Mail\Storage\Message;
+use Psr\Log\LoggerAwareTrait;
 
 class ImapMessageIterator implements \Iterator, \Countable
 {
+    use LoggerAwareTrait;
+
     /** @var Imap */
     private $imap;
 
@@ -133,7 +135,8 @@ class ImapMessageIterator implements \Iterator, \Countable
                 $messages = $this->imap->getMessages(array_values($ids));
                 foreach ($ids as $pos => $id) {
                     if (!isset($messages[$id])) {
-                        throw new InvalidEmailFormatException('Invalid email format');
+                        $this->logUnsupportedFormatMessage($id);
+                        continue;
                     }
                     $this->batch[$pos] = $messages[$id];
                 }
@@ -269,5 +272,15 @@ class ImapMessageIterator implements \Iterator, \Countable
             $pos !== null
             && $pos >= $this->iterationMin
             && $pos <= $this->iterationMax;
+    }
+
+    /**
+     * @param string $id
+     */
+    protected function logUnsupportedFormatMessage($id)
+    {
+        if ($this->logger) {
+            $this->logger->error(sprintf('An email #%s was skipped due to unsupported format', $id));
+        }
     }
 }

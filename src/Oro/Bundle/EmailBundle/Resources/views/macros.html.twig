@@ -159,77 +159,13 @@
          data-page-component-options="{{ options|json_encode }}"
          data-page-component-name="email-template-variables"></div>
 {% endmacro %}
-
-{% macro renderPreviewDialog(formId, title) %}
-    <script type="text/javascript">
-        require(['jquery', 'underscore', 'orotranslation/js/translator', 'oro/dialog-widget'],
-        function($, _, __, DialogWidget){
-            $(function () {
-                var showEmailPreviewDialog = function(el) {
-                    var iframeId = 'preview-frame';
-                    var iframe = $('<iframe />', {
-                        name: iframeId,
-                        id: iframeId,
-                        frameborder: 0,
-                        marginwidth: 20,
-                        marginheight: 20,
-                        allowfullscreen: true
-                    });
-
-                    var form = $('#{{ formId }}');
-                    var formAction = form.attr('action');
-
-                    form.one('submit', function(e) {
-                        if (!e.result) {
-                            return;
-                        }
-                        var confirmModal = new DialogWidget({
-                            title: __('Preview'),
-                            'dialogOptions': {
-                                'modal': true,
-                                'resizable': true,
-                                'width': '85%',
-                                'height': '70%',
-                                'autoResize': true
-                            }
-                        });
-                        confirmModal.render();
-                        confirmModal._onContentLoad('<div class="widget-content"></div>');
-                        confirmModal._showLoading();
-                        confirmModal.widget.addClass('dialog-single-iframe-container');
-                        confirmModal.$el.append(iframe);
-                        form.attr('target', iframeId);
-                        form.attr('action', $(el).attr('href'));
-
-                        iframe.one('load', function() {
-                            confirmModal._hideLoading();
-                            form.removeAttr('target');
-                            form.attr('action', formAction);
-                        });
-
-                        // prevent navigation form processing
-                        e.stopImmediatePropagation();
-                    });
-
-                    form.submit();
-                };
-
-                $('.dialog-form-renderer').click(function (e) {
-                    showEmailPreviewDialog(this);
-                    e.preventDefault();
-                });
-            });
-        });
-    </script>
-{% endmacro %}
-
 {#
     Renders email address owner name as text
     Parameters:
         emailAddress - email address entity Oro\Bundle\EmailBundle\Entity\EmailAddress
 #}
 {% macro email_address_text(emailAddress) -%}
-    {{ emailAddress.owner|oro_format_name|default('N/A')|escape }}
+    {{ emailAddress.owner|oro_format_name|default('N/A')|oro_html_purify }}
 {%- endmacro -%}
 
 {#
@@ -240,7 +176,7 @@
 #}
 {% macro email_address_link(emailAddress, label) -%}
     {{ _self.renderEmailAddressLink(
-        label|default(_self.email_address_text(emailAddress)),
+        label|oro_html_purify|default(_self.email_address_text(emailAddress)),
         emailAddress.owner.class,
         emailAddress.owner.id) }}
 {%- endmacro -%}
@@ -255,9 +191,9 @@
 {% macro renderEmailAddressLink(label, ownerClass, ownerId) -%}
     {% set route = oro_entity_route(ownerClass) %}
     {% if route is not null %}
-        <a href="{{ path(route, {id: ownerId}) }}">{{ label }}</a>
+        <a href="{{ path(route, {id: ownerId}) }}">{{ label|oro_html_purify }}</a>
     {% else %}
-        {{ label }}
+        {{ label|oro_html_purify }}
     {% endif %}
 {%- endmacro -%}
 
@@ -267,7 +203,7 @@
         emailAddress - email address entity Oro\Bundle\EmailBundle\Entity\EmailAddress
 #}
 {% macro email_address_recipient_link(emailAddress, emailAddressName, label) -%}
-    {% set label = label|default(emailAddressName|default('N/A')) %}
+    {% set label = label|oro_html_purify|default(emailAddressName|default('N/A')) %}
     {% set route = oro_entity_route(emailAddress.owner.class) %}
     {% if route is not null %}
         <a href="{{ path(route, {id: emailAddress.owner.id}) }}">
@@ -288,7 +224,7 @@
 {% macro email_address(emailAddress, emailAddressName, noLink, knownOnly) -%}
     {% if emailAddress.owner is null -%}
         {% if not knownOnly|default(false) -%}
-            {{ emailAddressName }}
+            {{ emailAddressName|oro_html_purify }}
         {%- endif %}
     {%- else -%}
         {% if noLink|default(false) -%}
@@ -345,7 +281,7 @@
         {% endif %}
 
         {% if emailAddress %}
-            <a href="mailto:{{ emailAddress|e('html_attr') }}" title="{{ title|e('html_attr') }}" class="email">{{ title }}</a>
+            <a href="mailto:{{ emailAddress|e('html_attr') }}" title="{{ title|e('html_attr') }}" class="email">{{ title|oro_html_purify }}</a>
         {% endif %}
     {% endif %}
 {%- endmacro -%}
@@ -390,7 +326,7 @@
     {%- endfor -%}
 
     {% for address in addresses -%}
-        {{ address }}
+        {{ address|oro_html_purify }}
         {%- if not loop.last %}; {% endif %}
     {% else %}
         {{ 'N/A'|trans }}
@@ -495,7 +431,7 @@
             {{ _self.email_address_link(emailAddress, 'Me'|trans|lower)|raw }}
         {%- endif %}
     {%- else -%}
-        {%- set name = oro_get_email_address_name(emailAddressName)|default(oro_get_email_address(emailAddressName)) -%}
+        {%- set name = oro_get_email_address_name(emailAddressName)|default(oro_get_email_address(emailAddressName))|oro_html_purify -%}
         {{ _self.email_address(emailAddress, name, noLink, knownOnly) }}
     {%- endif %}
 {%- endmacro %}
@@ -547,19 +483,20 @@
     {% set recipientsCc = [] %}
     {% set recipientsBcc = [] %}
     {% for recipient in email.recipients %}
+        {% set recipientName = oro_get_email_address_name(recipient.name)|oro_html_purify ~ " &lt;" ~ oro_get_email_address(recipient.name)|oro_html_purify ~ "&gt;" %}
         {% if recipient.type == 'to' %}
-            {% set recipientsTo = recipientsTo|merge([recipient.name|e])%}
+            {% set recipientsTo = recipientsTo|merge([recipientName])%}
         {% elseif recipient.type == 'cc' %}
-            {% set recipientsCc = recipientsCc|merge([recipient.name|e])%}
+            {% set recipientsCc = recipientsCc|merge([recipientName])%}
         {% elseif recipient.type == 'bcc' %}
-            {% set recipientsBcc = recipientsBcc|merge([recipient.name|e])%}
+            {% set recipientsBcc = recipientsBcc|merge([recipientName])%}
         {% endif %}
     {% endfor %}
-    {% set fromUserName = oro_get_email_address_name(email.fromName) %}
-    {% set fromEmailAddress = '&lt;' ~ oro_get_email_address(email.fromName) ~ '&gt;' %}
+    {% set fromUserName = oro_get_email_address_name(email.fromName)|oro_html_purify %}
+    {% set fromEmailAddress = '&lt;' ~ oro_get_email_address(email.fromName)|oro_html_purify ~ '&gt;' %}
     {% set data = [{
             label: 'From'|trans,
-            value: fromUserName ? '<b>' ~ fromUserName|e ~ '</b> ' ~ fromEmailAddress : '<b>' ~ fromEmailAddress ~ '</b>' ,
+            value: fromUserName ? '<b>' ~ fromUserName ~ '</b> ' ~ fromEmailAddress : '<b>' ~ fromEmailAddress ~ '</b>' ,
             cssClass: 'autor'
         }, {
             label: 'To'|trans,
@@ -575,7 +512,7 @@
             value: email.sentAt|oro_format_datetime|e
         }, {
             label: 'Subject'|trans,
-            value: email.subject|e
+            value: email.subject|oro_html_purify
     }] %}
     <ul class="form-horizontal">
     {% for item in data %}

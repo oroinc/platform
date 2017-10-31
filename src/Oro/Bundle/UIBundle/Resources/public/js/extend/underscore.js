@@ -23,6 +23,10 @@ define(['underscore', 'asap'], function(_, asap) {
                     .indexOf(' mobile-version ') !== -1;
         },
 
+        isDesktop: function() {
+            return !this.isMobile();
+        },
+
         trim: function(text) {
             return text.replace(/^\s*/, '').replace(/\s*$/, '');
         },

@@ -283,6 +283,12 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
                 ->getMock()
         );
         $kernel->getContainer()->set('logger', new NullLogger());
+        $kernel->getContainer()->set(
+            'oro_message_queue.consumption.cache_state',
+            $this->getMockBuilder('Oro\Bundle\MessageQueueBundle\Consumption\CacheState')
+                ->disableOriginalConstructor()
+                ->getMock()
+        );
 
         $containerBuilder->set('symfony2_extension.kernel', $kernel);
         $containerBuilder->set('symfony2_extension.suite.generator', new SymfonySuiteGenerator($kernel));

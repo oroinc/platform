@@ -13,6 +13,7 @@ class RootJobProgressCalculatorTest extends \PHPUnit_Framework_TestCase
             [[Job::STATUS_NEW, Job::STATUS_RUNNING], 0],
             [[Job::STATUS_SUCCESS, Job::STATUS_RUNNING, Job::STATUS_RUNNING], 0.3333],
             [[Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_CANCELLED], 1],
+            [[Job::STATUS_SUCCESS, Job::STATUS_STALE, Job::STATUS_STALE], 1],
         ];
     }
 
@@ -43,6 +44,7 @@ class RootJobProgressCalculatorTest extends \PHPUnit_Framework_TestCase
         $self = new RootJobProgressCalculator($storage);
         $self->calculate($childJob);
         $this->assertEquals($rootJob->getJobProgress(), $expectedProgress);
+        $this->assertInstanceOf(\DateTime::class, $rootJob->getLastActiveAt());
 
         $storage = $this->createJobStorageMock();
         $storage

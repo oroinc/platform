@@ -6,7 +6,7 @@
     align-content: stretch;
     justify-content: center;
 
-    margin: 10px 0;
+    margin: 10px -($offset-x-s);
     padding: 0;
 
     &__side,
@@ -70,15 +70,10 @@
             min-width: 64px;
         }
     }
-
 }
 
 .datagrid-tool {
-    margin: 3px 5px 3px 0;
-
-    &:not(:first-child) {
-        margin-left: $offset-x-s;
-    }
+    margin: $offset-x-s;
 
     &:first-child {
         position: relative;
@@ -86,6 +81,10 @@
 
     &:last-child {
         flex-grow: 0;
+    }
+
+    &__label {
+        vertical-align: middle;
     }
 }
 
@@ -120,6 +119,32 @@
             text-align: right;
         }
     }
+
+    .datagrid-tool {
+        &.display-options {
+            flex-basis: auto;
+            order: 2;
+        }
+
+        &.page-size {
+            order: 2;
+        }
+    }
+}
+
+@include breakpoint('tablet-small') {
+    .datagrid-toolbar {
+        margin-left: -($offset-x-s/2);
+        margin-right: -($offset-x-s/2);
+    }
+
+    .datagrid-tool {
+        margin: $offset-y-s ($offset-x-s/2);
+
+        &__label {
+            display: none;
+        }
+    }
 }
 
 @include breakpoint('mobile-landscape') {
@@ -131,6 +156,15 @@
 }
 
 @include breakpoint('mobile') {
+    .datagrid-tool {
+        margin-left: 0;
+        margin-right: 1px;
+
+        &:not(:first-child) {
+            margin-left: 1px;
+        }
+    }
+
     .datagrid-toolbar {
         justify-content: space-between;
 
@@ -152,6 +186,21 @@
 
         .action-selectbox_custom_in-pager {
             margin-right: $offset-x-s;
+        }
+    }
+}
+
+@include breakpoint('print') {
+    .datagrid-toolbar {
+        display: block;
+
+        &__side {
+            float: right;
+        }
+
+        &__rightside,
+        &__base {
+            display: none !important;
         }
     }
 }

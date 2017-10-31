@@ -67,7 +67,7 @@ The following table shows all actions provided out of the box:
 
 Please see [processors](./processors.md) section for more details about how to create a processor.
 
-Also you can use the [oro:api:debug](./debug_commands.md#oroapidebug) command to see all actions and processors.
+Also you can use the [oro:api:debug](./commands.md#oroapidebug) command to see all actions and processors.
 
 get Action
 ----------

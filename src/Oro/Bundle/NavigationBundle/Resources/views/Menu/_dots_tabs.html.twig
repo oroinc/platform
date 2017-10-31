@@ -14,7 +14,7 @@
         {%- set labelAttributes = item.labelAttributes %}
         {% set class = [''] %}
         {% if item.extras.active_if_first_is_empty is defined and item.extras.active_if_first_is_empty %}
-            {% set class = class|merge(['show-if-empty']) %}
+            {% set class = class|merge(['active']) %}
         {% endif %}
         <li id="{{- item.name|replace({' ': '_', '#': '_'})|lower|trim -}}-tab" class="{{ class|join(' ') }}">
             {{ block('linkElement') }}

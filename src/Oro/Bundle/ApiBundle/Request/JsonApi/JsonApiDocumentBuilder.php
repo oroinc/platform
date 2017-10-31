@@ -197,7 +197,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         if ($preparedValue['idOnly']) {
             $resourceId = $this->getResourceIdObject(
                 $preparedValue['entityType'],
-                $this->entityIdTransformer->transform($preparedValue['value'])
+                $this->entityIdTransformer->transform($preparedValue['value'], $targetMetadata)
             );
         } else {
             $targetObject = $preparedValue['value'];

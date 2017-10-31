@@ -6,9 +6,15 @@ use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\FormBundle\Tests\Behat\Context\ClearableInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\UiDialog;
+use WebDriver\Key;
 
 class Select2Entity extends Element implements ClearableInterface
 {
+    /**
+     * @var int Count of attempts for getting the correct field suggestions
+     */
+    protected $attempts;
+
     /**
      * {@inheritdoc}
      */
@@ -26,6 +32,7 @@ class Select2Entity extends Element implements ClearableInterface
             if (1 === count($results)) {
                 array_shift($results)->click();
                 $this->getDriver()->waitForAjax();
+
                 return;
             }
 
@@ -67,16 +74,7 @@ class Select2Entity extends Element implements ClearableInterface
     public function fillSearchField($value)
     {
         $this->open();
-        /** @var NodeElement[] $inputs */
-        $inputs = array_filter(
-            $this->getPage()->findAll('css', '.select2-search input'),
-            function (NodeElement $element) {
-                return $element->isVisible();
-            }
-        );
-
-        self::assertCount(1, $inputs);
-        array_shift($inputs)->setValue($value);
+        $this->getDriver()->typeIntoInput($this->getSearchInput()->getXpath(), $value);
     }
 
     /**
@@ -92,21 +90,50 @@ class Select2Entity extends Element implements ClearableInterface
      */
     public function getSuggestions()
     {
+        $this->attempts = 0;
+        $resultSet = $this->getResultSet();
+
+        $results = $this->spin(function (Select2Entity $element) use ($resultSet) {
+            /** @var NodeElement[] $results */
+            $results = $resultSet->findAll('css', 'li');
+            if (3 == $element->attempts) {
+                return $results;
+            }
+
+            try {
+                foreach ($results as $result) {
+                    $result->isVisible();
+                }
+            } catch (\Exception $e) {
+                $element->attempts = 0;
+            }
+
+            $element->attempts++;
+
+            return [];
+        }, 5);
+
+        return $results;
+    }
+
+    /**
+     * @return NodeElement
+     */
+    public function getResultSet()
+    {
         $this->open();
-        $this->getDriver()->waitForAjax();
         $this->waitFor(60, function () {
             return null === $this->getPage()->find('css', '.select2-results li.select2-searching');
         });
-        $this->getDriver()->waitForAjax();
 
         /** @var NodeElement $resultSet */
         foreach ($this->getPage()->findAll('css', '.select2-results') as $resultSet) {
             if ($resultSet->isVisible()) {
-                return $resultSet->findAll('css', 'li');
+                return $resultSet;
             }
         }
 
-        return [];
+        self::fail('No select 2 entity results found on page');
     }
 
     /**
@@ -129,18 +156,23 @@ class Select2Entity extends Element implements ClearableInterface
     {
         if (!$this->isOpen()) {
             $openArrow = $this->getParent()->find('css', '.select2-arrow');
-            // Although ajax is already loaded element need some extra time to appear by js animation
-            $openArrow->waitFor(60, function (NodeElement $element) {
-                return $element->isVisible();
-            });
-            $openArrow->click();
+            if ($openArrow) {
+                $this->focus();
+                // Although ajax is already loaded element need some extra time to appear by js animation
+                $openArrow->waitFor(60, function (NodeElement $element) {
+                    return $element->isVisible();
+                });
+                if ($openArrow->isVisible()) {
+                    $openArrow->click();
+                }
+            }
         }
     }
 
     public function close()
     {
-        if ($dropDownMask = $this->getPage()->find('css', '.select2-drop-mask')) {
-            $dropDownMask->click();
+        if ($this->getPage()->has('css', '.select2-drop-mask')) {
+            $this->getDriver()->typeIntoInput($this->getSearchInput()->getXpath(), Key::ESCAPE);
         } elseif ($this->isOpen()) {
             $this->getParent()->find('css', '.select2-arrow')->click();
         }
@@ -177,10 +209,16 @@ class Select2Entity extends Element implements ClearableInterface
      */
     public function openSelectEntityPopup()
     {
-        $this->getParent()->getParent()->find('css', '.entity-select-btn')->click();
-        $this->getDriver()->waitForAjax();
+        $entitySelectButton = $this->getParent()->getParent()->find('css', '.entity-select-btn');
+        $entitySelectButton->focus();
+        if ($entitySelectButton->isVisible()) {
+            $entitySelectButton->click();
+            $this->getDriver()->waitForAjax();
 
-        return $this->elementFactory->createElement('UiDialog');
+            return $this->elementFactory->createElement('UiDialog');
+        }
+
+        return null;
     }
 
     public function clear()
@@ -196,5 +234,22 @@ class Select2Entity extends Element implements ClearableInterface
         $span = $this->getParent()->find('css', 'span.select2-chosen');
 
         return $span ? $span->getText() : null;
+    }
+
+    /**
+     * @return NodeElement
+     */
+    private function getSearchInput()
+    {
+        $inputs = array_filter(
+            $this->getPage()->findAll('css', '.select2-search input'),
+            function (NodeElement $element) {
+                return $element->isVisible();
+            }
+        );
+
+        self::assertCount(1, $inputs);
+
+        return array_shift($inputs);
     }
 }

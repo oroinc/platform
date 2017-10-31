@@ -333,6 +333,7 @@ services:
         public: false
         arguments:
             - '@doctrine'
+            - '@oro_entity_config.provider.extend'
         tags:
             - { name: oro_entity.name_provider, priority: -90 }
 
@@ -458,6 +459,11 @@ services:
             - '@oro_entity.entity_field_provider'
             - '@oro_entity_config.provider.importexport'
             - '@oro_entity_extend.extend.field_type_helper'
+
+    oro_entity.helper.relation_helper:
+        class: 'Oro\Bundle\EntityBundle\Helper\RelationHelper'
+        arguments:
+            - '@oro_entity.virtual_relation_provider.chain'
 
     oro_entity.entity_reference_to_string_transformer:
         class: Oro\Bundle\EntityBundle\Form\DataTransformer\EntityReferenceToStringTransformer

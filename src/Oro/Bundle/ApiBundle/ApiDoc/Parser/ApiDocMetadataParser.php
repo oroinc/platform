@@ -2,8 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc\Parser;
 
+use Nelmio\ApiDocBundle\DataTypes as ApiDocDataTypes;
 use Nelmio\ApiDocBundle\Parser\ParserInterface;
 
+use Oro\Bundle\ApiBundle\ApiDoc\ApiDocDataTypeConverter;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -20,9 +25,19 @@ class ApiDocMetadataParser implements ParserInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    public function __construct(ValueNormalizer $valueNormalizer)
-    {
+    /** @var ApiDocDataTypeConverter */
+    protected $dataTypeConverter;
+
+    /**
+     * @param ValueNormalizer         $valueNormalizer
+     * @param ApiDocDataTypeConverter $dataTypeConverter
+     */
+    public function __construct(
+        ValueNormalizer $valueNormalizer,
+        ApiDocDataTypeConverter $dataTypeConverter
+    ) {
         $this->valueNormalizer = $valueNormalizer;
+        $this->dataTypeConverter = $dataTypeConverter;
     }
 
     /**
@@ -31,10 +46,9 @@ class ApiDocMetadataParser implements ParserInterface
     public function supports(array $item)
     {
         return
-            array_key_exists('options', $item)
-            && array_key_exists('metadata', $item['options'])
-            && is_a($item['class'], ApiDocMetadata::class, true)
-            &&  $item['options']['metadata'] instanceof ApiDocMetadata;
+            isset($item['options']['metadata'])
+            && $item['options']['metadata'] instanceof ApiDocMetadata
+            && is_a($item['class'], ApiDocMetadata::class, true);
     }
 
     /**
@@ -59,7 +73,7 @@ class ApiDocMetadataParser implements ParserInterface
      * @param string                 $action
      * @param RequestType            $requestType
      *
-     * @return array ['fieldName' => [field config array]]
+     * @return array [field name => [key => value, ...], ...]
      */
     protected function getApiDocFieldsDefinition(
         EntityMetadata $metadata,
@@ -68,61 +82,101 @@ class ApiDocMetadataParser implements ParserInterface
         RequestType $requestType
     ) {
         $identifiersData = [];
-        $fields = [];
-        $relations = [];
+        $fieldsData = [];
+        $associationsData = [];
 
-        $addIdentifiers = ApiActions::isIdentifierNeededForAction($action);
         $identifiers = $metadata->getIdentifierFieldNames();
-        // process fields
-        foreach ($metadata->getFields() as $fieldName => $fieldMetadata) {
-            $fieldData = [];
+        $isReadOnlyIdentifier = ApiActions::CREATE === $action && $metadata->hasIdentifierGenerator();
 
-            $fieldData['required'] = !$fieldMetadata->isNullable();
-            $fieldData['dataType'] = $fieldMetadata->getDataType();
-            $fieldData['description'] = $config->getField($fieldName)->getDescription();
-            $fieldData['readonly'] = !$addIdentifiers && in_array($fieldName, $identifiers, true);
-            $fieldData['isRelation'] = false;
-            $fieldData['isCollection'] = false;
+        $fields = $metadata->getFields();
+        foreach ($fields as $fieldName => $fieldMetadata) {
+            $fieldData = $this->getFieldData(
+                $fieldMetadata,
+                $config->getField($fieldName)
+            );
+            if ($isReadOnlyIdentifier && in_array($fieldName, $identifiers, true)) {
+                $fieldData['readonly'] = true;
+            }
 
             if (in_array($fieldName, $identifiers, true)) {
                 $identifiersData[$fieldName] = $fieldData;
             } else {
-                $fields[$fieldName] = $fieldData;
+                $fieldsData[$fieldName] = $fieldData;
             }
         }
-        // process relations
-        foreach ($metadata->getAssociations() as $associationName => $associationMetadata) {
-            $fieldData = [];
 
-            $fieldData['required'] = !$associationMetadata->isNullable();
-            $fieldData['description'] = $config->getField($associationName)->getDescription();
-            $fieldData['readonly'] = !$addIdentifiers && in_array($associationName, $identifiers, true);
-            $fieldData['isCollection'] = $associationMetadata->isCollection();
-
-            $fieldData['dataType'] = $this->getEntityType($associationMetadata->getTargetClassName(), $requestType);
-            $fieldData['isRelation'] = true;
+        $associations = $metadata->getAssociations();
+        foreach ($associations as $associationName => $associationMetadata) {
+            $associationData = $this->getAssociationData(
+                $associationMetadata,
+                $config->getField($associationName),
+                $requestType
+            );
+            if ($isReadOnlyIdentifier && in_array($associationName, $identifiers, true)) {
+                $associationData['readonly'] = true;
+            }
 
             if (in_array($associationName, $identifiers, true)) {
-                $identifiersData[$associationName] = $fieldData;
+                $identifiersData[$associationName] = $associationData;
+            } elseif (isset($associationData['subType'])) {
+                $associationsData[$associationName] = $associationData;
             } else {
-                if (DataType::isAssociationAsField($associationMetadata->getDataType())) {
-                    $fieldData['dataType'] = $associationMetadata->getDataType();
-                    $fieldData['isRelation'] = false;
-                    $fields[$associationName] = $fieldData;
-                } else {
-                    if ($associationMetadata->isCollection()) {
-                        $fieldData['dataType'] = sprintf('array of %s', $fieldData['dataType']);
-                    }
-                    $relations[$associationName] = $fieldData;
-                }
+                $fieldsData[$associationName] = $associationData;
             }
         }
 
         ksort($identifiersData);
-        ksort($fields);
-        ksort($relations);
+        ksort($fieldsData);
+        ksort($associationsData);
 
-        return array_merge($identifiersData, $fields, $relations);
+        return array_merge($identifiersData, $fieldsData, $associationsData);
+    }
+
+    /**
+     * @param FieldMetadata               $metadata
+     * @param EntityDefinitionFieldConfig $config
+     *
+     * @return array
+     */
+    protected function getFieldData(
+        FieldMetadata $metadata,
+        EntityDefinitionFieldConfig $config
+    ) {
+        return [
+            'description' => $config->getDescription(),
+            'required'    => !$metadata->isNullable(),
+            'dataType'    => $this->dataTypeConverter->convertDataType($metadata->getDataType())
+        ];
+    }
+
+    /**
+     * @param AssociationMetadata         $metadata
+     * @param EntityDefinitionFieldConfig $config
+     * @param RequestType                 $requestType
+     *
+     * @return array
+     */
+    protected function getAssociationData(
+        AssociationMetadata $metadata,
+        EntityDefinitionFieldConfig $config,
+        RequestType $requestType
+    ) {
+        $result = [
+            'description' => $config->getDescription(),
+            'required'    => !$metadata->isNullable()
+        ];
+        $dataType = $metadata->getDataType();
+        $result['dataType'] = $this->dataTypeConverter->convertDataType($dataType);
+        if (!DataType::isAssociationAsField($dataType)) {
+            $result['subType'] = $this->getEntityType($metadata->getTargetClassName(), $requestType);
+            $actualType = null;
+            if ($metadata->isCollection()) {
+                $actualType = ApiDocDataTypes::COLLECTION;
+            }
+            $result['actualType'] = $actualType;
+        }
+
+        return $result;
     }
 
     /**

@@ -16,7 +16,6 @@ use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -215,14 +214,13 @@ class ImportExportController extends Controller
      * @param Request $request
      * @param string $processorAlias
      *
-     * @return array
+     * @return JsonResponse
      */
     public function importValidateAction(Request $request, $processorAlias)
     {
         $jobName = $request->get('importValidateJob', JobExecutor::JOB_IMPORT_VALIDATION_FROM_CSV);
         $fileName = $request->get('fileName', null);
         $originFileName = $request->get('originFileName', null);
-        $token = $this->getSecurityToken()->getToken();
 
         $this->getMessageProducer()->send(
             Topics::PRE_HTTP_IMPORT,
@@ -231,7 +229,6 @@ class ImportExportController extends Controller
                 'process' => ProcessorRegistry::TYPE_IMPORT_VALIDATION,
                 'originFileName' => $originFileName,
                 'userId' => $this->getUser()->getId(),
-                'securityToken' => $this->getTokenSerializer()->serialize($token),
                 'jobName' => $jobName,
                 'processorAlias' => $processorAlias,
                 'options' => $this->getOptionsFromRequest($request)
@@ -255,7 +252,6 @@ class ImportExportController extends Controller
         $jobName = $request->get('importJob', JobExecutor::JOB_IMPORT_FROM_CSV);
         $fileName = $request->get('fileName', null);
         $originFileName = $request->get('originFileName', null);
-        $token = $this->getSecurityToken()->getToken();
 
         $this->getMessageProducer()->send(
             Topics::PRE_HTTP_IMPORT,
@@ -264,7 +260,6 @@ class ImportExportController extends Controller
                 'process' => ProcessorRegistry::TYPE_IMPORT,
                 'userId' => $this->getUser()->getId(),
                 'originFileName' => $originFileName,
-                'securityToken' => $this->getTokenSerializer()->serialize($token),
                 'jobName' => $jobName,
                 'processorAlias' => $processorAlias,
                 'options' => $this->getOptionsFromRequest($request)
@@ -296,7 +291,6 @@ class ImportExportController extends Controller
             'options' => $options,
             'userId' => $this->getUser()->getId(),
             'organizationId' => $token->getOrganizationContext()->getId(),
-            'securityToken' => $this->getTokenSerializer()->serialize($token),
         ]);
 
         return new JsonResponse(['success' => true]);
@@ -315,7 +309,10 @@ class ImportExportController extends Controller
     {
         $entityName = $request->get('entity');
 
-        $exportForm = $this->createForm('oro_importexport_export', null, ['entityName' => $entityName]);
+        $exportForm = $this->createForm('oro_importexport_export', null, [
+            'entityName' => $entityName,
+            'processorAlias' => $request->get('processorAlias') ?? null
+        ]);
 
         if ($request->isMethod('POST')) {
             $exportForm->submit($request);
@@ -548,13 +545,5 @@ class ImportExportController extends Controller
     protected function getSecurityToken()
     {
         return $this->get('security.token_storage');
-    }
-
-    /**
-     * @return TokenSerializerInterface
-     */
-    protected function getTokenSerializer()
-    {
-        return $this->get('oro_security.token_serializer');
     }
 }

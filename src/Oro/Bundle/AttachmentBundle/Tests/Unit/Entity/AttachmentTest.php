@@ -8,32 +8,62 @@ use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestUser;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
-class AttachmentTest extends EntityTestAbstract
+class AttachmentTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var Attachment */
+    protected $entity;
+
     protected function setUp()
     {
         $this->entity = new Attachment();
     }
 
-    /**
-     * @return array
-     */
-    public function getSetDataProvider()
+    public function testComment()
     {
+        $this->assertNull($this->entity->getComment());
         $comment = 'test comment';
-        $file = new File();
-        $date = new \DateTime('now');
-        $owner = new TestUser();
-        $organization = new Organization();
+        $this->entity->setComment($comment);
+        $this->assertEquals($comment, $this->entity->getComment());
+    }
 
-        return [
-            'comment' => ['comment', $comment, $comment],
-            'file' => ['file', $file, $file],
-            'createdAt' => ['createdAt', $date, $date],
-            'updatedAt' => ['updatedAt', $date, $date],
-            'owner' => ['owner', $owner, $owner],
-            'organization' => ['organization', $organization, $organization]
-        ];
+    public function testCreatedAt()
+    {
+        $this->assertNull($this->entity->getCreatedAt());
+        $date = new \DateTime('now');
+        $this->entity->setCreatedAt($date);
+        $this->assertEquals($date, $this->entity->getCreatedAt());
+    }
+
+    public function testUpdatedAt()
+    {
+        $this->assertNull($this->entity->getUpdatedAt());
+        $date = new \DateTime('now');
+        $this->entity->setUpdatedAt($date);
+        $this->assertEquals($date, $this->entity->getUpdatedAt());
+    }
+
+    public function testFile()
+    {
+        $this->assertNull($this->entity->getFile());
+        $file = new File();
+        $this->entity->setFile($file);
+        $this->assertSame($file, $this->entity->getFile());
+    }
+
+    public function testOwner()
+    {
+        $this->assertNull($this->entity->getOwner());
+        $owner = new TestUser();
+        $this->entity->setOwner($owner);
+        $this->assertSame($owner, $this->entity->getOwner());
+    }
+
+    public function testOrganization()
+    {
+        $this->assertNull($this->entity->getOrganization());
+        $organization = new Organization();
+        $this->entity->setOrganization($organization);
+        $this->assertSame($organization, $this->entity->getOrganization());
     }
 
     public function testPrePersists()

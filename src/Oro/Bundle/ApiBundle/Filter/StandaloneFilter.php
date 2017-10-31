@@ -18,6 +18,9 @@ class StandaloneFilter implements FilterInterface
     /** @var bool */
     protected $arrayAllowed = false;
 
+    /** @var bool */
+    protected $rangeAllowed = false;
+
     /** @var string */
     protected $description;
 
@@ -75,6 +78,28 @@ class StandaloneFilter implements FilterInterface
     public function setArrayAllowed($arrayAllowed)
     {
         $this->arrayAllowed = $arrayAllowed;
+    }
+
+    /**
+     * Gets a flag determines if a value can be a pair of "from" and "to" values.
+     *
+     * @param string|null $operator
+     *
+     * @return bool
+     */
+    public function isRangeAllowed($operator = null)
+    {
+        return $this->rangeAllowed;
+    }
+
+    /**
+     * Sets a flag determines if a value can be a pair of "from" and "to" values.
+     *
+     * @param bool $rangeAllowed
+     */
+    public function setRangeAllowed($rangeAllowed)
+    {
+        $this->rangeAllowed = $rangeAllowed;
     }
 
     /**

@@ -19,6 +19,15 @@ oro_behat_extension:
           First Name: 'oro_user_user_form[firstName]'
           Last Name: 'oro_user_user_form[lastName]'
           Primary Email: 'oro_user_user_form[email]'
+          First Role:
+            locator: '//label[text()[contains(.,"First Role")]]/../input'
+            type: xpath
+          Second Role:
+            locator: '//label[text()[contains(.,"Second Role")]]/../input'
+            type: xpath
+          OroCRM Organization:
+            locator: '(//div[contains(@class,"organization-structure")]//input[@type="checkbox"][@data-name="organization"])[1]'
+            type: xpath
 
     UserMenu:
       selector: {type: 'xpath', locator: '//li[@id="user-menu"]'}
@@ -48,6 +57,9 @@ oro_behat_extension:
         locator: '//div[contains(@data-page-component-name,"role-permission-grid")]/..'
       class: Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm
 
+    Edit Button:
+      selector: 'a[title="Edit profile"]'
+
   pages:
     Login:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\Login
@@ -56,6 +68,10 @@ oro_behat_extension:
     User Profile View:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserProfileView
       route: 'oro_user_profile_view'
+
+    User Profile Update:
+      class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserProfileUpdate
+      route: 'oro_user_profile_update'
 
     User Profile Configuration:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserProfileConfiguration
@@ -76,3 +92,23 @@ oro_behat_extension:
     User Edit:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserEdit
       route: 'oro_user_edit'
+
+    Role View:
+      class: Oro\Bundle\UserBundle\Tests\Behat\Page\RoleView
+      route: 'oro_user_role_view'
+
+  suites:
+    OroUserBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\FixturesContext
+        - OroUserBundle::FeatureContext
+        - OroDataGridBundle::GridContext
+        - OroFormBundle::FormContext
+        - OroConfigBundle::FeatureContext
+        - OroSecurityBundle::ACLContext
+        - OroSecurityBundle::PermissionContext
+        - OroActivityListBundle::ActivityContext
+        - OroDataGridBundle::GridContext
+      paths:
+        - '@OroUserBundle/Tests/Behat/Features'

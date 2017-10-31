@@ -118,7 +118,7 @@ class ContextHelper
                 );
             }
 
-            $data = ['data' => $entity];
+            $data = ['data' => $entity, ActionData::OPERATION_TOKEN => $hash];
 
             if ($context[self::DATAGRID_PARAM]) {
                 $data['gridName'] = $context[self::DATAGRID_PARAM];

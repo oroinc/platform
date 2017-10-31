@@ -13,6 +13,10 @@ define(function(require) {
     EmailNotificationView = BaseView.extend({
         tagName: 'li',
 
+        attributes: {
+            'data-layout': 'separate'
+        },
+
         templateSelector: '#email-notification-item-template',
 
         events: {

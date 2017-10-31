@@ -49,9 +49,6 @@ class OwnershipConditionDataBuilder
     /** @var AclGroupProviderInterface */
     protected $aclGroupProvider;
 
-    /** @var null|mixed */
-    protected $user = null;
-
     /**
      * @param AuthorizationCheckerInterface      $authorizationChecker
      * @param TokenStorageInterface              $tokenStorage
@@ -417,21 +414,16 @@ class OwnershipConditionDataBuilder
      */
     public function getUser()
     {
-        if ($this->user) {
-            return $this->user;
-        }
-
         $token = $this->tokenStorage->getToken();
         if (!$token) {
             return null;
         }
+
         $user = $token->getUser();
         if (!is_object($user) || !is_a($user, $this->metadataProvider->getUserClass())) {
             return null;
         }
 
-        $this->user = $user;
-
-        return $this->user;
+        return $user;
     }
 }

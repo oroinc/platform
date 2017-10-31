@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Form\Type\EntityType;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
+use Oro\Bundle\ApiBundle\Util\EntityLoader;
 
 class EntityTypeTest extends OrmRelatedTestCase
 {
@@ -36,7 +37,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine),
+            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
             null,
             ['metadata' => $associationMetadata]
         );
@@ -64,7 +65,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine),
+            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
             null,
             ['metadata' => $associationMetadata]
         );
@@ -107,7 +108,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine),
+            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
             null,
             ['metadata' => $associationMetadata]
         );
@@ -140,7 +141,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine),
+            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
             null,
             ['metadata' => $associationMetadata]
         );
@@ -155,7 +156,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine),
+            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
             null,
             ['metadata' => $associationMetadata]
         );
@@ -170,7 +171,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine),
+            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
             null,
             ['metadata' => $associationMetadata]
         );
@@ -187,7 +188,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine),
+            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
             null,
             ['metadata' => $associationMetadata]
         );
@@ -204,7 +205,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine),
+            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
             null,
             ['metadata' => $associationMetadata]
         );
@@ -227,7 +228,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         $includedEntities->add($entity, $value['class'], $value['id'], new IncludedEntityData('/included/0', 0));
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine),
+            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
             null,
             ['metadata' => $associationMetadata, 'included_entities' => $includedEntities]
         );
@@ -250,7 +251,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         $includedEntities->add($entity, $value['class'], $value['id'], new IncludedEntityData('/included/0', 0));
 
         $form = $this->factory->create(
-            new EntityType($this->doctrine),
+            new EntityType($this->doctrine, new EntityLoader($this->doctrine)),
             null,
             ['metadata' => $associationMetadata, 'included_entities' => $includedEntities]
         );
@@ -260,7 +261,7 @@ class EntityTypeTest extends OrmRelatedTestCase
 
     public function testGetName()
     {
-        $type = new EntityType($this->doctrine);
+        $type = new EntityType($this->doctrine, new EntityLoader($this->doctrine));
         $this->assertEquals('oro_api_entity', $type->getName());
     }
 }

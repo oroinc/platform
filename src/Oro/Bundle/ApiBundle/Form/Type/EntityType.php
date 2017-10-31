@@ -13,18 +13,24 @@ use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\CollectionToArrayTransformer;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Util\EntityLoader;
 
 class EntityType extends AbstractType
 {
     /** @var ManagerRegistry */
     protected $doctrine;
 
+    /** @var EntityLoader */
+    protected $entityLoader;
+
     /**
      * @param ManagerRegistry $doctrine
+     * @param EntityLoader    $entityLoader
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, EntityLoader $entityLoader)
     {
         $this->doctrine = $doctrine;
+        $this->entityLoader = $entityLoader;
     }
 
     /**
@@ -41,13 +47,13 @@ class EntityType extends AbstractType
                 ->addEventSubscriber(new MergeDoctrineCollectionListener())
                 ->addViewTransformer(
                     new CollectionToArrayTransformer(
-                        new EntityToIdTransformer($this->doctrine, $metadata, $includedEntities)
+                        new EntityToIdTransformer($this->doctrine, $this->entityLoader, $metadata, $includedEntities)
                     ),
                     true
                 );
         } else {
             $builder->addViewTransformer(
-                new EntityToIdTransformer($this->doctrine, $metadata, $includedEntities)
+                new EntityToIdTransformer($this->doctrine, $this->entityLoader, $metadata, $includedEntities)
             );
         }
     }

@@ -8,7 +8,7 @@ define([
     'oroui/js/app/models/page-model',
     'module',
     'oroui/js/error'
-], function(asap, $, _, Chaplin, __, BaseController, PageModel, module, error) {
+], function(asap, $, _, Chaplin, __, BaseController, PageModel, module, errorHandler) {
     'use strict';
 
     var PageController;
@@ -193,6 +193,10 @@ define([
                     } else {
                         callback();
                     }
+                }).catch(function(error) {
+                    if (error) {
+                        errorHandler.showError(error);
+                    }
                 });
             }
 
@@ -248,7 +252,7 @@ define([
             if (_.isObject(data)) {
                 model.set(data, options);
             } else {
-                error.showError(new Error(__('Unexpected content format')));
+                errorHandler.showError(new Error(__('Unexpected content format')));
             }
 
             this.publishEvent('page:error', model.getAttributes(), options.actionArgs, jqXHR);
@@ -297,8 +301,8 @@ define([
                 return;
             }
             if (options.redirect) {
-                this.publishEvent('page:redirect');
                 _.extend(options, {forceStartup: true, force: true, redirection: true});
+                this.publishEvent('page:redirect', pathDesc, options);
                 utils.redirectTo(pathDesc, options);
                 return;
             }
