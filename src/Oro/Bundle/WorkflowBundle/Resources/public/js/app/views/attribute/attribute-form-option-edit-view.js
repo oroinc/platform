@@ -3,11 +3,11 @@ define(function(require) {
 
     var AttributeFormOptionEditView;
     var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
-    var helper = require('oroworkflow/js/tools/workflow-helper');
     var __ = require('orotranslation/js/translator');
-    require('oroentity/js/field-choice');
+    var $ = require('jquery');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var FieldChoiceView = require('oroentity/js/app/views/field-choice-view');
+    var helper = require('oroworkflow/js/tools/workflow-helper');
     require('jquery.validate');
 
     AttributeFormOptionEditView = BaseView.extend({
@@ -24,7 +24,7 @@ define(function(require) {
                 'required': false
             },
             entity_field_template: null,
-            entity_select_el: null,
+            $entityChoice: null,
             workflow: null
         },
 
@@ -39,8 +39,8 @@ define(function(require) {
             this.editViewId = null;
         },
 
-        getFieldSelector: function() {
-            return this.entityFieldSelectEl;
+        getFieldChoiceView: function() {
+            return this.subview('field-choice');
         },
 
         onAdd: function() {
@@ -56,20 +56,22 @@ define(function(require) {
 
         resetForm: function() {
             this.editViewId = null;
-            this.entityFieldSelectEl.inputWidget('val', '');
+            this.subview('field-choice').setValue('');
             this.form.get(0).reset();
             this.submitBtn.html('<i class="fa-plus"></i> ' + __('Add'));
             this.resetBtn.addClass('hide');
         },
 
-        initFieldChoice: function(container) {
-            this.entityFieldSelectEl = container.find('[name="property_path"]');
-            this.entityFieldSelectEl.fieldChoice({
-                fieldsLoaderSelector: this.options.entity_select_el,
+        initFieldChoiceView: function(container) {
+            this.subview('field-choice', new FieldChoiceView({
+                autoRender: true,
+                el: container.find('[name="property_path"]'),
+                entity: this.options.$entityChoice.val(),
+                fieldsLoaderSelector: this.options.$entityChoice,
                 select2: {
                     placeholder: __('Choose field...')
                 }
-            });
+            }));
         },
 
         editRow: function(data) {
@@ -90,7 +92,7 @@ define(function(require) {
                 'submitHandler': _.bind(this.onAdd, this)
             });
             this.form.on('submit', function(e) {e.preventDefault();});
-            this.initFieldChoice(this.form);
+            this.initFieldChoiceView(this.form);
 
             this.submitBtn = this.form.find('[type=submit]');
             this.resetBtn = this.form.find('[type=reset]');

@@ -110,7 +110,7 @@ define(function(require) {
                 'workflow': this.model,
                 'step_from': stepFrom,
                 'step_to': stepTo,
-                'entity_select_el': this.workflowManagementView.getEntitySelect(),
+                '$entityChoice': this.workflowManagementView.getEntitySelect(),
                 'workflowContainer': this.workflowManagementView.$el
             });
             transitionEditView.on('transitionAdd', this.addTransition, this);

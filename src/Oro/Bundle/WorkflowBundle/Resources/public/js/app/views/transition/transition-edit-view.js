@@ -30,7 +30,7 @@ define(function(require) {
             template: null,
             workflow: null,
             step_from: null,
-            entity_select_el: null,
+            $entitySelect: null,
             button_example_template: '<button type="button" class="btn <%- button_color %>" ' +
                 'title="<%- button_title %>">' +
                 '<% if (transition_prototype_icon) { %><i class="<%- transition_prototype_icon %>"/> <% } %>' +
@@ -156,7 +156,7 @@ define(function(require) {
             this.attributesFormView = new AttributeFormOptionEditView({
                 'el': el.find('.transition-attributes-form-container'),
                 'workflow': this.options.workflow,
-                'entity_select_el': this.options.entity_select_el
+                '$entityChoice': this.options.$entityChoice
             });
 
             this.attributesFormView.on('formOptionAdd', this.addFormOption, this);
@@ -196,7 +196,7 @@ define(function(require) {
             this.attributesList = new AttributeFormOptionListView({
                 el: el.find('.transition-attributes-list-container'),
                 items: this.getFormOptions(),
-                fields_selector_el: this.attributesFormView.getFieldSelector(),
+                fieldsChoiceView: this.attributesFormView.getFieldChoiceView(),
                 workflow: this.options.workflow
             });
 

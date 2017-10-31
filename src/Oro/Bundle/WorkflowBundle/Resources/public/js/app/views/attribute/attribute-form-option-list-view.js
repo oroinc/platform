@@ -11,7 +11,7 @@ define(function(require) {
         options: {
             listElBodyEl: 'tbody',
             template: null,
-            'fields_selector_el': null,
+            fieldsChoiceView: null,
             workflow: null,
             items: [],
             'entity_field_template': null
@@ -48,19 +48,20 @@ define(function(require) {
         },
 
         addItem: function(data) {
-            if (_.indexOf(this.getCollection(), data) === -1) {
-                this.getCollection().push(data);
+            var collection = this.getCollection();
+            if (!_.contains(collection, data)) {
+                collection.push(data);
             }
             var fieldId = this.options.workflow.getFieldIdByPropertyPath(data.property_path);
-            var $fieldChoice = this.options.fields_selector_el;
+            var fieldChoiceView = this.options.fieldsChoiceView;
             var hasEntityField = this.options.workflow.hasEntityField(fieldId);
             data.isSystemLabel = !data.label;
 
             if (fieldId && hasEntityField) {
                 if (!data.label) {
-                    data.label = _.last($fieldChoice.fieldChoice('splitFieldId', fieldId)).field.label;
+                    data.label = _.last(fieldChoiceView.splitFieldId(fieldId)).field.label;
                 }
-                data.entityField = $fieldChoice.fieldChoice('formatChoice', fieldId, this.entityFieldTemplate);
+                data.entityField = fieldChoiceView.formatChoice(fieldId, this.entityFieldTemplate);
             } else {
                 if (!data.label && data.attribute_name) {
                     var attribute = this.options.workflow.getAttributeByName(data.attribute_name);
