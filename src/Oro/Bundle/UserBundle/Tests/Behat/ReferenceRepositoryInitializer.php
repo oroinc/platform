@@ -9,6 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\ReferenceRepositoryInitialize
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
 
 class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerInterface
 {
@@ -35,10 +36,12 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
         }
 
         $userRole = $roleRepository->findOneBy(['role' => User::ROLE_DEFAULT]);
+        $managerRole = $roleRepository->findOneBy(['role' => LoadRolesData::ROLE_MANAGER]);
         $adminRole = $roleRepository->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
 
         $referenceRepository->set('admin', $user);
         $referenceRepository->set('userRole', $userRole);
+        $referenceRepository->set('managerRole', $managerRole);
         $referenceRepository->set('adminRole', $adminRole);
         $referenceRepository->set('organization', $user->getOrganization());
         $referenceRepository->set('business_unit', $user->getOwner());

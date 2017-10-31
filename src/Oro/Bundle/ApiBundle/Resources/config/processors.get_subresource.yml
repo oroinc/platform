@@ -53,6 +53,7 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_id_helper'
             - '@oro_entity_extend.association_manager'
+            - '@oro_api.entity_title_provider'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: load_data }
 

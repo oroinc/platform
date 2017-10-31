@@ -15,6 +15,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatistic;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\ServiceContainer\Formatter\StatisticFormatterFactory;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 final class BehatStatisticExtension implements TestworkExtension
@@ -69,7 +70,14 @@ final class BehatStatisticExtension implements TestworkExtension
      */
     public function process(ContainerBuilder $container)
     {
-        $this->upgradeSchema($container);
+        try {
+            $this->upgradeSchema($container);
+        } catch (ConnectionException $e) {
+            $this->skipStatisticSubscribers($container);
+            $this->showAlert($container->get('cli.output'), $e);
+
+            return;
+        }
     }
 
     /**
@@ -80,11 +88,7 @@ final class BehatStatisticExtension implements TestworkExtension
     {
         /** @var Connection $connection */
         $connection = $container->get('behat_statistic.database.connection');
-        try {
-            $connection->ping();
-        } catch (ConnectionException $e) {
-            throw new DBALException('Exception while connect to db', 0, $e);
-        }
+        $connection->ping();
 
         $schema = new Schema();
         FeatureStatistic::declareSchema($schema);
@@ -101,6 +105,28 @@ final class BehatStatisticExtension implements TestworkExtension
         }
 
         $connection->close();
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param \Exception $e
+     */
+    private function showAlert(OutputInterface $output, \Exception $e)
+    {
+        $output->writeln(sprintf(
+            "<error>%s\n%s</error>",
+            "Error while connectin to statistic DB",
+            $e->getMessage()
+        ));
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function skipStatisticSubscribers(ContainerBuilder $container)
+    {
+        $container->getDefinition('behat_statistic.listener.feature_statistic_subscriber')
+            ->addMethodCall('setSkip', [true]);
     }
 
     /**

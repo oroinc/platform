@@ -125,6 +125,13 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        listen: {
+            'datagrid:metadata-loaded mediator': 'updateFilters'
+        },
+
+        /**
          * Initialize filter list options
          *
          * @param {Object} options
@@ -176,6 +183,39 @@ define(function(require) {
             }
 
             FiltersManager.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @param {orodatagrid.datagrid.Grid} grid
+         */
+        updateFilters: function(grid) {
+            _.each(grid.metadata.filters, function(metadata) {
+                if (this.filters[metadata.name]) {
+                    this.filters[metadata.name].trigger('metadata-loaded', metadata);
+                }
+            }, this);
+
+            this.checkFiltersVisibility();
+        },
+
+        checkFiltersVisibility: function() {
+            var filterSelector = this.$(this.filterSelector);
+            _.each(this.filters, function(filter) {
+                var option = filterSelector.find('option[value="' + filter.name + '"]');
+                if (filter.visible && option.hasClass('hidden')) {
+                    option.removeClass('hidden');
+
+                    if (filter.enabled) {
+                        this._renderFilter(filter).show();
+                    }
+                } else if (!filter.visible && !option.hasClass('hidden')) {
+                    option.addClass('hidden');
+
+                    filter.hide();
+                }
+            }, this);
+
+            this._refreshSelectWidget();
         },
 
         /**
@@ -319,23 +359,16 @@ define(function(require) {
          * @return {*}
          */
         enableFilters: function(filters) {
-            var self = this;
             if (_.isEmpty(filters)) {
                 return this;
             }
             var optionsSelectors = [];
 
             _.each(filters, function(filter) {
-                if (filter.visible && !filter.isRendered()) {
-                    var oldEl = filter.$el;
-                    filter.setRenderMode(self.renderMode);
-                    // filter rendering process replaces $el
-                    filter.render();
-                    // so we need to replace element which keeps place in DOM with actual filter $el after rendering
-                    oldEl.replaceWith(filter.$el);
-                    filter.rendered();
+                this._renderFilter(filter);
+                if (filter.visible) {
+                    filter.enable();
                 }
-                filter.enable();
                 optionsSelectors.push('option[value="' + filter.name + '"]:not(:selected)');
             }, this);
 
@@ -378,6 +411,28 @@ define(function(require) {
             }
 
             return this;
+        },
+
+        /**
+         * @param {oro.filter.AbstractFilter} filter
+         * @returns {oro.filter.AbstractFilter}
+         */
+        _renderFilter: function(filter) {
+            if (!filter.isRendered()) {
+                var oldEl = filter.$el;
+                filter.setRenderMode(this.renderMode);
+                // filter rendering process replaces $el
+                filter.render();
+                // so we need to replace element which keeps place in DOM with actual filter $el after rendering
+                oldEl.replaceWith(filter.$el);
+                filter.rendered();
+
+                if (!filter.visible) {
+                    filter.hide();
+                }
+            }
+
+            return filter;
         },
 
         getTemplateData: function() {

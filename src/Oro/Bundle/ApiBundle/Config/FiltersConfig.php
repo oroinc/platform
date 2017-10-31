@@ -111,9 +111,11 @@ class FiltersConfig implements EntityConfigInterface
      */
     public function getField($fieldName)
     {
-        return isset($this->fields[$fieldName])
-            ? $this->fields[$fieldName]
-            : null;
+        if (!isset($this->fields[$fieldName])) {
+            return null;
+        }
+
+        return $this->fields[$fieldName];
     }
 
     /**

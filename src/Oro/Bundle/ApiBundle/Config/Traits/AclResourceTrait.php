@@ -26,9 +26,11 @@ trait AclResourceTrait
      */
     public function getAclResource()
     {
-        return array_key_exists(EntityDefinitionConfig::ACL_RESOURCE, $this->items)
-            ? $this->items[EntityDefinitionConfig::ACL_RESOURCE]
-            : null;
+        if (!array_key_exists(EntityDefinitionConfig::ACL_RESOURCE, $this->items)) {
+            return null;
+        }
+
+        return $this->items[EntityDefinitionConfig::ACL_RESOURCE];
     }
 
     /**
