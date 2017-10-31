@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\ApiBundle\Config\EntityConfigInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -94,19 +95,11 @@ class CompleteFilters extends CompleteSection
                 $propertyPath = $fieldName;
             }
 
-            $dataType = $filter->getDataType();
-            if (!$dataType && $metadata->hasField($propertyPath)) {
-                $dataType = $metadata->getTypeOfField($propertyPath);
-                $filter->setDataType($dataType);
+            if (!$filter->hasDataType() && $metadata->hasField($propertyPath)) {
+                $filter->setDataType($metadata->getTypeOfField($propertyPath));
             }
-            if ($dataType) {
-                if (!$filter->hasArrayAllowed()) {
-                    $filter->setArrayAllowed(!isset($this->disallowArrayDataTypes[$dataType]));
-                }
-                if (!$filter->hasRangeAllowed()) {
-                    $filter->setRangeAllowed(!isset($this->disallowRangeDataTypes[$dataType]));
-                }
-            }
+            $this->setFilterArrayAllowed($filter);
+            $this->setFilterRangeAllowed($filter);
         }
     }
 
@@ -138,9 +131,8 @@ class CompleteFilters extends CompleteSection
                     }
                     $filter->setDataType($dataType);
                 }
-                if (!$filter->hasArrayAllowed()) {
-                    $filter->setArrayAllowed();
-                }
+                $this->setFilterArrayAllowed($filter);
+                $this->setFilterRangeAllowed($filter);
             }
         }
     }
@@ -162,15 +154,9 @@ class CompleteFilters extends CompleteSection
                 $filter = $filters->getOrAddField($fieldName);
                 if (!$filter->hasDataType()) {
                     $filter->setDataType($dataType);
-                } else {
-                    $dataType = $filter->getDataType();
                 }
-                if (!$filter->hasArrayAllowed()) {
-                    $filter->setArrayAllowed(!isset($this->disallowArrayDataTypes[$dataType]));
-                }
-                if (!$filter->hasRangeAllowed()) {
-                    $filter->setRangeAllowed(!isset($this->disallowRangeDataTypes[$dataType]));
-                }
+                $this->setFilterArrayAllowed($filter);
+                $this->setFilterRangeAllowed($filter);
             }
         }
     }
@@ -193,9 +179,8 @@ class CompleteFilters extends CompleteSection
                 if (!$filter->hasDataType()) {
                     $filter->setDataType($dataType);
                 }
-                if (!$filter->hasArrayAllowed()) {
-                    $filter->setArrayAllowed();
-                }
+                $this->setFilterArrayAllowed($filter);
+                $this->setFilterRangeAllowed($filter);
             }
         }
     }
@@ -227,9 +212,8 @@ class CompleteFilters extends CompleteSection
             if (!$filter->hasType()) {
                 $filter->setType('association');
             }
-            if (!$filter->hasArrayAllowed()) {
-                $filter->setArrayAllowed();
-            }
+            $this->setFilterArrayAllowed($filter);
+            $this->setFilterRangeAllowed($filter);
             $options = $filter->getOptions();
             if (null === $options) {
                 $options = [];
@@ -241,6 +225,32 @@ class CompleteFilters extends CompleteSection
                 'associationKind'       => $associationKind
             ]);
             $filter->setOptions($options);
+        }
+    }
+
+    /**
+     * @param FilterFieldConfig $filter
+     */
+    protected function setFilterArrayAllowed(FilterFieldConfig $filter)
+    {
+        if (!$filter->hasArrayAllowed()) {
+            $dataType = $filter->getDataType();
+            if ($dataType && !isset($this->disallowArrayDataTypes[$dataType])) {
+                $filter->setArrayAllowed();
+            }
+        }
+    }
+
+    /**
+     * @param FilterFieldConfig $filter
+     */
+    protected function setFilterRangeAllowed(FilterFieldConfig $filter)
+    {
+        if (!$filter->hasRangeAllowed()) {
+            $dataType = $filter->getDataType();
+            if ($dataType && !isset($this->disallowRangeDataTypes[$dataType])) {
+                $filter->setRangeAllowed();
+            }
         }
     }
 }
