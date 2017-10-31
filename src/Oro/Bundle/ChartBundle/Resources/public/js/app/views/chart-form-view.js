@@ -45,7 +45,9 @@ define(function(request) {
         },
 
         undelegateEvents: function() {
-            this.$choiceElement.off(this.eventNamespace());
+            if (this.$choiceElement) {
+                this.$choiceElement.off(this.eventNamespace());
+            }
             ChartFormView.__super__.undelegateEvents.call(this);
         },
 
