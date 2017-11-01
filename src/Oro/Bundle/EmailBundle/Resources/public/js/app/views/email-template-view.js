@@ -5,29 +5,38 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var EmailTemplateCollection = require('oroemail/js/app/models/email-template-collection');
 
     /**
      * @export oroemail/js/app/views/email-template-view
      */
     EmailTemplateView = BaseView.extend({
+        optionNames: BaseView.prototype.optionNames.concat(['collectionOptions', 'targetSelector', 'target']),
+
         events: {
             'change': 'selectionChanged'
         },
-        target: null,
 
-        /**
-         * Constructor
-         *
-         * @param options {Object}
-         */
-        initialize: function(options) {
+        initialize: function() {
             this.template = _.template($('#emailtemplate-chooser-template').html());
-            this.target = options.target;
+
+            if (this.collectionOptions) {
+                this._initCollection(this.collectionOptions);
+            }
+
+            if (this.targetSelector) {
+                this.target = $(this.targetSelector);
+            }
 
             this.listenTo(this.collection, 'reset', this.render);
+
             if (!$(this.target).val()) {
                 this.selectionChanged();
             }
+        },
+
+        _initCollection: function(options) {
+            this.collection = new EmailTemplateCollection(null, options);
         },
 
         /**

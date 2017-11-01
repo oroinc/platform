@@ -1,17 +1,17 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Controller;
 
-use Oro\Bundle\ImportExportBundle\Async\Topics;
-use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 
 class ImportExportControllerTest extends WebTestCase
 {
@@ -76,6 +76,41 @@ class ImportExportControllerTest extends WebTestCase
             'userId' => $this->getCurrentUser()->getId(),
             'organizationId' => $organizationId,
         ]);
+    }
+
+    public function testDownloadFileSuccess()
+    {
+        $this->client->followRedirects(true);
+
+        $tmpDirName = $this->getContainer()->getParameter('kernel.root_dir') . '/import_export';
+        $tmpFileName = tempnam($tmpDirName, 'download.txt');
+        $tmp = explode('/', $tmpFileName);
+        $filename = array_pop($tmp);
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_importexport_export_download', [
+                'fileName' => $filename
+            ])
+        );
+
+        $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 200);
+
+        unlink($tmpFileName);
+    }
+
+    public function testDownloadFileReturns404IfFileDoesntExist()
+    {
+        $this->client->followRedirects(true);
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_importexport_export_download', [
+                'fileName' => 'non_existing_file.txt'
+            ])
+        );
+
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 404);
     }
 
     public function testImportProcessAction()

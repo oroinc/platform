@@ -1,0 +1,13 @@
+filters:
+    'filter[id]':
+        requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
+        type: 'integer or array or range'
+        operators: '=,!=,<,<=,>,>='
+    'filter[owner]':
+        requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
+        type: 'integer or array or range'
+        operators: '=,!='
+    'fields[businessunits]':
+        requirement: '.+'
+    'include':
+        requirement: '.+'

@@ -2,6 +2,8 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity;
+
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
@@ -119,7 +121,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testReuseExistingJoinJoinWithCondition()
+    public function testReuseExistingJoinWithCondition()
     {
         $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
             ->leftJoin('e.owner', 'user', 'WITH', 'e.owner = user.id AND user.name LIKE \'a%\'')
@@ -1008,7 +1010,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'     => 1,
                     'label'  => 'test_label',
-                    'entity' => 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group'
+                    'entity' => Entity\Group::class
                 ]
             ],
             $result
@@ -1057,7 +1059,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'     => 1,
                     'label'  => 'test_label',
-                    'entity' => 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group'
+                    'entity' => Entity\Group::class
                 ]
             ],
             $result
@@ -1104,7 +1106,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'     => 1,
                     'label'  => 'test_label',
-                    'entity' => 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group'
+                    'entity' => Entity\Group::class
                 ]
             ],
             $result
@@ -1154,7 +1156,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'     => 1,
                     'label'  => 'test_label',
-                    'entity' => 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group'
+                    'entity' => Entity\Group::class
                 ]
             ],
             $result

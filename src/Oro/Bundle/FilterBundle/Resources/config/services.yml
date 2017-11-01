@@ -56,4 +56,3 @@ services:
         class: Oro\Bundle\FilterBundle\Utils\DateFilterModifier
         arguments:
             - '@oro_filter.expression.date.compiler'
-
