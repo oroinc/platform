@@ -1,5 +1,0 @@
-Oro\Bundle\CMSBundle\Entity\LoginPage:
-    login_page:
-        topContent: '<xss("LoginPage.topContent")>'
-        bottomContent: '<xss("LoginPage.bottomContent")>'
-        css: '<xss("LoginPage.css")>'

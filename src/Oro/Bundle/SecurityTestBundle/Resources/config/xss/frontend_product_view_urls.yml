@@ -1,9 +1,0 @@
-urls:
-    - { route: 'oro_product_frontend_product_view', parameters: { id: '@simple_product_1.id' } }
-    - { route: 'oro_product_frontend_product_view', parameters: { id: '@simple_product_2.id' } }
-    - { route: 'oro_product_frontend_product_view', parameters: { id: '@configurable_product_1.id' } }
-    - { route: 'oro_product_frontend_product_view', parameters: { id: '@configurable_product_2.id' } }
-    - { route: 'oro_product_frontend_product_view', parameters: { id: '@configurable_product_3.id' } }
-    - { route: 'oro_product_frontend_product_view', parameters: { id: '@configurable_product_1_variant_1.id' } }
-    - { route: 'oro_product_frontend_product_view', parameters: { id: '@configurable_product_2_variant_1.id' } }
-    - { route: 'oro_product_frontend_product_view', parameters: { id: '@configurable_product_3_variant_1.id' } }

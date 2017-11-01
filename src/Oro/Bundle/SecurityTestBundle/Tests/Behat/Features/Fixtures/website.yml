@@ -1,5 +1,0 @@
-Oro\Bundle\WebsiteBundle\Entity\Website:
-    xss_website:
-        owner: '@xss_business_unit'
-        organization: '@xss_organization'
-        name: '<xss("Website.name")>'
