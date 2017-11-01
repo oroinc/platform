@@ -59,15 +59,16 @@ class ConfigurationCompilerPass implements CompilerPassInterface
             self::PROCESSOR_BAG_SERVICE_ID
         );
         if (null !== $processorBagServiceDef) {
+            $groups = [];
             foreach ($config['actions'] as $action => $actionConfig) {
                 if (isset($actionConfig['processing_groups'])) {
                     foreach ($actionConfig['processing_groups'] as $group => $groupConfig) {
-                        $processorBagServiceDef->addMethodCall(
-                            'addGroup',
-                            [$group, $action, $groupConfig['priority']]
-                        );
+                        $groups[$action][$group] = isset($groupConfig['priority']) ? $groupConfig['priority'] : 0;
                     }
                 }
+            }
+            if (!empty($groups)) {
+                $processorBagServiceDef->addMethodCall('setGroups', [$groups]);
             }
         }
     }
@@ -317,7 +318,7 @@ class ConfigurationCompilerPass implements CompilerPassInterface
         $guessers = [];
         foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_GUESSER_TAG) as $serviceId => $tags) {
             foreach ($tags as $tag) {
-                $guessers[$serviceId] = !empty($tag['priority']) ? $tag['priority'] : 0;
+                $guessers[$serviceId] = isset($tag['priority']) ? $tag['priority'] : 0;
             }
         }
         arsort($guessers, SORT_NUMERIC);

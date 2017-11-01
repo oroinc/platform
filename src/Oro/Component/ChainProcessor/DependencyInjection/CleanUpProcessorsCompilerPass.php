@@ -39,6 +39,7 @@ class CleanUpProcessorsCompilerPass implements CompilerPassInterface
             return;
         }
 
+        $processors = [];
         $factoryServiceDef = $container->getDefinition($this->simpleProcessorFactoryServiceId);
         $taggedServices    = $container->findTaggedServiceIds($this->processorTagName);
         foreach ($taggedServices as $id => $taggedAttributes) {
@@ -49,9 +50,12 @@ class CleanUpProcessorsCompilerPass implements CompilerPassInterface
 
             $arguments = $processorServiceDef->getArguments();
             if (empty($arguments)) {
-                $factoryServiceDef->addMethodCall('addProcessor', [$id, $processorServiceDef->getClass()]);
+                $processors[$id] = $processorServiceDef->getClass();
                 $container->removeDefinition($id);
             }
+        }
+        if (!empty($processors)) {
+            $factoryServiceDef->addMethodCall('setProcessors', [$processors]);
         }
     }
 }
