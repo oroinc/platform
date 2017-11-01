@@ -292,3 +292,8 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad, priority: -100 }
+
+    oro_search.utils.search_all_text:
+       class: Oro\Bundle\SearchBundle\Utils\SearchAllText
+       arguments:
+            - '@translator'

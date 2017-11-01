@@ -2,11 +2,12 @@
 
 namespace Oro\Component\ChainProcessor\DependencyInjection;
 
-use Oro\Component\ChainProcessor\ExpressionParser;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+
+use Oro\Component\ChainProcessor\ExpressionParser;
 
 /**
  * This DI compiler pass can be used if you want to use DI container tags to load processors and applicable checkers.
@@ -32,8 +33,8 @@ class LoadProcessorsCompilerPass implements CompilerPassInterface
         $processorTagName,
         $processorApplicableCheckerTagName = null
     ) {
-        $this->processorBagServiceId             = $processorBagServiceId;
-        $this->processorTagName                  = $processorTagName;
+        $this->processorBagServiceId = $processorBagServiceId;
+        $this->processorTagName = $processorTagName;
         $this->processorApplicableCheckerTagName = $processorApplicableCheckerTagName;
     }
 
@@ -58,20 +59,28 @@ class LoadProcessorsCompilerPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder $container
      * @param Definition       $processorBagServiceDef
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function registerProcessors(ContainerBuilder $container, Definition $processorBagServiceDef)
     {
-        $isDebug        = $container->getParameter('kernel.debug');
+        $processors = [];
+        $isDebug = $container->getParameter('kernel.debug');
         $taggedServices = $container->findTaggedServiceIds($this->processorTagName);
         foreach ($taggedServices as $id => $taggedAttributes) {
             foreach ($taggedAttributes as $attributes) {
-                $action   = !empty($attributes['action']) ? $attributes['action'] : null;
-                $group    = !empty($attributes['group']) ? $attributes['group'] : null;
-                $priority = isset($attributes['priority']) ? $attributes['priority'] : 0;
+                $action = '';
+                if (!empty($attributes['action'])) {
+                    $action = $attributes['action'];
+                }
+                unset($attributes['action']);
 
-                if (null === $action && null !== $group) {
+                $group = null;
+                if (!empty($attributes['group'])) {
+                    $group = $attributes['group'];
+                } else {
+                    unset($attributes['group']);
+                }
+
+                if (!$action && $group) {
                     throw new \InvalidArgumentException(
                         sprintf(
                             'Tag attribute "group" can be used only if '
@@ -81,10 +90,14 @@ class LoadProcessorsCompilerPass implements CompilerPassInterface
                     );
                 }
 
-                unset($attributes['action'], $attributes['group']);
+                $priority = 0;
+                if (isset($attributes['priority'])) {
+                    $priority = $attributes['priority'];
+                }
                 if (!$isDebug) {
                     unset($attributes['priority']);
                 }
+
                 $attributes = array_map(
                     function ($val) {
                         return $this->parseProcessorAttributeValue($val);
@@ -92,8 +105,11 @@ class LoadProcessorsCompilerPass implements CompilerPassInterface
                     $attributes
                 );
 
-                $processorBagServiceDef->addMethodCall('addProcessor', [$id, $attributes, $action, $group, $priority]);
+                $processors[$action][$priority][] = [$id, $attributes];
             }
+        }
+        if (!empty($processors)) {
+            $processorBagServiceDef->addMethodCall('setProcessors', [$processors]);
         }
     }
 
@@ -115,7 +131,10 @@ class LoadProcessorsCompilerPass implements CompilerPassInterface
     {
         $taggedServices = $container->findTaggedServiceIds($this->processorApplicableCheckerTagName);
         foreach ($taggedServices as $id => $taggedAttributes) {
-            $priority = isset($taggedAttributes[0]['priority']) ? $taggedAttributes[0]['priority'] : 0;
+            $priority = 0;
+            if (isset($taggedAttributes[0]['priority'])) {
+                $priority = $taggedAttributes[0]['priority'];
+            }
 
             $processorBagServiceDef->addMethodCall('addApplicableChecker', [new Reference($id), $priority]);
         }
