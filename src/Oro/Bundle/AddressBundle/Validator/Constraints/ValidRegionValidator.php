@@ -36,7 +36,7 @@ class ValidRegionValidator extends ConstraintValidator
 
         if (!$this->regionBelongsToCountry($country, $region)) {
             $this->context->addViolation(
-                'Region {{ region }} does not belong to country {{ country }}',
+                'oro.address.validation.invalid_country_region',
                 [
                     '{{ region }}' => $region->getName(),
                     '{{ country }}' => $country->getName(),
