@@ -39,10 +39,7 @@ class ProcessorBag implements ProcessorBagInterface
      * @var array
      *  [
      *      action => [
-     *          [
-     *              'processor'  => processorId,
-     *              'attributes' => [key => value, ...]
-     *          ],
+     *          [processor id, [attribute name => attribute value, ...]],
      *          ...
      *      ],
      *      ...
@@ -74,6 +71,26 @@ class ProcessorBag implements ProcessorBagInterface
     /**
      * {@inheritdoc}
      */
+    public function setGroups(array $groups)
+    {
+        $this->assertNotFrozen();
+
+        $this->initialData['groups'] = $groups;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setProcessors(array $processors)
+    {
+        $this->assertNotFrozen();
+
+        $this->initialData['processors'] = $processors;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function addGroup($group, $action, $priority = 0)
     {
         $this->assertNotFrozen();
@@ -95,10 +112,7 @@ class ProcessorBag implements ProcessorBagInterface
             $attributes['group'] = $group;
         }
 
-        $this->initialData['processors'][$action][$priority][] = [
-            'processor'  => $processorId,
-            'attributes' => $attributes
-        ];
+        $this->initialData['processors'][$action][$priority][] = [$processorId, $attributes];
     }
 
     /**
@@ -212,7 +226,7 @@ class ProcessorBag implements ProcessorBagInterface
             }
 
             $startCommonProcessors = [];
-            $endCommonProcessors   = [];
+            $endCommonProcessors = [];
             if (!empty($this->initialData['processors'][''])) {
                 foreach ($this->initialData['processors'][''] as $priority => $priorityData) {
                     foreach ($priorityData as $processor) {
@@ -224,7 +238,7 @@ class ProcessorBag implements ProcessorBagInterface
                     }
                 }
                 $startCommonProcessors = $this->sortByPriorityAndFlatten($startCommonProcessors);
-                $endCommonProcessors   = $this->sortByPriorityAndFlatten($endCommonProcessors);
+                $endCommonProcessors = $this->sortByPriorityAndFlatten($endCommonProcessors);
                 unset($this->initialData['processors']['']);
             }
 
@@ -251,14 +265,14 @@ class ProcessorBag implements ProcessorBagInterface
         $processorGroups = [];
         foreach ($actionData as $priority => $priorityData) {
             foreach ($priorityData as $processor) {
-                if (isset($processor['attributes']['group'])) {
-                    $group = $processor['attributes']['group'];
+                if (isset($processor[1]['group'])) {
+                    $group = $processor[1]['group'];
                     if (!isset($groups[$action][$group])) {
                         throw new \RuntimeException(
                             sprintf(
                                 'The group "%s" is not defined. Processor: "%s".',
                                 $group,
-                                $processor['processor']
+                                $processor[0]
                             )
                         );
                     }
