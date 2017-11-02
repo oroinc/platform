@@ -474,12 +474,12 @@ An information about `ApiDoc` annotation can be found in [Symfony documentation]
 
 Use [oro:api:doc:cache:clear](./commands.md#oroapidoccacheclear) command to apply changes in `ApiDoc` annotation to [API Sandbox](https://www.orocrm.com/documentation/current/book/data-api#api-sandbox).
 
-Using a non-primary key to identify entity
-------------------------------------------
+Using a non-primary key to identify an entity
+---------------------------------------------
 
-By default the primary key is used to identify ORM entities in API. But, if by some reasons you want to change this, you can use `identifier_field_names` option.
+By default, a primary key is used to identify ORM entities in API. If you need another field as an identifier, specify it using the `identifier_field_names` option.
 
-For example, if your entity has `id` field that is the primary key and `uuid` field that contains unique value for each entity, and you want to use `uuid` field to identify the entity, add the following in `Resources/config/oro/api.yml`:
+For example, let your entity has the `id` field that is the primary key and the `uuid` field that contains a unique value for each entity. To use the `uuid` field to identify the entity, add the following in `Resources/config/oro/api.yml`:
 
 ```yml
 api:
@@ -488,7 +488,7 @@ api:
             identifier_field_names: ['uuid']
 ```
 
-Also you can exclude `id` field if you do not want to expose it via API at all:
+You can also exclude the `id` field (primary key) if you do not want to expose it via API:
 
 ```yml
 api:

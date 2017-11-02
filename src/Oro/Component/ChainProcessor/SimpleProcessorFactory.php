@@ -11,7 +11,19 @@ class SimpleProcessorFactory implements ProcessorFactoryInterface
     protected $processors = [];
 
     /**
-     * Registers a processor
+     * Registers processors.
+     * This method was created by performance reasons and it is intended only to set initial set of processors.
+     * If the bag already contains any processors all of them will be lost.
+     *
+     * @param array $processors [processor id => processor class, ...]
+     */
+    public function setProcessors(array $processors)
+    {
+        $this->processors = $processors;
+    }
+
+    /**
+     * Registers a processor.
      *
      * @param string $processorId
      * @param string $processorClass
