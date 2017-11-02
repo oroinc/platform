@@ -28,7 +28,6 @@ class OroWorkflowBundle extends Bundle
         $container->addCompilerPass(
             new LoadProcessorsCompilerPass('oro_workflow.processor_bag', 'oro_workflow.processor')
         );
-        $container->addCompilerPass(new Compiler\WorkflowDataUpdaterCompilerPass());
         $container->addCompilerPass(new Compiler\EventsCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
 
         $addTopicMetaPass = AddTopicMetaPass::create();

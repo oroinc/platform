@@ -1,3 +1,0 @@
-services:
-    oro_workflow.data_updater.chain:
-        class: 'Oro\Bundle\WorkflowBundle\WorkflowData\WorkflowDataUpdaterChain'

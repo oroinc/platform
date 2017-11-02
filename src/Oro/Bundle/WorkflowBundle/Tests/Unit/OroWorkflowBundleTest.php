@@ -33,7 +33,6 @@ class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
                 'oro_workflow.processor_bag',
                 'oro_workflow.processor'
             ),
-            $this->isInstanceOf(Compiler\WorkflowDataUpdaterCompilerPass::class),
             $this->isInstanceOf(Compiler\EventsCompilerPass::class),
             $addTopicMetaPass,
         ];
