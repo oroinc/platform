@@ -24,192 +24,192 @@ class MatchApplicableCheckerTest extends \PHPUnit_Framework_TestCase
 
         $processors = [
             [
-                'processor'  => 'processor1',
-                'attributes' => []
+                'processor1',
+                []
             ],
             [
-                'processor'  => 'processor2',
-                'attributes' => ['class' => 'TestCls']
+                'processor2',
+                ['class' => 'TestCls']
             ],
             [
-                'processor'  => 'processor3',
-                'attributes' => ['type' => 'test']
+                'processor3',
+                ['type' => 'test']
             ],
             [
-                'processor'  => 'processor4',
-                'attributes' => ['class' => 'TestCls', 'type' => 'test']
+                'processor4',
+                ['class' => 'TestCls', 'type' => 'test']
             ],
             [
-                'processor'  => 'processor5',
-                'attributes' => ['class' => 'TestCls', 'type' => 'test', 'another' => 'val']
+                'processor5',
+                ['class' => 'TestCls', 'type' => 'test', 'another' => 'val']
             ],
             [
-                'processor'  => 'processor6',
-                'attributes' => ['class' => 'AnotherCls']
+                'processor6',
+                ['class' => 'AnotherCls']
             ],
             [
-                'processor'  => 'processor7',
-                'attributes' => ['type' => 'test']
+                'processor7',
+                ['type' => 'test']
             ],
             [
-                'processor'  => 'processor8',
-                'attributes' => ['class' => 'AnotherCls', 'type' => 'test']
+                'processor8',
+                ['class' => 'AnotherCls', 'type' => 'test']
             ],
             [
-                'processor'  => 'processor9',
-                'attributes' => ['class' => 'AnotherCls', 'type' => 'test', 'another' => 'val']
+                'processor9',
+                ['class' => 'AnotherCls', 'type' => 'test', 'another' => 'val']
             ],
             [
-                'processor'  => 'processor10',
-                'attributes' => ['class' => 'TestCls']
+                'processor10',
+                ['class' => 'TestCls']
             ],
             [
-                'processor'  => 'processor11',
-                'attributes' => ['type' => 'another']
+                'processor11',
+                ['type' => 'another']
             ],
             [
-                'processor'  => 'processor12',
-                'attributes' => ['class' => 'TestCls', 'type' => 'another']
+                'processor12',
+                ['class' => 'TestCls', 'type' => 'another']
             ],
             [
-                'processor'  => 'processor13',
-                'attributes' => ['class' => 'TestCls', 'type' => 'another', 'another' => 'val']
+                'processor13',
+                ['class' => 'TestCls', 'type' => 'another', 'another' => 'val']
             ],
             [
-                'processor'  => 'processor14',
-                'attributes' => ['class' => 'TestCls', 'feature' => 'feature1']
+                'processor14',
+                ['class' => 'TestCls', 'feature' => 'feature1']
             ],
             [
-                'processor'  => 'processor15',
-                'attributes' => ['class' => 'TestCls', 'feature' => 'feature2']
+                'processor15',
+                ['class' => 'TestCls', 'feature' => 'feature2']
             ],
             [
-                'processor'  => 'processor16',
-                'attributes' => ['class' => 'TestCls', 'feature' => 'feature3']
+                'processor16',
+                ['class' => 'TestCls', 'feature' => 'feature3']
             ],
             [
-                'processor'  => 'processor17',
-                'attributes' => ['class' => 'TestCls', 'feature' => ['&' => ['feature1', 'feature3']]]
+                'processor17',
+                ['class' => 'TestCls', 'feature' => ['&' => ['feature1', 'feature3']]]
             ],
             [
-                'processor'  => 'processor18',
-                'attributes' => ['class' => 'TestCls', 'feature' => ['&' => ['feature3', 'feature1']]]
+                'processor18',
+                ['class' => 'TestCls', 'feature' => ['&' => ['feature3', 'feature1']]]
             ],
             [
-                'processor'  => 'processor19',
-                'attributes' => ['class' => 'TestCls', 'feature' => ['&' => ['feature1', 'feature2']]]
+                'processor19',
+                ['class' => 'TestCls', 'feature' => ['&' => ['feature1', 'feature2']]]
             ],
             [
-                'processor'  => 'processor20',
-                'attributes' => ['type' => ['!' => 'test']]
+                'processor20',
+                ['type' => ['!' => 'test']]
             ],
             [
-                'processor'  => 'processor21',
-                'attributes' => ['type' => ['!' => 'test1']]
+                'processor21',
+                ['type' => ['!' => 'test1']]
             ],
             [
-                'processor'  => 'processor22',
-                'attributes' => ['feature' => '!feature1']
+                'processor22',
+                ['feature' => '!feature1']
             ],
             [
-                'processor'  => 'processor23',
-                'attributes' => ['feature' => ['!' => 'feature2']]
+                'processor23',
+                ['feature' => ['!' => 'feature2']]
             ],
             [
-                'processor'  => 'processor24',
-                'attributes' => ['feature' => ['&' => [['!' => 'feature1'], ['!' => 'feature2']]]]
+                'processor24',
+                ['feature' => ['&' => [['!' => 'feature1'], ['!' => 'feature2']]]]
             ],
             [
-                'processor'  => 'processor25',
-                'attributes' => ['feature' => ['&' => ['feature1', ['!' => 'feature2']]]]
+                'processor25',
+                ['feature' => ['&' => ['feature1', ['!' => 'feature2']]]]
             ],
             [
-                'processor'  => 'processor26',
-                'attributes' => ['feature' => ['&' => [['!' => 'feature1'], 'feature2']]]
+                'processor26',
+                ['feature' => ['&' => [['!' => 'feature1'], 'feature2']]]
             ],
             [
-                'processor'  => 'processor27',
-                'attributes' => ['feature' => ['&' => [['!' => 'feature1'], ['!' => 'feature3']]]]
+                'processor27',
+                ['feature' => ['&' => [['!' => 'feature1'], ['!' => 'feature3']]]]
             ],
             [
-                'processor'  => 'processor28',
-                'attributes' => ['feature' => ['&' => [['!' => 'feature2'], ['!' => 'feature4']]]]
+                'processor28',
+                ['feature' => ['&' => [['!' => 'feature2'], ['!' => 'feature4']]]]
             ],
             [
-                'processor'  => 'processor29',
-                'attributes' => ['type' => ['&' => [['!' => 'test'], ['!' => 'test1']]]]
+                'processor29',
+                ['type' => ['&' => [['!' => 'test'], ['!' => 'test1']]]]
             ],
             [
-                'processor'  => 'processor30',
-                'attributes' => ['type' => ['&' => ['test', ['!' => 'test1']]]]
+                'processor30',
+                ['type' => ['&' => ['test', ['!' => 'test1']]]]
             ],
             [
-                'processor'  => 'processor31',
-                'attributes' => ['type' => ['&' => [['!' => 'test'], 'test1']]]
+                'processor31',
+                ['type' => ['&' => [['!' => 'test'], 'test1']]]
             ],
             [
-                'processor'  => 'processor32',
-                'attributes' => ['type' => ['&' => ['test', 'test1']]]
+                'processor32',
+                ['type' => ['&' => ['test', 'test1']]]
             ],
             [
-                'processor'  => 'processor33',
-                'attributes' => ['class' => 'TestCls', 'featureObj' => ['&' => ['feature1', 'feature3']]]
+                'processor33',
+                ['class' => 'TestCls', 'featureObj' => ['&' => ['feature1', 'feature3']]]
             ],
             [
-                'processor'  => 'processor34',
-                'attributes' => ['class' => 'TestCls', 'featureObj' => ['&' => ['feature3', 'feature1']]]
+                'processor34',
+                ['class' => 'TestCls', 'featureObj' => ['&' => ['feature3', 'feature1']]]
             ],
             [
-                'processor'  => 'processor35',
-                'attributes' => ['class' => 'TestCls', 'featureObj' => ['&' => ['feature1', 'feature2']]]
+                'processor35',
+                ['class' => 'TestCls', 'featureObj' => ['&' => ['feature1', 'feature2']]]
             ],
             [
-                'processor'  => 'processor36',
-                'attributes' => ['feature' => ['|' => [['!' => 'feature1'], ['!' => 'feature2']]]]
+                'processor36',
+                ['feature' => ['|' => [['!' => 'feature1'], ['!' => 'feature2']]]]
             ],
             [
-                'processor'  => 'processor37',
-                'attributes' => ['feature' => ['|' => ['feature1', ['!' => 'feature2']]]]
+                'processor37',
+                ['feature' => ['|' => ['feature1', ['!' => 'feature2']]]]
             ],
             [
-                'processor'  => 'processor38',
-                'attributes' => ['feature' => ['|' => [['!' => 'feature1'], 'feature2']]]
+                'processor38',
+                ['feature' => ['|' => [['!' => 'feature1'], 'feature2']]]
             ],
             [
-                'processor'  => 'processor39',
-                'attributes' => ['feature' => ['|' => [['!' => 'feature1'], ['!' => 'feature3']]]]
+                'processor39',
+                ['feature' => ['|' => [['!' => 'feature1'], ['!' => 'feature3']]]]
             ],
             [
-                'processor'  => 'processor40',
-                'attributes' => ['feature' => ['|' => [['!' => 'feature2'], ['!' => 'feature4']]]]
+                'processor40',
+                ['feature' => ['|' => [['!' => 'feature2'], ['!' => 'feature4']]]]
             ],
             [
-                'processor'  => 'processor41',
-                'attributes' => ['type' => ['|' => [['!' => 'test'], ['!' => 'test1']]]]
+                'processor41',
+                ['type' => ['|' => [['!' => 'test'], ['!' => 'test1']]]]
             ],
             [
-                'processor'  => 'processor42',
-                'attributes' => ['type' => ['|' => ['test', ['!' => 'test1']]]]
+                'processor42',
+                ['type' => ['|' => ['test', ['!' => 'test1']]]]
             ],
             [
-                'processor'  => 'processor43',
-                'attributes' => ['type' => ['|' => [['!' => 'test'], 'test1']]]
+                'processor43',
+                ['type' => ['|' => [['!' => 'test'], 'test1']]]
             ],
             [
-                'processor'  => 'processor44',
-                'attributes' => ['type' => ['|' => ['test', 'test1']]]
+                'processor44',
+                ['type' => ['|' => ['test', 'test1']]]
             ],
             [
-                'processor'  => 'processor45',
-                'attributes' => ['class' => 'TestCls', 'featureObj' => ['|' => ['feature1', 'feature3']]]
+                'processor45',
+                ['class' => 'TestCls', 'featureObj' => ['|' => ['feature1', 'feature3']]]
             ],
             [
-                'processor'  => 'processor46',
-                'attributes' => ['class' => 'TestCls', 'featureObj' => ['|' => ['feature3', 'feature1']]]
+                'processor46',
+                ['class' => 'TestCls', 'featureObj' => ['|' => ['feature3', 'feature1']]]
             ],
             [
-                'processor'  => 'processor47',
-                'attributes' => ['class' => 'TestCls', 'featureObj' => ['|' => ['feature1', 'feature2']]]
+                'processor47',
+                ['class' => 'TestCls', 'featureObj' => ['|' => ['feature1', 'feature2']]]
             ],
         ];
 
@@ -266,108 +266,108 @@ class MatchApplicableCheckerTest extends \PHPUnit_Framework_TestCase
 
         $processors = [
             [
-                'processor'  => 'processor1',
-                'attributes' => []
+                'processor1',
+                []
             ],
             [
-                'processor'  => 'processor1_disabled',
-                'attributes' => ['disabled' => true]
+                'processor1_disabled',
+                ['disabled' => true]
             ],
             [
-                'processor'  => 'processor2',
-                'attributes' => ['class' => 'TestCls']
+                'processor2',
+                ['class' => 'TestCls']
             ],
             [
-                'processor'  => 'processor2_disabled',
-                'attributes' => ['disabled' => true, 'class' => 'TestCls']
+                'processor2_disabled',
+                ['disabled' => true, 'class' => 'TestCls']
             ],
             [
-                'processor'  => 'processor3',
-                'attributes' => ['type' => 'test']
+                'processor3',
+                ['type' => 'test']
             ],
             [
-                'processor'  => 'processor3_disabled',
-                'attributes' => ['disabled' => true, 'type' => 'test']
+                'processor3_disabled',
+                ['disabled' => true, 'type' => 'test']
             ],
             [
-                'processor'  => 'processor4',
-                'attributes' => ['class' => 'TestCls', 'type' => 'test']
+                'processor4',
+                ['class' => 'TestCls', 'type' => 'test']
             ],
             [
-                'processor'  => 'processor4_disabled',
-                'attributes' => ['disabled' => true, 'class' => 'TestCls', 'type' => 'test']
+                'processor4_disabled',
+                ['disabled' => true, 'class' => 'TestCls', 'type' => 'test']
             ],
             [
-                'processor'  => 'processor5',
-                'attributes' => ['class' => 'TestCls', 'type' => 'test', 'another' => 'val']
+                'processor5',
+                ['class' => 'TestCls', 'type' => 'test', 'another' => 'val']
             ],
             [
-                'processor'  => 'processor5_disabled',
-                'attributes' => ['disabled' => true, 'class' => 'TestCls', 'type' => 'test', 'another' => 'val']
+                'processor5_disabled',
+                ['disabled' => true, 'class' => 'TestCls', 'type' => 'test', 'another' => 'val']
             ],
             [
-                'processor'  => 'processor6',
-                'attributes' => ['class' => 'AnotherCls']
+                'processor6',
+                ['class' => 'AnotherCls']
             ],
             [
-                'processor'  => 'processor6_disabled',
-                'attributes' => ['disabled' => true, 'class' => 'AnotherCls']
+                'processor6_disabled',
+                ['disabled' => true, 'class' => 'AnotherCls']
             ],
             [
-                'processor'  => 'processor7',
-                'attributes' => ['type' => 'test']
+                'processor7',
+                ['type' => 'test']
             ],
             [
-                'processor'  => 'processor7_disabled',
-                'attributes' => ['disabled' => true, 'type' => 'test']
+                'processor7_disabled',
+                ['disabled' => true, 'type' => 'test']
             ],
             [
-                'processor'  => 'processor8',
-                'attributes' => ['class' => 'AnotherCls', 'type' => 'test']
+                'processor8',
+                ['class' => 'AnotherCls', 'type' => 'test']
             ],
             [
-                'processor'  => 'processor8_disabled',
-                'attributes' => ['disabled' => true, 'class' => 'AnotherCls', 'type' => 'test']
+                'processor8_disabled',
+                ['disabled' => true, 'class' => 'AnotherCls', 'type' => 'test']
             ],
             [
-                'processor'  => 'processor9',
-                'attributes' => ['class' => 'AnotherCls', 'type' => 'test', 'another' => 'val']
+                'processor9',
+                ['class' => 'AnotherCls', 'type' => 'test', 'another' => 'val']
             ],
             [
-                'processor'  => 'processor9_disabled',
-                'attributes' => ['disabled' => true, 'class' => 'AnotherCls', 'type' => 'test', 'another' => 'val']
+                'processor9_disabled',
+                ['disabled' => true, 'class' => 'AnotherCls', 'type' => 'test', 'another' => 'val']
             ],
             [
-                'processor'  => 'processor10',
-                'attributes' => ['class' => 'TestCls']
+                'processor10',
+                ['class' => 'TestCls']
             ],
             [
-                'processor'  => 'processor10_disabled',
-                'attributes' => ['disabled' => true, 'class' => 'TestCls']
+                'processor10_disabled',
+                ['disabled' => true, 'class' => 'TestCls']
             ],
             [
-                'processor'  => 'processor11',
-                'attributes' => ['type' => 'another']
+                'processor11',
+                ['type' => 'another']
             ],
             [
-                'processor'  => 'processor11_disabled',
-                'attributes' => ['disabled' => true, 'type' => 'another']
+                'processor11_disabled',
+                ['disabled' => true, 'type' => 'another']
             ],
             [
-                'processor'  => 'processor12',
-                'attributes' => ['class' => 'TestCls', 'type' => 'another']
+                'processor12',
+                ['class' => 'TestCls', 'type' => 'another']
             ],
             [
-                'processor'  => 'processor12_disabled',
-                'attributes' => ['disabled' => true, 'class' => 'TestCls', 'type' => 'another']
+                'processor12_disabled',
+                ['disabled' => true, 'class' => 'TestCls', 'type' => 'another']
             ],
             [
-                'processor'  => 'processor13',
-                'attributes' => ['class' => 'TestCls', 'type' => 'another', 'another' => 'val']
+                'processor13',
+                ['class' => 'TestCls', 'type' => 'another', 'another' => 'val']
             ],
             [
-                'processor'  => 'processor13_disabled',
-                'attributes' => ['disabled' => true, 'class' => 'TestCls', 'type' => 'another', 'another' => 'val']
+                'processor13_disabled',
+                ['disabled' => true, 'class' => 'TestCls', 'type' => 'another', 'another' => 'val']
             ],
         ];
 
