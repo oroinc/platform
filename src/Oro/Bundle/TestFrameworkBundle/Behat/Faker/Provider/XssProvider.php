@@ -45,15 +45,18 @@ class XssProvider extends BaseProvider
 
     /**
      * @param string $identifier
-     * @param string $payloadType
+     * @param string|null $payloadType
+     * @param null|string $elementId
      * @return string
      */
-    public function xss($identifier = 'XSS', $payloadType = 'script')
+    public function xss($identifier = 'XSS', $payloadType = null, $elementId = null)
     {
-        $elementId = $this->prefix . ++self::$idx;
+        if (!$elementId) {
+            $elementId = $this->prefix . ++self::$idx;
+        }
         $jsPayload = sprintf('_x("%s","%s");', $elementId, $identifier);
 
-        return sprintf($this->payloadProvider->getPayload($payloadType, $jsPayload, $elementId));
+        return sprintf($this->payloadProvider->getPayload($jsPayload, $payloadType, $elementId));
     }
 
     /**
