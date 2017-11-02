@@ -12,6 +12,7 @@ Feature: Organizations management
       |Name         | Acme, Inc |
     When I save and close form
     Then I should see "Organization saved" flash message
+    And I click Logout in user menu
 
   Scenario: Administrator creates new one organization
     Given I login as administrator
@@ -78,4 +79,3 @@ Feature: Organizations management
     And login as administrator
     Then I should not see a "Organizations switcher" element
     And I should see "FALSE, ORG" in the "Current Organization" element
-    And I wait for action

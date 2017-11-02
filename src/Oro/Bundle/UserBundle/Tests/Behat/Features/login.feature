@@ -22,7 +22,7 @@ Feature: User back office login
       | Password | admim |
     When I press "Log in"
     Then I should see "Invalid credentials. You have 9 login attempts remaining."
-    # Then I should see "Invalid user name or password."
+    # Then I should see "Invalid user name or password." /BAP-15864
 
   Scenario: successful back office login using email
     Given I am logged out
@@ -41,7 +41,7 @@ Feature: User back office login
       | Password | charlie@example.com |
     When I press "Log in"
     Then I should see "Invalid credentials. You have 9 login attempts remaining."
-    # Then I should see "Invalid user name or password."
+    # Then I should see "Invalid user name or password." /BAP-15864
 
   Scenario: failing back office login of nonexistent user
     Given I am logged out
