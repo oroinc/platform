@@ -6,6 +6,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\HelpBundle\Annotation\Help;
+
+/**
+ * @Help(link="https://www.orocommerce.com/documentation/current/install-upgrade")
+ */
 class SecurityController extends Controller
 {
     /**
