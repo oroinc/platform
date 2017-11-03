@@ -33,22 +33,28 @@ define(function(require) {
 
             this.initLayout()
                 .then(function() {
-                    setTimeout(this.loadSubviews.bind(this), 0);
+                    this._getFormButtons().addClass('disabled').prop('disabled', true);
+                    this._loadSubviews().then(this._afterLoadSubviews.bind(this));
                 }.bind(this));
 
             return this;
         },
 
-        loadSubviews: function() {
-            //TODO disable save button
+        _afterLoadSubviews: function() {
+            this._getFormButtons().removeClass('disabled').removeAttr('disabled');
+            mediator.trigger('page:afterPagePartChange');
+        },
+
+        _loadSubviews: function() {
             var promises = _.map(this.subviews, function(view) {
                 return view.startLoading();
             });
 
-            return $.when.apply($, promises).done(function() {
-                mediator.trigger('page:afterChange');
-                //TODO enable save button
-            });
+            return $.when.apply($, promises);
+        },
+
+        _getFormButtons: function() {
+            return this.$('.title-buttons-container .btn');
         }
     });
 

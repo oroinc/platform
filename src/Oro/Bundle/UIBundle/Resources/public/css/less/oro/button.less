@@ -288,3 +288,22 @@
   }
 }
 /* button inside dropdown-menu:end */
+
+/* disabled button group with dropdown-menu */
+.title-buttons-container {
+  .btn-group {
+    > .btn.main-group {
+      & {
+        .border-radius(0);
+        .border-left-radius(3px);
+      }
+    }
+    > .btn.main-group + .btn {
+      & {
+        .border-radius(0);
+        .border-right-radius(3px);
+      }
+    }
+  }
+}
+/* disabled button group with dropdown-menu:end */
