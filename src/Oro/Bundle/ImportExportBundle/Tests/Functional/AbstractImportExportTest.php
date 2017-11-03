@@ -12,6 +12,7 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -135,7 +136,7 @@ abstract class AbstractImportExportTest extends WebTestCase
         string $importCsvFilePath,
         string $errorsFilePath = ''
     ) {
-        $this->markTestSkipped();
+        $this->markTestSkipped('Unskip after BB-12769');
 
         $this->assertPreImportValidationActionExecuted($configuration, $importCsvFilePath);
 
@@ -221,7 +222,13 @@ abstract class AbstractImportExportTest extends WebTestCase
 
         foreach ($sentMessages as $messageData) {
             if ($messageData['topic'] === $topic) {
-                return $messageData['message'];
+                $message = $messageData['message'];
+
+                if ($message instanceof Message) {
+                    return $message->getBody();
+                }
+
+                return $message;
             }
         }
 
@@ -252,8 +259,7 @@ abstract class AbstractImportExportTest extends WebTestCase
             'outputFilePrefix' => $configuration->getFilePrefix(),
             'options' => $configuration->getRouteOptions(),
             'userId' => $this->getCurrentUser()->getId(),
-            'organizationId' => $this->getSecurityToken()->getOrganizationContext()->getId(),
-            'securityToken' => $this->getSerializedSecurityToken(),
+            'organizationId' => $this->getSecurityToken()->getOrganizationContext()->getId()
         ]);
     }
 
@@ -289,7 +295,6 @@ abstract class AbstractImportExportTest extends WebTestCase
             'process' => ProcessorRegistry::TYPE_IMPORT,
             'userId' => $this->getCurrentUser()->getId(),
             'originFileName' => $file->getClientOriginalName(),
-            'securityToken' => $this->getSerializedSecurityToken(),
             'jobName' => $configuration->getImportJobName() ?: JobExecutor::JOB_IMPORT_FROM_CSV,
             'processorAlias' => $configuration->getImportProcessorAlias(),
             'options' => $configuration->getRouteOptions(),
@@ -328,7 +333,6 @@ abstract class AbstractImportExportTest extends WebTestCase
             'process' => ProcessorRegistry::TYPE_IMPORT_VALIDATION,
             'userId' => $this->getCurrentUser()->getId(),
             'originFileName' => $file->getClientOriginalName(),
-            'securityToken' => $this->getSerializedSecurityToken(),
             'jobName' => $configuration->getImportValidationJobName() ?: JobExecutor::JOB_IMPORT_VALIDATION_FROM_CSV,
             'processorAlias' => $configuration->getImportProcessorAlias(),
             'options' => $configuration->getRouteOptions(),

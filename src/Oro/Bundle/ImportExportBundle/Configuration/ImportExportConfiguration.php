@@ -22,6 +22,7 @@ class ImportExportConfiguration extends ParameterBag implements ImportExportConf
     const FIELD_IMPORT_JOB_NAME = 'importJobName';
     const FIELD_IMPORT_PROCESSOR_ALIAS = 'importProcessorAlias';
 
+    const FIELD_IMPORT_ENTITY_LABEL = 'importEntityLabel';
     const FIELD_IMPORT_VALIDATION_JOB_NAME = 'importValidationJobName';
     const FIELD_IMPORT_VALIDATION_BUTTON_LABEL = 'importValidationButtonLabel';
 
@@ -100,14 +101,6 @@ class ImportExportConfiguration extends ParameterBag implements ImportExportConf
     /**
      * {@inheritDoc}
      */
-    public function getExportTemplateButtonLabel()
-    {
-        return $this->get(self::FIELD_EXPORT_TEMPLATE_BUTTON_LABEL);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getImportJobName()
     {
         return $this->get(self::FIELD_IMPORT_JOB_NAME);
@@ -119,6 +112,14 @@ class ImportExportConfiguration extends ParameterBag implements ImportExportConf
     public function getImportProcessorAlias()
     {
         return $this->get(self::FIELD_IMPORT_PROCESSOR_ALIAS);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getImportEntityLabel()
+    {
+        return $this->get(self::FIELD_IMPORT_ENTITY_LABEL);
     }
 
     /**

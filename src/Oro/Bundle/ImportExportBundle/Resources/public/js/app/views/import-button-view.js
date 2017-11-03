@@ -23,7 +23,8 @@ define(function(require) {
                     width: 650,
                     autoResize: true,
                     modal: true,
-                    minHeight: 100
+                    minHeight: 100,
+                    dialogClass: 'import-dialog-widget'
                 }
             },
             routeOptions: {}

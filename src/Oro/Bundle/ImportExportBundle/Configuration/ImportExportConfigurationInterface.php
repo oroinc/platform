@@ -52,11 +52,6 @@ interface ImportExportConfigurationInterface
     /**
      * @return string|null
      */
-    public function getExportTemplateButtonLabel();
-
-    /**
-     * @return string|null
-     */
     public function getImportJobName();
 
     /**
@@ -68,6 +63,11 @@ interface ImportExportConfigurationInterface
      * @return string|null
      */
     public function getImportValidationJobName();
+
+    /**
+     * @return string|null
+     */
+    public function getImportEntityLabel();
 
     /**
      * @return string|null

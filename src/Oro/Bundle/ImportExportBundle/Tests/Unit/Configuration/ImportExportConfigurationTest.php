@@ -49,10 +49,6 @@ class ImportExportConfigurationTest extends TestCase
             $configuration->getExportTemplateProcessorAlias()
         );
         static::assertSame(
-            $parameters[ImportExportConfiguration::FIELD_EXPORT_TEMPLATE_BUTTON_LABEL],
-            $configuration->getExportTemplateButtonLabel()
-        );
-        static::assertSame(
             $parameters[ImportExportConfiguration::FIELD_IMPORT_JOB_NAME],
             $configuration->getImportJobName()
         );
@@ -67,6 +63,10 @@ class ImportExportConfigurationTest extends TestCase
         static::assertSame(
             $parameters[ImportExportConfiguration::FIELD_IMPORT_VALIDATION_BUTTON_LABEL],
             $configuration->getImportValidationButtonLabel()
+        );
+        static::assertSame(
+            $parameters[ImportExportConfiguration::FIELD_IMPORT_ENTITY_LABEL],
+            $configuration->getImportEntityLabel()
         );
     }
 
@@ -85,11 +85,11 @@ class ImportExportConfigurationTest extends TestCase
             ImportExportConfiguration::FIELD_EXPORT_POPUP_TITLE => 'export title',
             ImportExportConfiguration::FIELD_EXPORT_TEMPLATE_JOB_NAME => 'export t job',
             ImportExportConfiguration::FIELD_EXPORT_TEMPLATE_PROCESSOR_ALIAS => 'export t processor',
-            ImportExportConfiguration::FIELD_EXPORT_TEMPLATE_BUTTON_LABEL => 'export t label',
             ImportExportConfiguration::FIELD_IMPORT_JOB_NAME => 'import job',
             ImportExportConfiguration::FIELD_IMPORT_PROCESSOR_ALIAS => 'import processor',
             ImportExportConfiguration::FIELD_IMPORT_VALIDATION_JOB_NAME => 'import v job',
             ImportExportConfiguration::FIELD_IMPORT_VALIDATION_BUTTON_LABEL => 'import v label',
+            ImportExportConfiguration::FIELD_IMPORT_ENTITY_LABEL => 'Some Entity'
         ];
     }
 }

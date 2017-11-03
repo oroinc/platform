@@ -33,7 +33,7 @@ oro:
             errors_found:   "Errors found: %errors%"
             error %number%: "Error in row #%number%."
             label:          "Import file"
-            validation_label: "Validate Data File"
+            validation_label: "Validate"
             success:        "File was successfully imported."
             alert:          "%added% %entities% were added, %updated% %entities% were updated"
             entity:         Import %entityName%

@@ -2,21 +2,33 @@
 
 {% set configurations = get_import_export_configuration(alias) %}
 <div class="widget-content import-widget-content">
+    {% if configurations|length > 1 %}
     <ul class="nav nav-tabs">
         {% for configuration in configurations %}
             {% set shortEntityName = configuration.entityClass|basename %}
+
+            {% if configuration.importEntityLabel is defined and configuration.importEntityLabel is not empty %}
+                {% set entityLabel = configuration.importEntityLabel %}
+            {% else %}
+                {% set entityLabel = shortEntityName %}
+            {% endif %}
+
             <li {% if loop.index == 1 %} class="active" {% endif %}>
-                <a data-toggle="tab" href="#importExport{{ shortEntityName }}">{{ shortEntityName }}</a>
+                <a data-toggle="tab" href="#importExport{{ shortEntityName }}">{{ entityLabel }}</a>
             </li>
         {% endfor %}
     </ul>
 
+    {% endif %}
+
+    {% if configurations|length > 1 %}
     <div class="tab-content">
+    {% endif %}
+
         {% for config in configurations %}
 
             {% set form = get_import_form(config.entityClass).createView() %}
             {% set shortEntityName = config.entityClass|basename %}
-
             <div id="importExport{{ shortEntityName }}" class="tab-pane fade in {% if loop.index == 1 %} active{% endif %}">
                 <div class="form-container">
                     <form method="post"
@@ -45,80 +57,85 @@
                                 {{ form_row(form.processorAlias, {'label': 'oro.importexport.import.strategy'}) }}
                             </div>
                             {{ form_rest(form) }}
-                        </fieldset>
+
 
                         {% set exportTemplateProcessors = config.exportTemplateProcessorAlias %}
                         {% set hasExportTemplateProcessor = config.exportTemplateProcessorAlias is not empty %}
                         {% set isMultipleProcessorsRequired = exportTemplateProcessors is iterable %}
+                            <div class="control-group control-group-file multicurrency-selection-control-group">
+                                <div class="control-label wrap"></div>
+                                <div class="controls">
+                                    {% if hasExportTemplateProcessor %}
+                                        {% if isMultipleProcessorsRequired and exportTemplateProcessors|length > 1 %}
+                                            {% set exportTemplateButtons = [] %}
 
-                        {% if hasExportTemplateProcessor %}
+                                            {% for alias, label in exportTemplateProcessors %}
+                                                {% set exportTemplateButtons = exportTemplateButtons|merge([{
+                                                        'path':'#',
+                                                        'aCss':'icons-holder-text no-hash',
+                                                        'title': label|trans,
+                                                        'iCss':'fa-file-o hide-text',
+                                                        'label': label|trans,
+                                                        'data': {
+                                                            'page-component-module': 'oroui/js/app/components/view-component',
+                                                            'page-component-options': {
+                                                                'view': 'oroimportexport/js/app/views/export-template-button-view',
+                                                                'exportTemplateProcessor': alias,
+                                                                'exportTemplateJob': config.exportTemplateJob|default(null),
+                                                                'routeOptions': options|default({})
+                                                            }|json_encode
+                                                        }
+                                                    }])
+                                                %}
+                                            {% endfor %}
 
-                            {% if isMultipleProcessorsRequired and exportTemplateProcessors|length > 1 %}
-                                {% set exportTemplateButtons = [] %}
-
-                                {% for alias, label in exportTemplateProcessors %}
-                                    {% set exportTemplateButtons = exportTemplateButtons|merge([{
-                                            'path':'#',
-                                            'aCss':'icons-holder-text no-hash',
-                                            'title': label|trans,
-                                            'iCss':'fa-file-o hide-text',
-                                            'label': label|trans,
-                                            'data': {
-                                                'page-component-module': 'oroui/js/app/components/view-component',
-                                                'page-component-options': {
-                                                    'view': 'oroimportexport/js/app/views/export-template-button-view',
-                                                    'exportTemplateProcessor': alias,
-                                                    'exportTemplateJob': config.exportTemplateJob|default(null),
-                                                    'routeOptions': options|default({})
-                                                }|json_encode
-                                            }
-                                        }])
-                                    %}
-                                {% endfor %}
-
-                                {{ UI.dropdownButton({
-                                    'label': config.exportTemplateButtonLabel|default('oro.importexport.export_template.label'|trans),
-                                    'elements': exportTemplateButtons
-                                }) }}
-                            {% else %}
-                                {{ UI.button({
-                                    'path':'#',
-                                    'aCss':'icons-holder-text no-hash',
-                                    'title': config.exportTemplateButtonLabel|default('oro.importexport.export_template.label'|trans),
-                                    'iCss':'fa-file-o hide-text',
-                                    'label': config.exportTemplateButtonLabel|default('oro.importexport.export_template.label'|trans),
-                                    'data': {
-                                        'page-component-module': 'oroui/js/app/components/view-component',
-                                        'page-component-options': {
-                                            'view': 'oroimportexport/js/app/views/export-template-button-view',
-                                            'exportTemplateProcessor': config.exportTemplateProcessorAlias,
-                                            'exportTemplateJob': config.exportTemplateJob|default(null),
-                                            'routeOptions': options|default({})
-                                        }|json_encode
-                                    }
-                                }) }}
-                            {% endif %}
-
-                        {% endif %}
+                                            {{ UI.dropdownButton({
+                                                'label': 'oro.importexport.export_template.label'|trans,
+                                                'elements': exportTemplateButtons
+                                            }) }}
+                                        {% else %}
+                                            {{ UI.button({
+                                                'path':'#',
+                                                'aCss':'icons-holder-text no-hash',
+                                                'title': 'oro.importexport.export_template.label'|trans,
+                                                'iCss':'fa-file-o hide-text',
+                                                'label': 'oro.importexport.export_template.label'|trans,
+                                                'data': {
+                                                    'page-component-module': 'oroui/js/app/components/view-component',
+                                                    'page-component-options': {
+                                                        'view': 'oroimportexport/js/app/views/export-template-button-view',
+                                                        'exportTemplateProcessor': config.exportTemplateProcessorAlias,
+                                                        'exportTemplateJob': config.exportTemplateJob|default(null),
+                                                        'routeOptions': options|default({})
+                                                    }|json_encode
+                                                }
+                                            }) }}
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </fieldset>
                     </form>
                     {{ oro_form_js_validation(form) }}
                 </div>
             </div>
         {% endfor %}
 
+    {% if configurations|length > 1 %}
     </div>
+    {% endif %}
 
-        <div class="widget-actions">
-                <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
-                <button class="btn btn-primary" type="button" id="validate_import_button">{{ 'oro.importexport.import.validation_label'|trans }}</button>
-                <button class="btn btn-success" type="button" id="import_button">{{ 'oro.importexport.import.label'|trans }}</button>
-        </div>
+    <div class="widget-actions">
+        <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+        <button class="btn btn-primary" type="button" id="validate_import_button">{{ 'oro.importexport.import.validation_label'|trans }}</button>
+        <button class="btn btn-success" type="button" id="import_button">{{ 'oro.importexport.import.label'|trans }}</button>
+    </div>
 
     <script type="text/javascript">
         require(['underscore', 'orotranslation/js/translator', 'oroui/js/widget-manager', 'oroui/js/messenger'],
             function(_, __, WidgetManager, Messenger) {
                 var getCurrentlyActiveTabContent = function(){
-                    return $('.tab-content .active');
+                    return $('.tab-pane.active');
                 };
 
                 var resetWidgetFormToActiveTabForm = function(widget) {
