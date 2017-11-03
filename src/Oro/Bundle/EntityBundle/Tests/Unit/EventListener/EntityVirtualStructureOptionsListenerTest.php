@@ -1,0 +1,64 @@
+<?php
+
+namespace Oro\Bundle\EntityBundle\Tests\Unit\EventListener;
+
+use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
+use Oro\Bundle\EntityBundle\EventListener\EntityVirtualStructureOptionsListener;
+use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
+use Oro\Bundle\EntityBundle\Model\EntityStructure;
+use Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
+use Oro\Component\Testing\Unit\EntityTrait;
+
+class EntityVirtualStructureOptionsListenerTest extends \PHPUnit_Framework_TestCase
+{
+    use EntityTrait;
+
+    /** @var EntityVirtualStructureOptionsListener */
+    protected $listener;
+
+    /** @var EntityAliasProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $virtualFieldProvider;
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function setUp()
+    {
+        $this->virtualFieldProvider = $this->createMock(ChainVirtualFieldProvider::class);
+        $this->listener = new EntityVirtualStructureOptionsListener($this->virtualFieldProvider);
+    }
+
+    public function testOnOptionsRequest()
+    {
+        $fieldStructure = (new EntityFieldStructure())->setName('field1');
+        $entityStructure = $this->getEntity(
+            EntityStructure::class,
+            [
+                'className' => \stdClass::class,
+                'fields' => [$fieldStructure],
+            ]
+        );
+
+        $this->virtualFieldProvider
+            ->expects($this->once())
+            ->method('isVirtualField')
+            ->with($entityStructure->getClassName(), 'field1')
+            ->willReturn(true);
+
+        $event = $this->getEntity(EntityStructureOptionsEvent::class, ['data' => [$entityStructure]]);
+        $expectedFieldStructure = (clone $fieldStructure)->addOption(
+            EntityVirtualStructureOptionsListener::OPTION_NAME,
+            true
+        );
+        $expectedEntityStructure = $this->getEntity(
+            EntityStructure::class,
+            [
+                'className' => \stdClass::class,
+                'fields' => [$expectedFieldStructure],
+            ]
+        );
+        $this->listener->onOptionsRequest($event);
+        $this->assertEquals([$expectedEntityStructure], $event->getData());
+    }
+}

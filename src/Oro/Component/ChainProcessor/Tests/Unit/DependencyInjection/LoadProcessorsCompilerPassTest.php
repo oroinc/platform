@@ -114,8 +114,14 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $methodCalls);
         $this->assertEquals(
             [
-                'addProcessor',
-                ['processor1', [], null, null, 0]
+                'setProcessors',
+                [
+                    [
+                        '' => [
+                            0   => [['processor1', []]],
+                        ]
+                    ]
+                ]
             ],
             $methodCalls[0]
         );
@@ -150,8 +156,14 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $methodCalls);
         $this->assertEquals(
             [
-                'addProcessor',
-                ['processor1', [], 'action1', null, 0]
+                'setProcessors',
+                [
+                    [
+                        'action1' => [
+                            0   => [['processor1', []]],
+                        ]
+                    ]
+                ]
             ],
             $methodCalls[0]
         );
@@ -192,46 +204,26 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $compilerPass->process($container);
 
         $methodCalls = $processorBag->getMethodCalls();
-        $this->assertCount(4, $methodCalls);
+        $this->assertCount(1, $methodCalls);
         $this->assertEquals(
             [
-                'addProcessor',
+                'setProcessors',
                 [
-                    'processor1',
-                    [],
-                    'action1',
-                    'group1',
-                    123,
+                    [
+                        ''        => [
+                            0 => [['processor3', []]]
+                        ],
+                        'action1' => [
+                            0   => [['processor2', []]],
+                            123 => [['processor1', ['group' => 'group1']]]
+                        ],
+                        'action2' => [
+                            0 => [['processor1', ['group' => 'group2', 'test_attr' => 'test']]]
+                        ],
+                    ]
                 ]
             ],
             $methodCalls[0]
-        );
-        $this->assertEquals(
-            [
-                'addProcessor',
-                [
-                    'processor1',
-                    ['test_attr' => 'test'],
-                    'action2',
-                    'group2',
-                    0,
-                ]
-            ],
-            $methodCalls[1]
-        );
-        $this->assertEquals(
-            [
-                'addProcessor',
-                ['processor2', [], 'action1', null, 0]
-            ],
-            $methodCalls[2]
-        );
-        $this->assertEquals(
-            [
-                'addProcessor',
-                ['processor3', [], null, null, 0]
-            ],
-            $methodCalls[3]
         );
     }
 
@@ -265,41 +257,41 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $compilerPass->process($container);
 
         $methodCalls = $processorBag->getMethodCalls();
-        $this->assertCount(5, $methodCalls);
+        $this->assertCount(1, $methodCalls);
         $this->assertEquals(
             [
-                'addProcessor',
-                ['processor1', ['test_attr' => ['!' => 'test1']], 'action1', null, 0]
+                'setProcessors',
+                [
+                    [
+                        'action1' => [
+                            0 => [
+                                ['processor1', ['test_attr' => ['!' => 'test1']]]
+                            ]
+                        ],
+                        'action2' => [
+                            0 => [
+                                ['processor1', ['test_attr' => ['&' => ['test1', 'test2']]]]
+                            ]
+                        ],
+                        'action3' => [
+                            0 => [
+                                ['processor1', ['test_attr' => ['|' => ['test1', 'test2']]]]
+                            ]
+                        ],
+                        'action4' => [
+                            0 => [
+                                ['processor1', ['test_attr' => ['|' => [['!' => 'test1'], 'test2']]]]
+                            ]
+                        ],
+                        'action5' => [
+                            0 => [
+                                ['processor1', ['test_attr' => ['|' => ['test1', ['!' => 'test2']]]]]
+                            ]
+                        ]
+                    ]
+                ]
             ],
             $methodCalls[0]
-        );
-        $this->assertEquals(
-            [
-                'addProcessor',
-                ['processor1', ['test_attr' => ['&' => ['test1', 'test2']]], 'action2', null, 0]
-            ],
-            $methodCalls[1]
-        );
-        $this->assertEquals(
-            [
-                'addProcessor',
-                ['processor1', ['test_attr' => ['|' => ['test1', 'test2']]], 'action3', null, 0]
-            ],
-            $methodCalls[2]
-        );
-        $this->assertEquals(
-            [
-                'addProcessor',
-                ['processor1', ['test_attr' => ['|' => [['!' => 'test1'], 'test2']]], 'action4', null, 0]
-            ],
-            $methodCalls[3]
-        );
-        $this->assertEquals(
-            [
-                'addProcessor',
-                ['processor1', ['test_attr' => ['|' => ['test1', ['!' => 'test2']]]], 'action5', null, 0]
-            ],
-            $methodCalls[4]
         );
     }
 

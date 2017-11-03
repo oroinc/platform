@@ -77,7 +77,7 @@ class OptimizedProcessorBagTest extends \PHPUnit_Framework_TestCase
         $this->processorIteratorFactory->expects(self::once())
             ->method('createProcessorIterator')
             ->with(
-                [['processor' => 'processor1', 'attributes' => ['group' => 'group1']]],
+                [['processor1', ['group' => 'group1']]],
                 self::identicalTo($context),
                 self::identicalTo($this->applicableChecker),
                 self::identicalTo($this->processorFactory)
@@ -100,7 +100,7 @@ class OptimizedProcessorBagTest extends \PHPUnit_Framework_TestCase
         $this->ungroupedProcessorIteratorFactory->expects(self::once())
             ->method('createProcessorIterator')
             ->with(
-                [['processor' => 'processor2', 'attributes' => []]],
+                [['processor2', []]],
                 self::identicalTo($context),
                 self::identicalTo($this->ungroupedApplicableChecker),
                 self::identicalTo($this->processorFactory)

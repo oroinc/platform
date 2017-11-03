@@ -573,3 +573,10 @@ services:
         public: false
         tags:
             - { name: oro_entity.name_provider, priority: 0 }
+
+    oro_entity_extend.event_listener.entity_structure_options_listener:
+        class: 'Oro\Bundle\EntityExtendBundle\EventListener\EntityExtendedStructureOptionsListener'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: kernel.event_listener, event: oro_entity.structure.options, method: onOptionsRequest }

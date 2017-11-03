@@ -78,8 +78,8 @@ class CleanUpProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $methodCalls);
         $this->assertEquals(
             [
-                'addProcessor',
-                ['simple_processor', 'Test\SimpleProcessor']
+                'setProcessors',
+                [['simple_processor' => 'Test\SimpleProcessor']]
             ],
             $methodCalls[0]
         );
