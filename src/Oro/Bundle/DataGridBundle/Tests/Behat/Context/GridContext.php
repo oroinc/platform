@@ -1103,7 +1103,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * Click on first row action.
-     * Example: And click view on first row in grid
+     * Example: And click "view" on first row in grid
      *
      * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in grid$/
      * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in "(?P<gridName>[\w\s]+)" grid$/

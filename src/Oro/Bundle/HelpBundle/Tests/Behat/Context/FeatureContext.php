@@ -7,15 +7,15 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 class FeatureContext extends OroFeatureContext
 {
     /**
-     * @Then the documentation will opened
+     * Example: Then the documentation "www.orocrm.com/documentation/current" will opened
+     * @Then /^the documentation "([^"]*)" will opened$/
+     *
+     * @param string $url
      */
-    public function theDocumentationWillOpened()
+    public function theDocumentationWillOpened($url)
     {
         $windowNames = $this->getSession()->getWindowNames();
-        $this->getSession()->switchToWindow($windowNames[1]);
-        self::assertContains(
-            'www.orocrm.com/documentation/current',
-            $this->getSession()->getCurrentUrl()
-        );
+        $this->getSession()->switchToWindow(end($windowNames));
+        self::assertContains($url, $this->getSession()->getCurrentUrl());
     }
 }
