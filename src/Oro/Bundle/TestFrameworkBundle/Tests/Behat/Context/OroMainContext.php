@@ -396,7 +396,13 @@ class OroMainContext extends MinkContext implements
         $driver = $this->getSession()->getDriver();
         $session = $driver->getWebDriverSession();
 
-        $session->accept_alert();
+        for ($tries = 0; $tries < 3; ++$tries) {
+            try {
+                $session->accept_alert();
+            } catch (NoAlertOpenError $exception) {
+                usleep(50000);
+            }
+        }
     }
 
     /**
