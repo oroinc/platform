@@ -385,6 +385,27 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Accepts alert.
+     * Example: I accept alert
+     *
+     * @When /^(?:|I )accept alert$/
+     */
+    public function iAcceptAlert()
+    {
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $session = $driver->getWebDriverSession();
+
+        for ($tries = 0; $tries < 3; ++$tries) {
+            try {
+                $session->accept_alert();
+            } catch (NoAlertOpenError $exception) {
+                usleep(50000);
+            }
+        }
+    }
+
+    /**
      * Assert alert is not present
      * Example: Then I should not see alert
      *

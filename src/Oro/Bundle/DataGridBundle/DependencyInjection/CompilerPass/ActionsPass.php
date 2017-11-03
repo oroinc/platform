@@ -21,6 +21,11 @@ class ActionsPass implements CompilerPassInterface
     const MASS_ACTION_FACTORY_SERVICE_ID = 'oro_datagrid.extension.mass_action.factory';
     const MASS_ACTION_TAG_NAME           = 'oro_datagrid.extension.mass_action.type';
 
+    const ITERABLE_RESULT_FACTORY_REGISTRY_SERVICE_ID =
+        'oro_datagrid.extension.mass_action.iterable_result_factory_registry';
+
+    const ITERABLE_RESULT_FACTORY_TAG_NAME = 'oro_datagrid.extension.mass_action.iterable_result_factory';
+
     /**
      * {@inheritDoc}
      */
@@ -36,6 +41,13 @@ class ActionsPass implements CompilerPassInterface
             self::ACTION_EXTENSION_SERVICE_ID,
             self::ACTION_PROVIDER_TAG,
             'addActionProvider'
+        );
+
+        $this->registerTaggedServices(
+            $container,
+            self::ITERABLE_RESULT_FACTORY_REGISTRY_SERVICE_ID,
+            self::ITERABLE_RESULT_FACTORY_TAG_NAME,
+            'addFactory'
         );
 
         $this->registerActions(

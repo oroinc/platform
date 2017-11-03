@@ -38,12 +38,19 @@ services:
     oro_datagrid.mass_action.parameters_parser:
         class: %oro_datagrid.mass_action.parameters_parser.class%
 
+    oro_datagrid.mass_action.helper:
+        class: Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHelper
+        public: false
+        arguments:
+            - '@service_container'
+
     oro_datagrid.mass_action.dispatcher:
         class: %oro_datagrid.mass_action.dispatcher.class%
         arguments:
-            - '@service_container'
             - '@oro_datagrid.datagrid.manager'
-            - '@oro_security.acl_helper'
+            - '@oro_datagrid.mass_action.helper'
+            - '@oro_datagrid.mass_action.parameters_parser'
+            - '@oro_datagrid.extension.mass_action.iterable_result_factory_registry'
 
     oro_datagrid.extension.mass_action.type.ajax:
         class: %oro_datagrid.extension.mass_action.type.ajax.class%
@@ -92,3 +99,15 @@ services:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimiter
         arguments:
             - '@oro_security.acl_helper'
+
+    oro_datagrid.extension.mass_action.iterable_result_factory:
+        class: Oro\Bundle\DataGridBundle\Extension\MassAction\IterableResultFactory
+        public: false
+        arguments:
+            - '@oro_security.acl_helper'
+        tags:
+            - { name: oro_datagrid.extension.mass_action.iterable_result_factory }
+
+    oro_datagrid.extension.mass_action.iterable_result_factory_registry:
+        class: Oro\Bundle\DataGridBundle\Extension\MassAction\IterableResultFactoryRegistry
+        public: false
