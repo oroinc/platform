@@ -27,7 +27,7 @@ define(function(require) {
         },
 
         _processSelect2Options: function(options) {
-            var opts = _.clone(options.select2);
+            var opts = _.clone(options.select2) || {};
 
             if (!opts.formatSelectionTemplate && opts.formatSelectionTemplateSelector) {
                 opts.formatSelectionTemplate = $(opts.formatSelectionTemplateSelector).text();

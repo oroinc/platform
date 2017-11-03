@@ -171,7 +171,7 @@ define(function(require) {
 
             if (!this._hasEmptyFilter()) {
                 value = {
-                    columnName: this.getChoiceInputValue(),
+                    columnName: this.getColumnName(),
                     criterion: this._getFilterCriterion()
                 };
             }
@@ -228,6 +228,10 @@ define(function(require) {
 
         getChoiceInputValue: function() {
             return this.subview('choice-input').getValue();
+        },
+
+        getColumnName: function() {
+            return this.getChoiceInputValue();
         },
 
         /**

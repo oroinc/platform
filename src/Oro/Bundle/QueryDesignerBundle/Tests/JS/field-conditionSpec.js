@@ -58,7 +58,7 @@ define(function(require) {
                 expect(fieldConditionView).toEqual(jasmine.any(BaseView));
             });
 
-            it('has choiceInput widget', function() {
+            it('has choiceInput view', function() {
                 expect(fieldConditionView.subview('choice-input')).toEqual(jasmine.any(BaseView));
             });
 

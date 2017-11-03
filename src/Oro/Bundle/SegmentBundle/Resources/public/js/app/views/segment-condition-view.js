@@ -1,6 +1,8 @@
 define(function(require) {
     'use strict';
 
+    // @export orosegment/js/app/views/segment-condition-view
+
     var SegmentConditionView;
     var _ = require('underscore');
     var SegmentFilter = require('orosegment/js/filter/segment-filter');
@@ -87,7 +89,7 @@ define(function(require) {
             return value;
         },
 
-        getChoiceInputValue: function() {
+        getColumnName: function() {
             var entity = this.subview('choice-input').entity;
             return this.filter ? _.result(this.filter.entity_ids, entity) : null;
         }

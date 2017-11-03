@@ -1,0 +1,25 @@
+[
+  {
+    "name":"segment",
+    "label":"Segment",
+    "choices": {
+      "1": {
+        "label": "Segment 1",
+        "value": "1"
+      },
+      "2": {
+        "label": "Segment 2",
+        "value": "2"
+      }
+    },
+    "applicable":[
+      {
+        "type":"entity"
+      }
+    ],
+    "type":"segment",
+    "entity_ids":{
+      "Oro\\Bundle\\AccountBundle\\Entity\\Account":"id"
+    }
+  }
+]

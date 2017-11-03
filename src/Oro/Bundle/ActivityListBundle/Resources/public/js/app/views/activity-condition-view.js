@@ -197,7 +197,7 @@ define(function(require) {
                     activityType: this.typeFilter.getValue(),
                     filter: filter,
                     entityClassName: $(this.options.entitySelector).val(),
-                    activityFieldName: this.getChoiceInputValue()
+                    activityFieldName: this.getColumnName()
                 }
             };
         },
