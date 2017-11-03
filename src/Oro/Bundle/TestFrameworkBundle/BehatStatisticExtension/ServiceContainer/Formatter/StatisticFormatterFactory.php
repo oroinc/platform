@@ -35,9 +35,9 @@ final class StatisticFormatterFactory implements FormatterFactory
     public function processFormatter(ContainerBuilder $container)
     {
         $container->getDefinition('behat_statistic.listener.feature_statistic_subscriber')
+            ->addArgument($container->getParameter('statistic.build_id'))
             ->addArgument($container->getParameter('statistic.branch_name'))
             ->addArgument($container->getParameter('statistic.target_branch'))
-            ->addArgument($container->getParameter('statistic.build_id'))
         ;
     }
 

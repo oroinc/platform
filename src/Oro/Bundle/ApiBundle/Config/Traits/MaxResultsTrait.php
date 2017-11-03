@@ -26,9 +26,11 @@ trait MaxResultsTrait
      */
     public function getMaxResults()
     {
-        return array_key_exists(EntityDefinitionConfig::MAX_RESULTS, $this->items)
-            ? $this->items[EntityDefinitionConfig::MAX_RESULTS]
-            : null;
+        if (!array_key_exists(EntityDefinitionConfig::MAX_RESULTS, $this->items)) {
+            return null;
+        }
+
+        return $this->items[EntityDefinitionConfig::MAX_RESULTS];
     }
 
     /**

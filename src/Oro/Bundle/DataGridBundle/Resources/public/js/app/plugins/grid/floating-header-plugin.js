@@ -144,14 +144,14 @@ define(function(require) {
             // compensate scroll bar
             if (this.scrollVisible) {
                 this.$grid.css({borderRight: scrollBarWidth + 'px solid transparent'});
-                totalWidth = this.$grid[0].offsetWidth - scrollBarWidth;
+                totalWidth = this.$grid[0].scrollWidth - scrollBarWidth;
             } else {
-                totalWidth = this.$grid[0].offsetWidth;
+                totalWidth = this.$grid[0].scrollWidth;
             }
 
             // save widths
             headerCells.each(function(i, headerCell) {
-                widths.push(headerCell.offsetWidth);
+                widths.push(headerCell.scrollWidth);
             });
 
             // FF sometimes gives wrong values, need to check

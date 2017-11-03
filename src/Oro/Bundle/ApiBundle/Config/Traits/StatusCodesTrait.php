@@ -17,9 +17,11 @@ trait StatusCodesTrait
      */
     public function getStatusCodes()
     {
-        return array_key_exists(EntityDefinitionConfig::STATUS_CODES, $this->items)
-            ? $this->items[EntityDefinitionConfig::STATUS_CODES]
-            : null;
+        if (!array_key_exists(EntityDefinitionConfig::STATUS_CODES, $this->items)) {
+            return null;
+        }
+
+        return $this->items[EntityDefinitionConfig::STATUS_CODES];
     }
 
     /**

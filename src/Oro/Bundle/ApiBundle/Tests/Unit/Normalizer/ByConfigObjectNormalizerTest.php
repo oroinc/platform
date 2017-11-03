@@ -6,7 +6,9 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Oro\Component\EntitySerializer\DataNormalizer;
 use Oro\Component\EntitySerializer\EntityDataTransformer;
+use Oro\Component\EntitySerializer\SerializationHelper;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -14,7 +16,6 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
-use Oro\Bundle\ApiBundle\Normalizer\DataNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
@@ -23,6 +24,9 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityDataAccessor;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ObjectNormalizer */
@@ -41,8 +45,10 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->objectNormalizer = new ObjectNormalizer(
             $normalizers,
             new DoctrineHelper($doctrine),
+            new SerializationHelper(
+                new EntityDataTransformer($this->createMock(ContainerInterface::class))
+            ),
             new EntityDataAccessor(),
-            new EntityDataTransformer($this->createMock(ContainerInterface::class)),
             new ConfigNormalizer(),
             new DataNormalizer()
         );
@@ -159,6 +165,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             ],
             'post_serialize'   => function (array $item, array $context) {
                 $item['name'] .= sprintf('_additional[%s]', $context['key']);
+                $item['another'] = 'value';
 
                 return $item;
             }
@@ -172,8 +179,9 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                'id'   => 123,
-                'name' => 'test_name_additional[context value]'
+                'id'      => 123,
+                'name'    => 'test_name_additional[context value]',
+                'another' => 'value'
             ],
             $result
         );
@@ -266,7 +274,6 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'id'        => 123,
-                'category'  => null,
                 'category1' => null,
                 'owner'     => null
             ],
@@ -279,9 +286,9 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'id'        => null,
-                'name'      => ['exclude' => true],
-                'owner'     => [
+                'id'    => null,
+                'name'  => ['exclude' => true],
+                'owner' => [
                     'exclusion_policy' => 'all',
                     'fields'           => [
                         'name'    => null,
@@ -302,8 +309,8 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                'id'        => 123,
-                'owner'     => [
+                'id'    => 123,
+                'owner' => [
                     'name'    => 'user_name',
                     'groups1' => [11, 22]
                 ]
@@ -320,9 +327,9 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'id'        => null,
-                'name'      => ['exclude' => true],
-                'owner'     => [
+                'id'    => null,
+                'name'  => ['exclude' => true],
+                'owner' => [
                     'exclusion_policy' => 'all',
                     'fields'           => [
                         'name'    => null,
@@ -344,8 +351,8 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                'id'        => 123,
-                'owner'     => [
+                'id'    => 123,
+                'owner' => [
                     'name'    => 'user_name',
                     'groups1' => [11, 22]
                 ]
@@ -396,7 +403,6 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'id'        => 123,
-                'category'  => null,
                 'category1' => null,
                 'owner'     => [
                     'name'    => 'user_name',
@@ -404,41 +410,6 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             $result
-        );
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage A value of "groups" field should be "null or array". Got: string.
-     */
-    public function testNormalizeObjectWithInvalidValueForToManyRelation()
-    {
-        $data = $this->createProductObject();
-        $data->getOwner()->setGroups('invalid value');
-
-        $config = [
-            'exclusion_policy' => 'all',
-            'fields'           => [
-                'id'        => null,
-                'name'      => ['exclude' => true],
-                'owner'     => [
-                    'exclusion_policy' => 'all',
-                    'fields'           => [
-                        'name'    => null,
-                        'groups1' => [
-                            'exclusion_policy' => 'all',
-                            'property_path'    => 'groups',
-                            'target_type'      => 'to-many',
-                            'fields'           => 'id'
-                        ]
-                    ]
-                ]
-            ]
-        ];
-
-        $result = $this->objectNormalizer->normalizeObject(
-            $data,
-            $this->createConfigObject($config)
         );
     }
 
@@ -856,8 +827,97 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                'id'   => 123,
                 'name' => 'test_name',
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeWithDependsOnComputedField()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'        => null,
+                'ownerName' => [
+                    'property_path' => 'owner.computedName.value'
+                ],
+                'owner'     => [
+                    'exclusion_policy' => 'all',
+                    'exclude'          => true,
+                    'fields'           => [
+                        'name'         => null,
+                        'computedName' => [
+                            'fields' => [
+                                'value' => null
+                            ]
+                        ]
+                    ],
+                    'post_serialize'   => function (array $item) {
+                        $item['computedName'] = ['value' => $item['name'] . ' (computed)'];
+
+                        return $item;
+                    }
+                ]
+            ]
+        ];
+
+        $result = $this->objectNormalizer->normalizeObject(
+            $this->createProductObject(),
+            $this->createConfigObject($config)
+        );
+
+        $this->assertEquals(
+            [
+                'id'        => 123,
+                'ownerName' => 'user_name (computed)'
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeWithDependsOnRenamedComputedField()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'           => null,
+                'ownerName'    => [
+                    'property_path' => 'owner.computedName.value'
+                ],
+                'renamedOwner' => [
+                    'exclusion_policy' => 'all',
+                    'exclude'          => true,
+                    'property_path'    => 'owner',
+                    'fields'           => [
+                        'name'                => null,
+                        'renamedComputedName' => [
+                            'property_path' => 'computedName',
+                            'fields'        => [
+                                'renamedValue' => [
+                                    'property_path' => 'value',
+                                ]
+                            ]
+                        ]
+                    ],
+                    'post_serialize'   => function (array $item) {
+                        $item['renamedComputedName'] = ['renamedValue' => $item['name'] . ' (computed)'];
+
+                        return $item;
+                    }
+                ]
+            ]
+        ];
+
+        $result = $this->objectNormalizer->normalizeObject(
+            $this->createProductObject(),
+            $this->createConfigObject($config)
+        );
+
+        $this->assertEquals(
+            [
+                'id'        => 123,
+                'ownerName' => 'user_name (computed)'
             ],
             $result
         );
