@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridInterface;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow;
@@ -769,6 +770,27 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         } else {
             self::assertFalse($result, "There is a text '$content' in table '$tableContent'");
         }
+    }
+
+    /**
+     * Assert that mass action checkbox is unchecked for a record.
+     * Example: Then I should see "Priority" record unchecked
+     *
+     * @Then /^I should see (?P<content>[\w\s]+) unchecked record in grid$/
+     * @Then /^I should see (?P<content>[\w\s]+) unchecked record in "(?P<gridName>[\w\s]+)"$/
+     *
+     * @param string $content
+     * @param string|null $gridName
+     */
+    public function assertRecordIsUnchecked($content, $gridName = null)
+    {
+        /** @var Grid $grid */
+        $grid = $this->getGrid($gridName);
+
+        static::assertTrue(
+            $grid->isRecordUnchecked($content),
+            sprintf('Record with "%s" content is checked', $content)
+        );
     }
 
     //@codingStandardsIgnoreStart

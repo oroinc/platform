@@ -211,6 +211,15 @@ class GridRow extends TableRow
 
     /**
      * @param int $cellNumber
+     * @return bool
+     */
+    public function isMassActionChecked($cellNumber = 0): bool
+    {
+        return $this->getCellByNumber($cellNumber)->isChecked();
+    }
+
+    /**
+     * @param int $cellNumber
      * @return NodeElement|null
      */
     private function getMassActionCheckbox($cellNumber)

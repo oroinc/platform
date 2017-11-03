@@ -148,6 +148,15 @@ class Grid extends Table implements GridInterface
     }
 
     /**
+     * @param string $content
+     * @return bool
+     */
+    public function isRecordUnchecked($content)
+    {
+        return !$this->getRowByContent($content)->isMassActionChecked();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function checkRecord($content)
