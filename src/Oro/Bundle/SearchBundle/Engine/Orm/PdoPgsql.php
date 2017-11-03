@@ -268,8 +268,13 @@ class PdoPgsql extends BaseDriver
     {
         $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
 
-        $qb->addSelect(sprintf('TsRank(%s.value, :value%s) as rankField%s', $joinAlias, $index, $index))
+        $qb->addSelect(sprintf('TsRank(%s.value, :quotedValue%s) as rankField%s', $joinAlias, $index, $index))
            ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
+
+        $parameter = $qb->getParameter(sprintf('value%s', $index));
+        $quotedValue = sprintf('\'%s\'', $parameter->getValue());
+
+        $qb->setParameter(sprintf('quotedValue%s', $index), $quotedValue);
     }
 
     /**

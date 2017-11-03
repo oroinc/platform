@@ -89,14 +89,14 @@ trait PageObjectDictionary
 
     /**
      * @param string $elementName
-     * @param NodeElement $productItem
+     * @param NodeElement $context
      *
      * @return bool
      */
-    public function isElementVisible($elementName, $productItem)
+    public function isElementVisible($elementName, NodeElement $context = null)
     {
         if ($this->hasElement($elementName)) {
-            $element = $this->createElement($elementName, $productItem);
+            $element = $this->createElement($elementName, $context);
             if ($element->isValid() && $element->isVisible()) {
                 return true;
             }

@@ -154,9 +154,11 @@ class ActionConfig implements ConfigBagInterface
      */
     public function getField($fieldName)
     {
-        return isset($this->fields[$fieldName])
-            ? $this->fields[$fieldName]
-            : null;
+        if (!isset($this->fields[$fieldName])) {
+            return null;
+        }
+
+        return $this->fields[$fieldName];
     }
 
     /**
@@ -215,9 +217,11 @@ class ActionConfig implements ConfigBagInterface
      */
     public function getOrderBy()
     {
-        return array_key_exists(self::ORDER_BY, $this->items)
-            ? $this->items[self::ORDER_BY]
-            : [];
+        if (!array_key_exists(self::ORDER_BY, $this->items)) {
+            return [];
+        }
+
+        return $this->items[self::ORDER_BY];
     }
 
     /**

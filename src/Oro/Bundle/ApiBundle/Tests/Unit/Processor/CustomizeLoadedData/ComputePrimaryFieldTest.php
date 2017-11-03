@@ -31,19 +31,6 @@ class ComputePrimaryFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->context->hasResult());
     }
 
-    public function testProcessWithoutConfig()
-    {
-        $this->context->setResult(
-            [
-                'roles' => [
-                    ['name' => 'role1', 'enabled' => false],
-                    ['name' => 'role2', 'enabled' => true]
-                ]
-            ]
-        );
-        $this->processor->process($this->context);
-    }
-
     public function testProcessWhenNoConfigForPrimaryField()
     {
         $config = new EntityDefinitionConfig();
@@ -163,13 +150,13 @@ class ComputePrimaryFieldTest extends \PHPUnit_Framework_TestCase
     {
         $this->processor = new ComputePrimaryField(
             'enabledRole',
-            'renamedRoles',
-            'renamedName',
-            'renamedEnabled'
+            'roles',
+            'name',
+            'enabled'
         );
 
         $config = new EntityDefinitionConfig();
-        $config->addField('enabledRole');
+        $config->addField('renamedEnabledRole')->setPropertyPath('enabledRole');
         $rolesField = $config->addField('renamedRoles');
         $rolesField->setPropertyPath('roles');
         $rolesConfig = $rolesField->getOrCreateTargetEntity();
@@ -178,9 +165,9 @@ class ComputePrimaryFieldTest extends \PHPUnit_Framework_TestCase
 
         $this->context->setResult(
             [
-                'roles' => [
-                    ['name' => 'role1', 'enabled' => false],
-                    ['name' => 'role2', 'enabled' => true]
+                'renamedRoles' => [
+                    ['renamedName' => 'role1', 'renamedEnabled' => false],
+                    ['renamedName' => 'role2', 'renamedEnabled' => true]
                 ]
             ]
         );
@@ -188,10 +175,10 @@ class ComputePrimaryFieldTest extends \PHPUnit_Framework_TestCase
         $this->processor->process($this->context);
         $this->assertEquals(
             [
-                'enabledRole' => 'role2',
-                'roles'       => [
-                    ['name' => 'role1', 'enabled' => false],
-                    ['name' => 'role2', 'enabled' => true]
+                'renamedEnabledRole' => 'role2',
+                'renamedRoles'       => [
+                    ['renamedName' => 'role1', 'renamedEnabled' => false],
+                    ['renamedName' => 'role2', 'renamedEnabled' => true]
                 ]
             ],
             $this->context->getResult()

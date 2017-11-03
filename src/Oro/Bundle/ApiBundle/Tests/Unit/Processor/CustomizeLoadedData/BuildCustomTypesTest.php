@@ -102,6 +102,51 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testProcessNestedObjectWithRenamedFields()
+    {
+        $data = [
+            'renamedField1' => 'val1',
+            'renamedField2' => null,
+            'renamedField3' => 'val3',
+        ];
+        $config = new EntityDefinitionConfig();
+        $field1 = $config->addField('renamedField1');
+        $field1->setExcluded();
+        $field1->setPropertyPath('field1');
+        $field2 = $config->addField('renamedField2');
+        $field2->setExcluded();
+        $field2->setPropertyPath('field2');
+        $field3 = $config->addField('renamedField3');
+        $field3->setExcluded();
+        $field3->setPropertyPath('field3');
+        $nestedObjectFieldConfig = $config->addField('nestedObjectField');
+        $nestedObjectFieldConfig->setDataType('nestedObject');
+        $nestedObjectFieldTargetConfig = $nestedObjectFieldConfig->getOrCreateTargetEntity();
+        $nestedObjectFieldTargetConfig->addField('targetField1')->setPropertyPath('field1');
+        $nestedObjectFieldTargetConfig->addField('targetField2')->setPropertyPath('field2');
+        $excludedTargetField = $nestedObjectFieldTargetConfig->addField('targetField3');
+        $excludedTargetField->setPropertyPath('field3');
+        $excludedTargetField->setExcluded();
+        $nestedObjectFieldTargetConfig->addField('targetField4')->setPropertyPath('field4');
+
+        $this->context->setResult($data);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+        $this->assertEquals(
+            [
+                'renamedField1'     => 'val1',
+                'renamedField2'     => null,
+                'renamedField3'     => 'val3',
+                'nestedObjectField' => [
+                    'targetField1' => 'val1',
+                    'targetField2' => null,
+                    'targetField4' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
     /**
      * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
      * @expectedExceptionMessage The "field1.field11" property path is not supported.
@@ -131,8 +176,9 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
         $nestedAssociationFieldConfig = $config->addField('nestedAssociationField');
         $nestedAssociationFieldConfig->setDataType('nestedAssociation');
         $nestedAssociationFieldTargetConfig = $nestedAssociationFieldConfig->getOrCreateTargetEntity();
-        $nestedAssociationFieldTargetConfig->addField(ConfigUtil::CLASS_NAME)->setPropertyPath('targetEntityClass');
-        $nestedAssociationFieldTargetConfig->getField(ConfigUtil::CLASS_NAME)->setMetaProperty(true);
+        $classNameField = $nestedAssociationFieldTargetConfig->addField(ConfigUtil::CLASS_NAME);
+        $classNameField->setPropertyPath('targetEntityClass');
+        $classNameField->setMetaProperty(true);
         $nestedAssociationFieldTargetConfig->addField('id')->setPropertyPath('targetEntityId');
 
         $this->context->setResult($data);
@@ -143,6 +189,43 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
                 'targetEntityClass'      => 'Test\TargetEntity',
                 'targetEntityId'         => 123,
                 'nestedAssociationField' => [
+                    ConfigUtil::CLASS_NAME => 'Test\TargetEntity',
+                    'id'                   => 123
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessNestedAssociationWithRenamedFields()
+    {
+        $data = [
+            'renamedTargetEntityClass' => 'Test\TargetEntity',
+            'renamedTargetEntityId'    => 123,
+        ];
+        $config = new EntityDefinitionConfig();
+        $targetEntityClassField = $config->addField('renamedTargetEntityClass');
+        $targetEntityClassField->setExcluded();
+        $targetEntityClassField->setPropertyPath('targetEntityClass');
+        $targetEntityIdField = $config->addField('renamedTargetEntityId');
+        $targetEntityIdField->setExcluded();
+        $targetEntityIdField->setPropertyPath('targetEntityId');
+        $nestedAssociationFieldConfig = $config->addField('nestedAssociationField');
+        $nestedAssociationFieldConfig->setDataType('nestedAssociation');
+        $nestedAssociationFieldTargetConfig = $nestedAssociationFieldConfig->getOrCreateTargetEntity();
+        $classNameField = $nestedAssociationFieldTargetConfig->addField(ConfigUtil::CLASS_NAME);
+        $classNameField->setPropertyPath('targetEntityClass');
+        $classNameField->setMetaProperty(true);
+        $nestedAssociationFieldTargetConfig->addField('id')->setPropertyPath('targetEntityId');
+
+        $this->context->setResult($data);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+        $this->assertEquals(
+            [
+                'renamedTargetEntityClass' => 'Test\TargetEntity',
+                'renamedTargetEntityId'    => 123,
+                'nestedAssociationField'   => [
                     ConfigUtil::CLASS_NAME => 'Test\TargetEntity',
                     'id'                   => 123
                 ]

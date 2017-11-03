@@ -901,6 +901,38 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Example: Then I should see grid with filter hints:
+     *            | Any Text: contains "Lamp" |
+     *
+     * @When /^(?:|I )should see grid with filter hints:$/
+     *
+     * @param TableNode $table
+     */
+    public function shouldSeeGridWithFilterHints(TableNode $table)
+    {
+        $hints = array_filter(
+            array_map(
+                function ($item) {
+                    $label = trim($this->createElement('GridFilterHintLabel', $item)->getText());
+                    $text = trim($this->createElement('GridFilterHint', $item)->getText());
+
+                    return $label && $text ? sprintf('%s %s', $label, $text) : '';
+                },
+                $this->findAllElements('GridFilterHintItem')
+            )
+        );
+
+        foreach ($table->getRows() as $row) {
+            list($hint) = $row;
+
+            $this->assertTrue(
+                in_array($hint, $hints, true),
+                sprintf('Hint "%s" not found on page', $hint)
+            );
+        }
+    }
+
+    /**
      * @When /^(?:|I )check All Visible records in grid$/
      * @When /^(?:|I )check All Visible records in "(?P<gridName>[\w\s]+)"$/
      * @When /^(?:|I )check All Visible records in "(?P<gridName>[\w\s]+)" grid$/
@@ -1071,7 +1103,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * Click on first row action.
-     * Example: And click view on first row in grid
+     * Example: And click "view" on first row in grid
      *
      * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in grid$/
      * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in "(?P<gridName>[\w\s]+)" grid$/
@@ -1274,13 +1306,13 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             Example: Then I should see following records in grid:
                        | Alice1  |
                        | Alice10 |
-            
+
             Guess, you can use another method...
-            
+
             And I should see following grid:
                 | First name | Last name | Primary Email     | Enabled | Status |
                 | John       | Doe       | admin@example.com | Enabled | Active |
-                
+
 TEXT;
 
         self::assertCount(1, $table->getRow(0), $errorMessage);

@@ -7,7 +7,6 @@ define([
     'use strict';
 
     var BaseComponent;
-    var componentOptions = ['model', 'collection', 'name'];
 
     /**
      * Base component's constructor
@@ -17,11 +16,13 @@ define([
      */
     BaseComponent = function(options) {
         this.cid = _.uniqueId('component');
-        _.extend(this, _.pick(options, componentOptions));
+        _.extend(this, _.pick(options, _.result(this, 'optionNames')));
         _.extend(this, options[BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME]);
         this.initialize(options);
         this.delegateListeners();
     };
+
+    BaseComponent.prototype.optionNames = ['model', 'collection', 'name'];
 
     // defines static methods
     _.extend(BaseComponent, {
@@ -125,10 +126,11 @@ define([
             this.stopListening();
             this.off();
             var siblingComponents = _.keys(BaseComponent.getRelatedSiblingComponentNames(this.constructor));
+            var optionNames = _.result(this, 'optionNames');
 
             // dispose and remove all own properties
             _.each(this, function(item, name) {
-                if (componentOptions.indexOf(name) !== -1 || siblingComponents.indexOf(name) !== -1) {
+                if (optionNames.indexOf(name) !== -1 || siblingComponents.indexOf(name) !== -1) {
                     /**
                      * Do not dispose auto-assigned props, that were passed over options or sibling components.
                      * Just delete a reference.

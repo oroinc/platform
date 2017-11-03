@@ -7,6 +7,7 @@ config:
         'oroentity/js/entity-field-view': 'bundles/oroentity/js/entity-field-view.js'
         'oroentity/js/app/views/entity-field-fallback': 'bundles/oroentity/js/app/views/entity-field-fallback.js'
         'oroentity/js/app/views/displayable-priority-view': 'bundles/oroentity/js/app/views/displayable-priority-view.js'
+        'oroentity/js/app/components/multiple-entity-component': 'bundles/oroentity/js/app/components/multiple-entity-component.js'
         'oro/select2-entity-field-component': 'bundles/oroentity/js/components/select2-entity-field-component.js'
         'oro/select2-entity-field-choice-component': 'bundles/oroentity/js/components/select2-entity-field-choice-component.js'
         'oro/select2-entity-field-select-component': 'bundles/oroentity/js/components/select2-entity-field-select-component.js'
