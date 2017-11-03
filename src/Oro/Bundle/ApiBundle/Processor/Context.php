@@ -201,6 +201,9 @@ class Context extends ApiContext implements ContextInterface
      */
     public function setResponseDocumentBuilder(DocumentBuilderInterface $documentBuilder = null)
     {
+        if (null !== $this->responseDocumentBuilder) {
+            $this->responseDocumentBuilder->clear();
+        }
         $this->responseDocumentBuilder = $documentBuilder;
     }
 

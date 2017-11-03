@@ -71,28 +71,8 @@ api:
             sorters:
                 fields:
                     email: ~
-        Oro\Bundle\TestFrameworkBundle\Entity\TestProduct:
-            fields:
-                renamedId:
-                    property_path: id
-                renamedName:
-                    property_path: name
-            filters:
-                fields:
-                    renamedName: ~
-            sorters:
-                fields:
-                    renamedName: ~
-        Oro\Bundle\TestFrameworkBundle\Entity\TestProductType:
-            fields:
-                renamedName:
-                    property_path: name
-            filters:
-                fields:
-                    renamedName: ~
-            sorters:
-                fields:
-                    renamedName: ~
+        Oro\Bundle\TestFrameworkBundle\Entity\TestProduct: ~
+        Oro\Bundle\TestFrameworkBundle\Entity\TestProductType: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestWithoutIdGenerator: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCompositeIdentifier:
             fields:

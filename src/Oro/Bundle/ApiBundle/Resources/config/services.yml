@@ -158,6 +158,17 @@ services:
             - '@oro_api.processor_bag'
             - customize_form_data
 
+    oro_api.resources.cache_warmer:
+        class: Oro\Bundle\ApiBundle\Provider\ResourcesCacheWarmer
+        public: false
+        arguments:
+            - '@oro_api.entity_alias_resolver'
+            - '@oro_api.resources_provider'
+            - '@oro_api.subresources_provider'
+            - [[rest], [rest, json_api]]
+        tags:
+            - { name: kernel.cache_warmer }
+
     oro_api.resources_provider:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesProvider
         arguments:
