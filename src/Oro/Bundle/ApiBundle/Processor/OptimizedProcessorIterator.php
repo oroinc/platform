@@ -75,7 +75,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
 
         $applicable = $this->applicableChecker->isApplicable(
             $this->context,
-            $this->processors[$this->index]['attributes']
+            $this->processors[$this->index][1]
         );
 
         return $applicable !== ApplicableCheckerInterface::NOT_APPLICABLE;
@@ -167,8 +167,8 @@ class OptimizedProcessorIterator extends ProcessorIterator
      */
     protected function getGroupByIndex($index)
     {
-        return isset($this->processors[$index]['attributes']['group'])
-            ? $this->processors[$index]['attributes']['group']
+        return isset($this->processors[$index][1]['group'])
+            ? $this->processors[$index][1]['group']
             : null;
     }
 
@@ -182,10 +182,10 @@ class OptimizedProcessorIterator extends ProcessorIterator
         $result = [];
         $groupIndex = 0;
         foreach ($this->processors as $processor) {
-            if (!isset($processor['attributes']['group'])) {
+            if (!isset($processor[1]['group'])) {
                 continue;
             }
-            $group = $processor['attributes']['group'];
+            $group = $processor[1]['group'];
             if (!isset($result[$group])) {
                 $result[$group] = $groupIndex;
                 $groupIndex++;

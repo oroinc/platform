@@ -199,16 +199,6 @@ class AddActivityTargetTest extends \PHPUnit_Framework_TestCase
                 $this->equalTo(true)
             );
 
-        $this->activityListChainProvider->expects($this->any())
-            ->method('getActivityListEntitiesByActivityEntity')
-            ->with(
-                $this->equalTo($email)
-            )->will($this->returnValue($list = new ActivityList()));
-
-        $this->entityManager->expects($this->once())
-            ->method('persist')
-            ->with($this->equalTo($list));
-
         $this->emailActivityManager->expects($this->once())
             ->method('addAssociation')
             ->with(
@@ -245,16 +235,6 @@ class AddActivityTargetTest extends \PHPUnit_Framework_TestCase
 
         $this->contextAccessor->expects($this->never())
             ->method('setValue');
-
-        $this->activityListChainProvider->expects($this->any())
-            ->method('getActivityListEntitiesByActivityEntity')
-            ->with(
-                $this->equalTo($email)
-            )->will($this->returnValue($list = new ActivityList()));
-
-        $this->entityManager->expects($this->once())
-            ->method('persist')
-            ->with($this->equalTo($list));
 
         $this->emailActivityManager->expects($this->once())
             ->method('addAssociation')

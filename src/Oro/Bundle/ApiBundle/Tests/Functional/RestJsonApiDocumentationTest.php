@@ -11,9 +11,13 @@ use Symfony\Component\Routing\Route;
 use Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class RestJsonApiDocumentationTest extends RestJsonApiTestCase
 {
     const VIEW = 'rest_json_api';
@@ -94,14 +98,7 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
     public function testSimpleDataTypesInRequestAndResponse()
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
-        $docs = $this->filterDocs(
-            $this->getExtractor()->all(self::VIEW),
-            function (Route $route) use ($entityType) {
-                return
-                    $route->getDefault('entity') === $entityType
-                    && $route->getDefault('_action') === ApiActions::CREATE;
-            }
-        );
+        $docs = $this->getEntityDocsForAction($entityType, ApiActions::CREATE);
 
         $data = $this->getSimpleFormatter()->format($docs);
         $resourceData = reset($data);
@@ -116,19 +113,42 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
     public function testSimpleDataTypesInFilters()
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
-        $docs = $this->filterDocs(
-            $this->getExtractor()->all(self::VIEW),
-            function (Route $route) use ($entityType) {
-                return
-                    $route->getDefault('entity') === $entityType
-                    && $route->getDefault('_action') === ApiActions::GET_LIST;
-            }
-        );
+        $docs = $this->getEntityDocsForAction($entityType, ApiActions::GET_LIST);
 
         $data = $this->getSimpleFormatter()->format($docs);
         $resourceData = reset($data);
         $resourceData = reset($resourceData);
         $expectedData = $this->loadYamlData('simple_data_types_filters.yml', 'documentation');
+        self::assertArrayContains($expectedData, $resourceData);
+    }
+
+    /**
+     * @depends testWarmUpCache
+     */
+    public function testAssociationsInRequestAndResponse()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $docs = $this->getEntityDocsForAction($entityType, ApiActions::CREATE);
+
+        $data = $this->getSimpleFormatter()->format($docs);
+        $resourceData = reset($data);
+        $resourceData = reset($resourceData);
+        $expectedData = $this->loadYamlData('associations.yml', 'documentation');
+        self::assertArrayContains($expectedData, $resourceData);
+    }
+
+    /**
+     * @depends testWarmUpCache
+     */
+    public function testAssociationsInFilters()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $docs = $this->getEntityDocsForAction($entityType, ApiActions::GET_LIST);
+
+        $data = $this->getSimpleFormatter()->format($docs);
+        $resourceData = reset($data);
+        $resourceData = reset($resourceData);
+        $expectedData = $this->loadYamlData('associations_filters.yml', 'documentation');
         self::assertArrayContains($expectedData, $resourceData);
     }
 
@@ -276,6 +296,24 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
         }
 
         return $message;
+    }
+
+    /**
+     * @param string $entityType
+     * @param string $action
+     *
+     * @return array
+     */
+    protected function getEntityDocsForAction($entityType, $action)
+    {
+        return $this->filterDocs(
+            $this->getExtractor()->all(self::VIEW),
+            function (Route $route) use ($entityType, $action) {
+                return
+                    $route->getDefault('entity') === $entityType
+                    && $route->getDefault('_action') === $action;
+            }
+        );
     }
 
     /**

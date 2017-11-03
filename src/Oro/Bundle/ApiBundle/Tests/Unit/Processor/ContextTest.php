@@ -225,6 +225,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->context->setResponseDocumentBuilder($documentBuilder);
         $this->assertSame($documentBuilder, $this->context->getResponseDocumentBuilder());
 
+        $documentBuilder->expects(self::once())
+            ->method('clear');
         $this->context->setResponseDocumentBuilder(null);
         $this->assertNull($this->context->getResponseDocumentBuilder());
     }

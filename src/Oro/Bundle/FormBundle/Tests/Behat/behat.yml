@@ -61,3 +61,7 @@ oro_behat_extension:
 
     PrettyCheckbox:
       class: Oro\Bundle\FormBundle\Tests\Behat\Element\PrettyCheckbox
+
+    TypeableInput:
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\TypeableInput
+

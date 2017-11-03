@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridInterface;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow;
@@ -771,6 +772,27 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         }
     }
 
+    /**
+     * Assert that mass action checkbox is unchecked for a record.
+     * Example: Then I should see "Priority" record unchecked
+     *
+     * @Then /^I should see (?P<content>[\w\s]+) unchecked record in grid$/
+     * @Then /^I should see (?P<content>[\w\s]+) unchecked record in "(?P<gridName>[\w\s]+)"$/
+     *
+     * @param string $content
+     * @param string|null $gridName
+     */
+    public function assertRecordIsUnchecked($content, $gridName = null)
+    {
+        /** @var Grid $grid */
+        $grid = $this->getGrid($gridName);
+
+        static::assertTrue(
+            $grid->isRecordUnchecked($content),
+            sprintf('Record with "%s" content is checked', $content)
+        );
+    }
+
     //@codingStandardsIgnoreStart
     /**
      * Filter grid by string filter
@@ -898,6 +920,38 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterItem = $this->getGridFilters($filterGridName)
             ->getFilterItem($filterGridName . 'FilterItem', $filterName);
         $filterItem->reset();
+    }
+
+    /**
+     * Example: Then I should see grid with filter hints:
+     *            | Any Text: contains "Lamp" |
+     *
+     * @When /^(?:|I )should see grid with filter hints:$/
+     *
+     * @param TableNode $table
+     */
+    public function shouldSeeGridWithFilterHints(TableNode $table)
+    {
+        $hints = array_filter(
+            array_map(
+                function ($item) {
+                    $label = trim($this->createElement('GridFilterHintLabel', $item)->getText());
+                    $text = trim($this->createElement('GridFilterHint', $item)->getText());
+
+                    return $label && $text ? sprintf('%s %s', $label, $text) : '';
+                },
+                $this->findAllElements('GridFilterHintItem')
+            )
+        );
+
+        foreach ($table->getRows() as $row) {
+            list($hint) = $row;
+
+            $this->assertTrue(
+                in_array($hint, $hints, true),
+                sprintf('Hint "%s" not found on page', $hint)
+            );
+        }
     }
 
     /**
@@ -1071,7 +1125,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * Click on first row action.
-     * Example: And click view on first row in grid
+     * Example: And click "view" on first row in grid
      *
      * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in grid$/
      * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in "(?P<gridName>[\w\s]+)" grid$/
@@ -1274,13 +1328,13 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             Example: Then I should see following records in grid:
                        | Alice1  |
                        | Alice10 |
-            
+
             Guess, you can use another method...
-            
+
             And I should see following grid:
                 | First name | Last name | Primary Email     | Enabled | Status |
                 | John       | Doe       | admin@example.com | Enabled | Active |
-                
+
 TEXT;
 
         self::assertCount(1, $table->getRow(0), $errorMessage);
@@ -1716,5 +1770,45 @@ TEXT;
 
         $rows = $table->getRows();
         self::assertCount(0, $rows);
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Example: I should see mass action checkbox in row with "shirt_main" content for grid
+     * Example: I should see mass action checkbox in row with "shirt_main" content for "Frontend Grid"
+     *
+     * @Then /^I should see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for grid$/
+     * @Then /^I should see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for "(?P<gridName>[\w\s]+)"$/
+     *
+     * @param string $content
+     * @param string|null $gridName
+     */
+    //@codingStandardsIgnoreEnd
+    public function iShouldSeeMassActionCheckbox(string $content, string $gridName = null)
+    {
+        static::assertTrue(
+            $this->getGrid($gridName)->getRowByContent($content)->hasMassActionCheckbox(),
+            sprintf('Grid row with "%s" content has no mass action checkbox in it', $content)
+        );
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Example: I should not see mass action checkbox in row with "shirt_main" content for grid
+     * Example: I should not see mass action checkbox in row with "shirt_main" content for "Frontend Grid"
+     *
+     * @Then /^I should not see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for grid$/
+     * @Then /^I should not see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for "(?P<gridName>[\w\s]+)"$/
+     *
+     * @param string $content
+     * @param string|null $gridName
+     */
+    //@codingStandardsIgnoreEnd
+    public function iShouldNotSeeMassActionCheckbox(string $content, string $gridName = null)
+    {
+        static::assertFalse(
+            $this->getGrid($gridName)->getRowByContent($content)->hasMassActionCheckbox(),
+            sprintf('Grid row with "%s" content has mass action checkbox in it', $content)
+        );
     }
 }

@@ -45,6 +45,11 @@ final class FeatureStatisticSubscriber implements EventListener
     private $gitTarget;
 
     /**
+     * @var bool
+     */
+    private $skip = false;
+
+    /**
      * FeatureStatisticSubscriber constructor.
      * @param StatisticRepositoryInterface $featureRepository
      * @param string $basePath
@@ -71,6 +76,10 @@ final class FeatureStatisticSubscriber implements EventListener
      */
     public function listenEvent(Formatter $formatter, Event $event, $eventName)
     {
+        if ($this->skip) {
+            return;
+        }
+
         if ($event instanceof BeforeFeatureTested) {
             $this->record();
         }
@@ -99,6 +108,10 @@ final class FeatureStatisticSubscriber implements EventListener
      */
     public function captureStats(AfterFeatureTested $event)
     {
+        if (!$event->getTestResult()->isPassed()) {
+            return;
+        }
+
         $this->timer->stop();
         $stat = new FeatureStatistic();
         $stat
@@ -116,5 +129,13 @@ final class FeatureStatisticSubscriber implements EventListener
     public function saveStats()
     {
         $this->featureRepository->flush();
+    }
+
+    /**
+     * @param bool $skip
+     */
+    public function setSkip(bool $skip)
+    {
+        $this->skip = $skip;
     }
 }

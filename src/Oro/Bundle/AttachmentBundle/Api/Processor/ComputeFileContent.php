@@ -45,22 +45,25 @@ class ComputeFileContent implements ProcessorInterface
         }
 
         $config = $context->getConfig();
-        if (null === $config) {
+
+        $contentFieldName = $config->findFieldNameByPropertyPath('file');
+        if (!$contentFieldName
+            || $config->getField($contentFieldName)->isExcluded()
+            || array_key_exists($contentFieldName, $data)
+        ) {
+            // the content field is undefined, excluded or already added
             return;
         }
 
-        $contentField = $config->getField('content');
-        if (!$contentField || $contentField->isExcluded()) {
+        $fileNameFieldName = $config->findFieldNameByPropertyPath('filename');
+        if (!$fileNameFieldName || empty($data[$fileNameFieldName])) {
+            // the file name field is undefined or its value is not specified
             return;
         }
 
-        if (empty($data['filename'])) {
-            return;
-        }
-
-        $content = $this->getFileContent($data['filename']);
+        $content = $this->getFileContent($data[$fileNameFieldName]);
         if (null !== $content) {
-            $data[$contentField->getPropertyPath()] = $content;
+            $data[$contentFieldName] = $content;
             $context->setResult($data);
         }
     }

@@ -33,4 +33,3 @@ Feature: Web install
     Then I should be on the 5 step
     When I press Launch application button
     Then I should be on the admin login page
-

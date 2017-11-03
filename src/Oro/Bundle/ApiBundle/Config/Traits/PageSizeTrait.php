@@ -28,9 +28,11 @@ trait PageSizeTrait
      */
     public function getPageSize()
     {
-        return array_key_exists(EntityDefinitionConfig::PAGE_SIZE, $this->items)
-            ? $this->items[EntityDefinitionConfig::PAGE_SIZE]
-            : null;
+        if (!array_key_exists(EntityDefinitionConfig::PAGE_SIZE, $this->items)) {
+            return null;
+        }
+
+        return $this->items[EntityDefinitionConfig::PAGE_SIZE];
     }
 
     /**
