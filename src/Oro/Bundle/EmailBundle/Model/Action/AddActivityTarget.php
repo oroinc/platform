@@ -68,10 +68,6 @@ class AddActivityTarget extends AbstractAction
         $email = $this->contextAccessor->getValue($context, $this->activityEntity);
         $targetEntity = $this->contextAccessor->getValue($context, $this->targetEntity);
 
-        $activityList = $this->chainProvider->getActivityListEntitiesByActivityEntity($email);
-        if ($activityList) {
-            $this->entityManager->persist($activityList);
-        }
         $result = $this->activityManager->addAssociation($email, $targetEntity);
 
         if ($this->attribute !== null) {

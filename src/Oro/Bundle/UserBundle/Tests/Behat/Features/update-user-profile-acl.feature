@@ -1,3 +1,4 @@
+@regression
 @fixture-OroUserBundle:manager.yml
 Feature: Update user profile acl
   In order to control for users ability to update their own profile
