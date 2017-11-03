@@ -13,9 +13,11 @@ define(function(require) {
 
         initialize: function() {
             var self = this;
-            var index = this.$(window.location.hash).parents('.responsive-section').index();
-
-            index = index !== -1 ? index : 0;
+            //TODO: uncomment when scrol to section will be fixed
+            // var index = this.$(window.location.hash).parents('.responsive-section').index();
+            //
+            // index = index !== -1 ? index : 0;
+            var index = 0;
 
             this.$('.responsive-section').not(':nth-child(' + (index + 1) + ')').each(function(index, el) {
                 self.subview('form-section-loading-' + index, new FormSectionLoadingView({
