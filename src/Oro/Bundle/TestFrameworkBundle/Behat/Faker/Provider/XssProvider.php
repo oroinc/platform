@@ -54,7 +54,7 @@ class XssProvider extends BaseProvider
         if (!$elementId) {
             $elementId = $this->prefix . ++self::$idx;
         }
-        $jsPayload = sprintf('_x("%s","%s");', $elementId, $identifier);
+        $jsPayload = sprintf('_x("%s","%s")', $elementId, $identifier);
 
         return sprintf($this->payloadProvider->getPayload($jsPayload, $payloadType, $elementId));
     }

