@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
-use Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass;
+use Oro\Component\ChainProcessor\DependencyInjection\LoadApplicableCheckersCompilerPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocConfigurationCompilerPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiSecurityFirewallCompilerPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ConfigurationCompilerPass;
@@ -39,17 +39,10 @@ class OroApiBundle extends Bundle
         $container->addCompilerPass(new ConstraintTextExtractorConfigurationCompilerPass());
         $container->addCompilerPass(new QueryExpressionCompilerPass());
         $container->addCompilerPass(
-            new LoadProcessorsCompilerPass(
-                'oro_api.processor_bag',
-                'oro.api.processor',
-                'oro.api.processor.applicable_checker'
-            )
+            new LoadApplicableCheckersCompilerPass('oro_api.processor_bag', 'oro.api.processor.applicable_checker')
         );
         $container->addCompilerPass(
-            new CleanUpProcessorsCompilerPass(
-                'oro_api.simple_processor_factory',
-                'oro.api.processor'
-            ),
+            new CleanUpProcessorsCompilerPass('oro_api.simple_processor_factory', 'oro.api.processor'),
             PassConfig::TYPE_BEFORE_REMOVING
         );
         $container->addCompilerPass(
