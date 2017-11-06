@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
-use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
+use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 
 /**
  * Validates and fill included entities.
@@ -20,19 +20,19 @@ abstract class ProcessIncludedEntities implements ProcessorInterface
     /** @var ActionProcessorBagInterface */
     protected $processorBag;
 
-    /** @var ErrorCompleterInterface */
-    protected $errorCompleter;
+    /** @var ErrorCompleterRegistry */
+    protected $errorCompleterRegistry;
 
     /**
      * @param ActionProcessorBagInterface $processorBag
-     * @param ErrorCompleterInterface     $errorCompleter
+     * @param ErrorCompleterRegistry      $errorCompleterRegistry
      */
     public function __construct(
         ActionProcessorBagInterface $processorBag,
-        ErrorCompleterInterface $errorCompleter
+        ErrorCompleterRegistry $errorCompleterRegistry
     ) {
         $this->processorBag = $processorBag;
-        $this->errorCompleter = $errorCompleter;
+        $this->errorCompleterRegistry = $errorCompleterRegistry;
     }
 
     /**
@@ -105,10 +105,11 @@ abstract class ProcessIncludedEntities implements ProcessorInterface
         $actionProcessor->process($actionContext);
 
         if ($actionContext->hasErrors()) {
+            $errorCompleter = $this->errorCompleterRegistry->getErrorCompleter($actionContext->getRequestType());
             $actionMetadata = $actionContext->getMetadata();
             $errors = $actionContext->getErrors();
             foreach ($errors as $error) {
-                $this->errorCompleter->complete($error, $actionMetadata);
+                $errorCompleter->complete($error, $actionMetadata);
                 $this->fixErrorPath($error, $entityData->getPath());
                 $context->addError($error);
             }

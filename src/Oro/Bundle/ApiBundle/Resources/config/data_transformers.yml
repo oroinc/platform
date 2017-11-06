@@ -3,7 +3,7 @@ services:
         public: false
         class: Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry
         arguments:
-            - [] # transformers. They are set by \Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DataTransformerConfigurationCompilerPass
+            - [] # transformers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DataTransformerConfigurationCompilerPass
             - '@oro_api.request_expression_matcher'
         lazy: true
 

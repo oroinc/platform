@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 use Doctrine\Common\Collections\Criteria;
 
 use Oro\Component\ChainProcessor\ProcessorBag;
+use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Model\Range;
@@ -31,7 +32,8 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $processorFactory = $this->createMock(ProcessorFactoryInterface::class);
-        $processorBag = new ProcessorBag($processorFactory);
+        $builder = new ProcessorBagConfigBuilder();
+        $processorBag = new ProcessorBag($builder, $processorFactory);
 
         $entityAliasResolver = $this->createMock(EntityAliasResolver::class);
         $entityAliasResolver->expects($this->any())
@@ -50,75 +52,75 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $processorMap = [
             [
-                $this->addProcessor($processorBag, 'string', DataType::STRING),
+                $this->addProcessor($builder, 'string', DataType::STRING),
                 new Processor\NormalizeString()
             ],
             [
-                $this->addProcessor($processorBag, 'bigint', DataType::BIGINT),
+                $this->addProcessor($builder, 'bigint', DataType::BIGINT),
                 new Processor\NormalizeBigint()
             ],
             [
-                $this->addProcessor($processorBag, 'smallint', DataType::SMALLINT),
+                $this->addProcessor($builder, 'smallint', DataType::SMALLINT),
                 new Processor\NormalizeInteger()
             ],
             [
-                $this->addProcessor($processorBag, 'integer', DataType::INTEGER),
+                $this->addProcessor($builder, 'integer', DataType::INTEGER),
                 new Processor\NormalizeInteger()
             ],
             [
-                $this->addProcessor($processorBag, 'duration', DataType::DURATION),
+                $this->addProcessor($builder, 'duration', DataType::DURATION),
                 new Processor\NormalizeInteger()
             ],
             [
-                $this->addProcessor($processorBag, 'unsigned_integer', DataType::UNSIGNED_INTEGER),
+                $this->addProcessor($builder, 'unsigned_integer', DataType::UNSIGNED_INTEGER),
                 new Processor\NormalizeUnsignedInteger()
             ],
             [
-                $this->addProcessor($processorBag, 'boolean', DataType::BOOLEAN),
+                $this->addProcessor($builder, 'boolean', DataType::BOOLEAN),
                 new Processor\NormalizeBoolean()
             ],
             [
-                $this->addProcessor($processorBag, 'decimal', DataType::DECIMAL),
+                $this->addProcessor($builder, 'decimal', DataType::DECIMAL),
                 new Processor\NormalizeDecimal()
             ],
             [
-                $this->addProcessor($processorBag, 'money', DataType::MONEY),
+                $this->addProcessor($builder, 'money', DataType::MONEY),
                 new Processor\NormalizeDecimal()
             ],
             [
-                $this->addProcessor($processorBag, 'float', DataType::FLOAT),
+                $this->addProcessor($builder, 'float', DataType::FLOAT),
                 new Processor\NormalizeNumber()
             ],
             [
-                $this->addProcessor($processorBag, 'percent', DataType::PERCENT),
+                $this->addProcessor($builder, 'percent', DataType::PERCENT),
                 new Processor\NormalizeNumber()
             ],
             [
-                $this->addProcessor($processorBag, 'guid', DataType::GUID),
+                $this->addProcessor($builder, 'guid', DataType::GUID),
                 new Processor\NormalizeString()
             ],
             [
-                $this->addProcessor($processorBag, 'entityClass', DataType::ENTITY_CLASS),
+                $this->addProcessor($builder, 'entityClass', DataType::ENTITY_CLASS),
                 new Processor\NormalizeEntityClass($entityAliasResolver)
             ],
             [
-                $this->addProcessor($processorBag, 'entityType', DataType::ENTITY_TYPE),
+                $this->addProcessor($builder, 'entityType', DataType::ENTITY_TYPE),
                 new Processor\NormalizeEntityType($entityAliasResolver)
             ],
             [
-                $this->addProcessor($processorBag, 'rest.datetime', DataType::DATETIME, [RequestType::REST]),
+                $this->addProcessor($builder, 'rest.datetime', DataType::DATETIME, [RequestType::REST]),
                 new Processor\Rest\NormalizeDateTime()
             ],
             [
-                $this->addProcessor($processorBag, 'rest.date', DataType::DATE, [RequestType::REST]),
+                $this->addProcessor($builder, 'rest.date', DataType::DATE, [RequestType::REST]),
                 new Processor\Rest\NormalizeDate()
             ],
             [
-                $this->addProcessor($processorBag, 'rest.time', DataType::TIME, [RequestType::REST]),
+                $this->addProcessor($builder, 'rest.time', DataType::TIME, [RequestType::REST]),
                 new Processor\Rest\NormalizeTime()
             ],
             [
-                $this->addProcessor($processorBag, 'rest.order_by', DataType::ORDER_BY, [RequestType::REST]),
+                $this->addProcessor($builder, 'rest.order_by', DataType::ORDER_BY, [RequestType::REST]),
                 new Processor\Rest\NormalizeOrderBy()
             ],
         ];
@@ -1644,15 +1646,19 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param ProcessorBag         $processorBag
-     * @param string               $processorId
-     * @param string|null          $dataType
-     * @param string|string[]|null $requestType
+     * @param ProcessorBagConfigBuilder $processorBagConfigBuilder
+     * @param string                    $processorId
+     * @param string|null               $dataType
+     * @param string|string[]|null      $requestType
      *
      * @return string
      */
-    protected function addProcessor(ProcessorBag $processorBag, $processorId, $dataType = null, $requestType = null)
-    {
+    protected function addProcessor(
+        ProcessorBagConfigBuilder $processorBagConfigBuilder,
+        $processorId,
+        $dataType = null,
+        $requestType = null
+    ) {
         $attributes = [];
         if (null !== $dataType) {
             $attributes['dataType'] = $dataType;
@@ -1660,7 +1666,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
         if (null !== $requestType) {
             $attributes['requestType'] = is_array($requestType) ? ['&' => $requestType] : $requestType;
         }
-        $processorBag->addProcessor($processorId, $attributes, 'normalize_value', null, -10);
+        $processorBagConfigBuilder->addProcessor($processorId, $attributes, 'normalize_value', null, -10);
 
         return $processorId;
     }
