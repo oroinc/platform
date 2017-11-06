@@ -33,9 +33,3 @@ Feature: Web install
     Then I should be on the 5 step
     When I press Launch application button
     Then I should be on the admin login page
-
-  Scenario: Check link to the documentation
-    Given I am on "/install.php/login"
-    And I should see "Oro Installer"
-    When I click on "Get help"
-    Then the documentation "https://www.orocommerce.com/documentation/current/install-upgrade" will opened

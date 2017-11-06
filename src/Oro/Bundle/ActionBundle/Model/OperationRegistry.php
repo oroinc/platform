@@ -179,6 +179,9 @@ class OperationRegistry
      */
     private function isEntityClassMatched(OperationFindCriteria $criteria, array $config)
     {
+        if (in_array('index', (array)$config['entities'])) {
+            return true;
+        }
         $applicable = $this->match(
             $criteria->getEntityClass(),
             $this->filterEntities((array)$config['entities']),

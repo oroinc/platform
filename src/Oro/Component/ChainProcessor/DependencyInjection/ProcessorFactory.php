@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 
 /**
- * A factory that can be used to get processors from DI container
+ * A factory that can be used to get processors from DIC.
  */
 class ProcessorFactory implements ProcessorFactoryInterface
 {

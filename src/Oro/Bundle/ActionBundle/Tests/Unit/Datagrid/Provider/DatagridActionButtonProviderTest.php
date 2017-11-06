@@ -166,18 +166,16 @@ class DatagridActionButtonProviderTest extends \PHPUnit_Framework_TestCase
             $this->provider->setGroups($groups);
         }
 
-        if ($this->provider->hasActions($datagridConfig)) {
-            $this->provider->applyActions($datagridConfig);
+        $this->provider->applyActions($datagridConfig);
 
-            $actionConfigurationCallback = $datagridConfig->offsetGetOr(ActionExtension::ACTION_CONFIGURATION_KEY, []);
+        $actionConfigurationCallback = $datagridConfig->offsetGetOr(ActionExtension::ACTION_CONFIGURATION_KEY, []);
 
-            if ($actionConfigurationCallback) {
-                $this->assertInstanceOf('Closure', $actionConfigurationCallback);
+        if ($actionConfigurationCallback) {
+            $this->assertInstanceOf('Closure', $actionConfigurationCallback);
 
-                $this->assertEquals($expectedActions, $actionConfigurationCallback($record, []));
-            } else {
-                $this->assertEmpty($actionConfigurationCallback);
-            }
+            $this->assertEquals($expectedActions, $actionConfigurationCallback($record, []));
+        } else {
+            $this->assertEmpty($actionConfigurationCallback);
         }
     }
 
@@ -337,8 +335,8 @@ class DatagridActionButtonProviderTest extends \PHPUnit_Framework_TestCase
                     ]
                 ),
                 'expectedActions' => [
-                    'action1' => ['option1' => 'value1', 'option2' => 'value2', 'key1' => 'value1'],
-                    'action2' => ['option1' => 'value1', 'option2' => 'value2', 'key1' => 'value1'],
+                    'operation1' => ['option1' => 'value1', 'option2' => 'value2', 'key1' => 'value1'],
+                    'operation2' => ['option1' => 'value1', 'option2' => 'value2', 'key1' => 'value1'],
                 ],
             ],
             '1 allowed action' => [
@@ -351,8 +349,8 @@ class DatagridActionButtonProviderTest extends \PHPUnit_Framework_TestCase
                     ]
                 ),
                 'expectedActions' => [
-                    'action1' => ['option1' => 'value1', 'option2' => 'value2', 'key1' => 'value1'],
-                    'action3' => false
+                    'operation1' => ['option1' => 'value1', 'option2' => 'value2', 'key1' => 'value1'],
+                    'operation3' => false
                 ],
             ],
             '1 allowed action and array parent config' => [

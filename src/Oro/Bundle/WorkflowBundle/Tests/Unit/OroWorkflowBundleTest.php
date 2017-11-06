@@ -6,7 +6,7 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Oro\Bundle\WorkflowBundle\Async\Topics;
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler;
 use Oro\Bundle\WorkflowBundle\OroWorkflowBundle;
-use Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass;
+use Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
@@ -29,8 +29,8 @@ class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
             $this->isInstanceOf(Compiler\EventTriggerExtensionCompilerPass::class),
             $this->isInstanceOf(Compiler\WorkflowConfigurationHandlerCompilerPass::class),
             $this->isInstanceOf(Compiler\WorkflowDefinitionBuilderExtensionCompilerPass::class),
-            new LoadProcessorsCompilerPass(
-                'oro_workflow.processor_bag',
+            new LoadAndBuildProcessorsCompilerPass(
+                'oro_workflow.processor_bag_config_provider',
                 'oro_workflow.processor'
             ),
             $this->isInstanceOf(Compiler\EventsCompilerPass::class),

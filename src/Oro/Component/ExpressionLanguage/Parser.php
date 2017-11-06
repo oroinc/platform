@@ -12,7 +12,7 @@ use Symfony\Component\ExpressionLanguage\TokenStream;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  *
  * Copy of \Symfony\Component\ExpressionLanguage\Parser with
- * denied methods calls, special "all" and "any" methods for collections with expression as argument
+ * denied methods calls, special "all", "any" and "sum" methods for collections with expression as argument
  */
 class Parser
 {
@@ -91,6 +91,7 @@ class Parser
         $this->methods = [
             'all' => CustomNode\GetAttrNode::ALL_CALL,
             'any' => CustomNode\GetAttrNode::ANY_CALL,
+            'sum' => CustomNode\GetAttrNode::SUM_CALL,
         ];
     }
 
