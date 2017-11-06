@@ -301,7 +301,7 @@ class ImportExportContext extends OroFeatureContext implements
      */
     public function tryImportFile()
     {
-        $importSubmitButton = $this->getPage()->find('css','#import_button');
+        $importSubmitButton = $this->getPage()->find('css', '#import_button');
 
         if (null === $importSubmitButton) {
             $this->getPage()->clickLink('Import file');
