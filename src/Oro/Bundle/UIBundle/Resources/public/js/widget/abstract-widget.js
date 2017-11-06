@@ -35,7 +35,8 @@ define(function(require) {
             container: null,
             submitHandler: function() {
                 this.trigger('adoptedFormSubmit', this.form, this);
-            }
+            },
+            initLayoutOptions: null
         },
 
         loadingElement: null,
@@ -857,7 +858,7 @@ define(function(require) {
             this._renderInContainer();
             this.trigger('renderComplete', this.$el, this);
             this.getLayoutElement().attr('data-layout', 'separate');
-            this.initLayout()
+            this.initLayout(this.options.initLayoutOptions || {})
                 .done(_.bind(this._afterLayoutInit, this));
         },
 
