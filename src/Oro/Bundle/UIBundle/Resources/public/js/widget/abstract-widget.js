@@ -712,6 +712,7 @@ define(function(require) {
             if (jqxhr.status === 403) {
                 message = __('oro.ui.forbidden_error');
             } else if (jqxhr.status === 404) {
+                mediator.trigger('widget:notFound');
                 mediator.execute('refreshPage');
                 return;
             }

@@ -64,6 +64,10 @@ oro_behat_extension:
     Tooltip Container:
       selector: '.popover-content'
 
+    Shopping List Config:
+      selector: 'form[name="shopping_list"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+
   suites:
     OroConfigBundle:
       contexts:

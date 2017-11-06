@@ -27,13 +27,14 @@ abstract class ApiTestCase extends WebTestCase
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
+    /** @var bool */
+    private $isKernelRebootDisabled = false;
+
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->initClient([], $this->getRequestParameters());
-
         /** @var ContainerInterface $container */
         $container = $this->getContainer();
 
@@ -346,12 +347,21 @@ abstract class ApiTestCase extends WebTestCase
      * for each configuration.
      * Please note that the configuration is restored after each test and you do not need to do it manually.
      *
-     * @param string $entityClass
-     * @param array  $config
+     * @param string $entityClass          The class name of API resource
+     * @param array $config                The config to append,
+     *                                     e.g. ['fields' => ['renamedField' => ['property_path' => 'field']]]
+     * @param bool   $affectResourcesCache Whether the appended config affects the API resources or sub-resources
+     *                                     cache. E.g. this can happen when an association is renamed or excluded,
+     *                                     or when a API resource is added or excluded
      */
-    public function appendEntityConfig($entityClass, array $config)
+    public function appendEntityConfig($entityClass, array $config, $affectResourcesCache = false)
     {
-        $this->getConfigRegistry()->appendEntityConfig($entityClass, $config);
+        $this->getConfigRegistry()->appendEntityConfig($entityClass, $config, $affectResourcesCache);
+        // disable the kernel reboot to avoid loosing of changes in configs
+        if (null !== $this->client && !$this->isKernelRebootDisabled) {
+            $this->client->disableReboot();
+            $this->isKernelRebootDisabled = true;
+        }
     }
 
     /**
@@ -362,5 +372,12 @@ abstract class ApiTestCase extends WebTestCase
     protected function restoreConfigs()
     {
         $this->getConfigRegistry()->restoreConfigs();
+        // restore the kernel reboot if it was disabled in appendEntityConfig method
+        if ($this->isKernelRebootDisabled) {
+            $this->isKernelRebootDisabled = false;
+            if (null !== $this->client) {
+                $this->client->enableReboot();
+            }
+        }
     }
 }

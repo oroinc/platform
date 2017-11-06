@@ -10,7 +10,11 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Oro\Bundle\DistributionBundle\Entity\Composer\Config;
+use Oro\Bundle\HelpBundle\Annotation\Help;
 
+/**
+ * @Help(link="https://www.orocommerce.com/documentation/current/install-upgrade")
+ */
 class SettingsController extends Controller
 {
     /**

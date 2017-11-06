@@ -55,6 +55,20 @@
             font-size: $checkbox-icon-check-size;
             line-height: 1;
         }
+
+        &--circle {
+            border-radius: 50%;
+            @include fa-icon($checkbox-icon-circle-unchecked);
+        }
+
+        &--size-l {
+            width: $checkbox-icon-font-size--l;
+            height: $checkbox-icon-font-size--l;
+
+            &:before {
+                font-size: $checkbox-icon-check-size--l;
+            }
+        }
     }
 
     &__text {
@@ -69,9 +83,9 @@
             margin-left: $checkbox-icon-absolute-offset;
         }
 
-       .custom-checkbox__icon {
-           position: absolute;
-           left: 0;
-       }
+        .custom-checkbox__icon {
+            position: absolute;
+            left: 0;
+        }
     }
 }

@@ -60,6 +60,7 @@ class GetAttrNodeTest extends AbstractNodeTest
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
     public function getCompileData()
@@ -135,6 +136,24 @@ class GetAttrNodeTest extends AbstractNodeTest
                         new Node\ConstantNode(10)
                     ),
                     CustomNode\GetAttrNode::ANY_CALL
+                ),
+                ['foo' => new SimpleObject()]
+            ],
+            [
+                'call_user_func(function ($__variables) { foreach ($__variables as $__name => $__value) '
+                .'{ $$__name = $__value; } $__result = false; foreach ($foo as $fooItem ) '
+                .'{ $__evaluated_result = $fooItem->index; '
+                .'$__result += $__evaluated_result; } return $__result; }, get_defined_vars())',
+                new CustomNode\GetAttrNode(
+                    new Node\NameNode('foo'),
+                    new Node\ConstantNode('all'),
+                    new CustomNode\GetAttrNode(
+                        new Node\NameNode('fooItem'),
+                        new Node\ConstantNode('index'),
+                        new Node\ArgumentsNode(),
+                        CustomNode\GetAttrNode::PROPERTY_CALL
+                    ),
+                    CustomNode\GetAttrNode::SUM_CALL
                 ),
                 ['foo' => new SimpleObject()]
             ],
@@ -281,5 +300,109 @@ class GetAttrNodeTest extends AbstractNodeTest
                 'expectedValue' => false,
             ]
         ];
+    }
+
+    /**
+     * @dataProvider sumMethodEvaluateDataProvider
+     *
+     * @param array $variables
+     * @param bool $expectedData
+     */
+    public function testMethodSumEvaluate(array $variables, $expectedData)
+    {
+        $argument = new CustomNode\GetAttrNode(
+            new Node\NameNode('item'),
+            new Node\ConstantNode('foo'),
+            new Node\ArgumentsNode(),
+            CustomNode\GetAttrNode::PROPERTY_CALL
+        );
+
+        $node = new CustomNode\GetAttrNode(
+            new Node\NameNode('items'),
+            new Node\ConstantNode('sum'),
+            $argument,
+            CustomNode\GetAttrNode::SUM_CALL
+        );
+        // items.sum(item.foo)
+        $this->assertSame($expectedData, $node->evaluate([], $variables));
+    }
+
+    /**
+     * @return array
+     */
+    public function sumMethodEvaluateDataProvider(): array
+    {
+        return [
+            'sum' => [
+                'variables' => [
+                    'items' => [
+                        [
+                            'foo' => 10,
+                        ],
+                        [
+                            'foo' => 20,
+                        ]
+                    ]
+                ],
+                'expectedValue' => 30,
+            ],
+            'sum float' => [
+                'variables' => [
+                    'items' => [
+                        [
+                            'foo' => 3.4,
+                        ],
+                        [
+                            'foo' => 20,
+                        ]
+                    ]
+                ],
+                'expectedValue' => 23.4,
+            ],
+        ];
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Unable to sum a non-numeric value, value: ''.
+     */
+    public function testMethodSumNonNumericEvaluate()
+    {
+        $variables = [
+            'items' => [
+                ['foo' => '']
+            ]
+        ];
+        $argument = new CustomNode\GetAttrNode(
+            new Node\NameNode('item'),
+            new Node\ConstantNode('foo'),
+            new Node\ArgumentsNode(),
+            CustomNode\GetAttrNode::PROPERTY_CALL
+        );
+
+        $node = new CustomNode\GetAttrNode(
+            new Node\NameNode('items'),
+            new Node\ConstantNode('sum'),
+            $argument,
+            CustomNode\GetAttrNode::SUM_CALL
+        );
+        // items.sum(item.foo)
+        $node->evaluate([], $variables);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Unable node type: -1. Available types are 1, 2, 3, 4, 5.
+     */
+    public function testUnknownNodeType()
+    {
+        $node = new CustomNode\GetAttrNode(
+            new Node\NameNode('item'),
+            new Node\ConstantNode('foo'),
+            new Node\ArgumentsNode(),
+            -1
+        );
+
+        $node->evaluate([], []);
     }
 }
