@@ -76,6 +76,8 @@ class ImportTypeTest extends FormIntegrationTestCase
     public function submitDataProvider()
     {
         $data = new ImportData();
+        $data->setProcessorAlias('importname');
+
         return array(
             'empty data' => array(
                 'submitData' => array(),
