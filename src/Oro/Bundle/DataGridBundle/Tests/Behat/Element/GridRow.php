@@ -18,7 +18,7 @@ class GridRow extends TableRow
      */
     public function checkMassActionCheckbox($cellNumber = 0)
     {
-        $rowCheckbox = $this->getCellByNumber($cellNumber)->find('css', '[type="checkbox"]');
+        $rowCheckbox = $this->getMassActionCheckbox($cellNumber);
         self::assertNotNull($rowCheckbox, sprintf('No mass action checkbox found for "%s"', $this->getText()));
 
         if ($rowCheckbox->isChecked()) {
@@ -33,7 +33,7 @@ class GridRow extends TableRow
      */
     public function uncheckMassActionCheckbox($cellNumber = 0)
     {
-        $rowCheckbox = $this->getCellByNumber($cellNumber)->find('css', '[type="checkbox"]');
+        $rowCheckbox = $this->getMassActionCheckbox($cellNumber);
         self::assertNotNull($rowCheckbox, sprintf('No mass action checkbox found for "%s"', $this->getText()));
 
         if (!$rowCheckbox->isChecked()) {
@@ -41,6 +41,15 @@ class GridRow extends TableRow
         }
 
         $rowCheckbox->click();
+    }
+
+    /**
+     * @param int $cellNumber
+     * @return bool
+     */
+    public function hasMassActionCheckbox($cellNumber = 0): bool
+    {
+        return $this->getMassActionCheckbox($cellNumber) !== null;
     }
 
     /**
@@ -198,5 +207,23 @@ class GridRow extends TableRow
         }
 
         return $links;
+    }
+
+    /**
+     * @param int $cellNumber
+     * @return bool
+     */
+    public function isMassActionChecked($cellNumber = 0): bool
+    {
+        return $this->getCellByNumber($cellNumber)->isChecked();
+    }
+
+    /**
+     * @param int $cellNumber
+     * @return NodeElement|null
+     */
+    private function getMassActionCheckbox($cellNumber)
+    {
+        return $this->getCellByNumber($cellNumber)->find('css', '[type="checkbox"]');
     }
 }

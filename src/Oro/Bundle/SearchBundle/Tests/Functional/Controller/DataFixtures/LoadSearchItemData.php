@@ -48,6 +48,7 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
             $item->phone = sprintf($ind % 2 ? '0123-456%s00' : '%s00987654', $ind);
 
             $manager->persist($item);
+            $this->addReference(sprintf('item_%d', $ind), $item);
         }
 
         $manager->flush();

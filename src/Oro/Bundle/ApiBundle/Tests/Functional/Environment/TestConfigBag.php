@@ -16,6 +16,9 @@ class TestConfigBag extends ConfigBag
     /** @var array */
     private $originalConfig;
 
+    /** @var array */
+    private $appendedConfig = [];
+
     /** @var bool */
     private $hasChanges = false;
 
@@ -36,10 +39,11 @@ class TestConfigBag extends ConfigBag
      */
     public function appendEntityConfig($entityClass, array $config)
     {
+        $this->appendedConfig['entities'][$entityClass] = $config;
         $processor = new Processor();
         $this->config = $processor->processConfiguration(
             new ApiConfiguration($this->extensionRegistry),
-            [$this->config, ['entities' => [$entityClass => $config]]]
+            [$this->originalConfig, $this->appendedConfig]
         );
         $this->hasChanges = true;
     }
@@ -54,6 +58,7 @@ class TestConfigBag extends ConfigBag
         }
 
         $this->config = $this->originalConfig;
+        $this->appendedConfig = [];
         $this->hasChanges = false;
 
         return true;

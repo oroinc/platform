@@ -47,8 +47,7 @@ class ApiDocMetadataParser implements ParserInterface
     {
         return
             isset($item['options']['metadata'])
-            && $item['options']['metadata'] instanceof ApiDocMetadata
-            && is_a($item['class'], ApiDocMetadata::class, true);
+            && $item['options']['metadata'] instanceof ApiDocMetadata;
     }
 
     /**

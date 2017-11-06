@@ -228,7 +228,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
                     new Reference('oro_api.config_provider'),
                     new Reference('oro_api.relation_config_provider'),
                     new Reference('oro_api.metadata_provider'),
-                    new Reference('oro_api.resources_cache')
+                    new Reference('oro_api.resources_cache.impl')
                 ]
             )
         );

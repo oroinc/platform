@@ -108,6 +108,10 @@ final class FeatureStatisticSubscriber implements EventListener
      */
     public function captureStats(AfterFeatureTested $event)
     {
+        if (!$event->getTestResult()->isPassed()) {
+            return;
+        }
+
         $this->timer->stop();
         $stat = new FeatureStatistic();
         $stat

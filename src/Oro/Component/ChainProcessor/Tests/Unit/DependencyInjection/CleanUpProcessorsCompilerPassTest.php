@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
+use Oro\Component\ChainProcessor\SimpleProcessorFactory;
 
 class CleanUpProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,11 +17,9 @@ class CleanUpProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $simpleProcessor = new Definition('Test\SimpleProcessor');
         $simpleProcessor->addTag('processor');
 
-        $container->addDefinitions(
-            [
-                'simple_processor' => $simpleProcessor,
-            ]
-        );
+        $container->addDefinitions([
+            'simple_processor' => $simpleProcessor,
+        ]);
 
         $compilerPass = new CleanUpProcessorsCompilerPass(
             'simple_factory',
@@ -29,14 +28,14 @@ class CleanUpProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
 
         $compilerPass->process($container);
 
-        $this->assertTrue($container->hasDefinition('simple_processor'));
+        self::assertTrue($container->hasDefinition('simple_processor'));
     }
 
     public function testProcess()
     {
         $container = new ContainerBuilder();
 
-        $simpleFactory = new Definition();
+        $simpleFactory = new Definition(SimpleProcessorFactory::class, [[]]);
 
         $simpleProcessor = new Definition('Test\SimpleProcessor');
         $simpleProcessor->addTag('processor');
@@ -52,15 +51,13 @@ class CleanUpProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $withArgumentsProcessor = new Definition('Test\WithArgumentsProcessor', ['test']);
         $withArgumentsProcessor->addTag('processor');
 
-        $container->addDefinitions(
-            [
-                'simple_factory'           => $simpleFactory,
-                'simple_processor'         => $simpleProcessor,
-                'abstract_processor'       => $abstractProcessor,
-                'lazy_processor'           => $lazyProcessor,
-                'with_arguments_processor' => $withArgumentsProcessor,
-            ]
-        );
+        $container->addDefinitions([
+            'simple_factory'           => $simpleFactory,
+            'simple_processor'         => $simpleProcessor,
+            'abstract_processor'       => $abstractProcessor,
+            'lazy_processor'           => $lazyProcessor,
+            'with_arguments_processor' => $withArgumentsProcessor,
+        ]);
 
         $compilerPass = new CleanUpProcessorsCompilerPass(
             'simple_factory',
@@ -69,19 +66,43 @@ class CleanUpProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
 
         $compilerPass->process($container);
 
-        $this->assertFalse($container->hasDefinition('simple_processor'));
-        $this->assertTrue($container->hasDefinition('abstract_processor'));
-        $this->assertTrue($container->hasDefinition('lazy_processor'));
-        $this->assertTrue($container->hasDefinition('with_arguments_processor'));
+        self::assertFalse($container->hasDefinition('simple_processor'));
+        self::assertTrue($container->hasDefinition('abstract_processor'));
+        self::assertTrue($container->hasDefinition('lazy_processor'));
+        self::assertTrue($container->hasDefinition('with_arguments_processor'));
 
-        $methodCalls = $simpleFactory->getMethodCalls();
-        $this->assertCount(1, $methodCalls);
-        $this->assertEquals(
-            [
-                'setProcessors',
-                [['simple_processor' => 'Test\SimpleProcessor']]
-            ],
-            $methodCalls[0]
+        self::assertEquals(
+            ['simple_processor' => 'Test\SimpleProcessor'],
+            $simpleFactory->getArgument(0)
+        );
+    }
+
+    public function testProcessForSimpleFactoryWithoutArguments()
+    {
+        $container = new ContainerBuilder();
+
+        $simpleFactory = new Definition(SimpleProcessorFactory::class, []);
+
+        $simpleProcessor = new Definition('Test\SimpleProcessor');
+        $simpleProcessor->addTag('processor');
+
+        $container->addDefinitions([
+            'simple_factory'   => $simpleFactory,
+            'simple_processor' => $simpleProcessor
+        ]);
+
+        $compilerPass = new CleanUpProcessorsCompilerPass(
+            'simple_factory',
+            'processor'
+        );
+
+        $compilerPass->process($container);
+
+        self::assertFalse($container->hasDefinition('simple_processor'));
+
+        self::assertEquals(
+            ['simple_processor' => 'Test\SimpleProcessor'],
+            $simpleFactory->getArgument(0)
         );
     }
 }
