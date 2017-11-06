@@ -66,10 +66,6 @@ class ImportTypeTest extends FormIntegrationTestCase
             [new ChoiceView($key, $key, 'oro.importexport.import.' . $key)],
             $form->createView()->offsetGet('processorAlias')->vars['choices']
         );
-        $this->assertEquals(
-            array('oro.importexport.import.' . $key),
-            $form->get('processorAlias')->getConfig()->getOption('preferred_choices')
-        );
 
         $form->submit($submitData);
 
@@ -80,8 +76,6 @@ class ImportTypeTest extends FormIntegrationTestCase
     public function submitDataProvider()
     {
         $data = new ImportData();
-        $data->setProcessorAlias('importname');
-
         return array(
             'empty data' => array(
                 'submitData' => array(),

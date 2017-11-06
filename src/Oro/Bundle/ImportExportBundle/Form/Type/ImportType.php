@@ -34,6 +34,7 @@ class ImportType extends AbstractType
         $builder->add('file', 'file');
 
         $processorChoices = $this->getImportProcessorsChoices($options['entityName']);
+        $processorNames = array_keys($processorChoices);
 
         $builder->add(
             'processorAlias',
@@ -42,8 +43,7 @@ class ImportType extends AbstractType
                 [
                     'choices' => $processorChoices,
                     'required' => true,
-                    'preferred_choices' => $processorChoices ? [reset($processorChoices)] : [],
-                    'empty_data' => key($processorChoices),
+                    'data' => reset($processorNames)
                 ],
                 $options['processorAliasOptions']
             )
