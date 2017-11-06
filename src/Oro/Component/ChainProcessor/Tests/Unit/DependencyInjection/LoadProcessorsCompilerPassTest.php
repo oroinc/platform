@@ -4,85 +4,26 @@ namespace Oro\Component\ChainProcessor\Tests\Unit\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass;
+use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 
 class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
 {
-    public function testProcessWithoutProcessorBag()
+    public function testProcessWithoutProcessorBagConfigBuilder()
     {
         $container = new ContainerBuilder();
 
         $processor1 = new Definition('Test\Processor1');
         $processor1->addTag('processor');
 
-        $container->addDefinitions(
-            [
-                'processor1' => $processor1,
-            ]
-        );
+        $container->addDefinitions([
+            'processor1' => $processor1
+        ]);
 
-        $compilerPass = new LoadProcessorsCompilerPass(
-            'processor_bag',
-            'processor',
-            'applicable_checker'
-        );
+        $compilerPass = new LoadProcessorsCompilerPass('processor_bag_config_builder', 'processor');
 
         $compilerPass->process($container);
-    }
-
-    public function testApplicableCheckers()
-    {
-        $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', false);
-
-        $processorBag = new Definition('Test\ProcessorBag');
-
-        $applicableChecker1 = new Definition('Test\ApplicableChecker1');
-        $applicableChecker1->addTag('applicable_checker');
-
-        $applicableChecker2 = new Definition('Test\ApplicableChecker1');
-        $applicableChecker2->addTag('applicable_checker', ['priority' => 123]);
-
-        $container->addDefinitions(
-            [
-                'processor_bag'       => $processorBag,
-                'applicable_checker1' => $applicableChecker1,
-                'applicable_checker2' => $applicableChecker2,
-            ]
-        );
-
-        $compilerPass = new LoadProcessorsCompilerPass(
-            'processor_bag',
-            'processor',
-            'applicable_checker'
-        );
-
-        $compilerPass->process($container);
-
-        $methodCalls = $processorBag->getMethodCalls();
-        $this->assertCount(2, $methodCalls);
-        $this->assertEquals(
-            [
-                'addApplicableChecker',
-                [
-                    new Reference('applicable_checker1'),
-                    0
-                ]
-            ],
-            $methodCalls[0]
-        );
-        $this->assertEquals(
-            [
-                'addApplicableChecker',
-                [
-                    new Reference('applicable_checker2'),
-                    123
-                ]
-            ],
-            $methodCalls[1]
-        );
     }
 
     public function testCommonProcessor()
@@ -90,40 +31,27 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
 
-        $processorBag = new Definition('Test\ProcessorBag');
+        $processorBagConfigBuilder = new Definition(ProcessorBagConfigBuilder::class, [[], []]);
 
         $processor1 = new Definition('Test\Processor2');
         $processor1->addTag('processor');
 
-        $container->addDefinitions(
-            [
-                'processor_bag' => $processorBag,
-                'processor1'    => $processor1,
-            ]
-        );
+        $container->addDefinitions([
+            'processor_bag_config_builder' => $processorBagConfigBuilder,
+            'processor1'                   => $processor1
+        ]);
 
-        $compilerPass = new LoadProcessorsCompilerPass(
-            'processor_bag',
-            'processor',
-            'applicable_checker'
-        );
+        $compilerPass = new LoadProcessorsCompilerPass('processor_bag_config_builder', 'processor');
 
         $compilerPass->process($container);
 
-        $methodCalls = $processorBag->getMethodCalls();
-        $this->assertCount(1, $methodCalls);
-        $this->assertEquals(
+        self::assertEquals(
             [
-                'setProcessors',
-                [
-                    [
-                        '' => [
-                            0   => [['processor1', []]],
-                        ]
-                    ]
+                '' => [
+                    0 => [['processor1', []]],
                 ]
             ],
-            $methodCalls[0]
+            $processorBagConfigBuilder->getArgument(1)
         );
     }
 
@@ -132,40 +60,27 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
 
-        $processorBag = new Definition('Test\ProcessorBag');
+        $processorBagConfigBuilder = new Definition(ProcessorBagConfigBuilder::class, [[], []]);
 
         $processor1 = new Definition('Test\Processor1');
         $processor1->addTag('processor', ['action' => 'action1']);
 
-        $container->addDefinitions(
-            [
-                'processor_bag' => $processorBag,
-                'processor1'    => $processor1,
-            ]
-        );
+        $container->addDefinitions([
+            'processor_bag_config_builder' => $processorBagConfigBuilder,
+            'processor1'                   => $processor1
+        ]);
 
-        $compilerPass = new LoadProcessorsCompilerPass(
-            'processor_bag',
-            'processor',
-            'applicable_checker'
-        );
+        $compilerPass = new LoadProcessorsCompilerPass('processor_bag_config_builder', 'processor');
 
         $compilerPass->process($container);
 
-        $methodCalls = $processorBag->getMethodCalls();
-        $this->assertCount(1, $methodCalls);
-        $this->assertEquals(
+        self::assertEquals(
             [
-                'setProcessors',
-                [
-                    [
-                        'action1' => [
-                            0   => [['processor1', []]],
-                        ]
-                    ]
+                'action1' => [
+                    0 => [['processor1', []]],
                 ]
             ],
-            $methodCalls[0]
+            $processorBagConfigBuilder->getArgument(1)
         );
     }
 
@@ -174,7 +89,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
 
-        $processorBag = new Definition('Test\ProcessorBag');
+        $processorBagConfigBuilder = new Definition(ProcessorBagConfigBuilder::class, [[], []]);
 
         $processor1 = new Definition('Test\Processor1');
         $processor1->addTag('processor', ['action' => 'action1', 'group' => 'group1', 'priority' => 123]);
@@ -186,44 +101,31 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $processor3 = new Definition('Test\Processor3');
         $processor3->addTag('processor');
 
-        $container->addDefinitions(
-            [
-                'processor_bag' => $processorBag,
-                'processor1'    => $processor1,
-                'processor2'    => $processor2,
-                'processor3'    => $processor3,
-            ]
-        );
+        $container->addDefinitions([
+            'processor_bag_config_builder' => $processorBagConfigBuilder,
+            'processor1'                   => $processor1,
+            'processor2'                   => $processor2,
+            'processor3'                   => $processor3
+        ]);
 
-        $compilerPass = new LoadProcessorsCompilerPass(
-            'processor_bag',
-            'processor',
-            'applicable_checker'
-        );
+        $compilerPass = new LoadProcessorsCompilerPass('processor_bag_config_builder', 'processor');
 
         $compilerPass->process($container);
 
-        $methodCalls = $processorBag->getMethodCalls();
-        $this->assertCount(1, $methodCalls);
-        $this->assertEquals(
+        self::assertEquals(
             [
-                'setProcessors',
-                [
-                    [
-                        ''        => [
-                            0 => [['processor3', []]]
-                        ],
-                        'action1' => [
-                            0   => [['processor2', []]],
-                            123 => [['processor1', ['group' => 'group1']]]
-                        ],
-                        'action2' => [
-                            0 => [['processor1', ['group' => 'group2', 'test_attr' => 'test']]]
-                        ],
-                    ]
-                ]
+                ''        => [
+                    0 => [['processor3', []]]
+                ],
+                'action1' => [
+                    0   => [['processor2', []]],
+                    123 => [['processor1', ['group' => 'group1']]]
+                ],
+                'action2' => [
+                    0 => [['processor1', ['group' => 'group2', 'test_attr' => 'test']]]
+                ],
             ],
-            $methodCalls[0]
+            $processorBagConfigBuilder->getArgument(1)
         );
     }
 
@@ -232,7 +134,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
 
-        $processorBag = new Definition('Test\ProcessorBag');
+        $processorBagConfigBuilder = new Definition(ProcessorBagConfigBuilder::class, [[], []]);
 
         $processor1 = new Definition('Test\Processor1');
         $processor1->addTag('processor', ['action' => 'action1', 'test_attr' => '!test1']);
@@ -241,57 +143,44 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $processor1->addTag('processor', ['action' => 'action4', 'test_attr' => '!test1|test2']);
         $processor1->addTag('processor', ['action' => 'action5', 'test_attr' => 'test1|!test2']);
 
-        $container->addDefinitions(
-            [
-                'processor_bag' => $processorBag,
-                'processor1'    => $processor1,
-            ]
-        );
+        $container->addDefinitions([
+            'processor_bag_config_builder' => $processorBagConfigBuilder,
+            'processor1'                   => $processor1
+        ]);
 
-        $compilerPass = new LoadProcessorsCompilerPass(
-            'processor_bag',
-            'processor',
-            'applicable_checker'
-        );
+        $compilerPass = new LoadProcessorsCompilerPass('processor_bag_config_builder', 'processor');
 
         $compilerPass->process($container);
 
-        $methodCalls = $processorBag->getMethodCalls();
-        $this->assertCount(1, $methodCalls);
-        $this->assertEquals(
+        self::assertEquals(
             [
-                'setProcessors',
-                [
-                    [
-                        'action1' => [
-                            0 => [
-                                ['processor1', ['test_attr' => ['!' => 'test1']]]
-                            ]
-                        ],
-                        'action2' => [
-                            0 => [
-                                ['processor1', ['test_attr' => ['&' => ['test1', 'test2']]]]
-                            ]
-                        ],
-                        'action3' => [
-                            0 => [
-                                ['processor1', ['test_attr' => ['|' => ['test1', 'test2']]]]
-                            ]
-                        ],
-                        'action4' => [
-                            0 => [
-                                ['processor1', ['test_attr' => ['|' => [['!' => 'test1'], 'test2']]]]
-                            ]
-                        ],
-                        'action5' => [
-                            0 => [
-                                ['processor1', ['test_attr' => ['|' => ['test1', ['!' => 'test2']]]]]
-                            ]
-                        ]
+                'action1' => [
+                    0 => [
+                        ['processor1', ['test_attr' => ['!' => 'test1']]]
+                    ]
+                ],
+                'action2' => [
+                    0 => [
+                        ['processor1', ['test_attr' => ['&' => ['test1', 'test2']]]]
+                    ]
+                ],
+                'action3' => [
+                    0 => [
+                        ['processor1', ['test_attr' => ['|' => ['test1', 'test2']]]]
+                    ]
+                ],
+                'action4' => [
+                    0 => [
+                        ['processor1', ['test_attr' => ['|' => [['!' => 'test1'], 'test2']]]]
+                    ]
+                ],
+                'action5' => [
+                    0 => [
+                        ['processor1', ['test_attr' => ['|' => ['test1', ['!' => 'test2']]]]]
                     ]
                 ]
             ],
-            $methodCalls[0]
+            $processorBagConfigBuilder->getArgument(1)
         );
     }
 
@@ -306,24 +195,77 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
 
-        $processorBag = new Definition('Test\ProcessorBag');
+        $processorBagConfigBuilder = new Definition(ProcessorBagConfigBuilder::class, [[], []]);
 
         $processor1 = new Definition('Test\Processor2');
         $processor1->addTag('processor', ['group' => 'group1']);
 
-        $container->addDefinitions(
-            [
-                'processor_bag' => $processorBag,
-                'processor1'    => $processor1,
-            ]
-        );
+        $container->addDefinitions([
+            'processor_bag_config_builder' => $processorBagConfigBuilder,
+            'processor1'                   => $processor1
+        ]);
 
-        $compilerPass = new LoadProcessorsCompilerPass(
-            'processor_bag',
-            'processor',
-            'applicable_checker'
-        );
+        $compilerPass = new LoadProcessorsCompilerPass('processor_bag_config_builder', 'processor');
 
         $compilerPass->process($container);
+    }
+
+    public function testProcessForProcessorBagConfigBuilderWithoutArguments()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+
+        $processorBagConfigBuilder = new Definition(ProcessorBagConfigBuilder::class, []);
+
+        $processor1 = new Definition('Test\Processor2');
+        $processor1->addTag('processor');
+
+        $container->addDefinitions([
+            'processor_bag_config_builder' => $processorBagConfigBuilder,
+            'processor1'                   => $processor1
+        ]);
+
+        $compilerPass = new LoadProcessorsCompilerPass('processor_bag_config_builder', 'processor');
+
+        $compilerPass->process($container);
+
+        self::assertEquals(
+            [],
+            $processorBagConfigBuilder->getArgument(0)
+        );
+        self::assertEquals(
+            ['' => [0 => [['processor1', []]]]],
+            $processorBagConfigBuilder->getArgument(1)
+        );
+    }
+
+    public function testProcessForProcessorBagConfigBuilderWithoutProcessorsArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+
+        $groups = ['action1' => ['group1' => 1]];
+        $processorBagConfigBuilder = new Definition(ProcessorBagConfigBuilder::class, [$groups]);
+
+        $processor1 = new Definition('Test\Processor2');
+        $processor1->addTag('processor');
+
+        $container->addDefinitions([
+            'processor_bag_config_builder' => $processorBagConfigBuilder,
+            'processor1'                   => $processor1
+        ]);
+
+        $compilerPass = new LoadProcessorsCompilerPass('processor_bag_config_builder', 'processor');
+
+        $compilerPass->process($container);
+
+        self::assertEquals(
+            $groups,
+            $processorBagConfigBuilder->getArgument(0)
+        );
+        self::assertEquals(
+            ['' => [0 => [['processor1', []]]]],
+            $processorBagConfigBuilder->getArgument(1)
+        );
     }
 }

@@ -71,24 +71,21 @@ class ApiDocMetadata implements \Serializable
     }
 
     /**
-     * Implementation of \Serializable.
-     * Do not serialize any data because it already was processed
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function serialize()
     {
-        return serialize([]);
+        // do nothing because this class do not need serialization
+        // and implements Serializable interface just to avoid failure of CachingApiDocExtractor
+        return '';
     }
 
     /**
-     * Implementation of \Serializable.
-     * Do not unserialize any data because it already was processed
-     *
-     * @param string $serialized
+     * {@inheritdoc}
      */
     public function unserialize($serialized)
     {
-        unserialize($serialized);
+        // do nothing because this class do not need serialization
+        // and implements Serializable interface just to avoid failure of CachingApiDocExtractor
     }
 }

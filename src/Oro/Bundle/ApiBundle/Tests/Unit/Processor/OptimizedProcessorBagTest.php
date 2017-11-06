@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorApplicableCheckerFactoryInterface;
+use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorIterator;
 use Oro\Component\ChainProcessor\ProcessorIteratorFactoryInterface;
@@ -53,7 +54,9 @@ class OptimizedProcessorBagTest extends \PHPUnit_Framework_TestCase
             ->method('createApplicableChecker')
             ->willReturn($this->ungroupedApplicableChecker);
 
+        $processorBagConfigBuilder = new ProcessorBagConfigBuilder();
         $this->processorBag = new OptimizedProcessorBag(
+            $processorBagConfigBuilder,
             $this->processorFactory,
             false,
             $this->applicableCheckerFactory,
@@ -62,9 +65,9 @@ class OptimizedProcessorBagTest extends \PHPUnit_Framework_TestCase
             $this->ungroupedProcessorIteratorFactory
         );
 
-        $this->processorBag->addGroup('group1', 'action_with_groups');
-        $this->processorBag->addProcessor('processor1', [], 'action_with_groups', 'group1');
-        $this->processorBag->addProcessor('processor2', [], 'action_without_groups');
+        $processorBagConfigBuilder->addGroup('group1', 'action_with_groups');
+        $processorBagConfigBuilder->addProcessor('processor1', [], 'action_with_groups', 'group1');
+        $processorBagConfigBuilder->addProcessor('processor2', [], 'action_without_groups');
     }
 
     public function testBagWithGroups()
