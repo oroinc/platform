@@ -32,10 +32,11 @@ define(function(require) {
             FormLoadingView.__super__.render.apply(this, arguments);
 
             this.$el.removeAttr('data-skip-input-widgets');
+            this.$el.addClass('lazy-loading');
 
             this.initLayout()
                 .then(function() {
-                    this._getFormButtons().addClass('disabled').prop('disabled', true);
+                    this._disableButton();
                     this._loadSubviews().then(this._afterLoadSubviews.bind(this));
                 }.bind(this));
 
@@ -43,8 +44,9 @@ define(function(require) {
         },
 
         _afterLoadSubviews: function() {
-            this._getFormButtons().removeClass('disabled').removeAttr('disabled');
+            this._enableButtons();
             mediator.trigger('page:afterPagePartChange');
+            this.$el.removeClass('lazy-loading');
         },
 
         _loadSubviews: function() {
@@ -55,8 +57,13 @@ define(function(require) {
             return $.when.apply($, promises);
         },
 
-        _getFormButtons: function() {
-            return this.$('.title-buttons-container .btn');
+        _enableButtons: function() {
+            this.$('.title-buttons-container .btn').removeClass('disabled').removeAttr('disabled');
+        },
+
+        _disableButton: function() {
+            this.$('.title-buttons-container .btn').addClass('disabled');
+            this.$('.title-buttons-container .btn:not(.dropdown-toggle)').prop('disabled', true);
         }
     });
 
