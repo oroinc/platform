@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Controller;
 
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\File\File;
@@ -293,7 +294,7 @@ class ImportExportControllerTest extends WebTestCase
 
         static::assertResponseStatusCodeEquals($response, 200);
         static::assertContains('Cancel', $response->getContent());
-        static::assertContains('Validate Data File', $response->getContent());
+        static::assertContains('Validate', $response->getContent());
         static::assertContains('Import file', $response->getContent());
     }
 
@@ -356,10 +357,8 @@ class ImportExportControllerTest extends WebTestCase
                 'process' => ProcessorRegistry::TYPE_IMPORT_VALIDATION,
                 'originFileName' => 'testLineEndings.csv',
                 'userId' => $this->getCurrentUser()->getId(),
-                'securityToken' =>
-                    'organizationId=1;userId=1;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR',
                 'jobName' => 'entity_import_validation_from_csv',
-                'processorAlias' => 'oro_user.add_or_replace',
+                'processorAlias' => 'oro_ldap_user_import',
                 'options' => [],
             ]
         );
@@ -426,10 +425,8 @@ class ImportExportControllerTest extends WebTestCase
                 'process' => ProcessorRegistry::TYPE_IMPORT,
                 'userId' => $this->getCurrentUser()->getId(),
                 'originFileName' => 'testLineEndings.csv',
-                'securityToken' =>
-                    'organizationId=1;userId=1;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR',
                 'jobName' => 'entity_import_from_csv',
-                'processorAlias' => 'oro_user.add_or_replace',
+                'processorAlias' => 'oro_ldap_user_import',
                 'options' => [],
             ]
         );

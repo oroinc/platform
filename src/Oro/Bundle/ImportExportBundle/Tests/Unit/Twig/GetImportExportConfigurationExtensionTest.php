@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistryInterface;
 use Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension;
 use PHPUnit\Framework\TestCase;
@@ -38,11 +39,14 @@ class GetImportExportConfigurationExtensionTest extends TestCase
     {
         $alias = 'test';
 
+        $expectedResult = [$this->createMock(ImportExportConfigurationInterface::class)];
+
         $this->configurationRegistry
             ->expects(static::once())
             ->method('getConfigurations')
-            ->with($alias);
+            ->with($alias)
+            ->willReturn($expectedResult);
 
-        $this->extension->getConfiguration($alias);
+        static::assertSame($expectedResult, $this->extension->getConfiguration($alias));
     }
 }

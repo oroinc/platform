@@ -91,18 +91,11 @@ class ImportExportContext extends OroFeatureContext implements
             $entity
         ));
 
-        $importButton = $this->getSession()
-            ->getPage()
-            ->findLink('Import');
-        self::assertNotNull($importButton);
+        $this->getPage()->clickLink('Import file');
+        $this->waitForAjax();
 
-        $importButton
-            ->getParent()
-            ->find('css', 'a.dropdown-toggle')
-            ->click();
-        $link = $importButton->getParent()->findLink('Download Data Template');
-
-        self::assertNotNull($link);
+        $exportButton = $this->getSession()->getPage()->findLink('Export template');
+        self::assertNotNull($exportButton, "Export template link was not found");
 
         $url = $this->locatePath($this->getContainer()->get('router')->generate(
             'oro_importexport_export_template',
@@ -308,11 +301,15 @@ class ImportExportContext extends OroFeatureContext implements
      */
     public function tryImportFile()
     {
-        $page = $this->getSession()->getPage();
-        $page->clickLink('Import file');
-        $this->waitForAjax();
+        $importSubmitButton = $this->getPage()->find('css','#import_button');
+
+        if (null === $importSubmitButton) {
+            $this->getPage()->clickLink('Import file');
+            $this->waitForAjax();
+        }
+
         $this->createElement('ImportFileField')->attachFile($this->importFile);
-        $page->pressButton('Submit');
+        $importSubmitButton->press();
         $this->waitForAjax();
     }
 
