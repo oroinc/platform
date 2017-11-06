@@ -34,7 +34,7 @@ define(function(require) {
             if (!this.options.exportProcessor) {
                 return;
             }
-            
+
             this.$el.on('click' + this.eventNamespace(), _.bind(this.onExportClick, this));
             this.importExportManager = new ImportExportManager(this.options);
         },
@@ -48,6 +48,6 @@ define(function(require) {
             this.importExportManager.handleExport();
         }
     });
-    
+
     return ExportButtonView;
 });
