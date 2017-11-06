@@ -339,7 +339,6 @@ class ImportExportControllerTest extends WebTestCase
             ]
         );
 
-        $response = $this->client->getResponse();
         $this->assertJsonResponseSuccess();
 
         $tmpDirPath = static::getContainer()->getParameter('kernel.root_dir') . '/import_export';
