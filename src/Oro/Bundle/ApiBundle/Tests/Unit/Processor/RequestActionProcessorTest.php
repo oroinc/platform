@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
-use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ProcessorBag;
+use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\SimpleProcessorFactory;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\RequestActionProcessor;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -15,6 +16,9 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
 
     /** @var SimpleProcessorFactory */
     protected $processorFactory;
+
+    /** @var ProcessorBagConfigBuilder */
+    protected $processorBagConfigBuilder;
 
     /** @var ProcessorBag */
     protected $processorBag;
@@ -31,10 +35,11 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->processorFactory = new SimpleProcessorFactory();
-        $this->processorBag = new ProcessorBag($this->processorFactory);
-        $this->processorBag->addGroup('group1', self::TEST_ACTION);
-        $this->processorBag->addGroup('group2', self::TEST_ACTION);
-        $this->processorBag->addGroup(RequestActionProcessor::NORMALIZE_RESULT_GROUP, self::TEST_ACTION);
+        $this->processorBagConfigBuilder = new ProcessorBagConfigBuilder();
+        $this->processorBag = new ProcessorBag($this->processorBagConfigBuilder, $this->processorFactory);
+        $this->processorBagConfigBuilder->addGroup('group1', self::TEST_ACTION);
+        $this->processorBagConfigBuilder->addGroup('group2', self::TEST_ACTION);
+        $this->processorBagConfigBuilder->addGroup(RequestActionProcessor::NORMALIZE_RESULT_GROUP, self::TEST_ACTION);
 
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
@@ -76,7 +81,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $processor = $this->createMock('Oro\Component\ChainProcessor\ProcessorInterface');
         $this->processorFactory->addProcessor($processorId, $processor);
-        $this->processorBag->addProcessor(
+        $this->processorBagConfigBuilder->addProcessor(
             $processorId,
             [],
             self::TEST_ACTION,

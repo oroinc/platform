@@ -9,17 +9,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
-use Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass;
-use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocConfigurationCompilerPass;
-use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiSecurityFirewallCompilerPass;
-use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ConfigurationCompilerPass;
-use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ConstraintTextExtractorConfigurationCompilerPass;
-use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DataTransformerConfigurationCompilerPass;
-use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityAliasesConfigurationCompilerPass;
-use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdTransformerConfigurationCompilerPass;
-use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ExceptionTextExtractorConfigurationCompilerPass;
-use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ExclusionProviderConfigurationCompilerPass;
-use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\QueryExpressionCompilerPass;
+use Oro\Component\ChainProcessor\DependencyInjection\LoadApplicableCheckersCompilerPass;
+use Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
 class OroApiBundle extends Bundle
 {
@@ -30,35 +21,28 @@ class OroApiBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new ConfigurationCompilerPass());
-        $container->addCompilerPass(new DataTransformerConfigurationCompilerPass());
-        $container->addCompilerPass(new EntityIdTransformerConfigurationCompilerPass());
-        $container->addCompilerPass(new EntityAliasesConfigurationCompilerPass());
-        $container->addCompilerPass(new ExclusionProviderConfigurationCompilerPass());
-        $container->addCompilerPass(new ExceptionTextExtractorConfigurationCompilerPass());
-        $container->addCompilerPass(new ConstraintTextExtractorConfigurationCompilerPass());
-        $container->addCompilerPass(new QueryExpressionCompilerPass());
+        $container->addCompilerPass(new Compiler\ConfigurationCompilerPass());
+        $container->addCompilerPass(new Compiler\DataTransformerConfigurationCompilerPass());
+        $container->addCompilerPass(new Compiler\EntityIdTransformerConfigurationCompilerPass());
+        $container->addCompilerPass(new Compiler\EntityAliasesConfigurationCompilerPass());
+        $container->addCompilerPass(new Compiler\ExclusionProviderConfigurationCompilerPass());
+        $container->addCompilerPass(new Compiler\ExceptionTextExtractorConfigurationCompilerPass());
+        $container->addCompilerPass(new Compiler\ConstraintTextExtractorConfigurationCompilerPass());
+        $container->addCompilerPass(new Compiler\QueryExpressionCompilerPass());
         $container->addCompilerPass(
-            new LoadProcessorsCompilerPass(
-                'oro_api.processor_bag',
-                'oro.api.processor',
-                'oro.api.processor.applicable_checker'
-            )
+            new LoadApplicableCheckersCompilerPass('oro_api.processor_bag', 'oro.api.processor.applicable_checker')
         );
         $container->addCompilerPass(
-            new CleanUpProcessorsCompilerPass(
-                'oro_api.simple_processor_factory',
-                'oro.api.processor'
-            ),
+            new CleanUpProcessorsCompilerPass('oro_api.simple_processor_factory', 'oro.api.processor'),
             PassConfig::TYPE_BEFORE_REMOVING
         );
         $container->addCompilerPass(
-            new ApiDocConfigurationCompilerPass(),
+            new Compiler\ApiDocConfigurationCompilerPass(),
             PassConfig::TYPE_BEFORE_REMOVING
         );
-        $container->addCompilerPass(
-            new ApiSecurityFirewallCompilerPass()
-        );
+        $container->addCompilerPass(new Compiler\ApiSecurityFirewallCompilerPass());
+        $container->addCompilerPass(new Compiler\DocumentBuilderConfigurationCompilerPass());
+        $container->addCompilerPass(new Compiler\ErrorCompleterConfigurationCompilerPass());
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $container->addCompilerPass(

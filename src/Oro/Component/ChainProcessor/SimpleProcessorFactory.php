@@ -7,17 +7,13 @@ namespace Oro\Component\ChainProcessor;
  */
 class SimpleProcessorFactory implements ProcessorFactoryInterface
 {
-    /** @var string[] */
-    protected $processors = [];
+    /** @var array [processor id => processor class, ...] */
+    protected $processors;
 
     /**
-     * Registers processors.
-     * This method was created by performance reasons and it is intended only to set initial set of processors.
-     * If the bag already contains any processors all of them will be lost.
-     *
      * @param array $processors [processor id => processor class, ...]
      */
-    public function setProcessors(array $processors)
+    public function __construct(array $processors = [])
     {
         $this->processors = $processors;
     }
