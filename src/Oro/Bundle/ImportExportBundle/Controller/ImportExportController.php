@@ -137,8 +137,6 @@ class ImportExportController extends Controller
                     $request->query->all()
                 );
             }
-
-            $formErrors = $importForm->getErrors(true);
         }
 
         return [
