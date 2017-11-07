@@ -30,6 +30,11 @@
             {% set form = get_import_form(config.entityClass).createView() %}
             {% set shortEntityName = config.entityClass|basename %}
             <div id="importExport{{ shortEntityName }}" class="tab-pane fade in {% if loop.index == 1 %} active{% endif %}">
+                <div class="alert alert-info import-notice">
+                    <strong>{{ 'oro.importexport.import.importance'|trans }}</strong>:
+                    {{ 'oro.importexport.import.columns_notice'|trans }}
+                </div>
+
                 <div class="form-container">
                     <form method="post"
                           data-nohash="true"
