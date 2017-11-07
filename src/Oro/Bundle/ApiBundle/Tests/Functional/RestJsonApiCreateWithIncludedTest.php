@@ -4,7 +4,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\Group;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestProductType;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
@@ -30,169 +31,141 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
     }
 
     /**
-     * @return array [$userId, $groupId]
+     * @return array [$productId, $productTypeId]
      */
     public function testCreateIncludedEntity()
     {
-        $org = $this->getOrganization();
-        $bu = $this->getBusinessUnit();
-
-        $entityType = $this->getEntityType(User::class);
-        $orgEntityType = $this->getEntityType(Organization::class);
-        $buEntityType = $this->getEntityType(BusinessUnit::class);
-        $groupEntityType = $this->getEntityType(Group::class);
-
         $data = [
             'data'     => [
-                'type'          => $entityType,
+                'type'          => 'testproducts',
                 'attributes'    => [
-                    'username'  => 'test_user_1',
-                    'firstName' => 'Test First Name',
-                    'lastName'  => 'Test Last Name',
-                    'email'     => 'test_user_1@example.com',
+                    'name' => 'Test Product 1'
                 ],
                 'relationships' => [
-                    'groups'       => [
-                        'data' => [
-                            ['type' => $groupEntityType, 'id' => 'TEST_USER_GROUP_1']
-                        ]
-                    ],
-                    'organization' => [
-                        'data' => ['type' => $orgEntityType, 'id' => (string)$org->getId()]
-                    ],
-                    'owner'        => [
-                        'data' => ['type' => $buEntityType, 'id' => (string)$bu->getId()]
+                    'productType' => [
+                        'data' => ['type' => 'testproducttypes', 'id' => 'TEST_PRODUCT_TYPE_1']
                     ]
                 ]
             ],
             'included' => [
                 [
-                    'type'          => $groupEntityType,
-                    'id'            => 'TEST_USER_GROUP_1',
-                    'attributes'    => [
-                        'name' => 'Test Group 1'
-                    ],
-                    'relationships' => [
-                        'organization' => [
-                            'data' => ['type' => $orgEntityType, 'id' => (string)$org->getId()]
-                        ],
-                        'owner'        => [
-                            'data' => ['type' => $buEntityType, 'id' => (string)$bu->getId()]
-                        ]
+                    'type'       => 'testproducttypes',
+                    'id'         => 'TEST_PRODUCT_TYPE_1',
+                    'attributes' => [
+                        'label' => 'Test Product Type 1'
                     ]
                 ]
             ]
         ];
 
-        $response = $this->post(['entity' => $entityType], $data);
+        $response = $this->post(['entity' => 'testproducts'], $data);
 
         $result = self::jsonToArray($response->getContent());
 
-        $userId = $result['data']['id'];
-        self::assertEquals('test_user_1', $result['data']['attributes']['username']);
-        self::assertCount(1, $result['data']['relationships']['groups']['data']);
+        $productId = $result['data']['id'];
+        self::assertEquals('Test Product 1', $result['data']['attributes']['name']);
+        self::assertNotEmpty($result['data']['relationships']['productType']['data']);
         self::assertCount(1, $result['included']);
-        $groupId = $result['data']['relationships']['groups']['data'][0]['id'];
-        self::assertEquals($groupEntityType, $result['included'][0]['type']);
-        self::assertEquals($groupId, $result['included'][0]['id']);
-        self::assertEquals('Test Group 1', $result['included'][0]['attributes']['name']);
+        $productTypeId = $result['data']['relationships']['productType']['data']['id'];
+        self::assertEquals('testproducttypes', $result['included'][0]['type']);
+        self::assertEquals($productTypeId, $result['included'][0]['id']);
+        self::assertEquals('Test Product Type 1', $result['included'][0]['attributes']['label']);
         self::assertNotEmpty($result['included'][0]['meta']);
-        self::assertSame('TEST_USER_GROUP_1', $result['included'][0]['meta']['includeId']);
+        self::assertSame('TEST_PRODUCT_TYPE_1', $result['included'][0]['meta']['includeId']);
 
-        // test that both the user and the group was created in the database
+        // test that both the product and the product type was created in the database
         $this->getEntityManager()->clear();
-        $group = $this->getEntityManager()->find(Group::class, (int)$groupId);
-        self::assertNotNull($group);
-        self::assertEquals('Test Group 1', $group->getName());
-        $user = $this->getEntityManager()->find(User::class, (int)$userId);
-        self::assertCount(1, $user->getGroups());
-        self::assertSame((int)$groupId, $user->getGroups()->first()->getId());
+        $productType = $this->getEntityManager()->find(TestProductType::class, $productTypeId);
+        self::assertNotNull($productType);
+        self::assertEquals('Test Product Type 1', $productType->getLabel());
+        $product = $this->getEntityManager()->find(TestProduct::class, (int)$productId);
+        self::assertEquals('Test Product 1', $product->getName());
+        self::assertNotNull($product->getProductType());
+        self::assertEquals($productTypeId, $product->getProductType()->getName());
 
-        return [$userId, $groupId];
+        return [$productId, $productTypeId];
     }
 
     /**
      * @depends testCreateIncludedEntity
      *
-     * @param array $ids [$userId, $groupId]
+     * @param array $ids [$productId, $productTypeId]
      */
     public function testUpdateIncludedEntity($ids)
     {
-        list($userId, $groupId) = $ids;
-
-        $entityType = $this->getEntityType(User::class);
-        $groupEntityType = $this->getEntityType(Group::class);
+        list($productId, $productTypeId) = $ids;
 
         $data = [
             'data'     => [
-                'type'          => $entityType,
-                'id'            => $userId,
+                'type'          => 'testproducts',
+                'id'            => $productId,
                 'attributes'    => [
-                    'firstName' => 'Test First Name',
+                    'name' => 'Test Product 1 (updated)'
                 ],
                 'relationships' => [
-                    'groups' => [
-                        'data' => [
-                            ['type' => $groupEntityType, 'id' => $groupId]
-                        ]
+                    'productType' => [
+                        'data' => ['type' => 'testproducttypes', 'id' => $productTypeId]
                     ]
                 ]
             ],
             'included' => [
                 [
-                    'type'       => $groupEntityType,
-                    'id'         => $groupId,
+                    'type'       => 'testproducttypes',
+                    'id'         => $productTypeId,
                     'meta'       => [
                         'update' => true
                     ],
                     'attributes' => [
-                        'name' => 'Test Group 1 (updated)'
-                    ],
-                ],
-            ]
-        ];
-
-        $response = $this->patch(['entity' => $entityType, 'id' => $userId], $data);
-
-        $result = self::jsonToArray($response->getContent());
-
-        self::assertCount(1, $result['data']['relationships']['groups']['data']);
-        self::assertCount(1, $result['included']);
-        $groupId = $result['data']['relationships']['groups']['data'][0]['id'];
-        self::assertEquals($groupEntityType, $result['included'][0]['type']);
-        self::assertEquals($groupId, $result['included'][0]['id']);
-        self::assertEquals('Test Group 1 (updated)', $result['included'][0]['attributes']['name']);
-        self::assertNotEmpty($result['included'][0]['meta']);
-        self::assertSame($groupId, $result['included'][0]['meta']['includeId']);
-
-        // test that the group was updated in the database
-        $this->getEntityManager()->clear();
-        $group = $this->getEntityManager()->find(Group::class, (int)$groupId);
-        self::assertNotNull($group);
-        self::assertEquals('Test Group 1 (updated)', $group->getName());
-    }
-
-    public function testCreateNotRelatedIncludedEntity()
-    {
-        $entityType = $this->getEntityType(User::class);
-        $groupEntityType = $this->getEntityType(Group::class);
-
-        $data = [
-            'data'     => [
-                'type' => $entityType,
-            ],
-            'included' => [
-                [
-                    'type' => $groupEntityType,
-                    'id'   => 'TEST_USER_GROUP_1',
+                        'label' => 'Test Product Type 1 (updated)'
+                    ]
                 ]
             ]
         ];
 
-        $response = $this->request(
-            'POST',
-            $this->getUrl('oro_rest_api_post', ['entity' => $entityType]),
-            $data
+        $response = $this->patch(['entity' => 'testproducts', 'id' => $productId], $data);
+
+        $result = self::jsonToArray($response->getContent());
+
+        self::assertEquals('Test Product 1 (updated)', $result['data']['attributes']['name']);
+        self::assertNotEmpty($result['data']['relationships']['productType']['data']);
+        self::assertCount(1, $result['included']);
+        $productTypeId = $result['data']['relationships']['productType']['data']['id'];
+        self::assertEquals('testproducttypes', $result['included'][0]['type']);
+        self::assertEquals($productTypeId, $result['included'][0]['id']);
+        self::assertEquals('Test Product Type 1 (updated)', $result['included'][0]['attributes']['label']);
+        self::assertNotEmpty($result['included'][0]['meta']);
+        self::assertSame($productTypeId, $result['included'][0]['meta']['includeId']);
+
+        // test that both the product and the product type was updated in the database
+        $this->getEntityManager()->clear();
+        $productType = $this->getEntityManager()->find(TestProductType::class, $productTypeId);
+        self::assertNotNull($productType);
+        self::assertEquals('Test Product Type 1 (updated)', $productType->getLabel());
+        $product = $this->getEntityManager()->find(TestProduct::class, (int)$productId);
+        self::assertEquals('Test Product 1 (updated)', $product->getName());
+        self::assertNotNull($product->getProductType());
+        self::assertEquals($productTypeId, $product->getProductType()->getName());
+    }
+
+    public function testCreateNotRelatedIncludedEntity()
+    {
+        $data = [
+            'data'     => [
+                'type' => 'testproducts'
+            ],
+            'included' => [
+                [
+                    'type' => 'testproducttypes',
+                    'id'   => 'TEST_PRODUCT_TYPE_1'
+                ]
+            ]
+        ];
+
+        $response = $this->post(
+            ['entity' => 'testproducts'],
+            $data,
+            [],
+            false
         );
 
         self::assertResponseStatusCodeEquals($response, 400);
@@ -277,7 +250,7 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
                             'data' => ['type' => $buEntityType, 'id' => 'BU1']
                         ]
                     ]
-                ],
+                ]
             ]
         ];
 
@@ -346,7 +319,7 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
                             ]
                         ]
                     ]
-                ],
+                ]
             ]
         ];
 

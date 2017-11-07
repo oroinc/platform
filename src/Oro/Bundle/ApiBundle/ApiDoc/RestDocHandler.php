@@ -249,7 +249,7 @@ class RestDocHandler implements HandlerInterface
     protected function getDirectionValue($action, EntityDefinitionConfig $config, EntityMetadata $metadata)
     {
         return [
-            'class'   => ApiDocMetadata::class,
+            'class'   => null,
             'options' => [
                 'metadata' => new ApiDocMetadata(
                     $action,

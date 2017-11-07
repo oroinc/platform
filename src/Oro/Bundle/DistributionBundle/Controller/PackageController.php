@@ -13,7 +13,11 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\DistributionBundle\Entity\PackageRequirement;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
+use Oro\Bundle\HelpBundle\Annotation\Help;
 
+/**
+ * @Help(link="https://www.orocommerce.com/documentation/current/install-upgrade")
+ */
 class PackageController extends Controller
 {
     const CODE_INSTALLED = 0;

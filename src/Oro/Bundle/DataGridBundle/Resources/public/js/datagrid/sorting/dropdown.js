@@ -172,7 +172,7 @@ define(function(require) {
         },
 
         _updateDisplayValue: function() {
-            this.$('select').select2('val', this._getCurrentValue());
+            this.$('select').inputWidget('val', this._getCurrentValue());
             if (this.hasSortingOrderButton) {
                 this._updateDisplayDirection();
             }

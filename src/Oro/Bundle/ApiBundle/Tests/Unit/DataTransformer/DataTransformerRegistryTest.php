@@ -43,7 +43,7 @@ class DataTransformerRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDataTransformerWhenItExistsForSpecificRequestType()
     {
-        $this->assertSame(
+        self::assertSame(
             $this->transformer2,
             $this->registry->getDataTransformer('dataType1', new RequestType(['rest', 'json_api']))
         );
@@ -51,7 +51,7 @@ class DataTransformerRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDataTransformerWhenItDoesNotExistForSpecificRequestTypeButExistsForAnyRequestType()
     {
-        $this->assertSame(
+        self::assertSame(
             $this->transformer1,
             $this->registry->getDataTransformer('dataType1', new RequestType(['another']))
         );
@@ -59,14 +59,14 @@ class DataTransformerRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDataTransformerWhenItDoesNotExistForSpecificRequestTypeAndDoesNotExistForAnyRequestType()
     {
-        $this->assertNull(
+        self::assertNull(
             $this->registry->getDataTransformer('dataType2', new RequestType(['another']))
         );
     }
 
     public function testGetDataTransformerForDataTypeWithoutTransformer()
     {
-        $this->assertNull(
+        self::assertNull(
             $this->registry->getDataTransformer('undefined', new RequestType(['rest', 'json_api']))
         );
     }
