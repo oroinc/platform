@@ -191,6 +191,11 @@ define([
 
         payload = {prevented: false, target: el};
 
+        /* original Chaplin's openLink code: start */
+        if (utils.modifierKeyPressed(event)) {
+            return;
+        }
+
         // jshint -W107
         // not link to same page and not javascript code link
         if (href && !Chaplin.mediator.execute('compareUrl', href) && href.substr(0, 11) !== 'javascript:') {
@@ -202,10 +207,6 @@ define([
             return;
         }
 
-        /* original Chaplin's openLink code: start */
-        if (utils.modifierKeyPressed(event)) {
-            return;
-        }
         el = $ ? event.currentTarget : event.delegateTarget;
         isAnchor = el.nodeName === 'A';
         href = el.getAttribute('href') || el.getAttribute('data-href') || null;
@@ -264,6 +265,50 @@ define([
             func.apply(this, _.rest(arguments));
         }
     });
+
+    /**
+     * Extends original Chaplin.SyncMachine with extra methods
+     *
+     * @mixin
+     */
+    Chaplin.SyncMachine = _.extend(/** @lends Chaplin.SyncMachine */{
+        UNSYNCED: 'unsynced',
+        SYNCING: 'syncing',
+        SYNCED: 'synced',
+        STATE_CHANGE: 'syncStateChange',
+        markAsSynced: function() {
+            if (this._syncState !== Chaplin.SyncMachine.SYNCED) {
+                this._previousSync = this._syncState;
+                this._syncState = Chaplin.SyncMachine.SYNCED;
+                this.trigger(this._syncState, this, this._syncState);
+                this.trigger(Chaplin.SyncMachine.STATE_CHANGE, this, this._syncState);
+            }
+        },
+        /**
+         * Returns promise that was resolved with fetched instance
+         * when sync will be finished and starts fetch it's needed
+         * @return {Promise.<Object>}
+         */
+        ensureSync: function() {
+            var deferred = $.Deferred();
+            switch (this.syncState()) {
+                case 'unsynced':
+                    this.fetch().then(function() {
+                        deferred.resolve(this);
+                    }.bind(this));
+                    break;
+                case 'syncing':
+                    this.once('synced', function() {
+                        deferred.resolve(this);
+                    }.bind(this));
+                    break;
+                case 'synced':
+                    deferred.resolve(this);
+                    break;
+            }
+            return deferred.promise();
+        }
+    }, Chaplin.SyncMachine);
 
     return Chaplin;
 });

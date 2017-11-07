@@ -12,7 +12,12 @@ define([
      * Base component's constructor
      *
      * @export oroui/js/app/components/base/component
-     * @class oroui.app.components.base.Component
+     * @class BaseComponent
+     * @mixes {Backbone.Events}
+     * @mixes {Chaplin.EventBroker}
+     * @borrows Chaplin.View.prototype.delegateListeners as delegateListeners
+     * @borrows Chaplin.View.prototype.delegateListener as delegateListener
+     * @param {Object} options - Options container
      */
     BaseComponent = function(options) {
         this.cid = _.uniqueId('component');
@@ -81,17 +86,15 @@ define([
     // lends methods from Backbone and Chaplin
     _.extend(
         BaseComponent.prototype,
-
         // extends BaseComponent.prototype with some Backbone's and Chaplin's functionality
-        /** @lends {Backbone.Events} */ Backbone.Events,
-        /** @lends {Chaplin.EventBroker} */ Chaplin.EventBroker,
-
+        Backbone.Events,
+        Chaplin.EventBroker,
         // lends useful methods Chaplin.View
         _.pick(Chaplin.View.prototype, ['delegateListeners', 'delegateListener'])
     );
 
     // defines own properties and methods
-    _.extend(BaseComponent.prototype, {
+    _.extend(BaseComponent.prototype, /** @lends BaseComponent.prototype */ {
         AUXILIARY_OPTIONS: ['_sourceElement', '_subPromises', 'name'],
 
         /**

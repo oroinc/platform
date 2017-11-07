@@ -171,7 +171,7 @@ define(function(require) {
 
             if (pathData.length > 1 && pathData[0] === this.get('entity_attribute')) {
                 pathData.splice(0, 1);
-                return this.entityFieldUtil.getPathByPropertyPath(pathData);
+                return this.entityFieldUtil.getPathByPropertyPath(pathData.join('.'));
             } else {
                 return null;
             }

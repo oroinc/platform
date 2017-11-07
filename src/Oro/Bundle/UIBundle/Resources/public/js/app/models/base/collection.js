@@ -6,7 +6,11 @@ define([
 
     var BaseCollection;
 
-    BaseCollection = Chaplin.Collection.extend({
+    /**
+     * @class BaseCollection
+     * @extends Chaplin.Collection
+     */
+    BaseCollection = Chaplin.Collection.extend(/** @lends BaseCollection.prototype */{
         model: BaseModel,
 
         /**
