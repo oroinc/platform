@@ -75,7 +75,7 @@ class ImportExportContext extends OroFeatureContext implements
      */
     protected $importFile;
 
-
+    //@codingStandardsIgnoreStart
     /**
      * Download data template from entity grid page with custom processor
      *
@@ -83,6 +83,7 @@ class ImportExportContext extends OroFeatureContext implements
      * @param string $entity
      * @param string $processorName
      */
+    //@codingStandardsIgnoreEnd
     public function iDownloadDataTemplateFileWithProcessor($entity, $processorName)
     {
         $this->iDownloadDataTemplateFileWithOptions($entity, null, $processorName);
@@ -99,6 +100,7 @@ class ImportExportContext extends OroFeatureContext implements
         $this->iDownloadDataTemplateFileWithOptions($entity);
     }
 
+    //@codingStandardsIgnoreStart
     /**
      * Download data template from entity grid page with specified button
      *
@@ -106,6 +108,7 @@ class ImportExportContext extends OroFeatureContext implements
      * @param string $entity
      * @param string $importButtonLabel
      */
+    //@codingStandardsIgnoreEnd
     public function iDownloadDataTemplateFileWithSpecifiedButton($entity, $importButtonLabel)
     {
         $importButton = $this->getSession()
@@ -120,8 +123,11 @@ class ImportExportContext extends OroFeatureContext implements
      * @param string|null $processorName
      * @param NodeElement|null $importButton
      */
-    protected function iDownloadDataTemplateFileWithOptions($entity, NodeElement $importButton = null, $processorName = null)
-    {
+    protected function iDownloadDataTemplateFileWithOptions(
+        $entity,
+        NodeElement $importButton = null,
+        $processorName = null
+    ) {
         $entityClass = $this->aliasResolver->getClassByAlias($this->convertEntityNameToAlias($entity));
         $processors = $this->processorRegistry->getProcessorAliasesByEntity('export_template', $entityClass);
 
