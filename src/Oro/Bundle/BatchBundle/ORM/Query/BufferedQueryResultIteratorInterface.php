@@ -10,7 +10,7 @@ interface BufferedQueryResultIteratorInterface extends \Iterator, \Countable
     /**
      * Gets the source query.
      *
-     * @return Query|QueryBuilder
+     * @return Query|QueryBuilder|object
      */
     public function getSource();
 

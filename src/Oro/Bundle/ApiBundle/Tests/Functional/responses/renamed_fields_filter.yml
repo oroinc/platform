@@ -1,7 +1,7 @@
 data:
   -
     type: 'testproducts'
-    id: 'auto'
+    id: '<toString(@test_product2->id)>'
     attributes:
       renamedName: 'product 2'
     relationships:

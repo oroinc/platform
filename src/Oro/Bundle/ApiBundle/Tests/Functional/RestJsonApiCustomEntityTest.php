@@ -48,7 +48,8 @@ class RestJsonApiCustomEntityTest extends RestJsonApiTestCase
                     'renamedDefaultBiO2M'   => ['property_path' => 'default_biO2M'],
                     'renamedBiO2MnD'        => ['property_path' => 'biO2MnD'],
                 ]
-            ]
+            ],
+            true
         );
     }
 

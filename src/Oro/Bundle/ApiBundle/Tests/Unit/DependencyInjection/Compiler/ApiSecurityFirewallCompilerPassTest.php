@@ -2,22 +2,23 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
+
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiSecurityFirewallCompilerPass;
 use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
 use Oro\Bundle\ApiBundle\Http\Firewall\ApiExceptionListener;
 use Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener;
-use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
 
 class ApiSecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ApiSecurityFirewallCompilerPass */
-    protected $compiler;
+    private $compiler;
 
     /** @var ContainerBuilder */
-    protected $container;
+    private $container;
 
     protected function setUp()
     {
@@ -30,7 +31,7 @@ class ApiSecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->container->prependExtensionConfig('security', []);
 
         $this->compiler->process($this->container);
-        $this->assertEquals(['service_container'], $this->container->getServiceIds());
+        self::assertEquals(['service_container'], $this->container->getServiceIds());
     }
 
     public function testProcessOnEmptySecurityFirewallsConfig()
@@ -38,7 +39,7 @@ class ApiSecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->container->prependExtensionConfig('security', ['firewalls' => []]);
 
         $this->compiler->process($this->container);
-        $this->assertEquals(['service_container'], $this->container->getServiceIds());
+        self::assertEquals(['service_container'], $this->container->getServiceIds());
     }
 
     public function testProcessOnNonStatelessFirewall()
@@ -50,7 +51,7 @@ class ApiSecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->container->setParameter('session.storage.options', ['name' => 'test']);
 
         $this->compiler->process($this->container);
-        $this->assertEquals(['service_container'], $this->container->getServiceIds());
+        self::assertEquals(['service_container'], $this->container->getServiceIds());
     }
 
     public function testProcessOnStatelessButWithoutContextFirewall()
@@ -62,7 +63,7 @@ class ApiSecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->container->setParameter('session.storage.options', ['name' => 'test']);
 
         $this->compiler->process($this->container);
-        $this->assertEquals(['service_container'], $this->container->getServiceIds());
+        self::assertEquals(['service_container'], $this->container->getServiceIds());
     }
 
     public function testProcessOnStatelessButWithoutMapContext()
@@ -74,7 +75,7 @@ class ApiSecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->container->setParameter('session.storage.options', ['name' => 'test']);
 
         $this->compiler->process($this->container);
-        $this->assertEquals(['service_container'], $this->container->getServiceIds());
+        self::assertEquals(['service_container'], $this->container->getServiceIds());
     }
 
     public function testProcess()
@@ -105,19 +106,18 @@ class ApiSecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
 
         $this->compiler->process($this->container);
 
-
         $contextListener = $this->container->getDefinition('oro_security.context_listener.main');
-        $this->assertEquals('security.context_listener', $contextListener->getParent());
-        $this->assertEquals('main', $contextListener->getArgument(2));
+        self::assertEquals('security.context_listener', $contextListener->getParent());
+        self::assertEquals('main', $contextListener->getArgument(2));
         $contextFirewallListener = $this->container->getDefinition('oro_security.context_listener.main.testFirewall');
-        $this->assertEquals(SecurityFirewallContextListener::class, $contextFirewallListener->getClass());
-        $this->assertEquals('oro_security.context_listener.main', (string)$contextFirewallListener->getArgument(0));
-        $this->assertEquals(ApiExceptionListener::class, $exceptionListenerDefinition->getClass());
+        self::assertEquals(SecurityFirewallContextListener::class, $contextFirewallListener->getClass());
+        self::assertEquals('oro_security.context_listener.main', (string)$contextFirewallListener->getArgument(0));
+        self::assertEquals(ApiExceptionListener::class, $exceptionListenerDefinition->getClass());
 
         $listeners = $contextFirewallContext->getArgument(0);
-        $this->assertCount(2, $listeners);
+        self::assertCount(2, $listeners);
         // Context serializer listener should does before the access listener
-        $this->assertEquals('oro_security.context_listener.main.testfirewall', (string)$listeners[0]);
-        $this->assertEquals('security.access_listener', (string)$listeners[1]);
+        self::assertEquals('oro_security.context_listener.main.testfirewall', (string)$listeners[0]);
+        self::assertEquals('security.access_listener', (string)$listeners[1]);
     }
 }

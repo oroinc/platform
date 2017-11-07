@@ -24,8 +24,13 @@ define([
         /** @property */
         tagName: 'th',
 
+        /** @property */
         template: template,
 
+        /** @property */
+        actionsPanel: ActionsPanel,
+
+        /** @property */
         options: {
             controls: '[data-toggle=dropdown]'
         },
@@ -55,6 +60,7 @@ define([
             }
             delete this.column;
             ActionHeaderCell.__super__.dispose.apply(this, arguments);
+            delete this.actionsPanel;
         },
 
         createActionsPanel: function() {
@@ -71,7 +77,7 @@ define([
                 );
             });
 
-            this.subview('actionsPanel', new ActionsPanel({'actions': actions}));
+            this.subview('actionsPanel', new this.actionsPanel({'actions': actions}));
         },
 
         render: function() {

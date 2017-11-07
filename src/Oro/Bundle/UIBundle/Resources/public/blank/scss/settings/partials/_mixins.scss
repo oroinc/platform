@@ -208,6 +208,13 @@
     }
 }
 
+// Check devices on server, if device is mobile added class to body (.mobile-version)
+@mixin only-mobile {
+    .mobile-version {
+        @content;
+    }
+}
+
 // Wrap element
 @mixin fullscreen-mode {
     @at-root {
