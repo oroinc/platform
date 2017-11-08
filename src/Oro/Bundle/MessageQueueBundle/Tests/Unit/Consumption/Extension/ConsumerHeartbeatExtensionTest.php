@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Psr\Log\LoggerInterface;
 
 use Oro\Component\MessageQueue\Consumption\Context;
@@ -12,26 +13,33 @@ use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ConsumerHeartbeatExtensi
 
 class ConsumerHeartbeatExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $consumerState;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConsumerHeartbeat */
+    protected $consumerHeartbeat;
 
-    /** @var ConsumerHeartbeatExtension */
-    protected $extension;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|LoggerInterface */
+    protected $logger;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|LoggerInterface */
+    protected $container;
 
     /** @var Context */
     protected $context;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $logger;
+    /** @var ConsumerHeartbeatExtension */
+    protected $extension;
 
     protected function setUp()
     {
-        $this->consumerState = $this->createMock(ConsumerHeartbeat::class);
-        $this->extension = new ConsumerHeartbeatExtension(15, $this->consumerState);
-
-        $this->context = new Context($this->createMock(SessionInterface::class));
+        $this->consumerHeartbeat = $this->createMock(ConsumerHeartbeat::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+        $this->context = new Context($this->createMock(SessionInterface::class));
         $this->context->setLogger($this->logger);
+
+        $this->container = TestContainerBuilder::create()
+            ->add('oro_message_queue.consumption.consumer_heartbeat', $this->consumerHeartbeat)
+            ->getContainer($this);
+
+        $this->extension = new ConsumerHeartbeatExtension(15, $this->container);
     }
 
     public function testOnBeforeReceiveOnStartConsumption()
@@ -39,7 +47,7 @@ class ConsumerHeartbeatExtensionTest extends \PHPUnit_Framework_TestCase
         $this->logger->expects($this->once())
             ->method('info')
             ->with('Update the consumer state time.');
-        $this->consumerState->expects($this->once())
+        $this->consumerHeartbeat->expects($this->once())
             ->method('tick');
 
         $this->extension->onBeforeReceive($this->context);
@@ -50,7 +58,7 @@ class ConsumerHeartbeatExtensionTest extends \PHPUnit_Framework_TestCase
         $this->logger->expects($this->once())
             ->method('info')
             ->with('Update the consumer state time.');
-        $this->consumerState->expects($this->once())
+        $this->consumerHeartbeat->expects($this->once())
             ->method('tick');
 
         $this->extension->onBeforeReceive($this->context);
@@ -59,11 +67,11 @@ class ConsumerHeartbeatExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testOnBeforeReceiveWithTurnedOffFunctionality()
     {
-        $this->extension = new ConsumerHeartbeatExtension(0, $this->consumerState);
+        $this->extension = new ConsumerHeartbeatExtension(0, $this->container);
 
         $this->logger->expects($this->never())
             ->method('info');
-        $this->consumerState->expects($this->never())
+        $this->consumerHeartbeat->expects($this->never())
             ->method('tick');
 
         $this->extension->onBeforeReceive($this->context);
