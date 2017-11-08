@@ -117,7 +117,7 @@ final class FeatureStatisticSubscriber implements EventListener
         $stat
             ->setBasePath($this->basePath)
             ->setPath($event->getFeature()->getFile())
-            ->setTime(round($this->timer->getSeconds()))
+            ->setTime(round($this->timer->getTime()))
             ->setGitBranch($this->gitBranch)
             ->setGitTarget($this->gitTarget)
             ->setBuildId($this->buildId)

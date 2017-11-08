@@ -7,6 +7,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use Oro\Component\DoctrineUtils\DependencyInjection\AddTransactionWatcherCompilerPass;
 use Oro\Component\PhpUtils\ClassLoader;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityFallbackCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityFieldHandlerPass;
@@ -40,6 +41,13 @@ class OroEntityBundle extends Bundle
             $kernel->getCacheDir() . DIRECTORY_SEPARATOR . 'oro_entities'
         );
         $loader->register();
+
+        // register connection proxy class that supports the transaction watcher
+        $loader = new ClassLoader(
+            AddTransactionWatcherCompilerPass::CONNECTION_PROXY_NAMESPACE . '\\',
+            AddTransactionWatcherCompilerPass::getConnectionProxyRootDir($kernel->getCacheDir())
+        );
+        $loader->register();
     }
 
     /**
@@ -71,5 +79,9 @@ class OroEntityBundle extends Bundle
                 'Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass'
             );
         }
+
+        $container->addCompilerPass(
+            new AddTransactionWatcherCompilerPass('oro.doctrine.connection.transaction_watcher')
+        );
     }
 }
