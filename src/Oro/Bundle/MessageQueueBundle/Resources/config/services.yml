@@ -59,7 +59,7 @@ services:
         public: false
         arguments:
             - '%oro_message_queue.consumer_heartbeat_update_period%'
-            - '@oro_message_queue.consumption.consumer_heartbeat'
+            - '@service_container'
         tags:
             - { name: 'oro_message_queue.consumption.extension', persistent: true }
 
@@ -73,6 +73,15 @@ services:
             - '@logger'
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
+
+    oro_message_queue.consumption.clear_logger_extension:
+        class: Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearLoggerExtension
+        public: false
+        arguments:
+            - '@service_container'
+            - [] # persistentLoggers; set by Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeLoggerServicesPersistentPass
+        tags:
+            - { name: oro_message_queue.consumption.extension, priority: -255, persistent: true }
 
     oro_message_queue.consumption.database_connections_clearer:
         class: Oro\Bundle\MessageQueueBundle\Consumption\Extension\DatabaseConnectionsClearer
@@ -90,6 +99,12 @@ services:
             - '@service_container'
         tags:
             - { name: oro_message_queue.consumption.clearer }
+
+    oro_message_queue.consumption.garbage_collector_clearer:
+        class: Oro\Bundle\MessageQueueBundle\Consumption\Extension\GarbageCollectorClearer
+        public: false
+        tags:
+            - { name: oro_message_queue.consumption.clearer, priority: -255 }
 
     oro_message_queue.consumption.queue_consumer:
         class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
