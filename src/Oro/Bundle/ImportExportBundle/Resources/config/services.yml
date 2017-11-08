@@ -106,13 +106,6 @@ services:
         tags:
             - { name: 'twig.extension' }
 
-    oro_importexport.twig_extension.get_import_form:
-        class: 'Oro\Bundle\ImportExportBundle\Twig\GetImportFormExtension'
-        arguments:
-            - '@form.factory'
-        tags:
-            - { name: 'twig.extension' }
-
     oro_importexport.twig_extension.basename:
         class: 'Oro\Bundle\ImportExportBundle\Twig\BasenameTwigExtension'
         public: false
