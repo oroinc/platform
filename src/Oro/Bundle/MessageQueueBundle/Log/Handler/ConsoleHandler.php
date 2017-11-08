@@ -22,6 +22,9 @@ class ConsoleHandler extends BaseConsoleHandler
     /** @var int */
     private $commandNestedLevel = 0;
 
+    /** @var array */
+    private $previousRecord;
+
     /**
      * @param ConsumerState $consumerState     The object that stores the current state of message queue consumer
      * @param bool          $bubble            Whether the messages that are handled can bubble up the stack or not
@@ -50,6 +53,10 @@ class ConsoleHandler extends BaseConsoleHandler
     public function handle(array $record)
     {
         if (!$this->consumerState->isConsumptionStarted()) {
+            return false;
+        }
+
+        if ($this->isDuplicatedRecord($record)) {
             return false;
         }
 
@@ -86,5 +93,23 @@ class ConsoleHandler extends BaseConsoleHandler
     protected function getDefaultFormatter()
     {
         return new ConsoleFormatter();
+    }
+
+    /**
+     * @param array $record
+     *
+     * @return bool
+     */
+    private function isDuplicatedRecord(array $record)
+    {
+        unset($record['datetime']);
+
+        if ($this->previousRecord === $record) {
+            return true;
+        }
+
+        $this->previousRecord = $record;
+
+        return false;
     }
 }
