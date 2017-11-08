@@ -27,6 +27,18 @@ class DoctrineHelper
     }
 
     /**
+     * Checks whether the given class is manageable entity.
+     *
+     * @param string $entityClass
+     *
+     * @return bool
+     */
+    public function isManageableEntity($entityClass)
+    {
+        return null !== $this->doctrine->getManagerForClass($entityClass);
+    }
+
+    /**
      * @param string $entityClass
      *
      * @return EntityManager

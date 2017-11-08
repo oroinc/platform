@@ -1,49 +1,76 @@
-define(['jquery'],  function($) {
+define(function(require) {
     'use strict';
 
+    var MergeView;
+    var BaseView = require('oroui/js/app/views/base/view');
+    var $ = require('jquery');
+
     /**
-     * @typedef mergeView
-     * @function entitySelectAllHandler
-     * @function entityValueSelectHandler
-     * @function resetViewState
-     * @function init
+     * @typedef MergeView
      * @export oroentitymerge/js/merge-view
-     * @type {object}
      */
-    /**
-     * @type mergeView
-     */
-    return {
+    MergeView = BaseView.extend({
+        events: {
+            'click .entity-merge-select-all': 'onEntitySelectAll',
+            'click .entity-merge-field-choice': 'onEntityValueSelect',
+            'click .entity-merge-decision-container': 'onColumnClick'
+        },
+
+        listen: {
+            'layout:reposition mediator': 'onFixTableWidth'
+        },
+
+        initialize: function() {
+            this.resetViewState();
+
+            MergeView.__super__.initialize.apply(this, arguments);
+        },
+
+        onFixTableWidth: function(event) {
+            var columns = this.$('.entity-merge-column');
+            var master = this.$('.merge-first-column');
+            var firstColumnWidth = parseInt(master.css('width'));
+            var tableWidth = parseInt(this.$('.entity-merge-table').css('width'));
+            var columnWidth = ((tableWidth - firstColumnWidth) / columns.length);
+
+            columns.css('width', columnWidth);
+        },
+
         /**
          * @desc This callback change entity field values class in one of the form column
          * @desc All field values in the column set to active
-         * @callback
-         * @desc {HTMLElement} this
          */
-        entitySelectAllHandler: function() {
-            var entityId = $(this).data('entity-key');
-            $('.entity-merge-field-choice[value="' + entityId + '"]').click();
+        onEntitySelectAll: function(event) {
+            var entityId = $(event.currentTarget).data('entity-key');
+            this.$('.entity-merge-field-choice[value="' + entityId + '"]').click();
         },
 
         /**
          * @desc This callback change entity field values class in one of the form rows
          * @desc All other then "target" value will be lighter
-         * @callback
-         * @desc {HTMLElement} this
          */
-        entityValueSelectHandler: function(event) {
+        onEntityValueSelect: function(event) {
             event.stopImmediatePropagation();
-            var $this = $(this);
-            var fieldName = $this.attr('name');
-            var entityKey = $this.val();
-            $('.merge-entity-representative[data-entity-field-name="' + fieldName + '"]').each(function(index, item) {
-                var $this = $(item);
-                if ($this.data('entity-key') !== entityKey) {
-                    $this.addClass('entity-merge-not-selected');
+            var $currentTarget = $(event.currentTarget);
+            var fieldName = $currentTarget.attr('name');
+            var entityKey = parseInt($currentTarget.val());
+            var mergeSelector = '.merge-entity-representative[data-entity-field-name="' + fieldName + '"]';
+
+            this.$(mergeSelector).each(function(index, item) {
+                var $item = $(item);
+                if ($item.data('entity-key') !== entityKey) {
+                    $item.addClass('entity-merge-not-selected');
                 } else {
-                    $this.removeClass('entity-merge-not-selected');
+                    $item.removeClass('entity-merge-not-selected');
                 }
             });
+        },
+
+        /**
+         * @desc select radio button if column clicked
+         */
+        onColumnClick: function(event) {
+            $(event.currentTarget).find('.entity-merge-field-choice').click();
         },
 
         /**
@@ -51,38 +78,9 @@ define(['jquery'],  function($) {
          * @desc All selected classes will have larger weight then not selected
          */
         resetViewState: function() {
-            $('input[type="radio"]:checked').click();
-        },
-
-        /**
-         * @desc calculate columns width
-         */
-        fixTableWidth: function() {
-            var columns = $('.entity-merge-column');
-            var master = $('.merge-first-column');
-            var firstColumnWidth = parseInt(master.css('width'));
-            var tableWidth = parseInt($('.entity-merge-table').css('width'));
-            var columnWidth = ((tableWidth - firstColumnWidth) / columns.length);
-            columns.css('width', columnWidth);
-        },
-
-        /**
-         * @desc select radio button if column clicked
-         */
-        columnClickHandler: function() {
-            $(this).find('.entity-merge-field-choice').click();
-        },
-
-        /**
-         * @constructs
-         */
-        init: function() {
-            $('.entity-merge-select-all').click(this.entitySelectAllHandler);
-            $('.entity-merge-field-choice').click(this.entityValueSelectHandler);
-            $(document).ready(this.fixTableWidth);
-            $(window).resize(this.fixTableWidth);
-            $('.entity-merge-decision-container').click(this.columnClickHandler);
-            this.resetViewState();
+            this.$('input[type="radio"]:checked').click();
         }
-    };
+    });
+
+    return MergeView;
 });

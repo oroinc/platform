@@ -100,9 +100,11 @@ class EntityConfig
      */
     public function get($key)
     {
-        return array_key_exists($key, $this->items)
-            ? $this->items[$key]
-            : null;
+        if (!array_key_exists($key, $this->items)) {
+            return null;
+        }
+
+        return $this->items[$key];
     }
 
     /**
@@ -157,9 +159,11 @@ class EntityConfig
      */
     public function getField($fieldName)
     {
-        return isset($this->fields[$fieldName])
-            ? $this->fields[$fieldName]
-            : null;
+        if (!isset($this->fields[$fieldName])) {
+            return null;
+        }
+
+        return $this->fields[$fieldName];
     }
 
     /**
@@ -198,9 +202,11 @@ class EntityConfig
      */
     public function getExclusionPolicy()
     {
-        return array_key_exists(self::EXCLUSION_POLICY, $this->items)
-            ? $this->items[self::EXCLUSION_POLICY]
-            : self::EXCLUSION_POLICY_NONE;
+        if (!array_key_exists(self::EXCLUSION_POLICY, $this->items)) {
+            return self::EXCLUSION_POLICY_NONE;
+        }
+
+        return $this->items[self::EXCLUSION_POLICY];
     }
 
     /**
@@ -250,9 +256,11 @@ class EntityConfig
      */
     public function isPartialLoadEnabled()
     {
-        return array_key_exists(self::DISABLE_PARTIAL_LOAD, $this->items)
-            ? !$this->items[self::DISABLE_PARTIAL_LOAD]
-            : true;
+        if (!array_key_exists(self::DISABLE_PARTIAL_LOAD, $this->items)) {
+            return true;
+        }
+
+        return !$this->items[self::DISABLE_PARTIAL_LOAD];
     }
 
     /**
@@ -281,9 +289,11 @@ class EntityConfig
      */
     public function getOrderBy()
     {
-        return array_key_exists(self::ORDER_BY, $this->items)
-            ? $this->items[self::ORDER_BY]
-            : [];
+        if (!array_key_exists(self::ORDER_BY, $this->items)) {
+            return [];
+        }
+
+        return $this->items[self::ORDER_BY];
     }
 
     /**
@@ -310,9 +320,11 @@ class EntityConfig
      */
     public function getMaxResults()
     {
-        return array_key_exists(self::MAX_RESULTS, $this->items)
-            ? $this->items[self::MAX_RESULTS]
-            : null;
+        if (!array_key_exists(self::MAX_RESULTS, $this->items)) {
+            return null;
+        }
+
+        return $this->items[self::MAX_RESULTS];
     }
 
     /**
@@ -337,9 +349,11 @@ class EntityConfig
      */
     public function getHints()
     {
-        return array_key_exists(self::HINTS, $this->items)
-            ? $this->items[self::HINTS]
-            : [];
+        if (!array_key_exists(self::HINTS, $this->items)) {
+            return [];
+        }
+
+        return $this->items[self::HINTS];
     }
 
     /**
@@ -350,10 +364,12 @@ class EntityConfig
      */
     public function addHint($name, $value = null)
     {
-        $hints   = $this->getHints();
-        $hints[] = null === $value
-            ? $name
-            : ['name' => $name, 'value' => $value];
+        $hints = $this->getHints();
+        if (null === $value) {
+            $hints[] = $name;
+        } else {
+            $hints[] = ['name' => $name, 'value' => $value];
+        }
 
         $this->items[self::HINTS] = $hints;
     }
@@ -366,7 +382,7 @@ class EntityConfig
      */
     public function removeHint($name, $value = null)
     {
-        $hints    = $this->getHints();
+        $hints = $this->getHints();
         $toRemove = [];
         if (null === $value) {
             foreach ($hints as $key => $hint) {
@@ -401,9 +417,11 @@ class EntityConfig
      */
     public function getPostSerializeHandler()
     {
-        return array_key_exists(self::POST_SERIALIZE, $this->items)
-            ? $this->items[self::POST_SERIALIZE]
-            : null;
+        if (!array_key_exists(self::POST_SERIALIZE, $this->items)) {
+            return null;
+        }
+
+        return $this->items[self::POST_SERIALIZE];
     }
 
     /**

@@ -34,8 +34,22 @@
     * method `hasDocumentationResource` was renamed to `hasDocumentationResources`
     * method `getDocumentationResource` was renamed to `getDocumentationResources`
     * method `setDocumentationResource` was renamed to `setDocumentationResources`
+* Added a possibility to rename associations. This leads the following backward incompatible changes:
+    * the data passed to `customize_loaded_data` processors were changed: from now these data contain already renamed fields and associations are not collapsed
+#### ChainProcessor Component
+* The performance and memory usage was optimized. As result the following changes were done:
+    * the building of groups and processors maps functionality was moved from `Oro\Component\ChainProcessor\ProcessorBag` to `Oro\Component\ChainProcessor\ProcessorBagConfigBuilder`
+    * methods `addGroup` and `addProcessor` were removed from `Oro\Component\ChainProcessor\ProcessorBag`
+    * the schema of data stored in `Oro\Component\ChainProcessor\ProcessorBag::$processors` property was changed from `[action => [['processor' => processor id, 'attributes' => [attribute name => attribute value, ...]], ...], ...]` to `[action => [[processor id, [attribute name => attribute value, ...]], ...], ...]`
+    * the schema of data stored in `Oro\Component\ChainProcessor\ProcessorIterator::$processors` property was changed from `[['processor' => processor id, 'attributes' => [attribute name => attribute value, ...]], ...]` to `[[processor id, [attribute name => attribute value, ...]], ...]`
+    * the DIC compiler pass `Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass` was split into two compiler passes `Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass` and `Oro\Component\ChainProcessor\DependencyInjection\LoadApplicableCheckersCompilerPass`
+    * added new DIC compiler pass `Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompilerPass`
 #### EntityConfigBundle
 * Implementation should be registered as a service with the `oro_entity_config.attribute_type` tag.
+#### EntitySerializer Component
+* Added a possibility to rename associations. This leads the following backward incompatible changes:
+    * the `Oro\Component\EntitySerializer\EntitySerializer` class was changed a lot. If you have classes extend this class, carefully check them
+    * the data passed to `post_serialize` handlers were changed: from now these data contain already renamed fields and associations are not collapsed
 #### MessageQueue Component
 * Interface `Oro\Component\MessageQueue\Job\ExtensionInterface`
     * renamed method `onCreateDelayed` to `onPostCreateDelayed`

@@ -1172,7 +1172,8 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'association1' => [
                         'data_type'   => 'integer',
-                        'allow_array' => true
+                        'allow_array' => true,
+                        'allow_range' => true
                     ]
                 ]
             ],
@@ -1221,7 +1222,8 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'renamedAssociation1' => [
                         'data_type'   => 'integer',
-                        'allow_array' => true
+                        'allow_array' => true,
+                        'allow_range' => true
                     ]
                 ]
             ],
@@ -1294,6 +1296,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                         'data_type'   => 'integer',
                         'type'        => 'association',
                         'allow_array' => true,
+                        'allow_range' => true,
                         'options'     => [
                             'associationOwnerClass' => self::TEST_CLASS_NAME,
                             'associationType'       => 'manyToOne',
@@ -1304,6 +1307,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                         'data_type'   => 'integer',
                         'type'        => 'association',
                         'allow_array' => true,
+                        'allow_range' => true,
                         'options'     => [
                             'associationOwnerClass' => self::TEST_CLASS_NAME,
                             'associationType'       => 'manyToOne',
@@ -1373,7 +1377,8 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'id' => [
                         'data_type'   => 'integer',
-                        'allow_array' => true
+                        'allow_array' => true,
+                        'allow_range' => true
                     ],
                 ]
             ],
@@ -1430,7 +1435,8 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'renamedId' => [
                         'data_type'   => 'integer',
-                        'allow_array' => true
+                        'allow_array' => true,
+                        'allow_range' => true
                     ],
                 ]
             ],

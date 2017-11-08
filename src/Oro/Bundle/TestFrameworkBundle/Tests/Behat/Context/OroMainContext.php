@@ -26,6 +26,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
+use Oro\Bundle\UIBundle\Tests\Behat\Element\EntityStatus;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 use Symfony\Component\Stopwatch\Stopwatch;
 use WebDriver\Exception\NoAlertOpenError;
@@ -382,6 +383,27 @@ class OroMainContext extends MinkContext implements
             $message,
             $title
         ));
+    }
+
+    /**
+     * Accepts alert.
+     * Example: I accept alert
+     *
+     * @When /^(?:|I )accept alert$/
+     */
+    public function iAcceptAlert()
+    {
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $session = $driver->getWebDriverSession();
+
+        for ($tries = 0; $tries < 3; ++$tries) {
+            try {
+                $session->accept_alert();
+            } catch (NoAlertOpenError $exception) {
+                usleep(50000);
+            }
+        }
     }
 
     /**
@@ -1733,5 +1755,22 @@ class OroMainContext extends MinkContext implements
     {
         $element = $this->elementFactory->createElement($elementName);
         $element->focus();
+    }
+
+    /**
+     * Asserts status badge on entity view page
+     *
+     * Examples: Then I should see "Closed Lost" gray status
+     *           Then I should see "Open" green status
+     *
+     * @Then /^I should see "(?P<status>[^"]+)" (?P<color>(green|gray)) status$/
+     */
+    public function iShouldSeeColoredStatus($status, $color)
+    {
+        /** @var EntityStatus $element */
+        $element = $this->createElement('Entity Status');
+
+        self::assertEquals($status, $element->getText());
+        self::assertEquals($color, $element->getColor());
     }
 }

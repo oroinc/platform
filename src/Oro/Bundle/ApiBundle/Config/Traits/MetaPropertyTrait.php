@@ -16,9 +16,11 @@ trait MetaPropertyTrait
      */
     public function isMetaPropertiesEnabled()
     {
-        return array_key_exists(EntityDefinitionConfig::DISABLE_META_PROPERTIES, $this->items)
-            ? !$this->items[EntityDefinitionConfig::DISABLE_META_PROPERTIES]
-            : true;
+        if (!array_key_exists(EntityDefinitionConfig::DISABLE_META_PROPERTIES, $this->items)) {
+            return true;
+        }
+
+        return !$this->items[EntityDefinitionConfig::DISABLE_META_PROPERTIES];
     }
 
     /**

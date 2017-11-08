@@ -7,11 +7,19 @@ namespace Oro\Component\ChainProcessor;
  */
 class SimpleProcessorFactory implements ProcessorFactoryInterface
 {
-    /** @var string[] */
-    protected $processors = [];
+    /** @var array [processor id => processor class, ...] */
+    protected $processors;
 
     /**
-     * Registers a processor
+     * @param array $processors [processor id => processor class, ...]
+     */
+    public function __construct(array $processors = [])
+    {
+        $this->processors = $processors;
+    }
+
+    /**
+     * Registers a processor.
      *
      * @param string $processorId
      * @param string $processorClass

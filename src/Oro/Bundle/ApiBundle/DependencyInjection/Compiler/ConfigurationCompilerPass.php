@@ -8,15 +8,18 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 
+use Oro\Component\ChainProcessor\DependencyInjection\ProcessorsLoader;
+use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Bundle\ApiBundle\Form\SwitchableFormRegistry;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 
 class ConfigurationCompilerPass implements CompilerPassInterface
 {
-    const PROCESSOR_BAG_SERVICE_ID          = 'oro_api.processor_bag';
-    const FILTER_FACTORY_SERVICE_ID         = 'oro_api.filter_factory';
-    const FILTER_FACTORY_TAG                = 'oro.api.filter_factory';
-    const DEFAULT_FILTER_FACTORY_SERVICE_ID = 'oro_api.filter_factory.default';
+    const PROCESSOR_BAG_CONFIG_PROVIDER_SERVICE_ID = 'oro_api.processor_bag_config_provider';
+    const PROCESSOR_TAG                            = 'oro.api.processor';
+    const FILTER_FACTORY_SERVICE_ID                = 'oro_api.filter_factory';
+    const FILTER_FACTORY_TAG                       = 'oro.api.filter_factory';
+    const DEFAULT_FILTER_FACTORY_SERVICE_ID        = 'oro_api.filter_factory.default';
 
     const FORM_REGISTRY_SERVICE_ID                 = 'form.registry';
     const EXPECTED_FORM_REGISTRY_CLASS             = 'Symfony\Component\Form\FormRegistry';
@@ -43,7 +46,7 @@ class ConfigurationCompilerPass implements CompilerPassInterface
     {
         $config = DependencyInjectionUtil::getConfig($container);
 
-        $this->registerProcessingGroups($container, $config);
+        $this->buildProcessorBagConfig($container, $config);
         $this->registerFilters($container, $config);
         $this->configureForms($container, $config);
     }
@@ -52,23 +55,25 @@ class ConfigurationCompilerPass implements CompilerPassInterface
      * @param ContainerBuilder $container
      * @param array            $config
      */
-    protected function registerProcessingGroups(ContainerBuilder $container, array $config)
+    protected function buildProcessorBagConfig(ContainerBuilder $container, array $config)
     {
-        $processorBagServiceDef = DependencyInjectionUtil::findDefinition(
+        $processorBagConfigProviderServiceDef = DependencyInjectionUtil::findDefinition(
             $container,
-            self::PROCESSOR_BAG_SERVICE_ID
+            self::PROCESSOR_BAG_CONFIG_PROVIDER_SERVICE_ID
         );
-        if (null !== $processorBagServiceDef) {
+        if (null !== $processorBagConfigProviderServiceDef) {
+            $groups = [];
             foreach ($config['actions'] as $action => $actionConfig) {
                 if (isset($actionConfig['processing_groups'])) {
                     foreach ($actionConfig['processing_groups'] as $group => $groupConfig) {
-                        $processorBagServiceDef->addMethodCall(
-                            'addGroup',
-                            [$group, $action, $groupConfig['priority']]
-                        );
+                        $groups[$action][$group] = isset($groupConfig['priority']) ? $groupConfig['priority'] : 0;
                     }
                 }
             }
+            $processors = ProcessorsLoader::loadProcessors($container, self::PROCESSOR_TAG);
+            $builder = new ProcessorBagConfigBuilder($groups, $processors);
+            $processorBagConfigProviderServiceDef->replaceArgument(0, $builder->getGroups());
+            $processorBagConfigProviderServiceDef->replaceArgument(1, $builder->getProcessors());
         }
     }
 
@@ -317,7 +322,7 @@ class ConfigurationCompilerPass implements CompilerPassInterface
         $guessers = [];
         foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_GUESSER_TAG) as $serviceId => $tags) {
             foreach ($tags as $tag) {
-                $guessers[$serviceId] = !empty($tag['priority']) ? $tag['priority'] : 0;
+                $guessers[$serviceId] = isset($tag['priority']) ? $tag['priority'] : 0;
             }
         }
         arsort($guessers, SORT_NUMERIC);

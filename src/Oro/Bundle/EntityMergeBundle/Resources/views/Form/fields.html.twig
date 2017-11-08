@@ -39,17 +39,14 @@
 {% endblock %}
 
 {% block oro_entity_merge_javascript %}
-    <script type="text/javascript">
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-        require(['oroentitymerge/js/merge-view'],
-                /**
-                 * @param {mergeView} mergeView
-                 */
-                function (mergeView) {
-
-                    mergeView.init.call(mergeView);
-                });
-    </script>
+    <div {{ UI.renderPageComponentAttributes({
+        view: 'oroentitymerge/js/merge-view',
+        options: {
+            _sourceElement: '#' ~ form.vars.id ~ ' .form-horizontal'
+        }
+    }) }}></div>
 {% endblock %}
 
 {% block oro_entity_merge_field_widget %}
