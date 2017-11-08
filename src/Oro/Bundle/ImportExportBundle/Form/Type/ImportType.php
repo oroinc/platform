@@ -43,7 +43,6 @@ class ImportType extends AbstractType
                 [
                     'choices' => $processorChoices,
                     'required' => true,
-                    'data' => reset($processorNames),
                     'empty_data' => reset($processorNames)
                 ],
                 $options['processorAliasOptions']

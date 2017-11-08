@@ -1,19 +1,21 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-{% set configurations = get_import_export_configuration(alias) %}
 <div class="widget-content import-widget-content">
-    {% if configurations|length > 1 %}
+    {% if configsWithForm|length > 1 %}
     <ul class="nav nav-tabs">
-        {% for configuration in configurations %}
-            {% set shortEntityName = configuration.entityClass|basename %}
+        {% for configWithForm in configsWithForm %}
+            {% set config = configWithForm.configuration %}
+            {% set shortEntityName = config.entityClass|basename %}
 
-            {% if configuration.importEntityLabel is defined and configuration.importEntityLabel is not empty %}
-                {% set entityLabel = configuration.importEntityLabel %}
+            {% if config.importEntityLabel is defined and config.importEntityLabel is not empty %}
+                {% set entityLabel = config.importEntityLabel %}
             {% else %}
                 {% set entityLabel = shortEntityName %}
             {% endif %}
 
-            <li {% if loop.index == 1 %} class="active" {% endif %}>
+            {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
+
+            <li {% if isActiveEntity %} class="active" {% endif %}>
                 <a data-toggle="tab" href="#importExport{{ shortEntityName }}">{{ entityLabel }}</a>
             </li>
         {% endfor %}
@@ -21,15 +23,18 @@
 
     {% endif %}
 
-    {% if configurations|length > 1 %}
+    {% if configsWithForm|length > 1 %}
     <div class="tab-content">
     {% endif %}
 
-        {% for config in configurations %}
-
-            {% set form = get_import_form(config.entityClass).createView() %}
+        {% for configWithForm in configsWithForm %}
+            {% set config = configWithForm.configuration %}
+            {% set form = configWithForm.form.createView() %}
             {% set shortEntityName = config.entityClass|basename %}
-            <div id="importExport{{ shortEntityName }}" class="tab-pane fade in {% if loop.index == 1 %} active{% endif %}">
+
+            {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
+
+            <div id="importExport{{ shortEntityName }}" class="tab-pane fade in {% if isActiveEntity %} active {% endif %}">
                 <div class="alert alert-info import-notice">
                     <strong>{{ 'oro.importexport.import.importance'|trans }}</strong>:
                     {{ 'oro.importexport.import.columns_notice'|trans }}
@@ -61,7 +66,7 @@
                             <div {% if form.processorAlias.vars.choices|length <= 1 %}style="display: none;"{% endif %}>
                                 {{ form_row(form.processorAlias, {'label': 'oro.importexport.import.strategy'}) }}
                             </div>
-                            {{ form_rest(form) }}
+                        {{ form_rest(form) }}
 
 
                         {% set exportTemplateProcessors = config.exportTemplateProcessorAlias %}
@@ -126,7 +131,7 @@
             </div>
         {% endfor %}
 
-    {% if configurations|length > 1 %}
+    {% if configsWithForm|length > 1 %}
     </div>
     {% endif %}
 

@@ -109,9 +109,27 @@ class ImportExportController extends Controller
 
         $entityName = $request->get('entity');
 
-        if ($entityName && $request->isMethod('POST')) {
-            $importForm = $this->getImportForm($entityName);
+        $configurationsByAlias = $this
+            ->get('oro_importexport.twig_extension.get_import_export_configuration')
+            ->getConfiguration($configAlias);
+
+        $configsWithForm = [];
+
+        $importForm = null;
+
+        foreach ($configurationsByAlias as $configuration) {
+            $form = $this->getImportForm($configuration->getEntityClass());
+
+            if ($configuration->getEntityClass() === $entityName) {
+                $importForm = $form;
+            }
+
+            $configsWithForm[] = ['form' => $form, 'configuration' => $configuration];
+        }
+
+        if ($entityName && null !== $importForm && $request->isMethod('POST')) {
             $importForm->submit($request);
+
             if ($importForm->isValid()) {
                 /** @var ImportData $data */
                 $data           = $importForm->getData();
@@ -141,7 +159,9 @@ class ImportExportController extends Controller
 
         return [
             'options' => $this->getOptionsFromRequest($request),
-            'alias' => $configAlias
+            'alias' => $configAlias,
+            'configsWithForm' => $configsWithForm,
+            'chosenEntityName' => $entityName
         ];
     }
 
