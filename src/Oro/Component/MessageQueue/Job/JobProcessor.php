@@ -149,10 +149,32 @@ class JobProcessor
         if ($job->getStatus() === Job::STATUS_STALE) {
             return true;
         }
+
+        if ($this->hasNotStartedChild($job)) {
+            return false;
+        }
+
         $timeBeforeStale = $this->getJobConfigurationProvider()->getTimeBeforeStaleForJobName($job->getName());
         if ($timeBeforeStale !== null && $timeBeforeStale != -1) {
             return $job->getLastActiveAt() <= new \DateTime('- ' . $timeBeforeStale. ' seconds');
         }
+
+        return false;
+    }
+
+    /**
+     * @param Job $job
+     *
+     * @return bool
+     */
+    private function hasNotStartedChild(Job $job)
+    {
+        foreach ($job->getChildJobs() as $childJob) {
+            if (Job::STATUS_NEW == $childJob->getStatus()) {
+                return true;
+            }
+        }
+
         return false;
     }
 
