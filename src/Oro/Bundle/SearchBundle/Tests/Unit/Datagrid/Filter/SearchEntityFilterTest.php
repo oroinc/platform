@@ -139,7 +139,8 @@ class SearchEntityFilterTest extends \PHPUnit_Framework_TestCase
                         $entity2->getId()
                     ]
                 ),
-                FilterUtility::CONDITION_AND, false
+                FilterUtility::CONDITION_AND,
+                false
             );
 
         $this->filter->init('test', [FilterUtility::DATA_NAME_KEY => $fieldName]);
