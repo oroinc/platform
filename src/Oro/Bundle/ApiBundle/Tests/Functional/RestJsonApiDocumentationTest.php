@@ -160,16 +160,10 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
      */
     protected function isSkippedEntity($entityClass, $entityType)
     {
-        // @todo: remove this variable after https://magecore.atlassian.net/browse/BAP-15863 fix
-        $temporarySkipEntities = [
-            'Extend\Entity\EV_Variant_Field_Code',
-        ];
-
         return
-            in_array($entityClass, $temporarySkipEntities, true)
-            || is_a($entityClass, TestFrameworkEntityInterface::class, true)
+            is_a($entityClass, TestFrameworkEntityInterface::class, true)
             || 0 === strpos($entityType, 'testapi')
-            || (// any entity from "Extend\Entity" namespace, except enums
+            || (// custom entities (entities from "Extend\Entity" namespace), except enums
                 0 === strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE)
                 && 0 !== strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE . 'EV_')
             );
