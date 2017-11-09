@@ -160,43 +160,9 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
      */
     protected function isSkippedEntity($entityClass, $entityType)
     {
-        // @todo: remove this variable after https://magecore.atlassian.net/browse/BB-9312 fix
+        // @todo: remove this variable after https://magecore.atlassian.net/browse/BAP-15863 fix
         $temporarySkipEntities = [
-            'Oro\Bundle\CustomerBundle\Entity\CustomerGroup',
-            'Oro\Bundle\CustomerBundle\Entity\CustomerUserRole',
-            'Oro\Bundle\CustomerBundle\Entity\CustomerUser',
-            'Oro\Bundle\CustomerBundle\Entity\Customer',
-            'Extend\Entity\EV_Acc_Internal_Rating',
-            'Oro\Bundle\InventoryBundle\Entity\InventoryLevel',
-            'Oro\Bundle\MarketingActivityBundle\Entity\MarketingActivity',
-            'Extend\Entity\EV_Ma_Type',
-            'Oro\Bundle\OrderBundle\Entity\OrderAddress',
-            'Oro\Bundle\OrderBundle\Entity\OrderDiscount',
-            'Oro\Bundle\OrderBundle\Entity\OrderLineItem',
-            'Oro\Bundle\OrderBundle\Entity\Order',
-            'Oro\Bundle\OrderBundle\Entity\OrderShippingTracking',
-            'Extend\Entity\EV_Quote_Customer_Status',
-            'Extend\Entity\EV_Quote_Internal_Status',
-            'Oro\Bundle\ProductBundle\Entity\ProductUnitPrecision',
-            'Oro\Bundle\ProductBundle\Entity\ProductUnit',
-            'Oro\Bundle\ProductBundle\Entity\RelatedItem\RelatedProduct',
-            'Extend\Entity\EV_Prod_Inventory_Status',
-            'Oro\Bundle\RFPBundle\Entity\RequestAdditionalNote',
-            'Oro\Bundle\RFPBundle\Entity\RequestProductItem',
-            'Oro\Bundle\RFPBundle\Entity\RequestProduct',
-            'Oro\Bundle\RFPBundle\Entity\Request',
-            'Extend\Entity\EV_Rfp_Customer_Status',
-            'Extend\Entity\EV_Rfp_Internal_Status',
-            'Oro\Bundle\WarehouseBundle\Entity\Warehouse',
-            'Oro\Bundle\WebsiteBundle\Entity\Website',
             'Extend\Entity\EV_Variant_Field_Code',
-            'Oro\Bundle\ProductBundle\Entity\Brand',
-            'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily',
-            'Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue',
-            'Oro\Bundle\LocaleBundle\Entity\Localization',
-            'Oro\Bundle\TaxBundle\Entity\ProductTaxCode',
-            'Oro\Bundle\CatalogBundle\Entity\Category',
-            'Oro\Bundle\PricingBundle\Entity\PriceAttributePriceList',
         ];
 
         return
