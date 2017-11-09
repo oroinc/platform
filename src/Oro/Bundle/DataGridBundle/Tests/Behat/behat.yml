@@ -83,7 +83,7 @@ oro_behat_extension:
 
     GridFilterManager:
       selector: 'div.filter-container>div.dropdown-menu'
-      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\FrontendGridFilterManager
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterManager
 
     GridColumnManagerTable:
       selector: 'div.column-manager-table'
