@@ -2,13 +2,14 @@ define(function(require) {
     'use strict';
 
     require('jasmine-jquery');
-    var $ = require('jquery');
     var Point2d = require('oroworkflow/js/tools/path-finder/point2d');
     var NodePoint = require('oroworkflow/js/tools/path-finder/node-point');
     var Connection = require('oroworkflow/js/tools/path-finder/connection');
 
     describe('oroworkflow/js/tools/path-finder/node-point', function() {
         beforeEach(function() {
+            window.setFixtures('<div class="workflow-flowchart-editor" />');
+
             this.a = new NodePoint(5.5, 7.5);
             var graph = jasmine.createSpyObj('graph', ['isConnectionUnderRect']);
             this.a.vAxis = {
@@ -19,10 +20,6 @@ define(function(require) {
                 recommendedPosition: 7,
                 graph: graph
             };
-        });
-
-        afterEach(function() {
-            $('svg').remove();
         });
 
         it('check node-point creation', function() {
@@ -114,7 +111,8 @@ define(function(require) {
 
         it('check draw method', function() {
             this.a.draw('yellow', 3);
-            expect(document.body).toContainElement('circle[fill=yellow][r=3][cx=5][cy=7]');
+            expect(document.body)
+                .toContainElement('svg[style^="top: 4px; left: 2px;"]>circle[fill=yellow][r=3][cx=3][cy=3]');
         });
     });
 });
