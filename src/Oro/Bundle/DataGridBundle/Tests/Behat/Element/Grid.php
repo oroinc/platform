@@ -76,6 +76,23 @@ class Grid extends Table implements GridInterface
     /**
      * {@inheritdoc}
      */
+    public function hasMassActionLink($title): bool
+    {
+        $massActionsButton = $this->elementFactory->createElement(
+            $this->getMappedChildElementName('MassActionButton'),
+            $this
+        );
+
+        if (!$massActionsButton) {
+            return false;
+        }
+
+        return $this->getMassActionLink($title) !== null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function clickMassActionLink($title)
     {
         $massActionsButton = $this->getMassActionButton();

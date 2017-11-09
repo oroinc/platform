@@ -56,6 +56,14 @@ interface GridInterface extends GridMappedChildInterface
     public function getMassActionLink($title);
 
     /**
+     * Checks if a grid has a mass action with a given $title.
+     *
+     * @param string $title
+     * @return bool
+     */
+    public function hasMassActionLink($title): bool;
+
+    /**
      * @param string $title
      * @throws \Exception
      */
