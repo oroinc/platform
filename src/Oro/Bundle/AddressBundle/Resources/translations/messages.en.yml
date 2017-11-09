@@ -115,7 +115,7 @@ oro:
         addresstype:
             entity_label:         Address Type
             entity_plural_label:  Address Types
-            entity_description:   Represent address type
+            entity_description:   Represent address type (e.g., shipping address, billing address, default shipping address, default billing address).
             name.label:           Name
             label:
                 label:            Label

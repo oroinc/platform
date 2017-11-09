@@ -127,24 +127,25 @@ oro:
     entityconfig:
         attribute.entity:
             attributefamily:
-                entity_label: Product Family
-                entity_plural_label: Product Families
+                entity_label:             Product Family
+                entity_plural_label:      Product Families
+                entity_description:       A product family is a set of the <a href="https://www.orocommerce.com/documentation/current/user-guide/products/product-families#products-product-families">product attributes</a> that are enough to store complete information about the products of a similar type (e.g., TV attributes vs T-shirts attributes). In the product family, attributes are organized into attribute groups that are displayed as titled sections on the OroCommerce front store.
                 code:
-                    label: Code
-                    description: The code of the attribute family
+                    label:                Code
+                    description:          The code of the attribute family.
                 entity_class:
-                    label: AttributeFamily
-                    description: The entity class of the attribute family
-                id.label: ID
+                    label:                AttributeFamily
+                    description:          The entity class of the attribute family.
+                id.label:                 ID
                 is_enabled:
-                    label: Is enabled
-                    description: A flag that says if the attribute family is available or not
-                attribute_groups.label: Group
+                    label:                Is enabled
+                    description:          A flag that says if the attribute family is available or not.
+                attribute_groups.label:   Group
                 image:
-                    label: Image
-                    description: The image of the attribute family
+                    label:                Image
+                    description:          The image of the attribute family.
                 labels:
-                    label: Labels
-                    description: The labels of the attribute family
-                owner.label: Owner
-                organization.label: Organization
+                    label:                Labels
+                    description:          The labels of the attribute family.
+                owner.label:              Owner
+                organization.label:       Organization

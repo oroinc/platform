@@ -254,8 +254,6 @@ class MarkdownApiDocParser
                         $subElement = strtolower($subElement);
                         if (isset($elementData[$subElement])) {
                             $result = $elementData[$subElement];
-                        } elseif (isset($elementData['common'])) {
-                            $result = $elementData['common'];
                         }
                     }
                 }
