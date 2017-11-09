@@ -11,6 +11,17 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class MakeLoggerServicesPersistentPass extends RegisterPersistentServicesPass
 {
     /**
+     * {@inheritdoc}
+     */
+    protected function processPersistentServices(ContainerBuilder $container, array $persistentServices)
+    {
+        parent::processPersistentServices($container, $persistentServices);
+        $container
+            ->getDefinition('oro_message_queue.consumption.clear_logger_extension')
+            ->replaceArgument(1, $persistentServices);
+    }
+
+    /**
      * @param ContainerBuilder $container
      *
      * @return string[]
@@ -19,7 +30,7 @@ class MakeLoggerServicesPersistentPass extends RegisterPersistentServicesPass
     {
         $result = [
             'logger',
-            'monolog.logger.event',
+            'monolog.logger.event'
         ];
 
         $loggerChannelCompilerPass = $this->getLoggerChannelCompilerPass($container);

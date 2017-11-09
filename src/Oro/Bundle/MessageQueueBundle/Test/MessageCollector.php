@@ -70,7 +70,7 @@ class MessageCollector implements MessageProducerInterface
     /**
      * Removes all collected messages.
      *
-     * $return self
+     * @return self
      */
     public function clear()
     {

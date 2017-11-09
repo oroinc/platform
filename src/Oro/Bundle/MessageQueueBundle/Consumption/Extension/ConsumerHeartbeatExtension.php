@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
@@ -15,20 +17,20 @@ class ConsumerHeartbeatExtension extends AbstractExtension
     /** @var int */
     private $updateHeartbeatPeriod;
 
-    /** @var ConsumerHeartbeat */
-    private $consumerHeartbeat;
+    /** @var ContainerInterface */
+    private $container;
 
     /** @var \DateTime */
     private $lastUpdatedTime;
 
     /**
-     * @param integer           $updateHeartbeatPeriod
-     * @param ConsumerHeartbeat $consumerHeartbeat
+     * @param integer            $updateHeartbeatPeriod
+     * @param ContainerInterface $container
      */
-    public function __construct($updateHeartbeatPeriod, ConsumerHeartbeat $consumerHeartbeat)
+    public function __construct($updateHeartbeatPeriod, ContainerInterface $container)
     {
         $this->updateHeartbeatPeriod = $updateHeartbeatPeriod;
-        $this->consumerHeartbeat = $consumerHeartbeat;
+        $this->container = $container;
     }
 
     /**
@@ -48,8 +50,16 @@ class ConsumerHeartbeatExtension extends AbstractExtension
             )
         ) {
             $context->getLogger()->info('Update the consumer state time.');
-            $this->consumerHeartbeat->tick();
+            $this->getConsumerHeartbeat()->tick();
             $this->lastUpdatedTime = $currentTime;
         }
+    }
+
+    /**
+     * @return ConsumerHeartbeat
+     */
+    private function getConsumerHeartbeat()
+    {
+        return $this->container->get('oro_message_queue.consumption.consumer_heartbeat');
     }
 }

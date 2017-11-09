@@ -89,6 +89,14 @@ class EntityRepositoryFactory implements RepositoryFactory
     }
 
     /**
+     * Removes instances of all already loaded repositories.
+     */
+    public function clear()
+    {
+        $this->repositoryServices = [];
+    }
+
+    /**
      * @param string $entityName
      * @return EntityManagerInterface
      * @throws NotManageableEntityException
