@@ -1,5 +1,10 @@
-define(['./util', './line2d'], function(util, Line2d) {
+define(function(require) {
     'use strict';
+
+    var util = require('./util');
+    var Line2d = require('./line2d');
+    var draw = require('./draw');
+
     /**
      * Interval on 2d surface specified by two points
      *
@@ -11,6 +16,46 @@ define(['./util', './line2d'], function(util, Line2d) {
         this.a = a;
         this.b = b;
     }
+
+    /**
+     * Start point
+     *
+     * @type {Point2d}
+     */
+    Object.defineProperty(Interval2d.prototype, 'a', {
+        get: function() {
+            return this._a;
+        },
+        set: function(value) {
+            delete this._length;
+            delete this._simpleLength;
+            delete this._line;
+            delete this._center;
+            this._a = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+
+    /**
+     * End Point
+     *
+     * @type {Point2d}
+     */
+    Object.defineProperty(Interval2d.prototype, 'b', {
+        get: function() {
+            return this._b;
+        },
+        set: function(value) {
+            delete this._length;
+            delete this._simpleLength;
+            delete this._line;
+            delete this._center;
+            this._b = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
 
     /**
      * Returns distance between start and end point
@@ -164,10 +209,7 @@ define(['./util', './line2d'], function(util, Line2d) {
         if (color === void 0) {
             color = 'green';
         }
-        document.body.insertAdjacentHTML('beforeEnd', '<svg style="position:absolute;width:1000px;height:1000px;">' +
-            '<path stroke-width="1" stroke="' + color +
-            '" fill="none" d="' + 'M ' + this.a.x + ' ' + this.a.y + ' L ' + this.b.x + ' ' + this.b.y +
-            '"></path></svg>');
+        draw.line(this.a, this.b, color);
     };
 
     return Interval2d;
