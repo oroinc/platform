@@ -1,5 +1,5 @@
+## MultiCheckboxEditorView ⇐ [SelectEditorView](./select-editor-view.md)
 <a name="module_MultiCheckboxEditorView"></a>
-## MultiCheckboxEditorView ⇐ <code>[SelectEditorView](./select-editor-view.md)</code>
 Multi-select content editor. Please note that it requires column data format
 corresponding to multi-select-cell.
 
@@ -37,26 +37,26 @@ inline_editing.save_api_accessor                    | Optional. Sets accessor mo
 
 ### Constructor parameters
 
-**Extends:** <code>[SelectEditorView](./select-editor-view.md)</code>  
+**Extends:** [SelectEditorView](./select-editor-view.md)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>Object</code> | Options container |
-| options.model | <code>Object</code> | Current row model |
-| options.placeholder | <code>string</code> | Placeholder translation key for an empty element |
-| options.placeholder_raw | <code>string</code> | Raw placeholder value. It overrides placeholder translation key |
-| options.maximumSelectionLength | <code>string</code> | Maximum selection length |
-| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
-| options.value | <code>string</code> | initial value of edited field |
+| options | `Object` | Options container |
+| options.model | `Object` | Current row model |
+| options.placeholder | `string` | Placeholder translation key for an empty element |
+| options.placeholder_raw | `string` | Raw placeholder value. It overrides placeholder translation key |
+| options.maximumSelectionLength | `string` | Maximum selection length |
+| options.validationRules | `Object` | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
+| options.value | `string` | initial value of edited field |
 
 <a name="module_MultiCheckboxEditorView#multiselect"></a>
 ### multiCheckboxEditorView.multiselect
 Jquery object that wraps select DOM element with initialized multiselect plugin
 
-**Kind**: instance property of <code>[MultiCheckboxEditorView](#module_MultiCheckboxEditorView)</code>  
+**Kind**: instance property of [MultiCheckboxEditorView](#module_MultiCheckboxEditorView)  
 **Properties**
 
 | Type |
 | --- |
-| <code>Object</code> | 
+| `Object` | 
 
