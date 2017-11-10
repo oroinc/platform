@@ -1,5 +1,6 @@
+## AbstractRelationEditorView ⇐ [SelectEditorView](./select-editor-view.md)
+
 <a name="module_AbstractRelationEditorView"></a>
-## AbstractRelationEditorView ⇐ <code>[SelectEditorView](./select-editor-view.md)</code>
 Abstract select editor which requests data from server.
 
 ### Options in yml:
@@ -14,15 +15,15 @@ inline_editing.autocomplete_api_accessor.class | One of the [list of search APIs
 
 ### Constructor parameters
 
-**Extends:** <code>[SelectEditorView](./select-editor-view.md)</code>  
+**Extends:** [SelectEditorView](./select-editor-view.md) 
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>Object</code> | Options container |
-| options.model | <code>Object</code> | Current row model |
-| options.input_delay | <code>Object</code> | Delay before user finished input and request sent to server |
-| options.fieldName | <code>string</code> | Field name to edit in model |
-| options.placeholder | <code>string</code> | Placeholder for an empty element |
-| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
-| options.autocomplete_api_accessor | <code>Object</code> | Autocomplete API specification.                                      Please see [list of search API's](../reference/search-apis.md) |
+| options | `Object` | Options container |
+| options.model | `Object` | Current row model |
+| options.input_delay | `Object` | Delay before user finished input and request sent to server |
+| options.fieldName | `string` | Field name to edit in model |
+| options.placeholder | `string` | Placeholder for an empty element |
+| options.validationRules | `Object` | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
+| options.autocomplete_api_accessor | `Object` | Autocomplete API specification.                                      Please see [list of search API's](../reference/search-apis.md) |
 

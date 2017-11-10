@@ -48,6 +48,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => $childId,
                     'change_set' => [],
+                    'additional_fields' => []
                 ],
             ],
             'deleted' => [],
@@ -81,6 +82,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => $child->getId(),
                     'change_set' => [],
+                    'additional_fields' => []
                 ]
             ],
             'deleted' => [],
@@ -113,6 +115,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => $child->getId(),
                     'change_set' => [],
+                    'additional_fields' => []
                 ]
             ],
             'deleted' => [],
@@ -145,6 +148,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => $child->getId(),
                     'change_set' => [],
+                    'additional_fields' => []
                 ]
             ],
             'deleted' => [],
@@ -180,6 +184,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => $child->getId(),
                     'change_set' => [],
+                    'additional_fields' => []
                 ]
             ],
             'inserted' => [],
@@ -217,6 +222,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => $childId,
                     'change_set' => [],
+                    'additional_fields' => []
                 ]
             ],
             'inserted' => [],
@@ -253,6 +259,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => $child->getId(),
                     'change_set' => [],
+                    'additional_fields' => []
                 ]
             ],
             'deleted' => [],
@@ -290,6 +297,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => $owner->getId(),
                     'change_set' => [],
+                    'additional_fields' => []
                 ],
             ],
         ], $insertedEntity['change_set']);
@@ -324,6 +332,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => $owner->getId(),
                     'change_set' => [],
+                    'additional_fields' => []
                 ],
             ],
         ], $updatedEntity['change_set']);
@@ -354,6 +363,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => $owner->getId(),
                     'change_set' => [],
+                    'additional_fields' => []
                 ],
             ],
         ], $updatedEntity['change_set']);
@@ -384,6 +394,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => $owner->getId(),
                     'change_set' => [],
+                    'additional_fields' => []
                 ],
             ],
         ], $updatedEntity['change_set']);
@@ -417,6 +428,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => $owner->getId(),
                     'change_set' => [],
+                    'additional_fields' => []
                 ],
                 null,
             ],
@@ -481,6 +493,7 @@ class SendCollectionsChangesToMessageQueueTest extends WebTestCase
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => $owner->getId(),
                     'change_set' => [],
+                    'additional_fields' => []
                 ],
             ],
         ], $insertedEntity['change_set']);
