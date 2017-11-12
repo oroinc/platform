@@ -1,5 +1,5 @@
 <a name="module_DatetimeEditorView"></a>
-## DatetimeEditorView ⇐ <code>[DateEditorView](./date-editor-view.md)</code>
+## DatetimeEditorView ⇐ [DateEditorView](./date-editor-view.md)
 Datetime cell content editor
 
 ### Column configuration samples:
@@ -52,17 +52,17 @@ inline_editing.save_api_accessor                    | Optional. Sets accessor mo
 
 ### Constructor parameters
 
-**Extends:** <code>[DateEditorView](./date-editor-view.md)</code>  
+**Extends:** [DateEditorView](./date-editor-view.md)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>Object</code> | Options container |
-| options.model | <code>Object</code> | Current row model |
-| options.fieldName | <code>string</code> | Field name to edit in model |
-| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
-| options.dateInputAttrs | <code>Object</code> | Attributes for date HTML input element |
-| options.datePickerOptions | <code>Object</code> | See [documentation here](http://api.jqueryui.com/datepicker/) |
-| options.timeInputAttrs | <code>Object</code> | Attributes for time HTML input element |
-| options.timePickerOptions | <code>Object</code> | See [documentation here](https://github.com/jonthornton/jquery-timepicker#options) |
-| options.value | <code>string</code> | initial value of edited field |
+| options | `Object` | Options container |
+| options.model | `Object` | Current row model |
+| options.fieldName | `string` | Field name to edit in model |
+| options.validationRules | `Object` | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
+| options.dateInputAttrs | `Object` | Attributes for date HTML input element |
+| options.datePickerOptions | `Object` | See [documentation here](http://api.jqueryui.com/datepicker/) |
+| options.timeInputAttrs | `Object` | Attributes for time HTML input element |
+| options.timePickerOptions | `Object` | See [documentation here](https://github.com/jonthornton/jquery-timepicker#options) |
+| options.value | `string` | initial value of edited field |
 

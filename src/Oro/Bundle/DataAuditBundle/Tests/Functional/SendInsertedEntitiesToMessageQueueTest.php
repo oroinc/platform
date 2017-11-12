@@ -211,6 +211,7 @@ class SendInsertedEntitiesToMessageQueueTest extends WebTestCase
                 'entity_class' => TestAuditDataChild::class,
                 'entity_id' => $child->getId(),
                 'change_set' => [],
+                'additional_fields' => []
             ]],
         ], $insertedEntity['change_set']);
     }
@@ -248,6 +249,7 @@ class SendInsertedEntitiesToMessageQueueTest extends WebTestCase
                 'entity_class' => TestAuditDataChild::class,
                 'entity_id' => $child->getId(),
                 'change_set' => [],
+                'additional_fields' => []
             ]],
         ], $insertedEntity['change_set']);
     }

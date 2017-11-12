@@ -350,7 +350,7 @@ $jobProcessor->setJobConfigurationProvider(new JobConfigurationProvider());
 ```
 
 In that case if second unique job with the same name is created, and previous job hasn't been
-updated for more than one hour, previous job get Job::STATUS_STALE status, and new job is created.
+updated for more than one hour, and it hasn't not started child, it get Job::STATUS_STALE status, and new job is created.
 
 Additionally, if processor tries to finish "staled" job, the job will be removed.
 

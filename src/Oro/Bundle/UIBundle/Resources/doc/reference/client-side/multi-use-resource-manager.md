@@ -1,5 +1,7 @@
+## MultiUseResourceManager ⇐ [BaseClass](./base-class.md)
+
 <a name="module_MultiUseResourceManager"></a>
-## MultiUseResourceManager ⇐ <code>[BaseClass](./base-class.md)</code>
+
 Allows to create/remove resource that could be used by multiple holders.
 
 Use case:
@@ -31,75 +33,75 @@ backdropManager.hold(this.cid);
 backdropManager.release(this.cid);
 ```
 
-**Extends:** <code>[BaseClass](./base-class.md)</code>  
+**Extends:** [BaseClass](./base-class.md)  
 
-* [MultiUseResourceManager](#module_MultiUseResourceManager) ⇐ <code>[BaseClass](./base-class.md)</code>
-  * [.counter](#module_MultiUseResourceManager#counter) : <code>number</code>
-  * [.isCreated](#module_MultiUseResourceManager#isCreated) : <code>boolean</code>
-  * [.holders](#module_MultiUseResourceManager#holders) : <code>Array</code>
+* [MultiUseResourceManager](#module_MultiUseResourceManager) ⇐ [BaseClass](./base-class.md)
+  * [.counter](#module_MultiUseResourceManager#counter) : `number`
+  * [.isCreated](#module_MultiUseResourceManager#isCreated) : `boolean`
+  * [.holders](#module_MultiUseResourceManager#holders) : `Array`
   * [.constructor()](#module_MultiUseResourceManager#constructor)
-  * [.hold(holder)](#module_MultiUseResourceManager#hold) ⇒ <code>\*</code>
+  * [.hold(holder)](#module_MultiUseResourceManager#hold) ⇒ `*`
   * [.release(id)](#module_MultiUseResourceManager#release)
-  * [.isReleased(id)](#module_MultiUseResourceManager#isReleased) ⇒ <code>boolean</code>
+  * [.isReleased(id)](#module_MultiUseResourceManager#isReleased) ⇒ `boolean`
   * [.checkState()](#module_MultiUseResourceManager#checkState)
   * [.dispose()](#module_MultiUseResourceManager#dispose)
 
 <a name="module_MultiUseResourceManager#counter"></a>
-### multiUseResourceManager.counter : <code>number</code>
+### multiUseResourceManager.counter : `number`
 Holders counter
 
-**Kind**: instance property of <code>[MultiUseResourceManager](#module_MultiUseResourceManager)</code>  
+**Kind**: instance property of [MultiUseResourceManager](#module_MultiUseResourceManager)  
 **Access:** protected  
 <a name="module_MultiUseResourceManager#isCreated"></a>
-### multiUseResourceManager.isCreated : <code>boolean</code>
+### multiUseResourceManager.isCreated : `boolean`
 True if resource is created
 
-**Kind**: instance property of <code>[MultiUseResourceManager](#module_MultiUseResourceManager)</code>  
+**Kind**: instance property of [MultiUseResourceManager](#module_MultiUseResourceManager)  
 <a name="module_MultiUseResourceManager#holders"></a>
-### multiUseResourceManager.holders : <code>Array</code>
+### multiUseResourceManager.holders : `Array`
 Array of ids of current resource holders
 
-**Kind**: instance property of <code>[MultiUseResourceManager](#module_MultiUseResourceManager)</code>  
+**Kind**: instance property of [MultiUseResourceManager](#module_MultiUseResourceManager)  
 <a name="module_MultiUseResourceManager#constructor"></a>
 ### multiUseResourceManager.constructor()
-**Kind**: instance method of <code>[MultiUseResourceManager](#module_MultiUseResourceManager)</code>  
+**Kind**: instance method of [MultiUseResourceManager](#module_MultiUseResourceManager)  
 <a name="module_MultiUseResourceManager#hold"></a>
-### multiUseResourceManager.hold(holder) ⇒ <code>\*</code>
+### multiUseResourceManager.hold(holder) ⇒ `*`
 Holds resource
 
-**Kind**: instance method of <code>[MultiUseResourceManager](#module_MultiUseResourceManager)</code>  
-**Returns**: <code>\*</code> - holder identifier  
+**Kind**: instance method of [MultiUseResourceManager](#module_MultiUseResourceManager)  
+**Returns**: `*` - holder identifier  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| holder | <code>\*</code> | holder identifier |
+| holder | `*` | holder identifier |
 
 <a name="module_MultiUseResourceManager#release"></a>
 ### multiUseResourceManager.release(id)
 Releases resource
 
-**Kind**: instance method of <code>[MultiUseResourceManager](#module_MultiUseResourceManager)</code>  
+**Kind**: instance method of [MultiUseResourceManager](#module_MultiUseResourceManager)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| id | <code>\*</code> | holder identifier |
+| id | `*` | holder identifier |
 
 <a name="module_MultiUseResourceManager#isReleased"></a>
-### multiUseResourceManager.isReleased(id) ⇒ <code>boolean</code>
+### multiUseResourceManager.isReleased(id) ⇒ `boolean`
 Returns true if resource holder has been already released
 
-**Kind**: instance method of <code>[MultiUseResourceManager](#module_MultiUseResourceManager)</code>  
+**Kind**: instance method of [MultiUseResourceManager](#module_MultiUseResourceManager)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| id | <code>\*</code> | holder identifier |
+| id | `*` | holder identifier |
 
 <a name="module_MultiUseResourceManager#checkState"></a>
 ### multiUseResourceManager.checkState()
 Check state, creates or disposes resource if required
 
-**Kind**: instance method of <code>[MultiUseResourceManager](#module_MultiUseResourceManager)</code>  
+**Kind**: instance method of [MultiUseResourceManager](#module_MultiUseResourceManager)  
 **Access:** protected  
 <a name="module_MultiUseResourceManager#dispose"></a>
 ### multiUseResourceManager.dispose()
-**Kind**: instance method of <code>[MultiUseResourceManager](#module_MultiUseResourceManager)</code>  
+**Kind**: instance method of [MultiUseResourceManager](#module_MultiUseResourceManager)  
