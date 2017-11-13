@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\DataAuditBundle\Entity\AuditAdditionalFieldsInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
@@ -14,7 +15,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
  * @ORM\Entity
  * @Config(defaultValues={"dataaudit"={"auditable"=true}})
  */
-class TestAuditDataOwner implements TestFrameworkEntityInterface
+class TestAuditDataOwner implements TestFrameworkEntityInterface, AuditAdditionalFieldsInterface
 {
     /**
      * @var int
@@ -95,6 +96,11 @@ class TestAuditDataOwner implements TestFrameworkEntityInterface
      * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     private $childrenOneToMany;
+
+    /**
+     * @var array
+     */
+    private $additionalFields;
 
     public function __construct()
     {
@@ -280,5 +286,21 @@ class TestAuditDataOwner implements TestFrameworkEntityInterface
     {
         $this->childrenOneToMany->removeElement($testAuditDataChild);
         $testAuditDataChild->setOwnerManyToOne(null);
+    }
+
+    /**
+     * @param array $fields
+     */
+    public function setAdditionalFields(array $fields)
+    {
+        $this->additionalFields = $fields;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAdditionalFields()
+    {
+        return $this->additionalFields;
     }
 }

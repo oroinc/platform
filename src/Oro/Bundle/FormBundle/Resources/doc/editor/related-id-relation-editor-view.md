@@ -1,5 +1,5 @@
 <a name="module_RelatedIdRelationEditorView"></a>
-## RelatedIdRelationEditorView ⇐ <code>[AbstractRelationEditorView](./abstract-relation-editor-view.md)</code>
+## RelatedIdRelationEditorView ⇐ [AbstractRelationEditorView](./abstract-relation-editor-view.md)
 Select-like cell content editor. This view is applicable when the cell value contains label (not the value).
 The editor will use `autocomplete_api_accessor` and `value_field_name`. The server will be updated with the value
 only.
@@ -66,18 +66,18 @@ inline_editing.save_api_accessor                    | Optional. Sets accessor mo
 
 ### Constructor parameters
 
-**Extends:** <code>[AbstractRelationEditorView](./abstract-relation-editor-view.md)</code>  
+**Extends:** [AbstractRelationEditorView](./abstract-relation-editor-view.md)
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>Object</code> | Options container |
-| options.model | <code>Object</code> | Current row model |
-| options.input_delay | <code>Object</code> | Delay before user finished input and request sent to server |
-| options.fieldName | <code>string</code> | Field name to edit in model |
-| options.className | <code>string</code> | CSS class name for editor element |
-| options.placeholder | <code>string</code> | Placeholder translation key for an empty element |
-| options.placeholder_raw | <code>string</code> | Raw placeholder value. It overrides placeholder translation key |
-| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
-| options.value_field_name | <code>Object</code> | Related value field name |
-| options.autocomplete_api_accessor | <code>Object</code> | Autocomplete API specification.                                      Please see [list of search API's](../reference/search-apis.md) |
+| options | `Object` | Options container |
+| options.model | `Object` | Current row model |
+| options.input_delay | `Object` | Delay before user finished input and request sent to server |
+| options.fieldName | `string` | Field name to edit in model |
+| options.className | `string` | CSS class name for editor element |
+| options.placeholder | `string` | Placeholder translation key for an empty element |
+| options.placeholder_raw | `string` | Raw placeholder value. It overrides placeholder translation key |
+| options.validationRules | `Object` | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
+| options.value_field_name | `Object` | Related value field name |
+| options.autocomplete_api_accessor | `Object` | Autocomplete API specification. Please see [list of search API's](../reference/search-apis.md) |
 
