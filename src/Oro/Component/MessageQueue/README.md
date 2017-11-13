@@ -12,8 +12,6 @@ It works on top of transport layer.
 
 The Client layer provides an ability to start producing/consuming messages with as little configuration as possible.
 
-Table of Contents
------------------
  - [External Links](#external-links)
  - [What is a Message Queue](#what-is-a-message-queue)
  - [Dictionary](#dictionary)
@@ -24,6 +22,7 @@ Table of Contents
  
 External Links
 --------------
+
  - [What is Message Queue](http://www.ibm.com/support/knowledgecenter/SSFKSJ_9.0.0/com.ibm.mq.pro.doc/q002620_.htm)
  - [Message Queue Benefits](https://www.iron.io/top-10-uses-for-message-queue/) (most of them are applicable for Oro Message Queue Component)
  - [Rabbit MQ Introduction](https://www.rabbitmq.com/tutorials/tutorial-one-php.html)
@@ -184,12 +183,12 @@ There is no ideal criteria to help decide whether a job should be created or not
 
 Here are a few recommendations:
 
-#### We Can Skip a Job Creation If:
+### We Can Skip a Job Creation If:
 
 * We have an easy fast-executing action such as status changing etc.
 * Our action looks like an event listener.
 
-#### We should always create jobs if:
+### We should always create jobs if:
 
 * The action is complicated and can be executed for a long time.
 * We need to monitor execution status.
