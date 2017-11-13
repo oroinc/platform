@@ -1,8 +1,6 @@
 Locale Settings
 ===============
 
-Table of Contents
------------------
  - [Overview](#overview)
  - [Locale](#locale)
  - [Language](#language)
@@ -18,7 +16,7 @@ Table of Contents
  - [Localization Dumping](#localization-dumping)
 
 Overview
-========
+--------
 
 Locale Settings is a service of Oro\Bundle\LocaleBundle\Model\LocaleSettings class. Id of the service is
 "oro_locale.settings". This service can be used to get locale specific settings of the application such as:
@@ -34,7 +32,7 @@ Locale Settings is a service of Oro\Bundle\LocaleBundle\Model\LocaleSettings cla
   * currency code, phone prefix, default locale based on country
 
 Locale
-======
+------
 
 Locale settings can provide default application locale. This setting is based on system configuration and can be
 different per user. Locale is used by all formatters, such as for names, addresses, numbers, date and times.
@@ -76,7 +74,7 @@ Returns the list of all available locales.
 Gets country by locale. If could not find result than returns default country.
 
 Language
-========
+--------
 
 Locale settings provides application language configuration. Application language affects translations and representation
 of date times. For example you could have en_US locale but french language, in this case date/times will be localized
@@ -88,7 +86,7 @@ $language = $locale->getLanguage();
 ```
 
 Calendar
-========
+--------
 
 Locale settings can provide instance of localized Calendar class (Oro\Bundle\LocaleBundle\Model\Calendar). This class
 can be used to get localized calendar data based on application locale and application language.
@@ -174,7 +172,7 @@ $narrowDowNames = $calendar->getDayOfWeekNames(Calendar::WIDTH_NARROW);
 ```
 
 Location
-========
+--------
 
 Location is a country associated with locale settings. Locations affects formatting of addresses in mode when
 addresses are not formatted using their Countries.
@@ -207,7 +205,7 @@ AE:
 ```
 
 Time Zone
-=========
+---------
 
 All dates in application are stored in UTC time zone. When dates are displayed on the UI they are formatted via date/time
 formatter. This formatter uses time zone setting from Locale Settings to display date times with respect of time zone.
@@ -224,7 +222,7 @@ $timeZone = $locale->getTimeZone();
 ```
 
 Currencies
-==========
+----------
 
 Locale Settings stores default currency of application. [Number formatter](./number-formatting.md) uses it for
 formatting when currency is not specified.
@@ -261,7 +259,7 @@ USD:
 
 
 Names formats
-=============
+-------------
 
 This data is used by [name formatter](./name-formatting.md). Locale settings can gets the full list of name formats
 that are available:
@@ -287,7 +285,7 @@ See name formats [detailed documentation](./name-formatting.md).
 
 
 Addresses formats
-=================
+-----------------
 
 This data is used by [address formatter](./address-formatting.md). Locale settings can gets the full list of addresses
 formats that are available:
@@ -320,7 +318,7 @@ AM:
 See address formats [detailed documentation](./address-formatting.md).
 
 Localization Dumping
-====================
+--------------------
 
 Localization information is stored in *.yml files in appropriate bundles, but during installation these data
 is dumped to container parameters (on backend) and to file oro.locale_data.js (on frontend).

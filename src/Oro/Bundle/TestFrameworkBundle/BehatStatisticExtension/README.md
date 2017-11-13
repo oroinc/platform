@@ -2,7 +2,7 @@
 
 Easy way to store behat build statistic in database
 
-### Configuration
+## Configuration
 
 ```yaml
 default: &default
@@ -25,7 +25,7 @@ http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/conf
 ```branch_name_env```, ```target_branch_env``` and ```build_id_env```
 environment variables name. If not set or not exists it will be null.
 
-### Usage
+## Usage
 
 Use ```-f statistic``` formatter argument to enable store statistic to database:
 ```bash
