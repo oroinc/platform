@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Entity;
 
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 
 class RecipientListTest extends \PHPUnit_Framework_TestCase
@@ -14,17 +16,20 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->entity = new RecipientList();
-
-        // get id should return null cause this entity was not loaded from DB
-        $this->assertNull($this->entity->getId());
-
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $this->entity->getUsers());
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $this->entity->getGroups());
     }
 
     protected function tearDown()
     {
         unset($this->entity);
+    }
+
+    public function testEmptyRecipientList()
+    {
+        // get id should return null cause this entity was not loaded from DB
+        $this->assertNull($this->entity->getId());
+
+        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $this->entity->getUsers());
+        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $this->entity->getGroups());
     }
 
     public function testSetterGetterForUsers()
@@ -87,6 +92,16 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(true, $this->entity->getOwner());
     }
 
+    public function testSetterGetterForEntityEmails()
+    {
+        $entityFields = ['field1', 'field2'];
+
+        $this->assertEquals([], $this->entity->getEntityEmails());
+
+        $this->entity->setEntityEmails($entityFields);
+        $this->assertEquals($entityFields, $this->entity->getEntityEmails());
+    }
+
     public function testToString()
     {
         $group = $this->createMock('Oro\Bundle\UserBundle\Entity\Group');
@@ -126,7 +141,8 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
 
     public function testNotValidData()
     {
-        $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContextInterface $context */
+        $context = $this->createMock(ExecutionContextInterface::class);
 
         $context->expects($this->once())
             ->method('getPropertyPath')
@@ -142,7 +158,8 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
         $group = $this->createMock('Oro\Bundle\UserBundle\Entity\Group');
         $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
 
-        $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContextInterface $context */
+        $context = $this->createMock(ExecutionContextInterface::class);
 
         $context->expects($this->never())
             ->method('getPropertyPath');
@@ -169,6 +186,11 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
         // only owner
         $this->entity->setOwner(true);
         $this->entity->isValid($context);
-        $this->entity->setEmail(null);
+        $this->entity->setOwner(null);
+
+        //only entity emails
+        $this->entity->setEntityEmails(['field1']);
+        $this->entity->isValid($context);
+        $this->entity->setEntityEmails([]);
     }
 }

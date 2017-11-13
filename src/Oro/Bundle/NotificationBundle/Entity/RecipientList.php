@@ -65,6 +65,12 @@ class RecipientList
      */
     protected $additionalEmailAssociations = [];
 
+    /**
+     * @var array
+     * @ORM\Column(name="entity_emails", type="simple_array", nullable=true)
+     */
+    protected $entityEmails = [];
+
     public function __construct()
     {
         $this->groups = new ArrayCollection();
@@ -277,7 +283,8 @@ class RecipientList
             $this->getGroups()->isEmpty()
             && $this->getUsers()->isEmpty()
             && $this->getEmail() == null
-            && $this->getOwner() == null;
+            && $this->getOwner() == null
+            && $this->getEntityEmails() === [];
 
         if ($notValid) {
             $propertyPath = $context->getPropertyPath() . '.recipientList';
@@ -286,5 +293,21 @@ class RecipientList
                 'oro.notification.validators.recipient_list.empty.message'
             );
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getEntityEmails()
+    {
+        return $this->entityEmails;
+    }
+
+    /**
+     * @param array $entityEmails
+     */
+    public function setEntityEmails(array $entityEmails)
+    {
+        $this->entityEmails = $entityEmails;
     }
 }

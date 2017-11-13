@@ -17,7 +17,7 @@ class OroNotificationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_3';
+        return 'v1_4';
     }
 
     /**
@@ -137,6 +137,14 @@ class OroNotificationBundleInstaller implements Installation
         $table->addColumn('owner', 'boolean', ['notnull' => false]);
         $table->addColumn(
             'additional_email_associations',
+            'simple_array',
+            [
+                'comment' => '(DC2Type:simple_array)',
+                'notnull' => false
+            ]
+        );
+        $table->addColumn(
+            'entity_emails',
             'simple_array',
             [
                 'comment' => '(DC2Type:simple_array)',
