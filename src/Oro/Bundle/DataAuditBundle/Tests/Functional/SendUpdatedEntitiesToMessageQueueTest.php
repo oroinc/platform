@@ -236,6 +236,7 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
                 'entity_class' => TestAuditDataChild::class,
                 'entity_id' => $child->getId(),
                 'change_set' => [],
+                'additional_fields' => []
             ]],
         ], $insertedEntity['change_set']);
     }
@@ -272,11 +273,13 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => $firstChild->getId(),
                     'change_set' => [],
+                    'additional_fields' => []
                 ],
                 [
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => $secondChild->getId(),
                     'change_set' => [],
+                    'additional_fields' => []
                 ]
             ],
         ], $insertedEntity['change_set']);
@@ -313,6 +316,7 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
                 'entity_class' => TestAuditDataChild::class,
                 'entity_id' => $child->getId(),
                 'change_set' => [],
+                'additional_fields' => []
             ]],
         ], $insertedEntity['change_set']);
     }

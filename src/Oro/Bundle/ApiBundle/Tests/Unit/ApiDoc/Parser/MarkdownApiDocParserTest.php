@@ -105,7 +105,7 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'only common doc exists'                                               => [
-                '<p>Description for ID field</p>',
+                null,
                 Entity\Account::class,
                 'id',
                 'get'
@@ -115,13 +115,13 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
                 Entity\Account::class,
                 'id'
             ],
-            'common doc should be used'                                            => [
-                '<p>Description for NAME field</p>',
+            'common doc should not be used'                                        => [
+                null,
                 Entity\Account::class,
                 'name',
                 'get'
             ],
-            'common doc should be used (requested common doc)'                     => [
+            'common doc should be returned if it requested directly'               => [
                 '<p>Description for NAME field</p>',
                 Entity\Account::class,
                 'name'

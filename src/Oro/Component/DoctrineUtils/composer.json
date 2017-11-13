@@ -6,7 +6,8 @@
     "license": "MIT",
     "require": {
         "php": ">=7.0",
-        "doctrine/orm": "2.5.*"
+        "doctrine/orm": "2.5.*",
+        "symfony/dependency-injection": "2.8.*"
     },
     "autoload": {
         "psr-0": { "Oro\\Component\\DoctrineUtils": "" }

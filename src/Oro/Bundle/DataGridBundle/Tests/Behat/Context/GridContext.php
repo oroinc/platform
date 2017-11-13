@@ -1287,11 +1287,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @Then /^(?:|I )shouldn't see (?P<action>(?:[^"]|\\")*) action$/
      * @Then /^(?:|I )shouldn't see (?P<action>(?:[^"]|\\")*) action in "(?P<gridName>[\w\s]+)"$/
      */
-    public function iShouldNotSeeDeleteAction($action, $gridName = null)
+    public function iShouldNotSeeMassAction($action, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
-        self::assertNull(
-            $grid->getMassActionLink($action),
+        self::assertFalse(
+            $grid->hasMassActionLink($action),
             sprintf('%s mass action should not be accessible', $action)
         );
     }

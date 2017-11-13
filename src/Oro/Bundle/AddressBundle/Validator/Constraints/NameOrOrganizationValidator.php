@@ -18,6 +18,9 @@ class NameOrOrganizationValidator extends ConstraintValidator
      */
     public function validate($entity, Constraint $constraint)
     {
+        if (!$entity) {
+            return;
+        }
         if (!$entity instanceof AbstractAddress) {
             throw new UnexpectedTypeException($entity, 'AbstractAddress');
         }

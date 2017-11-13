@@ -9,3 +9,7 @@ config:
         'oroaddress/js/region/model': 'bundles/oroaddress/js/region/model.js'
         'oroaddress/js/region/view': 'bundles/oroaddress/js/region/view.js'
         'oro/datagrid/action/map-action': 'bundles/oroaddress/js/datagrid/action/map-action.js'
+        'oroaddress/js/validator/name-or-organization': 'bundles/oroaddress/js/validator/name-or-organization.js'
+        'oroaddress/js/app/modules/validator-constraints-module': 'bundles/oroaddress/js/app/modules/validator-constraints-module.js'
+    appmodules:
+        - oroaddress/js/app/modules/validator-constraints-module

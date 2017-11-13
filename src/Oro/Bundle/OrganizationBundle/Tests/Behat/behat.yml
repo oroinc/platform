@@ -8,19 +8,3 @@ oro_behat_extension:
           Status: 'oro_organization_form[enabled]'
           Name: 'oro_organization_form[name]'
           Description: 'oro_organization_form[description]'
-    Organizations switcher:
-     selector: '.btn-organization-switcher'
-    Current Organization:
-      selector: '#organization-switcher > h1 > a'
-  suites:
-    OroOrganizationBundle:
-      contexts:
-        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\FixturesContext
-        - OroQuoteSalesBridgeBundle::FeatureContext
-        - OroDataGridBundle::GridContext
-        - OroFormBundle::FormContext
-        - OroSecurityBundle::ACLContext
-        - OroUserBundle::FeatureContext
-      paths:
-        - '@OroOrganizationBundle/Tests/Behat/Features'

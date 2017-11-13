@@ -66,6 +66,8 @@ class EntityChangesToAuditEntryConverter
     }
 
     /**
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @param array           $entityChanges
      * @param string          $transactionId
      * @param \DateTime       $loggedAt
@@ -140,6 +142,11 @@ class EntityChangesToAuditEntryConverter
                 $auditEntry->setOwnerDescription($ownerDescription);
                 $needFlush = true;
             }
+
+            if (isset($entityChange['additional_fields']) && !empty($entityChange['additional_fields'])) {
+                $auditEntry->setAdditionalFields($entityChange['additional_fields']);
+                $needFlush = true;
+            }
         }
 
         if ($needFlush) {
@@ -191,6 +198,10 @@ class EntityChangesToAuditEntryConverter
                 $impersonation,
                 $auditDefaultAction
             );
+
+            if (isset($entityChange['additional_fields']) && !empty($entityChange['additional_fields'])) {
+                $audit->setAdditionalFields($entityChange['additional_fields']);
+            }
 
             if ($ownerDescription) {
                 $audit->setOwnerDescription($ownerDescription);
