@@ -42,7 +42,7 @@ define(function(require) {
      */
     function validationsOf(element) {
         var validations = _.map(validationHolders(element), function(el) {
-            return $(el).data('validation');
+            return filterElementValidators(el);
         });
         validations.unshift({});
         return _.extend.apply(null, validations);
@@ -102,6 +102,23 @@ define(function(require) {
         }
 
         return $($errorHolder.find('.fields-row-error').get(0) || $errorHolder);
+    }
+
+    /**
+     * @param {jQuery} el
+     * @return {Object}
+     */
+    function filterElementValidators(el) {
+        var $el = $(el);
+        var validation = $el.data('validation');
+
+        if (!$el.is(':input')) {
+            //remove NotNull/NotBlank from not :input
+            delete validation.NotNull;
+            delete validation.NotBlank;
+        }
+
+        return validation;
     }
 
     // turn off adding rules from attributes

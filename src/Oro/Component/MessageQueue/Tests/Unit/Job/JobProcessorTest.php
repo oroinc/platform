@@ -173,6 +173,23 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($result);
     }
 
+    public function testFindOrCreateReturnsNullIfRootJobStaleByTimeButHaveNotStartedChild()
+    {
+        $job = new Job();
+        $childJob = new Job();
+        $childJob->setStatus(Job::STATUS_NEW);
+        $job->setChildJobs([$childJob]);
+
+        list($jobConfigurationProvider, $storage) = $this->configureBaseMocksForStaleJobsCases($job, 0, $job);
+
+        $processor = new JobProcessor($storage, $this->createMessageProducerMock());
+        $processor->setJobConfigurationProvider($jobConfigurationProvider);
+
+        $result = $processor->findOrCreateRootJob('owner-id', 'job-name', true);
+
+        $this->assertNull($result);
+    }
+
     public function testStaleRootJobAndChildrenWillChangeStatusForRootAndRunningChildren()
     {
         $rootJob = new Job();

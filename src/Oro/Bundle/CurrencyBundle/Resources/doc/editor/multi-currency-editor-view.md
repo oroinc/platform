@@ -1,5 +1,5 @@
 <a name="module_MultiCurrencyEditorView"></a>
-## MultiCurrencyEditorView ⇐ <code>[TextEditorView](../../../../FormBundle/Resources/doc/editor/text-editor-view.md)</code>
+## MultiCurrencyEditorView ⇐ [TextEditorView](../../../../FormBundle/Resources/doc/editor/text-editor-view.md)
 Multi currency cell content editor.
 
 ### Column configuration samples:
@@ -44,48 +44,48 @@ multicurrency_config.currency_field | Field that contains code of currency (e.g.
 
 ### Constructor parameters
 
-**Extends:** <code>[TextEditorView](../../../../FormBundle/Resources/doc/editor/text-editor-view.md)</code>  
+**Extends:** [TextEditorView](../../../../FormBundle/Resources/doc/editor/text-editor-view.md)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>Object</code> | Options container |
-| options.model | <code>Object</code> | Current row model |
-| options.fieldName | <code>string</code> | Field name to edit in model |
-| options.placeholder | <code>string</code> | Placeholder translation key for an empty element |
-| options.placeholder_raw | <code>string</code> | Raw placeholder value. It overrides placeholder translation key |
-| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](../../../../FormBundle/Resources/doc/reference/js_validation.md#conformity-server-side-validations-to-client-once) |
-| options.choices | <code>Object</code> | Array of codes of available currencies |
+| options | `Object` | Options container |
+| options.model | `Object` | Current row model |
+| options.fieldName | `string` | Field name to edit in model |
+| options.placeholder | `string` | Placeholder translation key for an empty element |
+| options.placeholder_raw | `string` | Raw placeholder value. It overrides placeholder translation key |
+| options.validationRules | `Object` | Validation rules. See [documentation here](../../../../FormBundle/Resources/doc/reference/js_validation.md#conformity-server-side-validations-to-client-once) |
+| options.choices | `Object` | Array of codes of available currencies |
 
 
-* [MultiCurrencyEditorView](#module_MultiCurrencyEditorView) ⇐ <code>[TextEditorView](./text-editor-view.md)</code>
+* [MultiCurrencyEditorView](#module_MultiCurrencyEditorView) ⇐ [TextEditorView](./text-editor-view.md)
   * [.MINIMUM_RESULTS_FOR_SEARCH](#module_MultiCurrencyEditorView#MINIMUM_RESULTS_FOR_SEARCH)
-  * [.parseRawValue(value)](#module_MultiCurrencyEditorView#parseRawValue) ⇒ <code>Object</code>
-  * [.getValue()](#module_MultiCurrencyEditorView#getValue) ⇒ <code>String</code>
-  * [.getCurrencyData()](#module_MultiCurrencyEditorView#getCurrencyData) ⇒ <code>Array</code>
+  * [.parseRawValue(value)](#module_MultiCurrencyEditorView#parseRawValue) ⇒ `Object`
+  * [.getValue()](#module_MultiCurrencyEditorView#getValue) ⇒ `String`
+  * [.getCurrencyData()](#module_MultiCurrencyEditorView#getCurrencyData) ⇒ `Array`
 
 <a name="module_MultiCurrencyEditorView#MINIMUM_RESULTS_FOR_SEARCH"></a>
 ### multiCurrencyEditorView.MINIMUM_RESULTS_FOR_SEARCH
 Option for select2 widget to show or hide search input for list of currencies
 
-**Kind**: instance property of <code>[MultiCurrencyEditorView](#module_MultiCurrencyEditorView)</code>  
+**Kind**: instance property of [MultiCurrencyEditorView](#module_MultiCurrencyEditorView)  
 **Access:** protected  
 <a name="module_MultiCurrencyEditorView#parseRawValue"></a>
-### multiCurrencyEditorView.parseRawValue(value) ⇒ <code>Object</code>
+### multiCurrencyEditorView.parseRawValue(value) ⇒ `Object`
 Convert string presetation of value to object with 'currency' and 'amount' fields
 
-**Kind**: instance method of <code>[MultiCurrencyEditorView](#module_MultiCurrencyEditorView)</code>  
+**Kind**: instance method of [MultiCurrencyEditorView](#module_MultiCurrencyEditorView)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| value | <code>String</code> | in format 'currency_code+amount' |
+| value | `String` | in format 'currency_code+amount' |
 
 <a name="module_MultiCurrencyEditorView#getValue"></a>
-### multiCurrencyEditorView.getValue() ⇒ <code>String</code>
+### multiCurrencyEditorView.getValue() ⇒ `String`
 Collects values from DOM elements and converts them to string format like EUR100.0000
 
-**Kind**: instance method of <code>[MultiCurrencyEditorView](#module_MultiCurrencyEditorView)</code>  
+**Kind**: instance method of [MultiCurrencyEditorView](#module_MultiCurrencyEditorView)  
 <a name="module_MultiCurrencyEditorView#getCurrencyData"></a>
-### multiCurrencyEditorView.getCurrencyData() ⇒ <code>Array</code>
+### multiCurrencyEditorView.getCurrencyData() ⇒ `Array`
 Prepares array of objects that presents select options in dropdown
 
-**Kind**: instance method of <code>[MultiCurrencyEditorView](#module_MultiCurrencyEditorView)</code>  
+**Kind**: instance method of [MultiCurrencyEditorView](#module_MultiCurrencyEditorView)  

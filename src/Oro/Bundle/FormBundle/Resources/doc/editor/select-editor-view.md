@@ -1,5 +1,7 @@
+## SelectEditorView ⇐ [TextEditorView](./text-editor-view.md)
+
 <a name="module_SelectEditorView"></a>
-## SelectEditorView ⇐ <code>[TextEditorView](./text-editor-view.md)</code>
+
 Select cell content editor. The cell value should be a value field.
 The grid will render a corresponding label from the `options.choices` map.
 The editor will use the same mapping
@@ -52,54 +54,54 @@ inline_editing.save_api_accessor                    | Optional. Sets accessor mo
 
 ### Constructor parameters
 
-**Extends:** <code>[TextEditorView](./text-editor-view.md)</code>  
+**Extends:** [TextEditorView](./text-editor-view.md)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>Object</code> | Options container |
-| options.model | <code>Object</code> | Current row model |
-| options.fieldName | <code>string</code> | Field name to edit in model |
-| options.className | <code>string</code> | CSS class name for editor element |
-| options.placeholder | <code>string</code> | Placeholder translation key for an empty element |
-| options.placeholder_raw | <code>string</code> | Raw placeholder value. It overrides placeholder translation key |
-| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
-| options.choices | <code>Object</code> | Key-value set of available choices |
+| options | `Object` | Options container |
+| options.model | `Object` | Current row model |
+| options.fieldName | `string` | Field name to edit in model |
+| options.className | `string` | CSS class name for editor element |
+| options.placeholder | `string` | Placeholder translation key for an empty element |
+| options.placeholder_raw | `string` | Raw placeholder value. It overrides placeholder translation key |
+| options.validationRules | `Object` | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
+| options.choices | `Object` | Key-value set of available choices |
 
 
-* [SelectEditorView](#module_SelectEditorView) ⇐ <code>[TextEditorView](./text-editor-view.md)</code>
-  * [.getSelect2Options()](#module_SelectEditorView#getSelect2Options) ⇒ <code>Object</code>
-  * [.getSelect2Data()](#module_SelectEditorView#getSelect2Data) ⇒ <code>Object</code>
+* [SelectEditorView](#module_SelectEditorView) ⇐ [TextEditorView](./text-editor-view.md)
+  * [.getSelect2Options()](#module_SelectEditorView#getSelect2Options) ⇒ `Object`
+  * [.getSelect2Data()](#module_SelectEditorView#getSelect2Data) ⇒ `Object`
   * [.onFocusout(e)](#module_SelectEditorView#onFocusout)
-  * [.isFocused()](#module_SelectEditorView#isFocused) ⇒ <code>boolean</code>
-  * [.getServerUpdateData()](#module_SelectEditorView#getServerUpdateData) ⇒ <code>Object</code>
+  * [.isFocused()](#module_SelectEditorView#isFocused) ⇒ `boolean`
+  * [.getServerUpdateData()](#module_SelectEditorView#getServerUpdateData) ⇒ `Object`
 
 <a name="module_SelectEditorView#getSelect2Options"></a>
-### selectEditorView.getSelect2Options() ⇒ <code>Object</code>
+### selectEditorView.getSelect2Options() ⇒ `Object`
 Prepares and returns Select2 options
 
-**Kind**: instance method of <code>[SelectEditorView](#module_SelectEditorView)</code>  
+**Kind**: instance method of [SelectEditorView](#module_SelectEditorView)  
 <a name="module_SelectEditorView#getSelect2Data"></a>
-### selectEditorView.getSelect2Data() ⇒ <code>Object</code>
+### selectEditorView.getSelect2Data() ⇒ `Object`
 Returns Select2 data from corresponding element
 
-**Kind**: instance method of <code>[SelectEditorView](#module_SelectEditorView)</code>  
+**Kind**: instance method of [SelectEditorView](#module_SelectEditorView)  
 <a name="module_SelectEditorView#onFocusout"></a>
 ### selectEditorView.onFocusout(e)
 Handles focusout event
 
-**Kind**: instance method of <code>[SelectEditorView](#module_SelectEditorView)</code>  
+**Kind**: instance method of [SelectEditorView](#module_SelectEditorView)  
 
 | Param | Type |
 | --- | --- |
-| e | <code>jQuery.Event</code> | 
+| e | `jQuery.Event` | 
 
 <a name="module_SelectEditorView#isFocused"></a>
-### selectEditorView.isFocused() ⇒ <code>boolean</code>
+### selectEditorView.isFocused() ⇒ `boolean`
 Returns true if element is focused
 
-**Kind**: instance method of <code>[SelectEditorView](#module_SelectEditorView)</code>  
+**Kind**: instance method of [SelectEditorView](#module_SelectEditorView)  
 <a name="module_SelectEditorView#getServerUpdateData"></a>
-### selectEditorView.getServerUpdateData() ⇒ <code>Object</code>
+### selectEditorView.getServerUpdateData() ⇒ `Object`
 Returns data which should be sent to the server
 
-**Kind**: instance method of <code>[SelectEditorView](#module_SelectEditorView)</code>  
+**Kind**: instance method of [SelectEditorView](#module_SelectEditorView)  

@@ -28,12 +28,12 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
         }
 
         /**
-         * Main biuld function
+         * Main build function
          */
         Graph.prototype.build = function() {
-            this.outerRect = this.rectangles.reduce(function(prev, current) {
+            this.outerRect = this.rectangles.slice(1).reduce(function(prev, current) {
                 return current.union(prev);
-            }, new Rectangle(this.rectangles[0].top, this.rectangles[0].left, 0, 0));
+            }, this.rectangles[0].clone());
             this.baseAxises.push(
                 BaseAxis.createFromInterval(
                     this.outerRect.topSide,
@@ -402,21 +402,20 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
          * Adds axises between rectangles
          */
         Graph.prototype.buildCenterLinesBetweenNodes = function() {
-            var _this = this;
             this.eachRectanglePair(function(a, b) {
-                if (a.top > b.bottom && a.top - b.bottom > _this.centerLineMinimalRequiredWidth) {
-                    _this.buildSingleCenterLine(a, b, (a.top + b.bottom) / 2, a.topSide, b.bottomSide, a.top, b.bottom);
+                if (a.top > b.bottom && a.top - b.bottom > this.centerLineMinimalRequiredWidth) {
+                    this.buildSingleCenterLine(a, b, (a.top + b.bottom) / 2, a.topSide, b.bottomSide, a.top, b.bottom);
                 }
-                if (b.top > a.bottom && b.top - a.bottom > _this.centerLineMinimalRequiredWidth) {
-                    _this.buildSingleCenterLine(a, b, (b.top + a.bottom) / 2, b.topSide, a.bottomSide, b.top, a.bottom);
+                if (b.top > a.bottom && b.top - a.bottom > this.centerLineMinimalRequiredWidth) {
+                    this.buildSingleCenterLine(a, b, (b.top + a.bottom) / 2, b.topSide, a.bottomSide, b.top, a.bottom);
                 }
-                if (a.left > b.right && a.left - b.right > _this.centerLineMinimalRequiredWidth) {
-                    _this.buildSingleCenterLine(a, b, (a.left + b.right) / 2, a.leftSide, b.rightSide, a.left, b.right);
+                if (a.left > b.right && a.left - b.right > this.centerLineMinimalRequiredWidth) {
+                    this.buildSingleCenterLine(a, b, (a.left + b.right) / 2, a.leftSide, b.rightSide, a.left, b.right);
                 }
-                if (b.left > a.right && b.left - a.right > _this.centerLineMinimalRequiredWidth) {
-                    _this.buildSingleCenterLine(a, b, (b.left + a.right) / 2, b.leftSide, a.rightSide, b.left, a.right);
+                if (b.left > a.right && b.left - a.right > this.centerLineMinimalRequiredWidth) {
+                    this.buildSingleCenterLine(a, b, (b.left + a.right) / 2, b.leftSide, a.rightSide, b.left, a.right);
                 }
-            });
+            }.bind(this));
         };
 
         /**
