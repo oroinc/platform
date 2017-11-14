@@ -58,12 +58,15 @@ define(function(require) {
         },
 
         _enableButtons: function() {
-            this.$('.title-buttons-container .btn').removeClass('disabled').removeAttr('disabled');
+            this._getNavButtons().removeClass('disabled');
         },
 
         _disableButton: function() {
-            this.$('.title-buttons-container .btn').addClass('disabled');
-            this.$('.title-buttons-container .btn:not(.dropdown-toggle)').prop('disabled', true);
+            this._getNavButtons().addClass('disabled');
+        },
+
+        _getNavButtons: function() {
+            return this.$('.title-buttons-container .btn');
         }
     });
 
