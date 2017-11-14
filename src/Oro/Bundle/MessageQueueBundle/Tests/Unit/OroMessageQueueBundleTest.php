@@ -18,15 +18,20 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\OroMessageQueueBundle;
 use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
+use Symfony\Component\HttpKernel\Kernel;
 
 class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
 {
     /** @var OroMessageQueueBundle */
     private $bundle;
 
+    /** @var Kernel|\PHPUnit_Framework_MockObject_MockObject */
+    private $kernel;
+
     protected function setUp()
     {
-        $this->bundle = new OroMessageQueueBundle();
+        $this->kernel = $this->createMock(Kernel::class);
+        $this->bundle = new OroMessageQueueBundle($this->kernel);
     }
 
     public function testShouldRegisterExpectedCompilerPasses()
@@ -67,7 +72,7 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
             ->method('getExtension')
             ->willReturn($this->createMock(OroMessageQueueExtension::class));
 
-        $bundle = new OroMessageQueueBundle();
+        $bundle = new OroMessageQueueBundle($this->kernel);
         $bundle->build($container);
     }
 
@@ -88,7 +93,7 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
             ->with('oro_message_queue')
             ->willReturn($extension);
 
-        $bundle = new OroMessageQueueBundle();
+        $bundle = new OroMessageQueueBundle($this->kernel);
         $bundle->build($container);
     }
 }

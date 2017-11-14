@@ -1,6 +1,8 @@
+## HiddenInitializationView ⇐ `BaseView`
+
 <a name="HiddenInitializationView"></a>
-## HiddenInitializationView ⇐ <code>BaseView</code>
-**Extends:** <code>BaseView</code>  
+
+**Extends:** `BaseView`  
 **Kind**: global class  
 <a name="new_HiddenInitializationView_new"></a>
 ### new HiddenInitializationView()

@@ -1,30 +1,32 @@
+## AclUsersSearchApiAccessor
+
 <a name="module_AclUsersSearchApiAccessor"></a>
-## AclUsersSearchApiAccessor ⇐ <code>[SearchApiAccessor](../../../../UIBundle/Resources/doc/reference/client-side/search-api-accessor.md)</code>
+**AclUsersSearchApiAccessor** ⇐ [SearchApiAccessor](../../../../UIBundle/Resources/doc/reference/client-side/search-api-accessor.md)
 Provides access to acl_users search API.
 
-**Extends:** <code>[SearchApiAccessor](../../../../UIBundle/Resources/doc/reference/client-side/search-api-accessor.md)</code>  
+**Extends:** [SearchApiAccessor](../../../../UIBundle/Resources/doc/reference/client-side/search-api-accessor.md)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>Object</code> |  |
-| options.permission_check_entity_name | <code>string</code> | The entity name to check permissions on |
-| options.permission | <code>string</code> | Optional. The permission name to check. Default value is `'ASSIGN'` |
+| options | `Object` |  |
+| options.permission_check_entity_name | `string` | The entity name to check permissions on |
+| options.permission | `string` | Optional. The permission name to check. Default value is `'ASSIGN'` |
 
 
-* [AclUsersSearchApiAccessor](#module_AclUsersSearchApiAccessor) ⇐ <code>[SearchApiAccessor](../../../../UIBundle/Resources/doc/reference/client-side/search-api-accessor.md)</code>
+* [AclUsersSearchApiAccessor](#module_AclUsersSearchApiAccessor) ⇐ [SearchApiAccessor](../../../../UIBundle/Resources/doc/reference/client-side/search-api-accessor.md)
   * [.initialize](#module_AclUsersSearchApiAccessor#initialize)
-  * [.hashCode(url)](#module_AclUsersSearchApiAccessor#hashCode) ⇒ <code>string</code>
+  * [.hashCode(url)](#module_AclUsersSearchApiAccessor#hashCode) ⇒ `string`
 
 <a name="module_AclUsersSearchApiAccessor#initialize"></a>
 ### aclUsersSearchApiAccessor.initialize
-**Kind**: instance class of <code>[AclUsersSearchApiAccessor](#module_AclUsersSearchApiAccessor)</code>  
+**Kind**: instance class of [AclUsersSearchApiAccessor](#module_AclUsersSearchApiAccessor)  
 <a name="module_AclUsersSearchApiAccessor#hashCode"></a>
-### aclUsersSearchApiAccessor.hashCode(url) ⇒ <code>string</code>
+### aclUsersSearchApiAccessor.hashCode(url) ⇒ `string`
 Returns hash code of url
 
-**Kind**: instance method of <code>[AclUsersSearchApiAccessor](#module_AclUsersSearchApiAccessor)</code>  
+**Kind**: instance method of [AclUsersSearchApiAccessor](#module_AclUsersSearchApiAccessor)  
 
 | Param | Type |
 | --- | --- |
-| url | <code>string</code> | 
+| url | `string` | 
 

@@ -577,3 +577,12 @@ services:
         public: false
         tags:
             - { name: oro_entity.name_provider, priority: 0 }
+
+    oro_entity_extend.async.orm_metadata_factory_clearer:
+        class: Oro\Bundle\EntityExtendBundle\Async\OrmMetadataFactoryClearer
+        public: false
+        arguments:
+            - '@service_container'
+            - 'oro_entity_extend.orm.metadata_factory'
+        tags:
+            - { name: oro_message_queue.consumption.clearer, priority: -10 }

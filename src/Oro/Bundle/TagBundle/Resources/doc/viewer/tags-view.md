@@ -1,5 +1,6 @@
+## TagsView ⇐ `BaseView`
+
 <a name="module_TagsView"></a>
-## TagsView ⇐ <code>BaseView</code>
 Tags view, able to handle tags array in model.
 
 Usage sample:
@@ -17,4 +18,4 @@ var tagsView = new TagsView({
 });
 ```
 
-**Extends:** <code>BaseView</code>  
+**Extends:** `BaseView`  

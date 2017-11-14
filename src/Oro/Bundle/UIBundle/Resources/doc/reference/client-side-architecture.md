@@ -79,7 +79,7 @@ config:
 ```
 This approach allows to define in each bundle code which should be executed on the application start.
 
-##### Example 1
+### Example 1
 `oroui/js/app/modules/views-module` - declares global views which will be instantiated right before an action point of controller gains control
 ```javascript
 define([
@@ -101,7 +101,7 @@ define([
     /* ... */
 });
 ```
-##### Example 2
+### Example 2
 `oroui/js/app/modules/messenger-module` - registers messenger's public methods as handlers in `mediator`
 ```javascript
 define([

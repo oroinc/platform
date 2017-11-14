@@ -45,7 +45,7 @@ class InsertFromSelectQueryExecutor
     /**
      * @param string $className
      * @param array $fields
-     * @return string
+     * @return array
      */
     protected function getColumns($className, array $fields)
     {

@@ -10,6 +10,10 @@ define(function(require) {
 
     ComponentShortcutsManager.add('module', {});
 
+    ComponentShortcutsManager.add('viewport', {
+        moduleName: 'oroui/js/app/components/viewport-component'
+    });
+
     ComponentShortcutsManager.add('jquery', {
         moduleName: 'oroui/js/app/components/jquery-widget-component',
         scalarOption: 'widgetModule'

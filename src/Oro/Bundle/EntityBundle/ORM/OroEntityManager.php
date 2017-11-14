@@ -12,20 +12,12 @@ use Doctrine\ORM\ORMException;
 
 use Oro\Bundle\EntityBundle\DataCollector\OrmLogger;
 use Oro\Bundle\EntityBundle\ORM\Event\PreCloseEventArgs;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 /**
  * @todo: think to replace this class with two decorators, one for override 'close' method, another for a profiling
  */
 class OroEntityManager extends EntityManager
 {
-    /**
-     * Entity config provider for "extend" scope
-     *
-     * @var ConfigProvider
-     */
-    protected $extendConfigProvider;
-
     /** @var OrmLogger */
     protected $logger;
 
@@ -80,29 +72,6 @@ class OroEntityManager extends EntityManager
         }
 
         parent::close();
-    }
-
-    /**
-     * @param ConfigProvider $extendConfigProvider
-     * @return $this
-     *
-     * @deprecated since 1.8. Will be removed in 2.0
-     */
-    public function setExtendConfigProvider($extendConfigProvider)
-    {
-        $this->extendConfigProvider = $extendConfigProvider;
-
-        return $this;
-    }
-
-    /**
-     * @return ConfigProvider
-     *
-     * @deprecated since 1.8. Will be removed in 2.0
-     */
-    public function getExtendConfigProvider()
-    {
-        return $this->extendConfigProvider;
     }
 
     /**

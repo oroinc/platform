@@ -2,6 +2,11 @@
     <div class="alert alert-info import-notice">
         <strong>{{ 'oro.importexport.import.importance'|trans }}</strong>:
         {{ 'oro.importexport.import.columns_notice'|trans }}
+        {% if options.additionalNotices is defined %}
+            {% for additionalNotice in options.additionalNotices %}
+                {{ additionalNotice|trans|nl2br }}
+            {% endfor %}
+        {% endif %}
     </div>
     <div class="form-container">
         <form method="post"

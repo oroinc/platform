@@ -13,3 +13,4 @@ This bundle provides the following functionality:
 - [Profiler of duplicated queries](./Resources/doc/profiler_duplicated_queries.md)
 - [Entity fallback values](./Resources/doc/entity_fallback.md)
 - [Entity repositories as a services](./Resources/doc/repositories_as_a_services.md)
+- [Transaction watchers for default DBAL connection](./Resources/doc/transaction_watchers.md)
