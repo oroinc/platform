@@ -1,8 +1,6 @@
 Getting Started
 ===============
 
-Table of Contents
------------------
  - [What is Workflow?](#what-is-workflow)
  - [Main Entities](#main-entities)
  - [How it works?](#how-it-works)
@@ -86,8 +84,10 @@ then return to it, and Workflow will have exactly the same state. Each Workflow 
 started for some specific entity.
 
 Entity Limitations
-==================
+------------------
+
 To be able to attach an entity to specific workflow (e.g. make entity workflow related) a few criteria should be met. 
+
 - Entity can not have composite fields as its primary keys.
 - Entity primary key can be integer or string (for doctrine types it is: BIGINT, DECIMAL, INTEGER, SMALLINT, STRING). In other words - all types that can be casted by SQL CAST to text representation.
 - Entity should be configurable see [Annotation](./#annotation) section.
@@ -133,10 +133,12 @@ workflows:
 WorkflowBundle provides REST API the allows to activate or deactivate workflow.
 
 Activation URL attributes:
+
 * **route:** oro_api_workflow_activate
 * **parameter:** workflowDefinition - name of the appropriate workflow
 
 Deactivation URL attributes:
+
 * **route:** oro_api_workflow_deactivate
 * **parameter:** workflowDefinition - name of the appropriate workflow
 
@@ -144,12 +146,14 @@ Deactivation URL attributes:
 
 WorkflowBundle has WorkflowManager service (oro_workflow.manager) that provides methods to activate and deactivate
 workflows:
+
 * **activateWorkflow(workflowIdentifier)** - activate workflow by workflow name, Workflow instance,
     WorkflowItem instance or WorkflowDefinition instance;
 * **deactivateWorkflow(workflowIdentifier)** - deactivate workflow by workflow name, Workflow instance (same as above).
 
 Mutually Exclusive Workflows
 ----------------------------
+
 In some cases, an application may be configured with several workflows that are mutually exclusive on different levels.
 For example, with default package, we have the standard workflow that somehow does not cover business logic that client might need.
 So we can implement another workflow for the same related entity and that two workflows are conflicting with each other by data or logic operations. 
@@ -388,7 +392,7 @@ Console commands
 
 WorkflowBundle provides following console commands to work with workflows.
 
-#### oro:workflow:definitions:load
+### oro:workflow:definitions:load
 
 This command loads workflow's configurations from *.yml configuration files to the database. It used
 during application installation and update processes. Command has two optional options:
@@ -398,7 +402,7 @@ during application installation and update processes. Command has two optional o
 
 **Note:** You must execute this command every time when workflow configurations were changed at "*.yml" files.
 
-#### oro:workflow:transit
+### oro:workflow:transit
 
 This command perform transition with specified name for WorkflowItem with specified ID. It used for performing scheduled
 transitions. Command has two required option:
@@ -406,7 +410,7 @@ transitions. Command has two required option:
 - **--workflow-item** - identifier of WorkflowItem.
 - **--transition** - name of Transition.
 
-#### oro:workflow:handle-transition-cron-trigger
+### oro:workflow:handle-transition-cron-trigger
 
 This command handles workflow transition cron trigger with specified identifier. Command has one required option:
 

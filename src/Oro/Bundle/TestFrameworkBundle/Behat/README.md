@@ -45,30 +45,30 @@
 
 The information below summarizes concepts and tools that are important for understanding and use of the test framework delivered within OroBehatExtension.
 
-***Behavior-driven development (BDD)*** is a software development process that emerged from test-driven development (TDD).
+**Behavior-driven development (BDD)** is a software development process that emerged from test-driven development (TDD).
 The Behavior-driven development combines the general techniques and principles of TDD
 with ideas from domain-driven design and object-oriented analysis and design to provide software development and management teams
 with shared tools and a shared process to collaborate on software development.
 [Read more at Wiki](https://en.wikipedia.org/wiki/Behavior-driven_development)
 
-***Behat*** is a Behavior Driven Development framework for PHP.
+**Behat** is a Behavior Driven Development framework for PHP.
 [See more in behat documentation](http://docs.behat.org/en/v3.0/)
 
-***Mink*** is an open source browser controller/emulator for web applications, developed using PHP.
+**Mink** is an open source browser controller/emulator for web applications, developed using PHP.
 [Mink documentation](http://mink.behat.org/en/latest/)
 
-***OroElementFactory*** creates elements in contexts.
+**OroElementFactory** creates elements in contexts.
 See more information about [page object pattern](http://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern).
 
-***Symfony2 Extension*** provides integration with Symfony2.
+**Symfony2 Extension** provides integration with Symfony2.
 [See Symfony2 Extension documentation](https://github.com/Behat/Symfony2Extension/blob/master/doc/index.rst)
 
-***@OroTestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension*** provides integration with Oro BAP based applications.
+**@OroTestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension** provides integration with Oro BAP based applications.
 
-***Selenium2Driver*** Selenium2Driver provides a bridge for the WebDriver's wire protocol.
+**Selenium2Driver** Selenium2Driver provides a bridge for the WebDriver's wire protocol.
 See [Driver Feature Support](http://mink.behat.org/en/latest/guides/drivers.html)
 
-***ChromeDriver*** WebDriver is an open source tool for automated testing of webapps across many browsers. 
+**ChromeDriver** WebDriver is an open source tool for automated testing of webapps across many browsers. 
 It provides capabilities for navigating to web pages, user input, JavaScript execution, and more. 
 [Website](https://sites.google.com/a/chromium.org/chromedriver/)
 
@@ -364,7 +364,7 @@ they are restored after the feature tests execution is complete.
 Every isolator must implement ```Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface``` and ```oro_behat.isolator``` tag with priority.
 See [isolators.yml](ServiceContainer/config/isolators.yml)
 
-##### Disable feature isolation
+#### Disable feature isolation
 
 You can disable feature isolation by adding ```--skip-isolators=database,cache``` option to behat console command.
 In this case, the combination of the feature tests might run much faster, but the test logics should care about the database and cache consistency.
