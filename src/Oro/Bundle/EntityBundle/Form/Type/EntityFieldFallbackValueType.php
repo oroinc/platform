@@ -17,6 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 use Oro\Bundle\EntityBundle\Form\DataTransformer\EntityFieldFallbackTransformer;
+use Oro\Bundle\EntityBundle\Exception\Fallback\FallbackFieldConfigurationMissingException;
 
 class EntityFieldFallbackValueType extends AbstractType
 {
@@ -139,7 +140,11 @@ class EntityFieldFallbackValueType extends AbstractType
         }
 
         // if no system configuration, try to get type from parent object field name fallback configuration
-        $type = $this->fallbackResolver->getType($form->getParent()->getData(), $form->getConfig()->getName());
+        try {
+            $type = $this->fallbackResolver->getType($form->getParent()->getData(), $form->getConfig()->getName());
+        } catch (FallbackFieldConfigurationMissingException $e) {
+            return ChoiceType::class;
+        }
 
         switch ($type) {
             case EntityFallbackResolver::TYPE_BOOLEAN:
