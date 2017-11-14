@@ -19,6 +19,8 @@ class EmbedFormControllerTest extends WebTestCase
 
     public function testSubmit()
     {
+        $this->markTestSkipped('BAP-15985: Unstable test');
+
         /** @var EmbeddedForm $feedbackForm */
         $feedbackForm = $this->getReference(LoadEmbeddedFormData::EMBEDDED_FORM);
 
