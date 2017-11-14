@@ -2,15 +2,14 @@ define(function(require) {
     'use strict';
 
     require('jasmine-jquery');
-    var $ = require('jquery');
     var Point2d = require('oroworkflow/js/tools/path-finder/point2d');
     var Interval2d = require('oroworkflow/js/tools/path-finder/interval2d');
     var Rectangle = require('oroworkflow/js/tools/path-finder/rectangle');
     var Interval1d = require('oroworkflow/js/tools/path-finder/interval1d');
 
     describe('oroworkflow/js/tools/path-finder/rectangle', function() {
-        afterEach(function() {
-            $('svg').remove();
+        beforeEach(function() {
+            window.setFixtures('<div class="workflow-flowchart-editor" />');
         });
 
         it('should correct initialize', function() {
@@ -127,10 +126,14 @@ define(function(require) {
         it('check point draw', function() {
             var rectangle = new Rectangle(10, 20, 30, 40);
             rectangle.draw('blue');
-            expect(document.body).toContainElement('path[d="M 10 20 L 40 20"][stroke=blue]');
-            expect(document.body).toContainElement('path[d="M 10 20 L 10 60"][stroke=blue]');
-            expect(document.body).toContainElement('path[d="M 10 60 L 40 60"][stroke=blue]');
-            expect(document.body).toContainElement('path[d="M 40 20 L 40 60"][stroke=blue]');
+            expect(document.body)
+                .toContainElement('svg[style^="top: 20px; left: 10px;"]>path[d="M 0 40 L 0 0"][stroke=blue]');
+            expect(document.body)
+                .toContainElement('svg[style^="top: 60px; left: 10px;"]>path[d="M 30 0 L 0 0"][stroke=blue]');
+            expect(document.body)
+                .toContainElement('svg[style^="top: 20px; left: 40px;"]>path[d="M 0 40 L 0 0"][stroke=blue]');
+            expect(document.body)
+                .toContainElement('svg[style^="top: 20px; left: 10px;"]>path[d="M 30 0 L 0 0"][stroke=blue]');
         });
     });
 });

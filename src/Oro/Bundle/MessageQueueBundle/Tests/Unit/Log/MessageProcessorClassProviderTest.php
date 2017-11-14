@@ -7,7 +7,6 @@ use Oro\Component\MessageQueue\Client\DelegateMessageProcessor;
 use Oro\Component\MessageQueue\Client\MessageProcessorRegistryInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
-
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Processor\Stub\MessageProcessorProxy;
 use Oro\Bundle\MessageQueueBundle\Log\MessageProcessorClassProvider;
 
@@ -31,11 +30,24 @@ class MessageProcessorClassProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetMessageProcessorClassForLazyService()
     {
         $messageProcessor = $this->createMock(MessageProcessorInterface::class);
-        $messageProcessorProxy = new MessageProcessorProxy($messageProcessor);
+        $messageProcessorProxy = $this->createMock(MessageProcessorProxy::class);
+
+        $messageProcessorProxy->expects(self::once())
+            ->method('getWrappedValueHolderValue')
+            ->willReturn($messageProcessor);
 
         $message = $this->createMock(MessageInterface::class);
 
-        $this->assertEquals(
+        self::assertEquals(
+            get_class($messageProcessor),
+            $this->messageProcessorClassProvider->getMessageProcessorClass(
+                $messageProcessorProxy,
+                $message
+            )
+        );
+
+        // test that the class name of the last processor is cached
+        self::assertEquals(
             get_class($messageProcessor),
             $this->messageProcessorClassProvider->getMessageProcessorClass(
                 $messageProcessorProxy,
@@ -50,7 +62,7 @@ class MessageProcessorClassProviderTest extends \PHPUnit_Framework_TestCase
         $messageProcessorDelegate = new DelegateMessageProcessor($this->messageProcessorRegistry);
 
         $message = $this->createMock(MessageInterface::class);
-        $message->expects(self::once())
+        $message->expects(self::any())
             ->method('getProperty')
             ->with(Config::PARAMETER_PROCESSOR_NAME)
             ->willReturn('test_processor');
@@ -60,7 +72,16 @@ class MessageProcessorClassProviderTest extends \PHPUnit_Framework_TestCase
             ->with('test_processor')
             ->willReturn($messageProcessor);
 
-        $this->assertEquals(
+        self::assertEquals(
+            get_class($messageProcessor),
+            $this->messageProcessorClassProvider->getMessageProcessorClass(
+                $messageProcessorDelegate,
+                $message
+            )
+        );
+
+        // test that the class name of the last processor is cached
+        self::assertEquals(
             get_class($messageProcessor),
             $this->messageProcessorClassProvider->getMessageProcessorClass(
                 $messageProcessorDelegate,
@@ -86,7 +107,7 @@ class MessageProcessorClassProviderTest extends \PHPUnit_Framework_TestCase
             ->with('test_processor')
             ->willReturn($messageProcessorProxy);
 
-        $this->assertEquals(
+        self::assertEquals(
             get_class($messageProcessor),
             $this->messageProcessorClassProvider->getMessageProcessorClass(
                 $messageProcessorDelegate,
@@ -108,7 +129,7 @@ class MessageProcessorClassProviderTest extends \PHPUnit_Framework_TestCase
         $this->messageProcessorRegistry->expects(self::never())
             ->method('get');
 
-        $this->assertEquals(
+        self::assertEquals(
             DelegateMessageProcessor::class,
             $this->messageProcessorClassProvider->getMessageProcessorClass(
                 $messageProcessorDelegate,
@@ -132,7 +153,7 @@ class MessageProcessorClassProviderTest extends \PHPUnit_Framework_TestCase
             ->with('test_processor')
             ->willThrowException(new \Exception('unknown processor'));
 
-        $this->assertEquals(
+        self::assertEquals(
             DelegateMessageProcessor::class,
             $this->messageProcessorClassProvider->getMessageProcessorClass(
                 $messageProcessorDelegate,

@@ -1,9 +1,9 @@
+## InlineEditableViewComponent ⇐ `BaseComponent`
 <a name="module_InlineEditableViewComponent"></a>
-## InlineEditableViewComponent ⇐ <code>BaseComponent</code>
 Allows to connect inline editors on view pages.
 Currently used only for tags-editor. See [index of supported editors](../editor)
 
-**Extends:** <code>BaseComponent</code>  
+**Extends:** `BaseComponent`  
 **Todo**
 
 - [ ] update after connecting other editors
@@ -50,32 +50,32 @@ Sample:
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>Object</code> | Options container |
-| options._sourceElement | <code>Object</code> | The element to which the view should be connected (passed automatically when                                          page component is [connected through DOM attributes](../../../../UIBundle/Resources/doc/reference/page-component.md)) |
-| options.frontend_type | <code>string</code> | frontend type, please find [available keys here](../../public/js/tools/frontend-type-map.js) |
-| options.value | <code>\*</code> | value to edit |
-| options.fieldName | <code>string</code> | field name to use when sending value to server |
-| options.metadata | <code>Object</code> | Editor metadata |
-| options.metadata.inline_editing | <code>Object</code> | inline-editing configuration |
+| options | `Object` | Options container |
+| options._sourceElement | `Object` | The element to which the view should be connected (passed automatically when                                          page component is [connected through DOM attributes](../../../../UIBundle/Resources/doc/reference/page-component.md)) |
+| options.frontend_type | `string` | frontend type, please find [available keys here](../../public/js/tools/frontend-type-map.js) |
+| options.value | `*` | value to edit |
+| options.fieldName | `string` | field name to use when sending value to server |
+| options.metadata | `Object` | Editor metadata |
+| options.metadata.inline_editing | `Object` | inline-editing configuration |
 
 
-* [InlineEditableViewComponent](#module_InlineEditableViewComponent) ⇐ <code>BaseComponent</code>
+* [InlineEditableViewComponent](#module_InlineEditableViewComponent) ⇐ `BaseComponent`
   * [.initialize](#module_InlineEditableViewComponent#initialize)
     * [new initialize(options)](#new_module_InlineEditableViewComponent#initialize_new)
   * [.resizeTo()](#module_InlineEditableViewComponent#resizeTo)
 
 <a name="module_InlineEditableViewComponent#initialize"></a>
 ### inlineEditableViewComponent.initialize
-**Kind**: instance class of <code>[InlineEditableViewComponent](#module_InlineEditableViewComponent)</code>  
+**Kind**: instance class of [InlineEditableViewComponent](#module_InlineEditableViewComponent)  
 <a name="new_module_InlineEditableViewComponent#initialize_new"></a>
 #### new initialize(options)
 
 | Param | Type |
 | --- | --- |
-| options | <code>Object</code> | 
+| options | `Object` | 
 
 <a name="module_InlineEditableViewComponent#resizeTo"></a>
 ### inlineEditableViewComponent.resizeTo()
 Resizes editor to base view width
 
-**Kind**: instance method of the <code>[InlineEditableViewComponent](#module_InlineEditableViewComponent)</code>  
+**Kind**: instance method of the [InlineEditableViewComponent](#module_InlineEditableViewComponent)  

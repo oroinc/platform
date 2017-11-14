@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     require('jasmine-jquery');
-    var $ = require('jquery');
     var Point2d = require('oroworkflow/js/tools/path-finder/point2d');
     var NodePoint = require('oroworkflow/js/tools/path-finder/node-point');
     var Interval2d = require('oroworkflow/js/tools/path-finder/interval2d');
@@ -11,6 +10,8 @@ define(function(require) {
 
     describe('oroworkflow/js/tools/path-finder/connection', function() {
         beforeEach(function() {
+            window.setFixtures('<div class="workflow-flowchart-editor" />');
+
             this.graph = jasmine.createSpyObj('graph', ['isConnectionUnderRect']);
             this.graph.isConnectionUnderRect.and.returnValue(false);
             this.direction = new Point2d(1, 0);
@@ -27,10 +28,6 @@ define(function(require) {
             this.b.vAxis = axis;
 
             this.connection = new Connection(this.a, this.b, this.direction);
-        });
-
-        afterEach(function() {
-            $('svg').remove();
         });
 
         it('check base connection creation', function() {
@@ -111,10 +108,12 @@ define(function(require) {
 
         it('check connection draw method', function() {
             this.connection.draw();
-            expect(document.body).toContainElement('path[stroke=green][d="M 10 20 L 40 20"]');
+            expect(document.body)
+                .toContainElement('svg[style^="top: 20px; left: 10px;"]>path[stroke=green][d="M 30 0 L 0 0"]');
 
             this.connection.draw('blue');
-            expect(document.body).toContainElement('path[stroke=blue][d="M 10 20 L 40 20"]');
+            expect(document.body)
+                .toContainElement('svg[style^="top: 20px; left: 10px;"]>path[stroke=blue][d="M 30 0 L 0 0"]');
         });
     });
 });

@@ -12,7 +12,7 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             storageKey: '',
             openClass: 'expanded',
             forcedState: null,
-            closeClass: '',
+            closeClass: 'collapsed',
             keepState: false,
             open: true,
             hideSibling: false,
