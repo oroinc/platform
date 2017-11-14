@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Form\Type\Filter;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Form\Type;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
