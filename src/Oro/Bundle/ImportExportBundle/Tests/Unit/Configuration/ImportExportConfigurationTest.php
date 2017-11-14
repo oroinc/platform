@@ -68,6 +68,14 @@ class ImportExportConfigurationTest extends TestCase
             $parameters[ImportExportConfiguration::FIELD_IMPORT_ENTITY_LABEL],
             $configuration->getImportEntityLabel()
         );
+        static::assertSame(
+            $parameters[ImportExportConfiguration::FIELD_IMPORT_STRATEGY_TOOLTIP],
+            $configuration->getImportStrategyTooltip()
+        );
+        static::assertSame(
+            $parameters[ImportExportConfiguration::FIELD_IMPORT_PROCESSORS_TO_CONFIRMATION_MESSAGE],
+            $configuration->getImportProcessorsToConfirmationMessage()
+        );
     }
 
     /**
@@ -89,7 +97,9 @@ class ImportExportConfigurationTest extends TestCase
             ImportExportConfiguration::FIELD_IMPORT_PROCESSOR_ALIAS => 'import processor',
             ImportExportConfiguration::FIELD_IMPORT_VALIDATION_JOB_NAME => 'import v job',
             ImportExportConfiguration::FIELD_IMPORT_VALIDATION_BUTTON_LABEL => 'import v label',
-            ImportExportConfiguration::FIELD_IMPORT_ENTITY_LABEL => 'Some Entity'
+            ImportExportConfiguration::FIELD_IMPORT_ENTITY_LABEL => 'Some Entity',
+            ImportExportConfiguration::FIELD_IMPORT_STRATEGY_TOOLTIP => 'tooltip',
+            ImportExportConfiguration::FIELD_IMPORT_PROCESSORS_TO_CONFIRMATION_MESSAGE => ['key' => 'value']
         ];
     }
 }

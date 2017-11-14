@@ -72,5 +72,15 @@ interface ImportExportConfigurationInterface
     /**
      * @return string|null
      */
+    public function getImportStrategyTooltip();
+
+    /**
+     * @return string|null
+     */
     public function getImportValidationButtonLabel();
+
+    /**
+     * @return string[]
+     */
+    public function getImportProcessorsToConfirmationMessage(): array;
 }

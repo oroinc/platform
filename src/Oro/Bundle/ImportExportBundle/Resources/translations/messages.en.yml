@@ -41,6 +41,7 @@ oro:
             tempate:        Download Data Template
             file:           File
             strategy:       Strategy
+            strategy.tooltip: '<b>Add and Replace</b> strategy overrides the existing data with the new one from the imported file.'
             importance:     Important
             columns_notice: The file must be comma-separated only. Files containing other separators will be rejected.
             errors:

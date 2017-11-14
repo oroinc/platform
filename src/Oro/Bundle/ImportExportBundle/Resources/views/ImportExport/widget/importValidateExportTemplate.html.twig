@@ -1,25 +1,28 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
+{% set importProcessorAliasesToConfirmMessage = [] %}
+
 <div class="widget-content import-widget-content">
     {% if configsWithForm|length > 1 %}
-    <ul class="nav nav-tabs">
-        {% for configWithForm in configsWithForm %}
-            {% set config = configWithForm.configuration %}
-            {% set shortEntityName = config.entityClass|basename %}
 
-            {% if config.importEntityLabel is defined and config.importEntityLabel is not empty %}
-                {% set entityLabel = config.importEntityLabel %}
-            {% else %}
-                {% set entityLabel = shortEntityName %}
-            {% endif %}
+        <ul class="nav nav-tabs">
+            {% for configWithForm in configsWithForm %}
+                {% set config = configWithForm.configuration %}
+                {% set shortEntityName = config.entityClass|basename %}
 
-            {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
+                {% if config.importEntityLabel is defined and config.importEntityLabel is not empty %}
+                    {% set entityLabel = config.importEntityLabel %}
+                {% else %}
+                    {% set entityLabel = shortEntityName %}
+                {% endif %}
 
-            <li {% if isActiveEntity %} class="active" {% endif %}>
-                <a data-toggle="tab" href="#importExport{{ shortEntityName }}">{{ entityLabel }}</a>
-            </li>
-        {% endfor %}
-    </ul>
+                {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
+
+                <li {% if isActiveEntity %} class="active" {% endif %}>
+                    <a data-toggle="tab" href="#importExport{{ shortEntityName }}">{{ entityLabel }}</a>
+                </li>
+            {% endfor %}
+        </ul>
 
     {% endif %}
 
@@ -31,8 +34,9 @@
             {% set config = configWithForm.configuration %}
             {% set form = configWithForm.form.createView() %}
             {% set shortEntityName = config.entityClass|basename %}
-
             {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
+            {% set strategyTooltip = config.importStrategyTooltip ? config.importStrategyTooltip : 'oro.importexport.import.strategy.tooltip' %}
+            {% set importProcessorAliasesToConfirmMessage = importProcessorAliasesToConfirmMessage|merge(config.importProcessorsToConfirmationMessage) %}
 
             <div id="importExport{{ shortEntityName }}" class="tab-pane fade in {% if isActiveEntity %} active {% endif %}">
                 <div class="alert alert-info import-notice">
@@ -64,10 +68,12 @@
                                 {{ form_row(form.file, {'label': 'oro.importexport.import.file'}) }}
                             </div>
                             <div {% if form.processorAlias.vars.choices|length <= 1 %}style="display: none;"{% endif %}>
-                                {{ form_row(form.processorAlias, {'label': 'oro.importexport.import.strategy'}) }}
+                                {{ form_row(form.processorAlias, {
+                                    'label': 'oro.importexport.import.strategy',
+                                    'tooltip': strategyTooltip
+                                }) }}
                             </div>
                         {{ form_rest(form) }}
-
 
                         {% set exportTemplateProcessors = config.exportTemplateProcessorAlias %}
                         {% set hasExportTemplateProcessor = config.exportTemplateProcessorAlias is not empty %}
@@ -142,11 +148,9 @@
     </div>
 
     <script type="text/javascript">
-        require(['underscore', 'orotranslation/js/translator', 'oroui/js/widget-manager', 'oroui/js/messenger'],
-            function(_, __, WidgetManager, Messenger) {
-                var getCurrentlyActiveTabContent = function(){
-                    return $('.tab-pane.active');
-                };
+        require(['underscore', 'orotranslation/js/translator', 'oroui/js/widget-manager', 'oroui/js/messenger', 'oroui/js/standart-confirmation'],
+            function(_, __, WidgetManager, Messenger, DeleteConfirmation) {
+                var importProcessorsToConfirmationMessages = {{ importProcessorAliasesToConfirmMessage|json_encode|raw }};
 
                 var resetWidgetFormToActiveTabForm = function(widget) {
                     var $tabContent = getCurrentlyActiveTabContent();
@@ -154,11 +158,36 @@
                     widget.form = $tabContent.find('form');
                 };
 
+                var getCurrentlyActiveTabContent = function(){
+                    return $('.tab-pane.active');
+                };
+
+                var getCurrentlyChosenProcessorAlias = function() {
+                    var form = getCurrentlyActiveTabContent().find('form');
+
+                    return form.find("select[name='oro_importexport_import[processorAlias]']").val();
+                };
+
                 $('#import_button').click(function(){
                     var $form = getCurrentlyActiveTabContent().find('form');
+
                     $form.find('input[name=isValidateJob]').val(false);
 
-                    $form.submit();
+                    var currentlyChosenProcessorAlias = getCurrentlyChosenProcessorAlias();
+
+                    if (importProcessorsToConfirmationMessages[currentlyChosenProcessorAlias] !== undefined) {
+                        var confirm = new DeleteConfirmation({
+                            content: importProcessorsToConfirmationMessages[currentlyChosenProcessorAlias]
+                        });
+
+                        confirm.on('ok', function () {
+                            $form.submit();
+                        });
+
+                        confirm.open();
+                    } else {
+                        $form.submit();
+                    }
                 });
 
                 $('#validate_import_button').click(function(){

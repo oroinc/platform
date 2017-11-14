@@ -23,6 +23,8 @@ class ImportExportConfiguration extends ParameterBag implements ImportExportConf
     const FIELD_IMPORT_PROCESSOR_ALIAS = 'importProcessorAlias';
 
     const FIELD_IMPORT_ENTITY_LABEL = 'importEntityLabel';
+    const FIELD_IMPORT_STRATEGY_TOOLTIP = 'importStrategyTooltip';
+    const FIELD_IMPORT_PROCESSORS_TO_CONFIRMATION_MESSAGE = 'importProcessorToConfirmationMessages';
     const FIELD_IMPORT_VALIDATION_JOB_NAME = 'importValidationJobName';
     const FIELD_IMPORT_VALIDATION_BUTTON_LABEL = 'importValidationButtonLabel';
 
@@ -136,5 +138,21 @@ class ImportExportConfiguration extends ParameterBag implements ImportExportConf
     public function getImportValidationButtonLabel()
     {
         return $this->get(self::FIELD_IMPORT_VALIDATION_BUTTON_LABEL);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getImportStrategyTooltip()
+    {
+        return $this->get(self::FIELD_IMPORT_STRATEGY_TOOLTIP);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getImportProcessorsToConfirmationMessage(): array
+    {
+        return $this->get(self::FIELD_IMPORT_PROCESSORS_TO_CONFIRMATION_MESSAGE, []);
     }
 }
