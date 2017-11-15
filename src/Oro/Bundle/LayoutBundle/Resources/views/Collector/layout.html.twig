@@ -78,6 +78,9 @@
         #tree-details-container.fixed {
             position: fixed;
             top: 10px;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         #tree-menu ul {
@@ -409,13 +412,21 @@
                 clickHandler(target, toggleAll);
             })();
 
-            window.onscroll = function (e) {
-                if (window.scrollY > 130) {
+            function fitDetailsContainer() {
+                var container = document.getElementById('tree-details-container');
+
+                if (window.scrollY > 245) {
                     Sfjs.addClass(document.getElementById('tree-details-container'), 'fixed');
+                    container.style.maxHeight = window.innerHeight - container.offsetTop + 'px';
                 } else {
                     Sfjs.removeClass(document.getElementById('tree-details-container'), 'fixed');
+                    container.style.maxHeight = '';
                 }
-            };
+            }
+
+            window.addEventListener('resize', fitDetailsContainer);
+            window.onscroll = fitDetailsContainer;
+            fitDetailsContainer();
         }());
     </script>
 {% endblock %}
