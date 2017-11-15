@@ -55,4 +55,14 @@ class TableHeader extends Element
         }
         return false;
     }
+
+    /**
+     * Checks if table header has mass actions column of checkboxes
+     *
+     * @return bool
+     */
+    public function hasMassActionColumn()
+    {
+        return $this->has('css', 'th.grid-header-cell-massAction');
+    }
 }

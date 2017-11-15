@@ -77,11 +77,14 @@ class SearchEntityFilter extends EntityFilter
         $values = $data['value'];
         $values = $values->map(
             function ($entity) {
-                return $this->doctrineHelper->getEntityIdentifier($entity);
+                return $this->doctrineHelper->getSingleEntityIdentifier($entity, false);
             }
         );
 
-        $ds->addRestriction(Criteria::expr()->in($fieldName, $values->toArray()), FilterUtility::CONDITION_AND);
+        $ds->addRestriction(
+            Criteria::expr()->in($fieldName, array_filter($values->toArray())),
+            FilterUtility::CONDITION_AND
+        );
 
         return true;
     }
