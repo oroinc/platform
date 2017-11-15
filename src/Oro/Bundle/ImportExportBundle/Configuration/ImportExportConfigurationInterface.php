@@ -83,4 +83,9 @@ interface ImportExportConfigurationInterface
      * @return string[]
      */
     public function getImportProcessorsToConfirmationMessage(): array;
+
+    /**
+     * @return string[]
+     */
+    public function getImportAdditionalNotices(): array;
 }

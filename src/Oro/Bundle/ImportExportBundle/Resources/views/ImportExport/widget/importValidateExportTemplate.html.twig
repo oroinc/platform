@@ -42,6 +42,11 @@
                 <div class="alert alert-info import-notice">
                     <strong>{{ 'oro.importexport.import.importance'|trans }}</strong>:
                     {{ 'oro.importexport.import.columns_notice'|trans }}
+                    {% if config.importAdditionalNotices is defined %}
+                        {% for importAdditionalNotice in config.importAdditionalNotices %}
+                            {{ importAdditionalNotice|nl2br }}
+                        {% endfor %}
+                    {% endif %}
                 </div>
 
                 <div class="form-container">
@@ -88,7 +93,7 @@
                                             {% for alias, label in exportTemplateProcessors %}
                                                 {% set exportTemplateButtons = exportTemplateButtons|merge([{
                                                         'path':'#',
-                                                        'aCss':'icons-holder-text no-hash',
+                                                        'aCss':'icons-holder-text no-hash export-tmpl-btn',
                                                         'title': label|trans,
                                                         'iCss':'fa-file-o hide-text',
                                                         'label': label|trans,
@@ -112,7 +117,7 @@
                                         {% else %}
                                             {{ UI.button({
                                                 'path':'#',
-                                                'aCss':'icons-holder-text no-hash',
+                                                'aCss':'icons-holder-text no-hash export-tmpl-btn',
                                                 'title': 'oro.importexport.export_template.label'|trans,
                                                 'iCss':'fa-file-o hide-text',
                                                 'label': 'oro.importexport.export_template.label'|trans,

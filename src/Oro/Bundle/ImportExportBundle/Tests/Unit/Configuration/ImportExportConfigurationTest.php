@@ -76,6 +76,10 @@ class ImportExportConfigurationTest extends TestCase
             $parameters[ImportExportConfiguration::FIELD_IMPORT_PROCESSORS_TO_CONFIRMATION_MESSAGE],
             $configuration->getImportProcessorsToConfirmationMessage()
         );
+        static::assertSame(
+            $parameters[ImportExportConfiguration::FIELD_IMPORT_ADDITIONAL_NOTICES],
+            $configuration->getImportAdditionalNotices()
+        );
     }
 
     /**
@@ -99,7 +103,8 @@ class ImportExportConfigurationTest extends TestCase
             ImportExportConfiguration::FIELD_IMPORT_VALIDATION_BUTTON_LABEL => 'import v label',
             ImportExportConfiguration::FIELD_IMPORT_ENTITY_LABEL => 'Some Entity',
             ImportExportConfiguration::FIELD_IMPORT_STRATEGY_TOOLTIP => 'tooltip',
-            ImportExportConfiguration::FIELD_IMPORT_PROCESSORS_TO_CONFIRMATION_MESSAGE => ['key' => 'value']
+            ImportExportConfiguration::FIELD_IMPORT_PROCESSORS_TO_CONFIRMATION_MESSAGE => ['key' => 'value'],
+            ImportExportConfiguration::FIELD_IMPORT_ADDITIONAL_NOTICES => ['value1','value2']
         ];
     }
 }

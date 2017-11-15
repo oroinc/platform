@@ -27,6 +27,7 @@ class ImportExportConfiguration extends ParameterBag implements ImportExportConf
     const FIELD_IMPORT_PROCESSORS_TO_CONFIRMATION_MESSAGE = 'importProcessorToConfirmationMessages';
     const FIELD_IMPORT_VALIDATION_JOB_NAME = 'importValidationJobName';
     const FIELD_IMPORT_VALIDATION_BUTTON_LABEL = 'importValidationButtonLabel';
+    const FIELD_IMPORT_ADDITIONAL_NOTICES = 'importAdditionalNotices';
 
     /**
      * {@inheritDoc}
@@ -154,5 +155,13 @@ class ImportExportConfiguration extends ParameterBag implements ImportExportConf
     public function getImportProcessorsToConfirmationMessage(): array
     {
         return $this->get(self::FIELD_IMPORT_PROCESSORS_TO_CONFIRMATION_MESSAGE, []);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getImportAdditionalNotices(): array
+    {
+        return $this->get(self::FIELD_IMPORT_ADDITIONAL_NOTICES, []);
     }
 }

@@ -21,6 +21,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element as OroElement;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -76,30 +77,90 @@ class ImportExportContext extends OroFeatureContext implements
     protected $importFile;
 
     /**
+     * Open specific tab on multi-import modal
+     *
+     * @When /^(?:|I )open "(?P<tabLabel>([\w\s]+))" import tab$/
+     * @param string $tabLabel
+     */
+    public function IOpenImportTab($tabLabel)
+    {
+        $this->openImportModalAndReturnImportSubmitButton();
+
+        if (false === $this->isMultiImportModal()) {
+            return;
+        }
+
+        $activeTab = $this->getPage()->find('css', '.import-widget-content .nav-tabs .active a');
+        $tabToBeActivated = $this->getPage()->findLink($tabLabel);
+
+        self::assertNotNull($activeTab, 'There are currently no active tabs');
+        self::assertNotNull($tabToBeActivated, 'Tab to be opened was not found');
+
+        if ($tabToBeActivated->getText() === $activeTab->getText()) {
+            return;
+        }
+
+        $tabToBeActivated->click();
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Download data template from entity grid page with custom processor
+     *
+     * @When /^(?:|I )download "(?P<entity>([\w\s]+))" Data Template file with processor "(?P<processorName>([\w\s\.]+))"$/
+     * @param string $entity
+     * @param string $processorName
+     */
+    //@codingStandardsIgnoreEnd
+    public function iDownloadDataTemplateFileWithProcessor($entity, $processorName)
+    {
+        $this->downloadTemplateFile($entity, $processorName);
+    }
+
+    /**
      * Download data template from entity grid page
      *
      * @When /^(?:|I )download "(?P<entity>([\w\s]+))" Data Template file$/
+     * @param string $entity
      */
     public function iDownloadDataTemplateFile($entity)
+    {
+        $this->downloadTemplateFile($entity);
+    }
+
+    /**
+     * @param string $entity
+     * @param null   $processorName
+     */
+    public function downloadTemplateFile($entity, $processorName = null)
     {
         $entityClass = $this->aliasResolver->getClassByAlias($this->convertEntityNameToAlias($entity));
         $processors = $this->processorRegistry->getProcessorAliasesByEntity('export_template', $entityClass);
 
-        self::assertCount(1, $processors, sprintf(
-            'Too many processors ("%s") for export "%s" entity',
-            implode(', ', $processors),
-            $entity
-        ));
+        if (!$processorName) {
+            self::assertCount(
+                1,
+                $processors,
+                sprintf(
+                    'Too many processors ("%s") for export "%s" entity',
+                    implode(', ', $processors),
+                    $entity
+                )
+            );
+            $processor = reset($processors);
+        } else {
+            self::assertContains($processorName, $processors);
+            $processor = $processorName;
+        }
 
-        $this->getPage()->clickLink('Import file');
-        $this->waitForAjax();
+        $this->openImportModalAndReturnImportSubmitButton();
 
-        $exportButton = $this->getSession()->getPage()->findLink('Export template');
-        self::assertNotNull($exportButton, "Export template link was not found");
+        $exportButton = $this->createElement('ActiveExportTemplateButton');
+        self::assertTrue($exportButton->isIsset(), "Export template link was not found");
 
         $url = $this->locatePath($this->getContainer()->get('router')->generate(
             'oro_importexport_export_template',
-            ['processorAlias' => array_shift($processors)]
+            ['processorAlias' => $processor]
         ));
         $this->template = tempnam(
             $this->getKernel()->getRootDir().DIRECTORY_SEPARATOR.'import_export',
@@ -237,7 +298,7 @@ class ImportExportContext extends OroFeatureContext implements
      * Example: When I download Data Template file
      *          And I see Account Customer name column
      *
-     * @Then /^(?:|I )see (?P<column>([\w\s]+)) column$/
+     * @Then /^(?:|I )see (?P<column>([\w\s.]+)) column$/
      */
     public function iSeeColumn($column)
     {
@@ -301,14 +362,10 @@ class ImportExportContext extends OroFeatureContext implements
      */
     public function tryImportFile()
     {
-        $importSubmitButton = $this->getPage()->find('css', '#import_button');
+        $importSubmitButton = $this->openImportModalAndReturnImportSubmitButton();
 
-        if (null === $importSubmitButton) {
-            $this->getPage()->clickLink('Import file');
-            $this->waitForAjax();
-        }
+        $this->createElement('ActiveImportFileField')->attachFile($this->importFile);
 
-        $this->createElement('ImportFileField')->attachFile($this->importFile);
         $importSubmitButton->press();
         $this->waitForAjax();
     }
@@ -371,6 +428,31 @@ class ImportExportContext extends OroFeatureContext implements
             $validationMessage,
             implode('", "', $existedErrors)
         ));
+    }
+
+    /**
+     * @return OroElement
+     */
+    protected function openImportModalAndReturnImportSubmitButton()
+    {
+        $importSubmitButton = $this->createElement('ImportModalImportFileButton');
+
+        if (false === $importSubmitButton->isIsset()) {
+            $mainImportButton =$this->createElement('MainImportFileButton');
+            self::assertNotNull($mainImportButton, 'Main import button was not found');
+            $mainImportButton->click();
+            $this->waitForAjax();
+        }
+
+        return $importSubmitButton;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isMultiImportModal(): bool
+    {
+        return $this->createElement('ImportNavTabsContainer')->isIsset();
     }
 
     /**
