@@ -14,7 +14,7 @@ define(function(require) {
          */
         options: {
             viewport: {},
-            component: 'oroui/js/app/components/view-component',
+            component: null,
             componentOptions: {}
         },
 
@@ -35,7 +35,20 @@ define(function(require) {
             this.options = _.extend({}, this.options, _.pick(options, ['viewport', 'component']));
             this.options.componentOptions = _.omit(options, _.keys(this.options));
 
+            this.resolveComponent();
+
             tools.loadModules(this.options.component, _.bind(this.onComponentLoaded, this));
+        },
+
+        resolveComponent: function() {
+            if (this.options.component) {
+                return;
+            }
+            if (this.options.componentOptions.view) {
+                this.options.component = 'oroui/js/app/components/view-component';
+            } else if (this.options.componentOptions.widgetModule) {
+                this.options.component = 'oroui/js/app/components/jquery-widget-component';
+            }
         },
 
         /**

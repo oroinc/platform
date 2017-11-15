@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -11,12 +12,17 @@ class ManyToOneAttributeType implements AttributeTypeInterface
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /**
      * @param EntityNameResolver $entityNameResolver
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(EntityNameResolver $entityNameResolver)
+    public function __construct(EntityNameResolver $entityNameResolver, DoctrineHelper $doctrineHelper)
     {
         $this->entityNameResolver = $entityNameResolver;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -56,7 +62,7 @@ class ManyToOneAttributeType implements AttributeTypeInterface
      */
     public function getSearchableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
-        return $this->getFilterableValue($attribute, $originalValue, $localization);
+        return $this->entityNameResolver->getName($originalValue, null, $localization);
     }
 
     /**
@@ -64,7 +70,9 @@ class ManyToOneAttributeType implements AttributeTypeInterface
      */
     public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
-        return $this->entityNameResolver->getName($originalValue, null, $localization);
+        return is_object($originalValue)
+            ? $this->doctrineHelper->getSingleEntityIdentifier($originalValue, false)
+            : null;
     }
 
     /**
@@ -72,6 +80,6 @@ class ManyToOneAttributeType implements AttributeTypeInterface
      */
     public function getSortableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
-        return $this->getFilterableValue($attribute, $originalValue, $localization);
+        return $this->getSearchableValue($attribute, $originalValue, $localization);
     }
 }

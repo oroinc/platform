@@ -1,5 +1,7 @@
+## RelatedIdSelectEditorView ⇐ [SelectEditorView](./select-editor-view.md)
+
 <a name="module_RelatedIdSelectEditorView"></a>
-## RelatedIdSelectEditorView ⇐ <code>[SelectEditorView](./select-editor-view.md)</code>
+
 Select-like cell content editor. This view is applicable when the cell value contains label (not the value).
 The editor will use provided `choices` map and `value_field_name`. The server will be updated with value only.
 
@@ -61,17 +63,17 @@ inline_editing.save_api_accessor                    | Optional. Sets accessor mo
 
 ### Constructor parameters
 
-**Extends:** <code>[SelectEditorView](./select-editor-view.md)</code>  
+**Extends:** [SelectEditorView](./select-editor-view.md)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>Object</code> | Options container |
-| options.model | <code>Object</code> | Current row model |
-| options.className | <code>string</code> | CSS class name for editor element |
-| options.fieldName | <code>string</code> | Field name to edit in model |
-| options.placeholder | <code>string</code> | Placeholder translation key for an empty element |
-| options.placeholder_raw | <code>string</code> | Raw placeholder value. It overrides placeholder translation key |
-| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
-| options.choices | <code>Object</code> | Key-value set of available choices |
-| options.value_field_name | <code>Object</code> | Related value field name |
+| options | `Object` | Options container |
+| options.model | `Object` | Current row model |
+| options.className | `string` | CSS class name for editor element |
+| options.fieldName | `string` | Field name to edit in model |
+| options.placeholder | `string` | Placeholder translation key for an empty element |
+| options.placeholder_raw | `string` | Raw placeholder value. It overrides placeholder translation key |
+| options.validationRules | `Object` | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
+| options.choices | `Object` | Key-value set of available choices |
+| options.value_field_name | `Object` | Related value field name |
 

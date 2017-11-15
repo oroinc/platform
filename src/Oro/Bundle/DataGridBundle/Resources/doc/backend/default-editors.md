@@ -1,74 +1,75 @@
+## defaultEditors : `Object`
 <a name="module_defaultEditors"></a>
-## defaultEditors : <code>Object</code>
+
 Maps frontend types to editor views
 
 
-* [defaultEditors](#module_defaultEditors) : <code>Object</code>
-  * [.string](#module_defaultEditors.string) : <code>function</code>
-  * [.phone](#module_defaultEditors.phone) : <code>function</code>
-  * [.datetime](#module_defaultEditors.datetime) : <code>function</code>
-  * [.date](#module_defaultEditors.date) : <code>function</code>
-  * [.currency](#module_defaultEditors.currency) : <code>function</code>
-  * [.number](#module_defaultEditors.number) : <code>function</code>
-  * [.integer](#module_defaultEditors.integer) : <code>function</code>
-  * [.decimal](#module_defaultEditors.decimal) : <code>function</code>
-  * [.percent](#module_defaultEditors.percent) : <code>function</code>
-  * [.select](#module_defaultEditors.select) : <code>function</code>
+* [defaultEditors](#module_defaultEditors) : `Object`
+  * [.string](#module_defaultEditors.string) : `function`
+  * [.phone](#module_defaultEditors.phone) : `function`
+  * [.datetime](#module_defaultEditors.datetime) : `function`
+  * [.date](#module_defaultEditors.date) : `function`
+  * [.currency](#module_defaultEditors.currency) : `function`
+  * [.number](#module_defaultEditors.number) : `function`
+  * [.integer](#module_defaultEditors.integer) : `function`
+  * [.decimal](#module_defaultEditors.decimal) : `function`
+  * [.percent](#module_defaultEditors.percent) : `function`
+  * [.select](#module_defaultEditors.select) : `function`
 
 <a name="module_defaultEditors.string"></a>
-### defaultEditors.string : <code>function</code>
+### defaultEditors.string : `function`
 Please see [text-editor-view](../../../../FormBundle/Resources/doc/editor/text-editor-view.md) for details
 
-**Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
+**Kind**: static property of [defaultEditors](#module_defaultEditors)  
 <a name="module_defaultEditors.phone"></a>
-### defaultEditors.phone : <code>function</code>
+### defaultEditors.phone : `function`
 Please see [text-editor-view](../../../../FormBundle/Resources/doc/editor/text-editor-view.md) for details
 
-**Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
+**Kind**: static property of [defaultEditors](#module_defaultEditors)  
 <a name="module_defaultEditors.datetime"></a>
-### defaultEditors.datetime : <code>function</code>
+### defaultEditors.datetime : `function`
 Please see [datetime-editor-view](../../../../FormBundle/Resources/doc/editor/datetime-editor-view.md)
 for details
 
-**Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
+**Kind**: static property of [defaultEditors](#module_defaultEditors)  
 <a name="module_defaultEditors.date"></a>
-### defaultEditors.date : <code>function</code>
+### defaultEditors.date : `function`
 Please see [date-editor-view](../../../../FormBundle/Resources/doc/editor/date-editor-view.md) for details
 
-**Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
+**Kind**: static property of [defaultEditors](#module_defaultEditors)  
 <a name="module_defaultEditors.currency"></a>
-### defaultEditors.currency : <code>function</code>
+### defaultEditors.currency : `function`
 Please see [number-editor-view](../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
 for details
 
-**Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
+**Kind**: static property of [defaultEditors](#module_defaultEditors)  
 <a name="module_defaultEditors.number"></a>
-### defaultEditors.number : <code>function</code>
+### defaultEditors.number : `function`
 Please see [number-editor-view](../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
 for details
 
-**Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
+**Kind**: static property of [defaultEditors](#module_defaultEditors)  
 <a name="module_defaultEditors.integer"></a>
-### defaultEditors.integer : <code>function</code>
+### defaultEditors.integer : `function`
 Please see [number-editor-view](../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
 for details
 
-**Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
+**Kind**: static property of [defaultEditors](#module_defaultEditors)  
 <a name="module_defaultEditors.decimal"></a>
-### defaultEditors.decimal : <code>function</code>
+### defaultEditors.decimal : `function`
 Please see [number-editor-view](../../../../FormBundle/Resources/doc/editor/number-editor-view.md)
 for details
 
-**Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
+**Kind**: static property of [defaultEditors](#module_defaultEditors)  
 <a name="module_defaultEditors.percent"></a>
-### defaultEditors.percent : <code>function</code>
+### defaultEditors.percent : `function`
 Please see [percent-editor-view](../../../../FormBundle/Resources/doc/editor/percent-editor-view.md)
 for details
 
-**Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
+**Kind**: static property of [defaultEditors](#module_defaultEditors)  
 <a name="module_defaultEditors.select"></a>
-### defaultEditors.select : <code>function</code>
+### defaultEditors.select : `function`
 Please see [select-editor-view](../../../../FormBundle/Resources/doc/editor/select-editor-view.md)
 for details
 
-**Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
+**Kind**: static property of [defaultEditors](#module_defaultEditors)  

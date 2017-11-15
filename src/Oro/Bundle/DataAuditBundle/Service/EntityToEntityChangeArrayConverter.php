@@ -4,6 +4,8 @@ namespace Oro\Bundle\DataAuditBundle\Service;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 
+use Oro\Bundle\DataAuditBundle\Entity\AuditAdditionalFieldsInterface;
+
 class EntityToEntityChangeArrayConverter
 {
     /**
@@ -17,10 +19,17 @@ class EntityToEntityChangeArrayConverter
     {
         $entityClass = ClassUtils::getClass($entity);
 
+        $additionalFields = [];
+
+        if ($entity instanceof AuditAdditionalFieldsInterface && $entity->getAdditionalFields()) {
+            $additionalFields = $this->sanitizeAdditionalFields($em, $entity->getAdditionalFields());
+        }
+
         return [
             'entity_class' => $entityClass,
             'entity_id' => $this->getEntityId($em, $entity),
             'change_set' => $this->sanitizeChangeSet($em, $changeSet),
+            'additional_fields' => $additionalFields
         ];
     }
 
@@ -45,6 +54,22 @@ class EntityToEntityChangeArrayConverter
         }
 
         return $sanitizedChangeSet;
+    }
+
+    /**
+     * @param EntityManagerInterface $em
+     * @param array $fields
+     *
+     * @return array
+     */
+    private function sanitizeAdditionalFields(EntityManagerInterface $em, array $fields)
+    {
+        $sanitizedFields = [];
+        foreach ($fields as $property => $change) {
+            $sanitizedFields[$property] = $this->convertFieldValue($em, $change);
+        }
+
+        return $sanitizedFields;
     }
 
     /**
