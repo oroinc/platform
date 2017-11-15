@@ -292,13 +292,20 @@
 /* disabled button group with dropdown-menu */
 .title-buttons-container {
   .btn-group {
-    > .btn.main-group {
+    > .btn {
+      &[data-action^=save] {
         .border-radius(0);
         .border-left-radius(3px);
-    }
-    > .btn.main-group + .btn {
+      }
+      &[data-toggle=dropdown] {
         .border-radius(0);
         .border-right-radius(3px);
+
+        &.disabled .caret {
+          border-top-color: #666;
+          border-bottom-color: #666;
+        }
+      }
     }
   }
 }
