@@ -7,6 +7,21 @@ use Doctrine\DBAL\Schema\Schema;
 interface StatisticModelInterface
 {
     /**
+     * @return mixed
+     */
+    public function getId();
+
+    /**
+     * @return boolean
+     */
+    public function isNew();
+
+    /**
+     * @return int duration in seconds
+     */
+    public function getDuration();
+
+    /**
      * Prepare Model to the db representation
      *
      * @return array
@@ -14,9 +29,10 @@ interface StatisticModelInterface
     public function toArray();
 
     /**
-     * @return boolean
+     * @param array $data
+     * @return StatisticModelInterface
      */
-    public function isNew();
+    public static function fromArray(array $data);
 
     /**
      * Describe schema for to CRUD model to persistent layer
@@ -30,4 +46,9 @@ interface StatisticModelInterface
      * @return string
      */
     public static function getName();
+
+    /**
+     * @return string
+     */
+    public static function getIdField();
 }
