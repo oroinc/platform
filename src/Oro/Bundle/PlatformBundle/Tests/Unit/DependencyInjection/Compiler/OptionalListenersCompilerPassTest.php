@@ -13,11 +13,16 @@ class OptionalListenersCompilerPassTest extends \PHPUnit_Framework_TestCase
     public function testProcess()
     {
         $container = new ContainerBuilder();
+
+        $nonInterfaceOrmListenerDefinition = new Definition(NonInterfaceListener::class);
+        $nonInterfaceOrmListenerDefinition->addTag('doctrine.orm.entity_listener');
         $nonInterfaceListenerDefinition = new Definition(NonInterfaceListener::class);
         $nonInterfaceListenerDefinition->addTag('doctrine.event_listener');
         $nonInterfaceSubscriberDefinition = new Definition(NonInterfaceListener::class);
         $nonInterfaceSubscriberDefinition->addTag('doctrine.event_subscriber');
 
+        $testOrmListenerDefinition = new Definition(TestListener::class);
+        $testOrmListenerDefinition->addTag('doctrine.orm.entity_listener');
         $testListenerDefinition = new Definition(TestListener::class);
         $testListenerDefinition->addTag('doctrine.event_listener');
         $testSubscriberDefinition = new Definition(TestListener::class);
@@ -30,12 +35,14 @@ class OptionalListenersCompilerPassTest extends \PHPUnit_Framework_TestCase
 
         $container->addDefinitions(
             [
-                'test.non_interface_listener'   => $nonInterfaceListenerDefinition,
-                'test.non_interface_subscriber' => $nonInterfaceSubscriberDefinition,
-                'test.listener'                 => $testListenerDefinition,
-                'test.subscriber'               => $testSubscriberDefinition,
-                'kernel.listener'               => $kernelListenerDefinition,
-                'kernel.subscriber'             => $kernelSubscriberDefinition,
+                'test.non_orm_interface_listener' => $nonInterfaceOrmListenerDefinition,
+                'test.non_interface_listener'     => $nonInterfaceListenerDefinition,
+                'test.non_interface_subscriber'   => $nonInterfaceSubscriberDefinition,
+                'test.orm_listener'               => $testOrmListenerDefinition,
+                'test.listener'                   => $testListenerDefinition,
+                'test.subscriber'                 => $testSubscriberDefinition,
+                'kernel.listener'                 => $kernelListenerDefinition,
+                'kernel.subscriber'               => $kernelSubscriberDefinition,
             ]
         );
 
@@ -48,6 +55,7 @@ class OptionalListenersCompilerPassTest extends \PHPUnit_Framework_TestCase
             [
                 'kernel.listener',
                 'kernel.subscriber',
+                'test.orm_listener',
                 'test.listener',
                 'test.subscriber',
             ],

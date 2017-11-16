@@ -25,7 +25,7 @@ class OptionalListenersCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $listeners = $this->getContainer()->get('oro_platform.optional_listeners.manager')->getListeners();
-        $output->writeln('List of optional doctrine listeners:');
+        $output->writeln('List of optional listeners:');
         foreach ($listeners as $listener) {
             $output->writeln(sprintf('  <comment>> %s</comment>', $listener));
         }
