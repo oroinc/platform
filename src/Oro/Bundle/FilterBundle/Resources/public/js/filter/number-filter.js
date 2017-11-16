@@ -152,6 +152,16 @@ define([
          */
         _isArrayType: function(type) {
             return _.contains(this.arrayOperators, parseInt(type) || 0);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _writeDOMValue: function(data) {
+            var value = _.isString(data.value) ? this.formatter.toRaw(data.value) : data.value;
+            this._setInputValue(this.criteriaValueSelectors.value, value);
+            this._setInputValue(this.criteriaValueSelectors.type, data.type);
+            return this;
         }
     });
 

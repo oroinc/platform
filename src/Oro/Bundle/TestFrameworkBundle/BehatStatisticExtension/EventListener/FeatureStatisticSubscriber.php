@@ -10,6 +10,8 @@ use Behat\Testwork\Output\Formatter;
 use Behat\Testwork\Output\Node\EventListener\EventListener;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatistic;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\Repository\StatisticRepositoryInterface;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\FeaturePathLocator;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 final class FeatureStatisticSubscriber implements EventListener
@@ -25,9 +27,9 @@ final class FeatureStatisticSubscriber implements EventListener
     private $featureRepository;
 
     /**
-     * @var string
+     * @var FeaturePathLocator
      */
-    private $basePath;
+    private $featurePathLocator;
 
     /**
      * @var string
@@ -50,22 +52,27 @@ final class FeatureStatisticSubscriber implements EventListener
     private $skip = false;
 
     /**
+     * @var OutputInterface
+     */
+    private $output;
+
+    /**
      * FeatureStatisticSubscriber constructor.
      * @param StatisticRepositoryInterface $featureRepository
-     * @param string $basePath
+     * @param FeaturePathLocator $featurePathLocator
      * @param string $buildId
      * @param string $gitBranch
      * @param string $gitTarget
      */
     public function __construct(
         StatisticRepositoryInterface $featureRepository,
-        $basePath,
+        FeaturePathLocator $featurePathLocator,
         $buildId,
         $gitBranch,
         $gitTarget
     ) {
         $this->featureRepository = $featureRepository;
-        $this->basePath = $basePath;
+        $this->featurePathLocator = $featurePathLocator;
         $this->buildId = $buildId;
         $this->gitBranch = $gitBranch;
         $this->gitTarget = $gitTarget;
@@ -113,10 +120,10 @@ final class FeatureStatisticSubscriber implements EventListener
         }
 
         $this->timer->stop();
+
         $stat = new FeatureStatistic();
         $stat
-            ->setBasePath($this->basePath)
-            ->setPath($event->getFeature()->getFile())
+            ->setPath($this->featurePathLocator->getRelativePath($event->getFeature()->getFile()))
             ->setTime(round($this->timer->getTime()))
             ->setGitBranch($this->gitBranch)
             ->setGitTarget($this->gitTarget)
@@ -128,7 +135,26 @@ final class FeatureStatisticSubscriber implements EventListener
 
     public function saveStats()
     {
-        $this->featureRepository->flush();
+        try {
+            $this->featureRepository->flush();
+        } catch (\Exception $e) {
+            // We should pass the tests even if we are unavailable record the statistics
+            if ($this->output) {
+                $this->output->writeln(sprintf(
+                    '<error>Exception while record the statistics:%s%s</error>',
+                    PHP_EOL,
+                    $e->getMessage()
+                ));
+            }
+        }
+    }
+
+    /**
+     * @param OutputInterface $output
+     */
+    public function setOutput(OutputInterface $output)
+    {
+        $this->output = $output;
     }
 
     /**

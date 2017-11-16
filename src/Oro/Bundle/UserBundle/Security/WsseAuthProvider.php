@@ -44,13 +44,7 @@ class WsseAuthProvider extends Provider
     protected function getSecret(UserInterface $user)
     {
         if ($user instanceof AdvancedApiUserInterface) {
-            $apiKeys = $user->getApiKeys();
-
-            if (0 === count($apiKeys)) {
-                return uniqid('undefined');
-            }
-
-            return $apiKeys;
+            return $user->getApiKeys();
         }
 
         return parent::getSecret($user);
@@ -120,13 +114,17 @@ class WsseAuthProvider extends Provider
         /** @var UserApi $userApi */
         foreach ($secrets as $userApi) {
             $currentIteration++;
-            $isSecretValid = $this->validateDigest(
-                $token->getAttribute('digest'),
-                $nonce,
-                $token->getAttribute('created'),
-                $userApi->getApiKey(),
-                $this->getSalt($user)
-            );
+            $secret = $userApi->getApiKey();
+            $isSecretValid = false;
+            if ($secret) {
+                $isSecretValid = $this->validateDigest(
+                    $token->getAttribute('digest'),
+                    $nonce,
+                    $token->getAttribute('created'),
+                    $secret,
+                    $this->getSalt($user)
+                );
+            }
             if ($isSecretValid && !$userApi->getUser()->getOrganizations()->contains($userApi->getOrganization())) {
                 throw new BadCredentialsException('Wrong API key.');
             }
