@@ -40,6 +40,8 @@ class UnchangeableFieldValidator extends ConstraintValidator
             $value = $this->getIdentifierFromObject($value, $associations);
         }
 
+        $current = (string)$current;
+
         if ($current === $value) {
             return;
         }
