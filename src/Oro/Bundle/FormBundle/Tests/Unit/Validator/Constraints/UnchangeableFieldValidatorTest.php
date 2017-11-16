@@ -44,14 +44,11 @@ class UnchangeableFieldValidatorTest extends AbstractConstraintValidatorTest
         $constraint = new UnchangeableField();
 
         $this->objectIsNotNew();
+        $this->prepareClassMetadata([]);
 
         $this->query->expects($this->once())
-            ->method('getOneOrNullResult')
-            ->willReturn(['o_' => 'old value']);
-
-        $this->classMetadata->expects($this->any())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+            ->method('getSingleScalarResult')
+            ->willReturn('old value');
 
         $this->validator->validate('new value', $constraint);
 
@@ -65,9 +62,10 @@ class UnchangeableFieldValidatorTest extends AbstractConstraintValidatorTest
         $constraint = new UnchangeableField();
 
         $this->objectIsNew();
+        $this->prepareClassMetadata([]);
 
         $this->query->expects($this->never())
-            ->method('getOneOrNullResult');
+            ->method('getSingleScalarResult');
 
         $this->validator->validate('new value', $constraint);
 
@@ -79,10 +77,11 @@ class UnchangeableFieldValidatorTest extends AbstractConstraintValidatorTest
         $constraint = new UnchangeableField();
 
         $this->objectIsNotNew();
+        $this->prepareClassMetadata([]);
 
         $this->query->expects($this->once())
-            ->method('getOneOrNullResult')
-            ->willReturn(['o_' => null]);
+            ->method('getSingleScalarResult')
+            ->willReturn(null);
 
         $this->validator->validate('new value', $constraint);
 
@@ -94,10 +93,11 @@ class UnchangeableFieldValidatorTest extends AbstractConstraintValidatorTest
         $constraint = new UnchangeableField();
 
         $this->objectIsNotNew();
+        $this->prepareClassMetadata([]);
 
         $this->query->expects($this->once())
-            ->method('getOneOrNullResult')
-            ->willReturn(['o_' => 'new value']);
+            ->method('getSingleScalarResult')
+            ->willReturn('new value');
 
         $this->validator->validate('new value', $constraint);
 
@@ -155,7 +155,7 @@ class UnchangeableFieldValidatorTest extends AbstractConstraintValidatorTest
     {
         $this->classMetadata->expects($this->any())
             ->method('getIdentifierValues')
-            ->willReturn(['id' => 1]);
+            ->willReturn(['id' => 1, 'relation' => (object)['id' => 10]]);
     }
 
     private function objectIsNew()
@@ -164,5 +164,15 @@ class UnchangeableFieldValidatorTest extends AbstractConstraintValidatorTest
         $this->classMetadata->expects($this->any())
             ->method('getIdentifierValues')
             ->willReturn([]);
+    }
+
+    /**
+     * @param array $return
+     */
+    private function prepareClassMetadata(array $return)
+    {
+        $this->classMetadata->expects($this->any())
+            ->method('getAssociationMappings')
+            ->willReturn($return);
     }
 }

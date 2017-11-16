@@ -15,6 +15,9 @@ class UnchangeableFieldValidator extends ConstraintValidator
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -79,7 +82,7 @@ class UnchangeableFieldValidator extends ConstraintValidator
      * @param object $object
      * @return array
      */
-    private function getIdentifier(string $className, $object)
+    private function getIdentifier($className, $object)
     {
         $manager = $this->doctrineHelper->getEntityManagerForClass($className);
 
