@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestProductType;
+
 class RestJsonApiGetWithRenamedFieldsTest extends RestJsonApiTestCase
 {
-    const PRODUCT_ENTITY_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\TestProduct';
-
     /**
      * {@inheritdoc}
      */
@@ -14,87 +15,74 @@ class RestJsonApiGetWithRenamedFieldsTest extends RestJsonApiTestCase
         parent::setUp();
 
         $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/renamed_fields.yml']);
-    }
 
-    /**
-     * @param array $expected
-     */
-    protected function updateProductExpectedData(array &$expected)
-    {
-        foreach ($expected['data'] as &$data) {
-            switch ($data['attributes']['renamedName']) {
-                case 'product 1':
-                    $data['id'] = (string)$this->getReference('test_product1')->getId();
-                    break;
-                case 'product 2':
-                    $data['id'] = (string)$this->getReference('test_product2')->getId();
-                    break;
-            }
-        }
-        unset($data);
+        $this->appendEntityConfig(
+            TestProduct::class,
+            [
+                'fields'  => [
+                    'renamedId'   => ['property_path' => 'id'],
+                    'renamedName' => ['property_path' => 'name']
+                ],
+                'filters' => [
+                    'fields' => [
+                        'renamedName' => null
+                    ]
+                ],
+                'sorters' => [
+                    'fields' => [
+                        'renamedName' => null
+                    ]
+                ]
+            ]
+        );
+        $this->appendEntityConfig(
+            TestProductType::class,
+            [
+                'fields'  => [
+                    'renamedName' => ['property_path' => 'name']
+                ],
+                'filters' => [
+                    'fields' => [
+                        'renamedName' => null
+                    ]
+                ],
+                'sorters' => [
+                    'fields' => [
+                        'renamedName' => null
+                    ]
+                ]
+            ]
+        );
     }
 
     public function testFilteringByRenamedIdentityField()
     {
-        $params = [
-            'filter[id]' => (string)$this->getReference('test_product2')->getId()
-        ];
-        $expected = $this->loadExpectation('output_filter_by_renamed_field_product2.yml');
-
-        $this->updateProductExpectedData($expected);
-
-        $entityType = $this->getEntityType(self::PRODUCT_ENTITY_CLASS);
-
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType]),
-            $params
+        $response = $this->cget(
+            ['entity' => 'testproducts'],
+            ['filter[id]' => '@test_product2->id']
         );
 
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
-        $this->assertEquals($expected, json_decode($response->getContent(), true));
+        $this->assertResponseContains('renamed_fields_filter.yml', $response);
     }
 
     public function testFilteringByRenamedField()
     {
-        $params = [
-            'filter[renamedName]' => 'product 2'
-        ];
-        $expected = $this->loadExpectation('output_filter_by_renamed_field_product2.yml');
-
-        $this->updateProductExpectedData($expected);
-
-        $entityType = $this->getEntityType(self::PRODUCT_ENTITY_CLASS);
-
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType]),
-            $params
+        $response = $this->cget(
+            ['entity' => 'testproducts'],
+            ['filter[renamedName]' => 'product 2']
         );
 
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
-        $this->assertEquals($expected, json_decode($response->getContent(), true));
+        $this->assertResponseContains('renamed_fields_filter.yml', $response);
     }
 
     public function testFilteringByRenamedRelatedField()
     {
-        $params = [
-            'filter[productType.renamedName]' => 'type2'
-        ];
-        $expected = $this->loadExpectation('output_filter_by_renamed_field_product2.yml');
-
-        $this->updateProductExpectedData($expected);
-
-        $entityType = $this->getEntityType(self::PRODUCT_ENTITY_CLASS);
-
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType]),
-            $params
+        $response = $this->cget(
+            ['entity' => 'testproducts'],
+            ['filter[productType.renamedName]' => 'type2']
         );
 
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
-        $this->assertEquals($expected, json_decode($response->getContent(), true));
+        $this->assertResponseContains('renamed_fields_filter.yml', $response);
     }
 
     /**
@@ -105,18 +93,12 @@ class RestJsonApiGetWithRenamedFieldsTest extends RestJsonApiTestCase
      */
     public function testSortingByRenamedField($params, $expected)
     {
-        $this->updateProductExpectedData($expected);
-
-        $entityType = $this->getEntityType(self::PRODUCT_ENTITY_CLASS);
-
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType]),
+        $response = $this->cget(
+            ['entity' => 'testproducts'],
             $params
         );
 
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
-        $this->assertEquals($expected, json_decode($response->getContent(), true));
+        $this->assertResponseContains($expected, $response);
     }
 
     /**
@@ -127,43 +109,43 @@ class RestJsonApiGetWithRenamedFieldsTest extends RestJsonApiTestCase
         return [
             'use default sorting'                   => [
                 'params'   => [],
-                'expected' => $this->loadExpectation('output_sort_by_renamed_field_asc.yml')
+                'expected' => 'renamed_fields_sort_asc.yml'
             ],
             'sort by renamed identity field (ASC)'  => [
                 'params'   => [
                     'sort' => 'id'
                 ],
-                'expected' => $this->loadExpectation('output_sort_by_renamed_field_asc.yml')
+                'expected' => 'renamed_fields_sort_asc.yml'
             ],
             'sort by renamed identity field (DESC)' => [
                 'params'   => [
                     'sort' => '-id'
                 ],
-                'expected' => $this->loadExpectation('output_sort_by_renamed_field_desc.yml')
+                'expected' => 'renamed_fields_sort_desc.yml'
             ],
             'sort by renamed field (ASC)'           => [
                 'params'   => [
                     'sort' => 'renamedName'
                 ],
-                'expected' => $this->loadExpectation('output_sort_by_renamed_field_asc.yml')
+                'expected' => 'renamed_fields_sort_asc.yml'
             ],
             'sort by renamed field (DESC)'          => [
                 'params'   => [
                     'sort' => '-renamedName'
                 ],
-                'expected' => $this->loadExpectation('output_sort_by_renamed_field_desc.yml')
+                'expected' => 'renamed_fields_sort_desc.yml'
             ],
             'sort by renamed related field (ASC)'   => [
                 'params'   => [
                     'sort' => 'productType.renamedName'
                 ],
-                'expected' => $this->loadExpectation('output_sort_by_renamed_field_asc.yml')
+                'expected' => 'renamed_fields_sort_asc.yml'
             ],
             'sort by renamed related field (DESC)'  => [
                 'params'   => [
                     'sort' => '-productType.renamedName'
                 ],
-                'expected' => $this->loadExpectation('output_sort_by_renamed_field_desc.yml')
+                'expected' => 'renamed_fields_sort_desc.yml'
             ],
         ];
     }

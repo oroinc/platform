@@ -12,13 +12,6 @@ services:
         calls:
             - [setLogQueries, [%oro_search.log_queries%]]
 
-    oro_search.search.engine.storer:
-        class: Oro\Bundle\SearchBundle\Engine\Orm\DbalStorer
-        arguments:
-            - '@oro_entity.doctrine_helper'
-        public: false
-        deprecated: ~
-
     oro_search.search.engine.indexer:
         class: '%oro_search.engine.indexer.class%'
         arguments:
@@ -26,4 +19,3 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_search.mapper'
             - '@oro_entity.entity_name_resolver'
-            - '@oro_search.search.engine.storer'

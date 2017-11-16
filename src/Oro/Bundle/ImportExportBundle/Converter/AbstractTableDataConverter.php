@@ -108,18 +108,32 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     /**
      * @param array $header
      * @param array $data
+     * @throws LogicException
+     */
+    protected function validateColumns(array $header, array $data)
+    {
+        $dataDiff = array_diff(array_keys($data), $header);
+        // if data contains keys that are not in header, refresh header and check again
+        if ($dataDiff) {
+            $header = $this->getRefreshedBackendHeader();
+            $dataDiff = array_diff(array_keys($data), $header);
+            if ($dataDiff) {
+                throw new LogicException(
+                    sprintf('Backend header doesn\'t contain fields: %s', implode(', ', $dataDiff))
+                );
+            }
+        }
+    }
+
+    /**
+     * @param array $header
+     * @param array $data
      * @return array
      * @throws LogicException
      */
     protected function fillEmptyColumns(array $header, array $data)
     {
-        $dataDiff = array_diff(array_keys($data), $header);
-        // if data contains keys that are not in header
-        if ($dataDiff) {
-            throw new LogicException(
-                sprintf('Backend header doesn\'t contain fields: %s', implode(', ', $dataDiff))
-            );
-        }
+        $this->validateColumns($header, $data);
 
         $result = array();
         foreach ($header as $headerKey) {
@@ -157,6 +171,15 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
                 return true;
             }
         );
+    }
+
+    /**
+     * @return array
+     */
+    protected function getRefreshedBackendHeader()
+    {
+        $this->backendHeader = null;
+        return $this->receiveBackendHeader();
     }
 
     /**

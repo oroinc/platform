@@ -1,6 +1,6 @@
 {% block oro_segment_filter_builder_row %}
     {% if form.name is defined %}
-        {{ form_row(form.name,{
+        {{ form_row(form.name, {
             'attr': {'class': 'control-group-oro_segment_filter_builder_segment_name'}
         }) }}
     {% endif %}
@@ -16,20 +16,23 @@
     {% set segment = form.vars.value %}
     {% set id = form.vars.id %}
     {% set coditionBuilderId = id ~ '-condition-builder' %}
-    {% set criteriaListId = 'filter-criteria-list_' ~ id %}
     {% set entityChoiceId = form.entity.vars.attr['data-ftid'] %}
     {% set definitionId = form.definition.vars.attr['data-ftid'] %}
+    {% set metadata = oro_query_filter_metadata() %}
+    {% set column_chain_template_id = 'column-chain-template-' ~ id %}
 
     {{ form_widget(form.entity) }}
     {{ form_widget(form.definition) }}
+    {{ QD.query_designer_column_chain_template(column_chain_template_id) }}
     {{ segmentQD.query_designer_condition_builder({
         'id': coditionBuilderId,
-        'criteria_list_id': criteriaListId,
         'entity_choice_id': entityChoiceId,
         'currentSegmentId': segment.id|default(null),
-        'page_limit': constant('\\Oro\\Bundle\\SegmentBundle\\Entity\\Manager\\SegmentManager::PER_PAGE')
+        'page_limit': constant('\\Oro\\Bundle\\SegmentBundle\\Entity\\Manager\\SegmentManager::PER_PAGE'),
+        'conditionBuilderOptions': condition_builder_options,
+        'metadata': metadata,
+        'column_chain_template_selector': '#' ~ column_chain_template_id
     }) }}
-    {{ QD.query_designer_column_chain_template('column-chain-template-' ~ id) }}
 
     {% set fieldsData = {} %}
     {% if not form.entity.vars.value is empty %}
@@ -48,14 +51,10 @@
             fieldsData:        fieldsData,
             confirmMessage:    'oro.segment.condition_builder.confirm_message'|trans,
         },
-        filters: {
-            criteriaList:     '#' ~ criteriaListId,
-            conditionBuilder: '#' ~ coditionBuilderId,
-        },
         entities:                   oro_query_filter_entities(),
-        metadata:                   oro_query_filter_metadata(),
+        metadata:                   metadata,
         initEntityChangeEvents:     false,
-        select2FieldChoiceTemplate: '#column-chain-template-' ~ id,
+        select2FieldChoiceTemplate: '#' ~ column_chain_template_id,
     } %}
 
     {% set widgetOptions = update_segment_widget_options(widgetOptions, id) %}

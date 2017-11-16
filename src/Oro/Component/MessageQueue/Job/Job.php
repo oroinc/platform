@@ -9,6 +9,12 @@ class Job
     const STATUS_FAILED = 'oro.message_queue_job.status.failed';
     const STATUS_FAILED_REDELIVERED = 'oro.message_queue_job.status.failed_redelivered';
     const STATUS_CANCELLED = 'oro.message_queue_job.status.cancelled';
+    const STATUS_STALE = 'oro.message_queue_job.status.stale';
+
+    /**
+     * @var array
+     */
+    public static $activeStatuses = [self::STATUS_NEW, self::STATUS_RUNNING, self::STATUS_FAILED_REDELIVERED];
 
     /**
      * @var int
@@ -59,6 +65,11 @@ class Job
      * @var \DateTime
      */
     protected $startedAt;
+
+    /**
+     * @var \DateTime
+     */
+    protected $lastActiveAt;
 
     /**
      * @var \DateTime
@@ -274,6 +285,25 @@ class Job
     /**
      * @return \DateTime
      */
+    public function getLastActiveAt()
+    {
+        return $this->lastActiveAt;
+    }
+
+    /**
+     * @param \DateTime $lastActiveAt
+     *
+     * @return $this
+     */
+    public function setLastActiveAt(\DateTime $lastActiveAt)
+    {
+        $this->lastActiveAt = $lastActiveAt;
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
     public function getStoppedAt()
     {
         return $this->stoppedAt;
@@ -334,7 +364,10 @@ class Job
      */
     public function getData()
     {
-        return $this->data;
+        $data = $this->data;
+        unset($data['_properties']);
+
+        return $data;
     }
 
     /**
@@ -342,7 +375,30 @@ class Job
      */
     public function setData(array $data)
     {
+        if (array_key_exists('_properties', $this->data)) {
+            $data['_properties'] = $this->data['_properties'];
+        }
         $this->data = $data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getProperties()
+    {
+        if (!array_key_exists('_properties', $this->data)) {
+            return [];
+        }
+
+        return $this->data['_properties'];
+    }
+
+    /**
+     * @param array $properties
+     */
+    public function setProperties(array $properties)
+    {
+        $this->data['_properties'] = $properties;
     }
 
     /**

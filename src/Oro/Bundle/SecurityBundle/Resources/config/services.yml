@@ -499,6 +499,10 @@ services:
         class: %oro_security.encoder.mcrypt.class%
         arguments: [ %kernel.secret% ]
 
+    oro_security.encoder.repetitive_crypter:
+        class: Oro\Bundle\SecurityBundle\Encoder\RepetitiveCrypter
+        arguments: [ %kernel.secret% ]
+
     oro_security.acl_helper:
         class: %oro_security.acl_helper.class%
         arguments:
@@ -843,3 +847,15 @@ services:
             - '@logger'
         lazy: true
         public: false
+
+    oro_security.owner.checker:
+        class: Oro\Bundle\SecurityBundle\Owner\OwnerChecker
+        arguments:
+           - '@oro_entity.doctrine_helper'
+           - '@oro_organization.business_unit_manager'
+           - '@oro_security.owner.ownership_metadata_provider'
+           - '@oro_security.owner.entity_owner_accessor'
+           - '@security.authorization_checker'
+           - '@oro_security.token_accessor'
+           - '@oro_security.ownership_tree_provider'
+           - '@?security.acl.voter.basic_permissions'

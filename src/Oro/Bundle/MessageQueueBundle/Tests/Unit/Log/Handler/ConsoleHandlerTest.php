@@ -82,6 +82,34 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testHandleDuplicatedRecord()
+    {
+        $this->output->expects(self::any())
+            ->method('getVerbosity')
+            ->willReturn(OutputInterface::VERBOSITY_DEBUG);
+
+        $this->consumerState->startConsumption();
+        $this->handler->setBubble(false);
+        self::assertTrue($this->handler->handle([
+            'level' => Logger::DEBUG,
+            'message' => 'Duplicated message',
+            'context' => ['key' => 'value'],
+            'extra' => []
+        ]));
+        self::assertFalse($this->handler->handle([
+            'level' => Logger::DEBUG,
+            'message' => 'Duplicated message',
+            'context' => ['key' => 'value'],
+            'extra' => []
+        ]));
+        self::assertTrue($this->handler->handle([
+            'level' => Logger::DEBUG,
+            'message' => 'New message',
+            'context' => ['key' => 'value'],
+            'extra' => []
+        ]));
+    }
+
     public function testCommandEventSubscriber()
     {
         $this->consumerState->startConsumption();

@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Yaml\Yaml;
 
+use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
@@ -57,7 +59,15 @@ class RestJsonApiTestCase extends ApiTestCase
             foreach ($parameters['filter'] as $key => $filter) {
                 $filter = self::processTemplateData($filter);
                 if (is_array($filter)) {
-                    $filter = implode(',', $filter);
+                    if (ArrayUtil::isAssoc($filter)) {
+                        foreach ($filter as $k => $v) {
+                            if (is_array($v)) {
+                                $filter[$k] = implode(',', $v);
+                            }
+                        }
+                    } else {
+                        $filter = implode(',', $filter);
+                    }
                 }
                 $parameters['filter'][$key] = $filter;
             }
@@ -436,9 +446,84 @@ class RestJsonApiTestCase extends ApiTestCase
     }
 
     /**
+     * Sends DELETE request for a relationship of a single entity.
+     *
+     * @param array $routeParameters
+     * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
+     *
+     * @return Response
+     */
+    protected function deleteRelationship(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = self::processTemplateData($parameters);
+        $response = $this->request(
+            'DELETE',
+            $this->getUrl('oro_rest_api_delete_relationship', $routeParameters),
+            $parameters,
+            $server
+        );
+
+        $this->getEntityManager()->clear();
+
+        if ($assertValid) {
+            $entityType = $this->extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                Response::HTTP_NO_CONTENT,
+                $entityType,
+                'delete relationship'
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * Loads the response content.
+     *
+     * @param string $fileName
+     * @param string $folderName
+     *
+     * @return array
+     */
+    protected function loadYamlData($fileName, $folderName = null)
+    {
+        if ($this->isRelativePath($fileName)) {
+            $fileName = $this->getTestResourcePath($folderName, $fileName);
+        }
+        $file = $this->getContainer()->get('file_locator')->locate($fileName);
+        self::assertTrue(is_file($file), sprintf('File "%s" with expected content not found', $fileName));
+
+        return Yaml::parse(file_get_contents($file));
+    }
+
+    /**
+     * Loads the response content.
+     *
+     * @param array|string $expectedContent The file name or full file path to YAML template file or array
+     *
+     * @return array
+     */
+    protected function loadResponseData($expectedContent)
+    {
+        if (is_string($expectedContent)) {
+            $expectedContent = $this->loadYamlData($expectedContent, 'responses');
+        }
+
+        return self::processTemplateData($expectedContent);
+    }
+
+    /**
      * Asserts the response content contains the the given data.
      *
-     * @param array|string $expectedContent The file name or full file path to yml template file or array
+     * @param array|string $expectedContent The file name or full file path to YAML template file or array
      * @param Response     $response
      * @param object|null  $entity          If not null, object will set as entity reference
      */
@@ -449,23 +534,39 @@ class RestJsonApiTestCase extends ApiTestCase
         }
 
         $content = json_decode($response->getContent(), true);
+        $expectedContent = self::processTemplateData($this->loadResponseData($expectedContent));
 
-        if (is_string($expectedContent)) {
-            if ($this->isRelativePath($expectedContent)) {
-                $expectedContent = $this->getTestResourcePath('responses', $expectedContent);
+        self::assertArrayContains($expectedContent, $content);
+
+        // test the primary data collection count and order
+        if (!empty($expectedContent[JsonApiDoc::DATA])) {
+            $expectedData = $expectedContent[JsonApiDoc::DATA];
+            if (is_array($expectedData) && isset($expectedData[0][JsonApiDoc::TYPE])) {
+                $expectedItems = $this->getResponseDataItems($expectedData);
+                $actualItems = $this->getResponseDataItems($content[JsonApiDoc::DATA]);
+                self::assertSame(
+                    $expectedItems,
+                    $actualItems,
+                    'Failed asserting the primary data collection items count and order.'
+                );
             }
-            $file = $this->getContainer()->get('file_locator')->locate($expectedContent);
-            self::assertTrue(is_file($file), sprintf('File "%s" with expected content not found', $expectedContent));
-
-            $expectedContent = Yaml::parse(file_get_contents($file));
         }
-
-        self::assertArrayContains(
-            self::processTemplateData($expectedContent),
-            $content
-        );
     }
 
+    /**
+     * @param array $data
+     *
+     * @return array [['type' => entity type, 'id' => entity id], ...]
+     */
+    private function getResponseDataItems(array $data)
+    {
+        $result = [];
+        foreach ($data as $item) {
+            $result[] = ['type' => $item[JsonApiDoc::TYPE], 'id' => $item[JsonApiDoc::ID]];
+        }
+
+        return $result;
+    }
     /**
      * Asserts the response contains the given number of data items.
      *
@@ -531,7 +632,13 @@ class RestJsonApiTestCase extends ApiTestCase
     }
 
     /**
+     * Saves a response content to a YAML file.
+     * If the first parameter is a file name, the file will be saved in the `responses` directory
+     * near to PHP file contains the test.
+     *
      * @param string   $fileName The file name or full path to the output file
+     *                           Also it can be NULL or empty string, in this case the response content
+     *                           will be written in to the console
      * @param Response $response
      */
     protected function dumpYmlTemplate($fileName, Response $response)
@@ -567,10 +674,14 @@ class RestJsonApiTestCase extends ApiTestCase
         // replace "data: {}" with "data: []" to correct representation of empty collection
         $content = preg_replace('/(\s+data: ){\s*}$/m', '$1[]', $content);
 
-        if ($this->isRelativePath($fileName)) {
-            $fileName = $this->getTestResourcePath('responses', $fileName);
+        if ($fileName) {
+            if ($this->isRelativePath($fileName)) {
+                $fileName = $this->getTestResourcePath('responses', $fileName);
+            }
+            file_put_contents($fileName, $content);
+        } else {
+            echo "\n" . $content;
         }
-        file_put_contents($fileName, $content);
     }
 
     /**

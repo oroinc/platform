@@ -1,4 +1,18 @@
 api:
+    entity_aliases:
+        Extend\Entity\TestApiE1:
+            alias: testapientity1
+            plural_alias: testapientity1
+        Extend\Entity\TestApiE2:
+            alias: testapientity2
+            plural_alias: testapientity2
+        Extend\Entity\EV_Api_Enum1:
+            alias: testapienum1
+            plural_alias: testapienum1
+        Extend\Entity\EV_Api_Enum2:
+            alias: testapienum2
+            plural_alias: testapienum2
+
     entities:
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
             fields:
@@ -7,17 +21,14 @@ api:
                     property_path: name
             filters:
                 fields:
-                    name:
-                        exclude: false
+                    name: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee:
             filters:
                 fields:
-                    name:
-                        exclude: false
+                    name: ~
             sorters:
                 fields:
-                    position:
-                        exclude: false
+                    position: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDefaultAndNull: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObjects:
             fields:
@@ -33,6 +44,14 @@ api:
                     exclude: true
                 lastName:
                     exclude: true
+                links:
+                    data_type: array
+                    exclusion_policy: all
+                    fields:
+                        firstName:
+                            property_path: name
+                        lastName:
+                            property_path: key
                 relatedEntity:
                     data_type: nestedAssociation
                     fields:
@@ -44,42 +63,76 @@ api:
                     exclude: true
                 relatedId:
                     exclude: true
-
-
         Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
             filters:
                 fields:
-                    name:
-                        exclude: false
-                    email:
-                        exclude: false
+                    name: ~
+                    email: ~
             sorters:
                 fields:
-                    email:
-                        exclude: false
-        Oro\Bundle\TestFrameworkBundle\Entity\TestProduct:
+                    email: ~
+        Oro\Bundle\TestFrameworkBundle\Entity\TestProduct: ~
+        Oro\Bundle\TestFrameworkBundle\Entity\TestProductType: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestWithoutIdGenerator: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCompositeIdentifier:
             fields:
-                renamedId:
+                renamedKey1:
+                    property_path: key1
+            filters:
+                fields:
+                    name: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier:
+            identifier_field_names: ['key']
+            fields:
+                databaseId:
                     property_path: id
-                renamedName:
-                    property_path: name
             filters:
                 fields:
-                    renamedName:
-                        exclude: false
-            sorters:
-                fields:
-                    renamedName:
-                        exclude: false
-        Oro\Bundle\TestFrameworkBundle\Entity\TestProductType:
+                    name: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomCompositeIdentifier:
+            identifier_field_names: ['key1', 'key2']
             fields:
-                renamedName:
-                    property_path: name
+                databaseId:
+                    property_path: id
             filters:
                 fields:
-                    renamedName:
-                        exclude: false
+                    name: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
+            filters:
+                fields:
+                    fieldString: ~
+                    fieldInt: ~
+                    fieldSmallInt: ~
+                    fieldBigInt: ~
+                    fieldBoolean: ~
+                    fieldDecimal: ~
+                    fieldFloat: ~
+                    fieldDateTime: ~
+                    fieldDate: ~
+                    fieldTime: ~
+                    fieldGuid: ~
+                    fieldPercent: ~
+                    fieldMoney: ~
+                    fieldDuration: ~
+                    fieldMoneyValue: ~
+                    fieldCurrency: ~
             sorters:
                 fields:
-                    renamedName:
-                        exclude: false
+                    fieldString: ~
+                    fieldInt: ~
+                    fieldSmallInt: ~
+                    fieldBigInt: ~
+                    fieldBoolean: ~
+                    fieldDecimal: ~
+                    fieldFloat: ~
+                    fieldDateTime: ~
+                    fieldDate: ~
+                    fieldTime: ~
+                    fieldGuid: ~
+                    fieldPercent: ~
+                    fieldMoney: ~
+                    fieldDuration: ~
+                    fieldMoneyValue: ~
+                    fieldCurrency: ~
+        Extend\Entity\TestApiE1: ~
+        Extend\Entity\TestApiE2: ~

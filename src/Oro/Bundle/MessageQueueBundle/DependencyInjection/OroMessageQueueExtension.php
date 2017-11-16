@@ -18,6 +18,8 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroMessageQueueExtension extends Extension
 {
+    const HEARTBEAT_UPDATE_PERIOD_PARAMETER_NAME = 'oro_message_queue.consumer_heartbeat_update_period';
+
     /**
      * @var TransportFactoryInterface[]
      */
@@ -97,6 +99,21 @@ class OroMessageQueueExtension extends Extension
             );
             $delayRedeliveredExtension->replaceArgument(1, $config['client']['redelivered_delay_time']);
         }
+
+        if (isset($config['consumer'])) {
+            $container->setParameter(
+                self::HEARTBEAT_UPDATE_PERIOD_PARAMETER_NAME,
+                $config['consumer']['heartbeat_update_period']
+            );
+        }
+
+        $this->setPersistenceServicesAndProcessors($config, $container);
+        $this->setSecurityAgnosticTopicsAndProcessors($config, $container);
+        $this->setJobConfigurationProvider($config, $container);
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $this->configureTestEnvironment($container);
+        }
     }
 
     /**
@@ -111,5 +128,67 @@ class OroMessageQueueExtension extends Extension
         $container->addResource(new FileResource($rc->getFileName()));
 
         return new Configuration($this->factories);
+    }
+
+    /**
+     * Sets the services that should not be reset during container reset and
+     * Message Queue processors that can work without container reset to container reset extension.
+     *
+     * @param array            $config
+     * @param ContainerBuilder $container
+     */
+    protected function setPersistenceServicesAndProcessors(array $config, ContainerBuilder $container)
+    {
+        if (!empty($config['persistent_services'])) {
+            $container->getDefinition('oro_message_queue.consumption.container_clearer')
+                ->addMethodCall('setPersistentServices', [$config['persistent_services']]);
+        }
+        if (!empty($config['persistent_processors'])) {
+            $container->getDefinition('oro_message_queue.consumption.container_reset_extension')
+                ->addMethodCall('setPersistentProcessors', [$config['persistent_processors']]);
+        }
+    }
+
+    /**
+     * @param array            $config
+     * @param ContainerBuilder $container
+     */
+    protected function setSecurityAgnosticTopicsAndProcessors(array $config, ContainerBuilder $container)
+    {
+        if (!empty($config['security_agnostic_topics'])) {
+            $container
+                ->getDefinition('oro_message_queue.client.security_aware_driver_factory')
+                ->replaceArgument(1, $config['security_agnostic_topics']);
+        }
+        if (!empty($config['security_agnostic_processors'])) {
+            $container
+                ->getDefinition('oro_message_queue.consumption.security_aware_extension')
+                ->replaceArgument(0, $config['security_agnostic_processors']);
+        }
+    }
+
+    /**
+     * @param array $config
+     * @param ContainerBuilder $container
+     */
+    protected function setJobConfigurationProvider(array $config, ContainerBuilder $container)
+    {
+        if (!empty($config['time_before_stale'])) {
+            $jobConfigurationProvider = $container->getDefinition('oro_message_queue.job.configuration_provider');
+            $jobConfigurationProvider->addMethodCall('setConfiguration', [$config['time_before_stale']]);
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    protected function configureTestEnvironment(ContainerBuilder $container)
+    {
+        // oro_message_queue.client.buffered_message_producer
+        $bufferedProducerDef = $container->getDefinition('oro_message_queue.client.buffered_message_producer');
+        $bufferedProducerDef->setClass(
+            'Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer'
+        );
+        $bufferedProducerDef->setPublic(true);
     }
 }

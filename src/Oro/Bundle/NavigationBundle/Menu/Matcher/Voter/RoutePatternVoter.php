@@ -39,6 +39,7 @@ class RoutePatternVoter implements VoterInterface
 
         $routes = (array) $item->getExtra('routes', array());
         $parameters = (array) $item->getExtra('routesParameters', array());
+
         foreach ($routes as $testedRoute) {
             if (!$this->routeMatch($testedRoute, $route)) {
                 continue;

@@ -12,8 +12,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\AttachmentBundle\Model\ExtendFile;
 
 /**
- * File
- *
  * @ORM\Table(name="oro_attachment_file", indexes = {
  *      @ORM\Index("att_file_orig_filename_idx", columns = {"original_filename"})
  * })
@@ -346,11 +344,17 @@ class File extends ExtendFile implements FileExtensionInterface
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function __toString()
     {
-        return (string)$this->getFilename()
-            ? $this->getFilename() . ' (' . $this->getOriginalFilename() . ')'
-            : '';
+        $fileName = (string)$this->getFilename();
+        if (!$fileName) {
+            return '';
+        }
+
+        return $fileName . ' (' . $this->getOriginalFilename() . ')';
     }
 
     /**

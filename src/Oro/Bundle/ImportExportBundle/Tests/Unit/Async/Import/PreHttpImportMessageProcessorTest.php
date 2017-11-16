@@ -141,7 +141,6 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
                 'fileName' => '123435.test',
                 'originFileName' => 'test.test',
                 'userId' => '1',
-                'securityToken' => 'test',
                 'jobName' => 'test',
                 'processorAlias' => 'test',
                 'process' => 'import',
@@ -205,7 +204,6 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
                 'fileName' => '123435.csv',
                 'originFileName' => 'test.csv',
                 'userId' => '1',
-                'securityToken' => 'test',
                 'jobName' => 'test',
                 'processorAlias' => 'test',
                 'process' => 'import',
@@ -232,7 +230,6 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
                 'fileName' => '12345.csv',
                 'originFileName' => 'test.csv',
                 'userId' => '1',
-                'securityToken' => 'test',
                 'jobName' => 'test',
                 'processorAlias' => 'test',
                 'process' => 'import',
@@ -334,7 +331,6 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             'jobName' => 'test_import',
             'processorAlias' => 'processor_test',
             'process' => 'import',
-            'securityToken' => 'test',
             'options' => [
                 'batch_size' => 100,
                 'batch_number' => 1

@@ -7,6 +7,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -133,26 +134,31 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
-    public function testDocumentationResource()
+    public function testDocumentationResources()
     {
         $config = new EntityDefinitionConfig();
-        $this->assertFalse($config->hasDocumentationResource());
-        $this->assertNull($config->getDocumentationResource());
+        $this->assertFalse($config->hasDocumentationResources());
+        $this->assertSame([], $config->getDocumentationResources());
 
-        $config->setDocumentationResource('resource link');
-        $this->assertTrue($config->hasDocumentationResource());
-        $this->assertEquals('resource link', $config->getDocumentationResource());
-        $this->assertEquals(['documentation_resource' => 'resource link'], $config->toArray());
+        $config->setDocumentationResources(['resource link']);
+        $this->assertTrue($config->hasDocumentationResources());
+        $this->assertEquals(['resource link'], $config->getDocumentationResources());
+        $this->assertEquals(['documentation_resource' => ['resource link']], $config->toArray());
 
-        $config->setDocumentationResource(null);
-        $this->assertFalse($config->hasDocumentationResource());
-        $this->assertNull($config->getDocumentationResource());
+        $config->setDocumentationResources('another resource link');
+        $this->assertTrue($config->hasDocumentationResources());
+        $this->assertEquals(['another resource link'], $config->getDocumentationResources());
+        $this->assertEquals(['documentation_resource' => ['another resource link']], $config->toArray());
+
+        $config->setDocumentationResources(null);
+        $this->assertFalse($config->hasDocumentationResources());
+        $this->assertSame([], $config->getDocumentationResources());
         $this->assertEquals([], $config->toArray());
 
-        $config->setDocumentationResource('resource link');
-        $config->setDocumentationResource('');
-        $this->assertFalse($config->hasDocumentationResource());
-        $this->assertNull($config->getDocumentationResource());
+        $config->setDocumentationResources(['resource link']);
+        $config->setDocumentationResources([]);
+        $this->assertFalse($config->hasDocumentationResources());
+        $this->assertSame([], $config->getDocumentationResources());
         $this->assertEquals([], $config->toArray());
     }
 
@@ -191,6 +197,8 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $swapField->setPropertyPath('realSwapField');
         $realSwapField = $config->addField('realSwapField');
         $realSwapField->setPropertyPath('swapField');
+        $ignoredField = $config->addField('ignoredField');
+        $ignoredField->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
         $this->assertNull($config->findField('unknown'));
         $this->assertNull($config->findField('unknown', true));
@@ -231,9 +239,20 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('swapField', $config->findFieldNameByPropertyPath('realSwapField'));
         $this->assertSame($realSwapField, $config->findFieldByPath('realSwapField'));
         $this->assertSame($swapField, $config->findFieldByPath('realSwapField', true));
+
+        $this->assertSame($ignoredField, $config->findField('ignoredField'));
+        $this->assertNull($config->findField('ignoredField', true));
+        $this->assertNull($config->findField(ConfigUtil::IGNORE_PROPERTY_PATH));
+        $this->assertNull($config->findField(ConfigUtil::IGNORE_PROPERTY_PATH, true));
+        $this->assertSame('ignoredField', $config->findFieldNameByPropertyPath('ignoredField'));
+        $this->assertNull($config->findFieldNameByPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH));
+        $this->assertSame($ignoredField, $config->findFieldByPath('ignoredField'));
+        $this->assertNull($config->findFieldByPath('ignoredField', true));
+        $this->assertNull($config->findFieldByPath(ConfigUtil::IGNORE_PROPERTY_PATH));
+        $this->assertNull($config->findFieldByPath(ConfigUtil::IGNORE_PROPERTY_PATH, true));
     }
 
-    public function testFindFieldByPath()
+    public function testFindFieldByPathForChildFields()
     {
         $config = new EntityDefinitionConfig();
 

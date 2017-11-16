@@ -3,11 +3,14 @@
 {% block oro_report_chart_widget %}
     {{ block('oro_chart_widget') }}
 
-    <script type="text/javascript">
-        require(['orochart/js/chart_form'], function (ChartForm) {
-            ChartForm.initialize('#{{ id }}');
-        });
-    </script>
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    <div {{ UI.renderPageComponentAttributes({
+        view: 'orochart/js/app/views/chart-form-view',
+        options: {
+            _sourceElement: '#' ~ id,
+        }
+    }) }}></div>
 {% endblock %}
 
 {% block oro_report_chart_data_schema_collection_row %}
@@ -17,9 +20,12 @@
 {% block oro_report_chart_data_schema_row %}
     {{ form_widget(form) }}
 
-    <script type="text/javascript">
-        require(['ororeport/js/chart-options'], function (ChartOptions) {
-            ChartOptions.initialize('{{ id }}', {});
-        });
-    </script>
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    <div {{ UI.renderPageComponentAttributes({
+        view: 'ororeport/js/app/views/report-chart-data-schema-view',
+        options: {
+            _sourceElement: '#' ~ form.vars.id,
+        }
+    }) }}></div>
 {% endblock %}

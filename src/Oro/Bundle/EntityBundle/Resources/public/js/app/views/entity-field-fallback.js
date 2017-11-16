@@ -28,13 +28,6 @@ define(function(require) {
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
-            var self = this;
-            this.initLayout().done(function() {
-                self.handleLayoutInit();
-            });
-        },
-
-        handleLayoutInit: function() {
             this.handleUseFallbackCheckbox();
         },
 

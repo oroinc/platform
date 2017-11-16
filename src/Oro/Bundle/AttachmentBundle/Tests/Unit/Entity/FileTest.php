@@ -7,38 +7,86 @@ use Symfony\Component\HttpFoundation\File\File as FileType;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestUser;
 
-class FileTest extends EntityTestAbstract
+class FileTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var File */
+    protected $entity;
+
     protected function setUp()
     {
         $this->entity = new File();
     }
 
-    /**
-     * @return array
-     */
-    public function getSetDataProvider()
+    public function testFilename()
     {
-        $filename = 'testFile.doc';
-        $originalFileName = 'original.doc';
-        $date = new \DateTime('now');
-        $file = new FileType('testPath', false);
-        $extension = 'txt';
-        $type = 'text/doc';
-        $fileSize = 10000;
-        $owner = new TestUser();
+        $this->assertNull($this->entity->getFilename());
+        $fileName = 'test.doc';
+        $this->entity->setFilename($fileName);
+        $this->assertEquals($fileName, $this->entity->getFilename());
+    }
 
-        return [
-            'filename' => ['filename', $filename, $filename],
-            'originalFileName' => ['originalFileName', $originalFileName, $originalFileName],
-            'createdAt' => ['createdAt', $date, $date],
-            'updatedAt' => ['updatedAt', $date, $date],
-            'file' => ['file', $file, $file],
-            'extension' => ['extension', $extension, $extension],
-            'mimeType' => ['mimeType', $type, $type],
-            'fileSize' => ['fileSize', $fileSize, $fileSize],
-            'owner'    => ['owner', $owner, $owner]
-        ];
+    public function testOriginalFilename()
+    {
+        $this->assertNull($this->entity->getOriginalFilename());
+        $fileName = 'test.doc';
+        $this->entity->setOriginalFilename($fileName);
+        $this->assertEquals($fileName, $this->entity->getOriginalFilename());
+    }
+
+    public function testCreatedAt()
+    {
+        $this->assertNull($this->entity->getCreatedAt());
+        $date = new \DateTime('now');
+        $this->entity->setCreatedAt($date);
+        $this->assertEquals($date, $this->entity->getCreatedAt());
+    }
+
+    public function testUpdatedAt()
+    {
+        $this->assertNull($this->entity->getUpdatedAt());
+        $date = new \DateTime('now');
+        $this->entity->setUpdatedAt($date);
+        $this->assertEquals($date, $this->entity->getUpdatedAt());
+    }
+
+    public function testFile()
+    {
+        $this->assertNull($this->entity->getFile());
+        $file = new FileType('testPath', false);
+        $this->entity->setFile($file);
+        $this->assertSame($file, $this->entity->getFile());
+    }
+
+    public function testExtension()
+    {
+        $this->assertNull($this->entity->getExtension());
+        $extension = 'ext';
+        $this->entity->setExtension($extension);
+        $this->assertEquals($extension, $this->entity->getExtension());
+    }
+
+    public function testMimeType()
+    {
+        $this->assertNull($this->entity->getMimeType());
+        $mimeType = 'text/plain';
+        $this->entity->setMimeType($mimeType);
+        $this->assertEquals($mimeType, $this->entity->getMimeType());
+    }
+
+    public function testFileSize()
+    {
+        $this->assertNull($this->entity->getFileSize());
+        $fileSize = 10000;
+        $this->entity->setFileSize($fileSize);
+        $this->assertSame($fileSize, $this->entity->getFileSize());
+    }
+
+    public function testOwner()
+    {
+        $this->assertNull($this->entity->getOwner());
+        $owner = new TestUser();
+        $this->entity->setOwner($owner);
+        $this->assertSame($owner, $this->entity->getOwner());
     }
 
     public function testPrePersists()
@@ -61,7 +109,7 @@ class FileTest extends EntityTestAbstract
 
     public function testToString()
     {
-        $this->assertEquals('', $this->entity->__toString());
+        $this->assertSame('', $this->entity->__toString());
         $this->entity->setFilename('file.doc');
         $this->entity->setOriginalFilename('original.doc');
         $this->assertEquals('file.doc (original.doc)', $this->entity->__toString());

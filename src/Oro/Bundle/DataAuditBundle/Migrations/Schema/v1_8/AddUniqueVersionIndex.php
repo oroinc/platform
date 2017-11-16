@@ -36,38 +36,78 @@ class AddUniqueVersionIndex implements Migration, ConnectionAwareInterface
 
     protected function resolveDuplicates()
     {
-        $platform = $this->connection->getDatabasePlatform();
+        if ($this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
+            $this->resolveDuplicatesPostgres();
+        } else {
+            $this->resolveDuplicatesMysql();
+        }
+    }
 
-        if ($platform instanceof PostgreSqlPlatform) {
-            $this->connection->exec('CREATE TEMPORARY SEQUENCE seq_temp_version START 1');
+    private function resolveDuplicatesPostgres()
+    {
+        $this->connection->exec('CREATE TEMPORARY SEQUENCE seq_temp_version START 1');
+        
+        while (true) {
+            $rowsFound = $this->connection->executeQuery(
+                'SELECT COUNT(*)
+                    FROM oro_audit
+                    GROUP BY object_id, object_class, version 
+                    HAVING COUNT(*) > 1 LIMIT 1'
+            )
+                ->fetchColumn();
+
+            if (!$rowsFound) {
+                break;
+            }
+            $this->connection->exec(
+                <<<'EOD'
+                DO $$
+                    DECLARE
+                        r RECORD;
+                        seq_temp INTEGER;   
+                    BEGIN
+                        FOR r IN SELECT object_id, object_class, version
+                            FROM oro_audit
+                            GROUP BY object_id, object_class, version 
+                            HAVING COUNT(*) > 1 LIMIT 100
+                        LOOP
+                            seq_temp := (SELECT setval('seq_temp_version', 1));
+                            IF r.object_id IS NULL THEN                                
+                                UPDATE oro_audit SET version = nextval('seq_temp_version') - 1 
+                                WHERE object_id IS NULL AND 
+                                      object_class = r.object_class;
+                            ELSE
+                                UPDATE oro_audit SET version = nextval('seq_temp_version') - 1 
+                                WHERE object_id = r.object_id AND 
+                                      object_class = r.object_class;
+                            END IF;
+                        END LOOP;
+                END $$;
+EOD
+            );
         }
 
+        $this->connection->exec('DROP SEQUENCE seq_temp_version');
+    }
+
+    private function resolveDuplicatesMysql()
+    {
         while (true) {
             $sql = 'SELECT object_id, object_class FROM oro_audit '.
-                'GROUP BY object_id, object_class, version HAVING COUNT(*) > 1 LIMIT 25';
+                'GROUP BY object_id, object_class, version HAVING COUNT(*) > 1 LIMIT 100';
             $rows = $this->connection->fetchAll($sql);
             if (!$rows) {
                 break;
             }
 
             foreach ($rows as $row) {
-                if ($platform instanceof PostgreSqlPlatform) {
-                    $sql = 'UPDATE oro_audit SET version = 0 ' .
-                        'WHERE object_id = :object_id AND '.
-                                  'object_class = :object_class;' .
-                        'SELECT setval(\'seq_temp_version\', 1);' .
-                        'UPDATE oro_audit SET version = nextval(\'seq_temp_version\') - 1 ' .
-                            'WHERE object_id = :object_id AND '.
-                                  'object_class = :object_class;';
-                } else {
-                    $sql = 'UPDATE oro_audit SET version = 0 ' .
-                        'WHERE object_id = :object_id AND '.
-                            'object_class = :object_class;'.
-                        'SET @version = 0;'.
-                        'UPDATE oro_audit SET version = @version:=@version+1 '.
-                            'WHERE object_id = :object_id AND '.
-                                  'object_class = :object_class;';
-                }
+                $sql = 'UPDATE oro_audit SET version = 0 '.
+                    'WHERE object_id = :object_id AND '.
+                    'object_class = :object_class;'.
+                    'SET @version = 0;'.
+                    'UPDATE oro_audit SET version = @version:=@version+1 '.
+                    'WHERE object_id = :object_id AND '.
+                    'object_class = :object_class;';
 
                 $this->connection->executeUpdate(
                     $sql,
@@ -81,10 +121,6 @@ class AddUniqueVersionIndex implements Migration, ConnectionAwareInterface
                     ]
                 );
             }
-        }
-
-        if ($platform instanceof PostgreSqlPlatform) {
-            $this->connection->exec('DROP SEQUENCE seq_temp_version');
         }
     }
 }

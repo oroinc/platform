@@ -84,6 +84,10 @@ abstract class AbstractSorterExtension extends AbstractExtension
     {
         $toolbarSort = $config->offsetGetByPath(Configuration::TOOLBAR_SORTING_PATH, false);
         $multiSort   = $config->offsetGetByPath(Configuration::MULTISORT_PATH, false);
+        $defaultSorting = $config->offsetGetByPath(Configuration::DEFAULT_SORTERS_PATH, false);
+        $disableDefaultSorting = $config->offsetGetByPath(Configuration::DISABLE_DEFAULT_SORTING_PATH, false);
+        $disableNotSelectedOption   = $config->offsetGetByPath(Configuration::DISABLE_NOT_SELECTED_OPTION_PATH, false);
+
         if ($toolbarSort && $multiSort) {
             throw new LogicException('Columns multiple_sorting cannot be enabled for toolbar_sorting');
         }
@@ -93,6 +97,9 @@ abstract class AbstractSorterExtension extends AbstractExtension
         $data->offsetAddToArray(MetadataObject::OPTIONS_KEY, ['multipleSorting' => $multiSort]);
         $toolbarOptions               = $data->offsetGetByPath(ToolbarExtension::TOOLBAR_OPTION_PATH, []);
         $toolbarOptions['addSorting'] = $toolbarSort;
+        $toolbarOptions['disableNotSelectedOption'] = $disableNotSelectedOption
+            && !empty($defaultSorting)
+            && !$disableDefaultSorting;
         $data->offsetSetByPath(ToolbarExtension::TOOLBAR_OPTION_PATH, $toolbarOptions);
 
         $this->setMetadataStates($config, $data);

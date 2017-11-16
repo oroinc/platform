@@ -9,26 +9,15 @@ class ExportTemplateType extends ExportType
     const NAME = 'oro_importexport_export_template';
 
     /**
-     * @param string $entityName
-     * @return array
+     * {@inheritdoc}
      */
-    protected function getExportProcessorsChoices($entityName)
+    protected function getProcessorType()
     {
-        $aliases = $this->processorRegistry->getProcessorAliasesByEntity(
-            ProcessorRegistry::TYPE_EXPORT_TEMPLATE,
-            $entityName
-        );
-        $result = array();
-        foreach ($aliases as $alias) {
-            $result[$alias] = $this->generateProcessorLabel($alias);
-        }
-
-        return $result;
+        return ProcessorRegistry::TYPE_EXPORT_TEMPLATE;
     }
 
     /**
-     * @param string $alias
-     * @return string
+     * {@inheritdoc}
      */
     protected function generateProcessorLabel($alias)
     {

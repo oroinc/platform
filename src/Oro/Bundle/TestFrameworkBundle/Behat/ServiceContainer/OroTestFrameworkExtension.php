@@ -31,10 +31,15 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
 use WebDriver\ServiceFactory;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class OroTestFrameworkExtension implements TestworkExtension
 {
     const ISOLATOR_TAG = 'oro_behat.isolator';
     const SUITE_AWARE_TAG = 'suite_aware';
+    const HEALTH_CHECKER_TAG = 'behat_health_checker';
+    const HEALTH_CHECKER_AWARE_TAG = 'health_checker_aware';
     const CONFIG_PATH = '/Tests/Behat/behat.yml';
     const MESSAGE_QUEUE_ISOLATOR_AWARE_TAG = 'message_queue_isolator_aware';
     const ELEMENTS_CONFIG_ROOT = 'elements';
@@ -66,10 +71,12 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->processBundleBehatConfigurations($container);
         $this->processBundleAutoload($container);
         $this->injectMessageQueueIsolator($container);
+        $this->processReferenceRepositoryInitializers($container);
         $this->processIsolationSubscribers($container);
         $this->processSuiteAwareSubscriber($container);
         $this->processClassResolvers($container);
         $this->processArtifactHandlers($container);
+        $this->processHealthCheckers($container);
         $this->replaceSessionListener($container);
         $this->setWebDriverCurl($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
@@ -115,9 +122,6 @@ class OroTestFrameworkExtension implements TestworkExtension
                     ->info('Contexts that added to all autoload bundles suites')
                     ->defaultValue([])
                 ->end()
-                ->scalarNode('reference_initializer_class')
-                    ->defaultValue('Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepositoryInitializer')
-                ->end()
                 ->arrayNode('artifacts')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -137,6 +141,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/config'));
         $loader->load('services.yml');
+        $loader->load('health_checkers.yml');
         $loader->load('isolators.yml');
         $loader->load('artifacts.yml');
         $loader->load('cli_controllers.yml');
@@ -144,7 +149,6 @@ class OroTestFrameworkExtension implements TestworkExtension
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
         $container->setParameter('oro_test.artifacts.handler_configs', $config['artifacts']['handlers']);
-        $container->setParameter('oro_test.reference_initializer_class', $config['reference_initializer_class']);
         // Remove reboot kernel after scenario because we have isolation in feature layer instead of scenario
         $container->getDefinition('symfony2_extension.context_initializer.kernel_aware')
             ->clearTag(EventDispatcherExtension::SUBSCRIBER_TAG);
@@ -218,6 +222,21 @@ class OroTestFrameworkExtension implements TestworkExtension
             $container->getDefinition($id)->replaceArgument(0, $handlerConfigurations[$handlerClass::getConfigKey()]);
             $prettySubscriberDefinition->addMethodCall('addArtifactHandler', [new Reference($id)]);
             $progressSubscriberDefinition->addMethodCall('addArtifactHandler', [new Reference($id)]);
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function processHealthCheckers(ContainerBuilder $container)
+    {
+        $healthCheckerIds = array_keys($container->findTaggedServiceIds(self::HEALTH_CHECKER_TAG));
+
+        foreach ($container->findTaggedServiceIds(self::HEALTH_CHECKER_AWARE_TAG) as $id => $attributes) {
+            $service = $container->getDefinition($id);
+            foreach ($healthCheckerIds as $healthCheckerId) {
+                $service->addMethodCall('addHealthChecker', [new Reference($healthCheckerId)]);
+            }
         }
     }
 
@@ -332,6 +351,7 @@ class OroTestFrameworkExtension implements TestworkExtension
 
         $container->getDefinition('oro_element_factory')->replaceArgument(2, $elements);
         $container->getDefinition('oro_page_factory')->replaceArgument(1, $pages);
+        $suites = array_merge($suites, $container->getParameter('suite.configurations'));
         $container->setParameter('suite.configurations', $suites);
     }
 
@@ -343,6 +363,39 @@ class OroTestFrameworkExtension implements TestworkExtension
             }
 
             $baseConfig[$key] = $value;
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function processReferenceRepositoryInitializers(ContainerBuilder $container)
+    {
+        $kernel = $container->get(Symfony2Extension::KERNEL_ID);
+        $doctrineIsolator = $container->getDefinition('oro_behat_extension.isolation.doctrine_isolator');
+
+        /** @var BundleInterface $bundle */
+        foreach ($kernel->getBundles() as $bundle) {
+            $namespace = sprintf('%s\Tests\Behat\ReferenceRepositoryInitializer', $bundle->getNamespace());
+
+            if (!class_exists($namespace)) {
+                continue;
+            }
+
+            try {
+                $initializer = new $namespace;
+            } catch (\Throwable $e) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Error while creating "%s" initializer. Initializer should not have any dependencies',
+                        $namespace
+                    ),
+                    0,
+                    $e
+                );
+            }
+
+            $doctrineIsolator->addMethodCall('addInitializer', [$initializer]);
         }
     }
 

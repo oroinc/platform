@@ -17,6 +17,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
 {
     use ClassExtensionTrait;
@@ -53,6 +56,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
     public function testShouldConfigureNullTransport()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
         $extension = new OroMessageQueueExtension();
         $extension->addTransportFactory(new NullTransportFactory());
@@ -71,6 +75,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
     public function testShouldUseNullTransportAsDefault()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
         $extension = new OroMessageQueueExtension();
         $extension->addTransportFactory(new NullTransportFactory());
@@ -96,6 +101,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
     public function testShouldConfigureFooTransport()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
         $extension = new OroMessageQueueExtension();
         $extension->addTransportFactory(new FooTransportFactory());
@@ -115,6 +121,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
     public function testShouldUseFooTransportAsDefault()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
         $extension = new OroMessageQueueExtension();
         $extension->addTransportFactory(new FooTransportFactory());
@@ -140,6 +147,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
     public function testShouldLoadClientServicesWhenEnabled()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
         $extension = new OroMessageQueueExtension();
         $extension->addTransportFactory(new DefaultTransportFactory());
@@ -158,6 +166,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
     public function testShouldUseMessageProducerByDefault()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('kernel.debug', false);
 
         $extension = new OroMessageQueueExtension();
@@ -177,6 +186,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
     public function testShouldUseMessageProducerIfTraceableProducerOptionSetToFalseExplicitly()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('kernel.debug', false);
 
         $extension = new OroMessageQueueExtension();
@@ -198,6 +208,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
     public function testShouldUseTraceableMessageProducerIfTraceableProducerOptionSetToTrueExplicitly()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('kernel.debug', true);
 
         $extension = new OroMessageQueueExtension();
@@ -229,6 +240,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
     public function testShouldConfigureDelayRedeliveredMessageExtension()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('kernel.debug', true);
 
         $extension = new OroMessageQueueExtension();
@@ -250,6 +262,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
     public function testShouldAddNullConnectionToNullDriverMapToDriverFactory()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('kernel.debug', true);
 
         $extension = new OroMessageQueueExtension();
@@ -273,6 +286,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
     public function testShouldAddDbalConnectionToDbalDriverMapToDriverFactory()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('kernel.debug', true);
 
         $extension = new OroMessageQueueExtension();
@@ -296,6 +310,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
     public function testShouldAddDbalLazyConnectionToDbalDriverMapToDriverFactory()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
         $container->setParameter('kernel.debug', true);
 
         $extension = new OroMessageQueueExtension();
@@ -323,5 +338,197 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $configuration = $extension->getConfiguration([], new ContainerBuilder());
 
         self::assertInstanceOf(Configuration::class, $configuration);
+    }
+
+    public function testSetPersistenceServices()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+
+        $extension->load(
+            [
+                [
+                    'transport' => [
+                        'default' => 'null'
+                    ],
+                    'persistent_services' => ['first_service', 'second_service']
+                ]
+            ],
+            $container
+        );
+
+        $extensionDefinition = $container->getDefinition('oro_message_queue.consumption.container_clearer');
+        $this->assertEquals(
+            [
+                'setPersistentServices',
+                [
+                    ['first_service', 'second_service']
+                ]
+            ],
+            $extensionDefinition->getMethodCalls()[0]
+        );
+    }
+
+    public function testSetPersistenceProcessors()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+
+        $extension->load(
+            [
+                [
+                    'transport' => [
+                        'default' => 'null'
+                    ],
+                    'persistent_processors' => ['first_processor']
+                ]
+            ],
+            $container
+        );
+
+        $extensionDefinition = $container->getDefinition('oro_message_queue.consumption.container_reset_extension');
+        $this->assertEquals(
+            [
+                'setPersistentProcessors',
+                [
+                    ['first_processor']
+                ]
+            ],
+            $extensionDefinition->getMethodCalls()[0]
+        );
+    }
+
+    public function testSetSecurityAgnosticTopics()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+        $extension->load(
+            [
+                [
+                    'transport' => [
+                        'default' => 'null'
+                    ],
+                    'client' => null,
+                    'security_agnostic_topics' => ['some_topic']
+                ]
+            ],
+            $container
+        );
+
+        $driverFactoryDefinition = $container->getDefinition('oro_message_queue.client.security_aware_driver_factory');
+        $this->assertEquals(
+            ['some_topic'],
+            $driverFactoryDefinition->getArgument(1)
+        );
+    }
+
+    public function testSetSecurityAgnosticProcessors()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+        $extension->load(
+            [
+                [
+                    'transport' => [
+                        'default' => 'null'
+                    ],
+                    'security_agnostic_processors' => ['some_processor']
+                ]
+            ],
+            $container
+        );
+
+        $driverFactoryDefinition = $container->getDefinition('oro_message_queue.consumption.security_aware_extension');
+        $this->assertEquals(
+            ['some_processor'],
+            $driverFactoryDefinition->getArgument(0)
+        );
+    }
+
+    public function testSetHeartbeatUpdatePeriodOption()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+        $extension->load(
+            [
+                [
+                    'transport' => [
+                        'default' => 'null'
+                    ],
+                    'consumer' => ['heartbeat_update_period' => 10]
+                ]
+            ],
+            $container
+        );
+
+        $this->assertEquals(10, $container->getParameter('oro_message_queue.consumer_heartbeat_update_period'));
+    }
+
+    public function testSetJobConfigurationProviderOnlyIfConfigIsSet()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+        $extension->load(
+            [
+                [
+                    'transport' => [
+                        'default' => 'null'
+                    ],
+                    'client' => null,
+                    'time_before_stale' => ['default' => 10, 'jobs' => ['custom' => 2]]
+                ]
+            ],
+            $container
+        );
+
+        $jobConfigurationProvider = $container->getDefinition('oro_message_queue.job.configuration_provider');
+        $providerMethodCalls = $jobConfigurationProvider->getMethodCalls();
+
+        $this->assertEquals(
+            ['setConfiguration', [['default' => 10, 'jobs' => ['custom' => 2]]]],
+            reset($providerMethodCalls)
+        );
+    }
+
+    public function testSetJobConfigurationProviderIsNotCalledWhenConfigIsNotSet()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+        $extension->load(
+            [
+                [
+                    'transport' => [
+                        'default' => 'null'
+                    ],
+                    'client' => null,
+                ]
+            ],
+            $container
+        );
+
+        $jobConfigurationProvider = $container->getDefinition('oro_message_queue.job.configuration_provider');
+
+        $this->assertEmpty($jobConfigurationProvider->getMethodCalls());
     }
 }

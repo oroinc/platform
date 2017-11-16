@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     require('jasmine-jquery');
-    var $ = require('jquery');
     var Vector2d = require('oroworkflow/js/tools/path-finder/vector2d');
     var Point2d = require('oroworkflow/js/tools/path-finder/point2d');
     var Line2d = require('oroworkflow/js/tools/path-finder/line2d');
@@ -10,8 +9,8 @@ define(function(require) {
     var Interval2d = require('oroworkflow/js/tools/path-finder/interval2d');
 
     describe('oroworkflow/js/tools/path-finder/vector2d', function() {
-        afterEach(function() {
-            $('svg').remove();
+        beforeEach(function() {
+            window.setFixtures('<div class="workflow-flowchart-editor" />');
         });
 
         it('check vector creation', function() {
@@ -110,7 +109,8 @@ define(function(require) {
             var direction = new Point2d(0, -1);
             var vector = new Vector2d(56, 67, direction);
             vector.draw('green');
-            expect(document.body).toContainElement('path[stroke=green][d="M 56 67 L 56 -99933"]');
+            expect(document.body)
+                .toContainElement('svg[style^="top: -99933px; left: 56px;"]>path[stroke=green][d="M 0 0 L 0 100000"]');
         });
     });
 });

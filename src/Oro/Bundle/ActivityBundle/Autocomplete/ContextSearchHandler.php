@@ -4,7 +4,6 @@ namespace Oro\Bundle\ActivityBundle\Autocomplete;
 
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Common\Util\ClassUtils;
@@ -34,9 +33,6 @@ use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
  */
 class ContextSearchHandler implements ConverterInterface
 {
-    /** @var TokenStorageInterface */
-    protected $token;
-
     /** @var TranslatorInterface */
     protected $translator;
 
@@ -65,7 +61,6 @@ class ContextSearchHandler implements ConverterInterface
     protected $class;
 
     /**
-     * @param TokenStorageInterface    $token
      * @param TranslatorInterface      $translator
      * @param Indexer                  $indexer
      * @param ActivityManager          $activityManager
@@ -79,7 +74,6 @@ class ContextSearchHandler implements ConverterInterface
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
-        TokenStorageInterface $token,
         TranslatorInterface $translator,
         Indexer $indexer,
         ActivityManager $activityManager,
@@ -90,7 +84,6 @@ class ContextSearchHandler implements ConverterInterface
         EventDispatcherInterface $dispatcher,
         $class = null
     ) {
-        $this->token                 = $token;
         $this->translator            = $translator;
         $this->indexer               = $indexer;
         $this->activityManager       = $activityManager;
@@ -213,16 +206,9 @@ class ContextSearchHandler implements ConverterInterface
      */
     protected function convertItems(array $items)
     {
-        $user = $this->token->getToken()->getUser();
-
         $result = [];
         /** @var Item $item */
         foreach ($items as $item) {
-            // Exclude current user from result
-            if (ClassUtils::getClass($user) === $item->getEntityName() && $user->getId() === $item->getRecordId()) {
-                continue;
-            }
-
             $result[] = $this->convertItem($item);
         }
 

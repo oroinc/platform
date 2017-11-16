@@ -7,7 +7,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\ImportExportBundle\Async\Topics;
-use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -35,11 +34,6 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
     protected $tokenStorage;
 
     /**
-     * @var TokenSerializerInterface
-     */
-    protected $tokenSerializer;
-
-    /**
      * @var DependentJobService
      */
     protected $dependentJob;
@@ -57,7 +51,6 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
     /**
      * @param JobRunner $jobRunner
      * @param MessageProducerInterface $producer
-     * @param TokenSerializerInterface $tokenSerializer
      * @param TokenStorageInterface $tokenStorage
      * @param DependentJobService $dependentJob
      * @param LoggerInterface $logger
@@ -66,7 +59,6 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
     public function __construct(
         JobRunner $jobRunner,
         MessageProducerInterface $producer,
-        TokenSerializerInterface $tokenSerializer,
         TokenStorageInterface $tokenStorage,
         DependentJobService $dependentJob,
         LoggerInterface $logger,
@@ -74,7 +66,6 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
     ) {
         $this->jobRunner = $jobRunner;
         $this->producer = $producer;
-        $this->tokenSerializer = $tokenSerializer;
         $this->tokenStorage = $tokenStorage;
         $this->logger = $logger;
         $this->dependentJob = $dependentJob;
@@ -128,28 +119,10 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
                 );
             }
 
-            $this->addDependedJob($job->getRootJob(), $body);
+            $this->addDependentJob($job->getRootJob(), $body);
 
             return true;
         };
-    }
-
-    /**
-     * @param string $serializedToken
-     *
-     * @return bool
-     */
-    protected function setSecurityToken($serializedToken)
-    {
-        $token = $this->tokenSerializer->deserialize($serializedToken);
-
-        if (null === $token) {
-            return false;
-        }
-
-        $this->tokenStorage->setToken($token);
-
-        return true;
     }
 
     /**
@@ -190,7 +163,7 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
      * @param Job   $rootJob
      * @param array $body
      */
-    protected function addDependedJob(Job $rootJob, array $body)
+    protected function addDependentJob(Job $rootJob, array $body)
     {
         $context = $this->dependentJob->createDependentJobContext($rootJob);
 

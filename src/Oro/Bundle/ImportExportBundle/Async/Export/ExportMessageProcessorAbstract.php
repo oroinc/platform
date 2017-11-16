@@ -3,9 +3,6 @@ namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
 use Psr\Log\LoggerInterface;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
-use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
@@ -27,16 +24,6 @@ abstract class ExportMessageProcessorAbstract implements MessageProcessorInterfa
     protected $jobStorage;
 
     /**
-     * @var TokenStorageInterface
-     */
-    protected $tokenStorage;
-
-    /**
-     * @var TokenSerializerInterface
-     */
-    protected $tokenSerializer;
-
-    /**
      * @var LoggerInterface
      */
     protected $logger;
@@ -44,21 +31,15 @@ abstract class ExportMessageProcessorAbstract implements MessageProcessorInterfa
     /**
      * @param JobRunner $jobRunner
      * @param JobStorage $jobStorage
-     * @param TokenStorageInterface $tokenStorage
-     * @param TokenSerializerInterface $tokenSerializer
      * @param LoggerInterface $logger
      */
     public function __construct(
         JobRunner $jobRunner,
         JobStorage $jobStorage,
-        TokenStorageInterface $tokenStorage,
-        TokenSerializerInterface $tokenSerializer,
         LoggerInterface $logger
     ) {
         $this->jobRunner = $jobRunner;
         $this->jobStorage = $jobStorage;
-        $this->tokenStorage = $tokenStorage;
-        $this->tokenSerializer = $tokenSerializer;
         $this->logger = $logger;
     }
 
@@ -100,24 +81,6 @@ abstract class ExportMessageProcessorAbstract implements MessageProcessorInterfa
 
             return $exportResult['success'];
         };
-    }
-
-    /**
-     * @param string $serializedToken
-     *
-     * @return bool
-     */
-    protected function setSecurityToken($serializedToken)
-    {
-        $token = $this->tokenSerializer->deserialize($serializedToken);
-
-        if (null === $token) {
-            return false;
-        }
-
-        $this->tokenStorage->setToken($token);
-
-        return true;
     }
 
     /**

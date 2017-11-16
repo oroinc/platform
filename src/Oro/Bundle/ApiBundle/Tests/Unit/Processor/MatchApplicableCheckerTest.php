@@ -19,20 +19,20 @@ class MatchApplicableCheckerTest extends \PHPUnit_Framework_TestCase
 
         $processors = [
             [
-                'processor'  => 'processor1',
-                'attributes' => []
+                'processor1',
+                []
             ],
             [
-                'processor'  => 'processor2',
-                'attributes' => ['class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User']
+                'processor2',
+                ['class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User']
             ],
             [
-                'processor'  => 'processor3',
-                'attributes' => ['class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserInterface']
+                'processor3',
+                ['class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserInterface']
             ],
             [
-                'processor'  => 'processor3',
-                'attributes' => ['class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Role']
+                'processor3',
+                ['class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Role']
             ],
         ];
 

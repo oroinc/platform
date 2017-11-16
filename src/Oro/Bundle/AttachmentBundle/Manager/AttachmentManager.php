@@ -46,19 +46,31 @@ class AttachmentManager
     /** @var AssociationManager */
     protected $associationManager;
 
+    /** @var bool */
+    protected $debug;
+
+    /** @var bool */
+    protected $debugImages;
+
     /**
      * @param RouterInterface    $router
      * @param array              $fileIcons
      * @param AssociationManager $associationManager
+     * @param bool               $debug
+     * @param bool               $debugImages
      */
     public function __construct(
         RouterInterface $router,
         $fileIcons,
-        AssociationManager $associationManager
+        AssociationManager $associationManager,
+        $debug,
+        $debugImages
     ) {
         $this->router = $router;
         $this->fileIcons = $fileIcons;
         $this->associationManager = $associationManager;
+        $this->debug = $debug;
+        $this->debugImages = $debugImages;
     }
 
     /**
@@ -322,7 +334,7 @@ class AttachmentManager
      */
     public function getFilteredImageUrl(File $entity, $filterName)
     {
-        return $this->router->generate(
+        return $this->generateUrl(
             'oro_filtered_attachment',
             [
                 'id'       => $entity->getId(),
@@ -330,6 +342,31 @@ class AttachmentManager
                 'filter'   => $filterName
             ]
         );
+    }
+
+    /**
+     * Generate url for prod env (without prefix "/app_dev.php")
+     *
+     * @param string $name
+     * @param array $parameters
+     * @return string
+     */
+    protected function generateUrl($name, $parameters = [])
+    {
+        if (!$this->debug || $this->debugImages) {
+            return $this->router->generate($name, $parameters);
+        }
+
+        $routerContext = $this->router->getContext();
+        $prevBaseUrl = $routerContext->getBaseUrl();
+        $baseUrlWithoutFrontController = preg_replace('/\/[\w_]+\.php$/', '', $prevBaseUrl);
+        $routerContext->setBaseUrl($baseUrlWithoutFrontController);
+
+        $url = $this->router->generate($name, $parameters);
+
+        $routerContext->setBaseUrl($prevBaseUrl);
+
+        return $url;
     }
 
     /**

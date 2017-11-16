@@ -10,10 +10,10 @@ system_configuration:
             title: 'First group'
 
         second_group:
-          title: 'Second group'
+            title: 'Second group'
 
         third_group:
-          title: 'Third group'
+            title: 'Third group'
 
     tree:
         system_configuration:

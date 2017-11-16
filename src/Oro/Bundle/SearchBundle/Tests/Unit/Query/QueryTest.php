@@ -314,4 +314,18 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(['text.notes' => 'notes', 'text.foo' => 'name', 'text.faa' => 'surname'], $fields);
     }
+
+    public function testAggregateAccessors()
+    {
+        $query = new Query();
+
+        $this->assertEquals([], $query->getAggregations());
+
+        $query->addAggregate('test_name', 'test_field', 'test_function');
+
+        $this->assertEquals(
+            ['test_name' => ['field' => 'test_field', 'function' => 'test_function']],
+            $query->getAggregations()
+        );
+    }
 }

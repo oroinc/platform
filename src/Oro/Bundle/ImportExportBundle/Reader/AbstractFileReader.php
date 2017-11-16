@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
+use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 
-abstract class AbstractFileReader extends AbstractReader
+abstract class AbstractFileReader extends AbstractReader implements ClosableInterface
 {
     /**
      * @var \SplFileInfo
@@ -69,5 +70,14 @@ abstract class AbstractFileReader extends AbstractReader
     public function getHeader()
     {
         return $this->header;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function close()
+    {
+        $this->file = null;
+        $this->header = null;
     }
 }

@@ -92,6 +92,10 @@ services:
         class:                        %oro_search.formatter.result_formatter.class%
         arguments:                    ["@doctrine.orm.entity_manager"]
 
+    oro_search.formatter.datetime_formatter:
+        class: 'Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter'
+        public: false
+
     oro_search.prepare_result_item.listener:
         class:                        %oro_search.prepare_result_item.listener.class%
         arguments:
@@ -148,6 +152,12 @@ services:
             - '@oro_search.extension.pager.orm.pager'
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_search.extension.mass_action.iterable_result_factory:
+        class: Oro\Bundle\SearchBundle\Datagrid\Extension\MassAction\IterableResultFactory
+        public: false
+        tags:
+            - { name: oro_datagrid.extension.mass_action.iterable_result_factory }
 
     # services used only for ORM search engine
     oro_search.fulltext_index_manager:
@@ -275,6 +285,19 @@ services:
         tags:
             - { name: form.type, alias: oro_search_type_string_filter }
 
+    oro_search.form.type.filter.search_enum:
+        class: Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchEnumFilterType
+        tags:
+            - { name: form.type, alias: oro_search_type_enum_filter }
+
+    oro_search.form.type.filter.search_entity:
+        class: Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchEntityFilterType
+        arguments:
+            - '@oro_entity.entity_name_resolver'
+            - '@oro_locale.helper.localization'
+        tags:
+            - { name: form.type, alias: oro_search_type_entity_filter }
+
     oro_search.migration.demo_data_fixtures_listener.reindex:
         class: Oro\Bundle\SearchBundle\EventListener\ReindexDemoDataFixturesListener
         arguments:
@@ -283,3 +306,8 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad, priority: -100 }
+
+    oro_search.utils.search_all_text:
+       class: Oro\Bundle\SearchBundle\Utils\SearchAllText
+       arguments:
+            - '@translator'

@@ -7,12 +7,14 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\Yaml\Parser;
 
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -25,20 +27,14 @@ abstract class ApiTestCase extends WebTestCase
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /**
-     * Local cache for expectations
-     *
-     * @var array
-     */
-    private $expectations = [];
+    /** @var bool */
+    private $isKernelRebootDisabled = false;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->initClient([], $this->getRequestParameters());
-
         /** @var ContainerInterface $container */
         $container = $this->getContainer();
 
@@ -181,37 +177,32 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * @param mixed $entityId
+     * @param string $entityClass
+     * @param mixed  $entityId
      *
      * @return string|null
      */
-    protected function getRestApiEntityId($entityId)
+    protected function getRestApiEntityId($entityClass, $entityId)
     {
         if (null === $entityId) {
             return null;
         }
 
+        $config = $this->getContainer()->get('oro_api.config_provider')->getConfig(
+            $entityClass,
+            Version::LATEST,
+            $this->getRequestType(),
+            [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
+        );
+        $metadata = $this->getContainer()->get('oro_api.metadata_provider')->getMetadata(
+            $entityClass,
+            Version::LATEST,
+            $this->getRequestType(),
+            $config->getDefinition()
+        );
+
         return $this->getContainer()->get('oro_api.rest.entity_id_transformer')
-            ->transform($entityId);
-    }
-    /**
-     * @param string $filename
-     *
-     * @return array
-     */
-    protected function loadExpectation($filename)
-    {
-        if (!isset($this->expectations[$filename])) {
-            $expectedContent = file_get_contents(
-                __DIR__ . DIRECTORY_SEPARATOR . 'Stub' . DIRECTORY_SEPARATOR . $filename
-            );
-
-            $ymlParser = new Parser();
-
-            $this->expectations[$filename] = $ymlParser->parse($expectedContent);
-        }
-
-        return $this->expectations[$filename];
+            ->transform($entityId, $metadata);
     }
 
     /**
@@ -339,5 +330,54 @@ abstract class ApiTestCase extends WebTestCase
     protected function getEntityManager()
     {
         return $this->getContainer()->get('doctrine')->getManager();
+    }
+
+    /**
+     * @return TestConfigRegistry
+     */
+    protected function getConfigRegistry()
+    {
+        return $this->getContainer()->get('oro_api.tests.config_registry');
+    }
+
+    /**
+     * Appends a configuration of an API resource.
+     * This method may be helpful if you create some general functionality
+     * and need to test it for different configurations without creating a test entity
+     * for each configuration.
+     * Please note that the configuration is restored after each test and you do not need to do it manually.
+     *
+     * @param string $entityClass          The class name of API resource
+     * @param array $config                The config to append,
+     *                                     e.g. ['fields' => ['renamedField' => ['property_path' => 'field']]]
+     * @param bool   $affectResourcesCache Whether the appended config affects the API resources or sub-resources
+     *                                     cache. E.g. this can happen when an association is renamed or excluded,
+     *                                     or when a API resource is added or excluded
+     */
+    public function appendEntityConfig($entityClass, array $config, $affectResourcesCache = false)
+    {
+        $this->getConfigRegistry()->appendEntityConfig($entityClass, $config, $affectResourcesCache);
+        // disable the kernel reboot to avoid loosing of changes in configs
+        if (null !== $this->client && !$this->isKernelRebootDisabled) {
+            $this->client->disableReboot();
+            $this->isKernelRebootDisabled = true;
+        }
+    }
+
+    /**
+     * Restored default configuration of API resources.
+     *
+     * @after
+     */
+    protected function restoreConfigs()
+    {
+        $this->getConfigRegistry()->restoreConfigs();
+        // restore the kernel reboot if it was disabled in appendEntityConfig method
+        if ($this->isKernelRebootDisabled) {
+            $this->isKernelRebootDisabled = false;
+            if (null !== $this->client) {
+                $this->client->enableReboot();
+            }
+        }
     }
 }

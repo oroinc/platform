@@ -61,6 +61,7 @@ services:
         arguments:
             - '@oro_entity_config.provider.attribute'
             - '@oro_entity_config.provider.serialized_field_provider'
+            - '@oro_entity_config.registry.attribute_type'
         tags:
             - { name: form.type_extension, alias: oro_entity_config_type }
 

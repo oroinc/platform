@@ -40,20 +40,19 @@ class NormalizeFilterValues implements ProcessorInterface
             return;
         }
 
-        $filterValues = $context->getFilterValues();
         $filters = $context->getFilters();
-        foreach ($filters as $filterKey => $filter) {
-            $filterValue = null;
-            if ($filterValues->has($filterKey)) {
-                $filterValue = $filterValues->get($filterKey);
+        $filterValues = $context->getFilterValues()->getAll();
+        foreach ($filterValues as $filterKey => $filterValue) {
+            if ($filters->has($filterKey)) {
+                $filter = $filters->get($filterKey);
                 if ($filter instanceof StandaloneFilter) {
-                    $value = null;
                     try {
                         $value = $this->valueNormalizer->normalizeValue(
                             $filterValue->getValue(),
                             $filter->getDataType(),
                             $context->getRequestType(),
-                            $filter->isArrayAllowed($filterValue->getOperator())
+                            $filter->isArrayAllowed($filterValue->getOperator()),
+                            $filter->isRangeAllowed($filterValue->getOperator())
                         );
                         $filterValue->setValue($value);
                     } catch (\Exception $e) {

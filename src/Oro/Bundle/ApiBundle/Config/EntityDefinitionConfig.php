@@ -117,9 +117,11 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function getParentResourceClass()
     {
-        return array_key_exists(self::PARENT_RESOURCE_CLASS, $this->items)
-            ? $this->items[self::PARENT_RESOURCE_CLASS]
-            : null;
+        if (!array_key_exists(self::PARENT_RESOURCE_CLASS, $this->items)) {
+            return null;
+        }
+
+        return $this->items[self::PARENT_RESOURCE_CLASS];
     }
 
     /**
@@ -191,6 +193,8 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 
     /**
      * Finds the name of the field by its property path.
+     * This method can be useful when a field was renamed and you need to find
+     * the name of the result field by the name defined in an entity.
      *
      * @param string $propertyPath
      *
@@ -290,9 +294,11 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function getIdentifierFieldNames()
     {
-        return array_key_exists(self::IDENTIFIER_FIELD_NAMES, $this->items)
-            ? $this->items[self::IDENTIFIER_FIELD_NAMES]
-            : [];
+        if (!array_key_exists(self::IDENTIFIER_FIELD_NAMES, $this->items)) {
+            return [];
+        }
+
+        return $this->items[self::IDENTIFIER_FIELD_NAMES];
     }
 
     /**
@@ -318,9 +324,11 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function isCollapsed()
     {
-        return array_key_exists(FieldConfig::COLLAPSE, $this->items)
-            ? $this->items[FieldConfig::COLLAPSE]
-            : false;
+        if (!array_key_exists(FieldConfig::COLLAPSE, $this->items)) {
+            return false;
+        }
+
+        return $this->items[FieldConfig::COLLAPSE];
     }
 
     /**
@@ -360,9 +368,11 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function getDeleteHandler()
     {
-        return array_key_exists(self::DELETE_HANDLER, $this->items)
-            ? $this->items[self::DELETE_HANDLER]
-            : null;
+        if (!array_key_exists(self::DELETE_HANDLER, $this->items)) {
+            return null;
+        }
+
+        return $this->items[self::DELETE_HANDLER];
     }
 
     /**
@@ -380,36 +390,38 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     }
 
     /**
-     * Indicates whether a link to documentation file exists.
+     * Indicates whether at least one link to documentation file exists.
      *
      * @return bool
      */
-    public function hasDocumentationResource()
+    public function hasDocumentationResources()
     {
         return array_key_exists(self::DOCUMENTATION_RESOURCE, $this->items);
     }
 
     /**
-     * Gets a link to file contains the documentation for API resource.
+     * Gets links to files contain the documentation for API resource.
      *
-     * @return string|null
+     * @return string[]
      */
-    public function getDocumentationResource()
+    public function getDocumentationResources()
     {
-        return array_key_exists(self::DOCUMENTATION_RESOURCE, $this->items)
-            ? $this->items[self::DOCUMENTATION_RESOURCE]
-            : null;
+        if (!array_key_exists(self::DOCUMENTATION_RESOURCE, $this->items)) {
+            return [];
+        }
+
+        return $this->items[self::DOCUMENTATION_RESOURCE];
     }
 
     /**
-     * Sets a link to file contains the documentation for API resource.
+     * Sets links to files contain the documentation for API resource.
      *
-     * @param string|null $resource
+     * @param string[]|string|null $resource
      */
-    public function setDocumentationResource($resource)
+    public function setDocumentationResources($resource)
     {
-        if ($resource) {
-            $this->items[self::DOCUMENTATION_RESOURCE] = $resource;
+        if (!empty($resource)) {
+            $this->items[self::DOCUMENTATION_RESOURCE] = (array)$resource;
         } else {
             unset($this->items[self::DOCUMENTATION_RESOURCE]);
         }

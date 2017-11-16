@@ -10,3 +10,9 @@
         padding: $page-header-inner-inner-offset;
     }
 }
+
+@include breakpoint('print') {
+    .page-header {
+        display: none !important;
+    }
+}

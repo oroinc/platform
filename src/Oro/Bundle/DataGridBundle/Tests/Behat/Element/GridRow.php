@@ -18,7 +18,7 @@ class GridRow extends TableRow
      */
     public function checkMassActionCheckbox($cellNumber = 0)
     {
-        $rowCheckbox = $this->getCellByNumber($cellNumber)->find('css', '[type="checkbox"]');
+        $rowCheckbox = $this->getMassActionCheckbox($cellNumber);
         self::assertNotNull($rowCheckbox, sprintf('No mass action checkbox found for "%s"', $this->getText()));
 
         if ($rowCheckbox->isChecked()) {
@@ -33,7 +33,7 @@ class GridRow extends TableRow
      */
     public function uncheckMassActionCheckbox($cellNumber = 0)
     {
-        $rowCheckbox = $this->getCellByNumber($cellNumber)->find('css', '[type="checkbox"]');
+        $rowCheckbox = $this->getMassActionCheckbox($cellNumber);
         self::assertNotNull($rowCheckbox, sprintf('No mass action checkbox found for "%s"', $this->getText()));
 
         if (!$rowCheckbox->isChecked()) {
@@ -41,6 +41,15 @@ class GridRow extends TableRow
         }
 
         $rowCheckbox->click();
+    }
+
+    /**
+     * @param int $cellNumber
+     * @return bool
+     */
+    public function hasMassActionCheckbox($cellNumber = 0): bool
+    {
+        return $this->getMassActionCheckbox($cellNumber) !== null;
     }
 
     /**
@@ -68,15 +77,7 @@ class GridRow extends TableRow
      */
     public function setCellValue($header, $value)
     {
-        $cell = $this->getCell($header);
-        $cell->mouseOver();
-
-        /** @var NodeElement $pencilIcon */
-        $pencilIcon = $cell->find('css', 'i[data-role="edit"]');
-        self::assertNotNull($pencilIcon, "Cell with '$header' is not inline editable");
-        self::assertTrue($pencilIcon->isValid(), "Cell with '$header' is not inline editable");
-        self::assertTrue($pencilIcon->isVisible(), "Cell with '$header' is not inline editable");
-        $pencilIcon->click();
+        $cell = $this->startInlineEditing($header);
 
         $this->getElement('OroForm')->fillField(
             'value',
@@ -84,6 +85,30 @@ class GridRow extends TableRow
         );
 
         $this->getDriver()->waitForAjax();
+
+        return $cell;
+    }
+
+    /**
+     * Start inline editing on the cell without changing the value and without saving
+     *
+     * @param string $header Column header name
+     * @return NodeElement
+     */
+    public function startInlineEditing($header)
+    {
+        $cell = $this->getCell($header);
+        $cell->mouseOver();
+
+        /** @var NodeElement $pencilIcon */
+        $pencilIcon = $cell->find('css', 'i[data-role="edit"]');
+        self::assertNotNull($pencilIcon, "Cell with '$header' is not inline editable");
+        self::assertTrue(
+            $pencilIcon->isValid() && $pencilIcon->isVisible(),
+            "Cell with '$header' is not inline editable"
+        );
+
+        $pencilIcon->click();
 
         return $cell;
     }
@@ -182,5 +207,23 @@ class GridRow extends TableRow
         }
 
         return $links;
+    }
+
+    /**
+     * @param int $cellNumber
+     * @return bool
+     */
+    public function isMassActionChecked($cellNumber = 0): bool
+    {
+        return $this->getCellByNumber($cellNumber)->isChecked();
+    }
+
+    /**
+     * @param int $cellNumber
+     * @return NodeElement|null
+     */
+    private function getMassActionCheckbox($cellNumber)
+    {
+        return $this->getCellByNumber($cellNumber)->find('css', '[type="checkbox"]');
     }
 }

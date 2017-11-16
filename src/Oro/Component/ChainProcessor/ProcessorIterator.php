@@ -2,18 +2,12 @@
 
 namespace Oro\Component\ChainProcessor;
 
+/**
+ * Iterates over processors filtered by matching theirs attributes and the current execution context.
+ */
 class ProcessorIterator implements \Iterator
 {
-    /**
-     * @var array
-     *  [
-     *      [
-     *          'processor'  => processorId,
-     *          'attributes' => [key => value, ...]
-     *      ],
-     *      ...
-     *  ]
-     */
+    /** @var array [[processor id, [attribute name => attribute value, ...]], ...] */
     protected $processors;
 
     /** @var ContextInterface */
@@ -43,10 +37,10 @@ class ProcessorIterator implements \Iterator
         ApplicableCheckerInterface $applicableChecker,
         ProcessorFactoryInterface $processorFactory
     ) {
-        $this->processors        = $processors;
-        $this->context           = $context;
+        $this->processors = $processors;
+        $this->context = $context;
         $this->applicableChecker = $applicableChecker;
-        $this->processorFactory  = $processorFactory;
+        $this->processorFactory = $processorFactory;
     }
 
     /**
@@ -90,11 +84,13 @@ class ProcessorIterator implements \Iterator
             return null;
         }
 
-        $attributes = $this->processors[$this->index]['attributes'];
+        $attributes = $this->processors[$this->index][1];
 
-        return isset($attributes['group'])
-            ? $attributes['group']
-            : null;
+        if (!isset($attributes['group'])) {
+            return null;
+        }
+
+        return $attributes['group'];
     }
 
     /**
@@ -108,7 +104,7 @@ class ProcessorIterator implements \Iterator
             return null;
         }
 
-        return $this->processors[$this->index]['processor'];
+        return $this->processors[$this->index][0];
     }
 
     /**
@@ -122,7 +118,7 @@ class ProcessorIterator implements \Iterator
             return null;
         }
 
-        return $this->processors[$this->index]['attributes'];
+        return $this->processors[$this->index][1];
     }
 
     /**
@@ -130,8 +126,8 @@ class ProcessorIterator implements \Iterator
      */
     public function current()
     {
-        $processorId = $this->processors[$this->index]['processor'];
-        $processor   = $this->processorFactory->getProcessor($processorId);
+        $processorId = $this->processors[$this->index][0];
+        $processor = $this->processorFactory->getProcessor($processorId);
         if (null === $processor) {
             throw new \RuntimeException(sprintf('The processor "%s" does not exist.', $processorId));
         }
@@ -168,7 +164,7 @@ class ProcessorIterator implements \Iterator
      */
     public function rewind()
     {
-        $this->index    = -1;
+        $this->index = -1;
         $this->maxIndex = count($this->processors) - 1;
         $this->nextApplicable();
     }
@@ -182,7 +178,7 @@ class ProcessorIterator implements \Iterator
         while ($this->index <= $this->maxIndex) {
             $applicable = $this->applicableChecker->isApplicable(
                 $this->context,
-                $this->processors[$this->index]['attributes']
+                $this->processors[$this->index][1]
             );
             if ($applicable !== ApplicableCheckerInterface::NOT_APPLICABLE) {
                 break;

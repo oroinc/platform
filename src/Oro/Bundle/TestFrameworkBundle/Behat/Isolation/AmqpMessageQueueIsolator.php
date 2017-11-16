@@ -2,16 +2,20 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-use Oro\Component\AmqpMessageQueue\Transport\Amqp\AmqpQueue;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Wire\AMQPTable;
+
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Process\Exception\RuntimeException;
 
+use Oro\Component\AmqpMessageQueue\Transport\Amqp\AmqpQueue;
+
 class AmqpMessageQueueIsolator extends AbstractMessageQueueIsolator
 {
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function isApplicable(ContainerInterface $container)
     {
         return 'amqp' === $container->getParameter('message_queue_transport');
@@ -35,9 +39,15 @@ class AmqpMessageQueueIsolator extends AbstractMessageQueueIsolator
         $messagesNumber = $this->getQueueMessageNumber($channel, $queue);
         // @todo: add wip messages?
         while (0 !== $messagesNumber) {
+            $isRunning = $this->ensureMessageQueueIsRunning();
+            if (!$isRunning) {
+                throw new RuntimeException('Message Queue is not running');
+            }
+
             if ($timeLimit <= 0) {
                 throw new RuntimeException('Message Queue was not process messages during time limit');
             }
+
             $messagesNumber = $this->getQueueMessageNumber($channel, $queue);
             sleep(1);
             $timeLimit -= 1;
@@ -66,6 +76,7 @@ class AmqpMessageQueueIsolator extends AbstractMessageQueueIsolator
      */
     private function createAmqpStreamConnection()
     {
+        $this->kernel->boot();
         $appContainer = $this->kernel->getContainer();
         $messageQueueParameters = $appContainer->getParameter('message_queue_transport_config');
 
@@ -93,7 +104,8 @@ class AmqpMessageQueueIsolator extends AbstractMessageQueueIsolator
 
     /**
      * @param AMQPChannel $channel
-     * @param AmqpQueue $queue
+     * @param AmqpQueue   $queue
+     *
      * @return int
      */
     private function getQueueMessageNumber(AMQPChannel $channel, AmqpQueue $queue)

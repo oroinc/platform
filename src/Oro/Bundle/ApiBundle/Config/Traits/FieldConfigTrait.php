@@ -30,9 +30,11 @@ trait FieldConfigTrait
      */
     public function getPropertyPath($defaultValue = null)
     {
-        return !empty($this->items[FieldConfig::PROPERTY_PATH])
-            ? $this->items[FieldConfig::PROPERTY_PATH]
-            : $defaultValue;
+        if (empty($this->items[FieldConfig::PROPERTY_PATH])) {
+            return $defaultValue;
+        }
+
+        return $this->items[FieldConfig::PROPERTY_PATH];
     }
 
     /**

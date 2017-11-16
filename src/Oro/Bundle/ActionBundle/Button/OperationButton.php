@@ -182,6 +182,14 @@ class OperationButton implements ButtonInterface
         return $this;
     }
 
+    /**
+     * @return ActionData
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
     public function __clone()
     {
         $this->buttonContext = clone $this->getButtonContext();

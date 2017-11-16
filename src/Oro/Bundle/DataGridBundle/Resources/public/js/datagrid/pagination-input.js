@@ -22,7 +22,6 @@ define([
 
         /** @property */
         events: {
-            'click [data-grid-pagination-trigger]': 'onChangePage',
             'blur [data-grid-pagination-trigger-input]': 'onChangePageByInput',
             'change [data-grid-pagination-trigger-input]': 'onChangePageByInput',
             'keyup input': function(e) {

@@ -4,16 +4,21 @@ namespace Oro\Component\ChainProcessor\Tests\Unit;
 
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorBag;
+use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
+use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 
 class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var ProcessorBagConfigBuilder */
+    protected $builder;
+
     /** @var ProcessorBag */
     protected $processorBag;
 
     protected function setUp()
     {
-        $factory = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
-        $factory->expects($this->any())
+        $factory = $this->createMock(ProcessorFactoryInterface::class);
+        $factory->expects(self::any())
             ->method('getProcessor')
             ->willReturnCallback(
                 function ($processorId) {
@@ -21,14 +26,15 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $this->processorBag = new ProcessorBag($factory);
+        $this->builder = new ProcessorBagConfigBuilder();
+        $this->processorBag = new ProcessorBag($this->builder, $factory);
     }
 
     public function testEmptyBag()
     {
         $context = new Context();
 
-        $this->assertProcessors(
+        self::assertProcessors(
             [],
             $this->processorBag->getProcessors($context)
         );
@@ -36,10 +42,10 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 
     public function testActions()
     {
-        $this->processorBag->addProcessor('processor1', [], 'action1');
-        $this->processorBag->addProcessor('processor2', [], 'action2');
+        $this->builder->addProcessor('processor1', [], 'action1');
+        $this->builder->addProcessor('processor2', [], 'action2');
 
-        $this->assertSame(
+        self::assertSame(
             ['action1', 'action2'],
             $this->processorBag->getActions()
         );
@@ -47,29 +53,40 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 
     public function testActionGroupsForUnknownAction()
     {
-        $this->processorBag->addGroup('group1', 'action1');
+        $this->builder->addGroup('group1', 'action1');
 
-        $this->processorBag->addProcessor('processor1', [], 'action1', 'group1');
+        $this->builder->addProcessor('processor1', [], 'action1', 'group1');
 
-        $this->assertSame(
+        self::assertSame(
             [],
             $this->processorBag->getActionGroups('unknown_action')
         );
     }
 
+    public function testActionGroupsForActionWithoutGroups()
+    {
+        $this->builder->addProcessor('processor1', [], 'action1');
+        $this->builder->addProcessor('processor2', [], 'action1');
+
+        self::assertSame(
+            [],
+            $this->processorBag->getActionGroups('action1')
+        );
+    }
+
     public function testActionGroups()
     {
-        $this->processorBag->addGroup('group3', 'action1', -10);
-        $this->processorBag->addGroup('group2', 'action1', -20);
-        $this->processorBag->addGroup('group1', 'action1', -30);
+        $this->builder->addGroup('group3', 'action1', -10);
+        $this->builder->addGroup('group2', 'action1', -20);
+        $this->builder->addGroup('group1', 'action1', -30);
 
-        $this->processorBag->addProcessor('processor1', [], 'action1', 'group1');
-        $this->processorBag->addProcessor('processor2', [], 'action1', 'group1');
-        $this->processorBag->addProcessor('processor3', [], 'action1', 'group3');
-        $this->processorBag->addProcessor('processor4', [], 'action1', 'group3');
-        $this->processorBag->addProcessor('processor5', [], 'action1', 'group1');
+        $this->builder->addProcessor('processor1', [], 'action1', 'group1');
+        $this->builder->addProcessor('processor2', [], 'action1', 'group1');
+        $this->builder->addProcessor('processor3', [], 'action1', 'group3');
+        $this->builder->addProcessor('processor4', [], 'action1', 'group3');
+        $this->builder->addProcessor('processor5', [], 'action1', 'group1');
 
-        $this->assertSame(
+        self::assertSame(
             ['group3', 'group1'],
             $this->processorBag->getActionGroups('action1')
         );
@@ -79,16 +96,16 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
     {
         $context = new Context();
 
-        $this->processorBag->addProcessor('processor1_1', [], 'action1');
-        $this->processorBag->addProcessor('processor1_2', [], 'action1', null, -1);
-        $this->processorBag->addProcessor('processor1_3', [], 'action1', null, 1);
+        $this->builder->addProcessor('processor1_1', [], 'action1');
+        $this->builder->addProcessor('processor1_2', [], 'action1', null, -1);
+        $this->builder->addProcessor('processor1_3', [], 'action1', null, 1);
 
-        $this->processorBag->addProcessor('processor2_1', [], 'action2');
-        $this->processorBag->addProcessor('processor2_2', [], 'action2', null, 1);
-        $this->processorBag->addProcessor('processor2_3', [], 'action2', null, -1);
+        $this->builder->addProcessor('processor2_1', [], 'action2');
+        $this->builder->addProcessor('processor2_2', [], 'action2', null, 1);
+        $this->builder->addProcessor('processor2_3', [], 'action2', null, -1);
 
         $context->setAction('action1');
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1_3',
                 'processor1_1',
@@ -98,7 +115,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         );
 
         $context->setAction('action2');
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor2_2',
                 'processor2_1',
@@ -108,7 +125,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         );
 
         $context->setAction('unknown_action');
-        $this->assertProcessors(
+        self::assertProcessors(
             [],
             $this->processorBag->getProcessors($context)
         );
@@ -118,28 +135,28 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
     {
         $context = new Context();
 
-        $this->processorBag->addProcessor('processor1_1', [], 'action1', 'group1');
-        $this->processorBag->addProcessor('processor1_2', [], 'action1', 'group1', -1);
-        $this->processorBag->addProcessor('processor1_3', [], 'action1', 'group1', 1);
-        $this->processorBag->addProcessor('processor1_4', [], 'action1', 'group2');
-        $this->processorBag->addProcessor('processor1_5', [], 'action1', 'group2', -1);
-        $this->processorBag->addProcessor('processor1_6', [], 'action1', 'group2', 1);
+        $this->builder->addProcessor('processor1_1', [], 'action1', 'group1');
+        $this->builder->addProcessor('processor1_2', [], 'action1', 'group1', -1);
+        $this->builder->addProcessor('processor1_3', [], 'action1', 'group1', 1);
+        $this->builder->addProcessor('processor1_4', [], 'action1', 'group2');
+        $this->builder->addProcessor('processor1_5', [], 'action1', 'group2', -1);
+        $this->builder->addProcessor('processor1_6', [], 'action1', 'group2', 1);
 
-        $this->processorBag->addProcessor('processor2_1', [], 'action2', 'group1');
-        $this->processorBag->addProcessor('processor2_2', [], 'action2', 'group1', 1);
-        $this->processorBag->addProcessor('processor2_3', [], 'action2', 'group1', -1);
-        $this->processorBag->addProcessor('processor2_4', [], 'action2', 'group2');
-        $this->processorBag->addProcessor('processor2_5', [], 'action2', 'group2', 1);
-        $this->processorBag->addProcessor('processor2_6', [], 'action2', 'group2', -1);
+        $this->builder->addProcessor('processor2_1', [], 'action2', 'group1');
+        $this->builder->addProcessor('processor2_2', [], 'action2', 'group1', 1);
+        $this->builder->addProcessor('processor2_3', [], 'action2', 'group1', -1);
+        $this->builder->addProcessor('processor2_4', [], 'action2', 'group2');
+        $this->builder->addProcessor('processor2_5', [], 'action2', 'group2', 1);
+        $this->builder->addProcessor('processor2_6', [], 'action2', 'group2', -1);
 
-        $this->processorBag->addGroup('group1', 'action1');
-        $this->processorBag->addGroup('group2', 'action1', 1);
+        $this->builder->addGroup('group1', 'action1');
+        $this->builder->addGroup('group2', 'action1', 1);
 
-        $this->processorBag->addGroup('group1', 'action2');
-        $this->processorBag->addGroup('group2', 'action2', -1);
+        $this->builder->addGroup('group1', 'action2');
+        $this->builder->addGroup('group2', 'action2', -1);
 
         $context->setAction('action1');
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1_6',
                 'processor1_4',
@@ -152,7 +169,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         );
 
         $context->setAction('action2');
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor2_2',
                 'processor2_1',
@@ -165,7 +182,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         );
 
         $context->setAction('unknown_action');
-        $this->assertProcessors(
+        self::assertProcessors(
             [],
             $this->processorBag->getProcessors($context)
         );
@@ -175,24 +192,24 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
     {
         $context = new Context();
 
-        $this->processorBag->addGroup('group1', 'action1');
-        $this->processorBag->addGroup('group2', 'action1', 1);
+        $this->builder->addGroup('group1', 'action1');
+        $this->builder->addGroup('group2', 'action1', 1);
 
-        $this->processorBag->addProcessor('processor1_1', [], 'action1', 'group1');
-        $this->processorBag->addProcessor('processor1_2', [], 'action1', 'group1', -1);
-        $this->processorBag->addProcessor('processor1_3', [], 'action1', 'group1', 1);
-        $this->processorBag->addProcessor('processor1_4', [], 'action1', 'group2');
-        $this->processorBag->addProcessor('processor1_5', [], 'action1', 'group2', -1);
-        $this->processorBag->addProcessor('processor1_6', [], 'action1', 'group2', 1);
+        $this->builder->addProcessor('processor1_1', [], 'action1', 'group1');
+        $this->builder->addProcessor('processor1_2', [], 'action1', 'group1', -1);
+        $this->builder->addProcessor('processor1_3', [], 'action1', 'group1', 1);
+        $this->builder->addProcessor('processor1_4', [], 'action1', 'group2');
+        $this->builder->addProcessor('processor1_5', [], 'action1', 'group2', -1);
+        $this->builder->addProcessor('processor1_6', [], 'action1', 'group2', 1);
 
-        $this->processorBag->addProcessor('processor1_no_group', [], 'action1');
-        $this->processorBag->addProcessor('processor2_no_group', [], 'action1', null, -1);
-        $this->processorBag->addProcessor('processor3_no_group', [], 'action1', null, 1);
-        $this->processorBag->addProcessor('processor4_no_group', [], 'action1', null, -1000);
-        $this->processorBag->addProcessor('processor5_no_group', [], 'action1', null, 1000);
+        $this->builder->addProcessor('processor1_no_group', [], 'action1');
+        $this->builder->addProcessor('processor2_no_group', [], 'action1', null, -1);
+        $this->builder->addProcessor('processor3_no_group', [], 'action1', null, 1);
+        $this->builder->addProcessor('processor4_no_group', [], 'action1', null, -1000);
+        $this->builder->addProcessor('processor5_no_group', [], 'action1', null, 1000);
 
         $context->setAction('action1');
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor5_no_group',
                 'processor3_no_group',
@@ -214,35 +231,35 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
     {
         $context = new Context();
 
-        $this->processorBag->addGroup('group1', 'action1');
-        $this->processorBag->addGroup('group2', 'action1', 1);
+        $this->builder->addGroup('group1', 'action1');
+        $this->builder->addGroup('group2', 'action1', 1);
 
-        $this->processorBag->addGroup('group1', 'action2');
+        $this->builder->addGroup('group1', 'action2');
 
-        $this->processorBag->addProcessor('processor1_1', [], 'action1', 'group1');
-        $this->processorBag->addProcessor('processor1_2', [], 'action1', 'group1', -1);
-        $this->processorBag->addProcessor('processor1_3', [], 'action1', 'group1', 1);
-        $this->processorBag->addProcessor('processor1_4', [], 'action1', 'group2');
-        $this->processorBag->addProcessor('processor1_5', [], 'action1', 'group2', -1);
-        $this->processorBag->addProcessor('processor1_6', [], 'action1', 'group2', 1);
+        $this->builder->addProcessor('processor1_1', [], 'action1', 'group1');
+        $this->builder->addProcessor('processor1_2', [], 'action1', 'group1', -1);
+        $this->builder->addProcessor('processor1_3', [], 'action1', 'group1', 1);
+        $this->builder->addProcessor('processor1_4', [], 'action1', 'group2');
+        $this->builder->addProcessor('processor1_5', [], 'action1', 'group2', -1);
+        $this->builder->addProcessor('processor1_6', [], 'action1', 'group2', 1);
 
-        $this->processorBag->addProcessor('processor1_no_action', []);
-        $this->processorBag->addProcessor('processor2_no_action', [], null, null, -1);
-        $this->processorBag->addProcessor('processor3_no_action', [], null, null, 1);
-        $this->processorBag->addProcessor('processor4_no_action', [], null, null, -1000);
-        $this->processorBag->addProcessor('processor5_no_action', [], null, null, 1000);
+        $this->builder->addProcessor('processor1_no_action', []);
+        $this->builder->addProcessor('processor2_no_action', [], null, null, -1);
+        $this->builder->addProcessor('processor3_no_action', [], null, null, 1);
+        $this->builder->addProcessor('processor4_no_action', [], null, null, -1000);
+        $this->builder->addProcessor('processor5_no_action', [], null, null, 1000);
 
-        $this->processorBag->addProcessor('processor1_1_no_group', [], 'action1');
-        $this->processorBag->addProcessor('processor1_2_no_group', [], 'action1', null, -1);
-        $this->processorBag->addProcessor('processor1_3_no_group', [], 'action1', null, 1);
-        $this->processorBag->addProcessor('processor1_4_no_group', [], 'action1', null, -1000);
-        $this->processorBag->addProcessor('processor1_5_no_group', [], 'action1', null, 1000);
+        $this->builder->addProcessor('processor1_1_no_group', [], 'action1');
+        $this->builder->addProcessor('processor1_2_no_group', [], 'action1', null, -1);
+        $this->builder->addProcessor('processor1_3_no_group', [], 'action1', null, 1);
+        $this->builder->addProcessor('processor1_4_no_group', [], 'action1', null, -1000);
+        $this->builder->addProcessor('processor1_5_no_group', [], 'action1', null, 1000);
 
-        $this->processorBag->addProcessor('processor2_1', [], 'action2', 'group1');
-        $this->processorBag->addProcessor('processor2_1_no_group', [], 'action2');
+        $this->builder->addProcessor('processor2_1', [], 'action2', 'group1');
+        $this->builder->addProcessor('processor2_1_no_group', [], 'action2');
 
         $context->setAction('action1');
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor5_no_action',
                 'processor3_no_action',
@@ -265,7 +282,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         );
 
         $context->setAction('action2');
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor5_no_action',
                 'processor3_no_action',
@@ -279,7 +296,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         );
 
         $context->setAction('unknown_action');
-        $this->assertProcessors(
+        self::assertProcessors(
             [],
             $this->processorBag->getProcessors($context)
         );
@@ -289,14 +306,14 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
     {
         $context = new Context();
 
-        $this->processorBag->addGroup('group1', 'action1');
+        $this->builder->addGroup('group1', 'action1');
 
-        $this->processorBag->addProcessor('processor1_1', [], 'action1', 'group1');
+        $this->builder->addProcessor('processor1_1', [], 'action1', 'group1');
 
-        $this->processorBag->addProcessor('processor1_no_action', []);
+        $this->builder->addProcessor('processor1_no_action', []);
 
         $context->setAction('action1');
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1_no_action',
                 'processor1_1',
@@ -309,14 +326,14 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
     {
         $context = new Context();
 
-        $this->processorBag->addGroup('group1', 'action1');
+        $this->builder->addGroup('group1', 'action1');
 
-        $this->processorBag->addProcessor('processor1_1', [], 'action1', 'group1');
+        $this->builder->addProcessor('processor1_1', [], 'action1', 'group1');
 
-        $this->processorBag->addProcessor('processor1_no_action', [], null, null, -1);
+        $this->builder->addProcessor('processor1_no_action', [], null, null, -1);
 
         $context->setAction('action1');
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1_1',
                 'processor1_no_action',
@@ -331,12 +348,12 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 
         $this->processorBag->addApplicableChecker(new NotDisabledApplicableChecker());
 
-        $this->processorBag->addProcessor('processor1_1', ['disabled' => true], 'action1');
-        $this->processorBag->addProcessor('processor1_2', [], 'action1', null, -1);
-        $this->processorBag->addProcessor('processor1_3', [], 'action1', null, 1);
+        $this->builder->addProcessor('processor1_1', ['disabled' => true], 'action1');
+        $this->builder->addProcessor('processor1_2', [], 'action1', null, -1);
+        $this->builder->addProcessor('processor1_3', [], 'action1', null, 1);
 
         $context->setAction('action1');
-        $this->assertProcessors(
+        self::assertProcessors(
             [
                 'processor1_3',
                 'processor1_2',
@@ -353,11 +370,11 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
     {
         $context = new Context();
 
-        $this->processorBag->addProcessor('processor1', [], 'action1', 'group1');
-        $this->processorBag->addProcessor('processor2', [], 'action1', 'group2');
-        $this->processorBag->addProcessor('processor3', [], 'action1', 'group3');
+        $this->builder->addProcessor('processor1', [], 'action1', 'group1');
+        $this->builder->addProcessor('processor2', [], 'action1', 'group2');
+        $this->builder->addProcessor('processor3', [], 'action1', 'group3');
 
-        $this->processorBag->addGroup('group1', 'action1');
+        $this->builder->addGroup('group1', 'action1');
 
         $context->setAction('action1');
         $this->processorBag->getProcessors($context);
@@ -371,7 +388,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
     {
         $this->processorBag->getProcessors(new Context());
 
-        $this->processorBag->addProcessor('processor1', [], 'action1');
+        $this->builder->addProcessor('processor1', [], 'action1');
     }
 
     /**
@@ -382,7 +399,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
     {
         $this->processorBag->getProcessors(new Context());
 
-        $this->processorBag->addGroup('group1', 'action1');
+        $this->builder->addGroup('group1', 'action1');
     }
 
     public function testAddApplicableCheckerToFrozenBag()
@@ -390,8 +407,8 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         $context = new Context();
         $context->setAction('action1');
 
-        $this->processorBag->addProcessor('processor1', ['disabled' => true], 'action1');
-        $this->processorBag->addProcessor('processor2', [], 'action1');
+        $this->builder->addProcessor('processor1', ['disabled' => true], 'action1');
+        $this->builder->addProcessor('processor2', [], 'action1');
 
         // freeze the processor bag
         // and make sure that the applicable checker is initialized and not blocks any processor
@@ -409,8 +426,8 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
      */
     public function testMaxGroupPriority()
     {
-        $this->processorBag->addGroup('group1', 'action1', 256);
-        $this->processorBag->addProcessor('processor1', [], 'action1', 'group1');
+        $this->builder->addGroup('group1', 'action1', 256);
+        $this->builder->addProcessor('processor1', [], 'action1', 'group1');
 
         $context = new Context();
         $context->setAction('action1');
@@ -423,8 +440,8 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
      */
     public function testMinGroupPriority()
     {
-        $this->processorBag->addGroup('group1', 'action1', -256);
-        $this->processorBag->addProcessor('processor1', [], 'action1', 'group1');
+        $this->builder->addGroup('group1', 'action1', -256);
+        $this->builder->addProcessor('processor1', [], 'action1', 'group1');
 
         $context = new Context();
         $context->setAction('action1');
@@ -437,8 +454,8 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
      */
     public function testMaxProcessorPriority()
     {
-        $this->processorBag->addGroup('group1', 'action1');
-        $this->processorBag->addProcessor('processor1', [], 'action1', 'group1', 256);
+        $this->builder->addGroup('group1', 'action1');
+        $this->builder->addProcessor('processor1', [], 'action1', 'group1', 256);
 
         $context = new Context();
         $context->setAction('action1');
@@ -451,8 +468,8 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
      */
     public function testMinProcessorPriority()
     {
-        $this->processorBag->addGroup('group1', 'action1');
-        $this->processorBag->addProcessor('processor1', [], 'action1', 'group1', -256);
+        $this->builder->addGroup('group1', 'action1');
+        $this->builder->addProcessor('processor1', [], 'action1', 'group1', -256);
 
         $context = new Context();
         $context->setAction('action1');
@@ -461,7 +478,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 
     public function testInternalPriorityForLastGroupedProcessor()
     {
-        $this->assertEquals(
+        self::assertEquals(
             -130561,
             $this->callCalculatePriority(-255, -255)
         );
@@ -469,7 +486,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 
     public function testInternalPriorityForFirstUngroupedProcessorExecutedAtEnd()
     {
-        $this->assertEquals(
+        self::assertEquals(
             -130562,
             $this->callCalculatePriority(-1)
         );
@@ -477,7 +494,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldNoLimitForPriorityOfUngroupedProcessorExecutedAtEnd()
     {
-        $this->assertEquals(
+        self::assertEquals(
             -130561 - 1000,
             $this->callCalculatePriority(-1000)
         );
@@ -485,7 +502,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 
     public function testInternalPriorityForFirstGroupedProcessor()
     {
-        $this->assertEquals(
+        self::assertEquals(
             130559,
             $this->callCalculatePriority(255, 255)
         );
@@ -493,7 +510,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 
     public function testInternalPriorityForLastUngroupedProcessorExecutedAtBegin()
     {
-        $this->assertEquals(
+        self::assertEquals(
             130560,
             $this->callCalculatePriority(0)
         );
@@ -501,7 +518,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldNoLimitForPriorityOfUngroupedProcessorExecutedAtBegin()
     {
-        $this->assertEquals(
+        self::assertEquals(
             130560 + 1000,
             $this->callCalculatePriority(1000)
         );
@@ -509,7 +526,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 
     public function testInternalPriorityForZeroProcessor()
     {
-        $this->assertEquals(
+        self::assertEquals(
             -1,
             $this->callCalculatePriority(0, 0)
         );
@@ -517,7 +534,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 
     public function testInternalPriorityForLastProcessorInZeroGroup()
     {
-        $this->assertEquals(
+        self::assertEquals(
             -256,
             $this->callCalculatePriority(-255, 0)
         );
@@ -525,7 +542,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 
     public function testInternalPriorityForFirstProcessorInZeroGroup()
     {
-        $this->assertEquals(
+        self::assertEquals(
             254,
             $this->callCalculatePriority(255, 0)
         );
@@ -563,7 +580,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
      */
     protected function callCalculatePriority($processorPriority, $groupPriority = null)
     {
-        $class  = new \ReflectionClass($this->processorBag);
+        $class  = new \ReflectionClass($this->builder);
         $method = $class->getMethod('calculatePriority');
         $method->setAccessible(true);
 
@@ -574,7 +591,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
      * @param string[]  $expectedProcessorIds
      * @param \Iterator $processors
      */
-    protected function assertProcessors(array $expectedProcessorIds, \Iterator $processors)
+    protected static function assertProcessors(array $expectedProcessorIds, \Iterator $processors)
     {
         $processorIds = [];
         /** @var ProcessorMock $processor */
@@ -582,6 +599,6 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
             $processorIds[] = $processor->getProcessorId();
         }
 
-        $this->assertEquals($expectedProcessorIds, $processorIds);
+        self::assertEquals($expectedProcessorIds, $processorIds);
     }
 }

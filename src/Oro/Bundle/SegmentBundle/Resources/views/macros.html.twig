@@ -1,8 +1,14 @@
 {% macro query_designer_condition_builder(params) %}
+    {% set params = {
+        column_chain_template_selector: '#column-chain-template',
+    }|merge(params) %}
+    {% set segment_selection_template_id = 'segment-template' %}
     {% set segmentConditionOptions = {
+        filters: params.metadata.filters|default([]),
         segmentChoice: {
             select2: {
                 placeholder: 'oro.segment.condition_builder.choose_entity_segment'|trans,
+                formatSelectionTemplateSelector: '#' ~ segment_selection_template_id,
                 ajax: {
                     url: 'oro_api_get_segment_items',
                     quietMillis: 100,
@@ -12,24 +18,27 @@
             currentSegment: params.currentSegmentId|default(null),
             pageLimit: params.page_limit|default(10)
         }
-    } %}
+    }|merge_recursive(params.segmentConditionOptions|default({})) %}
     {% set conditionBuilderOptions = {
-        criteriaListSelector: '#' ~ params.criteria_list_id,
+        criteriaListSelector: '.criteria-list',
+        conditionContainerSelector: '.condition-container',
         entityChoiceSelector: '[data-ftid=' ~ params.entity_choice_id ~ ']',
-        onFieldsUpdate: {
-            toggleCriteria: ['condition-item', 'condition-segment', 'conditions-group']
-        }
-    } %}
+        fieldsRelatedCriteria: ['condition-item', 'condition-segment', 'conditions-group'],
+    }|merge_recursive(params.conditionBuilderOptions|default({})) %}
     {% set conditionBuilderOptions = update_segment_condition_builder_options(conditionBuilderOptions) %}
-    <div class="condition-builder left-panel-container">
+
+    {{ _self.query_designer_segment_template(segment_selection_template_id) }}
+    <div class="condition-builder left-panel-container"
+         data-page-component-module="oroquerydesigner/js/app/components/condition-builder-component"
+         data-page-component-options="{{ conditionBuilderOptions|json_encode }}"
+         data-page-component-name="{{ params.componentName|default('condition-builder') }}">
         <div class="row-fluid">
             <div class="left-area filter-criteria">
                 <div class="hint">{{ 'oro.query_designer.condition_builder.criteria.drag_hint'|trans }}</div>
-                <ul class="criteria-list" id="{{ params.criteria_list_id }}">
+                <ul class="criteria-list">
                     {% placeholder segment_criteria_list with {params: params} %}
                     <li class="option" data-criteria="condition-segment"
-                        data-module="orosegment/js/segment-condition"
-                        data-widget="segmentCondition"
+                        data-module="orosegment/js/app/views/segment-condition-view"
                         data-options="{{ segmentConditionOptions|json_encode }}">
                         {{ 'oro.segment.condition_builder.criteria.segment_condition'|trans }}
                     </li>
@@ -39,9 +48,7 @@
                 </ul>
             </div>
             <div class="right-area">
-                <div id="{{ params.id }}"
-                     data-page-component-module="oroquerydesigner/js/app/components/condition-builder"
-                     data-page-component-options="{{ conditionBuilderOptions|json_encode }}"></div>
+                <div class="condition-container"></div>
             </div>
         </div>
     </div>
@@ -104,9 +111,6 @@
     @param array    metadata
 #}
 {% macro initJsWidgets(type, form, entities, metadata, entityFieldsRouteParams = {}) %}
-    {# Rendering templates #}
-    {{ _self.query_designer_segment_template('segment-template') }}
-
     {# Rertrieving fields data(actually this code works for already saved entities that's going to edit)#}
     {% set fieldsData = {} %}
     {% if not form.entity.vars.value is empty %}
@@ -126,10 +130,6 @@
             fieldsData:        fieldsData,
             confirmMessage:    type|replace('_', '.') ~ '.change_entity_confirmation',
         },
-        filters: {
-            criteriaList:     '#filter-criteria-list',
-            conditionBuilder: '#' ~ type ~ '-condition-builder'
-        },
         column: {
             editor:        { namePattern: '^' ~ type ~ '_form\\[column\\]\\[([\\w\\W]*)\\]$' },
             form:          '#' ~ type ~ '-column-form',
@@ -138,7 +138,6 @@
         },
         columnFieldChoiceOptions:     {},
         select2FieldChoiceTemplate:   '#column-chain-template',
-        select2SegmentChoiceTemplate: '#segment-template',
         entities:                     entities,
         metadata:                     metadata
     } %}

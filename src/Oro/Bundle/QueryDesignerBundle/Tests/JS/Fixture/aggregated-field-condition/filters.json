@@ -1,0 +1,31 @@
+[
+  {
+    "name":"number",
+    "label":"Number",
+    "choices":[
+      {
+        "label":"=",
+        "value":"3",
+        "data":3
+      }
+    ],
+    "applicable":[
+      {
+        "type":"integer"
+      }
+    ],
+    "type":"number",
+    "formatterOptions":{
+      "decimals":0,
+      "grouping":false,
+      "orderSeparator":"",
+      "decimalSeparator":"."
+    },
+    "arraySeparator":",",
+    "arrayOperators":[
+      9,
+      10
+    ],
+    "dataType":"data_integer"
+  }
+]

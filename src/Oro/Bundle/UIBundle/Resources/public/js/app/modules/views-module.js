@@ -23,6 +23,7 @@ define([
             mainMenu: '#main-menu',
             userMenu: '#top-page .user-menu',
             breadcrumb: '#breadcrumb',
+            leftPanel: '#left-panel',
             beforeContentAddition: '#before-content-addition',
             messages: '#flash-messages .flash-messages-holder'
         }
@@ -139,6 +140,19 @@ define([
             'oroui/js/mediator'
         ], function(mediator) {
             mediator.setHandler('updateDebugToolbar', _.noop);
+        });
+    }
+
+    if (!tools.isMobile()) {
+        /**
+         * Init SidePanelView
+         */
+        BaseController.loadBeforeAction([
+            'oroui/js/app/views/side-panel-view'
+        ], function(SidePanelView) {
+            BaseController.addToReuse('leftPanel', SidePanelView, {
+                el: 'region:leftPanel'
+            });
         });
     }
 });

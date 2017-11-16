@@ -14,11 +14,6 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Removes excluded fields and associations.
- * Renames fields and associations if their names are not correspond the configuration of entity
- * and there is the "property_path" attribute for the field.
- * For example, if the metadata has the "address_name" field, and there is the following configuration:
- *  address: { property_path: address_name }
- * the metadata field will be renamed to "address".
  * Expands metadata of root entity adding fields which are aliases for child associations.
  * For example, if there is the field configuration like:
  *  addressName: { property_path: address.name }
@@ -91,13 +86,11 @@ class NormalizeMetadata implements ProcessorInterface
         foreach ($fields as $fieldName => $field) {
             if (!$withExcludedProperties && $field->isExcluded()) {
                 $entityMetadata->removeProperty($fieldName);
-            } else {
+            } elseif ($processLinkedProperties) {
                 $propertyPath = $field->getPropertyPath();
                 if ($propertyPath && $fieldName !== $propertyPath) {
                     $path = ConfigUtil::explodePropertyPath($field->getPropertyPath());
-                    if (1 === count($path)) {
-                        $entityMetadata->renameProperty($propertyPath, $fieldName);
-                    } elseif ($processLinkedProperties && !$entityMetadata->hasProperty($fieldName)) {
+                    if (count($path) > 0 && !$entityMetadata->hasProperty($fieldName)) {
                         $addedPropertyName = $this->processLinkedProperty(
                             $entityMetadata,
                             $fieldName,
@@ -248,7 +241,7 @@ class NormalizeMetadata implements ProcessorInterface
                 throw new RuntimeException(
                     sprintf(
                         'A configuration of "%s" field does not exist.',
-                        implode('.', $propertyPath)
+                        implode(ConfigUtil::PATH_DELIMITER, $propertyPath)
                     )
                 );
             }
@@ -257,7 +250,7 @@ class NormalizeMetadata implements ProcessorInterface
                 throw new RuntimeException(
                     sprintf(
                         'A configuration of the target entity for "%s" field does not exist.',
-                        implode('.', $propertyPath)
+                        implode(ConfigUtil::PATH_DELIMITER, $propertyPath)
                     )
                 );
             }

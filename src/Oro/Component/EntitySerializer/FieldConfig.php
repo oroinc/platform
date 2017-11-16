@@ -101,9 +101,11 @@ class FieldConfig
      */
     public function isExcluded()
     {
-        return array_key_exists(self::EXCLUDE, $this->items)
-            ? $this->items[self::EXCLUDE]
-            : false;
+        if (!array_key_exists(self::EXCLUDE, $this->items)) {
+            return false;
+        }
+
+        return $this->items[self::EXCLUDE];
     }
 
     /**
@@ -127,9 +129,11 @@ class FieldConfig
      */
     public function isCollapsed()
     {
-        return array_key_exists(self::COLLAPSE, $this->items)
-            ? $this->items[self::COLLAPSE]
-            : false;
+        if (!array_key_exists(self::COLLAPSE, $this->items)) {
+            return false;
+        }
+
+        return $this->items[self::COLLAPSE];
     }
 
     /**
@@ -155,9 +159,11 @@ class FieldConfig
      */
     public function getPropertyPath($defaultValue = null)
     {
-        return !empty($this->items[self::PROPERTY_PATH])
-            ? $this->items[self::PROPERTY_PATH]
-            : $defaultValue;
+        if (empty($this->items[self::PROPERTY_PATH])) {
+            return $defaultValue;
+        }
+
+        return $this->items[self::PROPERTY_PATH];
     }
 
     /**
@@ -186,9 +192,11 @@ class FieldConfig
      */
     public function getDataTransformers()
     {
-        return array_key_exists(self::DATA_TRANSFORMER, $this->items)
-            ? $this->items[self::DATA_TRANSFORMER]
-            : [];
+        if (!array_key_exists(self::DATA_TRANSFORMER, $this->items)) {
+            return [];
+        }
+
+        return $this->items[self::DATA_TRANSFORMER];
     }
 
     /**
@@ -206,7 +214,7 @@ class FieldConfig
      */
     public function addDataTransformer($dataTransformer)
     {
-        $transformers   = $this->getDataTransformers();
+        $transformers = $this->getDataTransformers();
         $transformers[] = $dataTransformer;
 
         $this->items[self::DATA_TRANSFORMER] = $transformers;

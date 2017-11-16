@@ -26,8 +26,10 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
+use Oro\Bundle\UIBundle\Tests\Behat\Element\EntityStatus;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 use Symfony\Component\Stopwatch\Stopwatch;
+use WebDriver\Exception\NoAlertOpenError;
 use WebDriver\Exception\NoSuchElement;
 
 /**
@@ -66,12 +68,31 @@ class OroMainContext extends MinkContext implements
     /** @var bool */
     private $debug = false;
 
+    /** @var bool */
+    private $skipWait = false;
+
     /**
      * @BeforeScenario
      */
     public function beforeScenario()
     {
         $this->getSession()->resizeWindow(1920, 1080, 'current');
+    }
+
+    /**
+     * @BeforeScenario @skipWait
+     */
+    public function applySkipWait()
+    {
+        $this->skipWait = true;
+    }
+
+    /**
+     * @AfterScenario @skipWait
+     */
+    public function cancelSkipWait()
+    {
+        $this->skipWait = false;
     }
 
     /**
@@ -125,7 +146,7 @@ class OroMainContext extends MinkContext implements
      */
     public function beforeStep(BeforeStepScope $scope)
     {
-        if (!$this->getMink()->isSessionStarted()) {
+        if ($this->skipWait || !$this->getMink()->isSessionStarted()) {
             return;
         }
 
@@ -146,6 +167,7 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
         $driver->waitPageToLoad();
     }
 
@@ -155,7 +177,7 @@ class OroMainContext extends MinkContext implements
      */
     public function afterStep(AfterStepScope $scope)
     {
-        if (!$this->getMink()->isSessionStarted()) {
+        if ($this->skipWait || !$this->getMink()->isSessionStarted()) {
             return;
         }
 
@@ -186,8 +208,6 @@ class OroMainContext extends MinkContext implements
                 sprintf('There is an error message "%s" found on the page, something went wrong', $error->getText())
             );
         }
-
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     /**
@@ -366,6 +386,63 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Accepts alert.
+     * Example: I accept alert
+     *
+     * @When /^(?:|I )accept alert$/
+     */
+    public function iAcceptAlert()
+    {
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $session = $driver->getWebDriverSession();
+
+        for ($tries = 0; $tries < 3; ++$tries) {
+            try {
+                $session->accept_alert();
+            } catch (NoAlertOpenError $exception) {
+                usleep(50000);
+            }
+        }
+    }
+
+    /**
+     * Assert alert is not present
+     * Example: Then I should not see alert
+     *
+     * @Then I should not see alert
+     */
+    public function iShouldNotSeeAlert()
+    {
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $session = $driver->getWebDriverSession();
+
+        try {
+            $session->accept_alert();
+            $alertMessage = $session->getAlert_text();
+        } catch (NoAlertOpenError $e) {
+            return;
+        }
+
+        self::fail('Expect to see no alert but alert with "'.$alertMessage.'" message is present');
+    }
+
+    /**
+     * Assert that no malicious scripts present on page
+     * Example: Then I should not see malicious scripts
+     *
+     * @Then I should not see malicious scripts
+     */
+    public function iShouldNotSeeMaliciousScripts()
+    {
+        $this->assertPageNotContainsText('<script>');
+        $this->assertPageNotContainsText('<Script>');
+        $this->assertPageNotContainsText('&lt;script&gt;');
+        $this->assertPageNotContainsText('&lt;Script&gt;');
+    }
+
+    /**
      * @param \Closure $lambda
      * @param int $timeLimit in seconds
      * @return null|mixed Return null if closure throw error or return not true value.
@@ -411,6 +488,18 @@ class OroMainContext extends MinkContext implements
     public function closeUiDialog()
     {
         $this->getSession()->getPage()->find('css', 'button.ui-dialog-titlebar-close')->press();
+    }
+
+    /**
+     * Open dashboard
+     *
+     * @Given I am on dashboard
+     * @And I am on dashboard
+     */
+    public function iAmOnDashboard()
+    {
+        $router = $this->getContainer()->get('router');
+        $this->visit($router->generate('oro_default'));
     }
 
     /**
@@ -627,15 +716,23 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeModalWithElements($dialogName, TableNode $table)
     {
-        $modal = $this->elementFactory->createElement($dialogName);
+        $modals = $this->elementFactory->findAllElements($dialogName);
 
-        self::assertTrue($modal->isValid(), 'There is no modal on page at this moment');
-        self::assertTrue($modal->isVisible(), 'There is no visible modal on page at this moment');
+        $dialog = null;
+
+        foreach ($modals as $modal) {
+            if ($modal->isValid() && $modal->isVisible()) {
+                $dialog = $modal;
+                break;
+            }
+        }
+
+        self::assertNotNull($dialog, 'There is no modal on page at this moment');
 
         foreach ($table->getRows() as $row) {
             list($elementName, $expectedTitle) = $row;
 
-            $element = $modal->findElementContains(sprintf('%s %s', $dialogName, $elementName), $expectedTitle);
+            $element = $dialog->findElementContains(sprintf('%s %s', $dialogName, $elementName), $expectedTitle);
             self::assertTrue($element->isValid(), sprintf('Element with "%s" text not found', $expectedTitle));
         }
     }
@@ -712,6 +809,25 @@ class OroMainContext extends MinkContext implements
         $elementObject = $this->createElement($element);
         self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
         self::assertContains($text, $elementObject->getText());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertElementNotContainsText($element, $text)
+    {
+        $elementObject = $this->createElement($element);
+        self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
+        self::assertNotContains($text, $elementObject->getText());
+    }
+
+    /**
+     * Example: When I scroll to top
+     * @When /^I scroll to top$/
+     */
+    public function scrollTop()
+    {
+        $this->getSession()->executeScript('window.scrollTo(0,0);');
     }
 
     /**
@@ -1004,6 +1120,20 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Scrolls page to first element with given text
+     *
+     * @When /^(?:|I )scroll to text "(?P<text>(?:[^"]|\\")*)"$/
+     */
+    public function iScrollToText($text)
+    {
+        $this->assertPageContainsText($text);
+        $element = $this->getPage()->find('named', ['content', $text]);
+        if ($element) {
+            $element->focus();
+        }
+    }
+
+    /**
      * Presses button with specified id|name|title|alt|value in some named section
      * Example: When I press "Add" in "General Information" section
      * Example: And I press "Add" in "General Information" section
@@ -1057,6 +1187,7 @@ class OroMainContext extends MinkContext implements
      */
     public function iRestartMessageConsumer()
     {
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
         $this->messageQueueIsolator->stopMessageQueue();
         $this->messageQueueIsolator->startMessageQueue();
     }
@@ -1260,9 +1391,6 @@ class OroMainContext extends MinkContext implements
             $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
         } catch (\Exception $e) {
             throw $e;
-        } finally {
-            $this->messageQueueIsolator->stopMessageQueue();
-            $this->messageQueueIsolator->startMessageQueue();
         }
     }
 
@@ -1527,5 +1655,122 @@ class OroMainContext extends MinkContext implements
             $childElementName,
             $parentElementName
         ));
+    }
+
+    /**
+     * Example: Then I should see "Map container" element with text "Address" inside "Default Addresses" element
+     *
+     * @Then I should see :childElementName element with text :text inside :parentElementName element
+     * @param string $parentElementName
+     * @param string $childElementName
+     * @param string $text
+     */
+    public function iShouldSeeElementWithTextInsideElement($childElementName, $parentElementName, $text)
+    {
+        $parentElement = $this->createElement($parentElementName);
+        self::assertTrue($parentElement->isIsset() && $parentElement->isVisible(), sprintf(
+            'Parent element "%s" not found on page',
+            $parentElementName
+        ));
+
+        $childElement = $parentElement->findElementContains($childElementName, $text);
+        self::assertTrue($childElement->isIsset(), sprintf(
+            'Element "%s" with text "%s" not found inside element "%s"',
+            $childElementName,
+            $text,
+            $parentElementName
+        ));
+        self::assertTrue($childElement->isVisible(), sprintf(
+            'Element "%s" with text "%s" found inside element "%s", but it\'s not visible',
+            $childElementName,
+            $text,
+            $parentElementName
+        ));
+    }
+
+    /**
+     * Example: Then I should not see "Map container" element with text "Address" inside "Default Addresses" element
+     *
+     * @Then I should not see :childElementName element with text :text inside :parentElementName element
+     * @param string $parentElementName
+     * @param string $childElementName
+     * @param string $text
+     */
+    public function iShouldNotSeeElementWithTextInsideElement($childElementName, $parentElementName, $text)
+    {
+        $parentElement = $this->createElement($parentElementName);
+        self::assertTrue($parentElement->isIsset() && $parentElement->isVisible(), sprintf(
+            'Parent element "%s" not found on page',
+            $parentElementName
+        ));
+
+        $childElement = $parentElement->findElementContains($childElementName, $text);
+        self::assertTrue(!$childElement->isIsset() || !$childElement->isVisible(), sprintf(
+            'Element "%s" with text "%s" exists inside element "%s" when it should not',
+            $childElementName,
+            $text,
+            $parentElementName
+        ));
+    }
+
+    /**
+     * Assert link existing on current page
+     *
+     * @Then /^I should see following buttons:$/
+     */
+    public function iShouldSeeFollowingButtons(TableNode $table)
+    {
+        foreach ($table->getRows() as $item) {
+            $item = reset($item);
+            self::assertNotNull(
+                $this->getPage()->findLink($item),
+                "Button with name $item not found (link selector, actually)"
+            );
+        }
+    }
+
+    /**
+     * Assert that links are not present on current page
+     *
+     * @Then /^I should not see following buttons:$/
+     */
+    public function iShouldNotSeeFollowingButtons(TableNode $table)
+    {
+        foreach ($table->getRows() as $item) {
+            $item = reset($item);
+            self::assertNull(
+                $this->getPage()->findLink($item),
+                "Button with name $item still present on page (link selector, actually)"
+            );
+        }
+    }
+
+    /**
+     * Scroll element info viewport
+     *
+     * @When /^(?:|I )scroll to "(?P<elementName>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )focus on "(?P<elementName>(?:[^"]|\\")*)"$/
+     */
+    public function iScrollToElement($elementName)
+    {
+        $element = $this->elementFactory->createElement($elementName);
+        $element->focus();
+    }
+
+    /**
+     * Asserts status badge on entity view page
+     *
+     * Examples: Then I should see "Closed Lost" gray status
+     *           Then I should see "Open" green status
+     *
+     * @Then /^I should see "(?P<status>[^"]+)" (?P<color>(green|gray)) status$/
+     */
+    public function iShouldSeeColoredStatus($status, $color)
+    {
+        /** @var EntityStatus $element */
+        $element = $this->createElement('Entity Status');
+
+        self::assertEquals($status, $element->getText());
+        self::assertEquals($color, $element->getColor());
     }
 }

@@ -144,96 +144,90 @@ class MarkdownApiDocParser
         // suppress warnings like "Document is empty"
         @$doc->loadHTML($html);
 
-        $xpath = new \DOMXPath($doc);
-
-        $headers = $xpath->query('*//h1');
-        foreach ($headers as $index => $header) {
-            if (!isset($this->loadedData[$header->nodeValue])) {
-                $this->loadedData[$header->nodeValue] = [];
-            }
+        $rootNodes = $doc->getElementsByTagName('body');
+        if (0 === $rootNodes->length) {
+            return;
         }
+        $rootNodes = $rootNodes->item(0)->childNodes;
 
-        $classNames = array_keys($this->loadedData);
-        foreach ($classNames as $className) {
-            $section = ''; // 'fields', 'filters', 'actions', etc.
-            $element = ''; // field name, filter name, etc.
-            $action = '';
-
-            $nodes = $xpath->query("//*[preceding-sibling::h1[1][normalize-space()='{$className}']]");
-            foreach ($nodes as $node) {
-                /** @var \DOMElement $node */
-
-                if (in_array($node->tagName, ['h1', 'h2', 'h3', 'h4'], true)) {
-                    list($section, $element, $action) = $this->parseDocumentationHeaders(
-                        $node,
-                        $className,
-                        $section,
-                        $element
+        $state = new MarkdownApiDocParserState();
+        foreach ($rootNodes as $node) {
+            if ($node instanceof \DOMElement) {
+                if ('h1' === $node->tagName) {
+                    $state->setClassName($node->nodeValue);
+                } elseif ('h2' === $node->tagName && $state->hasClass()) {
+                    $state->setSection(strtolower($node->nodeValue));
+                } elseif ('h3' === $node->tagName && $state->hasSection()) {
+                    $state->setElement(strtolower($node->nodeValue));
+                    $section = $state->getSection();
+                    $state->setHasSubElements(
+                        ConfigUtil::FIELDS === $section || ConfigUtil::SUBRESOURCES === $section
                     );
-                    continue;
-                }
-
-                switch ($section) {
-                    case ConfigUtil::ACTIONS:
-                        $this->loadedData[$className][$section][$element] .= $doc->saveHTML($node);
-                        break;
-                    case ConfigUtil::FIELDS:
-                        $actions = $action ?: 'common';
-                        $text = $doc->saveHTML($node);
-                        foreach (explode(',', $actions) as $actionName) {
-                            $actionName = trim($actionName);
-                            if (!array_key_exists($actionName, $this->loadedData[$className][$section][$element])) {
-                                $this->loadedData[$className][$section][$element][$actionName] = '';
-                            }
-                            $this->loadedData[$className][$section][$element][$actionName] .= $text;
-                        }
-                        break;
-                    case ConfigUtil::SUBRESOURCES:
-                        if (!array_key_exists($action, $this->loadedData[$className][$section][$element])) {
-                            $this->loadedData[$className][$section][$element][$action] = '';
-                        }
-                        $this->loadedData[$className][$section][$element][$action] .= $doc->saveHTML($node);
-                        break;
-                    case ConfigUtil::FILTERS:
-                        $this->loadedData[$className][$section][$element] .= $node->nodeValue;
-                        break;
-                    default:
-                        throw new \RuntimeException(sprintf('Unknown section: "%s".', $section));
+                } elseif ($state->hasElement()) {
+                    if ('h4' === $node->tagName && $state->hasSubElements()) {
+                        $state->setSubElement(strtolower($node->nodeValue));
+                    } else {
+                        $this->saveElement($doc, $node, $state);
+                    }
                 }
             }
         }
+        $this->normalizeLoadedData();
+    }
+
+    protected function normalizeLoadedData()
+    {
+        // strip whitespace from the beginning and end of descriptions
+        array_walk_recursive($this->loadedData, function (&$element) {
+            if (is_string($element) && $element) {
+                $element = trim($element);
+            }
+        });
     }
 
     /**
-     * @param \DOMElement $tag
-     * @param string      $className
-     * @param string      $section
-     * @param string      $element
-     *
-     * @return array
+     * @param \DOMDocument              $doc
+     * @param \DOMNode                  $node
+     * @param MarkdownApiDocParserState $state
      */
-    protected function parseDocumentationHeaders($tag, $className, $section, $element)
+    protected function saveElement(\DOMDocument $doc, \DOMNode $node, MarkdownApiDocParserState $state)
     {
-        $action = '';
-
-        if ($tag->tagName === 'h2') {
-            $section = strtolower($tag->nodeValue);
-            if (!isset($this->loadedData[$className][$section])) {
-                $this->loadedData[$className][$section] = [];
+        $className = $state->getClassName();
+        $section = $state->getSection();
+        $element = $state->getElement();
+        $subElement = $state->getSubElement();
+        if (!$state->hasSubElements()) {
+            if (!isset($this->loadedData[$className][$section][$element])) {
+                $this->loadedData[$className][$section][$element] = '';
+            }
+            if (ConfigUtil::FILTERS === $section) {
+                $this->loadedData[$className][$section][$element] .= $node->nodeValue;
+            } else {
+                $this->loadedData[$className][$section][$element] .= $doc->saveHTML($node);
+            }
+        } else {
+            if (!isset($this->loadedData[$className][$section][$element])) {
+                $this->loadedData[$className][$section][$element] = [];
+            }
+            if (ConfigUtil::FIELDS === $section) {
+                $text = $doc->saveHTML($node);
+                if (!$subElement) {
+                    $subElement = 'common';
+                }
+                foreach (explode(',', $subElement) as $action) {
+                    $action = trim($action);
+                    if (!isset($this->loadedData[$className][$section][$element][$action])) {
+                        $this->loadedData[$className][$section][$element][$action] = '';
+                    }
+                    $this->loadedData[$className][$section][$element][$action] .= $text;
+                }
+            } elseif ($subElement) {
+                if (!isset($this->loadedData[$className][$section][$element][$subElement])) {
+                    $this->loadedData[$className][$section][$element][$subElement] = '';
+                }
+                $this->loadedData[$className][$section][$element][$subElement] .= $doc->saveHTML($node);
             }
         }
-
-        if ($tag->tagName === 'h3') {
-            $element = strtolower($tag->nodeValue);
-            $hasSubElements = (ConfigUtil::FIELDS === $section || ConfigUtil::SUBRESOURCES === $section);
-            $this->loadedData[$className][$section][$element] = $hasSubElements ? [] : '';
-        }
-
-        if ($tag->tagName === 'h4') {
-            $action = strtolower($tag->nodeValue);
-        }
-
-        return [$section, $element, $action];
     }
 
     /**
@@ -246,31 +240,26 @@ class MarkdownApiDocParser
      */
     protected function getDocumentation($className, $section, $element, $subElement = null)
     {
-        if (array_key_exists($className, $this->loadedData)) {
-            $classDocumentation = $this->loadedData[$className];
-            if (array_key_exists($section, $classDocumentation)) {
-                $sectionDocumentation = $classDocumentation[$section];
+        $result = null;
+        if (isset($this->loadedData[$className])) {
+            $classData = $this->loadedData[$className];
+            if (isset($classData[$section])) {
+                $sectionData = $classData[$section];
                 $element = strtolower($element);
-                if (array_key_exists($element, $sectionDocumentation)) {
-                    $elementDocumentation = $sectionDocumentation[$element];
-                    if (!is_array($elementDocumentation)) {
-                        return $elementDocumentation;
-                    }
-                    if ($subElement) {
+                if (isset($sectionData[$element])) {
+                    $elementData = $sectionData[$element];
+                    if (!is_array($elementData)) {
+                        $result = $elementData;
+                    } elseif ($subElement) {
                         $subElement = strtolower($subElement);
-                        if (!array_key_exists($subElement, $elementDocumentation)
-                            && array_key_exists('common', $elementDocumentation)
-                        ) {
-                            return $elementDocumentation['common'];
-                        }
-                        if (array_key_exists($subElement, $elementDocumentation)) {
-                            return $elementDocumentation[$subElement];
+                        if (isset($elementData[$subElement])) {
+                            $result = $elementData[$subElement];
                         }
                     }
                 }
             }
         }
 
-        return null;
+        return $result;
     }
 }

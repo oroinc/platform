@@ -21,9 +21,6 @@ class ContextsSelectTypeTest extends TypeTestCase
     protected $translator;
 
     /* @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityTokenStorage;
-
-    /* @var \PHPUnit_Framework_MockObject_MockObject */
     protected $dispatcher;
 
     /* @var \PHPUnit_Framework_MockObject_MockObject */
@@ -47,11 +44,6 @@ class ContextsSelectTypeTest extends TypeTestCase
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->securityTokenStorage =
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')
-                ->disableOriginalConstructor()
-                ->getMock();
 
         $this->entityTitleResolver = $this->getMockBuilder(EntityNameResolver::class)
             ->disableOriginalConstructor()
@@ -79,7 +71,6 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->em,
             $this->configManager,
             $this->translator,
-            $this->securityTokenStorage,
             $this->dispatcher,
             $this->entityTitleResolver,
             $this->createMock(FeatureChecker::class)
@@ -111,7 +102,6 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->em,
             $this->configManager,
             $this->translator,
-            $this->securityTokenStorage,
             $this->dispatcher,
             $this->entityTitleResolver,
             $this->createMock(FeatureChecker::class)
@@ -125,7 +115,6 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->em,
             $this->configManager,
             $this->translator,
-            $this->securityTokenStorage,
             $this->dispatcher,
             $this->entityTitleResolver,
             $this->createMock(FeatureChecker::class)
@@ -139,7 +128,6 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->em,
             $this->configManager,
             $this->translator,
-            $this->securityTokenStorage,
             $this->dispatcher,
             $this->entityTitleResolver,
             $this->createMock(FeatureChecker::class)

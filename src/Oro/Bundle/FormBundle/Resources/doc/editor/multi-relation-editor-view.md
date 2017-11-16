@@ -1,7 +1,8 @@
+## MultiRelationEditorView ⇐ [RelatedIdRelationEditorView](./related-id-relation-editor-view.md)
+
 <a name="module_MultiRelationEditorView"></a>
-## MultiRelationEditorView ⇐ <code>[RelatedIdRelationEditorView](./related-id-relation-editor-view.md)</code>
-Multi-relation content editor. Please note that it requires column data format
-corresponding to multi-relation-cell.
+
+Multi-relation content editor. Please note that it requires column data format corresponding to multi-relation-cell.
 
 ### Column configuration samples:
 ``` yml
@@ -45,17 +46,17 @@ inline_editing.autocomplete_api_accessor.class | One of the [list of search APIs
 
 ### Constructor parameters
 
-**Extends:** <code>[RelatedIdRelationEditorView](./related-id-relation-editor-view.md)</code>  
+**Extends:** [RelatedIdRelationEditorView](./related-id-relation-editor-view.md)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>Object</code> | Options container |
-| options.model | <code>Object</code> | Current row model |
-| options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
-| options.column | <code>Backgrid.Column</code> | Current datagrid column |
-| options.placeholder | <code>string</code> | Placeholder translation key for an empty element |
-| options.placeholder_raw | <code>string</code> | Raw placeholder value. It overrides placeholder translation key |
-| options.maximumSelectionLength | <code>string</code> | Maximum selection length |
-| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
-| options.autocomplete_api_accessor | <code>Object</code> | Autocomplete API specification.                                      Please see [list of search API's](../reference/search-apis.md) |
+| options | `Object` | Options container |
+| options.model | `Object` | Current row model |
+| options.cell | `Backgrid.Cell` | Current datagrid cell |
+| options.column | `Backgrid.Column` | Current datagrid column |
+| options.placeholder | `string` | Placeholder translation key for an empty element |
+| options.placeholder_raw | `string` | Raw placeholder value. It overrides placeholder translation key |
+| options.maximumSelectionLength | `string` | Maximum selection length |
+| options.validationRules | `Object` | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
+| options.autocomplete_api_accessor | `Object` | Autocomplete API specification. Please see [list of search API's](../reference/search-apis.md) |
 

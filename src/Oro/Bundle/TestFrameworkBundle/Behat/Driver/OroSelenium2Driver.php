@@ -153,9 +153,9 @@ JS;
             if (document.title === "Loading...") {
                 return false;
             }
-        
-            if (typeof(jQuery) == "undefined" || jQuery == null) {
-                return false;
+            
+            if (typeof(jQuery) == "undefined" || jQuery == null) {		
+                return false;		
             }
             
             if (jQuery(document.body).hasClass('loading')) {
@@ -209,6 +209,10 @@ JS;
             }
 
             if (0 !== jQuery("div.loader-mask.shown").length) {
+                return false;
+            }
+            
+            if (0 !== jQuery("div.lazy-loading").length) {
                 return false;
             }
             

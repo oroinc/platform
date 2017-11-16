@@ -1,4 +1,14 @@
 oro_behat_extension:
+  suites:
+    OroWorkflowBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroFormBundle::FormContext
+        - OroDataGridBundle::GridContext
+        - OroWorkflowBundle::FeatureContext
+      paths:
+        - '@OroWorkflowBundle/Tests/Behat/Features'
+
   elements:
     Workflow Page Title:
       selector: 'div.top-row h1, h1.page-title span.page-title__text'
@@ -56,3 +66,9 @@ oro_behat_extension:
     Workflow Readonly Label:
       selector: 'div.badge:contains("Read-only") i.fa-circle'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    User Role View Workflow Permissions:
+      selector:
+        type: 'xpath'
+        locator: '//div[contains(@data-page-component-name,"workflow-permission-grid")]/..'
+      class: Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm

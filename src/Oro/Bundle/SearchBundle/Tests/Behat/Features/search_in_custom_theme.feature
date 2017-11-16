@@ -10,8 +10,8 @@ Feature: Mobile menu
     And I go to System/Configuration
     And I follow "Commerce/Design/Theme" on configuration sidebar
     And fill "Theme Form" with:
-      |ThemeUseDefault|false       |
-      |Theme          |Custom theme|
+      | ThemeUseDefault | false        |
+      | Theme           | Custom theme |
     And submit form
 
   Scenario: Check that search option places in fullscreen popup in custom theme
@@ -23,7 +23,3 @@ Feature: Mobile menu
     When I click "Main Menu Button"
     Then I should see an "Fullscreen Popup" element
     And I should see an "Search Form" element
-    And fill "Search Form" with:
-      |Query|111A    |
-    And I click "Search Button"
-    Then I should see "111A"

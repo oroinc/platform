@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Doctrine\Common\Collections\Expr\Value;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison as SearchComparison;
@@ -44,9 +45,8 @@ class OrmExpressionVisitor extends ExpressionVisitor
         list($type, $field) = $this->explodeCombinedFieldString($comparison->getField());
         $condition = Criteria::getSearchOperatorByComparisonOperator($comparison->getOperator());
 
-        $index     = $this->driver->getUniqueId($field);
+        list($joinAlias, $index) = $this->driver->getJoinAttributes($field, $type, $this->qb->getAllAliases());
         $joinField = $this->driver->getJoinField($type);
-        $joinAlias = $this->driver->getJoinAlias($type, $index);
 
         $searchCondition = [
             'fieldName'  => $field,
@@ -55,19 +55,29 @@ class OrmExpressionVisitor extends ExpressionVisitor
             'fieldType'  => $type
         ];
 
+        $fieldConditionParam = 'field' . $index;
+
         if (in_array($comparison->getOperator(), SearchComparison::$filteringOperators, true)) {
-            return $this->driver->addFilteringField($this->qb, $index, $searchCondition);
+            $fieldCondition = is_array($searchCondition['fieldName'])
+                ? $joinAlias . '.field IN (:field' . $index . ')'
+                : $joinAlias . '.field = :field' . $index;
+
+            $this->qb->leftJoin($joinField, $joinAlias, Join::WITH, $fieldCondition);
+            $this->qb->setParameter($fieldConditionParam, $searchCondition['fieldName']);
+
+            return $this->driver->addFilteringField($index, $searchCondition);
         }
+
         if (is_string($searchCondition['fieldName'])) {
-            $this->qb->leftJoin($joinField, $joinAlias, 'WITH', $joinAlias . '.field = :field' . $index);
-            $this->qb->setParameter('field' . $index, $searchCondition['fieldName']);
+            $this->qb->leftJoin($joinField, $joinAlias, Join::WITH, $joinAlias . '.field = :field' . $index);
+            $this->qb->setParameter($fieldConditionParam, $searchCondition['fieldName']);
         } else {
             $this->qb->innerJoin($joinField, $joinAlias);
         }
 
         if ($type === Query::TYPE_TEXT && !in_array($condition, [Query::OPERATOR_IN, Query::OPERATOR_NOT_IN], true)) {
             if ($searchCondition['fieldValue'] === '') {
-                $this->qb->setParameter('field' . $index, $searchCondition['fieldName']);
+                $this->qb->setParameter($fieldConditionParam, $searchCondition['fieldName']);
 
                 return $joinAlias . '.field = :field' . $index;
             } else {
@@ -111,7 +121,14 @@ class OrmExpressionVisitor extends ExpressionVisitor
                 $operator           = $child->getOperator();
                 $value              = $child->getValue()->getValue();
                 $fieldType          = Criteria::explodeFieldTypeName($fieldName)[0];
-                $key                = $this->getExpressionKey($fieldType, $operator, $value);
+
+                if (CompositeExpression::TYPE_AND !== $expr->getType() && $fieldType !== Query::TYPE_TEXT) {
+                    $fieldParam = $fieldType;
+                } else {
+                    $fieldParam = $fieldName;
+                }
+
+                $key                = $this->getExpressionKey($fieldParam, $operator, $value);
                 $combinedExpression = $child;
                 if ($fieldType !== Query::TYPE_TEXT && array_key_exists($key, $expressionObjectList)) {
                     $combinedExpression = $expressionObjectList[$key];
@@ -162,16 +179,16 @@ class OrmExpressionVisitor extends ExpressionVisitor
     }
 
     /**
-     * @param string $fieldType
+     * @param string $fieldParam
      * @param string $operator
      * @param mixed  $value
      *
      * @return string
      */
-    protected function getExpressionKey($fieldType, $operator, $value)
+    protected function getExpressionKey($fieldParam, $operator, $value)
     {
         $value = is_array($value) ? serialize($value) : (string)$value;
-        return md5($fieldType . $operator . $value);
+        return md5($fieldParam . '|' . $operator . '|' . $value);
     }
 
     /**

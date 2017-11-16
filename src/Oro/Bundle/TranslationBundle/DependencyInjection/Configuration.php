@@ -31,7 +31,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->booleanNode('debug')
-                            ->defaultValue('%kernel.debug%')
+                            ->defaultTrue()
                         ->end()
                     ->end()
                 ->end()

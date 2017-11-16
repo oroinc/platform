@@ -12,6 +12,7 @@ class SkipTagTrackingPass implements CompilerPassInterface
     /** @var array */
     protected $skippedEntityClasses = [
         'Oro\Bundle\DataAuditBundle\Entity\Audit',
+        'Oro\Bundle\DataAuditBundle\Entity\AuditField',
         'Oro\Bundle\NavigationBundle\Entity\PageState',
         'Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem',
         'Oro\Bundle\SearchBundle\Entity\Item',
@@ -21,6 +22,7 @@ class SkipTagTrackingPass implements CompilerPassInterface
         'Oro\Bundle\SearchBundle\Entity\IndexDatetime',
         'Akeneo\Bundle\BatchBundle\Entity\JobExecution',
         'Akeneo\Bundle\BatchBundle\Entity\StepExecution',
+        'Oro\Bundle\MessageQueueBundle\Entity\Job',
     ];
 
     /**

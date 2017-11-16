@@ -158,6 +158,7 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $entityMetadata->getMetaProperties());
         $this->assertFalse($entityMetadata->hasProperty('unknown'));
         $this->assertFalse($entityMetadata->hasMetaProperty('unknown'));
+        $this->assertNull($entityMetadata->getProperty('unknown'));
         $this->assertNull($entityMetadata->getMetaProperty('unknown'));
 
         $property1 = new MetaPropertyMetadata('property1');
@@ -168,6 +169,7 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($entityMetadata->hasProperty('property1'));
         $this->assertTrue($entityMetadata->hasMetaProperty('property1'));
+        $this->assertSame($property1, $entityMetadata->getProperty('property1'));
         $this->assertSame($property1, $entityMetadata->getMetaProperty('property1'));
 
         $entityMetadata->removeMetaProperty('property1');
@@ -187,6 +189,7 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $entityMetadata->getFields());
         $this->assertFalse($entityMetadata->hasProperty('unknown'));
         $this->assertFalse($entityMetadata->hasField('unknown'));
+        $this->assertNull($entityMetadata->getProperty('unknown'));
         $this->assertNull($entityMetadata->getField('unknown'));
 
         $field1 = new FieldMetadata('field1');
@@ -197,6 +200,7 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($entityMetadata->hasProperty('field1'));
         $this->assertTrue($entityMetadata->hasField('field1'));
+        $this->assertSame($field1, $entityMetadata->getProperty('field1'));
         $this->assertSame($field1, $entityMetadata->getField('field1'));
 
         $entityMetadata->removeField('field1');
@@ -216,6 +220,7 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $entityMetadata->getAssociations());
         $this->assertFalse($entityMetadata->hasProperty('unknown'));
         $this->assertFalse($entityMetadata->hasAssociation('unknown'));
+        $this->assertNull($entityMetadata->getProperty('unknown'));
         $this->assertNull($entityMetadata->getAssociation('unknown'));
 
         $association1 = new AssociationMetadata('association1');
@@ -226,6 +231,7 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($entityMetadata->hasProperty('association1'));
         $this->assertTrue($entityMetadata->hasAssociation('association1'));
+        $this->assertSame($association1, $entityMetadata->getProperty('association1'));
         $this->assertSame($association1, $entityMetadata->getAssociation('association1'));
 
         $entityMetadata->removeAssociation('association1');
@@ -549,6 +555,40 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetIdentifierValueForEntityWithRenamedSingleId()
+    {
+        $entity = new Group();
+        $entity->setId(123);
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName(Group::class);
+        $entityMetadata->setIdentifierFieldNames(['renamedId']);
+        $entityMetadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
+
+        self::assertSame(
+            123,
+            $entityMetadata->getIdentifierValue($entity)
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The class "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" does not have property "unknownProperty".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testGetIdentifierValueForEntityWithSingleIdWhenIdPropertyDoesNotExist()
+    {
+        $entity = new Group();
+        $entity->setId(123);
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName(Group::class);
+        $entityMetadata->setIdentifierFieldNames(['unknownProperty']);
+
+        $entityMetadata->getIdentifierValue($entity);
+    }
+
     public function testGetIdentifierValueForEntityWithCompositeId()
     {
         $entity = new Group();
@@ -563,5 +603,42 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
             ['id' => 123, 'name' => 'test'],
             $entityMetadata->getIdentifierValue($entity)
         );
+    }
+
+    public function testGetIdentifierValueForEntityWithRenamedCompositeId()
+    {
+        $entity = new Group();
+        $entity->setId(123);
+        $entity->setName('test');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName(Group::class);
+        $entityMetadata->setIdentifierFieldNames(['renamedId', 'renamedName']);
+        $entityMetadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
+        $entityMetadata->addField(new FieldMetadata('renamedName'))->setPropertyPath('name');
+
+        self::assertSame(
+            ['renamedId' => 123, 'renamedName' => 'test'],
+            $entityMetadata->getIdentifierValue($entity)
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The class "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" does not have property "unknownProperty".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testGetIdentifierValueForEntityWithRenamedCompositeIdWhenIdPropertyDoesNotExist()
+    {
+        $entity = new Group();
+        $entity->setId(123);
+        $entity->setName('test');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName(Group::class);
+        $entityMetadata->setIdentifierFieldNames(['id', 'unknownProperty']);
+
+        $entityMetadata->getIdentifierValue($entity);
     }
 }

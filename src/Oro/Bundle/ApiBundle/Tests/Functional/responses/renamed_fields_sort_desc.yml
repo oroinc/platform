@@ -1,0 +1,21 @@
+data:
+  -
+    type: 'testproducts'
+    id: '<toString(@test_product2->id)>'
+    attributes:
+      renamedName: 'product 2'
+    relationships:
+      productType:
+        data:
+            type: 'testproducttypes'
+            id: 'type2'
+  -
+    type: 'testproducts'
+    id: '<toString(@test_product1->id)>'
+    attributes:
+      renamedName: 'product 1'
+    relationships:
+      productType:
+        data:
+            type: 'testproducttypes'
+            id: 'type1'

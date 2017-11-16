@@ -11,16 +11,17 @@ services:
     oro_workflow.processor_bag:
         class: Oro\Component\ChainProcessor\ProcessorBag
         arguments:
+            - '@oro_workflow.processor_bag_config_provider'
             - '@oro_workflow.processor_factory'
             - '%kernel.debug%'
-        calls:
-            - ['addGroup', ['initialize', 'transit', '70']]
-            - ['addGroup', ['configure', 'transit', '60']]
-            - ['addGroup', ['createForm', 'transit', '50']]
-            - ['addGroup', ['processForm', 'transit', '40']]
-            - ['addGroup', ['handle', 'transit', '30']]
-            - ['addGroup', ['normalize', 'transit', '20']]
-            - ['addGroup', ['result', 'transit', '10']]
+
+    oro_workflow.processor_bag_config_provider:
+        class: Oro\Component\ChainProcessor\ProcessorBagConfigProvider
+        public: false
+        arguments:
+            - # groups
+                'transit': ['initialize', 'configure', 'createForm', 'processForm', 'handle', 'normalize', 'result']
+            - [] # processors; injected by Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompilerPass
 
     oro_workflow.transit.action_processor:
         class: Oro\Bundle\WorkflowBundle\Processor\TransitActionProcessor

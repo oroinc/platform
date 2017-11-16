@@ -3,6 +3,7 @@ define(function(require) {
 
     var _ = require('underscore');
     var $ = require('jquery');
+    var RegionCollection = require('oroaddress/js/region/collection');
     var Backbone = require('backbone');
     var module = require('module');
     var config = _.defaults(module.config(), {
@@ -44,6 +45,12 @@ define(function(require) {
             this.target.on('input-widget:init', _.bind(function() {
                 this.displaySelect2(this.showSelect);
             }, this));
+
+            if (options.collectionRoute && !this.collection) {
+                this.collection = new RegionCollection([], {
+                    route: options.collectionRoute
+                });
+            }
 
             this.listenTo(this.collection, 'reset', this.render);
         },

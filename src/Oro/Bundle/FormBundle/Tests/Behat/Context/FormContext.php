@@ -102,6 +102,14 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @When /^(?:|I )save and create new form$/
+     */
+    public function iSaveAndCreateNewForm()
+    {
+        $this->createOroForm()->saveAndCreateNew();
+    }
+
+    /**
      * Find and assert field value
      * It's valid for entity edit or entity view page
      * Example: And Account Name field should has Good Company value
@@ -115,7 +123,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $possibleElementName = $this->fixStepArgument($fieldName);
         if ($this->elementFactory->hasElement($possibleElementName)) {
             $value = $this->createElement($possibleElementName)->getValue();
-            self::assertEquals($fieldValue, $value);
+            self::assertSame($fieldValue, $value);
 
             return;
         }

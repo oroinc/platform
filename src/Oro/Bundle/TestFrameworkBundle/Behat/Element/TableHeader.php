@@ -21,7 +21,7 @@ class TableHeader extends Element
 
         /** @var \DOMElement $th */
         foreach ($crawler->filter('th') as $th) {
-            $currentHeader = $th->textContent;
+            $currentHeader = trim($th->textContent);
             if (strtolower($currentHeader) === strtolower($headerText)) {
                 return $i;
             }
@@ -54,5 +54,15 @@ class TableHeader extends Element
             }
         }
         return false;
+    }
+
+    /**
+     * Checks if table header has mass actions column of checkboxes
+     *
+     * @return bool
+     */
+    public function hasMassActionColumn()
+    {
+        return $this->has('css', 'th.grid-header-cell-massAction');
     }
 }

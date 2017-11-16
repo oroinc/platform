@@ -1,25 +1,20 @@
-{% block _oro_entity_config_type_view_priority_widget %}
-    {{ form_widget(form) }}
+{% block _oro_entity_config_type_view_is_displayable_widget %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-    <script type="text/javascript">
-        require(['jquery', 'underscore'], function ($, _) {
-            $(function () {
-                var displayable = $('#{{ id|replace({(name): 'is_displayable'}) }}');
-                displayable
-                    .on('change', _.bind(function () {
-                        $('#{{ id }}').attr('disabled', displayable.val() == 0);
-                    }))
-                    .trigger('change');
-            });
-        });
-    </script>
+    <div {{ UI.renderPageComponentAttributes({
+        view: 'oroentity/js/app/views/displayable-priority-view',
+        options: {
+            prioritySelector: '#' ~ form.parent.children.priority.vars.id
+        }
+    }) }}>
+        {{ form_widget(form, { attr: { 'data-field': 'is_displayable'}}) }}
+    </div>
 {% endblock %}
 
 {% block oro_entity_fallback_value_widget %}
     <table class="entity-fallback-container"
            data-page-component-module="oroui/js/app/components/view-component"
            data-page-component-options="{{ {view: 'oroentity/js/app/views/entity-field-fallback'}|json_encode }}"
-           data-layout="separate"
     >
         <tr>
             <td>

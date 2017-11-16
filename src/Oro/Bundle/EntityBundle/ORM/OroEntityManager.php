@@ -7,29 +7,25 @@ use Doctrine\DBAL\Connection;
 
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\ORMException;
 
 use Oro\Bundle\EntityBundle\DataCollector\OrmLogger;
 use Oro\Bundle\EntityBundle\ORM\Event\PreCloseEventArgs;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 /**
  * @todo: think to replace this class with two decorators, one for override 'close' method, another for a profiling
  */
 class OroEntityManager extends EntityManager
 {
-    /**
-     * Entity config provider for "extend" scope
-     *
-     * @var ConfigProvider
-     */
-    protected $extendConfigProvider;
-
     /** @var OrmLogger */
     protected $logger;
 
     /** @var array */
     protected $loggingHydrators;
+
+    /** @var int|null */
+    protected $defaultQueryCacheLifetime;
 
     public static function create($conn, Configuration $config, EventManager $eventManager = null)
     {
@@ -51,6 +47,21 @@ class OroEntityManager extends EntityManager
     }
 
     /**
+     * Sets the Metadata factory service instead of create the factory in the manager constructor.
+     *
+     * @param ClassMetadataFactory $metadataFactory
+     */
+    public function setMetadataFactory(ClassMetadataFactory $metadataFactory)
+    {
+        $metadataFactory->setEntityManager($this);
+        $metadataFactory->setCacheDriver($this->getConfiguration()->getMetadataCacheImpl());
+
+        $reflProperty = new \ReflectionProperty(EntityManager::class, 'metadataFactory');
+        $reflProperty->setAccessible(true);
+        $reflProperty->setValue($this, $metadataFactory);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function close()
@@ -61,29 +72,6 @@ class OroEntityManager extends EntityManager
         }
 
         parent::close();
-    }
-
-    /**
-     * @param ConfigProvider $extendConfigProvider
-     * @return $this
-     *
-     * @deprecated since 1.8. Will be removed in 2.0
-     */
-    public function setExtendConfigProvider($extendConfigProvider)
-    {
-        $this->extendConfigProvider = $extendConfigProvider;
-
-        return $this;
-    }
-
-    /**
-     * @return ConfigProvider
-     *
-     * @deprecated since 1.8. Will be removed in 2.0
-     */
-    public function getExtendConfigProvider()
-    {
-        return $this->extendConfigProvider;
     }
 
     /**
@@ -187,6 +175,22 @@ class OroEntityManager extends EntityManager
         } else {
             parent::flush($entity);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createQuery($dql = '')
+    {
+        return parent::createQuery($dql)->setQueryCacheLifetime($this->defaultQueryCacheLifetime);
+    }
+
+    /**
+     * @param int|null
+     */
+    public function setDefaultQueryCacheLifetime($defaultQueryCacheLifetime)
+    {
+        $this->defaultQueryCacheLifetime = $defaultQueryCacheLifetime;
     }
 
     /**

@@ -3,41 +3,52 @@
 namespace Oro\Bundle\EntityExtendBundle\Cache;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate as BaseCacheWarmerAggregate;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate as CacheWarmer;
 
+use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\EntityBundle\Tools\CheckDatabaseStateManager;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 
 class CacheWarmerAggregate implements CacheWarmerInterface
 {
-    /** @var BaseCacheWarmerAggregate */
-    private $baseCacheWarmerAggregate;
+    /** @var ServiceLink */
+    private $cacheWarmerLink;
 
-    /** @var CacheWarmerInterface[] Warmers required for extend bundle */
-    private $warmers;
+    /** @var ServiceLink */
+    private $extendCacheWarmerLink;
+
+    /** @var bool */
+    private $optionalsEnabled = false;
 
     /**
-     * @param BaseCacheWarmerAggregate  $baseCacheWarmerAggregate
+     * @param ServiceLink               $cacheWarmerLink
+     * @param ServiceLink               $extendCacheWarmerLink
      * @param CheckDatabaseStateManager $checkDatabaseStateManager
      */
     public function __construct(
-        BaseCacheWarmerAggregate $baseCacheWarmerAggregate,
+        ServiceLink $cacheWarmerLink,
+        ServiceLink $extendCacheWarmerLink,
         CheckDatabaseStateManager $checkDatabaseStateManager
     ) {
-        $this->baseCacheWarmerAggregate = $baseCacheWarmerAggregate;
+        $this->cacheWarmerLink = $cacheWarmerLink;
+        $this->extendCacheWarmerLink = $extendCacheWarmerLink;
         $checkDatabaseStateManager->clearState();
     }
 
-    /** {@inheritdoc} */
+    /**
+     * Requests the execution of optional warmers during the warming up the cache.
+     */
     public function enableOptionalWarmers()
     {
-        $this->baseCacheWarmerAggregate->enableOptionalWarmers();
+        $this->optionalsEnabled = true;
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function isOptional()
     {
-        return $this->baseCacheWarmerAggregate->isOptional();
+        return false;
     }
 
     /**
@@ -47,25 +58,18 @@ class CacheWarmerAggregate implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
+        $cacheWarmerLink = $this->cacheWarmerLink;
         if (CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
             || CommandExecutor::isCurrentCommand('oro:install', true)
             || CommandExecutor::isCurrentCommand('oro:platform:upgrade20', true)
         ) {
-            foreach ($this->warmers as $warmer) {
-                $warmer->warmUp($cacheDir);
-            }
-
-            return;
+            $cacheWarmerLink = $this->extendCacheWarmerLink;
         }
-
-        $this->baseCacheWarmerAggregate->warmUp($cacheDir);
-    }
-
-    /**
-     * @param CacheWarmerInterface $cacheWarmer
-     */
-    public function addWarmer(CacheWarmerInterface $cacheWarmer)
-    {
-        $this->warmers[] = $cacheWarmer;
+        /** @var CacheWarmer $cacheWarmer */
+        $cacheWarmer = $cacheWarmerLink->getService();
+        if ($this->optionalsEnabled) {
+            $cacheWarmer->enableOptionalWarmers();
+        }
+        $cacheWarmer->warmUp($cacheDir);
     }
 }

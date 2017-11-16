@@ -5,6 +5,7 @@ namespace Oro\Bundle\SyncBundle\Content;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
@@ -50,11 +51,8 @@ class TopicSender
      */
     public function send(array $tags)
     {
-        $userName = $this->tokenStorage->getToken() && is_object($this->tokenStorage->getToken()->getUser())
-            ? $this->tokenStorage->getToken()->getUser()->getUserName()
-            : null;
-
         if (!empty($tags)) {
+            $userName = $this->getUserName();
             $tags = array_map(
                 function ($tag) use ($userName) {
                     return ['username' => $userName, 'tagname' => $tag];
@@ -64,7 +62,10 @@ class TopicSender
             try {
                 $this->publisher->send(self::UPDATE_TOPIC, json_encode($tags));
             } catch (\Exception $e) {
-                $this->logger->error($e->getMessage());
+                $this->logger->error(
+                    'Failed to publish a message to {topic}.',
+                    ['topic' => self::UPDATE_TOPIC, 'exception' => $e, 'tags' => $tags]
+                );
             }
         }
     }
@@ -75,5 +76,22 @@ class TopicSender
     public function getGenerator()
     {
         return $this->generatorLink->getService();
+    }
+
+    /**
+     * @return string|null
+     */
+    private function getUserName()
+    {
+        $userName = null;
+        $token = $this->tokenStorage->getToken();
+        if (null !== $token) {
+            $user = $token->getUser();
+            if ($user instanceof UserInterface) {
+                $userName = $user->getUserName();
+            }
+        }
+
+        return $userName;
     }
 }

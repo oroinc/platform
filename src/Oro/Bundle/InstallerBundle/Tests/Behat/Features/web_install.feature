@@ -30,6 +30,6 @@ Feature: Web install
     When I press "Install"
     And wait for Installation finish
     And I follow "Next"
-    Then I should see "You are now ready to start using Oro"
-    And I follow "Launch application"
-
+    Then I should be on the 5 step
+    When I press Launch application button
+    Then I should be on the admin login page

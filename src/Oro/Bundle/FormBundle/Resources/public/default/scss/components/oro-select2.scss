@@ -248,5 +248,11 @@
                 white-space: normal;
             }
         }
+
+        &--size-s {
+            .select2-chosen {
+                padding-right: 8px !important;
+            }
+        }
     }
 }

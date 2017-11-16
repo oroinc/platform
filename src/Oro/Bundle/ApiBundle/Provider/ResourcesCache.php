@@ -8,6 +8,9 @@ use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
+/**
+ * Provides access to API resourses and sub-resources related cache.
+ */
 class ResourcesCache
 {
     const RESOURCES_KEY_PREFIX            = 'resources_';
@@ -40,9 +43,11 @@ class ResourcesCache
             self::ACCESSIBLE_RESOURCES_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType)
         );
 
-        return false !== $resources
-            ? $resources
-            : null;
+        if (false === $resources) {
+            return null;
+        }
+
+        return $resources;
     }
 
     /**
@@ -59,9 +64,11 @@ class ResourcesCache
             self::EXCLUDED_ACTIONS_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType)
         );
 
-        return false !== $excludedActions
-            ? $excludedActions
-            : null;
+        if (false === $excludedActions) {
+            return null;
+        }
+
+        return $excludedActions;
     }
 
     /**
@@ -77,6 +84,7 @@ class ResourcesCache
         $resources = $this->cache->fetch(
             self::RESOURCES_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType)
         );
+
         if (false === $resources) {
             return null;
         }
@@ -103,6 +111,7 @@ class ResourcesCache
         $cachedData = $this->cache->fetch(
             self::SUBRESOURCE_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType) . $entityClass
         );
+
         if (false === $cachedData) {
             return null;
         }

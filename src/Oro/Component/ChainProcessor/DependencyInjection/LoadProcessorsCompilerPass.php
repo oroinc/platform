@@ -2,39 +2,29 @@
 
 namespace Oro\Component\ChainProcessor\DependencyInjection;
 
-use Oro\Component\ChainProcessor\ExpressionParser;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * This DI compiler pass can be used if you want to use DI container tags to load processors and applicable checkers.
+ * This DIC compiler pass can be used if you want to use DIC tags to load processors.
  */
 class LoadProcessorsCompilerPass implements CompilerPassInterface
 {
     /** @var string */
-    protected $processorBagServiceId;
+    protected $processorBagConfigBuilderServiceId;
 
     /** @var string */
     protected $processorTagName;
 
-    /** @var string */
-    protected $processorApplicableCheckerTagName;
-
     /**
-     * @param string $processorBagServiceId
+     * @param string $processorBagConfigBuilderServiceId
      * @param string $processorTagName
-     * @param string $processorApplicableCheckerTagName
      */
-    public function __construct(
-        $processorBagServiceId,
-        $processorTagName,
-        $processorApplicableCheckerTagName = null
-    ) {
-        $this->processorBagServiceId             = $processorBagServiceId;
-        $this->processorTagName                  = $processorTagName;
-        $this->processorApplicableCheckerTagName = $processorApplicableCheckerTagName;
+    public function __construct($processorBagConfigBuilderServiceId, $processorTagName)
+    {
+        $this->processorBagConfigBuilderServiceId = $processorBagConfigBuilderServiceId;
+        $this->processorTagName = $processorTagName;
     }
 
     /**
@@ -42,82 +32,39 @@ class LoadProcessorsCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition($this->processorBagServiceId)
-            && !$container->hasAlias($this->processorBagServiceId)
+        if (!$container->hasDefinition($this->processorBagConfigBuilderServiceId)
+            && !$container->hasAlias($this->processorBagConfigBuilderServiceId)
         ) {
             return;
         }
 
-        $processorBagServiceDef = $container->findDefinition($this->processorBagServiceId);
-        $this->registerProcessors($container, $processorBagServiceDef);
-        if ($this->processorApplicableCheckerTagName) {
-            $this->registerApplicableCheckers($container, $processorBagServiceDef);
-        }
+        $this->registerProcessors(
+            $container,
+            $container->findDefinition($this->processorBagConfigBuilderServiceId)
+        );
     }
 
     /**
      * @param ContainerBuilder $container
-     * @param Definition       $processorBagServiceDef
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @param Definition       $processorBagConfigBuilderServiceDef
      */
-    protected function registerProcessors(ContainerBuilder $container, Definition $processorBagServiceDef)
-    {
-        $isDebug        = $container->getParameter('kernel.debug');
-        $taggedServices = $container->findTaggedServiceIds($this->processorTagName);
-        foreach ($taggedServices as $id => $taggedAttributes) {
-            foreach ($taggedAttributes as $attributes) {
-                $action   = !empty($attributes['action']) ? $attributes['action'] : null;
-                $group    = !empty($attributes['group']) ? $attributes['group'] : null;
-                $priority = isset($attributes['priority']) ? $attributes['priority'] : 0;
-
-                if (null === $action && null !== $group) {
-                    throw new \InvalidArgumentException(
-                        sprintf(
-                            'Tag attribute "group" can be used only if '
-                            . 'the attribute "action" is specified. Service: "%s".',
-                            $id
-                        )
-                    );
+    protected function registerProcessors(
+        ContainerBuilder $container,
+        Definition $processorBagConfigBuilderServiceDef
+    ) {
+        // load processors
+        $processors = ProcessorsLoader::loadProcessors($container, $this->processorTagName);
+        // inject processors to the config builder service
+        if (!empty($processors)) {
+            $numberOfArguments = count($processorBagConfigBuilderServiceDef->getArguments());
+            if ($numberOfArguments > 1) {
+                $processorBagConfigBuilderServiceDef->replaceArgument(1, $processors);
+            } else {
+                if ($numberOfArguments === 0) {
+                    $processorBagConfigBuilderServiceDef->addArgument([]);
                 }
-
-                unset($attributes['action'], $attributes['group']);
-                if (!$isDebug) {
-                    unset($attributes['priority']);
-                }
-                $attributes = array_map(
-                    function ($val) {
-                        return $this->parseProcessorAttributeValue($val);
-                    },
-                    $attributes
-                );
-
-                $processorBagServiceDef->addMethodCall('addProcessor', [$id, $attributes, $action, $group, $priority]);
+                $processorBagConfigBuilderServiceDef->addArgument($processors);
             }
-        }
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    protected function parseProcessorAttributeValue($value)
-    {
-        return ExpressionParser::parse($value);
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     * @param Definition       $processorBagServiceDef
-     */
-    protected function registerApplicableCheckers(ContainerBuilder $container, Definition $processorBagServiceDef)
-    {
-        $taggedServices = $container->findTaggedServiceIds($this->processorApplicableCheckerTagName);
-        foreach ($taggedServices as $id => $taggedAttributes) {
-            $priority = isset($taggedAttributes[0]['priority']) ? $taggedAttributes[0]['priority'] : 0;
-
-            $processorBagServiceDef->addMethodCall('addApplicableChecker', [new Reference($id), $priority]);
         }
     }
 }
