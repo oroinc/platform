@@ -1,0 +1,43 @@
+services:
+    oro_behat_statistic.specification.specification_divider:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\SpecificationCountDivider
+
+    oro_behat_statistic.specification.suite_configuration_divider:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\SuiteConfigurationDivider
+        arguments:
+            - '@oro_behat_statistic.feature_repository'
+            - '@oro_behat_statistic.specification.feature_path_locator'
+
+    oro_behat_statistic.suite.suite_configuration_registry:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Suite\SuiteConfigurationRegistry
+        arguments:
+            - '@specifications.finder'
+            - '@oro_behat_statistic.specification.specification_divider'
+            - '@oro_behat_statistic.specification.suite_configuration_divider'
+            - '@oro_behat_statistic.specification.feature_path_locator'
+        calls:
+            - [addSuiteGenerator, ['@suite.generator.generic']]
+
+    oro_behat_statistic.specification.feature_path_locator:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\FeaturePathLocator
+        arguments:
+            - '%paths.base%'
+
+    oro_behat_statistic.database.connection:
+        class: Doctrine\DBAL\Connection
+        factory:   ['Doctrine\DBAL\DriverManager', getConnection]
+        arguments: ['%oro_behat_statistic.connection%']
+
+    oro_behat_statistic.feature_repository:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\Repository\FeatureStatisticRepository
+        arguments:
+            - '@oro_behat_statistic.database.connection'
+        calls:
+            - [setClassName, ['Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatistic']]
+            - [setBuildCountLimit, ['%oro_behat_statistic.count_build_limit%']]
+            -
+                - setCriteria
+                -
+                    -
+                        git_branch: '%oro_behat_statistic.branch_name%'
+                        git_target: '%oro_behat_statistic.target_branch%'

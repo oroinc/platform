@@ -17,7 +17,7 @@ define(function(require) {
 
         className: config.className,
 
-        template: _.template('<a href="#" class="' + config.templateClassName + '" data-tab-link><%= label %></a>'),
+        template: _.template('<a href="#" class="' + config.templateClassName + '" data-tab-link><%- label %></a>'),
 
         listen: {
             'change:active model': 'updateStates',

@@ -31,3 +31,21 @@ Use ```-f statistic``` formatter argument to enable store statistic to database:
 ```bash
 bin/behat -f statistic
 ```
+
+### Tests
+
+To run behat tests for extension install dev dependencies and run:
+
+```bash
+bin/behat
+```
+
+### Behat suite registry
+
+This extension replace ```Behat\Testwork\Suite\Cli\SuiteController``` and
+add new object ```SuiteConfigurationRegistry``` because list of suites
+generates according to parameters ```--suite-divider```, ```--suite-set-divider``` and ```--max_suite_set_execution_time```
+
+### ToDo
+
+- Make console command for schema update
