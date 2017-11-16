@@ -8,7 +8,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-class UnchangeableValidator extends ConstraintValidator
+class UnchangeableFieldValidator extends ConstraintValidator
 {
     const OBJECT_ALIAS = 'o';
 
@@ -53,6 +53,10 @@ class UnchangeableValidator extends ConstraintValidator
 
         $identifier = $manager->getClassMetadata($this->context->getClassName())
             ->getIdentifierValues($this->context->getObject());
+
+        if (empty($identifier)) {
+            return null;
+        }
 
         $qb = $manager->getRepository($this->context->getClassName())
             ->createQueryBuilder(self::OBJECT_ALIAS);

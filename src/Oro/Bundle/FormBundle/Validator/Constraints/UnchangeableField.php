@@ -4,7 +4,7 @@ namespace Oro\Bundle\FormBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-class Unchangeable extends Constraint
+class UnchangeableField extends Constraint
 {
     public $message = 'Field cannot be changed once set';
 
