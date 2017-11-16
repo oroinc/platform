@@ -38,9 +38,8 @@ class UnchangeableFieldValidator extends ConstraintValidator
 
         if (is_object($value) && array_key_exists($this->context->getPropertyName(), $associations)) {
             $value = $this->getIdentifierFromObject($value, $associations);
+            $current = (string)$current; //Just make sure that keys are the same type
         }
-
-        $current = (string)$current;
 
         if ($current === $value) {
             return;
