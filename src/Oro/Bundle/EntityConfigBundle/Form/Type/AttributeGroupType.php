@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
+use Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 
 use Symfony\Component\Form\AbstractType;
@@ -52,7 +53,8 @@ class AttributeGroupType extends AbstractType
                     ],
                     'attr' => [
                         'data-attribute-select-group' => true
-                    ]
+                    ],
+                    StripTagsExtension::OPTION_NAME => true,
                 ],
             ]
         );
