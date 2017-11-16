@@ -345,7 +345,7 @@ services:
             - { name: validator.constraint_validator, alias: oro_form.related_entity_validator }
 
     oro_form.validator.unchengable_field:
-        class: Oro\Bundle\FormBundle\Validator\Constraints\UnchangeableValidator
+        class: Oro\Bundle\FormBundle\Validator\Constraints\UnchangeableFieldValidator
         arguments:
             - '@oro_entity.doctrine_helper'
         tags:

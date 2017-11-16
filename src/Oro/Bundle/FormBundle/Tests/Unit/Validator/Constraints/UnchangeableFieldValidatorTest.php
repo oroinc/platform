@@ -10,18 +10,18 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\FormBundle\Validator\Constraints\Unchangeable;
+use Oro\Bundle\FormBundle\Validator\Constraints\UnchangeableField;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\FormBundle\Validator\Constraints\UnchangeableValidator;
+use Oro\Bundle\FormBundle\Validator\Constraints\UnchangeableFieldValidator;
 
 use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 
-class UnchangeableValidatorTest extends AbstractConstraintValidatorTest
+class UnchangeableFieldValidatorTest extends AbstractConstraintValidatorTest
 {
     /** @var Query|\PHPUnit_Framework_MockObject_MockObject */
     private $query;
 
-    /** @var ClassMetadata */
+    /** @var ClassMetadata|\PHPUnit_Framework_MockObject_MockObject */
     private $classMetadata;
 
     /** @var ObjectRepository|\PHPUnit_Framework_MockObject_MockObject */
@@ -39,9 +39,11 @@ class UnchangeableValidatorTest extends AbstractConstraintValidatorTest
         parent::setUp();
     }
 
-    public function testDoesNotValidatesIfValueChanged()
+    public function testViolationRaisedInCaseValueHasChanged()
     {
-        $constraint = new Unchangeable();
+        $constraint = new UnchangeableField();
+
+        $this->objectIsNotNew();
 
         $this->query->expects($this->once())
             ->method('getOneOrNullResult')
@@ -54,18 +56,25 @@ class UnchangeableValidatorTest extends AbstractConstraintValidatorTest
             ->assertRaised();
     }
 
-    public function testValidatesIfObjectIsNew()
+    public function testViolationShouldNotBeRaisedForNewObjects()
     {
-        $constraint = new Unchangeable();
+        $constraint = new UnchangeableField();
+
+        $this->objectIsNew();
+
+        $this->query->expects($this->never())
+            ->method('getOneOrNullResult');
 
         $this->validator->validate('new value', $constraint);
 
         $this->assertNoViolation();
     }
 
-    public function testValidatesIfPreviousValueWasNull()
+    public function testViolationShouldNotBeRaisedIfPreviousValueWasNull()
     {
-        $constraint = new Unchangeable();
+        $constraint = new UnchangeableField();
+
+        $this->objectIsNotNew();
 
         $this->query->expects($this->once())
             ->method('getOneOrNullResult')
@@ -76,9 +85,11 @@ class UnchangeableValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
-    public function testValidatesIfValueHasNotChanged()
+    public function testViolationShouldNotBeRaisedIfValueHasNotChanged()
     {
-        $constraint = new Unchangeable();
+        $constraint = new UnchangeableField();
+
+        $this->objectIsNotNew();
 
         $this->query->expects($this->once())
             ->method('getOneOrNullResult')
@@ -118,10 +129,6 @@ class UnchangeableValidatorTest extends AbstractConstraintValidatorTest
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
 
-        $this->classMetadata->expects($this->any())
-            ->method('getIdentifierValues')
-            ->willReturn(['id' => 1]);
-
         $this->manager->expects($this->any())
             ->method('getRepository')
             ->willReturn($this->repository);
@@ -137,6 +144,21 @@ class UnchangeableValidatorTest extends AbstractConstraintValidatorTest
 
     protected function createValidator()
     {
-        return new UnchangeableValidator($this->doctrineHelper);
+        return new UnchangeableFieldValidator($this->doctrineHelper);
+    }
+
+    private function objectIsNotNew()
+    {
+        $this->classMetadata->expects($this->any())
+            ->method('getIdentifierValues')
+            ->willReturn(['id' => 1]);
+    }
+
+    private function objectIsNew()
+    {
+        // doesn't find an identifier cause it's new object
+        $this->classMetadata->expects($this->any())
+            ->method('getIdentifierValues')
+            ->willReturn([]);
     }
 }
