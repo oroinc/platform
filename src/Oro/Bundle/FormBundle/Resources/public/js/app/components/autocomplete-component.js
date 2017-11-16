@@ -98,7 +98,6 @@ define(function(require) {
          */
         source: function(query, callback) {
             var $el = this.$el;
-            this.currentQuery = query;
 
             if (this.lastSearch === query) {
                 $el.typeahead('show');
@@ -112,18 +111,21 @@ define(function(require) {
         _searchForResults: function(query, callback) {
             var self = this;
 
-            $.ajax({
+            if (this.jqXHR) {
+                this.jqXHR.abort(); // abort ajax call with out-dated results
+            }
+
+            this.jqXHR = $.ajax({
                 url: self.url,
                 data: {query: query},
                 success: function(response) {
-                    if (self.currentQuery !== query) {
-                        return; // new ajax call in progress, prevent showing out-of-date results
-                    }
-
                     self.sourceCallback(query, callback, response);
                 },
                 error: function() {
                     self.sourceCallback(query, callback, {});
+                },
+                complete: function() {
+                    delete self.jqXHR; // clear
                 }
             });
         },
