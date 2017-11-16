@@ -2,11 +2,17 @@
     "name": "oroinc/behat-statistic-extension",
     "description": "Added database statistic formatter and suite divider",
     "require": {
-        "behat/behat": "3.*",
-        "doctrine/dbal": "2.*"
+        "php": ">=7.0",
+        "behat/behat": "^3.2",
+        "doctrine/dbal": "2.5.5",
+        "symfony/config": "^3.3"
     },
     "require-dev": {
-        "oro/platform": "dev-master"
+        "ext-pdo_sqlite": "*",
+        "phpunit/phpunit": "5.7.*",
+        "symfony/process": "^3.3",
+        "symfony/yaml": "^3.3",
+        "symfony/console": "2.8.*"
     },
     "license": "MIT",
     "authors": [
@@ -14,5 +20,25 @@
             "name": "Oro, Inc",
             "homepage": "http://www.orocrm.com"
         }
-    ]
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": {
+        "oro": {
+            "type": "composer",
+            "url": "https://packagist.orocrm.com"
+        },
+        "asset-packagist": {
+            "type": "composer",
+            "url": "https://asset-packagist.orocrm.com"
+        }
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "autoload": {
+        "psr-4": {
+            "Oro\\Bundle\\TestFrameworkBundle\\BehatStatisticExtension\\": "./"
+        }
+    }
 }
