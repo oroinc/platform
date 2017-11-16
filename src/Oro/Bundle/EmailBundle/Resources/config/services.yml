@@ -1267,7 +1267,7 @@ services:
         class: Oro\Bundle\EmailBundle\EventListener\EmailAssociationsDemoDataFixturesListener
         arguments:
             - '@oro_platform.optional_listeners.manager'
-            - '@oro_message_queue.client.message_producer'
+            - '@oro_email.async.manager.association_manager'
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }

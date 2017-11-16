@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Oro\Bundle\EmailBundle\Async\Topics as EmailTopics;
+use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 
@@ -21,19 +20,19 @@ class EmailAssociationsDemoDataFixturesListener
     /** @var OptionalListenerManager */
     private $listenerManager;
 
-    /** @var MessageProducerInterface */
-    private $messageProducer;
+    /** @var AssociationManager */
+    private $associationManager;
 
     /**
-     * @param OptionalListenerManager  $listenerManager
-     * @param MessageProducerInterface $messageProducer
+     * @param OptionalListenerManager $listenerManager
+     * @param AssociationManager $associationManager
      */
     public function __construct(
         OptionalListenerManager $listenerManager,
-        MessageProducerInterface $messageProducer
+        AssociationManager $associationManager
     ) {
         $this->listenerManager = $listenerManager;
-        $this->messageProducer = $messageProducer;
+        $this->associationManager = $associationManager;
     }
 
     /**
@@ -54,7 +53,11 @@ class EmailAssociationsDemoDataFixturesListener
         if ($event->isDemoFixtures()) {
             $this->listenerManager->enableListener(self::ENTITY_LISTENER);
 
-            $this->messageProducer->send(EmailTopics::UPDATE_ASSOCIATIONS_TO_EMAILS, []);
+            $event->log('updating email owners');
+
+            $this->associationManager->setQueued(false);
+            $this->associationManager->processUpdateAllEmailOwners();
+            $this->associationManager->setQueued(true);
         }
     }
 }
