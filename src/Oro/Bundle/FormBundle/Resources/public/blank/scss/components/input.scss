@@ -51,6 +51,11 @@
         }
     }
 
+    &[type="number"] {
+        // fix FireFox platform styles
+        box-shadow: none;
+    }
+
     &--short {
         width: $input-width-short;
     }
