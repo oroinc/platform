@@ -49,6 +49,10 @@ class UnchangeableFieldValidatorTest extends AbstractConstraintValidatorTest
             ->method('getOneOrNullResult')
             ->willReturn(['o_' => 'old value']);
 
+        $this->classMetadata->expects($this->any())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
         $this->validator->validate('new value', $constraint);
 
         $this->buildViolation($constraint->message)
