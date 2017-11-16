@@ -275,10 +275,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $grid = $this->getGrid($gridName);
         $tableHeaders = $table->getRow(0);
         $gridHeader = $grid->getHeader();
+        $indexOffset = $gridHeader->hasMassActionColumn() ? 1 : 0;
 
         foreach ($tableHeaders as $tableHeaderIndex => $tableHeaderValue) {
             self::assertEquals(
-                $tableHeaderIndex + 1,
+                $tableHeaderIndex + $indexOffset,
                 $gridHeader->getColumnNumber($tableHeaderValue),
                 'Wrong order of columns in grid'
             );
