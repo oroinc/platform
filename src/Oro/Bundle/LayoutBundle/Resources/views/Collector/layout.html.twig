@@ -93,7 +93,7 @@
 
         #tree-details-container.fixed {
             position: fixed;
-            top: 10px;
+            top: 5px;
             height: 100%;
             overflow-y: auto;
             overflow-x: hidden;
@@ -454,7 +454,7 @@
             function fitDetailsContainer() {
                 var container = document.getElementById('tree-details-container');
 
-                if (window.scrollY > 245) {
+                if (window.scrollY > 240) {
                     Sfjs.addClass(document.getElementById('tree-details-container'), 'fixed');
                     container.style.maxHeight = window.innerHeight - container.offsetTop + 'px';
                 } else {
