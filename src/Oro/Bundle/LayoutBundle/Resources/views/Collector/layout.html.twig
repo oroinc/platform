@@ -66,8 +66,24 @@
     <style>
         #tree-menu {
             width: 480px;
+            position: relative;
+        }
+
+        #tree-menu:after {
+            content: "";
+            position: absolute;
+            right: 10px;
+            top: 0;
+            width: 30px;
+            min-height: 100%;
+            height: 100%;
+            background: linear-gradient(to left, rgba(249,249,249,1) 0%,rgba(249,249,249,0) 100%);
+        }
+
+        .tree-menu-wrapper {
             overflow: auto;
         }
+
         #tree-details-container {
             margin-left: 500px;
             padding: 0;
@@ -94,7 +110,9 @@
         }
 
         .expand-all {
+            position: relative;
             text-align: right;
+            z-index: 1;
         }
 
         .expand-all a {
@@ -108,6 +126,25 @@
 
         .tree-inner.underline {
             text-decoration: line-through;
+        }
+
+        @media screen and (max-width: 1100px) {
+            #tree-menu {
+                width: 100%;
+            }
+
+            #tree-details-container {
+                clear: both;
+                width: 100%;
+                margin-left: 0;
+                padding-top: 20px;
+            }
+
+            #tree-details-container.fixed {
+                position: static;
+                overflow: visible;
+                max-height: inherit;
+            }
         }
     </style>
 {% endblock %}
@@ -124,14 +161,16 @@
             <div class="tab-content">
                 {% if collector.data.views|length %}
                     <div id="tree-menu" class="tree">
-                        <div class="expand-all">
-                            <a id="expand-all" href="#" data-collapsed-title="Collapse All">Expand All</a>
+                        <div class="tree-menu-wrapper">
+                            <div class="expand-all">
+                                <a id="expand-all" href="#" data-collapsed-title="Collapse All">Expand All</a>
+                            </div>
+                            <ul>
+                                {% for viewId, viewData in collector.data.views %}
+                                    {{ view_tree_entry(viewId, viewData, true) }}
+                                {% endfor %}
+                            </ul>
                         </div>
-                        <ul>
-                            {% for viewId, viewData in collector.data.views %}
-                                {{ view_tree_entry(viewId, viewData, true) }}
-                            {% endfor %}
-                        </ul>
                     </div>
                     <div id="tree-details-container">
                         {% for viewId, viewData in collector.data.views %}
@@ -424,7 +463,6 @@
                 }
             }
 
-            window.addEventListener('resize', fitDetailsContainer);
             window.onscroll = fitDetailsContainer;
             fitDetailsContainer();
         }());
