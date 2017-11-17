@@ -53,7 +53,7 @@
 
     &[type="number"] {
         // fix FireFox platform styles
-        box-shadow: none;
+        box-shadow: $input-number-box-shadow;
     }
 
     &--short {
