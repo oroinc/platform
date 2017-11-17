@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Validator\Constraints;
 
+use Doctrine\ORM\Query;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -37,7 +38,7 @@ class UnchangeableFieldValidator extends ConstraintValidator
 
         if (is_object($value) && array_key_exists($this->context->getPropertyName(), $associations)) {
             $value = $this->getIdentifierFromObject($value, $associations);
-            $current = (string)$current;
+            $current = (string)$current; //Just make sure that keys are the same type
         }
 
         if ($current === $value) {
