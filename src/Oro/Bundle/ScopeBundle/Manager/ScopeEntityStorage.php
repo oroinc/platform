@@ -53,6 +53,10 @@ class ScopeEntityStorage
 
     public function persistScheduledForInsert()
     {
+        if (!$this->scheduledForInsert) {
+            return;
+        }
+
         $em = $this->getEntityManager();
         foreach ($this->scheduledForInsert as $scope) {
             $em->persist($scope);
