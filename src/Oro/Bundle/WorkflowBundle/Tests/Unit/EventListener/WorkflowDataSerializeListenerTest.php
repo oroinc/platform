@@ -14,6 +14,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeListener;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
+use Oro\Component\TestUtils\Mocks\ServiceLink;
 
 class WorkflowDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,7 +37,7 @@ class WorkflowDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->serializer = $this->createMock(WorkflowAwareSerializer::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->listener = new WorkflowDataSerializeListener($this->serializer, $this->doctrineHelper);
+        $this->listener = new WorkflowDataSerializeListener(new ServiceLink($this->serializer), $this->doctrineHelper);
     }
 
     public function testPostLoad()
