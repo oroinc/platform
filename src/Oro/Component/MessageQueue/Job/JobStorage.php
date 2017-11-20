@@ -40,7 +40,7 @@ class JobStorage
      */
     public function findJobById($id)
     {
-        return $this->createQueryBuilder('job')
+        return $this->createJobQueryBuilder('job')
             ->addSelect('rootJob')
             ->leftJoin('job.rootJob', 'rootJob')
             ->where('job = :id')
@@ -57,7 +57,7 @@ class JobStorage
      */
     public function findRootJobByOwnerIdAndJobName($ownerId, $jobName)
     {
-        return $this->createQueryBuilder('job')
+        return $this->createJobQueryBuilder('job')
             ->where('job.ownerId = :ownerId AND job.name = :jobName')
             ->andWhere('job.rootJob is NULL')
             ->setParameter('ownerId', $ownerId)
@@ -76,7 +76,7 @@ class JobStorage
      */
     public function findRootJobByJobNameAndStatuses($jobName, array $statuses)
     {
-        return $this->createQueryBuilder('job')
+        return $this->createJobQueryBuilder('job')
             ->where('job.rootJob is NULL and job.name = :jobName and job.status in (:statuses)')
             ->andWhere('job.interrupted != true')
             ->setParameter('jobName', $jobName)
@@ -94,7 +94,7 @@ class JobStorage
      */
     public function findChildJobByName($name, Job $rootJob)
     {
-        return $this->createQueryBuilder('job')
+        return $this->createJobQueryBuilder('job')
             ->addSelect('rootJob')
             ->leftJoin('job.rootJob', 'rootJob')
             ->where('rootJob = :rootJob AND job.name = :name')
@@ -110,6 +110,19 @@ class JobStorage
     public function createJob()
     {
         return new $this->entityClass;
+    }
+
+    /**
+     * @param string $alias
+     *
+     * @return QueryBuilder
+     */
+    public function createJobQueryBuilder($alias)
+    {
+        return $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select($alias)
+            ->from($this->entityClass, $alias);
     }
 
     /**
@@ -236,18 +249,5 @@ class JobStorage
                 break;
             }
         }
-    }
-
-    /**
-     * @param string $alias
-     *
-     * @return QueryBuilder
-     */
-    private function createQueryBuilder($alias)
-    {
-        return $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select($alias)
-            ->from($this->entityClass, $alias);
     }
 }

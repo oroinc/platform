@@ -1,14 +1,13 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Async;
 
-use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\SearchBundle\Async\IndexEntitiesByTypeMessageProcessor;
 use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
 use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Job\Topics as JobTopics;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -20,7 +19,7 @@ use Oro\Component\MessageQueue\Util\JSON;
 class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
 {
     use SearchExtensionTrait;
-    use MessageQueueAssertTrait;
+    use MessageQueueExtension;
 
     protected function setUp()
     {
@@ -60,22 +59,14 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
 
         $this->getIndexEntitiesByTypeMessageProcessor()->process($message, $this->createQueueSessionMock());
 
-        $messages = self::getSentMessages();
+        $messages = self::getSentMessagesByTopic(Topics::INDEX_ENTITY_BY_RANGE);
 
-        $this->assertCount(6, $messages);
-        $this->assertEquals(JobTopics::CALCULATE_ROOT_JOB_STATUS, $messages[0]['topic']);
-        $this->assertEquals(JobTopics::CALCULATE_ROOT_JOB_STATUS, $messages[1]['topic']);
-        $this->assertEquals(JobTopics::CALCULATE_ROOT_JOB_STATUS, $messages[4]['topic']);
+        $this->assertCount(1, $messages);
 
-        $this->assertEquals(JobTopics::CALCULATE_ROOT_JOB_PROGRESS, $messages[2]['topic']);
-        $this->assertEquals(JobTopics::CALCULATE_ROOT_JOB_PROGRESS, $messages[5]['topic']);
-
-        $this->assertEquals(Topics::INDEX_ENTITY_BY_RANGE, $messages[3]['topic']);
-
-        $this->assertEquals(Item::class, $messages[3]['message']['entityClass']);
-        $this->assertEquals(0, $messages[3]['message']['offset']);
-        $this->assertEquals(1000, $messages[3]['message']['limit']);
-        $this->assertInternalType('integer', $messages[3]['message']['jobId']);
+        $this->assertEquals(Item::class, $messages[0]['entityClass']);
+        $this->assertEquals(0, $messages[0]['offset']);
+        $this->assertEquals(1000, $messages[0]['limit']);
+        $this->assertInternalType('integer', $messages[0]['jobId']);
     }
 
     /**
