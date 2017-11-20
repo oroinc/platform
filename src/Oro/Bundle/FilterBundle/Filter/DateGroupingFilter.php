@@ -4,9 +4,11 @@ namespace Oro\Bundle\FilterBundle\Filter;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Parameter;
 
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateGroupingFilterType;
@@ -99,7 +101,9 @@ class DateGroupingFilter extends ChoiceFilter
                         $this->groupingNames[DateGroupingFilterType::TYPE_MONTH],
                         $this->groupingNames[DateGroupingFilterType::TYPE_YEAR]
                     )
-                )->addGroupBy($columnName);
+                )
+                    ->addGroupBy($columnName)
+                    ->addOrderBy($this->groupingNames[DateGroupingFilterType::TYPE_YEAR]);
                 $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_MONTH;
                 $this->addWhereClause($qb, DateGroupingFilterType::TYPE_MONTH);
                 break;
@@ -113,7 +117,9 @@ class DateGroupingFilter extends ChoiceFilter
                         $this->groupingNames[DateGroupingFilterType::TYPE_QUARTER],
                         $this->groupingNames[DateGroupingFilterType::TYPE_YEAR]
                     )
-                )->addGroupBy($columnName);
+                )
+                    ->addGroupBy($columnName)
+                    ->addOrderBy($this->groupingNames[DateGroupingFilterType::TYPE_YEAR]);
                 $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_MONTH;
                 $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_QUARTER;
                 $this->addWhereClause($qb, DateGroupingFilterType::TYPE_QUARTER);
@@ -134,6 +140,45 @@ class DateGroupingFilter extends ChoiceFilter
         }
 
         return true;
+    }
+
+    /**
+     * If grouping by Day or Month make sure Year order is in same direction and keep multisort.
+     *
+     * @param OrmDatasource $datasource
+     * @param String $sortKey
+     * @param String $direction
+     */
+    public function applyOrderBy(OrmDatasource $datasource, String $sortKey, String $direction)
+    {
+        /* @var OrmDatasource $datasource */
+        $qb = $datasource->getQueryBuilder();
+        $added = false;
+        $orders = $qb->getDQLPart('orderBy');
+
+        //If orderBy year is present , make sure to add same direction as new sorter
+        //Respects multisort
+        if (!empty($orders)) {
+            $qb->resetDQLPart('orderBy');
+            /** @var OrderBy $order */
+            foreach ($orders as $order) {
+                $parts = $order->getParts();
+                $parts = reset($parts);
+                if (strpos($parts, DateGroupingFilterType::TYPE_YEAR) !== false) {
+                    $test = str_replace([" ASC", " DESC"], "", $parts);
+
+                    $qb->addOrderBy($test, $direction);
+                    $qb->addOrderBy($sortKey, $direction);
+                    $added = true;
+                } else {
+                    $qb->addOrderBy($order);
+                }
+            }
+        }
+
+        if (!$added) {
+            $qb->addOrderBy($sortKey, $direction);
+        }
     }
 
     /**

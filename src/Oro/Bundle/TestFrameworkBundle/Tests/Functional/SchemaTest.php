@@ -63,11 +63,6 @@ class SchemaTest extends WebTestCase
                 // https://github.com/doctrine/dbal-documentation/blob/master/en/reference/known-vendor-issues.rst
                 'ALTER TABLE oro_audit_field CHANGE old_datetimetz old_datetimetz DATETIME DEFAULT NULL, ' .
                 'CHANGE new_datetimetz new_datetimetz DATETIME DEFAULT NULL',
-                // MySQL is blind for partial indices
-                'DROP INDEX idx_oro_product_featured ON oro_product',
-                'DROP INDEX idx_oro_product_new_arrival ON oro_product',
-                'CREATE INDEX idx_oro_product_featured ON oro_product (is_featured)',
-                'CREATE INDEX idx_oro_product_new_arrival ON oro_product (is_new_arrival)'
             ],
         ];
 

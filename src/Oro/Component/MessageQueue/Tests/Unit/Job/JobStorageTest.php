@@ -8,6 +8,7 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManager;
 
+use Doctrine\ORM\QueryBuilder;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Tests\Unit\Mock\JobEntity;
@@ -319,6 +320,26 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
             $job,
             function () {
             }
+        );
+    }
+
+    public function testShouldCreateInitializedQueryBuilder()
+    {
+        $em = $this->createEntityManagerMock();
+        $qb = new QueryBuilder($em);
+        $em->expects(self::once())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(JobEntity::class)
+            ->will($this->returnValue($em));
+
+        $result = $this->storage->createJobQueryBuilder('e');
+
+        self::assertEquals(
+            sprintf('SELECT e FROM %s e', JobEntity::class),
+            $result->getDQL()
         );
     }
 
