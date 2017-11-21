@@ -8,14 +8,15 @@ use Oro\Bundle\UserBundle\Entity\User;
 class UserEmailChangeListener
 {
     /**
+     * @param User               $user
      * @param PreUpdateEventArgs $args
      */
-    public function preUpdate(PreUpdateEventArgs $args)
+    public function preUpdate(User $user, PreUpdateEventArgs $args)
     {
-        if (!$args->getEntity() instanceof User || !$args->hasChangedField('email')) {
+        if (!$args->hasChangedField('email')) {
             return;
         }
 
-        $args->getEntity()->setGoogleId(null);
+        $user->setGoogleId(null);
     }
 }

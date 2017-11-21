@@ -1,0 +1,3 @@
+lazy_services:
+    - foo_service
+    - not_existing_service

@@ -93,15 +93,12 @@ class ProcessDataSerializeListener
     /**
      * After ProcessJob loaded deserialize $serializedData
      *
+     * @param ProcessJob         $entity
      * @param LifecycleEventArgs $args
      */
-    public function postLoad(LifecycleEventArgs $args)
+    public function postLoad(ProcessJob $entity, LifecycleEventArgs $args)
     {
-        /** @var ProcessJob $entity */
-        $entity = $args->getEntity();
-        if ($this->isSupported($entity)) {
-            $this->deserialize($entity);
-        }
+        $this->deserialize($entity);
     }
 
     /**

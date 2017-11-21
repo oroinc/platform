@@ -1,27 +1,22 @@
-parameters:
-    oro_workflow.listener.process_data_serialize.class:  Oro\Bundle\WorkflowBundle\EventListener\ProcessDataSerializeListener
-    oro_workflow.listener.workflow_data_serialize.class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeListener
-    oro_workflow.listener.workflow_item.class:           Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener
-
 services:
     oro_workflow.listener.process_data_serialize:
-        class: %oro_workflow.listener.process_data_serialize.class%
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\ProcessDataSerializeListener'
         arguments:
             - '@oro_workflow.serializer.process.serializer.link'
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
-            - { name: doctrine.event_listener, event: postLoad }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\WorkflowBundle\Entity\ProcessJob, event: postLoad }
 
     oro_workflow.listener.workflow_data_serialize:
-        class: %oro_workflow.listener.workflow_data_serialize.class%
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeListener'
         arguments:
             - '@oro_workflow.serializer.data.serializer.link'
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
-            - { name: doctrine.event_listener, event: postLoad }
+            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_item.class%', event: postLoad }
 
     oro_workflow.listener.workflow_item:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener'
@@ -31,7 +26,7 @@ services:
             - '@oro_workflow.entity_connector'
             - '@oro_workflow.cache.entity_aware'
         tags:
-            - { name: doctrine.event_listener, event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_item.class%', event: postPersist }
             - { name: doctrine.event_listener, event: preRemove }
 
     oro_workflow.listener.workflow_transition_record:
@@ -40,7 +35,7 @@ services:
             - '@event_dispatcher'
             - '@security.token_storage'
         tags:
-            - { name: doctrine.event_listener, event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord, event: postPersist }
 
     oro_workflow.listener.start_workflow:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowStartListener'
@@ -48,7 +43,7 @@ services:
             - '@oro_workflow.registry.workflow_manager'
             - '@oro_workflow.cache.entity_aware'
         tags:
-            - { name: doctrine.event_listener,  event: postPersist }
+            - { name: doctrine.event_listener, event: postPersist }
             - { name: doctrine.event_listener, event: postFlush }
 
     oro_workflow.listener.event_trigger_collector:
