@@ -1,6 +1,8 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\CalculateRootJobStatusProcessor;
@@ -31,8 +33,6 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit_Framework_TestCase
             CalculateRootJobStatusProcessor::getSubscribedTopics()
         );
     }
-
-
 
     public function testShouldLogErrorAndRejectMessageIfMessageIsInvalid()
     {
@@ -163,8 +163,10 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit_Framework_TestCase
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::ROOT_JOB_STOPPED, ['jobId' => 12345])
-        ;
+            ->with(
+                Topics::ROOT_JOB_STOPPED,
+                new Message(['jobId' => 12345], MessagePriority::HIGH)
+            );
 
         $message = new NullMessage();
         $message->setBody(json_encode(['jobId' => 12345]));

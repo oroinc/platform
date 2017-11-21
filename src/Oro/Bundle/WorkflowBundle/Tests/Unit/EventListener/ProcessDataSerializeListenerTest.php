@@ -4,13 +4,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-
 use Doctrine\ORM\Event\PostFlushEventArgs;
+
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\EventListener\ProcessDataSerializeListener;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+use Oro\Component\TestUtils\Mocks\ServiceLink;
 
 class ProcessDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,7 +30,7 @@ class ProcessDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->serializer = $this->getMockForAbstractClass('Symfony\Component\Serializer\SerializerInterface');
-        $this->listener = new ProcessDataSerializeListener($this->serializer);
+        $this->listener = new ProcessDataSerializeListener(new ServiceLink($this->serializer));
     }
 
     /**
