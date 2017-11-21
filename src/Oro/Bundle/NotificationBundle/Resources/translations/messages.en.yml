@@ -41,6 +41,8 @@ oro:
             email.label:                         Email
             owner.label:                         Owner
             additional_email_associations.label: Additional associations
+            additional_email_associations.label: Additional associations
+            contact_emails.label:                Contact Emails
 
         massnotification:
             entity_label:         Maintenance Notification

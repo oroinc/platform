@@ -6,8 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -18,17 +16,21 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Entity\Event;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
+use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
+use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber;
 use Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationEntityChoiceType;
 use Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationType;
 use Oro\Bundle\NotificationBundle\Form\Type\RecipientListType;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+use Oro\Bundle\NotificationBundle\Provider\ContactInformationEmailsProvider;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
@@ -87,11 +89,14 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
             ->willReturn($entityManager);
         $configManager = $this->createMock(ConfigManager::class);
 
+        $contactInformationEmailsProvider = $this->createMock(ContactInformationEmailsProvider::class);
+
         $this->formType = new EmailNotificationType(
             new BuildTemplateFormSubscriber($tokenStorage),
             new AdditionalEmailsSubscriber($registry, $this->getTranslator(), $configManager),
             $this->configProvider,
-            $router
+            $router,
+            new ContactInformationEmailsSubscriber($contactInformationEmailsProvider)
         );
 
         parent::setUp();

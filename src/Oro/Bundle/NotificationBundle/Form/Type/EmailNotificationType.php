@@ -18,6 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
+use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 
 class EmailNotificationType extends AbstractType
@@ -36,22 +37,28 @@ class EmailNotificationType extends AbstractType
     /** @var RouterInterface */
     private $router;
 
+    /** @var ContactInformationEmailsSubscriber */
+    protected $contactInformationEmailsSubscriber;
+
     /**
      * @param BuildTemplateFormSubscriber $buildTemplateSubscriber
      * @param AdditionalEmailsSubscriber $additionalEmailsSubscriber
      * @param ConfigProvider $ownershipConfigProvider
      * @param RouterInterface $router
+     * @param ContactInformationEmailsSubscriber $contactInformationEmailsSubscriber
      */
     public function __construct(
         BuildTemplateFormSubscriber $buildTemplateSubscriber,
         AdditionalEmailsSubscriber $additionalEmailsSubscriber,
         ConfigProvider $ownershipConfigProvider,
-        RouterInterface $router
+        RouterInterface $router,
+        ContactInformationEmailsSubscriber $contactInformationEmailsSubscriber
     ) {
         $this->buildTemplateSubscriber = $buildTemplateSubscriber;
         $this->additionalEmailsSubscriber = $additionalEmailsSubscriber;
         $this->ownershipConfigProvider = $ownershipConfigProvider;
         $this->router = $router;
+        $this->contactInformationEmailsSubscriber = $contactInformationEmailsSubscriber;
     }
 
     /**
@@ -61,6 +68,7 @@ class EmailNotificationType extends AbstractType
     {
         $builder->addEventSubscriber($this->buildTemplateSubscriber);
         $builder->addEventSubscriber($this->additionalEmailsSubscriber);
+        $builder->addEventSubscriber($this->contactInformationEmailsSubscriber);
 
         $builder->add(
             'entityName',
