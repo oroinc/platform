@@ -12,12 +12,12 @@ class LoadScheduleData extends AbstractFixture
     /** @var array */
     protected $schedules = [
         [
-            'command' => 'oro:test',
+            'command' => 'oro:test:not-exist-command',
             'arguments' => [],
             'definition' => '*/1 * * * *'
         ],
         [
-            'command' => 'oro:cron:cleanup',
+            'command' => 'oro:test:exist-command',
             'arguments' => ['--dry-run'],
             'definition' => '* */5 * * *'
         ]
