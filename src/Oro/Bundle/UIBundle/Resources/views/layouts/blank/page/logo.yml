@@ -1,8 +1,5 @@
 layout:
     actions:
-        - '@setBlockTheme':
-            themes: 'logo.html.twig'
-
         - '@add':
             id: logo
             parentId: middle_bar_logo
