@@ -8,8 +8,11 @@ use Behat\Testwork\Counter\Timer;
 use Behat\Testwork\EventDispatcher\Event\AfterExerciseCompleted;
 use Behat\Testwork\Output\Formatter;
 use Behat\Testwork\Output\Node\EventListener\EventListener;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\CriteriaArrayCollection;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatistic;
-use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\Repository\StatisticRepositoryInterface;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\BatchRepositoryInterface;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\FeaturePathLocator;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 final class FeatureStatisticSubscriber implements EventListener
@@ -20,14 +23,14 @@ final class FeatureStatisticSubscriber implements EventListener
     private $timer;
 
     /**
-     * @var StatisticRepositoryInterface
+     * @var BatchRepositoryInterface
      */
     private $featureRepository;
 
     /**
-     * @var string
+     * @var FeaturePathLocator
      */
-    private $basePath;
+    private $featurePathLocator;
 
     /**
      * @var string
@@ -50,25 +53,26 @@ final class FeatureStatisticSubscriber implements EventListener
     private $skip = false;
 
     /**
+     * @var OutputInterface
+     */
+    private $output;
+
+    /**
      * FeatureStatisticSubscriber constructor.
-     * @param StatisticRepositoryInterface $featureRepository
-     * @param string $basePath
-     * @param string $buildId
-     * @param string $gitBranch
-     * @param string $gitTarget
+     * @param BatchRepositoryInterface $featureRepository
+     * @param FeaturePathLocator $featurePathLocator
+     * @param CriteriaArrayCollection $criteria
      */
     public function __construct(
-        StatisticRepositoryInterface $featureRepository,
-        $basePath,
-        $buildId,
-        $gitBranch,
-        $gitTarget
+        BatchRepositoryInterface $featureRepository,
+        FeaturePathLocator $featurePathLocator,
+        CriteriaArrayCollection $criteria
     ) {
         $this->featureRepository = $featureRepository;
-        $this->basePath = $basePath;
-        $this->buildId = $buildId;
-        $this->gitBranch = $gitBranch;
-        $this->gitTarget = $gitTarget;
+        $this->featurePathLocator = $featurePathLocator;
+        $this->buildId = $criteria->get('build_id');
+        $this->gitBranch = $criteria->get('branch_name') ?: $criteria->get('single_branch_name');
+        $this->gitTarget = $criteria->get('target_branch');
     }
 
     /**
@@ -113,10 +117,10 @@ final class FeatureStatisticSubscriber implements EventListener
         }
 
         $this->timer->stop();
+
         $stat = new FeatureStatistic();
         $stat
-            ->setBasePath($this->basePath)
-            ->setPath($event->getFeature()->getFile())
+            ->setPath($this->featurePathLocator->getRelativePath($event->getFeature()->getFile()))
             ->setTime(round($this->timer->getTime()))
             ->setGitBranch($this->gitBranch)
             ->setGitTarget($this->gitTarget)
@@ -128,7 +132,26 @@ final class FeatureStatisticSubscriber implements EventListener
 
     public function saveStats()
     {
-        $this->featureRepository->flush();
+        try {
+            $this->featureRepository->flush();
+        } catch (\Exception $e) {
+            // We should pass the tests even if we are unavailable record the statistics
+            if ($this->output) {
+                $this->output->writeln(sprintf(
+                    '<error>Exception while record the statistics:%s%s</error>',
+                    PHP_EOL,
+                    $e->getMessage()
+                ));
+            }
+        }
+    }
+
+    /**
+     * @param OutputInterface $output
+     */
+    public function setOutput(OutputInterface $output)
+    {
+        $this->output = $output;
     }
 
     /**
