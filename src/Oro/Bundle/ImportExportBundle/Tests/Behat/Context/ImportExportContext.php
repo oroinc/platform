@@ -75,25 +75,81 @@ class ImportExportContext extends OroFeatureContext implements
      */
     protected $importFile;
 
+    //@codingStandardsIgnoreStart
+    /**
+     * Download data template from entity grid page with custom processor
+     *
+     * @When /^(?:|I )download "(?P<entity>([\w\s]+))" Data Template file with processor "(?P<processorName>([\w\s\.]+))"$/
+     * @param string $entity
+     * @param string $processorName
+     */
+    //@codingStandardsIgnoreEnd
+    public function iDownloadDataTemplateFileWithProcessor($entity, $processorName)
+    {
+        $this->iDownloadDataTemplateFileWithOptions($entity, null, $processorName);
+    }
+
     /**
      * Download data template from entity grid page
      *
      * @When /^(?:|I )download "(?P<entity>([\w\s]+))" Data Template file$/
+     * @param string $entity
      */
     public function iDownloadDataTemplateFile($entity)
     {
+        $this->iDownloadDataTemplateFileWithOptions($entity);
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Download data template from entity grid page with specified button
+     *
+     * @When /^(?:|I )download "(?P<entity>([\w\s]+))" Data Template file through "(?P<importButtonLabel>([\w\s]+))" button$/
+     * @param string $entity
+     * @param string $importButtonLabel
+     */
+    //@codingStandardsIgnoreEnd
+    public function iDownloadDataTemplateFileWithSpecifiedButton($entity, $importButtonLabel)
+    {
+        $importButton = $this->getSession()
+            ->getPage()
+            ->find('xpath', "//a[contains(text(), '$importButtonLabel') and not(contains(@class, 'dropdown-item'))]");
+
+        $this->iDownloadDataTemplateFileWithOptions($entity, $importButton);
+    }
+
+    /**
+     * @param string $entity
+     * @param string|null $processorName
+     * @param NodeElement|null $importButton
+     */
+    protected function iDownloadDataTemplateFileWithOptions(
+        $entity,
+        NodeElement $importButton = null,
+        $processorName = null
+    ) {
         $entityClass = $this->aliasResolver->getClassByAlias($this->convertEntityNameToAlias($entity));
         $processors = $this->processorRegistry->getProcessorAliasesByEntity('export_template', $entityClass);
 
-        self::assertCount(1, $processors, sprintf(
-            'Too many processors ("%s") for export "%s" entity',
-            implode(', ', $processors),
-            $entity
-        ));
+        if (!$processorName) {
+            self::assertCount(
+                1,
+                $processors,
+                sprintf(
+                    'Too many processors ("%s") for export "%s" entity',
+                    implode(', ', $processors),
+                    $entity
+                )
+            );
+            $processor = reset($processors);
+        } else {
+            self::assertContains($processorName, $processors);
+            $processor = $processorName;
+        }
 
-        $importButton = $this->getSession()
-            ->getPage()
-            ->findLink('Import');
+        $importButton = $importButton instanceof NodeElement
+            ? $importButton
+            : $this->getSession()->getPage()->findLink('Import');
         self::assertNotNull($importButton);
 
         $importButton
@@ -106,7 +162,7 @@ class ImportExportContext extends OroFeatureContext implements
 
         $url = $this->locatePath($this->getContainer()->get('router')->generate(
             'oro_importexport_export_template',
-            ['processorAlias' => array_shift($processors)]
+            ['processorAlias' => $processor]
         ));
         $this->template = tempnam(
             $this->getKernel()->getRootDir().DIRECTORY_SEPARATOR.'import_export',
@@ -122,17 +178,21 @@ class ImportExportContext extends OroFeatureContext implements
         self::assertEquals(200, $response->getStatusCode());
     }
 
+    //@codingStandardsIgnoreStart
     /**
      * This method strictly compares data from the downloaded file
      *
      * @Given /^Exported file for "(?P<entity>([\w\s]+))" contains the following data:$/
+     * @Given /^Exported file for "(?P<entity>([\w\s]+))" with processor "(?P<processorName>([\w\s\.]+))" contains the following data:$/
      *
-     * @param string    $entity
+     * @param string $entity
+     * @param string $processorName
      * @param TableNode $expectedEntities
      */
-    public function exportedFileContainsFollowingData($entity, TableNode $expectedEntities)
+    //@codingStandardsIgnoreEnd
+    public function exportedFileContainsFollowingData($entity, TableNode $expectedEntities, $processorName = null)
     {
-        $filePath = $this->performExport($entity);
+        $filePath = $this->performExport($entity, $processorName);
 
         try {
             $handler = fopen($filePath, 'rb');
@@ -240,7 +300,7 @@ class ImportExportContext extends OroFeatureContext implements
      * Example: When I download Data Template file
      *          And I see Account Customer name column
      *
-     * @Then /^(?:|I )see (?P<column>([\w\s]+)) column$/
+     * @Then /^(?:|I )see (?P<column>([\w\s.]+)) column$/
      */
     public function iSeeColumn($column)
     {
@@ -288,10 +348,11 @@ class ImportExportContext extends OroFeatureContext implements
      * Import filled file
      *
      * @When /^(?:|I )import file$/
+     * @When /^(?:|I )import file with "(?P<importButtonLabel>([\w\s]+))" button$/
      */
-    public function iImportFile()
+    public function iImportFile($importButtonLabel = null)
     {
-        $this->tryImportFile();
+        $this->tryImportFile($importButtonLabel);
 
         $flashMessage = 'Import started successfully. You will receive email notification upon completion.';
         $this->oroMainContext->iShouldSeeFlashMessage($flashMessage);
@@ -302,10 +363,11 @@ class ImportExportContext extends OroFeatureContext implements
      *
      * @When /^(?:|I )try import file$/
      */
-    public function tryImportFile()
+    public function tryImportFile($importButtonLabel = null)
     {
+        $importButtonLabel = $importButtonLabel ?? 'Import file';
         $page = $this->getSession()->getPage();
-        $page->clickLink('Import file');
+        $page->clickLink($importButtonLabel);
         $this->waitForAjax();
         $this->createElement('ImportFileField')->attachFile($this->importFile);
         $page->pressButton('Submit');

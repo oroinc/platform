@@ -93,9 +93,17 @@ define([
             $(e.currentTarget).parent().addClass('active');
 
             var parentDiv = $(e.currentTarget).parent().parent().parent();
-            var type = $(e.currentTarget).attr('data-value');
             var choiceName = $(e.currentTarget).html();
+            choiceName += this.caret;
+            parentDiv.find('.dropdown-toggle').html(choiceName);
 
+            var type = $(e.currentTarget).attr('data-value');
+            this._onClickChoiceValueSetType(type);
+
+            e.preventDefault();
+        },
+
+        _onClickChoiceValueSetType: function(type) {
             var $typeInput = this.$(this.criteriaValueSelectors.type);
             $typeInput.each(function() {
                 var $input = $(this);
@@ -124,14 +132,11 @@ define([
                     return true;
                 }
             });
+
             this.fixSelects();
             $typeInput.trigger('change');
-            choiceName += this.caret;
-            parentDiv.find('.dropdown-toggle').html(choiceName);
-
             this._handleEmptyFilter(type);
-            this.trigger('onClickChoiceValue', this);
-            e.preventDefault();
+            this.trigger('typeChange', this);
         },
 
         /**

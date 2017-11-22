@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Util\EntityLoader;
 
 class EntityToIdTransformer extends AbstractEntityAssociationTransformer
 {
@@ -14,15 +15,17 @@ class EntityToIdTransformer extends AbstractEntityAssociationTransformer
 
     /**
      * @param ManagerRegistry               $doctrine
+     * @param EntityLoader                  $entityLoader
      * @param AssociationMetadata           $metadata
      * @param IncludedEntityCollection|null $includedEntities
      */
     public function __construct(
         ManagerRegistry $doctrine,
+        EntityLoader $entityLoader,
         AssociationMetadata $metadata,
         IncludedEntityCollection $includedEntities = null
     ) {
-        parent::__construct($doctrine, $metadata);
+        parent::__construct($doctrine, $entityLoader, $metadata);
         $this->includedEntities = $includedEntities;
     }
 

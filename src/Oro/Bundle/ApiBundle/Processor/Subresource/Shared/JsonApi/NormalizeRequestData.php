@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared\JsonApi;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
@@ -62,6 +63,7 @@ class NormalizeRequestData implements ProcessorInterface
     protected function normalizeData(array $data)
     {
         $associationName = $this->context->getAssociationName();
+        $targetMetadata = $this->context->getParentMetadata()->getAssociation($associationName)->getTargetMetadata();
         $dataPointer = $this->buildPointer('', JsonApiDoc::DATA);
         if ($this->context->isCollection()) {
             $associationData = [];
@@ -69,14 +71,16 @@ class NormalizeRequestData implements ProcessorInterface
                 $associationData[] = $this->normalizeRelationId(
                     $this->buildPointer($dataPointer, $key),
                     $value[JsonApiDoc::TYPE],
-                    $value[JsonApiDoc::ID]
+                    $value[JsonApiDoc::ID],
+                    $targetMetadata
                 );
             }
         } elseif (null !== $data[JsonApiDoc::DATA]) {
             $associationData = $this->normalizeRelationId(
                 $dataPointer,
                 $data[JsonApiDoc::DATA][JsonApiDoc::TYPE],
-                $data[JsonApiDoc::DATA][JsonApiDoc::ID]
+                $data[JsonApiDoc::DATA][JsonApiDoc::ID],
+                $targetMetadata
             );
         } else {
             $associationData = null;
@@ -86,13 +90,14 @@ class NormalizeRequestData implements ProcessorInterface
     }
 
     /**
-     * @param string $pointer
-     * @param string $entityType
-     * @param mixed  $entityId
+     * @param string         $pointer
+     * @param string         $entityType
+     * @param mixed          $entityId
+     * @param EntityMetadata $entityMetadata
      *
      * @return array ['class' => entity class, 'id' => entity id]
      */
-    protected function normalizeRelationId($pointer, $entityType, $entityId)
+    protected function normalizeRelationId($pointer, $entityType, $entityId, EntityMetadata $entityMetadata)
     {
         $entityClass = $this->normalizeEntityClass(
             $this->buildPointer($pointer, JsonApiDoc::TYPE),
@@ -101,8 +106,8 @@ class NormalizeRequestData implements ProcessorInterface
         if ($entityClass) {
             $entityId = $this->normalizeEntityId(
                 $this->buildPointer($pointer, JsonApiDoc::ID),
-                $entityClass,
-                $entityId
+                $entityId,
+                $entityMetadata
             );
         }
 
@@ -113,16 +118,16 @@ class NormalizeRequestData implements ProcessorInterface
     }
 
     /**
-     * @param string $pointer
-     * @param string $entityClass
-     * @param mixed  $entityId
+     * @param string         $pointer
+     * @param mixed          $entityId
+     * @param EntityMetadata $entityMetadata
      *
      * @return mixed
      */
-    protected function normalizeEntityId($pointer, $entityClass, $entityId)
+    protected function normalizeEntityId($pointer, $entityId, EntityMetadata $entityMetadata)
     {
         try {
-            return $this->entityIdTransformer->reverseTransform($entityClass, $entityId);
+            return $this->entityIdTransformer->reverseTransform($entityId, $entityMetadata);
         } catch (\Exception $e) {
             $error = Error::createValidationError(Constraint::ENTITY_ID)
                 ->setInnerException($e)

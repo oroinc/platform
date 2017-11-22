@@ -12,8 +12,6 @@ It works on top of transport layer.
 
 The Client layer provides an ability to start producing/consuming messages with as little configuration as possible.
 
-Table of Contents
------------------
  - [External Links](#external-links)
  - [What is a Message Queue](#what-is-a-message-queue)
  - [Dictionary](#dictionary)
@@ -24,6 +22,7 @@ Table of Contents
  
 External Links
 --------------
+
  - [What is Message Queue](http://www.ibm.com/support/knowledgecenter/SSFKSJ_9.0.0/com.ibm.mq.pro.doc/q002620_.htm)
  - [Message Queue Benefits](https://www.iron.io/top-10-uses-for-message-queue/) (most of them are applicable for Oro Message Queue Component)
  - [Rabbit MQ Introduction](https://www.rabbitmq.com/tutorials/tutorial-one-php.html)
@@ -84,7 +83,7 @@ The received message can be processed, rejected, and re-queued. An exception can
 
 **Message Processor will return `self::ACK` in the following cases:**
 
-* If a message wass processed successfully.
+* If a message was processed successfully.
 * If the created job returned `true`.
 
 It means that the message was processed successfully and is removed from the queue.
@@ -184,12 +183,12 @@ There is no ideal criteria to help decide whether a job should be created or not
 
 Here are a few recommendations:
 
-#### We Can Skip a Job Creation If:
+### We Can Skip a Job Creation If:
 
 * We have an easy fast-executing action such as status changing etc.
 * Our action looks like an event listener.
 
-#### We should always create jobs if:
+### We should always create jobs if:
 
 * The action is complicated and can be executed for a long time.
 * We need to monitor execution status.
@@ -300,6 +299,7 @@ A two-level job hierarchy is created for the process where:
   * If the closure returns `true`, the job status is changed to `Job::STATUS_SUCCESS`, the job `stoppedAt` field is changed to the current time.
   * If the closure returns `false` or throws an exception, the job status is changed to `Job::STATUS_FAILED`, the job `stoppedAt` field is changed to the current time.
   * If someone interrupts the job, it stops working and gets `Job::STATUS_CANCELLED` status, the job `stoppedAt` field is changed to the current time.
+  * If new unique job is created, but the previous job has not finished, its execution time is checked. If the execution time is longer than the configured time_before_stale, (see [Stale jobs](#stale-jobs)) Job::STATUS_STALE status is set. 
 * **Child jobs:** When a message is being processed by a consumer, a JobRunner method `runUnique` is called which creates child jobs with `createDelayed`:
   * The root job is created and the closure passed in params runs. The job gets  `Job::STATUS_RUNNING` status, the job `startedAt` field is set to the current time.
   * When the JobRunner method `createDelayed` is called, the child jobs are created and get the `Job::STATUS_NEW` statuses. The messages for the jobs are sent to the message queue.
@@ -309,8 +309,49 @@ A two-level job hierarchy is created for the process where:
   * When all child jobs are stopped, the root job status is changed according to the child jobs statuses.
   * If someone interrupts a child job, it stops working and gets `Job::STATUS_CANCELLED` status, the job `stoppedAt` field is changed to the current time.
   * If someone interrupts the root job, the child jobs that are already running finish their work and get the statuses according to the work result (see the description above). The child jobs that are not run yet are cancelled and get `Job::STATUS_CANCELLED` statuses.
+  * If the root job status changes to Job::STATUS_STALE, its children automatically get the same status. (see [Stale jobs](#stale-jobs))
 * **Also:** If a jobs closure returns `true`, the process method which runs this job should return `self::ACK`. If a job closure returns `false`, the process method which runs this job should return `self::REJECT`.
-  
+
+### Stale Jobs
+
+It is not possible to create two unique jobs with the same name. That's why if one unique job 
+is not able to finish its work, it can block another job. To handle such a situation 
+you can use Stale Jobs functionality.
+
+By default JobProcessor uses NullJobConfigurationProvider, so unique job will never
+be "stale". If you want to change that behaviour you need to create your own provider
+that implements JobConfigurationProviderInterface.
+
+Method JobConfigurationProvider::getTimeBeforeStaleForJobName($jobName); should
+return number of seconds, after which job will be considered as "stale". If you don't
+want job to be staled, return null or -1.
+
+In example below all jobs will be treated as "stale" after one hour.
+
+```php
+<?php
+
+use Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface;
+
+class JobConfigurationProvider implements JobConfigurationProviderInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function getTimeBeforeStaleForJobName($jobName)
+    {
+        return 3600;
+    }
+}
+
+$jobProcessor = new JobProcessor(/* arguments */);
+$jobProcessor->setJobConfigurationProvider(new JobConfigurationProvider());
+```
+
+In that case if second unique job with the same name is created, and previous job hasn't been
+updated for more than one hour, and it hasn't not started child, it get Job::STATUS_STALE status, and new job is created.
+
+Additionally, if processor tries to finish "staled" job, the job will be removed.
 
 Flow
 ----

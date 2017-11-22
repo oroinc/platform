@@ -36,17 +36,19 @@ class FixFieldNaming implements ProcessorInterface
             $this->renameReservedField($definition, $entityClass, JsonApiDoc::TYPE);
         }
         // process "id" field
-        if ($definition->hasField(JsonApiDoc::ID)
-            && !$this->isIdentifierField($definition, JsonApiDoc::ID)
-        ) {
-            $this->renameReservedField($definition, $entityClass, JsonApiDoc::ID);
-        }
-        // make sure the identifier field has "id" name
         $idFieldNames = $definition->getIdentifierFieldNames();
-        if (count($idFieldNames) === 1) {
+        $numberOfIdFields = count($idFieldNames);
+        if ($numberOfIdFields === 1) {
             $idFieldName = reset($idFieldNames);
             if (JsonApiDoc::ID !== $idFieldName) {
+                if ($definition->hasField(JsonApiDoc::ID)) {
+                    $this->renameReservedField($definition, $entityClass, JsonApiDoc::ID);
+                }
                 $this->renameIdField($definition, $idFieldName, JsonApiDoc::ID);
+            }
+        } elseif ($numberOfIdFields > 1) {
+            if ($definition->hasField(JsonApiDoc::ID)) {
+                $this->renameReservedField($definition, $entityClass, JsonApiDoc::ID);
             }
         }
     }
@@ -96,27 +98,12 @@ class FixFieldNaming implements ProcessorInterface
     protected function renameIdField(EntityDefinitionConfig $definition, $fieldName, $newFieldName)
     {
         $field = $definition->getField($fieldName);
-        if (!$field->hasPropertyPath()) {
+        if (null !== $field && !$field->hasPropertyPath()) {
             $definition->removeField($fieldName);
             $field->setPropertyPath($fieldName);
             $definition->addField($newFieldName, $field);
             $definition->setIdentifierFieldNames([$newFieldName]);
         }
-    }
-
-    /**
-     * Checks whether the given field is an identifier of the given entity
-     *
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $fieldName
-     *
-     * @return bool
-     */
-    protected function isIdentifierField(EntityDefinitionConfig $definition, $fieldName)
-    {
-        $idFieldNames = $definition->getIdentifierFieldNames();
-
-        return count($idFieldNames) === 1 && reset($idFieldNames) === $fieldName;
     }
 
     /**

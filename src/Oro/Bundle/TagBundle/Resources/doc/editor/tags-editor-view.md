@@ -1,5 +1,6 @@
+## TagsEditorView ⇐ [AbstractRelationEditorView](../../../../FormBundle/Resources/doc/editor/abstract-relation-editor-view.md)
 <a name="module_TagsEditorView"></a>
-## TagsEditorView ⇐ <code>[AbstractRelationEditorView](../../../../FormBundle/Resources/doc/editor/abstract-relation-editor-view.md)</code>
+
 Tags-select content editor. Please note that it requires column data format
 corresponding to [tags-view](../viewer/tags-view.md).
 
@@ -50,14 +51,14 @@ inline_editing.save_api_accessor                    | Optional. Sets accessor mo
 
 ### Constructor parameters
 
-**Extends:** <code>[AbstractRelationEditorView](../../../../FormBundle/Resources/doc/editor/abstract-relation-editor-view.md)</code>  
+**Extends:** [AbstractRelationEditorView](../../../../FormBundle/Resources/doc/editor/abstract-relation-editor-view.md)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>Object</code> | Options container |
-| options.model | <code>Object</code> | Current row model |
-| options.fieldName | <code>string</code> | Field name to edit in model |
-| options.permissions | <code>string</code> | Permissions object |
-| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](../../../../FormBundle/Resources/doc/reference/js_validation.md#conformity-server-side-validations-to-client-once) |
-| options.autocomplete_api_accessor | <code>Object</code> | Autocomplete API specification.                                      Please see [list of search API's](../reference/search-apis.md) |
+| options | `Object` | Options container |
+| options.model | `Object` | Current row model |
+| options.fieldName | `string` | Field name to edit in model |
+| options.permissions | `string` | Permissions object |
+| options.validationRules | `Object` | Validation rules. See [documentation here](../../../../FormBundle/Resources/doc/reference/js_validation.md#conformity-server-side-validations-to-client-once) |
+| options.autocomplete_api_accessor | `Object` | Autocomplete API specification.                                      Please see [list of search API's](../reference/search-apis.md) |
 

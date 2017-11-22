@@ -16,6 +16,8 @@ use Oro\Bundle\AttachmentBundle\Manager\FileManager;
  */
 class ComputeFileContent implements ProcessorInterface
 {
+    const CONTENT_FIELD_NAME = 'content';
+
     /** @var FileManager */
     protected $fileManager;
 
@@ -43,24 +45,27 @@ class ComputeFileContent implements ProcessorInterface
         if (!is_array($data)) {
             return;
         }
+
         $config = $context->getConfig();
 
-        if (null === $config) {
+        $contentField = $config->getField(self::CONTENT_FIELD_NAME);
+        if (null === $contentField
+            || $contentField->isExcluded()
+            || array_key_exists(self::CONTENT_FIELD_NAME, $data)
+        ) {
+            // the content field is undefined, excluded or already added
             return;
         }
 
-        $contentField = $config->getField('content');
-        if (!$contentField || $contentField->isExcluded()) {
+        $fileNameFieldName = $config->findFieldNameByPropertyPath('filename');
+        if (!$fileNameFieldName || empty($data[$fileNameFieldName])) {
+            // the file name field is undefined or its value is not specified
             return;
         }
 
-        if (empty($data['filename'])) {
-            return;
-        }
-
-        $content = $this->getFileContent($data['filename']);
+        $content = $this->getFileContent($data[$fileNameFieldName]);
         if (null !== $content) {
-            $data[$contentField->getPropertyPath()] = $content;
+            $data[self::CONTENT_FIELD_NAME] = $content;
             $context->setResult($data);
         }
     }

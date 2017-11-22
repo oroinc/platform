@@ -14,8 +14,11 @@
    - [Custom transport](#custom-transport)
    - [Key Classes](#key-classes)
  - [Unit and Functional tests](#unit-and-functional-tests)
+ - [Stale Jobs](#stale-jobs)
+ - [Consumer heartbeat](#consumer-heartbeat)
  - [Resetting Symfony Container in consumer](Resources/doc/container_in_consumer.md)
  - [Security Context in consumer](Resources/doc/secutity_context.md)
+ - [Buffering Messages](Resources/doc/buffering_messages.md)
 
 ## Overview
 
@@ -318,3 +321,59 @@ class SomeTest extends \PHPUnit_Framework_TestCase
     }
 }
 ```
+
+## Stale Jobs
+
+It is not possible to create two unique jobs with the same name. That's why if one unique job 
+is not able to finish its work, it can block another job. 
+
+To avoid this situation, you can set maximum time for the unique job execution. If the job is still running longer than that, it is 
+possible to create new copy of the unique job (with the same name). The old job is marked as "stale" in this case. 
+See [Stale Jobs](../../Component/MessageQueue/README.md#stale-jobs) for more details.
+
+You can configure the time_before_stale parameter in config.yml file, providing time in seconds:
+ 
+```yaml
+oro_message_queue:
+    time_before_stale:
+        default: 1800
+        jobs:
+            bundle_name.processor_name.entity_name.user: 3600
+            bundle_name.processor_name.entity_name: 2000
+            bundle_name.processor_name: -1
+```
+The parser first searches for job by its full name. If the job is not found by the full name, the parser attempts to match
+the longest part of the job name (reading from the left).
+
+In the example above:
+* **bundle_name.processor_name.entity_name.user** will be *staled* after **3600** seconds
+* **bundle_name.processor_name.entity_name.organisation** will be *staled* after **2000** seconds
+* **bundle_name.processor_name.other_name.some_job** will **never** be *staled*.
+* **bundle_name.other_processor.other_name.some_job** will be *staled* after **1800** seconds
+* **processor_name.entity_name.user** will be *staled* after **1800** seconds
+
+## Consumer Heartbeat
+
+An administrator must be informed about the state of consumers in the system (whether there is at least one alive). 
+
+This is covered by the Consumer Heartbeat functionality that works in the following way:
+
+- On start and after every configured time period, each consumer calls the `tick` method of the [ConsumerHeartbeat](./Consumption/ConsumerHeartbeat.php)
+service that informs the system that the consumer is alive.
+- The cron command [oro:cron:message-queue:consumer_heartbeat_check](./Command/ConsumerHeartbeatCommand.php)
+is periodically executed to check consumers' state. If it does not find any alive consumers, the `oro/message_queue_state`
+socket message is sent notifying all logged-in users that the system may work incorrectly (because consumers are not available).
+- The same check is also performed when a user logs in. This is done to notify users about the problem as soon as possible.                                 
+                     
+The check period can be changed in the application configuration file using the `consumer_heartbeat_update_period` option:
+
+```yml
+oro_message_queue:
+    consumer:
+        heartbeat_update_period: 20 #the update period was set to 20 minutes 
+
+```                     
+
+The default value of the `heartbeat_update_period` option is 15 minutes.
+
+To disable the Consumer Heartbeat functionality, set the `heartbeat_update_period` option to 0.

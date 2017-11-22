@@ -36,7 +36,7 @@ services:
     oro_report.listener.navigation_listener:
         class: %oro_report.listener.navigation_listener.class%
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@oro_entity.doctrine_helper'
             - '@oro_entity_config.provider.entity'
             - '@oro_security.token_accessor'
             - '@oro_security.acl_helper'
@@ -51,7 +51,7 @@ services:
             - '@oro_report.cache'
             - '%oro_report.cache.report_grid_config_key%'
         tags:
-            - { name: doctrine.event_listener, event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: '%oro_report.report.entity.class%', event: postUpdate }
 
     oro_report.report_manager:
         class: %oro_report.report_manager.class%

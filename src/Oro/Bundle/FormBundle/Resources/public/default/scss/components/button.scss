@@ -14,6 +14,7 @@
         box-shadow: $btn-shadow;
     }
 
+    &.checked,
     &.active,
     &.pressed {
         box-shadow: $btn-shadow;
@@ -207,6 +208,18 @@
         &-m {
             margin-left: $offset-y-m;
         }
+    }
+
+    &--baseline {
+        vertical-align: baseline;
+    }
+
+    &--clip-text {
+        overflow: hidden;
+
+        white-space: nowrap;
+
+        text-overflow: ellipsis;
     }
 }
 

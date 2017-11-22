@@ -47,7 +47,7 @@ class LoadConfigurationSections implements ProcessorInterface
 
         // Here we need to check if an access to system configuration is granted,
         // because it is possible that some configuration sections will be accessible
-        // event if "Access system configuration" capability is disabled.
+        // even if "Access system configuration" capability is disabled.
         // So, such sections will be added by separate loaders in additional to existing sections.
         $isAccessToSystemConfigurationGranted = true;
         $aclResource = $context->getConfig()->getAclResource();

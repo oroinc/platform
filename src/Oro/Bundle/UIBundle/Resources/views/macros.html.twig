@@ -586,24 +586,17 @@
 
 {#
     Renders page component attributes passed in array
-
-    Parameters - array:
-        [
-            'module' - module name to load, will be loaded through RequireJS
-            'options' - options to pass into page-component
-        ]
 #}
 {% macro renderPageComponentAttributes(pageComponent) %}
-    data-page-component-module="{{ pageComponent.module }}"
-    {% if pageComponent.options is defined %}
-        data-page-component-options="{{ pageComponent.options|json_encode }}"
-    {% endif %}
-    {% if pageComponent.name is defined %}
-        data-page-component-name="{{ pageComponent.name }}"
-    {% endif %}
-    {% if pageComponent.layout is defined %}
-        data-layout="{{ pageComponent.layout }}"
-    {% endif %}
+    {% for key,value in pageComponent %}
+        {% if key == 'layout' %}
+            data-layout="{{ pageComponent.layout }}"
+        {% elseif value is iterable %}
+            data-page-component-{{ key }}="{{ value|json_encode }}"
+        {% else %}
+            data-page-component-{{ key }}="{{ value }}"
+        {% endif %}
+    {% endfor %}
 {% endmacro %}
 
 {#
@@ -930,20 +923,22 @@
     <div class="responsive-section">
         <h4 class="scrollspy-title">{{ title }}{% if headerLinkContent is defined %}{{ headerLinkContent }}{% endif %}</h4>
         <div id="{{ blockId }}" class="scrollspy-nav-target"></div>
-        <div class="row-fluid{% if (contentAttributes is defined and contentAttributes.class is defined and contentAttributes.class|length) %} {{ contentAttributes.class }}{% endif %}{% if cols > 1 and (useSubBlockDivider is not defined or useSubBlockDivider == true) %} row-fluid-divider{% endif %}" {{ _self.attributes(contentAttributes, ['class']) }}>
-            {% if isForm is defined and isForm == true %}
-                <fieldset class="form-horizontal">
-            {% else %}
-                <div class="form-horizontal">
-            {% endif %}
-                {% for subblock in subblocks %}
-                    {{ _self.scrollSubblock(subblock.title is defined and subblock.title|length ? subblock.title : null, subblock.data, isForm, subblock.useSpan is defined ? subblock.useSpan : true, subblock.spanClass is defined ? subblock.spanClass : '') }}
-                {% endfor %}
-            {% if isForm is defined and isForm == true %}
-                </fieldset>
-            {% else %}
-                </div>
-            {% endif %}
+        <div class="section-content">
+            <div class="row-fluid{% if (contentAttributes is defined and contentAttributes.class is defined and contentAttributes.class|length) %} {{ contentAttributes.class }}{% endif %}{% if cols > 1 and (useSubBlockDivider is not defined or useSubBlockDivider == true) %} row-fluid-divider{% endif %}" {{ _self.attributes(contentAttributes, ['class']) }}>
+                {% if isForm is defined and isForm == true %}
+                    <fieldset class="form-horizontal">
+                {% else %}
+                    <div class="form-horizontal">
+                {% endif %}
+                    {% for subblock in subblocks %}
+                        {{ _self.scrollSubblock(subblock.title is defined and subblock.title|length ? subblock.title : null, subblock.data, isForm, subblock.useSpan is defined ? subblock.useSpan : true, subblock.spanClass is defined ? subblock.spanClass : '') }}
+                    {% endfor %}
+                {% if isForm is defined and isForm == true %}
+                    </fieldset>
+                {% else %}
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 {% endmacro %}
@@ -1008,7 +1003,7 @@
                 {{ _self.scrollBlock("scroll-" ~ loop.index, scrollBlock.title, scrollBlock.subblocks, isForm, scrollBlock.content_attr is defined ? scrollBlock.content_attr : null, scrollBlock.useSubBlockDivider is defined ? scrollBlock.useSubBlockDivider : true, scrollBlock.headerLinkContent is defined ? scrollBlock.headerLinkContent : null) }}
             {% endfor %}
             {% if data.hiddenData is defined or isForm %}
-                <div class="hide" data-skip-input-widgets>
+                <div class="hide" data-skip-input-widgets data-layout="separate">
                     {% if data.hiddenData is defined %}
                         {{ data.hiddenData|raw }}
                     {% endif %}

@@ -23,45 +23,15 @@
             </div>
         </div>
     </div>
-    <script type="text/javascript">
-        require(['jquery', 'underscore', 'oroui/js/mediator', 'oroui/js/app/views/loading-mask-view'],
-        function($, _, mediator, LoadingMask){
-            var loadingMask = null;
-            $(document).on('click', '#{{ widgetContentId }} .tab-button', function (e) {
-                var $el = $(this);
-                var $prevTab = $el.closest('.nav-tabs').find('li.active');
-                var $currentTab = $el.closest('li');
-                $prevTab.removeClass('active');
-                $currentTab.addClass('active');
 
-                var $tabContent = $el.closest('.widget-content').find('.tab-content');
-                if (!loadingMask) {
-                    loadingMask = new LoadingMask({container: $tabContent});
-                }
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-                loadingMask.show();
-                // add style like on standard tabs realization through tabs-component
-                $el.addClass('widget-component-processing');
-                $.ajax({
-                    url: $el.data('url'),
-                    dataType: 'html',
-                    error: function(jqXHR) {
-                        loadingMask.hide();
-                        $currentTab.removeClass('active');
-                        $prevTab.addClass('active');
-                        $el.removeClass('widget-component-processing');
-                    },
-                    success: function(data) {
-                        $tabContent.find('.content')
-                            .trigger('content:remove')
-                            .html(data)
-                            .trigger('content:changed');
-                        loadingMask.hide();
-                        $el.removeClass('widget-component-processing');
-                    }
-                });
-            });
-        });
-    </script>
+    <div {{ UI.renderPageComponentAttributes({
+        view: 'orodashboard/js/app/views/widget-tabs-view',
+        options: {
+            _sourceElement: '#' ~ widgetContentId
+        }
+    }) }}></div>
+
     {{ parent() }}
 {% endblock %}

@@ -17,6 +17,18 @@ default_exclusion_policy:
         exclusion_policy: none
     expected: []
 
+documentation_resource:
+    config:
+        documentation_resource: [test.md]
+    expected:
+        documentation_resource: [test.md]
+
+documentation_resource_as_string:
+    config:
+        documentation_resource: test.md
+    expected:
+        documentation_resource: [test.md]
+
 empty_order_by:
     config:
         order_by: []
@@ -141,6 +153,7 @@ default_collapse:
 all_attributes:
     config:
         exclusion_policy: all
+        documentation_resource: [test.md]
         order_by:
             id: DESC
         page_size: 20
@@ -156,6 +169,7 @@ all_attributes:
         extra1: true
     expected:
         exclusion_policy: all
+        documentation_resource: [test.md]
         order_by:
             id: DESC
         page_size: 20

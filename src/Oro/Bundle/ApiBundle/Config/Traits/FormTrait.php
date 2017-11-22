@@ -18,9 +18,11 @@ trait FormTrait
      */
     public function getFormType()
     {
-        return array_key_exists(EntityDefinitionConfig::FORM_TYPE, $this->items)
-            ? $this->items[EntityDefinitionConfig::FORM_TYPE]
-            : null;
+        if (!array_key_exists(EntityDefinitionConfig::FORM_TYPE, $this->items)) {
+            return null;
+        }
+
+        return $this->items[EntityDefinitionConfig::FORM_TYPE];
     }
 
     /**
@@ -44,9 +46,11 @@ trait FormTrait
      */
     public function getFormOptions()
     {
-        return array_key_exists(EntityDefinitionConfig::FORM_OPTIONS, $this->items)
-            ? $this->items[EntityDefinitionConfig::FORM_OPTIONS]
-            : null;
+        if (!array_key_exists(EntityDefinitionConfig::FORM_OPTIONS, $this->items)) {
+            return null;
+        }
+
+        return $this->items[EntityDefinitionConfig::FORM_OPTIONS];
     }
 
     /**

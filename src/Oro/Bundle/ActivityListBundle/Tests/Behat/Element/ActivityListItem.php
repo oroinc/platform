@@ -37,8 +37,12 @@ class ActivityListItem extends Element
 
     public function deleteAllContexts()
     {
-        foreach ($this->getContexts() as $context) {
+        $contexts = array_reverse($this->getContexts());
+        // order of contexts is changed to avoid jumping element after previous one removed after animation
+        // since it sometimes leads to try clicking at wrong position
+        foreach ($contexts as $context) {
             $context->find('css', 'i.fa-close')->click();
+            $this->getDriver()->waitForAjax();
         }
     }
 

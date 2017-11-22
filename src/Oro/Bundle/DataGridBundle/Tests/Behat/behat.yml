@@ -56,6 +56,15 @@ oro_behat_extension:
       selector: 'div.filter-item'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterItem
 
+    GridFilterHintItem:
+      selector: 'span.filter-criteria-hint-item'
+
+    GridFilterHintLabel:
+      selector: 'span.filter-criteria-hint-label'
+
+    GridFilterHint:
+      selector: 'span.filter-criteria-hint'
+
     GridFilterDateTimeItem:
       selector: 'div.filter-item'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem
@@ -74,7 +83,7 @@ oro_behat_extension:
 
     GridFilterManager:
       selector: 'div.filter-container>div.dropdown-menu'
-      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\FrontendGridFilterManager
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterManager
 
     GridColumnManagerTable:
       selector: 'div.column-manager-table'

@@ -9,6 +9,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
@@ -50,16 +51,21 @@ class SetDataTransformers implements ProcessorInterface
 
         $this->setDataTransformers(
             $definition,
+            $context->getRequestType(),
             $this->doctrineHelper->getEntityMetadataForClass($context->getClassName(), false)
         );
     }
 
     /**
      * @param EntityDefinitionConfig $definition
+     * @param RequestType            $requestType
      * @param ClassMetadata|null     $metadata
      */
-    protected function setDataTransformers(EntityDefinitionConfig $definition, ClassMetadata $metadata = null)
-    {
+    protected function setDataTransformers(
+        EntityDefinitionConfig $definition,
+        RequestType $requestType,
+        ClassMetadata $metadata = null
+    ) {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             if ($field->hasDataTransformers()) {
@@ -67,31 +73,30 @@ class SetDataTransformers implements ProcessorInterface
             }
 
             $targetConfig = $field->getTargetEntity();
-            if (null !== $targetConfig) {
-                if (null !== $metadata && $targetConfig->hasFields()) {
-                    $propertyPath = $field->getPropertyPath($fieldName);
-                    if ($metadata->hasAssociation($propertyPath)) {
-                        $this->setDataTransformers(
-                            $targetConfig,
-                            $this->doctrineHelper->getEntityMetadataForClass(
-                                $metadata->getAssociationTargetClass($propertyPath)
-                            )
-                        );
-                    }
-                }
-            } else {
+            if (null === $targetConfig) {
                 $dataType = $field->getDataType();
-                if (null !== $metadata && !$dataType) {
+                if (!$dataType && null !== $metadata) {
                     $propertyPath = $field->getPropertyPath($fieldName);
                     if ($metadata->hasField($propertyPath)) {
                         $dataType = $metadata->getTypeOfField($propertyPath);
                     }
                 }
                 if ($dataType) {
-                    $dataTransformer = $this->dataTransformerRegistry->getDataTransformer($dataType);
+                    $dataTransformer = $this->dataTransformerRegistry->getDataTransformer($dataType, $requestType);
                     if (null !== $dataTransformer) {
                         $field->addDataTransformer($dataTransformer);
                     }
+                }
+            } elseif ($targetConfig->hasFields() && null !== $metadata) {
+                $propertyPath = $field->getPropertyPath($fieldName);
+                if ($metadata->hasAssociation($propertyPath)) {
+                    $this->setDataTransformers(
+                        $targetConfig,
+                        $requestType,
+                        $this->doctrineHelper->getEntityMetadataForClass(
+                            $metadata->getAssociationTargetClass($propertyPath)
+                        )
+                    );
                 }
             }
         }

@@ -6,20 +6,38 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\ActionProcessorBag
 
     oro_api.processor_bag:
-        class: Oro\Component\ChainProcessor\ProcessorBag
+        class: Oro\Bundle\ApiBundle\Processor\OptimizedProcessorBag
         public: false
         arguments:
+            - '@oro_api.processor_bag_config_provider'
             - '@oro_api.processor_factory'
             - %kernel.debug%
             - '@oro_api.processor_applicable_checker_factory'
             - '@oro_api.processor_iterator_factory'
+            - '@oro_api.processor_applicable_checker_factory.ungrouped'
+            - '@oro_api.processor_iterator_factory.ungrouped'
+
+    oro_api.processor_bag_config_provider:
+        class: Oro\Component\ChainProcessor\ProcessorBagConfigProvider
+        public: false
+        arguments:
+            - [] # groups; they are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ConfigurationCompilerPass
+            - [] # processors; they are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ConfigurationCompilerPass
 
     oro_api.processor_iterator_factory:
         class: Oro\Bundle\ApiBundle\Processor\OptimizedProcessorIteratorFactory
         public: false
 
+    oro_api.processor_iterator_factory.ungrouped:
+        class: Oro\Component\ChainProcessor\ProcessorIteratorFactory
+        public: false
+
     oro_api.processor_applicable_checker_factory:
         class: Oro\Bundle\ApiBundle\Processor\ProcessorApplicableCheckerFactory
+        public: false
+
+    oro_api.processor_applicable_checker_factory.ungrouped:
+        class: Oro\Bundle\ApiBundle\Processor\ProcessorApplicableCheckerWithoutGroupsFactory
         public: false
 
     oro_api.processor_factory:
@@ -75,8 +93,18 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
 
+    oro_api.entity_loader:
+        class: Oro\Bundle\ApiBundle\Util\EntityLoader
+        public: false
+        arguments:
+            - '@doctrine'
+
     oro_api.entity_accessor:
         class: Oro\Bundle\ApiBundle\Util\EntityDataAccessor
+        public: false
+
+    oro_api.entity_id_helper:
+        class: Oro\Bundle\ApiBundle\Util\EntityIdHelper
         public: false
 
     oro_api.entity_metadata_factory:
@@ -96,8 +124,8 @@ services:
         arguments:
             - '@oro_api.object_normalizer_registry'
             - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_serializer.serialization_helper'
             - '@oro_api.entity_accessor'
-            - '@oro_api.entity_serializer.data_transformer'
             - '@oro_api.object_normalizer.config_normalizer'
             - '@oro_api.object_normalizer.data_normalizer'
 
@@ -106,7 +134,7 @@ services:
         public: false
 
     oro_api.object_normalizer.data_normalizer:
-        class: Oro\Bundle\ApiBundle\Normalizer\DataNormalizer
+        class: Oro\Component\EntitySerializer\DataNormalizer
         public: false
 
     oro_api.object_normalizer_registry:
@@ -137,6 +165,17 @@ services:
         arguments:
             - '@oro_api.processor_bag'
             - customize_form_data
+
+    oro_api.resources.cache_warmer:
+        class: Oro\Bundle\ApiBundle\Provider\ResourcesCacheWarmer
+        public: false
+        arguments:
+            - '@oro_api.entity_alias_resolver'
+            - '@oro_api.resources_provider'
+            - '@oro_api.subresources_provider'
+            - [[rest], [rest, json_api]]
+        tags:
+            - { name: kernel.cache_warmer }
 
     oro_api.resources_provider:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesProvider
@@ -293,13 +332,13 @@ services:
         public: false
         arguments:
             - '@oro_api.entity_serializer.doctrine_helper'
+            - '@oro_api.entity_serializer.serialization_helper'
             - '@oro_api.entity_accessor'
-            - '@oro_api.entity_serializer.data_transformer'
             - '@oro_api.entity_serializer.query_factory'
             - '@oro_api.entity_serializer.field_accessor'
             - '@oro_api.entity_serializer.config_normalizer'
-            - '@oro_api.entity_serializer.data_normalizer'
             - '@oro_api.entity_serializer.config_converter'
+            - '@oro_api.entity_serializer.data_normalizer'
         calls:
             - [setFieldsFilter, ['@oro_security.serializer.filter_chain']]
 
@@ -308,6 +347,12 @@ services:
         public: false
         arguments:
             - '@doctrine'
+
+    oro_api.entity_serializer.serialization_helper:
+        class: Oro\Component\EntitySerializer\SerializationHelper
+        public: false
+        arguments:
+            - '@oro_api.entity_serializer.data_transformer'
 
     oro_api.entity_serializer.query_factory:
         class: Oro\Bundle\ApiBundle\Util\AclProtectedQueryFactory
@@ -343,12 +388,20 @@ services:
         arguments:
             - '@service_container'
 
+    oro_api.entity_id_transformer_registry:
+        class: Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry
+        public: false
+        arguments:
+            - [] # transformers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdTransformerConfigurationCompilerPass
+            - '@oro_api.request_expression_matcher'
+
     oro_api.rest.entity_id_transformer:
         class: Oro\Bundle\ApiBundle\Request\Rest\EntityIdTransformer
         public: false
         arguments:
-            - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
+        tags:
+            - { name: oro.api.entity_id_transformer, requestType: rest }
 
     oro_api.exception_text_extractor:
         class: Oro\Bundle\ApiBundle\Request\ChainExceptionTextExtractor
@@ -367,37 +420,55 @@ services:
         tags:
             - { name: oro.api.exception_text_extractor, priority: -10 }
 
+    oro_api.error_completer_registry:
+        class: Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry
+        public: false
+        arguments:
+            - [] # error_completers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ErrorCompleterConfigurationCompilerPass
+            - '@service_container'
+            - '@oro_api.request_expression_matcher'
+
+    oro_api.error_completer.default:
+        class: Oro\Bundle\ApiBundle\Request\NullErrorCompleter
+        tags:
+            - { name: oro.api.error_completer, priority: -255 }
+
+    oro_api.document_builder_factory:
+        class: Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory
+        public: false
+        arguments:
+            - [] # document builders. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentBuilderConfigurationCompilerPass
+            - '@service_container'
+            - '@oro_api.request_expression_matcher'
+
     oro_api.rest.document_builder:
         class: Oro\Bundle\ApiBundle\Request\Rest\RestDocumentBuilder
-        public: false
+        shared: false
+        tags:
+            - { name: oro.api.document_builder, requestType: rest&!json_api, priority: -10 }
 
     oro_api.rest.error_completer:
         class: Oro\Bundle\ApiBundle\Request\Rest\ErrorCompleter
-        public: false
         arguments:
             - '@oro_api.exception_text_extractor'
-        lazy: true
+        tags:
+            - { name: oro.api.error_completer, requestType: rest&!json_api, priority: -10 }
 
     oro_api.json_api.document_builder:
         class: Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder
-        public: false
+        shared: false
         arguments:
             - '@oro_api.value_normalizer'
             - '@oro_api.rest.entity_id_transformer'
+        tags:
+            - { name: oro.api.document_builder, requestType: json_api }
 
     oro_api.json_api.error_completer:
         class: Oro\Bundle\ApiBundle\Request\JsonApi\ErrorCompleter
-        public: false
         arguments:
             - '@oro_api.exception_text_extractor'
-        lazy: true
-
-    oro_api.json_api.relationship_error_completer:
-        class: Oro\Bundle\ApiBundle\Request\JsonApi\RelationshipErrorCompleter
-        public: false
-        arguments:
-            - '@oro_api.exception_text_extractor'
-        lazy: true
+        tags:
+            - { name: oro.api.error_completer, requestType: json_api }
 
     oro_api.rest.routing_options_resolver.default:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestRouteOptionsResolver
@@ -434,6 +505,7 @@ services:
         arguments:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.value_normalizer'
+            - '@oro_api.rest.doc_data_type_converter'
 
     oro_api.rest.doc_handler.filters:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestDocFiltersHandler
@@ -441,6 +513,22 @@ services:
         arguments:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.value_normalizer'
+            - '@oro_api.rest.doc_data_type_converter'
+
+    oro_api.rest.doc_data_type_converter:
+        class: Oro\Bundle\ApiBundle\ApiDoc\ApiDocDataTypeConverter
+        public: false
+        arguments:
+            -
+                'unsignedInteger': 'integer'
+                'text': 'string'
+                'guid': 'string'
+                'json_array': 'object'
+                'simple_array': 'array'
+                'percent': 'float'
+                'currency': 'string'
+                'money_value': 'money'
+                'duration': 'integer'
 
     oro_api.api_doc.formatter.html_formatter:
         class: Oro\Bundle\ApiBundle\ApiDoc\NewHtmlFormatter
@@ -478,6 +566,7 @@ services:
         class: Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadataParser
         arguments:
             - '@oro_api.value_normalizer'
+            - '@oro_api.rest.doc_data_type_converter'
         tags:
             - { name: nelmio_api_doc.extractor.parser }
 
@@ -530,6 +619,12 @@ services:
             - '@property_accessor'
         tags:
             - { name: oro.api.filter_factory, priority: -10 }
+
+    oro_api.filter_factory.composite_identifier:
+        class: Oro\Bundle\ApiBundle\Filter\CompositeIdentifierFilterFactory
+        public: false
+        arguments:
+            - '@oro_api.entity_id_transformer_registry'
 
     oro_api.filter_factory.extended_association:
         class: Oro\Bundle\ApiBundle\Filter\ExtendedAssociationFilterFactory

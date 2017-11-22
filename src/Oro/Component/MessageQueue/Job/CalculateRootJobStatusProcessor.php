@@ -1,41 +1,37 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Job;
 
+use Psr\Log\LoggerInterface;
+
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
 
 class CalculateRootJobStatusProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * @var JobStorage
-     */
+    /** @var JobStorage */
     private $jobStorage;
 
-    /**
-     * @var RootJobStatusCalculator
-     */
+    /** @var RootJobStatusCalculator */
     private $rootJobStatusCalculator;
 
-    /**
-     * @var MessageProducerInterface
-     */
+    /** @var MessageProducerInterface */
     private $producer;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
 
     /**
-     * @param JobStorage $jobStorage
-     * @param RootJobStatusCalculator $calculateRootJobStatusCase
+     * @param JobStorage               $jobStorage
+     * @param RootJobStatusCalculator  $calculateRootJobStatusCase
      * @param MessageProducerInterface $producer
-     * @param LoggerInterface $logger
+     * @param LoggerInterface          $logger
      */
     public function __construct(
         JobStorage $jobStorage,
@@ -69,12 +65,16 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
             return self::REJECT;
         }
 
-        $isRootJobStopped = $this->rootJobStatusCalculator->calculate($job);
+        $isRootJobStopped = $this->rootJobStatusCalculator->calculate(
+            $job,
+            $data['calculateProgress'] ?? false
+        );
 
         if ($isRootJobStopped) {
-            $this->producer->send(Topics::ROOT_JOB_STOPPED, [
-                'jobId' => $job->getRootJob()->getId(),
-            ]);
+            $this->producer->send(
+                Topics::ROOT_JOB_STOPPED,
+                new Message(['jobId' => $job->getRootJob()->getId()], MessagePriority::HIGH)
+            );
         }
 
         return self::ACK;

@@ -28,9 +28,11 @@ trait ActionsTrait
      */
     public function getAction($actionName)
     {
-        return isset($this->actions[$actionName])
-            ? $this->actions[$actionName]
-            : null;
+        if (!isset($this->actions[$actionName])) {
+            return null;
+        }
+
+        return $this->actions[$actionName];
     }
 
     /**

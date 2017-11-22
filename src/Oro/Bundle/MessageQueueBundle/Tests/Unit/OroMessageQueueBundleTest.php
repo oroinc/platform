@@ -10,6 +10,7 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageProce
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageToArrayConverterPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildRouteRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaSubscribersPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureClearersPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureDbalTransportExtensionsPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeAnnotationReaderServicesPersistentPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeLoggerServicesPersistentPass;
@@ -17,15 +18,20 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\OroMessageQueueBundle;
 use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
+use Symfony\Component\HttpKernel\Kernel;
 
 class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
 {
     /** @var OroMessageQueueBundle */
     private $bundle;
 
+    /** @var Kernel|\PHPUnit_Framework_MockObject_MockObject */
+    private $kernel;
+
     protected function setUp()
     {
-        $this->bundle = new OroMessageQueueBundle();
+        $this->kernel = $this->createMock(Kernel::class);
+        $this->bundle = new OroMessageQueueBundle($this->kernel);
     }
 
     public function testShouldRegisterExpectedCompilerPasses()
@@ -54,8 +60,11 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf(BuildMessageToArrayConverterPass::class));
         $container->expects($this->at(7))
             ->method('addCompilerPass')
-            ->with($this->isInstanceOf(MakeLoggerServicesPersistentPass::class));
+            ->with($this->isInstanceOf(ConfigureClearersPass::class));
         $container->expects($this->at(8))
+            ->method('addCompilerPass')
+            ->with($this->isInstanceOf(MakeLoggerServicesPersistentPass::class));
+        $container->expects($this->at(9))
             ->method('addCompilerPass')
             ->with($this->isInstanceOf(MakeAnnotationReaderServicesPersistentPass::class));
 
@@ -63,7 +72,7 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
             ->method('getExtension')
             ->willReturn($this->createMock(OroMessageQueueExtension::class));
 
-        $bundle = new OroMessageQueueBundle();
+        $bundle = new OroMessageQueueBundle($this->kernel);
         $bundle->build($container);
     }
 
@@ -84,7 +93,7 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
             ->with('oro_message_queue')
             ->willReturn($extension);
 
-        $bundle = new OroMessageQueueBundle();
+        $bundle = new OroMessageQueueBundle($this->kernel);
         $bundle->build($container);
     }
 }

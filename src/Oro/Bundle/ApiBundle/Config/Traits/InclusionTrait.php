@@ -16,9 +16,11 @@ trait InclusionTrait
      */
     public function isInclusionEnabled()
     {
-        return array_key_exists(EntityDefinitionConfig::DISABLE_INCLUSION, $this->items)
-            ? !$this->items[EntityDefinitionConfig::DISABLE_INCLUSION]
-            : true;
+        if (!array_key_exists(EntityDefinitionConfig::DISABLE_INCLUSION, $this->items)) {
+            return true;
+        }
+
+        return !$this->items[EntityDefinitionConfig::DISABLE_INCLUSION];
     }
 
     /**

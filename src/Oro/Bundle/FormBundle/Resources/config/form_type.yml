@@ -259,6 +259,13 @@ services:
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
+    oro_form.extension.strip_tags:
+        class: 'Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension'
+        arguments:
+            - '@oro_ui.html_tag_helper'
+        tags:
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+
     oro_form.type.encoded_password:
         class: %oro_form.type.encoded_password.class%
         arguments:
@@ -336,6 +343,13 @@ services:
             - '@oro_entity.entity_class_name_helper'
         tags:
             - { name: validator.constraint_validator, alias: oro_form.related_entity_validator }
+
+    oro_form.validator.unchangable_field:
+        class: Oro\Bundle\FormBundle\Validator\Constraints\UnchangeableFieldValidator
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_form.unchangable_field_validator }
 
     oro_form.related_entity.form.transformer.api:
         class: Oro\Bundle\FormBundle\Form\DataTransformer\RelatedEntityTransformer

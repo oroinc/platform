@@ -7,3 +7,4 @@ twig:
         ws:
             port:       "%websocket_frontend_port%"  # Websocket port used in JS
             host:       "%websocket_frontend_host%"  # Websocket host used in JS
+            path:       "%websocket_frontend_path%"  # Websocket request path used in JS

@@ -175,7 +175,7 @@ api:
 
 The `entities` section describes a configuration of entities.
 
-* **documentation_resource** *string* May contain the link to [markdown](https://en.wikipedia.org/wiki/Markdown) file that contains a detailed documentation for a single or multiple API resources. For more details see [Documenting API Resources](./documentation.md).
+* **documentation_resource** *string* May contain the link to [markdown](https://en.wikipedia.org/wiki/Markdown) file that contains a detailed documentation for a single or multiple API resources. For more details see [Documenting API Resources](./documentation.md). Please note that the same entity can be configured in different `Resources/config/oro/api.yml` files, e.g. when some bundle needs to add a field to an entity declared in another bundle. In this case all configuration files for this entity can have **documentation_resource** option and all documentation files declared there will be merged. Also pay attention that in case if the same field is documented in several documentation files, they will not be merged and only a documentation from one file will be used.
 * **exclude** *boolean* Indicates whether the entity should be excluded from Data API. By default `false`.
 * **inherit** *boolean* By default `true`. The flag indicates that the configuration for certain entity should be merged with the configuration of a parent entity. If a derived entity should have completely different configuration and merging with parent configuration is not needed the flag should be set to `false`.
 * **exclusion_policy** *string* - Can be `all` or `none`. By default `none`. Indicates the exclusion strategy that should be used for the entity. `all` means that all fields are not configured explicitly will be excluded. `none` means that only fields marked with `exclude` flag will be excluded.
@@ -185,7 +185,7 @@ The `entities` section describes a configuration of entities.
 * **disable_fieldset** *boolean* The flag indicates whether a requesting of a restricted set of fields is disabled. In JSON.API an [**fields** request parameter](http://jsonapi.org/format/#fetching-sparse-fieldsets) can be used to customize which fields should be returned. By default `false`.
 * **disable_meta_properties** *boolean* The flag indicates whether a requesting of additional meta properties is disabled. By default `false`.
 * **hints** *array* Sets [Doctrine query hints](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints). Each item can be a string or an array with `name` and `value` keys. The string value is a short form of `[name: hint name]`.
-* **identifier_field_names** *string[]* The names of identifier fields of the entity. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity. For ORM entities a value of this option is retrieved from an entity metadata.
+* **identifier_field_names** *string[]* The names of identifier fields of the entity. Usually it should be set in a configuration file in case if Data API resource is not based on ORM entity. For ORM entities a value of this option is retrieved from an entity metadata, but this can be changed using this option if by some reasons you do not want to use the primary key as an entity identifier in Data API.
 * **delete_handler** *string* The id of a service that should be used to delete entity by the [delete](./actions.md#delete-action) and [delete_list](./actions.md#delete_list-action) actions. By default the [oro_soap.handler.delete](../../../SoapBundle/Handler/DeleteHandler.php) service is used.
 * **form_type** *string* The form type that should be used for the entity in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. By default the `form` form type is used.
 * **form_options** *array* The form options that should be used for the entity in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
@@ -247,6 +247,9 @@ As described above, the **data_type** attribute can be used to specify a data ty
 
 | Data Type | Description |
 | --- | --- |
+| scalar | Used to represent a field of to-one association as a field of parent entity. In JSON.API it means that the association's field should be in "attributes" section instead of "relationships" section. |
+| object | Used to represent to-one association as a field. In JSON.API it means that the association should be in "attributes" section instead of "relationships" section. |
+| array | Used to represent to-many association as a field. In JSON.API it means that the association should be in "attributes" section instead of "relationships" section. |
 | nestedObject | Used to configure nested objects. For details see [Configure nested object](./how_to.md#configure-nested-object). |
 | nestedAssociation | Used to configure nested associations. For details see [Configure nested association](./how_to.md#configure-nested-association). |
 | association:relationType\[:associationKind\] | Used to configure extended associations. For details see [Configure Extended Many-To-One Association](./how_to.md#configure-extended-many-to-one-association), [Configure Extended Many-To-Many Association](./how_to.md#configure-extended-many-to-many-association) and [Configure Extended Multiple Many-To-One Association](./how_to.md#configure-extended-multiple-many-to-one-association). |
@@ -321,6 +324,7 @@ This section describes fields by which the result data can be filtered. It conta
     * **property_path** *string* The property path to reach the fields' value. The same way as above in `fields` configuration section.
     * **data_type** *string* The data type of the filter value. Can be `boolean`, `integer`, `string`, etc.
     * **allow_array** *boolean* A flag indicates whether the filter can contains several values. By default `false`.
+    * **allow_range** *boolean* A flag indicates whether the filter can contains a pair of "from" and "to" values. By default `false`.
     * **type** *string* The filter type. By default the filter type is equal to the **data_type** property.
     * **options** *array* The filter options.
     * **operators** *array* A list of operators supported by the filter. By default the list of operators depends on the filter type. For example a string filter supports **=** and **!=** operators, a number filter supports **=**, **!=**, **<**, **<=**, **>** and **>=** operators, etc. Usually you need to use this parameter in case if you need to make a list of supported operators more limited.
@@ -342,8 +346,9 @@ api:
                         property_path: firstName
                         description: 'My filter description'
                     field3:
-                        data_type: boolean
-                        allow_array: false
+                        data_type: date
+                        allow_array: true
+                        allow_range: true
                     field4:
                         data_type: string
                         type: myFilter
@@ -572,4 +577,4 @@ api:
 "relations" configuration section
 ---------------------------------
 
-The `relations` configuration section describes a configuration of an entity if it is used in a relationship. This section is not used for JSON.API, but can be helpfull for other types of API. This section is similar to the [entities](#entities-configuration-section) section.
+The `relations` configuration section describes a configuration of an entity if it is used in a relationship. This section is not used for JSON.API, but can be helpful for other types of API. This section is similar to the [entities](#entities-configuration-section) section.

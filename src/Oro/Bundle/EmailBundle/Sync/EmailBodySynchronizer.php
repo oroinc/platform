@@ -237,7 +237,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
             );
             throw $loadEx;
         } catch (\Exception $ex) {
-            $this->logger->notice(
+            $this->logger->info(
                 sprintf(
                     'Load email body failed. Email id: %d. Error: %s.',
                     $email->getId(),

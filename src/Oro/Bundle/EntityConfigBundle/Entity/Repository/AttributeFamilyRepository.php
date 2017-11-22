@@ -29,7 +29,7 @@ class AttributeFamilyRepository extends EntityRepository
 
     /**
      * @param array
-     * @return array
+     * @return array ['<attributeId>' => [<'familyId'>, <'familyId'>], ...]
      */
     public function getFamilyIdsForAttributes(array $attributes)
     {
@@ -54,7 +54,7 @@ class AttributeFamilyRepository extends EntityRepository
 
         $attributeIds = [];
         foreach ($result as $item) {
-            $attributeIds[(int) $item['attributeId']] = (int) $item['familyId'];
+            $attributeIds[(int) $item['attributeId']][] = (int) $item['familyId'];
         }
 
         return $attributeIds;

@@ -15,7 +15,7 @@ class ConfigNormalizer extends BaseConfigNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalizeConfig(array $config, $parentField = null)
+    protected function doNormalizeConfig(array $config)
     {
         if (!empty($config[ConfigUtil::FIELDS])) {
             $toRemove = [];
@@ -38,7 +38,7 @@ class ConfigNormalizer extends BaseConfigNormalizer
             }
         }
 
-        return parent::normalizeConfig($config, $parentField);
+        return parent::doNormalizeConfig($config);
     }
 
     /**

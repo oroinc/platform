@@ -7,10 +7,13 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemQuery;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\CriteriaConnector;
+use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
@@ -29,7 +32,11 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->processor = new BuildSingleItemQuery($this->doctrineHelper, $this->criteriaConnector);
+        $this->processor = new BuildSingleItemQuery(
+            $this->doctrineHelper,
+            $this->criteriaConnector,
+            new EntityIdHelper()
+        );
     }
 
     public function testProcessWhenQueryIsAlreadyBuilt()
@@ -66,6 +73,10 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
     {
         $entityClass = Entity\User::class;
         $entityId = 123;
+        $metadata = new EntityMetadata();
+        $metadata->setClassName($entityClass);
+        $metadata->setIdentifierFieldNames(['id']);
+        $metadata->addField(new FieldMetadata('id'));
 
         $resolver = $this->getMockBuilder(EntityClassResolver::class)
             ->disableOriginalConstructor()
@@ -78,6 +89,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $this->context->setCriteria($criteria);
         $this->context->setClassName($entityClass);
         $this->context->setId($entityId);
+        $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
         $this->assertTrue($this->context->hasQuery());
@@ -97,6 +109,11 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
     {
         $entityClass = Entity\CompositeKeyEntity::class;
         $entityId = ['id' => 123, 'title' => 'test'];
+        $metadata = new EntityMetadata();
+        $metadata->setClassName($entityClass);
+        $metadata->setIdentifierFieldNames(['id', 'title']);
+        $metadata->addField(new FieldMetadata('id'));
+        $metadata->addField(new FieldMetadata('title'));
 
         $resolver = $this->getMockBuilder(EntityClassResolver::class)
             ->disableOriginalConstructor()
@@ -105,6 +122,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $this->context->setCriteria(new Criteria($resolver));
         $this->context->setClassName($entityClass);
         $this->context->setId($entityId);
+        $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
         $this->assertTrue($this->context->hasQuery());
@@ -130,6 +148,10 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $parentResourceClass = Entity\User::class;
         $entityId = 123;
         $this->notManageableClassNames = [$entityClass];
+        $metadata = new EntityMetadata();
+        $metadata->setClassName($entityClass);
+        $metadata->setIdentifierFieldNames(['id']);
+        $metadata->addField(new FieldMetadata('id'));
 
         $config = new EntityDefinitionConfig();
         $config->setParentResourceClass($parentResourceClass);
@@ -145,6 +167,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $this->context->setClassName($entityClass);
         $this->context->setId($entityId);
         $this->context->setConfig($config);
+        $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
         $this->assertTrue($this->context->hasQuery());
@@ -165,6 +188,10 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $entityClass = 'Test\Class';
         $parentResourceClass = 'Test\ParentClass';
         $this->notManageableClassNames = [$entityClass, $parentResourceClass];
+        $metadata = new EntityMetadata();
+        $metadata->setClassName($entityClass);
+        $metadata->setIdentifierFieldNames(['id']);
+        $metadata->addField(new FieldMetadata('id'));
 
         $config = new EntityDefinitionConfig();
         $config->setParentResourceClass($parentResourceClass);
@@ -176,6 +203,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $this->context->setCriteria(new Criteria($resolver));
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
+        $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
         $this->assertNull($this->context->getQuery());

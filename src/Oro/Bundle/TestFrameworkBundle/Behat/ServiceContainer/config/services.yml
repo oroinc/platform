@@ -1,14 +1,4 @@
 services:
-    oro_test.listener.step_duration_measure_subscriber:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\StepDurationMeasureSubscriber'
-        arguments:
-            - '@definition.finder'
-
-    oro_test.listener.feature_duration_subscriber:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\FeatureDurationSubscriber'
-        arguments:
-            - '%kernel.log_dir%'
-
     oro_test.listener.interactive_execution_subscriber:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\InteractiveExecutionSubscriber'
 
@@ -108,28 +98,12 @@ services:
         calls:
             - [setKernel, ['@symfony2_extension.kernel']]
 
-    oro_behat_extension.specification.specification_divider:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationCountDivider
-
-    oro_behat_extension.specification.suite_configuration_divider:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Specification\SuiteConfigurationDivider
-        arguments:
-            - '@oro_behat_extension.specification.statistic.filesystem_statistic_repository'
-
-    oro_behat_extension.specification.statistic.filesystem_statistic_repository:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Specification\Statistic\FilesystemStatisticRepository
-        arguments:
-            - '%kernel.root_dir%'
-
-    oro_behat_extension.suite.suite_configuration_registry:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfigurationRegistry
+    oro_behat_extension.suite.oro_suite_generator:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Suite\OroSuiteGenerator
         arguments:
             - '@symfony2_extension.kernel'
-            - '@specifications.finder'
-            - '@oro_behat_extension.specification.specification_divider'
-            - '@oro_behat_extension.specification.suite_configuration_divider'
-        calls:
-            - [setSuiteConfigurations, ['%suite.configurations%']]
+        tags:
+            - { name: 'suite.generator', priority: 100 }
 
     oro_test.alice_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader

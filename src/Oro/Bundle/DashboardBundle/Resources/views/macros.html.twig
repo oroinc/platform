@@ -1,0 +1,27 @@
+{% macro renderDateWidgeView(form, valueType, className, viewType) %}
+    <div class="datetime-range-filter filter-criteria {{ className }}-range-filter-{{ form.vars.name }}">
+        <!-- datetime range filter placeholder -->
+        <input type="hidden" name="{{ form.vars.full_name }}[part]" value="value"/>
+    </div>
+
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    {% set options = {
+        _sourceElement: 'div.widget-configuration',
+        metadata: form.vars.datetime_range_metadata,
+        formName: form.vars.name,
+        formFullName: form.vars.full_name,
+        valueType: valueType,
+    } %}
+
+    {% if form.vars.value.value != null %}
+        {% set options = options|merge({
+            valueConfig: form.vars.value.value
+        }) %}
+    {% endif %}
+
+    <div {{ UI.renderPageComponentAttributes({
+        view: viewType,
+        options: options
+    }) }}></div>
+{% endmacro %}

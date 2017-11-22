@@ -118,7 +118,7 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
             if ($errors) {
                 $warningsText = 'Some entities were skipped due to warnings:' . PHP_EOL;
                 $warningsText .= implode($errors, PHP_EOL);
-                $this->logger->warning($warningsText);
+
                 $message .= PHP_EOL . $warningsText;
             }
             $status->setCode(Status::STATUS_COMPLETED)->setMessage($message);

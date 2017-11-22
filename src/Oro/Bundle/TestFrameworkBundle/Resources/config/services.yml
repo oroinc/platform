@@ -92,3 +92,14 @@ services:
             - '@oro_entity.entity_alias_loader'
             - '@oro_entity.entity_alias_cache'
             - true
+
+    oro_test.provider.container_tags_documentation_information:
+        class: Oro\Bundle\TestFrameworkBundle\Provider\ContainerTagsDocumentationInformationProvider
+        arguments:
+            - '%kernel.root_dir%/../'
+
+    oro_search.extension.mass_action.iterable_result_factory.alias:
+        alias: oro_search.extension.mass_action.iterable_result_factory
+
+    oro_datagrid.extension.mass_action.iterable_result_factory.alias:
+        alias: oro_datagrid.extension.mass_action.iterable_result_factory

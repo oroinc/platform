@@ -1,8 +1,5 @@
 oro:
     cron:
-        action:
-            jobs_management: Access job queue
-
         header:
             command:      Command
             error:        Error output

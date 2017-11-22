@@ -6,7 +6,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
+use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 
 /**
  * Checks if there are any errors in the Context,
@@ -17,15 +17,15 @@ use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
  */
 class CompleteErrors implements ProcessorInterface
 {
-    /** @var ErrorCompleterInterface */
-    protected $errorCompleter;
+    /** @var ErrorCompleterRegistry */
+    protected $errorCompleterRegistry;
 
     /**
-     * @param ErrorCompleterInterface $errorCompleter
+     * @param ErrorCompleterRegistry $errorCompleterRegistry
      */
-    public function __construct(ErrorCompleterInterface $errorCompleter)
+    public function __construct(ErrorCompleterRegistry $errorCompleterRegistry)
     {
-        $this->errorCompleter = $errorCompleter;
+        $this->errorCompleterRegistry = $errorCompleterRegistry;
     }
 
     /**
@@ -40,10 +40,11 @@ class CompleteErrors implements ProcessorInterface
             return;
         }
 
-        $errors = $context->getErrors();
+        $errorCompleter = $this->errorCompleterRegistry->getErrorCompleter($context->getRequestType());
         $metadata = $this->getMetadata($context);
+        $errors = $context->getErrors();
         foreach ($errors as $error) {
-            $this->errorCompleter->complete($error, $metadata);
+            $errorCompleter->complete($error, $metadata);
         }
     }
 

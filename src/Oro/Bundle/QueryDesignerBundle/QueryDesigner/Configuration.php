@@ -88,7 +88,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     // JS module should be used to initialize a filter. This module should returns the following
                     // function "function (filterOptions, context)" and should return promise (jQuery.Deferred instance)
-                    // see _createFilter() method in 'field-condition.js' file
+                    // see _createFilter() method in 'field-condition-view.js' file
                     ->scalarNode('init_module')->end()
                     // types of queries a filter is available. use "all" if it should be available in any query
                     ->arrayNode('query_type')

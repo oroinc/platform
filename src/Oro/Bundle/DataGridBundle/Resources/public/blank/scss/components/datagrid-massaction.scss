@@ -7,24 +7,35 @@
         position: relative;
 
         display: inline-block;
+        margin-left: $datagrid-massaction-toggle-offset-left;
         padding: $datagrid-massaction-toggle-offset-inner;
 
         font-size: $datagrid-massaction-toggle-font-size;
         font-weight: $datagrid-massaction-toggle-font-weight;
         line-height: $datagrid-massaction-toggle-font-size;
-        white-space: nowrap;
 
         color: $datagrid-massaction-toggle-color;
         background-color: $datagrid-massaction-toggle-background-color;
         border: $datagrid-massaction-toggle-border;
 
         border-radius: $datagrid-massaction-toggle-border-radius;
+
+        cursor: pointer;
+
         white-space: nowrap;
 
         @include caret();
 
+        @include element-state('hover') {
+            background-color: $datagrid-massaction-toggle-hover-background-color;
+        }
+
         @include element-state('active') {
-            box-shadow: $datagrid-massaction-toggle-hover-box-shadow;
+            box-shadow: $datagrid-massaction-toggle-active-box-shadow;
+        }
+
+        &--size-m {
+            padding: $datagrid-massaction-toggle--size-m-offset-inner;
         }
     }
 
@@ -51,6 +62,10 @@
     &__dropdown-menu {
         min-width: 0;
 
+        &--stretch {
+            min-width: 100%;
+        }
+
         .action {
             display: block;
             padding: $datagrid-massaction-dropdown-menu-action-offset-inner;
@@ -67,6 +82,16 @@
                 background-color: $datagrid-massaction-dropdown-menu-action-hover-bg;
                 color: $datagrid-massaction-dropdown-menu-action-color;
             }
+        }
+    }
+
+    &__action-trigger {
+        color: inherit;
+
+        @include hover-focus {
+            text-decoration: inherit;
+
+            color: inherit;
         }
     }
 

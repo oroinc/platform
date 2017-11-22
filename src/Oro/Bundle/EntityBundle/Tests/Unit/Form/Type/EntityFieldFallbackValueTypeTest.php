@@ -11,6 +11,7 @@ use Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\FallbackParentStub;
 use Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\FallbackParentStubType;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Form\Type\EntityFieldFallbackValueType;
+use Oro\Bundle\EntityBundle\Exception\Fallback\FallbackFieldConfigurationMissingException;
 
 class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
 {
@@ -84,6 +85,23 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         $parentObject->valueWithFallback = new EntityFieldFallbackValue();
         $this->fallbackResolver->expects($this->any())->method('getSystemConfigFormDescription')->willReturn([]);
         $this->fallbackResolver->expects($this->any())->method('getType')->willReturn('boolean');
+        $this->fallbackResolver->expects($this->any())
+            ->method('getFallbackConfig')->willReturn([]);
+        $form = $this->factory->create(new FallbackParentStubType(), $parentObject, $this->getDefaultOptions());
+        $this->assertEquals(
+            'choice',
+            $this->getChildForm($form)->get('scalarValue')->getConfig()->getType()->getName()
+        );
+    }
+
+    public function testscalarValueTypeFallbacksToBoolFieldConfigWhenThereIsNoConfig()
+    {
+        $parentObject = new FallbackParentStub();
+        $parentObject->valueWithFallback = new EntityFieldFallbackValue();
+        $this->fallbackResolver->expects($this->any())->method('getSystemConfigFormDescription')->willReturn([]);
+        $this->fallbackResolver->expects($this->any())
+            ->method('getType')
+            ->will($this->throwException(new FallbackFieldConfigurationMissingException()));
         $this->fallbackResolver->expects($this->any())
             ->method('getFallbackConfig')->willReturn([]);
         $form = $this->factory->create(new FallbackParentStubType(), $parentObject, $this->getDefaultOptions());

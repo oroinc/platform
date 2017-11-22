@@ -142,8 +142,8 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, ['choices', 'dropdownContainer']);
-            _.extend(this, opts);
+            var opts = _.pick(options, 'choices', 'dropdownContainer', 'widgetOptions');
+            $.extend(true, this, opts);
 
             this._setChoices(this.choices);
 
@@ -186,17 +186,15 @@ define(function(require) {
         },
 
         /**
-         * Render filter template
-         *
-         * @return {*}
+         * @inheritDoc
          */
-        render: function() {
+        getTemplateData: function() {
             var options = this.choices.slice(0);
             if (this.populateDefault) {
                 options.unshift({value: '', label: this.placeholder || this.populateDefault});
             }
 
-            var html = this.template({
+            return {
                 label: this.labelPrefix + this.label,
                 showLabel: this.showLabel,
                 options: options,
@@ -204,7 +202,16 @@ define(function(require) {
                 selected: _.extend({}, this.emptyValue, this.value),
                 isEmpty: this.isEmpty(),
                 renderMode: this.renderMode
-            });
+            };
+        },
+
+        /**
+         * Render filter template
+         *
+         * @return {*}
+         */
+        render: function() {
+            var html = this.template(this.getTemplateData());
 
             if (!this.selectWidget) {
                 this.setElement(html);
@@ -233,6 +240,18 @@ define(function(require) {
          */
         setDropdownContainer: function(container) {
             this.dropdownContainer = $(container);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        hide: function() {
+            // when the filter has been opened and becomes invisible - close multiselect too
+            if (this.selectWidget) {
+                this.selectWidget.multiselect('close');
+            }
+
+            return SelectFilter.__super__.hide.apply(this, arguments);
         },
 
         /**

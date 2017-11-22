@@ -6,6 +6,8 @@ use Psr\Log\LoggerInterface;
 
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\SyncBundle\Content\TagGeneratorChain;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
@@ -50,45 +52,96 @@ class TopicSenderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    protected function tearDown()
-    {
-        unset($this->publisher, $this->generator, $this->tokenStorage, $this->sender);
-    }
-
     public function testGetGenerator()
     {
-        $this->assertSame($this->generator, $this->sender->getGenerator(), 'Should return generator chain object');
+        self::assertSame($this->generator, $this->sender->getGenerator());
     }
 
-    public function testSend()
+    public function testSendWithLoggedInUser()
     {
-        $user = $this->getMockForAbstractClass('Symfony\Component\Security\Core\User\UserInterface');
-        $user->expects($this->any())->method('getUserName')->will($this->returnValue(self::TEST_USERNAME));
+        $token = $this->createMock(TokenInterface::class);
+        $user = $this->createMock(UserInterface::class);
 
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token->expects($this->any())->method('getUser')->will($this->returnValue($user));
+        $this->tokenStorage->expects(self::any())
+            ->method('getToken')
+            ->willReturn($token);
+        $token->expects(self::any())
+            ->method('getUser')
+            ->willReturn($user);
+        $user->expects(self::any())
+            ->method('getUserName')
+            ->willReturn(self::TEST_USERNAME);
 
-        $this->tokenStorage->expects($this->any())->method('getToken')->will($this->returnValue($token));
+        $expectedMessage = [
+            ['username' => self::TEST_USERNAME, 'tagname' => self::TEST_TAG1],
+            ['username' => self::TEST_USERNAME, 'tagname' => self::TEST_TAG2]
+        ];
+        $this->publisher->expects(self::once())
+            ->method('send')
+            ->with('oro/data/update', json_encode($expectedMessage));
 
-        $that = $this;
-        $this->publisher->expects($this->once())->method('send')
-            ->will(
-                $this->returnCallback(
-                    function ($topic, $payload) use ($that) {
-                        $that->assertSame('oro/data/update', $topic, 'Should be the same as frontend code expects');
+        $tags = [self::TEST_TAG1, self::TEST_TAG2];
+        $this->sender->send($tags);
+    }
 
-                        $tags = json_decode($payload, true);
-                        $that->assertCount(2, $tags);
+    public function testSendWithoutToken()
+    {
+        $this->tokenStorage->expects(self::any())
+            ->method('getToken')
+            ->willReturn(null);
 
-                        foreach ($tags as $tag) {
-                            $that->assertArrayHasKey('username', $tag);
-                            $that->assertArrayHasKey('tagname', $tag);
+        $expectedMessage = [
+            ['username' => null, 'tagname' => self::TEST_TAG1],
+            ['username' => null, 'tagname' => self::TEST_TAG2]
+        ];
+        $this->publisher->expects(self::once())
+            ->method('send')
+            ->with('oro/data/update', json_encode($expectedMessage));
 
-                            $that->assertSame(self::TEST_USERNAME, $tag['username']);
-                        }
-                    }
-                )
-            );
+        $tags = [self::TEST_TAG1, self::TEST_TAG2];
+        $this->sender->send($tags);
+    }
+
+    public function testSendWhenTypeOfLoggedInUserIsNotSupported()
+    {
+        $token = $this->createMock(TokenInterface::class);
+
+        $this->tokenStorage->expects(self::any())
+            ->method('getToken')
+            ->willReturn($token);
+        $token->expects(self::any())
+            ->method('getUser')
+            ->willReturn(self::TEST_USERNAME);
+
+        $expectedMessage = [
+            ['username' => null, 'tagname' => self::TEST_TAG1],
+            ['username' => null, 'tagname' => self::TEST_TAG2]
+        ];
+        $this->publisher->expects(self::once())
+            ->method('send')
+            ->with('oro/data/update', json_encode($expectedMessage));
+
+        $tags = [self::TEST_TAG1, self::TEST_TAG2];
+        $this->sender->send($tags);
+    }
+
+    public function testSendWithoutTags()
+    {
+        $this->tokenStorage->expects(self::never())
+            ->method('getToken');
+        $this->publisher->expects(self::never())
+            ->method('send');
+
+        $this->sender->send([]);
+    }
+
+    public function testSendWithException()
+    {
+        $this->publisher->expects(self::once())
+            ->method('send')
+            ->willThrowException(new \Exception());
+        $this->logger->expects(self::once())
+            ->method('error');
 
         $tags = [self::TEST_TAG1, self::TEST_TAG2];
         $this->sender->send($tags);

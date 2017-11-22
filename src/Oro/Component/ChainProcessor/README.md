@@ -48,7 +48,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
-use Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass;
+use Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompilerPass;
 
 class AcmeTextRepresentationBundle extends Bundle
 {
@@ -58,8 +58,8 @@ class AcmeTextRepresentationBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         $container->addCompilerPass(
-            new LoadProcessorsCompilerPass(
-                'text_representation.processor_bag',
+            new LoadAndBuildProcessorsCompilerPass(
+                'text_representation.processor_bag_config_provider',
                 'text_representation.processor'
             )
         );
@@ -154,26 +154,35 @@ services:
     text_representation.object_to_string_converter:
         class: Acme\Bundle\TextRepresentationBundle\ObjectToStringConverter
         arguments:
-            - @text_representation.processor
+            - '@text_representation.processor'
 
     text_representation.processor:
         class: Acme\Bundle\TextRepresentationBundle\TextRepresentationProcessor
         public: false
         arguments:
-            - @text_representation.processor_bag
+            - '@text_representation.processor_bag'
 
     text_representation.processor_bag:
         class: Oro\Component\ChainProcessor\ProcessorBag
         public: false
         arguments:
-            - @text_representation.processor_factory
+            - '@text_representation.processor_bag_config_provider'
+            - '@text_representation.processor_factory'
+            - '%kernel.debug%'
+
+    text_representation.processor_bag_config_provider:
+        class: Oro\Component\ChainProcessor\ProcessorBagConfigProvider
+        public: false
+        arguments:
+            - # groups
+                'get_text_representation': ['prepare_data', 'format']
 
     text_representation.processor_factory:
         class: Oro\Component\ChainProcessor\ChainProcessorFactory
         public: false
         calls:
-            - [addFactory, [@text_representation.simple_processor_factory, 10]]
-            - [addFactory, [@text_representation.di_processor_factory]]
+            - [addFactory, ['@text_representation.simple_processor_factory', 10]]
+            - [addFactory, ['@text_representation.di_processor_factory']]
 
     text_representation.simple_processor_factory:
         class: Oro\Component\ChainProcessor\SimpleProcessorFactory
@@ -183,7 +192,7 @@ services:
         class: Oro\Component\ChainProcessor\DependencyInjection\ProcessorFactory
         public: false
         arguments:
-            - @service_container
+            - '@service_container'
 ```
 
 - Implement a simple processor that will get an object identifier and register it in `prepare_data` group
@@ -391,6 +400,7 @@ Here is a list of key classes:
 - [ActionProcessor](./ActionProcessor.php) - The base class for processors for your actions. This class executes processors registered in [ProcessorBag](./ProcessorBag.php) and suitable for the specified [Context](./Context.php).
 - [Context](./Context.php) - The base implementation of an execution context.
 - [ProcessorBag](./ProcessorBag.php) - A container for processors and applicable checkers.
+- [ProcessorBagConfigBuilder](./ProcessorBagConfigBuilder.php) - A builder for processors map used in the ProcessorBag.
 - [ProcessorInterface](./ProcessorInterface.php) - An interface of processors.
 - [ApplicableCheckerInterface](./ApplicableCheckerInterface.php) - An interface of applicable checkers.
 - [ProcessorBagAwareApplicableCheckerInterface](./ProcessorBagAwareApplicableCheckerInterface.php) - An interface that should be implemented by applicable checkers that need access to the processor bag.

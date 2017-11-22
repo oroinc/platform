@@ -49,15 +49,15 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getParseData
      *
-     * @param Node\ $node
+     * @param Node\Node  $expectedNode
      * @param string $expression
-     * @param array $names
+     * @param array  $names
      */
-    public function testParse($node, $expression, $names = [])
+    public function testParse($expectedNode, $expression, $names = [])
     {
         $lexer = new Lexer();
         $parser = new Parser([]);
-        $this->assertEquals($node, $parser->parse($lexer->tokenize($expression), $names));
+        $this->assertEquals($expectedNode, $parser->parse($lexer->tokenize($expression), $names));
     }
 
     /**
@@ -137,6 +137,16 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                     CustomNode\GetAttrNode::ANY_CALL
                 ),
                 'foo.any(true)',
+                ['foo'],
+            ],
+            [
+                new CustomNode\GetAttrNode(
+                    new Node\NameNode('foo'),
+                    new Node\ConstantNode('sum'),
+                    new Node\ConstantNode(true),
+                    CustomNode\GetAttrNode::SUM_CALL
+                ),
+                'foo.sum(1)',
                 ['foo'],
             ],
             [

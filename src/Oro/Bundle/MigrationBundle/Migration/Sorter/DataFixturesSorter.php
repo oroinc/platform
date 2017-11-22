@@ -193,7 +193,7 @@ class DataFixturesSorter
 
         $loadedFixtureClasses = array_keys($this->fixtures);
         foreach ($dependenciesClasses as $class) {
-            if (!in_array($class, $loadedFixtureClasses)) {
+            if (!in_array($class, $loadedFixtureClasses) && class_exists($class)) {
                 throw new \RuntimeException(
                     sprintf(
                         'Fixture "%s" was declared as a dependency, but it should be added in fixture loader first.',

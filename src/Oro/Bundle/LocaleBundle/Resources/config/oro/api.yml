@@ -1,12 +1,14 @@
 api:
     entities:
         Oro\Bundle\LocaleBundle\Entity\Localization:
+            documentation_resource: '@OroLocaleBundle/Resources/doc/api/localization.md'
             actions:
                 create: false
                 update: false
                 delete_list: false
                 delete: false
         Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+            documentation_resource: '@OroLocaleBundle/Resources/doc/api/localization.md'
             actions:
                 delete_list: false
                 delete: false

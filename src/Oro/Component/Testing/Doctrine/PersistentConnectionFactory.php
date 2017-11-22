@@ -16,11 +16,18 @@ class PersistentConnectionFactory extends ConnectionFactory
         EventManager $eventManager = null,
         array $mappingTypes = array()
     ) {
+        $wrapperClass = PersistentConnection::class;
         if (isset($params['wrapperClass'])) {
-            throw new \LogicException('The wrapper class has already been defined. We cannot overwrite it.');
+            if (!is_a($params['wrapperClass'], $wrapperClass, true)) {
+                throw new \LogicException(sprintf(
+                    'The connection wrapper class "%s" has to be "%s" or its subtype.',
+                    $params['wrapperClass'],
+                    $wrapperClass
+                ));
+            }
+        } else {
+            $params['wrapperClass'] = $wrapperClass;
         }
-
-        $params['wrapperClass'] = 'Oro\Component\Testing\Doctrine\PersistentConnection';
 
         return parent::createConnection($params, $config, $eventManager, $mappingTypes);
     }

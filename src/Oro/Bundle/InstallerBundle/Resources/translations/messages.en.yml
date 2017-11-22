@@ -43,13 +43,17 @@ form:
             frontend:
                 host:             WS Frontend host
                 port:             WS Frontend port
+                path:             Service URI path
                 host.tooltip:     Websocket host the browser will connect to
                 port.tooltip:     Websocket port the browser will connect to
+                path.tooltip:     The URI path of the socket server
             backend:
                 host:             WS Backend host
                 port:             WS Backend port
+                path:             WS Backend URI path
                 host.tooltip:     Websocket host the application server will connect to
                 port.tooltip:     Websocket port the application server will connect to
+                path.tooltip:     Websocket URI path the application server will connect to
     setup:
         email:             Email
         organization_name: Organization name

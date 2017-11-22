@@ -26,6 +26,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
+use Oro\Bundle\UIBundle\Tests\Behat\Element\EntityStatus;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 use Symfony\Component\Stopwatch\Stopwatch;
 use WebDriver\Exception\NoAlertOpenError;
@@ -385,6 +386,27 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Accepts alert.
+     * Example: I accept alert
+     *
+     * @When /^(?:|I )accept alert$/
+     */
+    public function iAcceptAlert()
+    {
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $session = $driver->getWebDriverSession();
+
+        for ($tries = 0; $tries < 3; ++$tries) {
+            try {
+                $session->accept_alert();
+            } catch (NoAlertOpenError $exception) {
+                usleep(50000);
+            }
+        }
+    }
+
+    /**
      * Assert alert is not present
      * Example: Then I should not see alert
      *
@@ -694,15 +716,23 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeModalWithElements($dialogName, TableNode $table)
     {
-        $modal = $this->elementFactory->createElement($dialogName);
+        $modals = $this->elementFactory->findAllElements($dialogName);
 
-        self::assertTrue($modal->isValid(), 'There is no modal on page at this moment');
-        self::assertTrue($modal->isVisible(), 'There is no visible modal on page at this moment');
+        $dialog = null;
+
+        foreach ($modals as $modal) {
+            if ($modal->isValid() && $modal->isVisible()) {
+                $dialog = $modal;
+                break;
+            }
+        }
+
+        self::assertNotNull($dialog, 'There is no modal on page at this moment');
 
         foreach ($table->getRows() as $row) {
             list($elementName, $expectedTitle) = $row;
 
-            $element = $modal->findElementContains(sprintf('%s %s', $dialogName, $elementName), $expectedTitle);
+            $element = $dialog->findElementContains(sprintf('%s %s', $dialogName, $elementName), $expectedTitle);
             self::assertTrue($element->isValid(), sprintf('Element with "%s" text not found', $expectedTitle));
         }
     }
@@ -789,6 +819,15 @@ class OroMainContext extends MinkContext implements
         $elementObject = $this->createElement($element);
         self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
         self::assertNotContains($text, $elementObject->getText());
+    }
+
+    /**
+     * Example: When I scroll to top
+     * @When /^I scroll to top$/
+     */
+    public function scrollTop()
+    {
+        $this->getSession()->executeScript('window.scrollTo(0,0);');
     }
 
     /**
@@ -1078,6 +1117,20 @@ class OroMainContext extends MinkContext implements
             $result,
             sprintf('Element "%s" is present when it should not', $element)
         );
+    }
+
+    /**
+     * Scrolls page to first element with given text
+     *
+     * @When /^(?:|I )scroll to text "(?P<text>(?:[^"]|\\")*)"$/
+     */
+    public function iScrollToText($text)
+    {
+        $this->assertPageContainsText($text);
+        $element = $this->getPage()->find('named', ['content', $text]);
+        if ($element) {
+            $element->focus();
+        }
     }
 
     /**
@@ -1690,5 +1743,34 @@ class OroMainContext extends MinkContext implements
                 "Button with name $item still present on page (link selector, actually)"
             );
         }
+    }
+
+    /**
+     * Scroll element info viewport
+     *
+     * @When /^(?:|I )scroll to "(?P<elementName>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )focus on "(?P<elementName>(?:[^"]|\\")*)"$/
+     */
+    public function iScrollToElement($elementName)
+    {
+        $element = $this->elementFactory->createElement($elementName);
+        $element->focus();
+    }
+
+    /**
+     * Asserts status badge on entity view page
+     *
+     * Examples: Then I should see "Closed Lost" gray status
+     *           Then I should see "Open" green status
+     *
+     * @Then /^I should see "(?P<status>[^"]+)" (?P<color>(green|gray)) status$/
+     */
+    public function iShouldSeeColoredStatus($status, $color)
+    {
+        /** @var EntityStatus $element */
+        $element = $this->createElement('Entity Status');
+
+        self::assertEquals($status, $element->getText());
+        self::assertEquals($color, $element->getColor());
     }
 }

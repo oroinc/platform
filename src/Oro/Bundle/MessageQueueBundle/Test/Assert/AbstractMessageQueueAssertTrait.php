@@ -156,4 +156,21 @@ trait AbstractMessageQueueAssertTrait
         }
         self::fail(sprintf('A message was not sent to "%s" topic.', $topic));
     }
+
+    /**
+     * @param string $expectedTopic
+     * @return mixed[]
+     */
+    protected static function getSentMessagesByTopic($expectedTopic)
+    {
+        $topicMessages = [];
+        $sentMessages = self::getSentMessages();
+        foreach ($sentMessages as $sentMessage) {
+            if ($sentMessage['topic'] === $expectedTopic) {
+                $topicMessages[] = $sentMessage['message'];
+            }
+        }
+
+        return $topicMessages;
+    }
 }

@@ -5,9 +5,10 @@ namespace Oro\Bundle\WorkflowBundle;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Oro\Bundle\WorkflowBundle\Async\Topics;
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler;
-use Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass;
+use Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroWorkflowBundle extends Bundle
@@ -21,12 +22,19 @@ class OroWorkflowBundle extends Bundle
 
         $container->addCompilerPass(new Compiler\AddAttributeNormalizerCompilerPass());
         $container->addCompilerPass(new Compiler\AddWorkflowValidationLoaderCompilerPass());
-        $container->addCompilerPass(new Compiler\WorkflowChangesEventsCompilerPass());
+        $container->addCompilerPass(new RegisterListenersPass(
+            'oro_workflow.changes.event.dispatcher',
+            'oro_workflow.changes.listener',
+            'oro_workflow.changes.subscriber'
+        ));
         $container->addCompilerPass(new Compiler\EventTriggerExtensionCompilerPass());
         $container->addCompilerPass(new Compiler\WorkflowConfigurationHandlerCompilerPass);
         $container->addCompilerPass(new Compiler\WorkflowDefinitionBuilderExtensionCompilerPass);
         $container->addCompilerPass(
-            new LoadProcessorsCompilerPass('oro_workflow.processor_bag', 'oro_workflow.processor')
+            new LoadAndBuildProcessorsCompilerPass(
+                'oro_workflow.processor_bag_config_provider',
+                'oro_workflow.processor'
+            )
         );
         $container->addCompilerPass(new Compiler\EventsCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
 

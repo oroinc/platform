@@ -17,6 +17,7 @@ Table of Contents
  - [Configure Extended Many-To-Many Association](#configure-extended-many-to-many-association)
  - [Configure Extended Multiple Many-To-One Association](#configure-extended-multiple-many-to-one-association)
  - [Add custom controller](#add-custom-controller)
+ - [Using a non-primary key to identify entity](#using-a-non-primary-key-to-identify-entity)
 
 
 Turn on API for entity
@@ -472,3 +473,29 @@ acme_api_get_my_resource:
 An information about `ApiDoc` annotation can be found in [Symfony documentation](https://symfony.com/doc/current/bundles/NelmioApiDocBundle/the-apidoc-annotation.html). To find all possible properties of `fields` option take a look at [AbstractFormatter class in NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle/blob/2.x/Formatter/AbstractFormatter.php). Please note that `fields` option can be used inside `input` and `output` options.
 
 Use [oro:api:doc:cache:clear](./commands.md#oroapidoccacheclear) command to apply changes in `ApiDoc` annotation to [API Sandbox](https://www.orocrm.com/documentation/current/book/data-api#api-sandbox).
+
+Using a non-primary key to identify an entity
+---------------------------------------------
+
+By default, a primary key is used to identify ORM entities in API. If you need another field as an identifier, specify it using the `identifier_field_names` option.
+
+For example, let your entity has the `id` field that is the primary key and the `uuid` field that contains a unique value for each entity. To use the `uuid` field to identify the entity, add the following in `Resources/config/oro/api.yml`:
+
+```yml
+api:
+    entities:
+        Acme\Bundle\AppBundle\Entity\SomeEntity:
+            identifier_field_names: ['uuid']
+```
+
+You can also exclude the `id` field (primary key) if you do not want to expose it via API:
+
+```yml
+api:
+    entities:
+        Acme\Bundle\AppBundle\Entity\SomeEntity:
+            identifier_field_names: ['uuid']
+            fields:
+                id:
+                    exclude: true
+```

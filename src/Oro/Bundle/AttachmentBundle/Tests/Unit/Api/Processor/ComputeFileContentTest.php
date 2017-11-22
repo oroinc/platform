@@ -6,6 +6,7 @@ use Gaufrette\Exception\FileNotFound;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\AttachmentBundle\Api\Processor\ComputeFileContent;
 
 class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
@@ -56,6 +57,7 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
     {
         $config = new EntityDefinitionConfig();
         $config->addField('content')->setExcluded();
+        $config->addField('filename')->setExcluded();
 
         $this->context->setResult(['filename' => 'test.txt']);
         $this->context->setConfig($config);
@@ -69,7 +71,8 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
     public function testProcessWhenFileNameFieldDoesNotExist()
     {
         $config = new EntityDefinitionConfig();
-        $config->addField('content')->setPropertyPath('file');
+        $config->addField('content')->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $config->addField('filename')->setExcluded();
 
         $this->context->setResult([]);
         $this->context->setConfig($config);
@@ -83,7 +86,8 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
     public function testProcessWhenContentFieldShouldBeSet()
     {
         $config = new EntityDefinitionConfig();
-        $config->addField('content')->setPropertyPath('file');
+        $config->addField('content')->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $config->addField('filename')->setExcluded();
 
         $this->fileManager->expects($this->once())
             ->method('getContent')
@@ -94,7 +98,7 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
         $this->assertEquals(
-            ['filename' => 'test.txt', 'file' => base64_encode('test')],
+            ['filename' => 'test.txt', 'content' => base64_encode('test')],
             $this->context->getResult()
         );
     }
@@ -102,7 +106,8 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
     public function testProcessWhenFileNameIsEmpty()
     {
         $config = new EntityDefinitionConfig();
-        $config->addField('content')->setPropertyPath('file');
+        $config->addField('content')->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $config->addField('filename')->setExcluded();
 
         $this->fileManager->expects($this->never())
             ->method('getContent');
@@ -119,18 +124,19 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
     public function testProcessWhenFileIsEmpty()
     {
         $config = new EntityDefinitionConfig();
-        $config->addField('content')->setPropertyPath('file');
+        $config->addField('content')->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $config->addField('filename')->setExcluded();
 
         $this->fileManager->expects($this->once())
             ->method('getContent')
             ->with('test.txt')
-            ->willReturn('');
+            ->willReturn(null);
 
         $this->context->setResult(['filename' => 'test.txt']);
         $this->context->setConfig($config);
         $this->processor->process($this->context);
         $this->assertEquals(
-            ['filename' => 'test.txt', 'file' => base64_encode('')],
+            ['filename' => 'test.txt'],
             $this->context->getResult()
         );
     }
@@ -138,7 +144,8 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
     public function testProcessWhenFileIsNotFound()
     {
         $config = new EntityDefinitionConfig();
-        $config->addField('content')->setPropertyPath('file');
+        $config->addField('content')->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $config->addField('filename')->setExcluded();
 
         $exception = new FileNotFound('test.txt');
         $this->fileManager->expects($this->once())
@@ -165,7 +172,8 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
     public function testProcessWhenUnexpectedExceptionOccurred()
     {
         $config = new EntityDefinitionConfig();
-        $config->addField('content')->setPropertyPath('file');
+        $config->addField('content')->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $config->addField('filename')->setExcluded();
 
         $exception = new \Exception('some error');
         $this->fileManager->expects($this->once())

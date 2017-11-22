@@ -2,37 +2,44 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Nelmio\ApiDocBundle\DataTypes as ApiDocDataType;
-
-use Oro\Bundle\ApiBundle\Request\DataType;
-
 /**
- * Helps to convert a data-type to a data-type supported by Nelmio\ApiDocBundle
+ * Helps to convert a data-type to a data-type that should be returned in API documentation.
  */
 class ApiDocDataTypeConverter
 {
+    /** @var array [data type => data type in documentation, ...] */
+    private $map;
+
     /**
-     * Converts a data-type to a data-type supported by Nelmio\ApiDocBundle.
+     * @param array $map [data type => data type in documentation, ...]
+     */
+    public function __construct(array $map)
+    {
+        $this->map = $map;
+    }
+
+    /**
+     * @param string $dataType
+     * @param string $docDataType
+     */
+    public function addDataType($dataType, $docDataType)
+    {
+        $this->map[$dataType] = $docDataType;
+    }
+
+    /**
+     * Converts a data-type to a data-type that should be returned in API documentation.
      *
      * @param string $dataType
      *
      * @return string
      */
-    public static function convertToApiDocDataType($dataType)
+    public function convertDataType($dataType)
     {
-        switch ($dataType) {
-            case DataType::INTEGER:
-            case DataType::UNSIGNED_INTEGER:
-                return ApiDocDataType::INTEGER;
-            case DataType::BOOLEAN:
-                return ApiDocDataType::BOOLEAN;
-            case DataType::DATETIME:
-                return ApiDocDataType::DATETIME;
-            case DataType::FLOAT:
-            case DataType::DECIMAL:
-                return ApiDocDataType::FLOAT;
+        if (!isset($this->map[$dataType])) {
+            return $dataType;
         }
 
-        return ApiDocDataType::STRING;
+        return $this->map[$dataType];
     }
 }

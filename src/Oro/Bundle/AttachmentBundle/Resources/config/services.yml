@@ -1,6 +1,5 @@
 parameters:
     oro_attachment.manager.attachment_manager.class:             Oro\Bundle\AttachmentBundle\Manager\AttachmentManager
-    oro_attachment.listener.file_listener.class:                 Oro\Bundle\AttachmentBundle\EventListener\FileListener
 
     oro_attachment.entity.class:                                 Oro\Bundle\AttachmentBundle\Entity\Attachment
     oro_attachment.file.entity.class:                            Oro\Bundle\AttachmentBundle\Entity\File
@@ -104,15 +103,15 @@ services:
             - '@oro_attachment.manager'
 
     oro_attachment.listener.file_listener:
-        class: %oro_attachment.listener.file_listener.class%
+        class: Oro\Bundle\AttachmentBundle\EventListener\FileListener
         arguments:
             - '@oro_attachment.file_manager'
             - '@oro_security.token_accessor'
         tags:
-            - { name: doctrine.event_listener, event: prePersist }
-            - { name: doctrine.event_listener, event: preUpdate }
-            - { name: doctrine.event_listener, event: postPersist }
-            - { name: doctrine.event_listener, event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: prePersist }
+            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: preUpdate }
+            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postUpdate }
 
     oro_attachment.twig.file_extension:
         class: Oro\Bundle\AttachmentBundle\Twig\FileExtension

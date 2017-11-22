@@ -37,7 +37,7 @@ class TranslationOperationsTest extends ActionTestCase
     }
 
     /**
-     * @dataProvider removeTranslationOperation
+     * @dataProvider testRemoveTranslationOperationDataProvider
      *
      * @param string $translation
      */
@@ -46,23 +46,28 @@ class TranslationOperationsTest extends ActionTestCase
         $translation = $this->getReference($translation);
         $translationClass = $this->getContainer()->getParameter('oro_translation.entity.translation.class');
 
+        $entityId = $translation->getId();
         $this->assertExecuteOperation(
             'oro_translation_translation_reset',
-            $translation->getId(),
+            $entityId,
             $translationClass,
             ['datagrid' => 'oro-translation-translations-grid', 'group' => ['datagridRowAction']]
         );
         $response = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals(true, $response['success']);
         $this->assertContains("oro-translation-translations-grid", $response['refreshGrid']);
-        $em = $this->getContainer()->get('oro_entity.doctrine_helper')->getEntityManager($translationClass);
-        $this->assertNull($em->find($translationClass, $translation->getId()));
+        $removedTranslation = self::getContainer()
+            ->get('doctrine')
+            ->getRepository($translationClass)
+            ->find($entityId);
+
+        static::assertNull($removedTranslation);
     }
 
     /**
      * @return array
      */
-    public function removeTranslationOperation()
+    public function testRemoveTranslationOperationDataProvider()
     {
         return [
             'scope SYSTEM' => [LoadTranslations::TRANSLATION_KEY_1],
