@@ -54,9 +54,16 @@ define([
 
     /**
      * Notifier object
-     * @type {{close: function()}}
+     * @type {Object}
+     * {
+     *     result: {{close: function()}},
+     *     title: {string}
+     * }
      */
-    var notifier;
+    var notifier = {
+        result: null,
+        title: null
+    };
 
     /**
      * Pages that has been out dated
@@ -97,6 +104,27 @@ define([
     }
 
     /**
+     * Notify messenger about new message
+     *
+     * @param {string} title
+     */
+    function sendMessage(title) {
+        var options = {
+            onClose: function() {
+                notifier.result.close();
+                notifier.result = null;
+                notifier.title = null;
+            }
+        };
+        notifier.result = messenger.notificationMessage(
+            'warning',
+            __('sync.message.content.outdated', {title: title}),
+            options
+        );
+        notifier.title = title;
+    }
+
+    /**
      * Default callback on content outdated
      *
      * shows notification of outdated content
@@ -106,13 +134,9 @@ define([
     function defaultCallback(path) {
         var data = contentManager.get(path);
         var title = data ? '<b>' + data.page.titleShort + '</b>' : 'the';
-        if (notifier) {
-            notifier.close();
+        if (notifier.result === null || notifier.title !== title) {
+            sendMessage(title);
         }
-        notifier = messenger.notificationMessage(
-            'warning',
-            __('sync.message.content.outdated', {title: title})
-        );
     }
 
     /**
@@ -206,8 +230,10 @@ define([
         var path = args.route.path !== null && args.route.path !== void 0  ? args.route.path : current.path;
         var query = args.route.query !== null && args.route.query !== void 0 ? args.route.query : current.query;
         changeUrl(path, query);
-        if (notifier) {
-            notifier.close();
+        if (notifier.result) {
+            notifier.result.close();
+            notifier.result = null;
+            notifier.title = null;
         }
     });
 

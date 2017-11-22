@@ -40,7 +40,7 @@ configuration file. Here is an example:
 ```yaml
 oro_message_queue:
     security_agnostic_topics:
-        - 'oro.message_queue.job.calculate_root_job_progress'
+        - 'oro.message_queue.job.calculate_root_job_status'
 ```
 
 Please note that for such messages the security token is never added to the message. Moreover, even if the security

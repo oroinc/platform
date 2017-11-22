@@ -45,13 +45,14 @@ class WorkflowItemListener
     /**
      * Set workflow item entity ID
      *
+     * @param WorkflowItem       $workflowItem
      * @param LifecycleEventArgs $args
+     *
      * @throws WorkflowException
      */
-    public function postPersist(LifecycleEventArgs $args)
+    public function postPersist(WorkflowItem $workflowItem, LifecycleEventArgs $args)
     {
-        $workflowItem = $args->getEntity();
-        if ($workflowItem instanceof WorkflowItem && !$workflowItem->getEntityId()) {
+        if (!$workflowItem->getEntityId()) {
             $entity = $workflowItem->getEntity();
             if (!$entity) {
                 throw new WorkflowException('Workflow item does not contain related entity');

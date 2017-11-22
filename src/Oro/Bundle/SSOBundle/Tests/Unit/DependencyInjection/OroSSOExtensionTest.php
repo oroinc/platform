@@ -14,7 +14,7 @@ class OroSSOExtensionTest extends ExtensionTestCase
 
         $expectedDefinitions = [
             'oro_sso.oauth_provider',
-            'oro_sso.event_listener.user_email_change_listener.class',
+            'oro_sso.event_listener.user_email_change_listener',
             'oro_sso.token.factory.oauth',
         ];
         $this->assertDefinitionsLoaded($expectedDefinitions);

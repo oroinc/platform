@@ -48,13 +48,9 @@ class CommentLifecycleListenerTest extends \PHPUnit_Framework_TestCase
         $oldUser = new User();
         $oldUser->setFirstName('oldUser');
 
-        if ($entity instanceof Comment) {
-            $entity->setUpdatedBy($oldUser);
-        }
+        $entity->setUpdatedBy($oldUser);
 
-        $initialEntity = clone $entity;
-        $newUser       = null;
-
+        $newUser = null;
         if ($mockUser) {
             $newUser = new User();
             $newUser->setFirstName('newUser');
@@ -72,30 +68,21 @@ class CommentLifecycleListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getUnitOfWork')
             ->will($this->returnValue($unitOfWork));
 
-        if ($entity instanceof Comment) {
-            $callIndex = 0;
-            if (null !== $detachedUser) {
-                $unitOfWork->expects($this->once(++$callIndex))
-                    ->method('getEntityState')
-                    ->with($newUser)
-                    ->will($this->returnValue($detachedUser ? UnitOfWork::STATE_DETACHED : UnitOfWork::STATE_MANAGED));
-            }
+        $callIndex = 0;
+        if (null !== $detachedUser) {
             $unitOfWork->expects($this->once(++$callIndex))
-                ->method('propertyChanged')
-                ->with($entity, 'updatedBy', $oldUser, $newUser);
-        } else {
-            $unitOfWork->expects($this->never())->method($this->anything());
+                ->method('getEntityState')
+                ->with($newUser)
+                ->will($this->returnValue($detachedUser ? UnitOfWork::STATE_DETACHED : UnitOfWork::STATE_MANAGED));
         }
+        $unitOfWork->expects($this->once(++$callIndex))
+            ->method('propertyChanged')
+            ->with($entity, 'updatedBy', $oldUser, $newUser);
 
         $changeSet = array();
         $args      = new PreUpdateEventArgs($entity, $entityManager, $changeSet);
 
-        $this->subscriber->preUpdate($args);
-
-        if (!$entity instanceof Comment) {
-            $this->assertEquals($initialEntity, $entity);
-            return;
-        }
+        $this->subscriber->preUpdate($entity, $args);
 
         if ($mockUser) {
             $this->assertEquals($newUser, $entity->getUpdatedBy());
@@ -110,10 +97,6 @@ class CommentLifecycleListenerTest extends \PHPUnit_Framework_TestCase
     public function prePersistAndPreUpdateDataProvider()
     {
         return [
-            'not applied'     => [
-                'entity'   => new \DateTime('now'),
-                'mockUser' => false,
-            ],
             'with a user'     => [
                 'entity'       => new Comment(),
                 'mockUser'     => true,

@@ -42,13 +42,12 @@ class WorkflowTransitionRecordListener implements OptionalListenerInterface
     }
 
     /**
-     * @param LifecycleEventArgs $args
+     * @param WorkflowTransitionRecord $transitionRecord
+     * @param LifecycleEventArgs       $args
      */
-    public function postPersist(LifecycleEventArgs $args)
+    public function postPersist(WorkflowTransitionRecord $transitionRecord, LifecycleEventArgs $args)
     {
-        $transitionRecord = $args->getEntity();
-
-        if (!$this->enabled || !$transitionRecord instanceof WorkflowTransitionRecord) {
+        if (!$this->enabled) {
             return;
         }
 

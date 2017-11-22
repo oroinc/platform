@@ -25,17 +25,11 @@ class CommentLifecycleListener
     }
 
     /**
+     * @param Comment            $entity
      * @param LifecycleEventArgs $args
      */
-    public function preUpdate(LifecycleEventArgs $args)
+    public function preUpdate(Comment $entity, LifecycleEventArgs $args)
     {
-        $entity = $args->getEntity();
-
-        if (!$this->isCommentEntity($entity)) {
-            return;
-        }
-
-        /** @var Comment $entity */
         $this->setUpdatedProperties($entity, $args->getEntityManager(), true);
     }
 
@@ -54,16 +48,6 @@ class CommentLifecycleListener
         }
 
         $comment->setUpdatedBy($newUpdatedBy);
-    }
-
-    /**
-     * @param mixed $entity
-     *
-     * @return bool
-     */
-    protected function isCommentEntity($entity)
-    {
-        return $entity instanceof Comment;
     }
 
     /**
