@@ -85,15 +85,12 @@ class WorkflowDataSerializeListener
     /**
      * After WorkflowItem loaded, deserialize WorkflowItem
      *
+     * @param WorkflowItem       $entity
      * @param LifecycleEventArgs $args
      */
-    public function postLoad(LifecycleEventArgs $args)
+    public function postLoad(WorkflowItem $entity, LifecycleEventArgs $args)
     {
-        /** @var WorkflowItem $entity */
-        $entity = $args->getEntity();
-        if ($this->isSupported($entity)) {
-            $this->deserialize($entity);
-        }
+        $this->deserialize($entity);
     }
 
     /**
