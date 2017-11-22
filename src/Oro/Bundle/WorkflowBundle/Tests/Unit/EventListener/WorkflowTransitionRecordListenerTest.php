@@ -42,18 +42,7 @@ class WorkflowTransitionRecordListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->eventDispatcher->expects($this->never())->method('dispatch');
 
-        $this->listener->postPersist($this->args);
-    }
-
-    public function testPostPersistNotSupportedEntity()
-    {
-        $this->listener->setEnabled(true);
-
-        $this->args->expects($this->once())->method('getEntity')->willReturn(new \stdClass());
-
-        $this->eventDispatcher->expects($this->never())->method('dispatch');
-
-        $this->listener->postPersist($this->args);
+        $this->listener->postPersist($this->createMock(WorkflowTransitionRecord::class), $this->args);
     }
 
     /**
@@ -67,15 +56,13 @@ class WorkflowTransitionRecordListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->listener->setEnabled(true);
 
-        $this->args->expects($this->once())->method('getEntity')->willReturn($transitionRecord);
-
         $this->tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(LoadWorkflowNotificationEvents::TRANSIT_EVENT, $expected);
 
-        $this->listener->postPersist($this->args);
+        $this->listener->postPersist($transitionRecord, $this->args);
     }
 
     /**

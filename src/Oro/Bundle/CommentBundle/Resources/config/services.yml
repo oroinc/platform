@@ -3,7 +3,6 @@ parameters:
     oro_comment.entity_generator.extension.class:     Oro\Bundle\CommentBundle\Tools\CommentEntityGeneratorExtension
     oro_comment.entity_config_dumper.extension.class: Oro\Bundle\CommentBundle\Tools\CommentEntityConfigDumperExtension
     oro_comment.comment.api_manager.class:            Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager
-    oro_comment.comment_lifecycle_listener.class:     Oro\Bundle\CommentBundle\EventListener\CommentLifecycleListener
     oro_comment.placeholder.filter.class:             Oro\Bundle\CommentBundle\Placeholder\CommentPlaceholderFilter
 
 services:
@@ -50,11 +49,11 @@ services:
             - [setAttachmentManager, ['@oro_attachment.manager']]
 
     oro_comment.comment_lifecycle_listener:
-        class: %oro_comment.comment_lifecycle_listener.class%
+        class: Oro\Bundle\CommentBundle\EventListener\CommentLifecycleListener
         arguments:
             - '@oro_security.token_accessor'
         tags:
-            - { name: doctrine.event_listener, event: preUpdate }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\CommentBundle\Entity\Comment, event: preUpdate }
     
     oro_comment.placeholder.filter:
         class: %oro_comment.placeholder.filter.class%

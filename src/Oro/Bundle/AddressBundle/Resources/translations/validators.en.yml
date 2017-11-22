@@ -8,3 +8,4 @@ oro:
             invalid_first_name_field: 'First Name and Last Name or Organization should not be blank.'
             invalid_last_name_field: 'Last Name and First Name or Organization should not be blank.'
             invalid_organization_field: 'Organization or First Name and Last Name should not be blank.'
+            invalid_country_region: 'Region {{ region }} does not belong to country {{ country }}'
