@@ -96,7 +96,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
         $em = $this->createMock(EntityManager::class);
         $em->expects($this->once())->method('getUnitOfWork')->willReturn($uow);
 
-        $this->listener->postPersist($this->getEvent($workflowItem, $em));
+        $this->listener->postPersist($workflowItem, $this->getEvent($workflowItem, $em));
     }
 
     /**
@@ -109,7 +109,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->once())->method('getEntity');
 
-        $this->listener->postPersist($this->getEvent($workflowItem));
+        $this->listener->postPersist($workflowItem, $this->getEvent($workflowItem));
     }
 
     /**
@@ -123,7 +123,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
         $workflowItem->expects($this->once())->method('getWorkflowName')->willReturn('test_workflow');
         $workflowItem->expects($this->once())->method('getEntity')->willReturn(new \stdClass());
 
-        $this->listener->postPersist($this->getEvent($workflowItem));
+        $this->listener->postPersist($workflowItem, $this->getEvent($workflowItem));
     }
 
     /**

@@ -37,7 +37,7 @@ use Oro\Bundle\AttachmentBundle\Model\ExtendFile;
  *      }
  * )
  */
-class File extends ExtendFile implements FileExtensionInterface
+class File extends ExtendFile implements FileExtensionInterface, \Serializable
 {
     /**
      * @var integer
@@ -365,6 +365,8 @@ class File extends ExtendFile implements FileExtensionInterface
     public function setOwner($owningUser)
     {
         $this->owner = $owningUser;
+
+        return $this;
     }
 
     /**
@@ -380,5 +382,27 @@ class File extends ExtendFile implements FileExtensionInterface
         if ($this->id) {
             $this->id = null;
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize([
+            $this->id,
+            $this->filename,
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        list(
+            $this->id,
+            $this->filename,
+            ) = unserialize($serialized);
     }
 }

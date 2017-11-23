@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\EventListener;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
@@ -10,20 +11,20 @@ use Oro\Component\Layout\Extension\Theme\ResourceProvider\ResourceProviderInterf
 
 class ContainerListener
 {
-    /** @var ResourceProviderInterface */
-    protected $provider;
-
     /** @var ConfigMetadataDumperInterface */
-    protected $dumper;
+    private $dumper;
+
+    /** @var ContainerInterface */
+    private $container;
 
     /**
-     * @param ResourceProviderInterface $provider
      * @param ConfigMetadataDumperInterface $dumper
+     * @param ContainerInterface            $container
      */
-    public function __construct(ResourceProviderInterface $provider, ConfigMetadataDumperInterface $dumper)
+    public function __construct(ConfigMetadataDumperInterface $dumper, ContainerInterface $container)
     {
-        $this->provider = $provider;
         $this->dumper = $dumper;
+        $this->container = $container;
     }
 
     /**
@@ -33,11 +34,18 @@ class ContainerListener
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        if (!$this->dumper->isFresh()) {
+        if ($event->isMasterRequest() && !$this->dumper->isFresh()) {
             $container = new ContainerBuilder();
-
-            $this->provider->loadResources($container);
+            $this->getResourceProvider()->loadResources($container);
             $this->dumper->dump($container);
         }
+    }
+
+    /**
+     * @return ResourceProviderInterface
+     */
+    private function getResourceProvider()
+    {
+        return $this->container->get('oro_layout.theme_extension.resource_provider.theme');
     }
 }
