@@ -10,7 +10,7 @@ class BranchAvgTimeProvider extends AbstractAvgTimeProvider
     protected function calculate()
     {
         $this->isCalculated = true;
-        $branch = $this->criteria->get('branch_name') ?: $criteria->get('single_branch_name');
+        $branch = $this->criteria->get('branch_name') ?: $this->criteria->get('single_branch_name');
 
         if (!$branch) {
             return;
