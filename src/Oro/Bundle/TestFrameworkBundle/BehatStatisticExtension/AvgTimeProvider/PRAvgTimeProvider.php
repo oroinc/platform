@@ -9,8 +9,6 @@ class PRAvgTimeProvider extends AbstractAvgTimeProvider
      */
     protected function calculate()
     {
-        $this->isCalculated = true;
-
         if (!$this->criteria->containsKey('branch_name') || !$this->criteria->containsKey('target_branch')) {
             return;
         }

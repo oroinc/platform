@@ -9,14 +9,12 @@ class TargetAvgTimeProvider extends AbstractAvgTimeProvider
      */
     protected function calculate()
     {
-        $this->isCalculated = true;
-
         if (!$this->criteria->containsKey('target_branch')) {
             return;
         }
 
         $criteria = [
-            'git_target' => $this->criteria->get('target_branch'),
+            'git_branch' => $this->criteria->get('target_branch'),
         ];
 
         $buildIds = $this->repository->getLastBuildIds(

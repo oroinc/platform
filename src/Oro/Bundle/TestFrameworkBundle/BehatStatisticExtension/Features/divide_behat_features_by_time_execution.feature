@@ -11,9 +11,9 @@ Feature: Divide behat features by time execution
           driver: pdo_sqlite
           path: test.db
         criteria:
-          branch_name: CHANGE_BRANCH
-          target_branch: CHANGE_TARGET
-          build_id: BUILD_ID
+          branch_name: CHANGE_BRANCH_TEST
+          target_branch: CHANGE_TARGET_TEST
+          build_id: BUILD_ID_TEST
       """
     And enabled suites in behat.yml:
       """
@@ -59,9 +59,9 @@ Feature: Divide behat features by time execution
       | 1  | Features/10_seconds.feature | 10   | master                          |                  |          |
       | 2  | Features/20_seconds.feature | 20   | master                          |                  |          |
     And environment variables:
-      | CHANGE_BRANCH | ticket/BAP-1902_store_statistic |
-      | CHANGE_TARGET | maintenance/2.4                 |
-      | BUILD_ID      | 35815                           |
+      | CHANGE_BRANCH_TEST | ticket/BAP-1902_store_statistic |
+      | CHANGE_TARGET_TEST | maintenance/2.4                 |
+      | BUILD_ID_TEST      | 35815                           |
     When I run "behat  --suite-divider=1 --max_suite_set_execution_time=30 --available-suite-sets -vvv"
     Then it should pass with:
       """
@@ -83,9 +83,9 @@ Feature: Divide behat features by time execution
       | 3  | Features/10_seconds.feature | 20   | ticket/BAP-1902_store_statistic | maintenance/2.4 | 35814    |
       | 4  | Features/20_seconds.feature | 30   | ticket/BAP-1902_store_statistic | maintenance/2.4 | 35814    |
     And environment variables:
-      | CHANGE_BRANCH | ticket/BAP-1902_store_statistic |
-      | CHANGE_TARGET | maintenance/2.4                 |
-      | BUILD_ID      | 35815                           |
+      | CHANGE_BRANCH_TEST | ticket/BAP-1902_store_statistic |
+      | CHANGE_TARGET_TEST | maintenance/2.4                 |
+      | BUILD_ID_TEST      | 35815                           |
     When I run "behat  --suite-divider=1 --max_suite_set_execution_time=30 --available-suite-sets -vvv"
     Then it should pass with:
       """
@@ -94,7 +94,7 @@ Feature: Divide behat features by time execution
               Features/20_seconds.feature - 30 sec
       AutoSuiteSet_1
           ping_pong_0
-              Features/ping_pong.feature - 23 sec
+              Features/ping_pong.feature - 21 sec
       AutoSuiteSet_2
           measurable_features_0
               Features/10_seconds.feature - 20 sec

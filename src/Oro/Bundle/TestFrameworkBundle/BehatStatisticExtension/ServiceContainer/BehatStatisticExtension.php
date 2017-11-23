@@ -84,11 +84,17 @@ final class BehatStatisticExtension implements TestworkExtension
         $loader->load('avg_time_feature.yml');
     }
 
+    /**
+     * @param array $criteria
+     * @return array
+     */
     private function getEnvVars(array $criteria)
     {
-        return array_map(function ($env) {
+        $vars =  array_map(function ($env) {
             return getenv($env) ?: null;
         }, $criteria);
+
+        return array_filter($vars);
     }
 
     /**

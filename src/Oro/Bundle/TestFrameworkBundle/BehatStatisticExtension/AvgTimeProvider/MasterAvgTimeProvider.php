@@ -9,8 +9,6 @@ class MasterAvgTimeProvider extends AbstractAvgTimeProvider
      */
     protected function calculate()
     {
-        $this->isCalculated = true;
-
         $criteria = [
             'git_branch' => 'master',
         ];

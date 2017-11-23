@@ -74,6 +74,7 @@ abstract class AbstractAvgTimeProvider implements StatisticRepositoryAwareInterf
     public function getAverageTimeById($id)
     {
         if (!$this->isCalculated) {
+            $this->isCalculated = true;
             $this->calculate();
         }
 
