@@ -142,6 +142,13 @@ abstract class AbstractAudit
     protected $ownerDescription;
 
     /**
+     * @var array $additionalFields
+     *
+     * @ORM\Column(name="additional_fields", type="array", nullable=true)
+     */
+    protected $additionalFields = [];
+
+    /**
      * Set user
      *
      * @param  AbstractUser $user
@@ -446,5 +453,21 @@ abstract class AbstractAudit
     public function setOwnerDescription($ownerDescription)
     {
         $this->ownerDescription = $ownerDescription;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getAdditionalFields()
+    {
+        return $this->additionalFields;
+    }
+
+    /**
+     * @param array $additionalFields
+     */
+    public function setAdditionalFields(array $additionalFields)
+    {
+        $this->additionalFields = $additionalFields;
     }
 }

@@ -1,7 +1,21 @@
 {% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
 
 {%- block list_wrapper -%}
-    {{- block('list') -}}
+    {% if item.hasChildren %}
+        {% if item.level == 1 %}
+            <div class="dropdown-menu-wrapper dropdown-menu-wrapper__placeholder">
+                <div class="dropdown-menu-wrapper dropdown-menu-wrapper__scrollable">
+                    {{- block('list') -}}
+                </div>
+            </div>
+        {% elseif item.level == 2 %}
+            <div class="dropdown-menu-wrapper dropdown-menu-wrapper__child">
+                {{- block('list') -}}
+            </div>
+        {% else %}
+            {{- block('list') -}}
+        {% endif %}
+    {% endif %}
 {%- endblock -%}
 
 {%- block item -%}

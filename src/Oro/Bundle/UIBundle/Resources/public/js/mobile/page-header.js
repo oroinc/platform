@@ -2,9 +2,14 @@ define(['jquery', 'oroui/js/mediator', 'orotranslation/js/translator', '../conte
     ], function($, mediator, __) {
     'use strict';
 
+    var containerSelector = '.navigation.navbar-extra .title-buttons-container';
+
+    function hideButtons() {
+        $(containerSelector).find('.btn').parent().hide();
+    }
+
     function updatePageHeader() {
-        var $header = $('.navigation.navbar-extra');
-        var $container = $header.find('.title-buttons-container');
+        var $container = $(containerSelector);
         var options = {
             moreLabel: __('oro.ui.page_header.button.more'),
             minItemQuantity: 1
@@ -24,7 +29,7 @@ define(['jquery', 'oroui/js/mediator', 'orotranslation/js/translator', '../conte
      */
     return {
         init: function() {
-            updatePageHeader();
+            hideButtons();
             mediator.on('page:afterChange', updatePageHeader);
         }
     };

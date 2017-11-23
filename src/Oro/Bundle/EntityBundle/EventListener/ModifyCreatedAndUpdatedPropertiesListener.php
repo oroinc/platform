@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\UnitOfWork;
+
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedAtAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
@@ -23,16 +22,6 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
 
     /** @var bool */
     protected $enabled = true;
-
-    /**
-     * @var ClassMetadata[]
-     */
-    protected $metadataCache = [];
-
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $entityManager;
 
     /**
      * @param TokenStorageInterface $tokenStorage
@@ -59,49 +48,34 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
             return;
         }
 
-        $this->entityManager = $args->getEntityManager();
-        $unitOfWork = $this->entityManager->getUnitOfWork();
+        $em = $args->getEntityManager();
+        $uow = $em->getUnitOfWork();
 
-        $newEntities = $unitOfWork->getScheduledEntityInsertions();
-        $updateEntities = $unitOfWork->getScheduledEntityUpdates();
-
-        foreach ($newEntities as $entity) {
+        foreach ($uow->getScheduledEntityInsertions() as $entity) {
             $isCreatedAtUpdated = $this->updateCreatedAt($entity);
             $isUpdatedPropertiesUpdated = $this->setUpdatedProperties($entity);
             if ($isCreatedAtUpdated || $isUpdatedPropertiesUpdated) {
-                $this->updateChangeSets($entity);
+                $this->updateChangeSets($entity, $em, $uow);
             }
         }
-        foreach ($updateEntities as $entity) {
+        foreach ($uow->getScheduledEntityUpdates() as $entity) {
             if ($this->setUpdatedProperties($entity)) {
-                $this->updateChangeSets($entity);
+                $this->updateChangeSets($entity, $em, $uow);
             }
         }
     }
 
     /**
-     * @param object $entity
+     * @param object        $entity
+     * @param EntityManager $em
+     * @param UnitOfWork    $uow
      */
-    protected function updateChangeSets($entity)
+    protected function updateChangeSets($entity, EntityManager $em, UnitOfWork $uow)
     {
-        $metadata = $this->getMetadataForEntity($entity);
-        $this->entityManager->getUnitOfWork()
-            ->recomputeSingleEntityChangeSet($metadata, $entity);
-    }
-
-    /**
-     * @param object $entity
-     *
-     * @return ClassMetadata
-     */
-    protected function getMetadataForEntity($entity)
-    {
-        $class = ClassUtils::getClass($entity);
-        if (!isset($this->metadataCache[$class])) {
-            $this->metadataCache[$class] = $this->entityManager->getClassMetadata($class);
-        }
-
-        return $this->metadataCache[$class];
+        $uow->recomputeSingleEntityChangeSet(
+            $em->getClassMetadata(ClassUtils::getClass($entity)),
+            $entity
+        );
     }
 
     /**
@@ -156,26 +130,32 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
      */
     protected function updateUpdatedBy($entity)
     {
-        $user = $this->getUser();
-        if ($entity instanceof UpdatedByAwareInterface && !$entity->isUpdatedBySet() && $user instanceof User) {
-            $entity->setUpdatedBy($user);
+        if ($entity instanceof UpdatedByAwareInterface && !$entity->isUpdatedBySet()) {
+            $user = $this->getUser();
+            if (null !== $user) {
+                $entity->setUpdatedBy($user);
 
-            return true;
+                return true;
+            }
         }
 
         return false;
     }
 
     /**
-     * @return UserInterface|null
+     * @return User|null
      */
     protected function getUser()
     {
-        if (!$token = $this->tokenStorage->getToken()) {
-            return null;
+        $token = $this->tokenStorage->getToken();
+        if (null !== $token) {
+            $user = $token->getUser();
+            if ($user instanceof User) {
+                return $user;
+            }
         }
 
-        return $token->getUser();
+        return null;
     }
 
     /**

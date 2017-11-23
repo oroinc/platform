@@ -21,6 +21,7 @@ define([
             'page:request mediator': 'onPageRequest',
             'page:update mediator': 'onPageUpdate',
             'page:afterChange mediator': 'afterPageChange',
+            'page:afterPagePartChange mediator': 'afterPageChange',
             'page:beforeRefresh mediator': 'beforePageRefresh',
             'openLink:before mediator': 'beforePageChange',
 

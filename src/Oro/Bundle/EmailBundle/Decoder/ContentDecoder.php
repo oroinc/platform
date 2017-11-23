@@ -26,6 +26,9 @@ class ContentDecoder
             }
         }
         if (!empty($fromEncoding) && !empty($toEncoding) && strtolower($fromEncoding) !== strtolower($toEncoding)) {
+            // Added additional option to avoid `illegal character` iconv decoding error
+            $toEncoding .= '//TRANSLIT//IGNORE';
+
             $str = iconv($fromEncoding, $toEncoding, $str);
         }
 

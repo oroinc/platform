@@ -7,6 +7,10 @@ search:
             name: oro_search_results
         fields:
             -
+                name: id
+                target_type: integer
+                target_fields: [id]
+            -
                 name: stringValue
                 target_type: text
                 target_fields: [stringValue, all_data]

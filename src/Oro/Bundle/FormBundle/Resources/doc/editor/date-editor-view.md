@@ -1,6 +1,7 @@
+## DateEditorView ⇐ [TextEditorView](./text-editor-view.md)
+
 <a name="module_DateEditorView"></a>
-## DateEditorView ⇐ <code>[TextEditorView](./text-editor-view.md)</code>
-Date cell content editor
+Date cell content editor.
 
 ### Column configuration samples:
 ``` yml
@@ -47,20 +48,20 @@ inline_editing.save_api_accessor                    | Optional. Sets accessor mo
 
 ### Constructor parameters
 
-**Extends:** <code>[TextEditorView](./text-editor-view.md)</code>  
+**Extends:** [TextEditorView](./text-editor-view.md)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>Object</code> | Options container |
-| options.model | <code>Object</code> | Current row model |
-| options.fieldName | <code>string</code> | Field name to edit in model |
-| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
-| options.dateInputAttrs | <code>Object</code> | Attributes for date HTML input element |
-| options.datePickerOptions | <code>Object</code> | See [documentation here](http://api.jqueryui.com/datepicker/) |
-| options.value | <code>string</code> | initial value of edited field |
+| options | `Object` | Options container |
+| options.model | `Object` | Current row model |
+| options.fieldName | `string` | Field name to edit in model |
+| options.validationRules | `Object` | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
+| options.dateInputAttrs | `Object` | Attributes for date HTML input element |
+| options.datePickerOptions | `Object` | See [documentation here](http://api.jqueryui.com/datepicker/) |
+| options.value | `string` | initial value of edited field |
 
 <a name="module_DateEditorView#getViewOptions"></a>
-### dateEditorView.getViewOptions() ⇒ <code>Object</code>
+### dateEditorView.getViewOptions() ⇒ `Object`
 Prepares and returns editor sub-view options
 
-**Kind**: instance method of <code>[DateEditorView](#module_DateEditorView)</code>  
+**Kind**: instance method of [DateEditorView](#module_DateEditorView)  

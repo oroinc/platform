@@ -17,10 +17,19 @@ abstract class RegisterPersistentServicesPass implements CompilerPassInterface
     {
         $persistentServices = $this->getPersistentServices($container);
         if (!empty($persistentServices)) {
-            $container
-                ->getDefinition('oro_message_queue.consumption.container_clearer')
-                ->addMethodCall('setPersistentServices', [$persistentServices]);
+            $this->processPersistentServices($container, $persistentServices);
         }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param string[]           $persistentServices
+     */
+    protected function processPersistentServices(ContainerBuilder $container, array $persistentServices)
+    {
+        $container
+            ->getDefinition('oro_message_queue.consumption.container_clearer')
+            ->addMethodCall('setPersistentServices', [$persistentServices]);
     }
 
     /**

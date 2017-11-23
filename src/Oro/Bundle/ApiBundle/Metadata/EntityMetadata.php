@@ -658,13 +658,23 @@ class EntityMetadata implements ToArrayInterface
     /**
      * @param object           $entity
      * @param \ReflectionClass $reflClass
-     * @param string           $propertyName
+     * @param string           $fieldName
      *
      * @return mixed
      */
-    private function getPropertyValue($entity, \ReflectionClass $reflClass, $propertyName)
+    private function getPropertyValue($entity, \ReflectionClass $reflClass, $fieldName)
     {
+        $propertyName = $fieldName;
+        $property = $this->getProperty($fieldName);
+        if (null !== $property) {
+            $propertyName = $property->getPropertyPath();
+        }
         $property = ReflectionUtil::getProperty($reflClass, $propertyName);
+        if (null === $property) {
+            throw new RuntimeException(
+                sprintf('The class "%s" does not have property "%s".', $reflClass->name, $propertyName)
+            );
+        }
         if (!$property->isPublic()) {
             $property->setAccessible(true);
         }

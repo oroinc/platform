@@ -11,6 +11,9 @@ use Oro\Bundle\BatchBundle\Tests\Functional\ORM\Constraint\IsEqualById;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @dbIsolationPerTest
+ */
 class BufferedIdentityQueryResultIteratorTest extends WebTestCase
 {
     /**

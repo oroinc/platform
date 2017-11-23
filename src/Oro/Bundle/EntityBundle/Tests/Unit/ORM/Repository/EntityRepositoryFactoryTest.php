@@ -246,4 +246,31 @@ class EntityRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
         $repositoryFactory = new EntityRepositoryFactory($this->container, [$entityName => $repositoryService]);
         $repositoryFactory->getRepository($entityManager, $entityName);
     }
+
+    public function testClear()
+    {
+        $entityName = 'TestEntity';
+        $repositoryService = 'test.entity.repository';
+
+        $entityRepository = $this->createMock(TestEntityRepository::class);
+
+        $classMetadata = new ClassMetadata($entityName);
+        $classMetadata->customRepositoryClassName = TestEntityRepository::class;
+
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->expects(self::any())
+            ->method('getClassMetadata')
+            ->with($entityName)
+            ->willReturn($classMetadata);
+        $this->container->expects(self::exactly(2))
+            ->method('get')
+            ->with($repositoryService)
+            ->willReturn($entityRepository);
+
+        $repositoryFactory = new EntityRepositoryFactory($this->container, [$entityName => $repositoryService]);
+        self::assertSame($entityRepository, $repositoryFactory->getRepository($entityManager, $entityName));
+
+        $repositoryFactory->clear();
+        self::assertSame($entityRepository, $repositoryFactory->getRepository($entityManager, $entityName));
+    }
 }

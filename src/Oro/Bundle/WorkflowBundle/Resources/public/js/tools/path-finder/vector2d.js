@@ -1,5 +1,10 @@
-define(['./point2d', './line2d', './interval2d', './util'], function(Point2d, Line2d, Interval2d, util) {
+define(function(require) {
     'use strict';
+
+    var util = require('./util');
+    var Point2d = require('./point2d');
+    var Line2d = require('./line2d');
+    var Interval2d = require('./interval2d');
 
     /**
      * Constructs vector. Vector is specified by start point and direction
@@ -105,10 +110,7 @@ define(['./point2d', './line2d', './interval2d', './util'], function(Point2d, Li
         }
         this.start.draw(color, 3);
         var interval = new Interval2d(this.start, this.start.add(this.direction.unitVector.mul(100000)));
-        document.body.insertAdjacentHTML('beforeEnd', '<svg style="position:absolute;width:1000px;height: 1000px;">' +
-            '<path stroke-width="1" stroke="' + color + '" fill="none" d="' +
-            'M ' + interval.a.x + ' ' + interval.a.y + ' L ' + interval.b.x + ' ' + interval.b.y +
-            '"></path></svg>');
+        interval.draw(color);
     };
 
     return Vector2d;

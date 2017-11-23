@@ -6,18 +6,27 @@ oro.locale:
             label: Localizations
 
     localization:
-        entity_label: 'Localization'
-        entity_plural_label: 'Localizations'
-        entity_description: 'Holds language code, formatting code and parent localization'
-
-        id.label: 'Id'
-        name.label: 'Name'
-        title.label: 'Title'
-        titles.label: 'Titles'
-        language.label: 'Language'
-        formatting_code.label: 'Formatting'
-        child_localizations.label: 'Child localizations'
-        parent_localization.label: 'Parent localization'
+        entity_label:               'Localization'
+        entity_plural_label:        'Localizations'
+        entity_description:         Localization item stores locale-specific congiuration: the language code of the locale's main language, a formatting code that is used for the locale, and a parent localization that is used by default whenever the translation for the main language is missing.
+        id.label:                   'Id'
+        name:
+            label:                  'Name'
+            description:            A human readable localization name that helps identify settings for the particular locale.
+        title.label:                'Title'
+        titles:
+            label:                  'Titles'
+            description:            The relationship between the localization item and its localizable label that is used to refer to the localization in the UI.
+        language.label:             'Language'
+        formatting_code:
+            label:                  'Formatting'
+            description:            Code of the formatting style that should apply in the localized instance.
+        child_localizations:
+            label:                  'Child localizations'
+            description:            The relationships between the localization item and other localization items that treat the localization item as a parent localization.
+        parent_localization:
+            label:                  'Parent localization'
+            description:            The relationships between the localization item and its parent localization.
 
         widgets:
             localization_information: Localization Information
@@ -37,15 +46,16 @@ oro.locale:
                 choose: 'Choose a localization...'
 
     localizedfallbackvalue:
-        entity_label: 'Localized fallback value'
-        entity_plural_label: 'Localized fallback values'
-        id.label: 'ID'
+        entity_label:         'Localized fallback value'
+        entity_plural_label:  'Localized fallback values'
+        entity_description:   Localizedfallbackvalue stores relationships between the text values (content like name, description, etc.) and their translation data.
+        id.label:             'ID'
         fallback:
-            label: 'Fallback'
-            description: The value for the fallback
+            label:            'Fallback'
+            description:      The value for the fallback
         localization:
-            label: 'Localization'
-            description: The value for the localization, selected language
+            label:            'Localization'
+            description:      The value for the localization, selected language
         string:
             label: 'String value'
             description: The string value for the curent localization

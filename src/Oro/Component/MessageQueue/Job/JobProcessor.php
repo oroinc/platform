@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Job;
 
 use Oro\Component\MessageQueue\Client\Message;
@@ -16,19 +17,13 @@ use Oro\Component\MessageQueue\Provider\NullJobConfigurationProvider;
  */
 class JobProcessor
 {
-    /**
-     * @var JobConfigurationProviderInterface
-     */
+    /** @var JobConfigurationProviderInterface */
     private $jobConfigurationProvider;
 
-    /**
-     * @var JobStorage
-     */
+    /** @var JobStorage */
     private $jobStorage;
 
-    /**
-     * @var MessageProducerInterface
-     */
+    /** @var MessageProducerInterface */
     private $producer;
 
     /**
@@ -131,7 +126,7 @@ class JobProcessor
             $this->jobStorage->saveJob($job);
             return $job;
         } catch (DuplicateJobException $e) {
-            $currentRootJob = $this->findRootJobByJobNameAndStatuses($job->getName(), Job::$activeStatuses);
+            $currentRootJob = $this->findRootJobByJobNameAndStatuses($job->getName(), $this->getActiveJobStatuses());
             if ($currentRootJob && $this->isJobStale($currentRootJob)) {
                 $this->staleRootJobAndChildren($currentRootJob);
                 return $this->saveJobAndStaleDuplicateIfQualifies($job);
@@ -149,10 +144,32 @@ class JobProcessor
         if ($job->getStatus() === Job::STATUS_STALE) {
             return true;
         }
+
+        if ($this->hasNotStartedChild($job)) {
+            return false;
+        }
+
         $timeBeforeStale = $this->getJobConfigurationProvider()->getTimeBeforeStaleForJobName($job->getName());
         if ($timeBeforeStale !== null && $timeBeforeStale != -1) {
             return $job->getLastActiveAt() <= new \DateTime('- ' . $timeBeforeStale. ' seconds');
         }
+
+        return false;
+    }
+
+    /**
+     * @param Job $job
+     *
+     * @return bool
+     */
+    private function hasNotStartedChild(Job $job)
+    {
+        foreach ($job->getChildJobs() as $childJob) {
+            if (Job::STATUS_NEW === $childJob->getStatus()) {
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -184,11 +201,7 @@ class JobProcessor
         $job->setJobProgress(0);
         $this->jobStorage->saveJob($job);
 
-        $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
-            'jobId' => $job->getId()
-        ]);
-
-        $this->sendRecalculateJobProgressMessage($job);
+        $this->sendCalculateJobStatusMessage($job, true);
 
         return $job;
     }
@@ -204,7 +217,7 @@ class JobProcessor
 
         $job = $this->jobStorage->findJobById($job->getId());
 
-        if (! in_array($job->getStatus(), [Job::STATUS_NEW, Job::STATUS_FAILED_REDELIVERED])) {
+        if (! in_array($job->getStatus(), $this->getNotStartedJobStatuses(), true)) {
             throw new \LogicException(sprintf(
                 'Can start only new jobs: id: "%s", status: "%s"',
                 $job->getId(),
@@ -218,9 +231,7 @@ class JobProcessor
         $this->jobStorage->saveJob($job);
         $this->updateJobLastActiveAtAndSave($job->getRootJob());
 
-        $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
-            'jobId' => $job->getId()
-        ]);
+        $this->sendCalculateJobStatusMessage($job);
     }
 
     /**
@@ -247,11 +258,8 @@ class JobProcessor
         $job->setStoppedAt(new \DateTime());
         $this->jobStorage->saveJob($job);
         $this->updateJobLastActiveAtAndSave($job->getRootJob());
-        $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
-            'jobId' => $job->getId()
-        ]);
 
-        $this->sendRecalculateJobProgressMessage($job);
+        $this->sendCalculateJobStatusMessage($job, true);
     }
 
     /**
@@ -277,7 +285,7 @@ class JobProcessor
             $rootJob->setStoppedAt(new \DateTime());
 
             foreach ($rootJob->getChildJobs() as $childJob) {
-                if (in_array($childJob->getStatus(), Job::$activeStatuses)) {
+                if (in_array($childJob->getStatus(), $this->getActiveJobStatuses(), true)) {
                     $childJob->setStatus(Job::STATUS_STALE);
                     $childJob->setStoppedAt(new \DateTime());
                     $this->jobStorage->saveJob($childJob);
@@ -311,11 +319,7 @@ class JobProcessor
         $this->jobStorage->saveJob($job);
         $this->updateJobLastActiveAtAndSave($job->getRootJob());
 
-        $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
-            'jobId' => $job->getId()
-        ]);
-
-        $this->sendRecalculateJobProgressMessage($job);
+        $this->sendCalculateJobStatusMessage($job, true);
     }
 
     /**
@@ -341,9 +345,7 @@ class JobProcessor
         $this->jobStorage->saveJob($job);
         $this->updateJobLastActiveAtAndSave($job->getRootJob());
 
-        $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
-                'jobId' => $job->getId()
-            ]);
+        $this->sendCalculateJobStatusMessage($job);
     }
 
     /**
@@ -357,7 +359,7 @@ class JobProcessor
 
         $job = $this->jobStorage->findJobById($job->getId());
 
-        if (! in_array($job->getStatus(), Job::$activeStatuses)) {
+        if (! in_array($job->getStatus(), $this->getActiveJobStatuses(), true)) {
             throw new \LogicException(sprintf(
                 'Can cancel only new or running jobs. id: "%s", status: "%s"',
                 $job->getId(),
@@ -375,11 +377,7 @@ class JobProcessor
         $this->jobStorage->saveJob($job);
         $this->updateJobLastActiveAtAndSave($job->getRootJob());
 
-        $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
-            'jobId' => $job->getId()
-        ]);
-
-        $this->sendRecalculateJobProgressMessage($job);
+        $this->sendCalculateJobStatusMessage($job, true);
     }
 
     /**
@@ -392,7 +390,7 @@ class JobProcessor
         }
 
         foreach ($job->getChildJobs() as $childJob) {
-            if (in_array($childJob->getStatus(), Job::$activeStatuses)) {
+            if (in_array($childJob->getStatus(), $this->getActiveJobStatuses(), true)) {
                 $this->cancelChildJob($childJob);
             }
         }
@@ -410,10 +408,7 @@ class JobProcessor
         }
 
         foreach ($job->getChildJobs() as $childJob) {
-            if (in_array(
-                $childJob->getStatus(),
-                [Job::STATUS_NEW, Job::STATUS_FAILED_REDELIVERED]
-            )) {
+            if (in_array($childJob->getStatus(), $this->getNotStartedJobStatuses(), true)) {
                 $this->cancelChildJob($childJob);
             }
         }
@@ -451,11 +446,34 @@ class JobProcessor
     }
 
     /**
-     * @param $job
+     * @param Job  $job
+     * @param bool $calculateProgress
      */
-    protected function sendRecalculateJobProgressMessage($job)
+    private function sendCalculateJobStatusMessage($job, $calculateProgress = false)
     {
-        $message = new Message(['jobId' => $job->getId()], MessagePriority::HIGH);
-        $this->producer->send(Topics::CALCULATE_ROOT_JOB_PROGRESS, $message);
+        $message = ['jobId' => $job->getId()];
+        if ($calculateProgress) {
+            $message['calculateProgress'] = true;
+        }
+        $this->producer->send(
+            Topics::CALCULATE_ROOT_JOB_STATUS,
+            new Message($message, MessagePriority::HIGH)
+        );
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getNotStartedJobStatuses()
+    {
+        return [Job::STATUS_NEW, Job::STATUS_FAILED_REDELIVERED];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getActiveJobStatuses()
+    {
+        return [Job::STATUS_NEW, Job::STATUS_RUNNING, Job::STATUS_FAILED_REDELIVERED];
     }
 }

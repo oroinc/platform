@@ -8,35 +8,6 @@ services:
         tags:
             - { name: cli.controller, priority: 700 }
 
-    cli.controller.suite_configuration_filter:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteConfigurationFilterController
-        arguments:
-            - '@oro_behat_extension.suite.suite_configuration_registry'
-        tags:
-            - { name: cli.controller, priority: 650 }
-
-    cli.controller.suite_divider:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteDividerController
-        arguments:
-            - '@oro_behat_extension.suite.suite_configuration_registry'
-        tags:
-            - { name: cli.controller, priority: 600 }
-
-    cli.controller.suite_set_divider:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteSetDividerController
-        arguments:
-            - '@oro_behat_extension.suite.suite_configuration_registry'
-        tags:
-            - { name: cli.controller, priority: 590 }
-
-    cli.controller.suite:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteController
-        arguments:
-            - '@oro_behat_extension.suite.suite_configuration_registry'
-            - '@suite.registry'
-        tags:
-            - { name: cli.controller, priority: 580 }
-
     cli.controller.available_features:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableFeaturesController
         arguments:
@@ -52,14 +23,6 @@ services:
             - '@specifications.finder'
         tags:
             - { name: cli.controller, priority: 560 }
-
-    cli.controller.available_suite_sets:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuiteSetsController
-        arguments:
-            - '@oro_behat_extension.suite.suite_configuration_registry'
-            - '@oro_behat_extension.specification.statistic.filesystem_statistic_repository'
-        tags:
-            - { name: cli.controller, priority: 550 }
 
     cli.controller.interactive_execution:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\InteractiveExecutionController

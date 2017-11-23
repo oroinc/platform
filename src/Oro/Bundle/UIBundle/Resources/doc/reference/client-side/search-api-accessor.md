@@ -1,27 +1,29 @@
+## SearchApiAccessor
+
 <a name="module_SearchApiAccessor"></a>
-## SearchApiAccessor ⇐ <code>[ApiAccessor](./api-accessor.md)</code>
+**SearchApiAccessor** ⇐ [ApiAccessor](./api-accessor.md)
 Provides access to the search API for autocompletes.
 This class is by design to be initiated from server configuration.
 
-**Extends:** <code>[ApiAccessor](./api-accessor.md)</code>  
+**Extends:** [ApiAccessor](./api-accessor.md)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>Object</code> | Options container Also check the options for [ApiAccessor](./api-accessor.md) |
-| options.search_handler_name | <code>string</code> | Name of the search handler to use |
-| options.label_field_name | <code>string</code> | Name of the property that will be used as a label |
-| options.value_field_name | <code>string</code> | Optional. Name of the property that will be used as an identifier.                                       By default = `'id'` |
+| options | `Object` | Options container Also check the options for [ApiAccessor](./api-accessor.md) |
+| options.search_handler_name | `string` | Name of the search handler to use |
+| options.label_field_name | `string` | Name of the property that will be used as a label |
+| options.value_field_name | `string` | Optional. Name of the property that will be used as an identifier.                                       By default = `'id'` |
 
 
-* [SearchApiAccessor](#module_SearchApiAccessor) ⇐ <code>[ApiAccessor](./api-accessor.md)</code>
+* [SearchApiAccessor](#module_SearchApiAccessor) ⇐ [ApiAccessor](./api-accessor.md)
   * [.prepareUrlParameters()](#module_SearchApiAccessor#prepareUrlParameters)
-  * [.formatResult(response)](#module_SearchApiAccessor#formatResult) ⇒ <code>Object</code>
+  * [.formatResult(response)](#module_SearchApiAccessor#formatResult) ⇒ `Object`
 
 <a name="module_SearchApiAccessor#prepareUrlParameters"></a>
 ### searchApiAccessor.prepareUrlParameters()
-**Kind**: instance method of <code>[SearchApiAccessor](#module_SearchApiAccessor)</code>  
+**Kind**: instance method of [SearchApiAccessor](#module_SearchApiAccessor)  
 <a name="module_SearchApiAccessor#formatResult"></a>
-### searchApiAccessor.formatResult(response) ⇒ <code>Object</code>
+### searchApiAccessor.formatResult(response) ⇒ `Object`
 Formats response before it is sent out from this api accessor.
 Converts it to form
 ``` javascipt
@@ -31,9 +33,9 @@ Converts it to form
 }
 ```
 
-**Kind**: instance method of <code>[SearchApiAccessor](#module_SearchApiAccessor)</code>  
+**Kind**: instance method of [SearchApiAccessor](#module_SearchApiAccessor)  
 
 | Param | Type |
 | --- | --- |
-| response | <code>Object</code> | 
+| response | `Object` | 
 

@@ -192,17 +192,17 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
     {
         $noApiKeyUser = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
         $noApiKeyUser
-            ->expects(static::exactly(2))
+            ->expects(self::once())
             ->method('getApiKeys')
             ->will(static::returnValue(new ArrayCollection()));
 
         $noApiKeyUser->expects(static::never())->method('getPassword');
         $noApiKeyUser->expects(static::never())->method('getSalt');
-        $noApiKeyUser->expects(static::any())->method('getRoles')->will(static::returnValue([]));
+        $noApiKeyUser->expects(static::never())->method('getRoles');
         $noApiKeyUser->expects(static::once())->method('isEnabled')->willReturn(true);
 
         $this->userProvider
-            ->expects(static::exactly(2))
+            ->expects(self::once())
             ->method('loadUserByUsername')
             ->will(static::returnValue($noApiKeyUser));
 

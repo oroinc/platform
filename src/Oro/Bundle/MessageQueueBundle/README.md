@@ -18,6 +18,7 @@
  - [Consumer heartbeat](#consumer-heartbeat)
  - [Resetting Symfony Container in consumer](Resources/doc/container_in_consumer.md)
  - [Security Context in consumer](Resources/doc/secutity_context.md)
+ - [Buffering Messages](Resources/doc/buffering_messages.md)
 
 ## Overview
 

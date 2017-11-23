@@ -153,6 +153,12 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
+    oro_search.extension.mass_action.iterable_result_factory:
+        class: Oro\Bundle\SearchBundle\Datagrid\Extension\MassAction\IterableResultFactory
+        public: false
+        tags:
+            - { name: oro_datagrid.extension.mass_action.iterable_result_factory }
+
     # services used only for ORM search engine
     oro_search.fulltext_index_manager:
         class: %oro_search.fulltext_index_manager.class%
@@ -283,6 +289,14 @@ services:
         class: Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchEnumFilterType
         tags:
             - { name: form.type, alias: oro_search_type_enum_filter }
+
+    oro_search.form.type.filter.search_entity:
+        class: Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchEntityFilterType
+        arguments:
+            - '@oro_entity.entity_name_resolver'
+            - '@oro_locale.helper.localization'
+        tags:
+            - { name: form.type, alias: oro_search_type_entity_filter }
 
     oro_search.migration.demo_data_fixtures_listener.reindex:
         class: Oro\Bundle\SearchBundle\EventListener\ReindexDemoDataFixturesListener
