@@ -190,7 +190,7 @@ class ImportExportTest extends WebTestCase
         $this->assertEquals(
             [
                 'success' => true,
-                'message' => 'oro.importexport.import.success.message'
+                'message' => 'Import started successfully. You will receive an email notification upon completion.'
             ],
             $data
         );
