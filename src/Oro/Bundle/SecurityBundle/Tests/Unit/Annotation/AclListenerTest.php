@@ -1,24 +1,27 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\SecurityBundle\Tests\Unit\Annotation;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
-use Oro\Bundle\NavigationBundle\EventListener\ContainerListener;
-use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
+use Oro\Bundle\SecurityBundle\Annotation\AclListener;
+use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider;
 use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 
-class ContainerListenerTest extends \PHPUnit_Framework_TestCase
+class AclListenerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigMetadataDumperInterface */
     private $dumper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigurationProvider */
-    private $configurationProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|AclAnnotationProvider */
+    private $aclAnnotationProvider;
 
-    /** @var ContainerListener */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionMetadataProvider */
+    private $actionMetadataProvider;
+
+    /** @var AclListener */
     private $listener;
 
     /**
@@ -27,13 +30,15 @@ class ContainerListenerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->dumper = $this->createMock(ConfigMetadataDumperInterface::class);
-        $this->configurationProvider = $this->createMock(ConfigurationProvider::class);
+        $this->aclAnnotationProvider = $this->createMock(AclAnnotationProvider::class);
+        $this->actionMetadataProvider = $this->createMock(ActionMetadataProvider::class);
 
         $container = TestContainerBuilder::create()
-            ->add('oro_navigation.configuration.provider', $this->configurationProvider)
+            ->add('oro_security.acl.annotation_provider', $this->aclAnnotationProvider)
+            ->add('oro_security.action_metadata_provider', $this->actionMetadataProvider)
             ->getContainer($this);
 
-        $this->listener = new ContainerListener($this->dumper, $container);
+        $this->listener = new AclListener($this->dumper, $container);
     }
 
     /**
@@ -57,13 +62,12 @@ class ContainerListenerTest extends \PHPUnit_Framework_TestCase
             ->method('isFresh')
             ->willReturn(false);
 
-        $container = new ContainerBuilder();
-        $this->configurationProvider->expects(self::once())
-            ->method('loadConfiguration')
-            ->with($container);
+        $this->aclAnnotationProvider->expects(self::once())
+            ->method('warmUpCache');
+        $this->actionMetadataProvider->expects(self::once())
+            ->method('warmUpCache');
         $this->dumper->expects(self::once())
-            ->method('dump')
-            ->with($container);
+            ->method('dump');
 
         $this->listener->onKernelRequest($this->getEvent());
     }
@@ -74,8 +78,10 @@ class ContainerListenerTest extends \PHPUnit_Framework_TestCase
             ->method('isFresh')
             ->willReturn(true);
 
-        $this->configurationProvider->expects(self::never())
-            ->method('loadConfiguration');
+        $this->aclAnnotationProvider->expects(self::never())
+            ->method('warmUpCache');
+        $this->actionMetadataProvider->expects(self::never())
+            ->method('warmUpCache');
         $this->dumper->expects(self::never())
             ->method('dump');
 
@@ -86,8 +92,10 @@ class ContainerListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->dumper->expects(self::never())
             ->method('isFresh');
-        $this->configurationProvider->expects(self::never())
-            ->method('loadConfiguration');
+        $this->aclAnnotationProvider->expects(self::never())
+            ->method('warmUpCache');
+        $this->actionMetadataProvider->expects(self::never())
+            ->method('warmUpCache');
         $this->dumper->expects(self::never())
             ->method('dump');
 
