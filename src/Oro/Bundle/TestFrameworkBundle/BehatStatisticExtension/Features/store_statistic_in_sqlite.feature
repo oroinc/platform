@@ -10,9 +10,10 @@ Feature: Store statistic in sqlite
         connection:
           driver: pdo_sqlite
           path: test.db
-        branch_name_env: CHANGE_BRANCH
-        target_branch_env: CHANGE_TARGET
-        build_id_env: BUILD_ID
+        criteria:
+          branch_name: CHANGE_BRANCH_TEST
+          target_branch: CHANGE_TARGET_TEST
+          build_id: BUILD_ID_TEST
       """
     And "test.db" sqlite database exists
     When I run "behat --update-statistic-schema"
@@ -23,9 +24,9 @@ Feature: Store statistic in sqlite
 
   Scenario: Store statistic
     Given environment variables:
-      | CHANGE_BRANCH | ticket/BAP-1902_store_statistic |
-      | CHANGE_TARGET | maintenance/2.4                 |
-      | BUILD_ID      | 35815                           |
+      | CHANGE_BRANCH_TEST | ticket/BAP-1902_store_statistic |
+      | CHANGE_TARGET_TEST | maintenance/2.4                 |
+      | BUILD_ID_TEST      | 35815                           |
     And enabled suites in behat.yml:
       """
       default:

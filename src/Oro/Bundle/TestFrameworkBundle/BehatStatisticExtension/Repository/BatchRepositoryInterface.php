@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\Repository;
+namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository;
 
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\StatisticModelInterface;
 
-interface StatisticRepositoryInterface
+interface BatchRepositoryInterface
 {
     /**
      * Add Model to collection
