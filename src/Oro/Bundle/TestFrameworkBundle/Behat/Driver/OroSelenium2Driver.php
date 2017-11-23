@@ -213,6 +213,10 @@ JS;
                 return false;
             }
             
+            if (0 !== jQuery("div.lazy-loading").length) {
+                return false;
+            }
+            
             try {
                 if (!window.mediatorCachedForSelenium) {
                     window.mediatorCachedForSelenium = require('oroui/js/mediator');

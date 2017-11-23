@@ -923,20 +923,22 @@
     <div class="responsive-section">
         <h4 class="scrollspy-title">{{ title }}{% if headerLinkContent is defined %}{{ headerLinkContent }}{% endif %}</h4>
         <div id="{{ blockId }}" class="scrollspy-nav-target"></div>
-        <div class="row-fluid{% if (contentAttributes is defined and contentAttributes.class is defined and contentAttributes.class|length) %} {{ contentAttributes.class }}{% endif %}{% if cols > 1 and (useSubBlockDivider is not defined or useSubBlockDivider == true) %} row-fluid-divider{% endif %}" {{ _self.attributes(contentAttributes, ['class']) }}>
-            {% if isForm is defined and isForm == true %}
-                <fieldset class="form-horizontal">
-            {% else %}
-                <div class="form-horizontal">
-            {% endif %}
-                {% for subblock in subblocks %}
-                    {{ _self.scrollSubblock(subblock.title is defined and subblock.title|length ? subblock.title : null, subblock.data, isForm, subblock.useSpan is defined ? subblock.useSpan : true, subblock.spanClass is defined ? subblock.spanClass : '') }}
-                {% endfor %}
-            {% if isForm is defined and isForm == true %}
-                </fieldset>
-            {% else %}
-                </div>
-            {% endif %}
+        <div class="section-content">
+            <div class="row-fluid{% if (contentAttributes is defined and contentAttributes.class is defined and contentAttributes.class|length) %} {{ contentAttributes.class }}{% endif %}{% if cols > 1 and (useSubBlockDivider is not defined or useSubBlockDivider == true) %} row-fluid-divider{% endif %}" {{ _self.attributes(contentAttributes, ['class']) }}>
+                {% if isForm is defined and isForm == true %}
+                    <fieldset class="form-horizontal">
+                {% else %}
+                    <div class="form-horizontal">
+                {% endif %}
+                    {% for subblock in subblocks %}
+                        {{ _self.scrollSubblock(subblock.title is defined and subblock.title|length ? subblock.title : null, subblock.data, isForm, subblock.useSpan is defined ? subblock.useSpan : true, subblock.spanClass is defined ? subblock.spanClass : '') }}
+                    {% endfor %}
+                {% if isForm is defined and isForm == true %}
+                    </fieldset>
+                {% else %}
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 {% endmacro %}

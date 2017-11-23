@@ -4,64 +4,45 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model;
 
 use Doctrine\DBAL\Schema\Schema;
 
-final class FeatureStatistic implements StatisticModelInterface
+class FeatureStatistic implements StatisticModelInterface
 {
-    /**
-     * @var string
-     */
-    private $basePath;
-
     /**
      * @var mixed
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      */
-    private $path;
+    protected $path;
 
     /**
      * @var integer
      */
-    private $time;
+    protected $time;
 
     /**
      * @var string
      */
-    private $gitBranch;
+    protected $gitBranch;
 
     /**
      * @var string
      */
-    private $gitTarget;
+    protected $gitTarget;
 
     /**
      * @var string
      */
-    private $buildId;
+    protected $buildId;
 
     /**
-     * @param string $basePath
+     * @param string $path relative path to the feature file
      * @return $this
      */
-    public function setBasePath($basePath)
+    public function setPath($path)
     {
-        $this->basePath = $basePath;
-
-        return $this;
-    }
-
-    /**
-     * @param string $featurePath relative path to the feature file
-     * @return $this
-     */
-    public function setPath($featurePath)
-    {
-        $basePathDirectories = explode(DIRECTORY_SEPARATOR, realpath($this->basePath));
-        $featureDirectories = explode(DIRECTORY_SEPARATOR, realpath($featurePath));
-
-        $this->path = implode(DIRECTORY_SEPARATOR, array_diff($featureDirectories, $basePathDirectories));
+        $this->path = $path;
 
         return $this;
     }
@@ -127,9 +108,41 @@ final class FeatureStatistic implements StatisticModelInterface
     /**
      * {@inheritdoc}
      */
+    public static function fromArray(array $data)
+    {
+        $model = new self();
+        $model->id        = isset($data['id'])         ? $data['id']         : null;
+        $model->path      = isset($data['path'])       ? $data['path']       : null;
+        $model->time      = isset($data['time'])       ? $data['time']       : null;
+        $model->gitBranch = isset($data['git_branch']) ? $data['git_branch'] : null;
+        $model->gitTarget = isset($data['git_target']) ? $data['git_target'] : null;
+        $model->buildId   = isset($data['build_id'])   ? $data['build_id']   : null;
+
+        return $model;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isNew()
     {
         return null === $this->id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDuration()
+    {
+        return $this->time;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getId()
+    {
+        return $this->path;
     }
 
     /**
@@ -148,6 +161,10 @@ final class FeatureStatistic implements StatisticModelInterface
         $table->addColumn('build_id', 'integer', ['notnull' => false]);
 
         $table->setPrimaryKey(["id"]);
+        $table->addIndex(['path']);
+        $table->addIndex(['git_branch']);
+        $table->addIndex(['git_target']);
+        $table->addIndex(['build_id']);
     }
 
     /**
@@ -156,5 +173,13 @@ final class FeatureStatistic implements StatisticModelInterface
     public static function getName()
     {
         return 'feature_stat';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getIdField()
+    {
+        return 'path';
     }
 }

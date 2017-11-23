@@ -88,6 +88,14 @@ class LexerTest extends \PHPUnit_Framework_TestCase
                 ],
                 '3 = 5',
             ],
+            [
+                [
+                    new Token('number', '3', 1),
+                    new Token('operator', '==', 3),
+                    new Token('number', '5', 6),
+                ],
+                '3 == 5',
+            ],
         ];
     }
 }

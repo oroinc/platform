@@ -33,6 +33,10 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
         $loader->load('ownership.yml');
         $loader->load('services.yml');
 
+        if ($container->getParameter('kernel.debug')) {
+            $loader->load('debug.yml');
+        }
+
         $this->addClassesToCompile(['Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener']);
     }
 

@@ -11,6 +11,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
  * Performs serialization and deserialization of WorkflowItem data
@@ -32,20 +33,16 @@ class WorkflowDataSerializeListener
      */
     protected $scheduledEntities = [];
 
-    /**
-     * @var WorkflowAwareSerializer
-     */
-    protected $serializer;
+    /** @var ServiceLink */
+    private $serializerLink;
 
     /**
-     * Constructor
-     *
-     * @param WorkflowAwareSerializer $serializer
+     * @param ServiceLink $serializerLink
      * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(WorkflowAwareSerializer $serializer, DoctrineHelper $doctrineHelper)
+    public function __construct(ServiceLink $serializerLink, DoctrineHelper $doctrineHelper)
     {
-        $this->serializer = $serializer;
+        $this->serializerLink = $serializerLink;
         $this->doctrineHelper = $doctrineHelper;
     }
 
@@ -88,15 +85,12 @@ class WorkflowDataSerializeListener
     /**
      * After WorkflowItem loaded, deserialize WorkflowItem
      *
+     * @param WorkflowItem       $entity
      * @param LifecycleEventArgs $args
      */
-    public function postLoad(LifecycleEventArgs $args)
+    public function postLoad(WorkflowItem $entity, LifecycleEventArgs $args)
     {
-        /** @var WorkflowItem $entity */
-        $entity = $args->getEntity();
-        if ($this->isSupported($entity)) {
-            $this->deserialize($entity);
-        }
+        $this->deserialize($entity);
     }
 
     /**
@@ -106,9 +100,10 @@ class WorkflowDataSerializeListener
      */
     protected function serialize(WorkflowItem $workflowItem)
     {
-        $this->serializer->setWorkflowName($workflowItem->getWorkflowName());
+        $serializer = $this->getSerializer();
+        $serializer->setWorkflowName($workflowItem->getWorkflowName());
 
-        $serializedData = $this->serializer->serialize(
+        $serializedData = $serializer->serialize(
             $this->getWorkflowData($workflowItem),
             $this->format
         );
@@ -124,7 +119,7 @@ class WorkflowDataSerializeListener
     protected function deserialize(WorkflowItem $workflowItem)
     {
         // Pass serializer into $workflowItem to make lazy loading of workflow item data.
-        $workflowItem->setSerializer($this->serializer, $this->format);
+        $workflowItem->setSerializer($this->getSerializer(), $this->format);
 
         // Set related entity
         $relatedEntity = $this->doctrineHelper->getEntityReference(
@@ -185,5 +180,13 @@ class WorkflowDataSerializeListener
         }
 
         return array_keys($configuration[$definitionsNode][$variablesNode]);
+    }
+
+    /**
+     * @return WorkflowAwareSerializer
+     */
+    private function getSerializer()
+    {
+        return $this->serializerLink->getService();
     }
 }

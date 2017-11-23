@@ -5,84 +5,92 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\EventListener;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
-use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
-
 use Oro\Bundle\DataGridBundle\EventListener\ContainerListener;
+use Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider;
+use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
-/**
- * Class ContainerListenerTest for ContainerListener
- *
- * It implements ConfigMetadataDumperInterface just to simplify test flow
- * (Self-Shunt test pattern http://www.whiteboxtest.com/Test-Pattern-SelfShunt.php)
- */
-class ContainerListenerTest extends \PHPUnit_Framework_TestCase implements ConfigMetadataDumperInterface
+class ContainerListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var  ContainerListener */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigMetadataDumperInterface */
+    private $dumper;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigurationProvider */
+    private $configProvider;
+
+    /** @var ContainerListener */
     private $listener;
-
-    private $configProviderStub;
-
-    /** @var GetResponseEvent */
-    private $event;
-
-    /** @var  bool */
-    private $isFresh;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->configProviderStub = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->dumper = $this->createMock(ConfigMetadataDumperInterface::class);
+        $this->configProvider = $this->createMock(ConfigurationProvider::class);
 
-        $this->event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $container = TestContainerBuilder::create()
+            ->add('oro_datagrid.configuration.provider', $this->configProvider)
+            ->getContainer($this);
 
-        $this->listener = new ContainerListener($this->configProviderStub, $this);
+        $this->listener = new ContainerListener($this->dumper, $container);
     }
 
     /**
-     * Tests onKernelRequest in case we have data in cache. So we should not regenerate it
+     * @param bool $isMasterRequest
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject|GetResponseEvent
      */
-    public function testOnKernelRequestWithWarmedCache()
+    private function getEvent($isMasterRequest = true)
     {
-        $this->isFresh = true;
+        $event = $this->createMock(GetResponseEvent::class);
+        $event->expects(self::any())
+            ->method('isMasterRequest')
+            ->willReturn($isMasterRequest);
 
-        $this->configProviderStub->expects($this->never())
+        return $event;
+    }
+
+    public function testOnKernelRequestIsNotFresh()
+    {
+        $this->dumper->expects(self::once())
+            ->method('isFresh')
+            ->willReturn(false);
+
+        $container = new ContainerBuilder();
+        $this->configProvider->expects(self::once())
+            ->method('loadConfiguration')
+            ->with($container);
+        $this->dumper->expects(self::once())
+            ->method('dump')
+            ->with($container);
+
+        $this->listener->onKernelRequest($this->getEvent());
+    }
+
+    public function testOnKernelRequestIsFresh()
+    {
+        $this->dumper->expects(self::once())
+            ->method('isFresh')
+            ->willReturn(true);
+
+        $this->configProvider->expects(self::never())
             ->method('loadConfiguration');
+        $this->dumper->expects(self::never())
+            ->method('dump');
 
-        $this->listener->onKernelRequest($this->event);
+        $this->listener->onKernelRequest($this->getEvent());
     }
 
-    /**
-     * Tests onKernelRequest in case we have empty cache
-     */
-    public function testOnKernelRequestWithoutCahe()
+    public function testOnKernelRequestForSubRequest()
     {
-        $this->isFresh = false;
-
-        $this->configProviderStub->expects($this->once())
+        $this->dumper->expects(self::never())
+            ->method('isFresh');
+        $this->configProvider->expects(self::never())
             ->method('loadConfiguration');
+        $this->dumper->expects(self::never())
+            ->method('dump');
 
-        $this->listener->onKernelRequest($this->event);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dump(ContainerBuilder $container)
-    {
-        // Do nothing created just to implement an interface
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isFresh()
-    {
-        return $this->isFresh;
+        $this->listener->onKernelRequest($this->getEvent(false));
     }
 }

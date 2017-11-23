@@ -15,6 +15,15 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
 
+    oro_reminder.reminder_entity_listener:
+        class: Oro\Bundle\ReminderBundle\EventListener\ReminderListener
+        public: false
+        arguments:
+            - '@oro_reminder.entity.manager'
+        tags:
+            - { name: doctrine.event_listener, event: postLoad, lazy: false }
+            - { name: doctrine.event_listener, event: postPersist, lazy: false }
+
     oro_reminder.sender:
         class: %oro_reminder.sender.class%
         arguments:

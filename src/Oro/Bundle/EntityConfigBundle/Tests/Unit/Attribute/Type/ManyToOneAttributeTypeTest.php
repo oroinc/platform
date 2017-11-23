@@ -2,16 +2,27 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Attribute\Type;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Attribute\Type\ManyToOneAttributeType;
 
 class ManyToOneAttributeTypeTest extends AttributeTypeTestCase
 {
+    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrineHelper;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function getAttributeType()
     {
-        return new ManyToOneAttributeType($this->entityNameResolver);
+        return new ManyToOneAttributeType($this->entityNameResolver, $this->doctrineHelper);
     }
 
     public function testGetType()
@@ -44,11 +55,27 @@ class ManyToOneAttributeTypeTest extends AttributeTypeTestCase
     public function testGetFilterableValue()
     {
         $value = new \stdClass();
+        $filterableValue = 'filterable_value';
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifier')
+            ->with($this->identicalTo($value), false)
+            ->willReturn($filterableValue);
 
         $this->assertSame(
-            'resolved stdClass name in de locale',
+            $filterableValue,
             $this->getAttributeType()->getFilterableValue($this->attribute, $value, $this->localization)
         );
+    }
+
+    public function testGetFilterableValueNotObject()
+    {
+        $value = 'test_value';
+
+        $this->doctrineHelper->expects($this->never())
+            ->method($this->anything());
+
+        $this->assertNull($this->getAttributeType()->getFilterableValue($this->attribute, $value, $this->localization));
     }
 
     public function testGetSortableValue()

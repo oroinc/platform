@@ -28,6 +28,10 @@ class OroDataGridExtension extends Extension
         $loader->load('importexport.yml');
         $loader->load('layouts.yml');
 
+        if ($container->getParameter('kernel.debug')) {
+            $loader->load('debug.yml');
+        }
+
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
 }

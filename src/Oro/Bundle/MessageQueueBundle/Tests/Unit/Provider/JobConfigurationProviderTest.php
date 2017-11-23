@@ -43,6 +43,11 @@ class JobConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             ['root.child1.child2.child3', ['jobs' => ['root.child1' => 1]], 1],
             ['root.child1.child2.child3', ['jobs' => ['root' => 100]], 100],
             ['root.child1.child2.child3', ['jobs' => ['root' => 100, 'root.child1.child2' => 2]], 2],
+            'job with colon delimiter' => [
+                'jobName' => 'root:child1:child2:child3',
+                'configuration' => ['jobs' => ['root' => 100, 'root:child1:child2' => 5]],
+                'expectedTime' => 5
+            ],
         ];
     }
 }

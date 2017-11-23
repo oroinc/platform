@@ -102,17 +102,26 @@ define(function(require) {
             var elements = [];
             var self = this;
 
-            _.each(ComponentShortcutsManager.getAll(), function(shortcut, shortcutName) {
-                var dataKey = 'page-component-' + shortcutName;
-                var dataAttr = 'data-' + dataKey;
+            var shortcuts = ComponentShortcutsManager.getAll();
+            var selector = _.map(shortcuts, function(shortcut) {
+                return '[' + shortcut.dataAttr + ']';
+            });
 
-                this.$el.find('[' + dataAttr + ']').each(function() {
-                    var $elem = $(this);
-                    if (self._isInOwnLayout($elem)) {
+            this.$el.find(selector.join(',')).each(function() {
+                var $elem = $(this);
+                if (self._isInOwnLayout($elem)) {
+                    return;
+                }
+
+                var elemData = $elem.data();
+                _.each(shortcuts, function(shortcut) {
+                    var dataKey = shortcut.dataKey;
+                    var dataAttr = shortcut.dataAttr;
+                    if (elemData[dataKey] === undefined) {
                         return;
                     }
 
-                    var data = ComponentShortcutsManager.getComponentData(shortcut, $elem.data(dataKey));
+                    var data = ComponentShortcutsManager.getComponentData(shortcut, elemData[dataKey]);
                     data.pageComponentOptions = $.extend(
                         true,
                         data.pageComponentOptions,
@@ -124,7 +133,7 @@ define(function(require) {
 
                     elements.push($elem);
                 });
-            }, this);
+            });
 
             return elements;
         },

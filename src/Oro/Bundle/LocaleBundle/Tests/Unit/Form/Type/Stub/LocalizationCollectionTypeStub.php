@@ -6,14 +6,20 @@ use Oro\Bundle\LocaleBundle\Form\Type\LocalizationCollectionType;
 
 class LocalizationCollectionTypeStub extends LocalizationCollectionType
 {
-    /** {@inheritdoc} */
-    public function __construct()
+    /** @var array */
+    protected $localizations;
+
+    /**
+     * @param array $localizations
+     */
+    public function __construct(array $localizations = [])
     {
+        $this->localizations = $localizations;
     }
 
     /** {@inheritdoc} */
     protected function getLocalizations()
     {
-        return [];
+        return $this->localizations;
     }
 }
