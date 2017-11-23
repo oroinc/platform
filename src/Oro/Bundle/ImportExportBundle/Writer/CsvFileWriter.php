@@ -26,6 +26,7 @@ class CsvFileWriter extends CsvFileStreamWriter implements StepExecutionAwareInt
      */
     public function __construct(ContextRegistry $contextRegistry)
     {
+        parent::__construct();
         $this->contextRegistry = $contextRegistry;
     }
 

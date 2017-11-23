@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\CsvFileReader;
 
 class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
@@ -13,13 +14,13 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
     protected $reader;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var ContextRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $contextRegistry;
 
     protected function setUp()
     {
-        $this->contextRegistry = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextRegistry')
+        $this->contextRegistry = $this->getMockBuilder(ContextRegistry::class)
             ->disableOriginalConstructor()
             ->setMethods(['getByStepExecution'])
             ->getMock();
@@ -87,7 +88,7 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertAttributeEquals(',', 'delimiter', $this->reader);
         $this->assertAttributeEquals('"', 'enclosure', $this->reader);
-        $this->assertAttributeEquals('\\', 'escape', $this->reader);
+        $this->assertAttributeEquals(chr(0), 'escape', $this->reader);
         $this->assertAttributeEquals(true, 'firstLineIsHeader', $this->reader);
         $this->assertAttributeEmpty('header', $this->reader);
 
@@ -220,6 +221,22 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         ];
+    }
+
+    public function testReadWithBackslashes()
+    {
+        $context = $this->getContextWithOptionsMock([
+            'filePath' => __DIR__ . '/fixtures/import_with_backslashes.csv',
+            'firstLineIsHeader' => false
+        ]);
+        $stepExecution = $this->getMockStepExecution($context);
+        $this->reader->setStepExecution($stepExecution);
+        $data = [];
+        $row = null;
+        while (($dataRow = $this->reader->read($stepExecution)) !== null) {
+            $data[] = $row = $dataRow;
+        }
+        $this->assertEquals([['\\', 'other field', '\\\\', '\\notquote', 'back \\slash inside', '\"quoted\"']], $data);
     }
 
     /**
