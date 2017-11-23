@@ -2,7 +2,12 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler;
 
+use Doctrine\ORM\EntityManager;
+
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
+use Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
 use Oro\Component\Testing\Unit\EntityTrait;
@@ -17,25 +22,25 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
     /** @var EmailHolderStub */
     private $entity;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EmailNotification */
     private $emailNotification;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
     private $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
     private $configProvider;
 
     protected function setUp()
     {
         $this->entity = new EmailHolderStub();
-        $this->emailNotification = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Entity\EmailNotification')
+        $this->emailNotification = $this->getMockBuilder(EmailNotification::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->em = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->configProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -67,22 +72,7 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
     public function testGetRecipientEmails()
     {
         $emails = ['email'];
-        $recipientList = new RecipientList();
-        $repo = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->emailNotification->expects($this->once())
-            ->method('getRecipientList')
-            ->will($this->returnValue($recipientList));
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->with('Oro\Bundle\NotificationBundle\Entity\RecipientList')
-            ->will($this->returnValue($repo));
-        $repo->expects($this->once())
-            ->method('getRecipientEmails')
-            ->with($this->identicalTo($recipientList), $this->identicalTo($this->entity))
-            ->will($this->returnValue($emails));
+        $this->mockRecipientEmails(new RecipientList(), $emails);
 
         $this->assertEquals($emails, $this->adapter->getRecipientEmails());
     }
@@ -115,22 +105,91 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
             'holders.holder',
         ]);
 
-        $repo = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mockRecipientEmails($recipientList, []);
 
-        $this->emailNotification->expects($this->once())
-            ->method('getRecipientList')
-            ->will($this->returnValue($recipientList));
+        $this->assertEquals($expectedEmails, $this->adapter->getRecipientEmails());
+    }
+
+    /**
+     * @param mixed $email
+     * @param array $expected
+     *
+     * @dataProvider getEmailValues
+     */
+    public function testGetRecipientEmailsFromEntityEmails($email, $expected)
+    {
+        $recipientList = new RecipientList();
+        $recipientList->setEntityEmails(['getEmail']);
+        $this->entity->setEmail($email);
+        $this->mockRecipientEmails($recipientList, []);
+
+        $actualResult = array_values($this->adapter->getRecipientEmails());
+
+        $this->assertEquals($expected, $actualResult);
+    }
+
+    /**
+     * @return array
+     */
+    public function getEmailValues()
+    {
+        $testEmail = 'test1@example.com';
+        $emailHolderStub = new EmailHolderStub($testEmail);
+
+        return [
+            'email as string' => [
+                'actual'   => $testEmail,
+                'expected' => [$testEmail]
+            ],
+            'email as array of strings' => [
+                'actual'   => ['test2@example.com', 'test3@example.com'],
+                'expected' => ['test2@example.com', 'test3@example.com']
+            ],
+            'email as object with EmailHolderInterface' => [
+                'actual'   => $emailHolderStub,
+                'expected' => [$testEmail]
+            ],
+            'email as multidimensional array' => [
+                'actual'   => [
+                    new \stdClass(),
+                    [
+                        $testEmail,
+                        [
+                            [
+                                new \stdClass(),
+                                'test2@demo.com',
+                                $emailHolderStub
+                            ],
+                            [
+                                'test3@demo.com',
+                                new \stdClass()
+                            ]
+                        ]
+                    ]
+                ],
+                'expected' => [$testEmail, 'test2@demo.com', 'test3@demo.com']
+            ]
+        ];
+    }
+
+    /**
+     * @param RecipientList $recipientList
+     * @param array $emails
+     */
+    private function mockRecipientEmails(RecipientList $recipientList, $emails)
+    {
+        $repository = $this->createMock(RecipientListRepository::class);
+        $repository->expects($this->once())
+            ->method('getRecipientEmails')
+            ->with($this->identicalTo($recipientList), $this->identicalTo($this->entity))
+            ->will($this->returnValue($emails));
+
         $this->em->expects($this->once())
             ->method('getRepository')
             ->with('Oro\Bundle\NotificationBundle\Entity\RecipientList')
-            ->will($this->returnValue($repo));
-        $repo->expects($this->once())
-            ->method('getRecipientEmails')
-            ->with($this->identicalTo($recipientList), $this->identicalTo($this->entity))
-            ->will($this->returnValue([]));
-
-        $this->assertEquals($expectedEmails, $this->adapter->getRecipientEmails());
+            ->will($this->returnValue($repository));
+        $this->emailNotification->expects($this->once())
+            ->method('getRecipientList')
+            ->will($this->returnValue($recipientList));
     }
 }

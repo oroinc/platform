@@ -80,6 +80,10 @@ class EmailNotificationAdapter implements EmailNotificationInterface
             $emails,
             $this->getRecipientEmailsFromAdditionalAssociations($this->entity, $recipientList)
         );
+        $emails = array_merge(
+            $emails,
+            $this->getRecipientEmailsFromEntityEmails($this->entity, $recipientList)
+        );
 
         return array_unique($emails);
     }
@@ -121,5 +125,58 @@ class EmailNotificationAdapter implements EmailNotificationInterface
         );
 
         return array_filter($emails);
+    }
+
+    /**
+     * Get array of emails by field marked as contact information with type "email"
+     *
+     * @param mixed         $entity
+     * @param RecipientList $recipientList
+     *
+     * @return array
+     */
+    private function getRecipientEmailsFromEntityEmails($entity, RecipientList $recipientList)
+    {
+        $values = [];
+        // Getting values from fields that marked as entity email
+        foreach ($recipientList->getEntityEmails() as $propertyPath) {
+            $values = array_merge($values, $this->getEntityEmailValue($entity, $propertyPath));
+        }
+
+        // Recursively leave only string values
+        array_walk_recursive(
+            $values,
+            function (&$item) {
+                if ($item instanceof EmailHolderInterface) {
+                    $item = $item->getEmail();
+                }
+                if (!is_string($item)) {
+                    $item = null;
+                }
+            }
+        );
+
+        // Flatten multidimensional array
+        $emails = iterator_to_array(new \RecursiveIteratorIterator(new \RecursiveArrayIterator($values)), false);
+
+        return array_filter($emails);
+    }
+
+    /**
+     * Get email address value from entity by property path
+     *
+     * @param mixed  $entity
+     * @param string $propertyPath
+     *
+     * @return array|\Traversable
+     */
+    private function getEntityEmailValue($entity, $propertyPath)
+    {
+        $value = [];
+        if ($this->propertyAccessor->isReadable($entity, $propertyPath)) {
+            $value = $this->propertyAccessor->getValue($entity, $propertyPath);
+        }
+
+        return is_array($value) || $value instanceof \Traversable ? $value : [$value];
     }
 }
