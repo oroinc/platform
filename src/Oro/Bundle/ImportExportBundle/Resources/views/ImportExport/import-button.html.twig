@@ -7,15 +7,16 @@
 {% endfor %}
 
 {% if showImportButton %}
-    <div class="btn-group"
-         data-page-component-module="oroui/js/app/components/view-component"
-         data-page-component-options="{{ {
-             'view': 'oroimportexport/js/app/views/import-button-view',
-             'alias': alias,
-             'routeOptions': options|default({})
-         }|json_encode }}"
-    >
-        <a type="button" href="#" class="btn import-btn icons-holder-text no-hash">
+    <div class="btn-group">
+        <a type="button" href="#"
+           class="btn import-btn icons-holder-text no-hash"
+           data-page-component-module="oroui/js/app/components/view-component"
+           data-page-component-options="{{ {
+               'view': 'oroimportexport/js/app/views/import-button-view',
+               'alias': alias,
+               'routeOptions': options|default({})
+           }|json_encode }}"
+        >
             <i class="fa-download hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
         </a>
     </div>

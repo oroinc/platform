@@ -255,7 +255,10 @@ class ImportExportController extends Controller
             ]
         );
 
-        return new JsonResponse(['success' => true]);
+        return new JsonResponse([
+            'success' => true,
+            'message' => $this->get('translator')->trans('oro.importexport.import.validate.success.message'),
+        ]);
     }
 
     /**
@@ -286,7 +289,10 @@ class ImportExportController extends Controller
             ]
         );
 
-        return new JsonResponse(['success' => true]);
+        return new JsonResponse([
+            'success' => true,
+            'message' => $this->get('translator')->trans('oro.importexport.import.success.message'),
+        ]);
     }
 
     /**
