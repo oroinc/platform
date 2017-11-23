@@ -27,6 +27,9 @@ define(function(require) {
                 throw new Error('Component shortcut `' + key + '` already exists!');
             }
 
+            shortcut.dataKey = 'pageComponent' + _.capitalize(key);
+            shortcut.dataAttr = 'data-page-component-' + key;
+
             this.shortcuts[key] = shortcut;
         },
 

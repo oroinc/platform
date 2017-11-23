@@ -106,7 +106,9 @@ define(function(require) {
                 this.$('.filter-separator, .filter-end').show();
             } else {
                 this.$('.filter-separator, .filter-end').hide();
-                this._setInputValue(this.criteriaValueSelectors.value_end, this.emptyValue.value_end);
+
+                this.value.value_end = this.emptyValue.value_end;
+                this._setInputValue(this.criteriaValueSelectors.value_end, this.value.value_end);
             }
         },
 
@@ -146,7 +148,6 @@ define(function(require) {
          * @inheritDoc
          */
         _getCriteriaHint: function() {
-
             if (this.isEmptyValue()) {
                 return this.placeholder;
             }
@@ -219,7 +220,7 @@ define(function(require) {
                 }
                 if (!tools.isEqualsLoosely(value, oldValue)) {
                     //apply new values and filter type
-                    this._writeDOMValue(value);
+                    this.setValue(value);
                 }
             }
         },
@@ -228,7 +229,8 @@ define(function(require) {
          * @inheritDoc
          */
         _writeDOMValue: function(data) {
-            this._setInputValue(this.criteriaValueSelectors.value_end, data.value_end);
+            var valueEnd = _.isString(data.value_end) ? this.formatter.toRaw(data.value_end) : data.value_end;
+            this._setInputValue(this.criteriaValueSelectors.value_end, valueEnd);
             var $typeInput = this.$(this.criteriaValueSelectors.type);
             if ($typeInput.length && data.type !== $typeInput.val()) {
                 this._setInputValue(this.criteriaValueSelectors.type, data.type);

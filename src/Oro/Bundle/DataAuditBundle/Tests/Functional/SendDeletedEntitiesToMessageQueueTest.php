@@ -113,6 +113,7 @@ class SendDeletedEntitiesToMessageQueueTest extends WebTestCase
                     'entity_id' => $ownerId,
                     'entity_class' => TestAuditDataOwner::class,
                     'change_set' => [],
+                    'additional_fields' => []
                 ],
                 null
             ]

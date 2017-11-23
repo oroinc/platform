@@ -5,6 +5,9 @@ namespace Oro\Bundle\AddressBundle\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+use Oro\Bundle\AddressBundle\Entity\Country;
+use Oro\Bundle\AddressBundle\Entity\Region;
+
 class ValidRegionValidator extends ConstraintValidator
 {
     const ALIAS = 'oro_address_valid_region';
@@ -15,8 +18,11 @@ class ValidRegionValidator extends ConstraintValidator
      */
     public function validate($entity, Constraint $constraint)
     {
-        if ($entity->getCountry() && $entity->getCountry()->hasRegions() &&
-            !$entity->getRegion() && !$entity->getRegionText()
+        $country = $entity->getCountry();
+        $region = $entity->getRegion();
+
+        if ($country && $country->hasRegions() &&
+            !$region && !$entity->getRegionText()
         ) {
             // do not allow saving text region in case when region was checked from list
             // except when in base data region text existed
@@ -24,8 +30,36 @@ class ValidRegionValidator extends ConstraintValidator
             $this->context->addViolationAt(
                 'region',
                 $constraint->message,
-                ['{{ country }}' => $entity->getCountry()->getName()]
+                ['{{ country }}' => $country->getName()]
             );
         }
+
+        if (!$this->regionBelongsToCountry($country, $region)) {
+            $this->context->addViolation(
+                'oro.address.validation.invalid_country_region',
+                [
+                    '{{ region }}' => $region->getName(),
+                    '{{ country }}' => $country->getName(),
+                ]
+            );
+        }
+    }
+
+    /**
+     * This is needed to prevent setting for example region Berlin to country Romania
+     *
+     * @param Country|null $country
+     * @param Region|null $region
+     * @return bool
+     */
+    private function regionBelongsToCountry($country, $region)
+    {
+        // we can make this check only if elements are of the correct type
+        if ($country instanceof Country &&
+            $region instanceof Region) {
+            return $country->getRegions()->contains($region);
+        }
+
+        return true;
     }
 }

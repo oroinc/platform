@@ -34,33 +34,21 @@ class ReportCacheCleanerListenerTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
     }
 
-    public function testWithNotSupportedEntity()
-    {
-        $this->reportCacheManager->expects(self::never())->method('delete');
-        $this->reportCacheManager->expects(self::never())->method('contains');
-
-        $this->reportListener->postUpdate($this->lifecycleEventArgs);
-    }
-
     public function testCacheDoesNotHaveKey()
     {
-        $this->lifecycleEventArgs->expects(self::once())->method('getEntity')
-            ->willReturn($this->getReportEntity());
         $this->reportCacheManager->expects(self::once())->method('contains')->willReturn(false);
         $this->reportCacheManager->expects(self::never())->method('delete');
 
-        $this->reportListener->postUpdate($this->lifecycleEventArgs);
+        $this->reportListener->postUpdate($this->getReportEntity(), $this->lifecycleEventArgs);
     }
 
     public function testPostUpdateSuccess()
     {
-        $this->lifecycleEventArgs->expects(self::once())->method('getEntity')
-            ->willReturn($this->getReportEntity());
         $this->reportCacheManager->expects(self::once())->method('contains')->willReturn(true);
         $this->reportCacheManager->expects(self::once())->method('delete')
             ->with('comeKay.oro_report_table_1');
 
-        $this->reportListener->postUpdate($this->lifecycleEventArgs);
+        $this->reportListener->postUpdate($this->getReportEntity(), $this->lifecycleEventArgs);
     }
 
     /**
