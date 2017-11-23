@@ -535,3 +535,10 @@ services:
         abstract: true
         arguments:
             - '@oro_user.provider.default_user'
+
+    oro_user.event_listener.turn_off_caching:
+        class: 'Oro\Bundle\UserBundle\EventListener\TurnOffCachingListener'
+        arguments:
+            - '@security.token_storage'
+        tags:
+            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
