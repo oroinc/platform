@@ -83,6 +83,7 @@ oro:
             impersonation.label: Audit impersonation
             organization.label: Audit organization
             user.label: Audit user
+            additional_fields.label: Additional fields
 
         audit:
             entity_label: Audit
@@ -100,3 +101,4 @@ oro:
             impersonation.label: Audit impersonation
             organization.label: Audit organization
             user.label: Audit user
+            additional_fields.label: Additional fields

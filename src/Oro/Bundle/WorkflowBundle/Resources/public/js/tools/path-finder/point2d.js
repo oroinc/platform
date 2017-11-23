@@ -1,5 +1,7 @@
-define(function() {
+define(function(require) {
     'use strict';
+
+    var draw = require('./draw');
 
     /**
      * Constructs Points on 2d surface
@@ -166,8 +168,8 @@ define(function() {
     /**
      * Draws point
      *
-     * @param {string} color
-     * @param {number} radius
+     * @param {string} [color]
+     * @param {number} [radius]
      */
     Point2d.prototype.draw = function(color, radius) {
         if (color === void 0) {
@@ -176,24 +178,20 @@ define(function() {
         if (radius === void 0) {
             radius = 2;
         }
-        document.body.insertAdjacentHTML('beforeEnd', '<svg style="position:absolute;width:1000px;height:1000px;">' +
-            '<circle fill="' + color + '" r="' + radius + '" ' + 'cx="' + this.x + '" cy="' + this.y +
-            '"></circle></svg>');
+        draw.circle(this, radius, color);
     };
 
     /**
      * Draws text on point
      *
      * @param {string} text
-     * @param {string} color
+     * @param {string} [color]
      */
     Point2d.prototype.drawText = function(text, color) {
         if (color === void 0) {
             color = 'black';
         }
-        document.body.insertAdjacentHTML('beforeEnd', '<svg style="position:absolute;width:1000px;height:1000px;">' +
-            '<text x="' + (this.x + 5) + '" y="' + (this.y - 5) + '" fill="' + color + '" font-size="10">' +
-            text + '</text></svg>');
+        draw.text({x: this.x + 5, y: this.y - 5}, color, text);
     };
 
     return Point2d;

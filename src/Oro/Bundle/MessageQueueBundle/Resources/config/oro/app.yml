@@ -12,11 +12,9 @@ oro_message_queue:
     persistent_processors:
         - 'oro_message_queue.client.route_message_processor'
         - 'oro_message_queue.job.calculate_root_job_status_processor'
-        - 'oro_message_queue.job.calculate_root_job_progress_processor'
         - 'oro_message_queue.job.dependent_job_processor'
     security_agnostic_topics:
         - 'oro.message_queue.job.calculate_root_job_status'
-        - 'oro.message_queue.job.calculate_root_job_progress'
         - 'oro.message_queue.job.root_job_stopped'
     security_agnostic_processors:
         - 'oro_message_queue.client.route_message_processor'

@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ProcessIncludedEntities;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
+use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class ProcessIncludedEntitiesTest extends FormProcessorTestCase
@@ -33,9 +34,15 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $this->processorBag = $this->createMock(ActionProcessorBagInterface::class);
         $this->errorCompleter = $this->createMock(ErrorCompleterInterface::class);
 
+        $errorCompleterRegistry = $this->createMock(ErrorCompleterRegistry::class);
+        $errorCompleterRegistry->expects(self::any())
+            ->method('getErrorCompleter')
+            ->with($this->context->getRequestType())
+            ->willReturn($this->errorCompleter);
+
         $this->processor = new ProcessIncludedEntities(
             $this->processorBag,
-            $this->errorCompleter
+            $errorCompleterRegistry
         );
     }
 
@@ -79,7 +86,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $this->context->setIncludedData($includedData);
         $this->context->setIncludedEntities($includedEntities);
         $this->processor->process($this->context);
-        $this->assertEquals([$expectedError], $actionContext->getErrors());
+        self::assertEquals([$expectedError], $actionContext->getErrors());
     }
 
     public function testProcessWithFieldFormError()
@@ -123,7 +130,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $this->context->setIncludedData($includedData);
         $this->context->setIncludedEntities($includedEntities);
         $this->processor->process($this->context);
-        $this->assertEquals([$expectedError], $actionContext->getErrors());
+        self::assertEquals([$expectedError], $actionContext->getErrors());
     }
 
     public function testProcessWithFieldFormErrorRepresentedByPropertyPath()
@@ -167,6 +174,6 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $this->context->setIncludedData($includedData);
         $this->context->setIncludedEntities($includedEntities);
         $this->processor->process($this->context);
-        $this->assertEquals([$expectedError], $actionContext->getErrors());
+        self::assertEquals([$expectedError], $actionContext->getErrors());
     }
 }

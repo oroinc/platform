@@ -31,21 +31,24 @@ Finally, we valuate a boolean parameter: `product.enabled`; it should be *true* 
 1. In Oro ExpressionLanguage, `==` operator was removed and the `===` and `!==` operators were replaced with '=' (which stands for *identical*) and '!=' (which stands for *not identical*) respectively.
 2. Oro ExpressionLanguage component uses *\Oro\Component\PropertyAccess\PropertyAccessor* to access the object properties.
 3. `all` and `any` methods were added for arrays and *\Traversable* objects. A nested expression can act as an arguments for these methods, like in `product.units.any(unit = 'item')`. Note there are no quotes around the expression. 
+3. `sum` method was added for arrays and *\Traversable* objects. Example, `lineItems.sum(lineItems.price)`. 
 4. Oro ExpressionLanguage does not allow to call custom methods (other than `any` and `all`).
 
 Other features of Symfony ExpressionLanguage have been gracefully inherited.
 
 ## Working with arrays and collections
 
-As we've mentioned, `all` and `any` methods are available for arrays and *\Traversable* objects. These methods expect another expression as argument, for example, `products.all(product.enabled)`.
+As we've mentioned, `all`, `any`, and `sum` methods are available for arrays and *\Traversable* objects. These methods expect another expression as argument, for example, `products.all(product.enabled)`.
 
-When you are using `all` or `any` method, Oro ExpressionLanguage Component automatically adds special variable into the values of argument expression. If "products" array is a value of general expression, in `all`/`any` argument we will automatically get a "product" item, that is produced by stripping 's' from the array value to get a singular form. For collections of uncountable items, like `milk`, Oro ExpressionLanguage component adds 'Item' suffix, like in: `milk.all(milkItem.isfresh)`.
+When you are using one of those methods, Oro ExpressionLanguage Component automatically adds special variable into the values of argument expression. If "products" array is a value of general expression, in method argument we will automatically get a "product" item, that is produced by stripping 's' from the array value to get a singular form. For collections of uncountable items, like `milk`, Oro ExpressionLanguage component adds 'Item' suffix, like in: `milk.all(milkItem.isfresh)`.
 
 Now, let's see what actually happens when you call `all` and `any` methods. These methods generally follow the `and` and `or` logics when evaluating the nested expression for every element of array.
 
 `items.all(nested_expression)` is `true` when the nested condition is satisfied for every item in the collection. When an item evaluation results in `false`, the `items.all()` immediately returns `false` wihtout processing the remaining items. 
 
 Vise versa, `items.any(nested_expression)` is `true` if a nested expression evaluates to `true` for at least one item. Remaining items are not processed too.
+
+When you call `items.sum(nested_expression)` method, all processing items will be summed one by one. Note that `nested_expression` should return numeric value only (for example, `items.sum(item.price) < 100`). If the expression evaluation results in an invalid (non-numeric) value, the method throws an exception.
 
 ## Example
 

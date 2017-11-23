@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment;
 
+use Doctrine\Common\Cache\CacheProvider;
+
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
-use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
 
 class TestConfigRegistry
 {
@@ -21,22 +22,25 @@ class TestConfigRegistry
     /** @var MetadataProvider */
     private $metadataProvider;
 
-    /** @var ResourcesCache */
+    /** @var CacheProvider */
     private $resourcesCache;
+
+    /** @var bool */
+    private $isResourcesCacheAffected = false;
 
     /**
      * @param TestConfigBag          $configBag
      * @param ConfigProvider         $configProvider
      * @param RelationConfigProvider $relationConfigProvider
      * @param MetadataProvider       $metadataProvider
-     * @param ResourcesCache         $resourcesCache
+     * @param CacheProvider          $resourcesCache
      */
     public function __construct(
         TestConfigBag $configBag,
         ConfigProvider $configProvider,
         RelationConfigProvider $relationConfigProvider,
         MetadataProvider $metadataProvider,
-        ResourcesCache $resourcesCache
+        CacheProvider $resourcesCache
     ) {
         $this->configBag = $configBag;
         $this->configProvider = $configProvider;
@@ -48,10 +52,14 @@ class TestConfigRegistry
     /**
      * @param string $entityClass
      * @param array  $config
+     * @param bool   $affectResourcesCache
      */
-    public function appendEntityConfig($entityClass, array $config)
+    public function appendEntityConfig($entityClass, array $config, $affectResourcesCache)
     {
         $this->configBag->appendEntityConfig($entityClass, $config);
+        if ($affectResourcesCache) {
+            $this->isResourcesCacheAffected = true;
+        }
         $this->clearCaches();
     }
 
@@ -60,6 +68,7 @@ class TestConfigRegistry
         if ($this->configBag->restoreConfigs()) {
             $this->clearCaches();
         }
+        $this->isResourcesCacheAffected = false;
     }
 
     private function clearCaches()
@@ -67,6 +76,8 @@ class TestConfigRegistry
         $this->configProvider->clearCache();
         $this->relationConfigProvider->clearCache();
         $this->metadataProvider->clearCache();
-        $this->resourcesCache->clear();
+        if ($this->isResourcesCacheAffected) {
+            $this->resourcesCache->deleteAll();
+        }
     }
 }

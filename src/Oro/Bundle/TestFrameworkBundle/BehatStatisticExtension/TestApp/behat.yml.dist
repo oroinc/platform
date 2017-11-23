@@ -1,0 +1,8 @@
+default:
+  suites:
+      measurable_features:
+          contexts:
+              - Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\TestApp\FeatureContext
+          paths:
+              - Features/10_seconds.feature
+              - Features/20_seconds.feature

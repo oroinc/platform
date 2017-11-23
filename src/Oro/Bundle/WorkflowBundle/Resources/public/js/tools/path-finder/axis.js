@@ -186,7 +186,7 @@ function(__extends, Interval2d, directions, Point2d) {
      * Adds node to axis. That function keeps all connections up to date, while regular addNode() require
      * axis.finalize() call after all nodes addition. Used to update axis on fly
      *
-     * @param {NodePoint}
+     * @param {NodePoint} node
      */
     Axis.prototype.addFinalNode = function(node) {
         var nextNodeConnVector = this.nextNodeConnVector;

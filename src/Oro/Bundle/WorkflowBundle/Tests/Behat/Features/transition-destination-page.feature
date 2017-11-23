@@ -1,5 +1,4 @@
 @ticket-BAP-13968
-@skip
 @automatically-ticket-tagged
 @fixture-OroWorkflowBundle:Workflow.yml
 Feature: Transition Destination Page for Workflow

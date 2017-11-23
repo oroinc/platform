@@ -12,11 +12,6 @@ class Job
     const STATUS_STALE = 'oro.message_queue_job.status.stale';
 
     /**
-     * @var array
-     */
-    public static $activeStatuses = [self::STATUS_NEW, self::STATUS_RUNNING, self::STATUS_FAILED_REDELIVERED];
-
-    /**
      * @var int
      */
     protected $id;

@@ -20,14 +20,54 @@ class OroClassMetadataFactory extends ClassMetadataFactory
     /** @var OrmLogger */
     protected $logger;
 
+    /** @var bool */
+    private $disconected = false;
+
+    /**
+     * Indicates whether this metadata factory is in the disconnected state.
+     *
+     * @internal this method is intended to be used only to memory usage oprimization of the message queue consumer
+     *
+     * @return bool
+     */
+    public function isDisconected()
+    {
+        return $this->disconected;
+    }
+
+    /**
+     * Switches this metadata factory to the disconnected or connected state.
+     *
+     * @internal this method is intended to be used only to memory usage oprimization of the message queue consumer
+     *
+     * @param $disconected
+     */
+    public function setDisconected($disconected)
+    {
+        $this->disconected = $disconected;
+    }
+
+    /**
+     * Gets an instance of EntityManager connected to this this metadata factory.
+     *
+     * @internal this method is intended to be used only to memory usage oprimization of the message queue consumer
+     *
+     * @return EntityManagerInterface|null
+     */
+    public function getEntityManager()
+    {
+        return $this->entityManager;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function setEntityManager(EntityManagerInterface $em)
     {
-        parent::setEntityManager($em);
-
-        $this->entityManager = $em;
+        if (!$this->disconected) {
+            parent::setEntityManager($em);
+            $this->entityManager = $em;
+        }
     }
 
     /**

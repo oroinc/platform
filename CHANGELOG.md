@@ -1,3 +1,24 @@
+## 2.6.0 (Unreleased)
+
+### Changed
+#### EntityBundle
+* Added event `oro_entity.structure.options` (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/events.md#entity-structure-options-event))
+* Added provider `Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider` for getting data of entities structure (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/entity_structure_data_provider.md))
+### Removed
+#### AttachmentBundle
+* The parameter `oro_attachment.listener.file_listener.class` was removed form the service container
+#### CommentBundle
+* The parameter `oro_comment.comment_lifecycle_listener.class` was removed form the service container
+#### ImapBundle
+* The parameter `oro_imap.listener.user_email_origin.class` was removed form the service container
+#### ReminderBundle
+* The parameter `oro_reminder.event_listener.reminder_listener.class` was removed form the service container
+#### SSOBundle
+* The parameter `oro_sso.event_listener.user_email_change_listener.class` was removed form the service container
+#### WorkflowBundle
+* The parameter `oro_workflow.listener.process_data_serialize.class` was removed form the service container
+* The parameter `oro_workflow.listener.workflow_data_serialize.class` was removed form the service container
+
 ## 2.5.0 (Unreleased)
 
 ### Added
@@ -37,10 +58,13 @@
 * Added a possibility to rename associations. This leads the following backward incompatible changes:
     * the data passed to `customize_loaded_data` processors were changed: from now these data contain already renamed fields and associations are not collapsed
 #### ChainProcessor Component
-* Optimized memory usage. As result the schema of data stored in `Oro\Component\ChainProcessor\ProcessorBag::$processors` property was changed from `[action => [['processor' => processor id, 'attributes' => [attribute name => attribute value, ...]], ...], ...]` to `[action => [[processor id, [attribute name => attribute value, ...]], ...], ...]` and in `Oro\Component\ChainProcessor\ProcessorIterator::$processors` property from `[['processor' => processor id, 'attributes' => [attribute name => attribute value, ...]], ...]` to `[[processor id, [attribute name => attribute value, ...]], ...]`
-#### EntityBundle
-* Added event `oro_entity.structure.options` (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/events.md#entity-structure-options-event))
-* Added provider `Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider` for getting data of entities structure (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/entity_structure_data_provider.md))
+* The performance and memory usage was optimized. As result the following changes were done:
+    * the building of groups and processors maps functionality was moved from `Oro\Component\ChainProcessor\ProcessorBag` to `Oro\Component\ChainProcessor\ProcessorBagConfigBuilder`
+    * methods `addGroup` and `addProcessor` were removed from `Oro\Component\ChainProcessor\ProcessorBag`
+    * the schema of data stored in `Oro\Component\ChainProcessor\ProcessorBag::$processors` property was changed from `[action => [['processor' => processor id, 'attributes' => [attribute name => attribute value, ...]], ...], ...]` to `[action => [[processor id, [attribute name => attribute value, ...]], ...], ...]`
+    * the schema of data stored in `Oro\Component\ChainProcessor\ProcessorIterator::$processors` property was changed from `[['processor' => processor id, 'attributes' => [attribute name => attribute value, ...]], ...]` to `[[processor id, [attribute name => attribute value, ...]], ...]`
+    * the DIC compiler pass `Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass` was split into two compiler passes `Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass` and `Oro\Component\ChainProcessor\DependencyInjection\LoadApplicableCheckersCompilerPass`
+    * added new DIC compiler pass `Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompilerPass`
 #### EntityConfigBundle
 * Implementation should be registered as a service with the `oro_entity_config.attribute_type` tag.
 #### EntitySerializer Component

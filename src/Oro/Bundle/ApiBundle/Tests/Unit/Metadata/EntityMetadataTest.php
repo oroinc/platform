@@ -555,6 +555,40 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetIdentifierValueForEntityWithRenamedSingleId()
+    {
+        $entity = new Group();
+        $entity->setId(123);
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName(Group::class);
+        $entityMetadata->setIdentifierFieldNames(['renamedId']);
+        $entityMetadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
+
+        self::assertSame(
+            123,
+            $entityMetadata->getIdentifierValue($entity)
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The class "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" does not have property "unknownProperty".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testGetIdentifierValueForEntityWithSingleIdWhenIdPropertyDoesNotExist()
+    {
+        $entity = new Group();
+        $entity->setId(123);
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName(Group::class);
+        $entityMetadata->setIdentifierFieldNames(['unknownProperty']);
+
+        $entityMetadata->getIdentifierValue($entity);
+    }
+
     public function testGetIdentifierValueForEntityWithCompositeId()
     {
         $entity = new Group();
@@ -569,5 +603,42 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
             ['id' => 123, 'name' => 'test'],
             $entityMetadata->getIdentifierValue($entity)
         );
+    }
+
+    public function testGetIdentifierValueForEntityWithRenamedCompositeId()
+    {
+        $entity = new Group();
+        $entity->setId(123);
+        $entity->setName('test');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName(Group::class);
+        $entityMetadata->setIdentifierFieldNames(['renamedId', 'renamedName']);
+        $entityMetadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
+        $entityMetadata->addField(new FieldMetadata('renamedName'))->setPropertyPath('name');
+
+        self::assertSame(
+            ['renamedId' => 123, 'renamedName' => 'test'],
+            $entityMetadata->getIdentifierValue($entity)
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The class "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" does not have property "unknownProperty".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testGetIdentifierValueForEntityWithRenamedCompositeIdWhenIdPropertyDoesNotExist()
+    {
+        $entity = new Group();
+        $entity->setId(123);
+        $entity->setName('test');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName(Group::class);
+        $entityMetadata->setIdentifierFieldNames(['id', 'unknownProperty']);
+
+        $entityMetadata->getIdentifierValue($entity);
     }
 }

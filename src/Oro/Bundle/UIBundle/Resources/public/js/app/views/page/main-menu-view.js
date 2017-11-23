@@ -9,10 +9,16 @@ define([
     var PageMainMenuView;
 
     PageMainMenuView = PageRegionView.extend({
+        events: {
+            'mouseenter .dropdown': '_onDropdownMouseEnter'
+        },
+
         template: function(data) {
             return data.mainMenu;
         },
         pageItems: ['mainMenu', 'currentRoute'],
+
+        maxHeightModifier: 50,
 
         initialize: function(options) {
             // Array of search callback, that match route to menu item
@@ -21,6 +27,21 @@ define([
             this.routeMatchedMenuItemsCache = {};
 
             PageMainMenuView.__super__.initialize.call(this, options);
+        },
+
+        delegateEvents: function(events) {
+            PageMainMenuView.__super__.delegateEvents.call(this, events);
+
+            //can't use event delegation, in some cases bubbling will be break
+            this.$('a').on('click' + this.eventNamespace(), _.bind(this._onMenuItemClick, this));
+        },
+
+        undelegateEvents: function() {
+            if (this.$el) {
+                this.$('a').off(this.eventNamespace());
+            }
+
+            PageMainMenuView.__super__.undelegateEvents.call(this);
         },
 
         render: function() {
@@ -44,8 +65,108 @@ define([
             return this;
         },
 
+        _onMenuItemClick: function(e) {
+            this.hideDropdownScroll($(e.currentTarget));
+        },
+
+        _onDropdownMouseEnter: function(e) {
+            this.updateDropdownChildPosition($(e.currentTarget));
+            this.updateDropdownScroll($(e.currentTarget));
+        },
+
+        /**
+         * Fix issues with open dropdown after click on menu item
+         */
+        hideDropdownScroll: function($link) {
+            var $scrollable = $link.closest('.dropdown-menu-wrapper__scrollable');
+            if (!$scrollable.length) {
+                return;
+            }
+            $scrollable.addClass('hidden');
+        },
+
+        updateDropdownScroll: function($toggle) {
+            var $scrollable = $toggle.find('.dropdown-menu-wrapper__scrollable:first');
+            if (!$scrollable.length) {
+                return;
+            }
+
+            $scrollable.removeClass('hidden');
+
+            var $scrollableParent = $scrollable.parent();
+
+            //reset styles to recalc it
+            var scrollableHeight = $scrollable.children(':first').outerHeight();
+            $scrollable.css('max-height', scrollableHeight + 'px');
+            $scrollableParent.css('margin-top', 0);
+
+            var toggleHeight = $toggle.outerHeight();
+            var scrollableParentHeight = $scrollableParent.outerHeight();
+            var scrollableHeightModifier = 0;
+
+            var scrollableTop = $scrollable.get(0).getBoundingClientRect().top;
+            var availableHeight = window.innerHeight - scrollableTop;
+
+            if (scrollableParentHeight <= availableHeight) {
+                //scroll are not required
+                return;
+            }
+
+            var maxHeight = availableHeight - this.maxHeightModifier;
+            if (scrollableTop > availableHeight) {
+                //change dropdown direction if necessary
+                scrollableHeightModifier = scrollableParentHeight - scrollableHeight;
+
+                if (scrollableParentHeight > scrollableTop) {
+                    maxHeight = scrollableTop - scrollableHeightModifier - this.maxHeightModifier;
+                } else {
+                    maxHeight = scrollableHeight;
+                }
+
+                var marginTop = -1 * (maxHeight + scrollableHeightModifier) + toggleHeight;
+                $scrollableParent.css('margin-top', marginTop + 'px');
+            }
+            $scrollable.css('max-height', maxHeight + 'px');
+        },
+
+        updateDropdownChildPosition: function($toggle) {
+            var $child = $toggle.children('.dropdown-menu-wrapper__child:first');
+            if (!$child.length) {
+                return;
+            }
+
+            //reset styles to recalc it
+            $child.css({
+                'margin-left': 0,
+                'margin-top': 0
+            });
+
+            var $scrollable = $child.closest('.dropdown-menu-wrapper__scrollable');
+            var scrollControlWidth = $scrollable.outerWidth() - $toggle.outerWidth();
+
+            var scrollTop = $scrollable.scrollTop();
+            var toggleHeight = $toggle.outerHeight();
+
+            var marginTop = -1 * (toggleHeight + scrollTop);
+            $child.css({
+                'margin-left': 'calc(100% - ' + scrollControlWidth + 'px)',
+                'margin-top': marginTop + 'px'
+            });
+
+            //change dropdown direction if necessary
+            var childHeight = $child.outerHeight();
+            var childTop = $child.get(0).getBoundingClientRect().top;
+            if (childHeight + childTop > window.innerHeight) {
+                marginTop = -1 * (childHeight + scrollTop);
+                $child.css({
+                    'margin-top': marginTop + 'px'
+                });
+            }
+        },
+
         /**
          * Defines current route name
+         *
          * @param {Object=} data
          * @returns {string}
          */

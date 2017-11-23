@@ -110,6 +110,10 @@ class OroMessageQueueExtension extends Extension
         $this->setPersistenceServicesAndProcessors($config, $container);
         $this->setSecurityAgnosticTopicsAndProcessors($config, $container);
         $this->setJobConfigurationProvider($config, $container);
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $this->configureTestEnvironment($container);
+        }
     }
 
     /**
@@ -173,5 +177,18 @@ class OroMessageQueueExtension extends Extension
             $jobConfigurationProvider = $container->getDefinition('oro_message_queue.job.configuration_provider');
             $jobConfigurationProvider->addMethodCall('setConfiguration', [$config['time_before_stale']]);
         }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    protected function configureTestEnvironment(ContainerBuilder $container)
+    {
+        // oro_message_queue.client.buffered_message_producer
+        $bufferedProducerDef = $container->getDefinition('oro_message_queue.client.buffered_message_producer');
+        $bufferedProducerDef->setClass(
+            'Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer'
+        );
+        $bufferedProducerDef->setPublic(true);
     }
 }

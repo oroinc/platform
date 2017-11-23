@@ -28,6 +28,10 @@ class OroNavigationExtension extends Extension
         $loader->load('content_providers.yml');
         $loader->load('form_types.yml');
 
+        if ($container->getParameter('kernel.debug')) {
+            $loader->load('debug.yml');
+        }
+
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
 
         $this->addClassesToCompile(

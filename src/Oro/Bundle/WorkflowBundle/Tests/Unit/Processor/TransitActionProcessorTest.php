@@ -6,6 +6,7 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\TransitActionProcessor;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Oro\Component\ChainProcessor\ProcessorBag;
+use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Psr\Log\LoggerInterface;
@@ -16,6 +17,9 @@ use Psr\Log\LoggerInterface;
  */
 class TransitActionProcessorTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var ProcessorBagConfigBuilder */
+    protected $processorBagConfigBuilder;
+
     /** @var ProcessorBag */
     protected $processorBag;
 
@@ -33,7 +37,8 @@ class TransitActionProcessorTest extends \PHPUnit_Framework_TestCase
         $this->factory = $this->createMock(ProcessorFactoryInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->processorBag = new ProcessorBag($this->factory);
+        $this->processorBagConfigBuilder = new ProcessorBagConfigBuilder();
+        $this->processorBag = new ProcessorBag($this->processorBagConfigBuilder, $this->factory);
 
         $this->processor = new TransitActionProcessor($this->processorBag, $this->logger);
     }
@@ -62,17 +67,17 @@ class TransitActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor1 = $this->createMock(ProcessorInterface::class);
         $processor2 = $this->createMock(ProcessorInterface::class);
 
-        $this->factory->expects($this->exactly(2))
+        $this->factory->expects(self::exactly(2))
             ->method('getProcessor')
             ->willReturnOnConsecutiveCalls($processor1, $processor2);
 
-        $this->processorBag->addProcessor('processor1', [], 'action1', null, 20);
-        $this->processorBag->addProcessor('processor2', [], 'action1', null, 10);
+        $this->processorBagConfigBuilder->addProcessor('processor1', [], 'action1', null, 20);
+        $this->processorBagConfigBuilder->addProcessor('processor2', [], 'action1', null, 10);
 
         $context = new TransitionContext();
         $context->setAction('action1');
 
-        $this->logger->expects($this->exactly(4))
+        $this->logger->expects(self::exactly(4))
             ->method('debug')
             ->withConsecutive(
                 ['Execute processor {processorId}', ['processorId' => 'processor1', 'processorAttributes' => []]],
@@ -81,8 +86,8 @@ class TransitActionProcessorTest extends \PHPUnit_Framework_TestCase
                 ['Context processed.', ['context' => $context->toArray()]]
             );
 
-        $processor1->expects($this->once())->method('process')->with($this->identicalTo($context));
-        $processor2->expects($this->once())->method('process')->with($this->identicalTo($context));
+        $processor1->expects(self::once())->method('process')->with(self::identicalTo($context));
+        $processor2->expects(self::once())->method('process')->with(self::identicalTo($context));
 
         $this->processor->process($context);
     }
@@ -92,37 +97,37 @@ class TransitActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor1 = $this->createMock(ProcessorInterface::class);
         $processor2 = $this->createMock(ProcessorInterface::class);
 
-        $this->factory->expects($this->exactly(2))
+        $this->factory->expects(self::exactly(2))
             ->method('getProcessor')
             ->willReturnOnConsecutiveCalls($processor1, $processor2);
 
-        $this->processorBag->addGroup('group1', 'action1', 20);
-        $this->processorBag->addGroup('group2', 'action1', 10);
-        $this->processorBag->addProcessor('processor1', [], 'action1', 'group1', 20);
-        $this->processorBag->addProcessor('processor2', [], 'action1', 'group2', 20);
-        $this->processorBag->addProcessor('processor3', [], 'action1', 'group2', 10);
+        $this->processorBagConfigBuilder->addGroup('group1', 'action1', 20);
+        $this->processorBagConfigBuilder->addGroup('group2', 'action1', 10);
+        $this->processorBagConfigBuilder->addProcessor('processor1', [], 'action1', 'group1', 20);
+        $this->processorBagConfigBuilder->addProcessor('processor2', [], 'action1', 'group2', 20);
+        $this->processorBagConfigBuilder->addProcessor('processor3', [], 'action1', 'group2', 10);
 
         $context = new TransitionContext();
         $context->setAction('action1');
 
-        $processor1->expects($this->once())->method('process')->with($this->identicalTo($context));
-        $processor2->expects($this->once())
+        $processor1->expects(self::once())->method('process')->with(self::identicalTo($context));
+        $processor2->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->willThrowException(new \Exception('Some error.'));
 
         try {
             $this->processor->process($context);
-            $this->fail('An exception expected');
+            self::fail('An exception expected');
         } catch (ExecutionFailedException $e) {
-            $this->assertEquals('Processor failed: "processor2". Reason: Some error.', $e->getMessage());
-            $this->assertEquals('processor2', $e->getProcessorId());
-            $this->assertEquals('action1', $e->getAction());
-            $this->assertEquals('group2', $e->getGroup());
-            $this->assertNotNull($e->getPrevious());
-            $this->assertEquals('Some error.', $e->getPrevious()->getMessage());
+            self::assertEquals('Processor failed: "processor2". Reason: Some error.', $e->getMessage());
+            self::assertEquals('processor2', $e->getProcessorId());
+            self::assertEquals('action1', $e->getAction());
+            self::assertEquals('group2', $e->getGroup());
+            self::assertNotNull($e->getPrevious());
+            self::assertEquals('Some error.', $e->getPrevious()->getMessage());
         } catch (\Exception $e) {
-            $this->fail(sprintf('ExecutionFailedException expected. Got: %s', get_class($e)));
+            self::fail(sprintf('ExecutionFailedException expected. Got: %s', get_class($e)));
         }
     }
 }
