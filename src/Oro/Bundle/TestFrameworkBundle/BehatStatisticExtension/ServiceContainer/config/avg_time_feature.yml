@@ -1,0 +1,44 @@
+services:
+    oro_behat_statistic.feature_avg_time_provider.registry:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\FeatureAvgTimeRegistry
+        calls:
+            - [ addProvider, [ '@oro_behat_statistic.feature_avg_time_provider.pr' ]]
+            - [ addProvider, [ '@oro_behat_statistic.feature_avg_time_provider.branch' ]]
+            - [ addProvider, [ '@oro_behat_statistic.feature_avg_time_provider.target' ]]
+            - [ addProvider, [ '@oro_behat_statistic.feature_avg_time_provider.master' ]]
+            - [ addProvider, [ '@oro_behat_statistic.feature_avg_time_provider.simple' ]]
+
+    oro_behat_statistic.feature_avg_time_provider.pr:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\PRAvgTimeProvider
+        arguments:
+            - '@oro_behat_statistic.criteria_array_collection'
+        calls:
+            - ['setRepository', ['@oro_behat_statistic.feature_repository']]
+
+    oro_behat_statistic.feature_avg_time_provider.branch:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\BranchAvgTimeProvider
+        arguments:
+            - '@oro_behat_statistic.criteria_array_collection'
+        calls:
+            - ['setRepository', ['@oro_behat_statistic.feature_repository']]
+
+    oro_behat_statistic.feature_avg_time_provider.target:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\TargetAvgTimeProvider
+        arguments:
+            - '@oro_behat_statistic.criteria_array_collection'
+        calls:
+            - ['setRepository', ['@oro_behat_statistic.feature_repository']]
+
+    oro_behat_statistic.feature_avg_time_provider.master:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\MasterAvgTimeProvider
+        arguments:
+            - '@oro_behat_statistic.criteria_array_collection'
+        calls:
+            - ['setRepository', ['@oro_behat_statistic.feature_repository']]
+
+    oro_behat_statistic.feature_avg_time_provider.simple:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\SimpleAvgProvider
+        arguments:
+            - '@oro_behat_statistic.criteria_array_collection'
+        calls:
+            - ['setRepository', ['@oro_behat_statistic.feature_repository']]

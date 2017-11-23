@@ -3,8 +3,8 @@
 namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Tests\Cli;
 
 use Doctrine\DBAL\Connection;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\FeatureAvgTimeRegistry;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Cli\AvailableSuiteSetsController;
-use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\Repository\FeatureStatisticRepository;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\FeaturePathLocator;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Suite\SuiteConfigurationRegistry;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Tests\Stub\InputStub;
@@ -17,7 +17,7 @@ class AvailableSuiteSetsControllerTest extends \PHPUnit_Framework_TestCase
     {
         $controller = new AvailableSuiteSetsController(
             $this->getSuiteConfigRegistryMock(),
-            new FeatureStatisticRepository($this->getConnectionMock()),
+            new FeatureAvgTimeRegistry(),
             $this->getFeaturePathLocatorMock()
         );
         $command = new Command('test');
@@ -30,6 +30,7 @@ class AvailableSuiteSetsControllerTest extends \PHPUnit_Framework_TestCase
 
     public function testExecute()
     {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|SuiteConfigurationRegistry $suiteConfigRegistry */
         $suiteConfigRegistry = $this->getMockBuilder(SuiteConfigurationRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -38,7 +39,7 @@ class AvailableSuiteSetsControllerTest extends \PHPUnit_Framework_TestCase
 
         $controller = new AvailableSuiteSetsController(
             $suiteConfigRegistry,
-            new FeatureStatisticRepository($this->getConnectionMock()),
+            new FeatureAvgTimeRegistry,
             $this->getFeaturePathLocatorMock()
         );
         $returnCode = $controller->execute(new InputStub('', [], ['available-suite-sets' => true]), $output);
@@ -51,7 +52,7 @@ class AvailableSuiteSetsControllerTest extends \PHPUnit_Framework_TestCase
     {
         $controller = new AvailableSuiteSetsController(
             $this->getSuiteConfigRegistryMock(),
-            new FeatureStatisticRepository($this->getConnectionMock()),
+            new FeatureAvgTimeRegistry,
             $this->getFeaturePathLocatorMock()
         );
         $returnCode = $controller->execute(new InputStub(), new OutputStub());
