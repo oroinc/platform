@@ -3,28 +3,28 @@
 namespace Oro\Bundle\NavigationBundle\EventListener;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
-
 use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 
 class ContainerListener
 {
-    /** @var ConfigurationProvider */
-    private $configurationProvider;
-
     /** @var ConfigMetadataDumperInterface */
     private $dumper;
 
+    /** @var ContainerInterface */
+    private $container;
+
     /**
-     * @param ConfigurationProvider         $configurationProvider
      * @param ConfigMetadataDumperInterface $dumper
+     * @param ContainerInterface            $container
      */
-    public function __construct(ConfigurationProvider $configurationProvider, ConfigMetadataDumperInterface $dumper)
+    public function __construct(ConfigMetadataDumperInterface $dumper, ContainerInterface $container)
     {
-        $this->configurationProvider = $configurationProvider;
         $this->dumper = $dumper;
+        $this->container = $container;
     }
 
     /**
@@ -34,12 +34,18 @@ class ContainerListener
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        if (!$this->dumper->isFresh()) {
+        if ($event->isMasterRequest() && !$this->dumper->isFresh()) {
             $container = new ContainerBuilder();
-
-            // Reload navigation config to warm-up the cache
-            $this->configurationProvider->loadConfiguration($container);
+            $this->getConfigurationProvider()->loadConfiguration($container);
             $this->dumper->dump($container);
         }
+    }
+
+    /**
+     * @return ConfigurationProvider
+     */
+    private function getConfigurationProvider()
+    {
+        return $this->container->get('oro_navigation.configuration.provider');
     }
 }

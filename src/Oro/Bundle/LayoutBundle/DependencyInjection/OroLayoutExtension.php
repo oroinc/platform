@@ -85,6 +85,10 @@ class OroLayoutExtension extends Extension
         $themeResourceProviderDef = $container->getDefinition(self::THEME_RESOURCE_PROVIDER_SERVICE_ID);
         $themeResourceProviderDef->replaceArgument(2, $excludedPaths);
 
+        if ($container->getParameter('kernel.debug')) {
+            $loader->load('debug.yml');
+        }
+
         $this->addClassesToCompile([
             'Oro\Bundle\LayoutBundle\EventListener\ThemeListener',
             'Oro\Bundle\LayoutBundle\Request\LayoutHelper'

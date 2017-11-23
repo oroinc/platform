@@ -3,27 +3,28 @@
 namespace Oro\Bundle\DataGridBundle\EventListener;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
-use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider;
+use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 
 class ContainerListener
 {
-    protected $confProvider;
+    /** @var ConfigMetadataDumperInterface */
+    private $dumper;
 
-    protected $dumper;
+    /** @var ContainerInterface */
+    private $container;
 
     /**
-     * ContainerListener constructor.
-     *
-     * @param ConfigurationProvider $provider
      * @param ConfigMetadataDumperInterface $dumper
+     * @param ContainerInterface            $container
      */
-    public function __construct(ConfigurationProvider $provider, ConfigMetadataDumperInterface $dumper)
+    public function __construct(ConfigMetadataDumperInterface $dumper, ContainerInterface $container)
     {
-        $this->confProvider = $provider;
-        $this->dumper       = $dumper;
+        $this->dumper = $dumper;
+        $this->container = $container;
     }
 
     /**
@@ -33,11 +34,18 @@ class ContainerListener
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        if (!$this->dumper->isFresh()) {
-            $temporaryConfigContainer = new ContainerBuilder();
-            // Reload datagrid config to worm-up the cache
-            $this->confProvider->loadConfiguration($temporaryConfigContainer);
-            $this->dumper->dump($temporaryConfigContainer);
+        if ($event->isMasterRequest() && !$this->dumper->isFresh()) {
+            $container = new ContainerBuilder();
+            $this->getConfigurationProvider()->loadConfiguration($container);
+            $this->dumper->dump($container);
         }
+    }
+
+    /**
+     * @return ConfigurationProvider
+     */
+    private function getConfigurationProvider()
+    {
+        return $this->container->get('oro_datagrid.configuration.provider');
     }
 }

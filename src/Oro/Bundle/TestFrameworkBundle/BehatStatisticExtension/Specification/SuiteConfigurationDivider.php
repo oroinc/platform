@@ -3,15 +3,14 @@
 namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification;
 
 use Behat\Testwork\Suite\Suite;
-use Doctrine\Common\Persistence\ObjectRepository;
-use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\Repository\FeatureStatisticRepository;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\FeatureAvgTimeRegistry;
 
 class SuiteConfigurationDivider implements SpecificationDividerInterface
 {
     /**
-     * @var ObjectRepository
+     * @var FeatureAvgTimeRegistry
      */
-    protected $featureStatRepository;
+    protected $featureAvgTimeRegistry;
 
     /**
      * @var FeaturePathLocator
@@ -19,14 +18,14 @@ class SuiteConfigurationDivider implements SpecificationDividerInterface
     protected $featurePathLocator;
 
     /**
-     * @param FeatureStatisticRepository $featureStatRepository
+     * @param FeatureAvgTimeRegistry $featureAvgTimeRegistry
      * @param FeaturePathLocator $featurePathLocator
      */
     public function __construct(
-        FeatureStatisticRepository $featureStatRepository,
+        FeatureAvgTimeRegistry $featureAvgTimeRegistry,
         FeaturePathLocator $featurePathLocator
     ) {
-        $this->featureStatRepository = $featureStatRepository;
+        $this->featureAvgTimeRegistry = $featureAvgTimeRegistry;
         $this->featurePathLocator = $featurePathLocator;
     }
 
@@ -98,6 +97,6 @@ class SuiteConfigurationDivider implements SpecificationDividerInterface
     {
         $relativePath = $this->featurePathLocator->getRelativePath($path);
 
-        return $this->featureStatRepository->getAverageTime($relativePath);
+        return $this->featureAvgTimeRegistry->getAverageTimeById($relativePath);
     }
 }

@@ -22,5 +22,7 @@ api:
                     exclude: true
                 content:
                     data_type: string
-                    property_path: file
+                    property_path: _
                     depends_on: [filename]
+                    form_options:
+                        property_path: file
