@@ -31,7 +31,7 @@ class ImportExportControllerTest extends WebTestCase
             $this->getUrl('oro_importexport_export_instant', ['processorAlias' => 'oro_account'])
         );
 
-        $this->assertJsonResponseSuccess();
+        $this->assertJsonResponseSuccessOnExport();
 
         $organization = $this->getTokenAccessor()->getOrganization();
         $organizationId = $organization ? $organization->getId() : null;
@@ -61,7 +61,7 @@ class ImportExportControllerTest extends WebTestCase
             ])
         );
 
-        $this->assertJsonResponseSuccess();
+        $this->assertJsonResponseSuccessOnExport();
 
         $organization = $this->getTokenAccessor()->getOrganization();
         $organizationId = $organization ? $organization->getId() : null;
@@ -450,12 +450,22 @@ class ImportExportControllerTest extends WebTestCase
         return $this->getContainer()->get('security.token_storage')->getToken()->getUser();
     }
 
-    private function assertJsonResponseSuccess()
+    private function assertJsonResponseSuccessOnExport()
     {
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($result);
         $this->assertCount(1, $result);
         $this->assertTrue($result['success']);
+    }
+
+    private function assertJsonResponseSuccess()
+    {
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertNotEmpty($result);
+        $this->assertCount(2, $result);
+        $this->assertTrue($result['success']);
+        $this->assertContains('message', $result);
     }
 }

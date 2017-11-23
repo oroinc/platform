@@ -351,7 +351,7 @@ class ImportExportContext extends OroFeatureContext implements
     {
         $this->tryImportFile();
 
-        $flashMessage = 'Import started successfully. You will receive email notification upon completion.';
+        $flashMessage = 'Import started successfully. You will receive an email notification upon completion.';
         $this->oroMainContext->iShouldSeeFlashMessage($flashMessage);
     }
 

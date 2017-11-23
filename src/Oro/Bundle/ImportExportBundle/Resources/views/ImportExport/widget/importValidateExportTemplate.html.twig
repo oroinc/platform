@@ -173,6 +173,20 @@
                     return form.find("select[name='oro_importexport_import[processorAlias]']").val();
                 };
 
+                // this needs to be done because select2 does not work well with hidden selects in mobile version
+                var refreshActiveInputWidgets = function(){
+                    getCurrentlyActiveTabContent().find('select').each(function(){
+                        if (this.isRefreshed) {
+                            return;
+                        }
+
+                        $(this).inputWidget('refresh');
+                        this.isRefreshed = true; // so that each select is not refreshed every time
+                    });
+                };
+
+                refreshActiveInputWidgets();
+
                 $('#import_button').click(function(){
                     var $form = getCurrentlyActiveTabContent().find('form');
 
@@ -207,6 +221,7 @@
 
                     $('.nav-tabs a').on('shown .bs.tab', function() {
                         resetWidgetFormToActiveTabForm(widget);
+                        refreshActiveInputWidgets();
                     });
 
                     widget._onContentLoad = function (content) {
