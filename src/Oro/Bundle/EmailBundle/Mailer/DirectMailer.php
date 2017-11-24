@@ -260,7 +260,13 @@ class DirectMailer extends \Swift_Mailer
             }
             $mailer = $this->container->get(sprintf('swiftmailer.mailer.%s', $name));
             if ($mailer === $this->baseMailer) {
-                $realTransport = $this->container->get(sprintf('swiftmailer.mailer.%s.transport.real', $name));
+                if ($name === 'default') {
+                    $realTransport = $this->container->get('oro_email.util.configurable_transport')
+                        ->getDefaultTransport();
+                } else {
+                    $realTransport = $this->container->get(sprintf('swiftmailer.mailer.%s.transport.real', $name));
+                }
+
                 break;
             }
         }
