@@ -231,7 +231,7 @@ define(function(require) {
             beforeEach(function(done) {
                 EntityStructureDataProvider.getOwnDataContainer(applicant1, {
                     rootEntity: initialRootEntityClassName,
-                    capabilityOptions: ['configurable'],
+                    optionsFilter: {configurable: true},
                     exclude: [{name: 'createdAt'}],
                     include: ['type']
                 }).then(function(provider) {
@@ -255,12 +255,12 @@ define(function(require) {
             });
 
             it('capability options are defined over initial options', function() {
-                expect(dataProvider.capabilityOptions).toEqual({configurable: true});
+                expect(dataProvider.optionsFilter).toEqual({configurable: true});
             });
 
             it('changes capability options in runtime', function() {
-                dataProvider.setCapabilityOptions(['configurable', 'auditable']);
-                expect(dataProvider.capabilityOptions).toEqual({configurable: true, auditable: true});
+                dataProvider.setOptionsFilter({configurable: true, auditable: true});
+                expect(dataProvider.optionsFilter).toEqual({configurable: true, auditable: true});
             });
 
             it('filter entity fields using include and exclude options', function() {
@@ -290,6 +290,131 @@ define(function(require) {
                         jasmine.objectContaining({name: 'id', type: 'integer'})
                     ]
                 }));
+            });
+
+            it('reset filters configuration', function() {
+                dataProvider.setOptionsFilter(null);
+                dataProvider.setExcludeRules(null);
+                dataProvider.setIncludeRules(null);
+                var chain = dataProvider.pathToEntityChain();
+                expect(chain[0].entity.fields.length).toBe(6);
+            });
+        });
+
+        describe('filter fields in data provider with advanced options', function() {
+            var dataProvider;
+
+            beforeEach(function(done) {
+                EntityStructureDataProvider.getOwnDataContainer(applicant1, {
+                    rootEntity: 'Oro\\Bundle\\UserBundle\\Entity\\Group'
+                }).then(function(provider) {
+                    dataProvider = provider;
+                    done();
+                });
+            });
+
+            it('filter by unidirectional option', function() {
+                dataProvider.setOptionsFilter({unidirectional: true});
+                var chain = dataProvider.pathToEntityChain();
+                expect(chain[0].entity).toEqual(jasmine.objectContaining({
+                    fields: [
+                        jasmine.objectContaining({
+                            label: 'Groups (Users)',
+                            name: 'Oro\\Bundle\\UserBundle\\Entity\\User::groups'
+                        })
+                    ]
+                }));
+
+                dataProvider.setOptionsFilter({unidirectional: false});
+                chain = dataProvider.pathToEntityChain();
+                expect(chain[0].entity.fields.length).toBe(3);
+                expect(chain[0].entity.fields)
+                    .not.toContain(jasmine.objectContaining({
+                        label: 'Groups (Users)',
+                        name: 'Oro\\Bundle\\UserBundle\\Entity\\User::groups'
+                    }));
+            });
+
+            it('filter by auditable option', function() {
+                dataProvider.setOptionsFilter({auditable: true});
+                var chain = dataProvider.pathToEntityChain();
+                expect(chain[0].entity.fields).toEqual([
+                    jasmine.objectContaining({label: 'Name', name: 'name'}),
+                    jasmine.objectContaining({
+                        label: 'Groups (Users)',
+                        name: 'Oro\\Bundle\\UserBundle\\Entity\\User::groups'
+                    })
+                ]);
+
+                dataProvider.setOptionsFilter({auditable: false});
+                chain = dataProvider.pathToEntityChain();
+                expect(chain[0].entity.fields).toEqual([
+                    jasmine.objectContaining({label: 'Id', name: 'id'}),
+                    jasmine.objectContaining({label: 'Roles', name: 'roles'})
+                ]);
+            });
+
+            it('filter by relation option', function() {
+                dataProvider.setOptionsFilter({relation: true});
+                var chain = dataProvider.pathToEntityChain();
+                expect(chain[0].entity.fields).toEqual([
+                    jasmine.objectContaining({
+                        label: 'Groups (Users)',
+                        name: 'Oro\\Bundle\\UserBundle\\Entity\\User::groups'
+                    }),
+                    jasmine.objectContaining({label: 'Roles', name: 'roles'})
+                ]);
+
+                dataProvider.setOptionsFilter({relation: false});
+                chain = dataProvider.pathToEntityChain();
+                expect(chain[0].entity.fields).toEqual([
+                    jasmine.objectContaining({label: 'Id', name: 'id'}),
+                    jasmine.objectContaining({label: 'Name', name: 'name'})
+                ]);
+            });
+        });
+
+        describe('filter configuration preset is used in provider', function() {
+            var dataProvider;
+
+            beforeEach(function(done) {
+                EntityStructureDataProvider.defineFilterPreset('first-custom-fields-set', {
+                    optionsFilter: {configurable: true},
+                    include: [{relationType: 'manyToMany'}],
+                    exclude: []
+                });
+                EntityStructureDataProvider.defineFilterPreset('second-custom-fields-set', {
+                    optionsFilter: {virtual: true},
+                    include: [],
+                    exclude: [{relationType: 'manyToMany'}]
+                });
+                EntityStructureDataProvider.getOwnDataContainer(applicant1, {
+                    rootEntity: 'Oro\\Bundle\\UserBundle\\Entity\\Group',
+                    filterPreset: 'first-custom-fields-set'
+                }).then(function(provider) {
+                    dataProvider = provider;
+                    done();
+                });
+            });
+
+            afterEach(function() {
+                delete EntityStructureDataProvider.filterPresets['first-custom-fields-set'];
+                delete EntityStructureDataProvider.filterPresets['second-custom-fields-set'];
+            });
+
+            it('uses initial filter configuration preset', function() {
+                var chain = dataProvider.pathToEntityChain();
+                expect(chain[0].entity.fields).toEqual([
+                    jasmine.objectContaining({name: 'roles', label: 'Roles'})
+                ]);
+            });
+
+            it('change filter configuration preset in runtime', function() {
+                dataProvider.setFilterPreset('second-custom-fields-set');
+                var chain = dataProvider.pathToEntityChain();
+                expect(chain[0].entity.fields).toEqual([
+                    jasmine.objectContaining({name: 'name', label: 'Name'})
+                ]);
             });
         });
     });

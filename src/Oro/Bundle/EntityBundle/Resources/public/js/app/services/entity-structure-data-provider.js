@@ -9,6 +9,7 @@ define(function(require) {
     /** @type {Registry} */
     var registry = require('oroui/js/app/services/registry');
     var EntityStructuresCollection = require('oroentity/js/app/models/entitystructures-collection');
+    var fieldFilterers = require('oroentity/js/app/services/entity-field-filterers');
     var BaseClass = require('oroui/js/base-class');
 
     /**
@@ -21,9 +22,19 @@ define(function(require) {
      */
 
     /**
+     * @typedef {Object} FilterConfig
+     * @property {Object.<string, boolean>} [config.optionsFilter] acceptable entity's and fields' options
+     *  example:
+     *      {auditable: true, configurable: true, unidirectional: false}
+     * @property {[Object|string]} [config.exclude]
+     * @property {[Object|string]} [config.include]
+     * @property {fieldsFilterer} [config.fieldsFilterer]
+     */
+
+    /**
      * Field signature, base information of entity field
      *
-     * @typedef {Object} fieldSignature
+     * @typedef {Object} FieldSignature
      * @property {string} field - name of field
      * @property {string} entity - class name of related entity, that can be assigned to the field
      * @property {string} parent_entity - class name of parent entity
@@ -57,23 +68,36 @@ define(function(require) {
          *  examples:
          *      ['relationType'] - will exclude all entries that has 'relationType' key (means relational fields)
          *      [{type: 'date'}] - will exclude all entries that has property "type" equals to "date"
-         * @type {Array}
+         * @type {[Object|string]}
          */
         exclude: null,
 
         /**
          * Format same as exclude option
-         * @type {Array}
+         * @type {[Object|string]}
          */
         include: null,
 
         /**
-         * List of acceptable capability options of entities and fields, is used for filtering
+         * List of acceptable options of entities and fields, is used for filtering
          *  example:
-         *      {auditable: true, configurable: true]
+         *      {auditable: true, configurable: true, unidirectional: false}
          * @type {Object.<string, true>}
          */
-        capabilityOptions: null,
+        optionsFilter: null,
+
+        /**
+         * Same as optionsFilter, but filtered from options that require special filterer method
+         * @type {Object.<string, true>}
+         */
+        regularOptionsFilter: null,
+
+        /**
+         * List of filterer functions are used to filter entity fields
+         *
+         * @type {Object.<string, Function>}
+         */
+        fieldFilterers: null,
 
         /**
          * Allow to define advances filter function for entity fields
@@ -89,22 +113,25 @@ define(function(require) {
          * @param {Object} options
          * @param {EntityStructuresCollection} options.collection
          * @param {string} [options.rootEntity] class name of root entity
-         * @param {Array} [options.capabilityOptions] list of acceptable entity's and fields' capability options
+         * @param {string} [options.filterPreset] name of filter preset
+         * @param {Object.<string, boolean>} [options.optionsFilter] acceptable entity's and fields' options
          *  example:
-         *      ['auditable', 'configurable', 'exclude', 'virtual']
-         * @param {Array} [options.exclude]
-         * @param {Array} [options.include]
+         *      {auditable: true, configurable: true, unidirectional: false}
+         * @param {[Object|string]} [options.exclude]
+         * @param {[Object|string]} [options.include]
          * @param {fieldsFilterer} [options.fieldsFilterer]
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, 'collection', 'exclude', 'include', 'fieldsFilterer'));
+            _.extend(this, _.pick(options, 'collection', 'fieldsFilterer'));
             if (!(this.collection instanceof EntityStructuresCollection)) {
                 throw new TypeError('The option `collection` has to be an instance of `EntityStructuresCollection`');
             }
 
-            if (options.capabilityOptions) {
-                this.setCapabilityOptions(options.capabilityOptions);
+            this.fieldFilterers = {};
+            if (options.filterPreset) {
+                this.setFilterPreset(options.filterPreset);
             }
+            this._configureFilter(_.pick(options, 'optionsFilter', 'exclude', 'include', 'fieldsFilterer'));
 
             if (options.rootEntity) {
                 this.rootEntityClassName = options.rootEntity;
@@ -120,6 +147,7 @@ define(function(require) {
          */
         dispose: function() {
             delete this.collection;
+            delete this.fieldFilterers;
             EntityStructureDataProvider.__super__.dispose.call(this);
         },
 
@@ -143,17 +171,88 @@ define(function(require) {
             this.rootEntity = className ? this.collection.getEntityModelByClassName(className) : null;
         },
 
+        _configureFilter: function(filterConfig) {
+            if (filterConfig.optionsFilter) {
+                this.setOptionsFilter(filterConfig.optionsFilter);
+            }
+            if (filterConfig.exclude) {
+                this.setExcludeRules(filterConfig.exclude);
+            }
+            if (filterConfig.include) {
+                this.setIncludeRules(filterConfig.include);
+            }
+            if (filterConfig.fieldsFilterer) {
+                this.fieldsFilterer = filterConfig.fieldsFilterer;
+            }
+        },
+
         /**
-         * Converts array of capability options to object that is applicable for filtering
-         *  example:
-         *      ['auditable', 'configurable'] => {auditable: true, configurable: true}
+         * Configure filters on the base of preset name
          *
-         * @param {Array.<string>} capabilityOptions
+         * @param {string} presetName
          */
-        setCapabilityOptions: function(capabilityOptions) {
-            this.capabilityOptions = _.mapObject(_.invert(capabilityOptions), function() {
-                return true;
-            });
+        setFilterPreset: function(presetName) {
+            if (!(presetName in EntityStructureDataProvider.filterPresets)) {
+                throw new TypeError('Filter preset `' + presetName + '` is not defined');
+            }
+            this._configureFilter(EntityStructureDataProvider.filterPresets[presetName]);
+        },
+
+        /**
+         * Defines options filter
+         *  example:
+         *     {auditable: true, configurable: true, unidirectional: false}
+         *
+         * @param {Object.<string, boolean>} optionsFilter
+         */
+        setOptionsFilter: function(optionsFilter) {
+            this.optionsFilter = optionsFilter || {};
+            this.regularOptionsFilter = _.omit(this.optionsFilter, 'unidirectional', 'auditable', 'relation');
+            this._toggleFilterer('options', !_.isEmpty(this.regularOptionsFilter));
+            this._toggleFilterer('unidirectional', 'unidirectional' in this.optionsFilter);
+            this._toggleFilterer('auditable', 'auditable' in this.optionsFilter);
+            this._toggleFilterer('relation', 'relation' in this.optionsFilter);
+        },
+
+        /**
+         * Defines exclude rules for fields
+         *  examples:
+         *      ['relationType'] - will exclude all entries that has 'relationType' key (means relational fields)
+         *      [{type: 'date'}] - will exclude all entries that has property "type" equals to "date"
+         *
+         * @param {[Object|string]} exclude
+         */
+        setExcludeRules: function(exclude) {
+            this.exclude = exclude;
+            this._toggleFilterer('exclude', !_.isEmpty(this.exclude));
+        },
+
+        /**
+         * Defines include rules for fields
+         *  examples:
+         *      ['relationType'] - will include all entries that has 'relationType' key (means relational fields)
+         *      [{type: 'date'}] - will include all entries that has property "type" equals to "date"
+         *
+         * @param {[Object|string]} include
+         */
+        setIncludeRules: function(include) {
+            this.include = include;
+            this._toggleFilterer('include', !_.isEmpty(this.include));
+        },
+
+        /**
+         * Switches on/off filterer function
+         *
+         * @param {string} name
+         * @param {boolean} flag
+         * @protected
+         */
+        _toggleFilterer: function(name, flag) {
+            if (flag) {
+                this.fieldFilterers[name] = fieldFilterers[name];
+            } else {
+                delete this.fieldFilterers[name];
+            }
         },
 
         /**
@@ -169,7 +268,7 @@ define(function(require) {
 
         /**
          * Filters fields of entity by
-         *  - `capabilityOptions`
+         *  - `optionsFilter`
          *  - using `fieldsFilterer` callback function
          *  - `include`, `exclude` rules
          *
@@ -178,21 +277,16 @@ define(function(require) {
          * @return {Array.<Object>}
          */
         filterEntityFields: function(fields, entityClassName) {
-            if (!_.isEmpty(this.capabilityOptions)) {
-                fields = _.filter(fields, function(fieldInfo) {
-                    return _.isMatch(fieldInfo.options, this.capabilityOptions);
+            if (!_.isEmpty(this.fieldFilterers)) {
+                fields = _.filter(fields, function(field) {
+                    return _.every(this.fieldFilterers, function(filterer) {
+                        return filterer.call(this, field, entityClassName);
+                    }, this);
                 }, this);
             }
 
             fields = this.fieldsFilterer(entityClassName, fields);
 
-            if (!_.isEmpty(this.exclude)) {
-                fields = EntityStructureDataProvider.filterFields(fields, this.exclude);
-            }
-
-            if (!_.isEmpty(this.include)) {
-                fields = EntityStructureDataProvider.filterFields(fields, this.include, true);
-            }
             return fields;
         },
 
@@ -208,11 +302,17 @@ define(function(require) {
             attrs.fields = this.filterEntityFields(attrs.fields, entityModel.get('className'))
                 .map(function(fieldData) {
                     fieldData = _.clone(fieldData);
-                    fieldData.options = _.clone(fieldData.options);
+                    if (fieldData.options) {
+                        fieldData.options = _.clone(fieldData.options);
+                    }
                     return fieldData;
                 });
-            attrs.options = _.clone(attrs.options);
-            attrs.routes = _.clone(attrs.routes);
+            if (attrs.options) {
+                attrs.options = _.clone(attrs.options);
+            }
+            if (attrs.routes) {
+                attrs.routes = _.clone(attrs.routes);
+            }
             return attrs;
         },
 
@@ -242,7 +342,7 @@ define(function(require) {
          *  }]
          *
          * @param {string} fieldId
-         * @returns {Array.<Object>}
+         * @return {Array.<Object>}
          */
         pathToEntityChain: function(fieldId) {
             var entityModel;
@@ -328,7 +428,7 @@ define(function(require) {
          *  }]
          *
          * @param {string} fieldId
-         * @returns {Array.<Object>}
+         * @return {Array.<Object>}
          */
         pathToEntityChainExcludeTrailingField: function(fieldId) {
             var chain = this.pathToEntityChain(fieldId);
@@ -363,7 +463,7 @@ define(function(require) {
          *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
          *
          * @param {Array.<Object>} chain
-         * @returns {string}
+         * @return {string}
          */
         entityChainToPath: function(chain) {
             var path;
@@ -391,7 +491,7 @@ define(function(require) {
          *
          * @param {string} fieldId - Field Path, such as
          *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
-         * @returns {fieldSignature|null}
+         * @return {FieldSignature|null}
          */
         getFieldSignature: function(fieldId) {
             var signature = null;
@@ -430,7 +530,7 @@ define(function(require) {
          *      account.contacts.firstName
          *
          * @param {string} fieldId
-         * @returns {string}
+         * @return {string}
          */
         getPropertyPathByPath: function(fieldId) {
             var fields = [];
@@ -462,7 +562,7 @@ define(function(require) {
          *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
          *
          * @param {string} propertyPath
-         * @returns {string}
+         * @return {string}
          */
         getPathByPropertyPath: function(propertyPath) {
             var parts;
@@ -488,18 +588,24 @@ define(function(require) {
         }
     }, /** @lends EntityStructureDataProvider */{
         /**
+         * @type {Object.<string, FilterConfig>}
+         */
+        filterPresets: {},
+
+        /**
          * Creates instance of data provider and returns it with thepromise object
          *
          * @param {RegistryApplicant} applicant
          * @param {Object=} options
          * @param {string} [options.rootEntity] class name of root entity
-         * @param {Array} [options.capabilityOptions] list of acceptable entity's and fields' capability options
+         * @param {string} [options.filterPreset] name of filter preset
+         * @param {Object.<string, boolean>} [options.optionsFilter] acceptable entity's and fields' options
          *  example:
-         *      ['auditable', 'configurable', 'exclude', 'virtual']
-         * @param {Array} [options.exclude]
-         * @param {Array} [options.include]
+         *      {auditable: true, configurable: true, unidirectional: false}
+         * @param {[Object|string]} [options.exclude]
+         * @param {[Object|string]} [options.include]
          * @param {fieldsFilterer} [options.fieldsFilterer]
-         * @returns {Promise.<EntityStructureDataProvider>}
+         * @return {Promise.<EntityStructureDataProvider>}
          */
         getOwnDataContainer: function(applicant, options) {
             var collection;
@@ -524,20 +630,30 @@ define(function(require) {
         /**
          * Filters passed fields by rules
          *
-         * @param {Array} fields
-         * @param {Object} rules
+         * @param {Array.<Object>} fields
+         * @param {[Object|string]} rules
          * @param {boolean} [include=false]
-         * @returns {Array}
+         * @return {Array}
          * @static
          */
         filterFields: function(fields, rules, include) {
-            fields = _.filter(fields, function(fieldInfo) {
-                return Boolean(include) === _.some(rules, function(rule) {
-                    // rule can be a property name or an object with data to compare
-                    return _.isString(rule) ? Boolean(fieldInfo[rule]) : _.isMatch(fieldInfo, rule);
-                });
+            return _.filter(fields, function(field) {
+                return Boolean(include) === fieldFilterers.anyRule(field, rules);
             });
-            return fields;
+        },
+
+        /**
+         * Defines shortcut for filter configurations
+         *  it helps to reuse filter configurations
+         *
+         * @param {string} name
+         * @param {FilterConfig} config
+         */
+        defineFilterPreset: function(name, config) {
+            if (name in EntityStructureDataProvider.filterPresets) {
+                throw new Error('Filter preset with `' + name + '` name already defined');
+            }
+            EntityStructureDataProvider.filterPresets[name] = config;
         }
     });
 

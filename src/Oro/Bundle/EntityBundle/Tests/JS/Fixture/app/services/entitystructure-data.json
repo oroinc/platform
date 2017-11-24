@@ -127,6 +127,9 @@
         "pluralAlias": "usergroups",
         "className": "Oro\\Bundle\\UserBundle\\Entity\\Group",
         "icon": null,
+        "options": {
+          "auditable": true
+        },
         "routes": {
           "name": "oro_user_group_index"
         },
@@ -144,7 +147,9 @@
             "name": "name",
             "type": "string",
             "options": {
-              "configurable": true
+              "configurable": true,
+              "virtual": true,
+              "auditable": true
             }
           },
           {

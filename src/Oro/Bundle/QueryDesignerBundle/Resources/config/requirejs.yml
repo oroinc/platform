@@ -17,7 +17,9 @@ config:
         'oroquerydesigner/js/enum-filter-initialized': 'bundles/oroquerydesigner/js/enum-filter-initialized.js'
 
         'oroquerydesigner/js/app/modules/validator-constraints-module': 'bundles/oroquerydesigner/js/app/modules/validator-constraints-module.js'
+        'oroquerydesigner/js/app/modules/entity-filter-preset-module': 'bundles/oroquerydesigner/js/app/modules/entity-filter-preset-module.js'
         'oroquerydesigner/js/validator/not-blank-filters': 'bundles/oroquerydesigner/js/validator/not-blank-filters.js'
 
     appmodules:
         - oroquerydesigner/js/app/modules/validator-constraints-module
+        - oroquerydesigner/js/app/modules/entity-filter-preset-module
