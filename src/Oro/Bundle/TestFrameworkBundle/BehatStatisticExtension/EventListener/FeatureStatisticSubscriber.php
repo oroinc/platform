@@ -8,8 +8,9 @@ use Behat\Testwork\Counter\Timer;
 use Behat\Testwork\EventDispatcher\Event\AfterExerciseCompleted;
 use Behat\Testwork\Output\Formatter;
 use Behat\Testwork\Output\Node\EventListener\EventListener;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\CriteriaArrayCollection;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatistic;
-use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\Repository\StatisticRepositoryInterface;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\BatchRepositoryInterface;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\FeaturePathLocator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
@@ -22,7 +23,7 @@ final class FeatureStatisticSubscriber implements EventListener
     private $timer;
 
     /**
-     * @var StatisticRepositoryInterface
+     * @var BatchRepositoryInterface
      */
     private $featureRepository;
 
@@ -58,24 +59,20 @@ final class FeatureStatisticSubscriber implements EventListener
 
     /**
      * FeatureStatisticSubscriber constructor.
-     * @param StatisticRepositoryInterface $featureRepository
+     * @param BatchRepositoryInterface $featureRepository
      * @param FeaturePathLocator $featurePathLocator
-     * @param string $buildId
-     * @param string $gitBranch
-     * @param string $gitTarget
+     * @param CriteriaArrayCollection $criteria
      */
     public function __construct(
-        StatisticRepositoryInterface $featureRepository,
+        BatchRepositoryInterface $featureRepository,
         FeaturePathLocator $featurePathLocator,
-        $buildId,
-        $gitBranch,
-        $gitTarget
+        CriteriaArrayCollection $criteria
     ) {
         $this->featureRepository = $featureRepository;
         $this->featurePathLocator = $featurePathLocator;
-        $this->buildId = $buildId;
-        $this->gitBranch = $gitBranch;
-        $this->gitTarget = $gitTarget;
+        $this->buildId = $criteria->get('build_id');
+        $this->gitBranch = $criteria->get('branch_name') ?: $criteria->get('single_branch_name');
+        $this->gitTarget = $criteria->get('target_branch');
     }
 
     /**

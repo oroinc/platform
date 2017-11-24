@@ -1,0 +1,5 @@
+services:
+    oro_behat_statistic.criteria_array_collection:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\CriteriaArrayCollection
+        arguments:
+            - '%oro_behat_statistic.criteria%'
