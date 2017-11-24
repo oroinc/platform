@@ -7,6 +7,7 @@ config:
         'oroentity/js/app/views/entity-field-fallback': 'bundles/oroentity/js/app/views/entity-field-fallback.js'
         'oroentity/js/app/views/form-hide-related-field': 'bundles/oroentity/js/app/views/form-hide-related-field.js'
         'oroentity/js/app/views/displayable-priority-view': 'bundles/oroentity/js/app/views/displayable-priority-view.js'
+        'oroentity/js/app/views/customset-field-choice-view': 'bundles/oroentity/js/app/views/customset-field-choice-view.js'
         'oroentity/js/app/views/field-choice-view': 'bundles/oroentity/js/app/views/field-choice-view.js'
         'oroentity/js/app/components/multiple-entity-component': 'bundles/oroentity/js/app/components/multiple-entity-component.js'
         'oroentity/js/app/models/entity-model': 'bundles/oroentity/js/app/models/entity-model.js'

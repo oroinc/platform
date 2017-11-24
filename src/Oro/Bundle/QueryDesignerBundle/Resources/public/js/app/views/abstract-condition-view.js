@@ -42,10 +42,21 @@ define(function(require) {
         },
 
         render: function() {
+            var choiceInputView = this.subview('choice-input');
+            if (choiceInputView) {
+                this.stopListening(choiceInputView);
+                this.removeSubview('choice-input');
+            }
             AbstractConditionView.__super__.render.call(this);
 
             this.$choiceInput = this.$('.' + this.options.choiceInputClass);
-            var choiceInputView = this.initChoiceInputView();
+            this._deferredRender();
+            this.initChoiceInputView().then(this.onChoiceInputReady.bind(this));
+
+            return this;
+        },
+
+        onChoiceInputReady: function(choiceInputView) {
             this.subview('choice-input', choiceInputView);
             this.listenTo(choiceInputView, 'change', this._onChoiceInputChanged);
             this.$filterContainer = this.$('.' + this.options.filterContainerClass);
@@ -53,15 +64,14 @@ define(function(require) {
             var choiceInputValue = this._getInitialChoiceInputValue();
 
             if (choiceInputValue) {
-                this._deferredRender();
                 this.setChoiceInputValue(choiceInputValue);
                 this.once('filter-appended', function() {
                     this._resolveDeferredRender();
                 }.bind(this));
                 this._renderFilter(choiceInputValue);
+            } else {
+                this._resolveDeferredRender();
             }
-
-            return this;
         },
 
         _onChoiceInputChanged: function(selectedItem) {
@@ -237,7 +247,7 @@ define(function(require) {
         /**
          * Inits particular view on $choiceInput element
          *
-         * @return {Backbone.View}
+         * @return {Promise.<Backbone.View>}
          * @abstract
          */
         initChoiceInputView: function() {

@@ -15,7 +15,7 @@ define([
                         columnsCollection: $itemContainer.data('oroui-itemsManagerTable').options.collection
                     });
                 }
-                originalConfigureFilters.call(this);
+                return originalConfigureFilters.call(this);
             };
         }
     };

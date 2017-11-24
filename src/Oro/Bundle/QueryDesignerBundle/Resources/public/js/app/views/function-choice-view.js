@@ -25,7 +25,7 @@ define(function(require) {
          * Sets functions conform the given criteria as active
          *
          * @param {Object}  criteria
-         * @param {Boolean} convertersOnly
+         * @param {boolean} [convertersOnly=false]
          */
         setActiveFunctions: function(criteria, convertersOnly) {
             var foundGroups = [];
@@ -39,7 +39,7 @@ define(function(require) {
                 }
             }, this);
 
-            if (!convertersOnly) {
+            if (!convertersOnly && criteria) {
                 _.each(this.aggregates, function(item, name) {
                     if (this._matchApplicable(item.applicable, criteria)) {
                         foundGroups.push({group_name: name, group_type: 'aggregates'});
@@ -96,10 +96,10 @@ define(function(require) {
 
                 this.activeFunctionGroupKey = foundGroupKey;
             }
-
             this._disable(!foundGroupKey);
-
-            this.$el.val('').trigger('change');
+            if (this.$el.val() !== '') {
+                this.$el.val('').trigger('change');
+            }
         },
 
         _matchApplicable: function(applicable, criteria) {

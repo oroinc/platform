@@ -135,10 +135,11 @@ define(function(require) {
         /**
          * Finds EntityModel in collection by className and preserves search result in property
          *
-         * @param {string} rootEntityClassName class name of entity, like 'Oro\Bundle\UserBundle\Entity\User'
+         * @param {string} className class name of entity, like 'Oro\Bundle\UserBundle\Entity\User'
          */
-        setRootEntityClassName: function(rootEntityClassName) {
-            this.rootEntity = this.collection.getEntityModelByClassName(rootEntityClassName);
+        setRootEntityClassName: function(className) {
+            this.rootEntityClassName = className || void 0;
+            this.rootEntity = className ? this.collection.getEntityModelByClassName(className) : null;
         },
 
         /**

@@ -4,6 +4,7 @@ define(function(require) {
     // @export orosegment/js/app/views/segment-condition-view
 
     var SegmentConditionView;
+    var $ = require('jquery');
     var _ = require('underscore');
     var SegmentFilter = require('orosegment/js/filter/segment-filter');
     var AbstractConditionView = require('oroquerydesigner/js/app/views/abstract-condition-view');
@@ -23,16 +24,16 @@ define(function(require) {
                 el: this.$choiceInput,
                 entity: this.options.rootEntity
             }, this.options.segmentChoice));
-            return choiceInput;
+            return $.when(choiceInput);
         },
 
-        render: function() {
-            SegmentConditionView.__super__.render.call(this);
+        onChoiceInputReady: function(choiceInputView) {
+            SegmentConditionView.__super__.onChoiceInputReady.call(this, choiceInputView);
             if (this.filter) {
                 var filterValue = this._getFilterValue();
                 var label = this.filter.getSelectedLabel();
                 if (filterValue && label) {
-                    this.subview('choice-input').setSelectedData({
+                    choiceInputView.setSelectedData({
                         id: 'segment_' + filterValue.value,
                         text: label
                     });

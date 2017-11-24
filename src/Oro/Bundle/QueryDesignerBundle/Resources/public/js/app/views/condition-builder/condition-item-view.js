@@ -26,6 +26,10 @@ define(function(require) {
             view.render();
             if (view.deferredRender) {
                 this._deferredRender();
+                this.$el.addClass('loading');
+                view.deferredRender.then(function() {
+                    this.$el.removeClass('loading');
+                }.bind(this));
                 // in fact deferredRender will be resolved once all subviews have resolved their deferredRender objects
                 this._resolveDeferredRender();
             }

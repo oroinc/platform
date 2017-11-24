@@ -93,7 +93,7 @@ define(function(require) {
                 this.removeEntry(entry);
             });
             this.listenTo(entry, 'removeApplicant', function() {
-                if (!entry.requested.length || !this._hasExternalRequester(entry)) {
+                if (!entry.applicants.length || !this._hasExternalRequester(entry)) {
                     entry.instance.dispose();
                     this.removeEntry(entry);
                 }
@@ -116,8 +116,8 @@ define(function(require) {
             do {
                 currentEntry = queue.pop();
                 checked.push(currentEntry);
-                for (var i = 0; currentEntry.requested.length > i; i++) {
-                    relatedEntry = this._entries[currentEntry.requested[i].globalId];
+                for (var i = 0; currentEntry.applicants.length > i; i++) {
+                    relatedEntry = this._entries[currentEntry.applicants[i].globalId];
                     if (!relatedEntry) {
                         return true;
                     } else if (checked.indexOf(relatedEntry) === -1 && queue.indexOf(relatedEntry) === -1) {

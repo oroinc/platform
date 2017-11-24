@@ -36,7 +36,7 @@ define([
                     toggleCondition(this.$entityChoice.val(), this.$auditFieldsLoader.fieldsLoader('getFieldsData'));
                     this.on(this.options.auditFieldsLoader.loadEvent, toggleCondition);
                 }
-                originalConfigureFilters.apply(this, arguments);
+                return originalConfigureFilters.apply(this, arguments);
             };
 
             var originalInitEntityChangeEvents = segment.initEntityChangeEvents;

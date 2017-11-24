@@ -38,6 +38,9 @@ define(function(require) {
          * @return {EntityModel}
          */
         getEntityModelByClassName: function(className) {
+            if (typeof className !== 'string' || className === '') {
+                throw new Error('Parameter `className` has to be a not empty string.');
+            }
             return this.get(this.entityClassNameToId(className));
         }
     });

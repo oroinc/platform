@@ -2,33 +2,17 @@ define(function(require) {
     'use strict';
 
     var $ = require('jquery');
+    var requirejsExposure = require('requirejs-exposure');
     var data = JSON.parse(require('text!./Fixture/field-condition/entities.json'));
     var filters = JSON.parse(require('text!./Fixture/field-condition/filters.json'));
     var BaseView = require('oroui/js/app/views/base/view');
     var AbstractFilter = require('oro/filter/abstract-filter');
     var DateTimeFilter = require('oro/filter/datetime-filter');
     var FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
+    var FieldChoiceMock = require('./Fixture/field-condition/field-choice-mock');
     require('jasmine-jquery');
 
-    //Make cross link inside data members
-    // TODO: remove following processing of data after fileLoader is refactored
-    data = (function(data) {
-        $.each(data, function() {
-            var entity = this;
-            entity.fieldsIndex = {};
-            $.each(entity.fields, function() {
-                var field = this;
-                if (field.relation_type && field.related_entity_name) {
-                    field.related_entity = data[field.related_entity_name];
-                    delete field.related_entity_name;
-                }
-                field.entity = entity;
-                entity.fieldsIndex[field.name] = field;
-
-            });
-        });
-        return data;
-    })(data);
+    var exposure = requirejsExposure.disclose('oroquerydesigner/js/app/views/field-condition-view');
 
     describe('oroquerydesigner/js/app/views/field-condition-view', function() {
 
@@ -36,12 +20,13 @@ define(function(require) {
 
         describe('without initial value', function() {
             beforeEach(function(done) {
+                FieldChoiceMock.setData(data);
+                exposure.substitute('FieldChoiceView').by(FieldChoiceMock);
                 fieldConditionView = new FieldConditionView({
                     autoRender: true,
                     filters: filters,
                     fieldChoice: {
-                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account',
-                        data: data
+                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account'
                     }
                 });
                 window.setFixtures(fieldConditionView.$el);
@@ -52,6 +37,8 @@ define(function(require) {
 
             afterEach(function() {
                 fieldConditionView.dispose();
+                exposure.recover('FieldChoiceView');
+                delete FieldChoiceMock.lastCreatedInstance;
             });
 
             it('is instance of BaseView', function() {
@@ -96,6 +83,7 @@ define(function(require) {
                     };
                     fieldConditionView.filter.setValue(newFilterValue);
                     var conditionValue = fieldConditionView.getValue();
+                    expect(FieldChoiceMock.lastCreatedInstance.setValue).toHaveBeenCalledWith('createdAt');
                     expect(conditionValue.columnName).toBe('createdAt');
                     expect(conditionValue.criterion.data).toEqual(newFilterValue);
                     done();
@@ -115,13 +103,14 @@ define(function(require) {
                 }
             };
             beforeEach(function(done) {
+                FieldChoiceMock.setData(data);
+                exposure.substitute('FieldChoiceView').by(FieldChoiceMock);
                 fieldConditionView = new FieldConditionView({
                     autoRender: true,
                     filters: filters,
                     value: initialValue,
                     fieldChoice: {
-                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account',
-                        data: data
+                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account'
                     }
                 });
                 window.setFixtures(fieldConditionView.$el);
@@ -132,6 +121,8 @@ define(function(require) {
 
             afterEach(function() {
                 fieldConditionView.dispose();
+                exposure.recover('FieldChoiceView');
+                delete FieldChoiceMock.lastCreatedInstance;
             });
 
             it('shows a filter with value', function() {
@@ -142,6 +133,7 @@ define(function(require) {
             it('clears a filter after field is changed', function(done) {
                 fieldConditionView.setChoiceInputValue('createdAt').then(function() {
                     var filterValue = fieldConditionView.filter.getValue();
+                    expect(FieldChoiceMock.lastCreatedInstance.setValue).toHaveBeenCalledWith('createdAt');
                     expect(filterValue).toEqual(fieldConditionView.filter.emptyValue);
                     done();
                 });

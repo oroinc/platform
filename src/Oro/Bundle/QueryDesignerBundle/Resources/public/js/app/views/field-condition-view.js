@@ -1,7 +1,10 @@
 define(function(require) {
     'use strict';
 
+    // @export oroquerydesigner/js/app/views/field-condition-view
+
     var FieldConditionView;
+    var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var tools = require('oroui/js/tools');
@@ -53,7 +56,7 @@ define(function(require) {
 
         _createFilterOptions: function(fieldId) {
             var filterOptions;
-            var conditions = this.subview('choice-input').getApplicableConditions(fieldId);
+            var conditions = this.getApplicableConditions(fieldId);
 
             if (!_.isEmpty(conditions) && !(conditions.entity === 'Oro\\Bundle\\AccountBundle\\Entity\\Account' &&
                 conditions.field === 'lifetimeValue')) {
@@ -72,13 +75,17 @@ define(function(require) {
             return filterOptions;
         },
 
+        getApplicableConditions: function(fieldId) {
+            return this.subview('choice-input').getApplicableConditions(fieldId);
+        },
+
         initChoiceInputView: function() {
             var fieldChoiceView = new FieldChoiceView(_.extend({
                 autoRender: true,
                 el: this.$choiceInput,
                 entity: this.options.rootEntity
             }, this.options.fieldChoice));
-            return fieldChoiceView;
+            return $.when(fieldChoiceView.deferredRender);
         }
     });
 

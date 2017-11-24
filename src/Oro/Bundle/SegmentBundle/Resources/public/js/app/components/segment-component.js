@@ -59,6 +59,7 @@ define(function(require) {
         columnFormView: null,
 
         initialize: function(options) {
+            this._deferredInit();
             require(options.extensions || [], _.bind(function() {
                 var extensions = arguments;
                 _.each(extensions, function(extension) {
@@ -73,7 +74,9 @@ define(function(require) {
                 this.initGrouping();
                 this.initDateGrouping();
                 this.initColumn();
-                this.configureFilters();
+                this.configureFilters().then(function() {
+                    this._resolveDeferredInit();
+                }.bind(this));
                 if (this.options.initEntityChangeEvents) {
                     this.initEntityChangeEvents();
                 }
@@ -356,11 +359,10 @@ define(function(require) {
             }
 
             var groupingFieldChoiceView = this.groupingFieldChoiceComponent.view;
-            groupingFieldChoiceView.updateData(this.$entityChoice.val(),
-                EntityFieldsUtil.convertData(this._getInitFieldsData()));
+            groupingFieldChoiceView.setEntity(this.$entityChoice.val());
 
-            this.listenTo(this, 'fieldsLoaded', function(entity, data) {
-                this.groupingFieldChoiceComponent.view.updateData(entity, data);
+            this.listenTo(this, 'fieldsLoaded', function(entity) {
+                this.groupingFieldChoiceComponent.view.setEntity(entity);
             });
 
             // prepare collection for Items Manager
@@ -447,12 +449,10 @@ define(function(require) {
                 return;
             }
 
-            var fieldsData = EntityFieldsUtil.convertData(this._getInitFieldsData());
-
-            this.dateGroupingFieldChoiceComponent.view.updateData(this.$entityChoice.val(), fieldsData);
+            this.dateGroupingFieldChoiceComponent.view.setEntity(this.$entityChoice.val());
 
             this.listenTo(this, 'fieldsLoaded', function(entity, data) {
-                this.dateGroupingFieldChoiceComponent.view.updateData(entity, data);
+                this.dateGroupingFieldChoiceComponent.view.setEntity(entity);
             });
         },
 
@@ -477,9 +477,7 @@ define(function(require) {
             if (this.columnFunctionChoiceComponent) {
                 functionChoiceView = this.columnFunctionChoiceComponent.view;
             }
-            fieldChoiceView.updateData(
-                this.$entityChoice.val(), EntityFieldsUtil.convertData(this._getInitFieldsData())
-            );
+            fieldChoiceView.setEntity(this.$entityChoice.val());
 
             this.columnFormView = new ColumnFormView({
                 el: $form,
@@ -491,7 +489,7 @@ define(function(require) {
             var $editor = this.columnFormView.$el;
 
             this.listenTo(this, 'fieldsLoaded', function(entity, data) {
-                this.columnFieldChoiceComponent.view.updateData(entity, data);
+                this.columnFieldChoiceComponent.view.setEntity(entity);
             });
 
             // prepare collection for Items Manager
@@ -619,7 +617,7 @@ define(function(require) {
         configureFilters: function() {
             if (!this.conditionBuilderComponent) {
                 // there's no condition builder
-                return;
+                return $.when();
             }
 
             var setRootEntity = function(entity) {
@@ -643,6 +641,8 @@ define(function(require) {
             this.on('updateData', function(data) {
                 this.conditionBuilderComponent.view.setValue(data.filters);
             }, this);
+
+            return $.when(this.conditionBuilderComponent.view.getDeferredRenderPromise());
         }
     }, {
         INVALID_DATA_ISSUE: 'INVALID_DATA',

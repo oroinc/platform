@@ -104,6 +104,13 @@
     position: relative;
     &.controls {
       margin-left: 0;
+      &.loading {
+        background: transparent url('../../../oroui/img/loader.gif') no-repeat center;
+        .condition-item > * {
+          visibility: hidden;
+          point-events: none;
+        }
+      }
     }
     .conditions-group {
       min-height: 138px;

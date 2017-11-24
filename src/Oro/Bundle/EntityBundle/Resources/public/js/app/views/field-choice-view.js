@@ -5,22 +5,19 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
-    var Util = require('oroentity/js/entity-fields-util');
-    var BaseView = require('oroui/js/app/views/base/view');
-    require('jquery-ui');
-    require('jquery.select2');
-    require('oroui/js/input-widget-manager');
+    var Select2View = require('oroform/js/app/views/select2-view');
+    var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
 
-    FieldChoiceView = BaseView.extend({
+    FieldChoiceView = Select2View.extend({
         defaultOptions: {
             entity: null,
-            data: {},
             dataFilter: function(entityName, entityFields) {
                 return entityFields;
             },
             select2: {
                 pageableResults: true,
-                dropdownAutoWidth: true
+                dropdownAutoWidth: true,
+                allowClear: false
             },
             /*
              * Array of rule objects or strings that will be used for entries filtering
@@ -41,98 +38,35 @@ define(function(require) {
             dataFilter: null
         },
 
-        events: {
-            change: 'onChange'
-        },
-
         initialize: function(options) {
-            // @TODO: remove fetching data from a DOM element after EntitiesFieldsDataProvider is implementing
-            if (!('data' in options) && 'fieldsLoaderSelector' in options) {
-                options.data = $(options.fieldsLoaderSelector).data('fields') || this.defaultOptions.data;
-            }
-
-            options = _.defaults({}, options, this.defaultOptions);
+            options = $.extend(true, {}, this.defaultOptions, options);
             _.extend(this, _.pick(options, _.without(_.keys(this.defaultOptions), 'select2')));
             this.callbacks = _.pick(options, _.keys(this.callbacks));
-            this.select2Options = this._prepareSelect2Options(options);
-            this.util = new Util(this.entity, this.data);
+            this.select2Config = this._prepareSelect2Options(options);
             FieldChoiceView.__super__.initialize.call(this, options);
         },
 
         onChange: function(e) {
-            var selectedItem = e.added || this.$el.inputWidget('data');
+            var selectedItem = e.added || this.getData();
             this.trigger('change', selectedItem);
         },
 
         render: function() {
-            var instance;
-            var select2Options;
-
-            select2Options = $.extend({
-                initSelection: function(element, callback) {
-                    instance = element.data('select2');
-                    var opts = instance.opts;
-                    var id = element.val();
-                    var match = null;
-                    var chain;
-                    try {
-                        chain = this.util.pathToEntityChain(id, true);
-                        instance.pagePath = chain[chain.length - 1].basePath;
-                    } catch (e) {
-                        instance.pagePath = '';
-                    }
-                    opts.query({
-                        matcher: function(term, text, el) {
-                            var isMatch = id === opts.id(el);
-                            if (isMatch) {
-                                match = el;
-                            }
-                            return isMatch;
-                        },
-                        callback: !$.isFunction(callback) ? $.noop : function() {
-                            callback(match);
-                        }
-                    });
-                }.bind(this),
-                id: function(result) {
-                    return result.id !== void 0 ? result.id : result.pagePath;
-                },
-                data: function() {
-                    instance = this.$el.data('select2');
-                    var pagePath = (instance && instance.pagePath) || '';
-                    var results = this._select2Data(pagePath);
-                    if (_.isFunction(this.callbacks.select2ResultsCallback)) {
-                        results = this.callbacks.select2ResultsCallback(results);
-                    }
-                    return {
-                        more: false,
-                        pagePath: pagePath,
-                        results: results
-                    };
-                }.bind(this),
-                formatBreadcrumbItem: function(item) {
-                    var label;
-                    label = item.field ? item.field.label : item.entity.label;
-                    return label;
-                },
-                breadcrumbs: function(pagePath) {
-                    var chain = this.util.pathToEntityChain(pagePath, true);
-                    $.each(chain, function(i, item) {
-                        item.pagePath = item.basePath;
-                    });
-                    return chain;
-                }.bind(this)
-            }, this.select2Options);
-
-            this.$el.inputWidget('create', 'select2', {initializeOptions: select2Options});
-        },
-
-        dispose: function() {
-            if (this.disposed) {
-                return;
+            this._deferredRender();
+            var providerOptions = _.extend({
+                rootEntity: this.entity
+            }, _.pick(this, 'exclude', 'include'));
+            if (this.callbacks.dataFilter) {
+                providerOptions.fieldsFilterer = this.callbacks.dataFilter;
             }
-            this.$el.data('select2').destroy();
-            FieldChoiceView.__super__.dispose.call(this);
+            EntityStructureDataProvider.getOwnDataContainer(this, providerOptions).then(function(provider) {
+                if (this.entity) {
+                    provider.setRootEntityClassName(this.entity);
+                }
+                this.dataProvider = provider;
+                FieldChoiceView.__super__.render.call(this);
+                this._resolveDeferredRender();
+            }.bind(this));
         },
 
         _prepareSelect2Options: function(options) {
@@ -157,47 +91,90 @@ define(function(require) {
                     return result;
                 }, this);
             }
+            _.extend(select2Opts, {
+                initSelection: function(element, callback) {
+                    var instance = element.data('select2');
+                    var opts = instance.opts;
+                    var id = element.val();
+                    var match = null;
+                    var chain;
+                    try {
+                        chain = this.dataProvider.pathToEntityChainExcludeTrailingField(id);
+                        instance.pagePath = chain[chain.length - 1].basePath;
+                    } catch (e) {
+                        instance.pagePath = '';
+                    }
+                    opts.query({
+                        matcher: function(term, text, el) {
+                            var isMatch = id === opts.id(el);
+                            if (isMatch) {
+                                match = el;
+                            }
+                            return isMatch;
+                        },
+                        callback: !$.isFunction(callback) ? $.noop : function() {
+                            callback(match);
+                        }
+                    });
+                }.bind(this),
+                id: function(result) {
+                    return result.id !== void 0 ? result.id : result.pagePath;
+                },
+                data: function() {
+                    var instance = this.$el.data('select2');
+                    var pagePath = (instance && instance.pagePath) || '';
+                    var results = this._select2Data(pagePath);
+                    if (_.isFunction(this.callbacks.select2ResultsCallback)) {
+                        results = this.callbacks.select2ResultsCallback(results);
+                    }
+                    return {
+                        more: false,
+                        pagePath: pagePath,
+                        results: results
+                    };
+                }.bind(this),
+                formatBreadcrumbItem: function(item) {
+                    var label;
+                    label = item.field ? item.field.label : item.entity.label;
+                    return label;
+                },
+                breadcrumbs: function(pagePath) {
+                    var chain = this.dataProvider.pathToEntityChainExcludeTrailingField(pagePath);
+                    $.each(chain, function(i, item) {
+                        item.pagePath = item.basePath;
+                    });
+                    return chain;
+                }.bind(this)
+            });
             return select2Opts;
         },
 
-        reset: function(entity, data) {
-            this.setValue('');
-            this.updateData(entity, data);
-        },
-
-        updateData: function(entity, data) {
-            data = data || {};
+        setEntity: function(entity) {
             this.entity = entity;
-            this.data = data;
 
-            this.util.init(entity, data);
-            this.$el.inputWidget('refresh');
-        },
+            if (this.dataProvider) {
+                this.dataProvider.setRootEntityClassName(entity);
+            }
 
-        getValue: function() {
-            return this.$el.inputWidget('val');
-        },
-
-        setValue: function(value) {
-            this.$el.inputWidget('val', value, true);
+            this.refresh();
         },
 
         formatChoice: function(value, template) {
             var data;
             if (value) {
                 try {
-                    data = this.util.pathToEntityChain(value);
+                    data = this.dataProvider.pathToEntityChain(value);
                 } catch (e) {}
             }
             return data ? template(data) : value;
         },
 
         splitFieldId: function(fieldId) {
-            return this.util.pathToEntityChain(fieldId);
+            return this.dataProvider.pathToEntityChain(fieldId);
         },
 
         getApplicableConditions: function(fieldId) {
-            var applicableConditions = this.util.getApplicableConditions(fieldId);
+            var applicableConditions = this.dataProvider.getFieldSignature(fieldId);
             if (_.isFunction(this.callbacks.applicableConditionsCallback)) {
                 applicableConditions = this.callbacks.applicableConditionsCallback(applicableConditions, fieldId);
             }
@@ -215,49 +192,30 @@ define(function(require) {
             var relations = [];
             var results = [];
             var chain;
-            var entityName;
             var entityFields;
-            var entityData = this.data;
-            var util = this.util;
-            if ($.isEmptyObject(entityData)) {
-                return results;
-            }
 
             try {
-                chain = this.util.pathToEntityChain(path, true);
-                entityName = chain[chain.length - 1].entity.name;
+                chain = this.dataProvider.pathToEntityChain(path);
+                entityFields = _.result(_.last(chain).entity, 'fields');
             } catch (e) {
                 return results;
             }
 
-            entityData = entityData[entityName];
-            entityFields = this.callbacks.dataFilter.call(this, entityName, entityData.fields);
-
-            if (!_.isEmpty(this.exclude)) {
-                entityFields = Util.filterFields(entityFields, this.exclude);
-            }
-
-            if (!_.isEmpty(this.include)) {
-                entityFields = Util.filterFields(entityFields, this.include, true);
-            }
-
-            $.each(entityFields, function() {
-                var field = this;
+            _.each(entityFields, function(field) {
                 var chainItem = {field: field};
                 var item = {
-                    id: util.entityChainToPath(chain.concat(chainItem)),
+                    id: this.dataProvider.entityChainToPath(chain.concat(chainItem)),
                     text: field.label
                 };
-                if (field.related_entity) {
-                    chainItem.entity = field.related_entity;
-                    item.pagePath = util.entityChainToPath(chain.concat(chainItem));
-                    item.related_entity = field.related_entity;
+                if (field.relatedEntityName) {
+                    chainItem.entity = {className: field.relatedEntityName};
+                    item.pagePath = this.dataProvider.entityChainToPath(chain.concat(chainItem));
                     delete item.id;
                     relations.push(item);
                 } else {
                     fields.push(item);
                 }
-            });
+            }, this);
 
             if (!_.isEmpty(fields)) {
                 results.push({

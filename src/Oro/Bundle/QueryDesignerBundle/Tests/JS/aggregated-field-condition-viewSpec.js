@@ -3,32 +3,17 @@ define(function(require) {
 
     var $ = require('jquery');
     var Backbone = require('backbone');
+    var requirejsExposure = require('requirejs-exposure');
     var markup = require('text!./Fixture/aggregated-field-condition/markup.html');
     var data = JSON.parse(require('text!./Fixture/aggregated-field-condition/entities.json'));
     var filters = JSON.parse(require('text!./Fixture/aggregated-field-condition/filters.json'));
     var columnsData = JSON.parse(require('text!./Fixture/aggregated-field-condition/columnsData.json'));
     var FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
+    var FieldChoiceMock = require('./Fixture/field-condition/field-choice-mock');
     var AggregatedFieldConditionView = require('oroquerydesigner/js/app/views/aggregated-field-condition-view');
     require('jasmine-jquery');
 
-    //Make cross link inside data members
-    // TODO: remove following processing of data after fileLoader is refactored
-    data = (function(data) {
-        $.each(data, function() {
-            var entity = this;
-            entity.fieldsIndex = {};
-            $.each(entity.fields, function() {
-                var field = this;
-                if (field.relation_type && field.related_entity_name) {
-                    field.related_entity = data[field.related_entity_name];
-                    delete field.related_entity_name;
-                }
-                field.entity = entity;
-                entity.fieldsIndex[field.name] = field;
-            });
-        });
-        return data;
-    })(data);
+    var exposure = requirejsExposure.disclose('oroquerydesigner/js/app/views/field-condition-view');
 
     describe('oroquerydesigner/js/app/views/aggregated-field-condition-view', function() {
 
@@ -37,6 +22,8 @@ define(function(require) {
         describe('without initial value', function() {
             var columnsCollection;
             beforeEach(function(done) {
+                FieldChoiceMock.setData(data);
+                exposure.substitute('FieldChoiceView').by(FieldChoiceMock);
                 window.setFixtures(markup);
                 columnsCollection = new Backbone.Collection(columnsData);
                 aggregatedFieldConditionView = new AggregatedFieldConditionView({
@@ -47,8 +34,7 @@ define(function(require) {
                         select2: {
                             formatSelectionTemplateSelector: '#format-selection-template'
                         },
-                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account',
-                        data: data
+                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account'
                     }
                 });
                 window.setFixtures(aggregatedFieldConditionView.$el);
@@ -59,20 +45,14 @@ define(function(require) {
 
             afterEach(function() {
                 aggregatedFieldConditionView.dispose();
+                exposure.recover('FieldChoiceView');
+                delete FieldChoiceMock.lastCreatedInstance;
             });
 
             it('is instance of FieldConditionView', function() {
                 expect(aggregatedFieldConditionView).toEqual(jasmine.any(FieldConditionView));
 
             });
-
-            it('has function name into label of field choice value', function(done) {
-                aggregatedFieldConditionView.setChoiceInputValue('id').then(function() {
-                    expect(aggregatedFieldConditionView.$('.select2 .select2-chosen').text()).toContain('Count');
-                    done();
-                });
-            });
-
         });
 
         describe('with initial value', function() {
@@ -98,6 +78,8 @@ define(function(require) {
             };
 
             beforeEach(function(done) {
+                FieldChoiceMock.setData(data);
+                exposure.substitute('FieldChoiceView').by(FieldChoiceMock);
                 window.setFixtures(markup);
                 columnsCollection = new Backbone.Collection(columnsData);
                 aggregatedFieldConditionView = new AggregatedFieldConditionView({
@@ -108,8 +90,7 @@ define(function(require) {
                         select2: {
                             formatSelectionTemplateSelector: '#format-selection-template'
                         },
-                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account',
-                        data: data
+                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account'
                     },
                     value: initialValue
                 });
@@ -121,10 +102,8 @@ define(function(require) {
 
             afterEach(function() {
                 aggregatedFieldConditionView.dispose();
-            });
-
-            it('has function name into label of field choice value', function() {
-                expect(aggregatedFieldConditionView.$('.select2 .select2-chosen').text()).toContain('Count');
+                exposure.recover('FieldChoiceView');
+                delete FieldChoiceMock.lastCreatedInstance;
             });
 
             it('shows a filter with value', function() {

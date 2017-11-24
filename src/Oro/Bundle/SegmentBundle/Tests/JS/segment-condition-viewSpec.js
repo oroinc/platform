@@ -1,6 +1,7 @@
 define(function(require) {
     'use strict';
 
+    var $ = require('jquery');
     var _ = require('underscore');
     var requirejsExposure = require('requirejs-exposure');
     var filters = JSON.parse(require('text!./Fixture/segment-condition/filters.json'));
@@ -16,7 +17,7 @@ define(function(require) {
         var segmentConditionView;
 
         describe('without initial value', function() {
-            beforeEach(function() {
+            beforeEach(function(done) {
                 exposure.substitute('SegmentChoiceView').by(SegmentChoiceMock);
                 segmentConditionView = new SegmentConditionView({
                     autoRender: true,
@@ -25,7 +26,9 @@ define(function(require) {
                         entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account'
                     }
                 });
-                window.setFixtures(segmentConditionView.$el);
+                $.when(segmentConditionView.deferredRender).then(function() {
+                    done();
+                });
             });
 
             afterEach(function() {
@@ -46,7 +49,7 @@ define(function(require) {
                 expect(segmentConditionView.$('.active-filter')).toBeEmpty();
             });
 
-            it('sets correct value in choice input after value was set', function() {
+            it('sets correct value in choice input after value was set', function(done) {
                 segmentConditionView.setValue({
                     columnName: 'id',
                     criterion: {
@@ -58,8 +61,11 @@ define(function(require) {
                     }
                 });
                 segmentConditionView.render();
-                expect(SegmentChoiceMock.lastCreatedInstance.setValue).toHaveBeenCalledWith('id');
-                expect(segmentConditionView.getChoiceInputValue()).toBe('segment_2');
+                $.when(segmentConditionView.deferredRender).then(function() {
+                    expect(SegmentChoiceMock.lastCreatedInstance.setValue).toHaveBeenCalledWith('id');
+                    expect(segmentConditionView.getChoiceInputValue()).toBe('segment_2');
+                    done();
+                }.bind(this));
             });
         });
 
@@ -78,7 +84,7 @@ define(function(require) {
             var filterChoice = filter.choices[initialValue.criterion.data.value];
             var initialChoiceInputValue = 'segment_' + _.result(filterChoice, 'value');
 
-            beforeEach(function() {
+            beforeEach(function(done) {
                 exposure.substitute('SegmentChoiceView').by(SegmentChoiceMock);
                 segmentConditionView = new SegmentConditionView({
                     autoRender: true,
@@ -88,7 +94,9 @@ define(function(require) {
                     },
                     value: initialValue
                 });
-                window.setFixtures(segmentConditionView.$el);
+                $.when(segmentConditionView.deferredRender).then(function() {
+                    done();
+                });
             });
 
             afterEach(function() {

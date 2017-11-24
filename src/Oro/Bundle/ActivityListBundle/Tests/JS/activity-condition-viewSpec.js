@@ -3,31 +3,11 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
-    var data = JSON.parse(require('text!./Fixture/entities.json'));
     var filters = JSON.parse(require('text!./Fixture/filters.json'));
     var listOptions = require('text!./Fixture/list-options.json');
     var FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
     var ActivityConditionView = require('oroactivitylist/js/app/views/activity-condition-view');
     require('jasmine-jquery');
-
-    //Make cross link inside data members
-    // TODO: remove following processing of data after fileLoader is refactored
-    data = (function(data) {
-        $.each(data, function() {
-            var entity = this;
-            entity.fieldsIndex = {};
-            $.each(entity.fields, function() {
-                var field = this;
-                if (field.relation_type && field.related_entity_name) {
-                    field.related_entity = data[field.related_entity_name];
-                    delete field.related_entity_name;
-                }
-                field.entity = entity;
-                entity.fieldsIndex[field.name] = field;
-            });
-        });
-        return data;
-    })(data);
 
     describe('oroactivitylist/js/app/views/activity-condition-view', function() {
         var activityConditionView;
@@ -35,21 +15,12 @@ define(function(require) {
         describe('without initial value', function() {
 
             beforeEach(function(done) {
-                var $html = $('<div />');
-                window.setFixtures($html);
-                var $fieldLoader = $('<div/>', {id: 'test-fields-loader'}).data('fields', _.clone(data));
-                $html.append($fieldLoader);
                 activityConditionView = new ActivityConditionView({
                     autoRender: true,
                     filters: filters,
-                    listOptions: _.clone(listOptions),
-                    fieldsLoaderSelector: '#test-fields-loader',
-                    fieldChoice: {
-                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account',
-                        data: data
-                    }
+                    listOptions: _.clone(listOptions)
                 });
-                $html.append(activityConditionView.$el);
+                window.setFixtures(activityConditionView.$el);
                 $.when(activityConditionView.deferredRender).then(function() {
                     done();
                 });
@@ -116,22 +87,13 @@ define(function(require) {
                 }
             };
             beforeEach(function(done) {
-                var $html = $('<div />');
-                window.setFixtures($html);
-                var $fieldLoader = $('<div/>', {id: 'test-fields-loader'}).data('fields', _.clone(data));
-                $html.append($fieldLoader);
                 activityConditionView = new ActivityConditionView({
                     autoRender: true,
                     filters: filters,
                     value: initialValue,
-                    listOptions: listOptions,
-                    fieldsLoaderSelector: '#test-fields-loader',
-                    fieldChoice: {
-                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account',
-                        data: data
-                    }
+                    listOptions: listOptions
                 });
-                $html.append(activityConditionView.$el);
+                window.setFixtures(activityConditionView.$el);
                 $.when(activityConditionView.deferredRender).then(function() {
                     done();
                 });
