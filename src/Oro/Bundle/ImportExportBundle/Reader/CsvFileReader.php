@@ -7,6 +7,7 @@ use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
 use Akeneo\Bundle\BatchBundle\Item\ParseException;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 
 class CsvFileReader extends AbstractFileReader
@@ -24,8 +25,18 @@ class CsvFileReader extends AbstractFileReader
     /**
      * @var string
      */
-    protected $escape = '\\';
+    protected $escape;
 
+    /**
+     * @param ContextRegistry $contextRegistry
+     */
+    public function __construct(ContextRegistry $contextRegistry)
+    {
+        parent::__construct($contextRegistry);
+
+        // Please, see CsvFileStreamWriter::__construct for explanation.
+        $this->escape = chr(0);
+    }
 
     /**
      * {@inheritdoc}
