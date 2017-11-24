@@ -12,6 +12,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
+use Oro\Bundle\EmailBundle\Util\ConfigurableTransport;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Component\DependencyInjection\ServiceLink;
 
@@ -33,6 +34,9 @@ class DirectMailer extends \Swift_Mailer
     /** @var ServiceLink  */
     protected $loggerLink;
 
+    /** @var ConfigurableTransport */
+    protected $configurableTransport;
+
     /**
      * Constructor
      *
@@ -41,10 +45,12 @@ class DirectMailer extends \Swift_Mailer
      */
     public function __construct(
         \Swift_Mailer $baseMailer,
-        ContainerInterface $container
+        ContainerInterface $container,
+        ConfigurableTransport $configurableTransport
     ) {
         $this->baseMailer = $baseMailer;
         $this->container  = $container;
+        $this->configurableTransport = $configurableTransport;
 
         $transport = $this->baseMailer->getTransport();
         if ($transport instanceof \Swift_Transport_SpoolTransport) {
@@ -260,7 +266,12 @@ class DirectMailer extends \Swift_Mailer
             }
             $mailer = $this->container->get(sprintf('swiftmailer.mailer.%s', $name));
             if ($mailer === $this->baseMailer) {
-                $realTransport = $this->container->get(sprintf('swiftmailer.mailer.%s.transport.real', $name));
+                if ($name === 'default') {
+                    $realTransport = $this->configurableTransport->getDefaultTransport();
+                } else {
+                    $realTransport = $this->container->get(sprintf('swiftmailer.mailer.%s.transport.real', $name));
+                }
+
                 break;
             }
         }
