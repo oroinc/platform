@@ -230,7 +230,7 @@ define(function(require) {
         _loadAndInitializeComponent: function(data) {
             var initDeferred = $.Deferred();
 
-            tools.loadModule(data.module)
+            tools.loadModules(data.module)
                 .then(this._onComponentLoaded.bind(this, initDeferred, data.options))
                 .catch(this._onRequireJsError.bind(this, initDeferred));
 

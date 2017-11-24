@@ -1,41 +1,41 @@
 define(function(require) {
     'use strict';
 
-    var FieldsCollection;
+    var EntityFieldsCollection;
     var _ = require('underscore');
     var BaseCollection = require('oroui/js/app/models/base/collection');
-    var EntityFieldsUtil = require('oroentity/js/entity-fields-util');
+    var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
 
-    FieldsCollection = BaseCollection.extend({
+    EntityFieldsCollection = BaseCollection.extend({
         /**
-         * @type {EntityFieldsUtil}
+         * @type {EntityStructureDataProvider}
          */
-        entityFieldsUtil: null,
+        dataProvider: null,
 
         /**
          * @inheritDoc
          */
         initialize: function(models, options) {
-            if (!options || !(options.entityFieldsUtil instanceof EntityFieldsUtil)) {
-                throw new TypeError('Option "entityFieldsUtil" have to be instance of EntityFieldsUtil');
+            if (!options || !(options.dataProvider instanceof EntityStructureDataProvider)) {
+                throw new TypeError('Option "dataProvider" have to be instance of EntityStructureDataProvider');
             }
-            _.extend(this, _.pick(options, ['entityFieldsUtil']));
-            FieldsCollection.__super__.initialize.call(this, models, options);
+            _.extend(this, _.pick(options, 'dataProvider'));
+            EntityFieldsCollection.__super__.initialize.call(this, models, options);
         },
 
         /**
          * @inheritDoc
          */
         _prepareModel: function(attrs, options) {
-            options.entityFieldsUtil = this.entityFieldsUtil;
-            return FieldsCollection.__super__._prepareModel.call(this, attrs, options);
+            options.dataProvider = this.dataProvider;
+            return EntityFieldsCollection.__super__._prepareModel.call(this, attrs, options);
         },
 
         /**
          * @inheritDoc
          */
         clone: function() {
-            return new this.constructor(this.models, {entityFieldsUtil: this.entityFieldsUtil});
+            return new this.constructor(this.models, {dataProvider: this.dataProvider});
         },
 
         /**
@@ -53,7 +53,7 @@ define(function(require) {
         /**
          * Removes invalid models from collection
          *
-         * @return {FieldsCollection}
+         * @return {EntityFieldsCollection}
          */
         removeInvalidModels: function() {
             var models = this.filter(function(model) {
@@ -64,5 +64,5 @@ define(function(require) {
         }
     });
 
-    return FieldsCollection;
+    return EntityFieldsCollection;
 });

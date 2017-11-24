@@ -1,16 +1,12 @@
 define(function(request) {
     'use strict';
 
-    var ChartFormView;
+    var ReportChartView;
     var BaseView = require('oroui/js/app/views/base/view');
     var $ = request('jquery');
     var _ = request('underscore');
 
-    /**
-     * @export orochart/js/chart_form
-     * @class  orochart.ChartForm
-     */
-    ChartFormView = BaseView.extend({
+    ReportChartView = BaseView.extend({
         /**
          * @property {Object}
          */
@@ -40,7 +36,7 @@ define(function(request) {
         },
 
         delegateEvents: function(events) {
-            ChartFormView.__super__.undelegateEvents.call(this, events);
+            ReportChartView.__super__.undelegateEvents.call(this, events);
             this.$choiceElement.on('change' + this.eventNamespace(), this.updateChartFormVisibility.bind(this));
         },
 
@@ -48,7 +44,7 @@ define(function(request) {
             if (this.$choiceElement) {
                 this.$choiceElement.off(this.eventNamespace());
             }
-            ChartFormView.__super__.undelegateEvents.call(this);
+            ReportChartView.__super__.undelegateEvents.call(this);
         },
 
         getNameChoiceElement: function() {
@@ -95,16 +91,16 @@ define(function(request) {
             var $el = $(options.el);
 
             this.$choiceElement = $el.find(this.defaults.templates.name({baseName: $el.data('ftid')}));
-            ChartFormView.__super__.constructor.apply(this, arguments);
+            ReportChartView.__super__.constructor.apply(this, arguments);
         },
 
         dispose: function() {
             delete this.options;
             delete this.$choiceElement;
 
-            ChartFormView.__super__.dispose.apply(this, arguments);
+            ReportChartView.__super__.dispose.apply(this, arguments);
         }
     });
 
-    return ChartFormView;
+    return ReportChartView;
 });

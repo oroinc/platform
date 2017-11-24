@@ -35,8 +35,7 @@ define(function(require) {
                 this.$filterContainer.html('<span class="loading-indicator">' + __('Loading...') + '</span>');
             }, this), 100);
 
-            tools.loadModules(requires, _.bind(function(modules) {
-                var Filter = _.first(modules);
+            tools.loadModules(requires, _.bind(function(Filter) {
                 var appendFilter = _.bind(function() {
                     clearTimeout(showLoadingTimeout);
                     var filter = new (Filter.extend(filterOptions))();
@@ -44,8 +43,8 @@ define(function(require) {
                         this._appendFilter(filter);
                     }
                 }, this);
-                if (modules.length > 1) {
-                    var optionResolver = modules[1];
+                if (arguments.length > 1) {
+                    var optionResolver = arguments[1];
                     var promise = optionResolver(filterOptions, this.subview('choice-input').splitFieldId(fieldId));
                     promise.done(appendFilter);
                 } else {

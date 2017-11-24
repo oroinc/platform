@@ -127,8 +127,9 @@ define(function(require) {
          * Handles collection sync action and updates the provider
          */
         onCollectionSync: function() {
-            if (this.rootEntityClassName) {
-                this.setRootEntityClassName(this.rootEntityClassName);
+            var className = this.rootEntityClassName;
+            if (className && (!this.rootEntity || this.rootEntity.get('className') !== className)) {
+                this.setRootEntityClassName(className);
             }
         },
 

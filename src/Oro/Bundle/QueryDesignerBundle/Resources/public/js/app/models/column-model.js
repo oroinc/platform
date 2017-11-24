@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     var GroupingModel;
-    var EntityFieldModel = require('./entity-field-model');
+    var EntityFieldModel = require('oroquerydesigner/js/app/models/entity-field-model');
 
     GroupingModel = EntityFieldModel.extend({
         fieldAttribute: 'name',

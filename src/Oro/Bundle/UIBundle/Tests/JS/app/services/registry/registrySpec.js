@@ -32,14 +32,14 @@ define(function(require) {
             function RegistryEntry(instance) {
                 var entry = Object.create(Backbone.Events);
                 entry.instance = instance;
-                entry.requested = [];
+                entry.applicants = [];
                 entry.addApplicant = function(applicant) {
-                    this.requested.push(applicant);
+                    this.applicants.push(applicant);
                 };
                 entry.removeApplicant = function(applicant) {
-                    var index = this.requested.indexOf(applicant);
+                    var index = this.applicants.indexOf(applicant);
                     if (index !== -1) {
-                        this.requested.splice(index, 1);
+                        this.applicants.splice(index, 1);
                         this.trigger('removeApplicant', this);
                     }
                 };

@@ -4,14 +4,16 @@ define(function(require) {
     var SegmentComponent;
     var $ = require('jquery');
     var _ = require('underscore');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var FieldsCollection = require('../models/fields-collection');
     var __ = require('orotranslation/js/translator');
+    var tools = require('oroui/js/tools');
+    var BaseComponent = require('oroui/js/app/components/base/component');
     var LoadingMask = require('oroui/js/app/views/loading-mask-view');
-    var GroupingModel = require('oroquerydesigner/js/items-manager/grouping-model');
-    var ColumnModel = require('oroquerydesigner/js/items-manager/column-model');
+    var EntityFieldsCollection = require('oroquerydesigner/js/app/models/entity-fields-collection');
+    var GroupingModel = require('oroquerydesigner/js/app/models/grouping-model');
+    var ColumnModel = require('oroquerydesigner/js/app/models/column-model');
     var DeleteConfirmation = require('oroui/js/delete-confirmation');
     var EntityFieldsUtil = require('oroentity/js/entity-fields-util');
+    var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
     var ColumnFormView = require('oroquerydesigner/js/app/views/column-form-view');
 
     require('oroentity/js/fields-loader');
@@ -56,36 +58,53 @@ define(function(require) {
             initEntityChangeEvents: true
         },
 
+        /**
+         * @type {EntityStructureDataProvider}
+         */
+        dataProvider: null,
+
+        /**
+         * @type {ColumnFormView}
+         */
         columnFormView: null,
 
         initialize: function(options) {
+            var providerPromise = EntityStructureDataProvider.getOwnDataContainer(this);
+            var modulesPromise = !options.extensions ? [] : tools.loadModules(options.extensions).then(function() {
+                // promise always has to return array of extensions, even if there's only one extension module
+                return _.values(arguments);
+            });
+            this.processOptions(options);
             this._deferredInit();
-            require(options.extensions || [], _.bind(function() {
-                var extensions = arguments;
-                _.each(extensions, function(extension) {
-                    extension.load(this);
-                }, this);
+            $.when(modulesPromise, providerPromise)
+                .then(this._init.bind(this))
+                .then(this._resolveDeferredInit.bind(this));
+            SegmentComponent.__super__.initialize.call(this, options);
+        },
 
-                this.processOptions(options);
-                this.initStorage();
+        _init: function(extensions, provider) {
+            this.dataProvider = provider;
 
-                this.initEntityFieldsUtil();
-                this.$fieldsLoader = this.initFieldsLoader();
-                this.initGrouping();
-                this.initDateGrouping();
-                this.initColumn();
-                this.configureFilters().then(function() {
-                    this._resolveDeferredInit();
-                }.bind(this));
-                if (this.options.initEntityChangeEvents) {
-                    this.initEntityChangeEvents();
-                }
+            _.each(extensions, function(extension) {
+                extension.load(this);
+            }, this);
 
-                SegmentComponent.__super__.initialize.call(this, options);
+            this.initStorage();
+            this.initEntityFieldsUtil();
+            this.$fieldsLoader = this.initFieldsLoader();
+            this.setupDataProvider();
+            this.initGrouping();
+            this.initDateGrouping();
+            this.initColumn();
+            var promise = this.configureFilters();
+            if (this.options.initEntityChangeEvents) {
+                this.initEntityChangeEvents();
+            }
 
-                this.form = this.$storage.parents('form');
-                this.form.submit(_.bind(this.onBeforeSubmit, this));
-            }, this));
+            this.form = this.$storage.parents('form');
+            this.form.submit(_.bind(this.onBeforeSubmit, this));
+
+            return promise;
         },
 
         _getInitFieldsData: function() {
@@ -281,6 +300,14 @@ define(function(require) {
             };
         },
 
+        setupDataProvider: function() {
+            // this.dataProvider.setFilterPreset('some preset');
+            this.dataProvider.setRootEntityClassName(this.$entityChoice.val());
+            this.$entityChoice.on('change', function() {
+                this.dataProvider.setRootEntityClassName(this.$entityChoice.val());
+            }.bind(this));
+        },
+
         /**
          * Initializes EntityFieldsUtil
          */
@@ -366,9 +393,9 @@ define(function(require) {
             });
 
             // prepare collection for Items Manager
-            var collection = new FieldsCollection(this.load('grouping_columns'), {
+            var collection = new EntityFieldsCollection(this.load('grouping_columns'), {
                 model: GroupingModel,
-                entityFieldsUtil: this.entityFieldsUtil
+                dataProvider: this.dataProvider
             });
             this.listenTo(collection, 'add remove sort change', function() {
                 this.save(collection.toJSON(), 'grouping_columns');
@@ -493,9 +520,9 @@ define(function(require) {
             });
 
             // prepare collection for Items Manager
-            var collection = new FieldsCollection(this.load('columns'), {
+            var collection = new EntityFieldsCollection(this.load('columns'), {
                 model: ColumnModel,
-                entityFieldsUtil: this.entityFieldsUtil
+                dataProvider: this.dataProvider
             });
             this.listenTo(collection, 'add remove sort change', function() {
                 this.save(collection.toJSON(), 'columns');

@@ -48,7 +48,8 @@ class ReportChartSchemaTypeTest extends FormIntegrationTestCase
                     'fieldName' => [
                         'label'    => 'label',
                         'name'     => 'name',
-                        'required' => true
+                        'required' => true,
+                        'default_type' => 'string',
                     ]
                 ]
             ]

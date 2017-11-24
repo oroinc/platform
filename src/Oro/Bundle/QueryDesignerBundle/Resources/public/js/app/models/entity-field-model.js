@@ -4,24 +4,24 @@ define(function(require) {
     var EntityFieldModel;
     var _ = require('underscore');
     var BaseModel = require('oroui/js/app/models/base/model');
-    var EntityFieldsUtil = require('oroentity/js/entity-fields-util');
+    var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
 
     EntityFieldModel = BaseModel.extend({
         fieldAttribute: 'name',
 
         /**
-         * @type {EntityFieldsUtil}
+         * @type {EntityStructureDataProvider}
          */
-        entityFieldsUtil: null,
+        dataProvider: null,
 
         /**
          * @inheritDoc
          */
         initialize: function(attributes, options) {
-            if (!options || !(options.entityFieldsUtil instanceof EntityFieldsUtil)) {
-                throw new TypeError('Option "entityFieldsUtil" have to be instance of EntityFieldsUtil');
+            if (!options || !(options.dataProvider instanceof EntityStructureDataProvider)) {
+                throw new TypeError('Option "dataProvider" have to be instance of EntityStructureDataProvider');
             }
-            _.extend(this, _.pick(options, ['entityFieldsUtil']));
+            _.extend(this, _.pick(options, 'dataProvider'));
             EntityFieldModel.__super__.initialize.call(this, attributes, options);
         },
 
@@ -31,7 +31,7 @@ define(function(require) {
         validate: function(attrs, options) {
             var error;
             try {
-                this.entityFieldsUtil.pathToEntityChain(attrs[this.fieldAttribute]);
+                this.dataProvider.pathToEntityChain(attrs[this.fieldAttribute]);
             } catch (e) {
                 error = e.message;
             }
