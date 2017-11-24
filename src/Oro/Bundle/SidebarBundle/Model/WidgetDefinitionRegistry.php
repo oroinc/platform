@@ -2,54 +2,51 @@
 
 namespace Oro\Bundle\SidebarBundle\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 class WidgetDefinitionRegistry
 {
-    /**
-     * @var ArrayCollection
-     */
-    protected $widgetDefinitions;
+    /** @var array */
+    private $definitions;
 
     /**
      * @param array $definitions
      */
     public function __construct(array $definitions)
     {
-        $this->widgetDefinitions = new ArrayCollection();
-
-        $this->setWidgetDefinitions($definitions);
+        $this->definitions = $definitions;
     }
 
     /**
-     * @param array $definitions
+     * @param array $definitions [widget name => widget definition, ...]
      */
     public function setWidgetDefinitions(array $definitions)
     {
         foreach ($definitions as $name => $definition) {
-            $this->widgetDefinitions->set($name, $definition);
+            $this->definitions[$name] = $definition;
         }
     }
 
     /**
-     * @return ArrayCollection
+     * @return array [widget name => widget definition, ...]
      */
     public function getWidgetDefinitions()
     {
-        return $this->widgetDefinitions;
+        return $this->definitions;
     }
 
     /**
      * @param string $placement
-     * @return ArrayCollection
+     *
+     * @return array [widget name => widget definition, ...]
      */
     public function getWidgetDefinitionsByPlacement($placement)
     {
-        return $this->widgetDefinitions->filter(
-            function ($widgetDefinition) use ($placement) {
-                return $widgetDefinition['placement'] === $placement
-                    || $widgetDefinition['placement'] === 'both';
+        $result = [];
+        foreach ($this->definitions as $name => $definition) {
+            if ($definition['placement'] === $placement || $definition['placement'] === 'both') {
+                $result[$name] = $definition;
             }
-        );
+        }
+
+        return $result;
     }
 }
