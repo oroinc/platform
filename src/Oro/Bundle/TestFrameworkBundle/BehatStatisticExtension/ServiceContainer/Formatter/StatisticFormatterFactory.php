@@ -7,8 +7,6 @@ use Behat\Testwork\Output\NodeEventListeningFormatter;
 use Behat\Testwork\Output\ServiceContainer\Formatter\FormatterFactory;
 use Behat\Testwork\Output\ServiceContainer\OutputExtension;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\EventListener\FeatureStatisticSubscriber;
-use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatistic;
-use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\Repository\FeatureStatisticRepository;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Output\Printer\NullOutputPrinter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -24,7 +22,6 @@ final class StatisticFormatterFactory implements FormatterFactory
     public function buildFormatter(ContainerBuilder $container)
     {
         $this->defineStatisticModels($container);
-        $this->loadRepositories($container);
         $this->loadSubscribers($container);
         $this->loadFormatter($container);
     }
@@ -37,11 +34,6 @@ final class StatisticFormatterFactory implements FormatterFactory
     public function processFormatter(ContainerBuilder $container)
     {
         $subsriber = $container->getDefinition('behat_statistic.listener.feature_statistic_subscriber');
-        $subsriber
-            ->addArgument($container->getParameter('oro_behat_statistic.build_id'))
-            ->addArgument($container->getParameter('oro_behat_statistic.branch_name'))
-            ->addArgument($container->getParameter('oro_behat_statistic.target_branch'))
-        ;
         $subsriber->addMethodCall('setOutput', [$container->get('cli.output')]);
     }
 
@@ -83,18 +75,6 @@ final class StatisticFormatterFactory implements FormatterFactory
     /**
      * @param ContainerBuilder $container
      */
-    private function loadRepositories(ContainerBuilder $container)
-    {
-        $featureRepository = new Definition(FeatureStatisticRepository::class, [
-            new Reference('oro_behat_statistic.database.connection')
-        ]);
-        $featureRepository->addMethodCall('setClassName', [FeatureStatistic::class]);
-        $container->setDefinition('oro_behat_statistic.feature_repository', $featureRepository);
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
     private function loadSubscribers(ContainerBuilder $container)
     {
         $featureStatisticSubscriber = new Definition(
@@ -102,6 +82,7 @@ final class StatisticFormatterFactory implements FormatterFactory
             [
                 new Reference('oro_behat_statistic.feature_repository'),
                 new Reference('oro_behat_statistic.specification.feature_path_locator'),
+                new Reference('oro_behat_statistic.criteria_array_collection'),
             ]
         );
 

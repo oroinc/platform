@@ -4,9 +4,10 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Tests\Specifica
 
 use Behat\Testwork\Suite\GenericSuite;
 use Behat\Testwork\Suite\Suite;
-use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\Repository\FeatureStatisticRepository;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\FeatureAvgTimeRegistry;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\FeaturePathLocator;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\SuiteConfigurationDivider;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Tests\Specification\Stub\AvgTimeProviderStub;
 
 class SuiteConfigurationDividerTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,7 +33,7 @@ class SuiteConfigurationDividerTest extends \PHPUnit_Framework_TestCase
     public function testDivide($suites, $maxSeconds, $expectedSets)
     {
         $divider = new SuiteConfigurationDivider(
-            $this->getFeatureStatisticRepositoryMock(),
+            $this->getSuiteConfigurationRegistryMock(),
             $this->getFeaturePathLocatorMock()
         );
         $actualResult = $divider->divide('SetStub', $this->generateConfigs($suites), $maxSeconds);
@@ -123,17 +124,14 @@ class SuiteConfigurationDividerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FeatureStatisticRepository
+     * @return FeatureAvgTimeRegistry
      */
-    private function getFeatureStatisticRepositoryMock()
+    private function getSuiteConfigurationRegistryMock()
     {
-        $repository = $this->getMockBuilder(FeatureStatisticRepository::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getFeaturesAverageTimes'])
-            ->getMock();
-        $repository->method('getFeaturesAverageTimes')->willReturn($this->featureDuration);
+        $avgTimeRegistry = new FeatureAvgTimeRegistry();
+        $avgTimeRegistry->addProvider(new AvgTimeProviderStub($this->featureDuration));
 
-        return $repository;
+        return $avgTimeRegistry;
     }
 
     /**
