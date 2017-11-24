@@ -5,7 +5,8 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Tests\Suite;
 use Behat\Testwork\Specification\SpecificationFinder;
 use Behat\Testwork\Suite\Generator\GenericSuiteGenerator;
 use Behat\Testwork\Suite\Suite;
-use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\Repository\FeatureStatisticRepository;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\FeatureAvgTimeRegistry;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\FeatureStatisticRepository;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\FeaturePathLocator;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\SpecificationCountDivider;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\SuiteConfigurationDivider;
@@ -237,7 +238,7 @@ class SuiteConfigurationRegistryTest extends \PHPUnit_Framework_TestCase
             $finder,
             new SpecificationCountDivider(),
             new SuiteConfigurationDivider(
-                $this->getFeatureStatisticRepositoryMock(),
+                $this->getFeatureAvgTimeRegistryMock(),
                 new FeaturePathLocator('')
             ),
             $this->getFeaturePathLocatorMock()
@@ -250,15 +251,11 @@ class SuiteConfigurationRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FeatureStatisticRepository
+     * @return FeatureAvgTimeRegistry
      */
-    private function getFeatureStatisticRepositoryMock()
+    private function getFeatureAvgTimeRegistryMock()
     {
-        $repository = $this->getMockBuilder(FeatureStatisticRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        return $repository;
+        return new FeatureAvgTimeRegistry();
     }
 
     /**

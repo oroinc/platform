@@ -4,6 +4,9 @@
 #### EntityBundle
 * Added event `oro_entity.structure.options` (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/events.md#entity-structure-options-event))
 * Added provider `Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider` for getting data of entities structure (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/entity_structure_data_provider.md))
+#### SidebarBundle
+* Class `Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry`
+    * the return type for methods `getWidgetDefinitions` and `getWidgetDefinitionsByPlacement` were changed from `ArrayCollection` to `array`
 ### Removed
 #### AttachmentBundle
 * The parameter `oro_attachment.listener.file_listener.class` was removed form the service container
@@ -13,6 +16,9 @@
 * The parameter `oro_imap.listener.user_email_origin.class` was removed form the service container
 #### ReminderBundle
 * The parameter `oro_reminder.event_listener.reminder_listener.class` was removed form the service container
+#### SidebarBundle
+* The parameter `oro_sidebar.widget_definition.registry.class` was removed form the service container
+* The service `oro_sidebar.request.handler` was removed
 #### SSOBundle
 * The parameter `oro_sso.event_listener.user_email_change_listener.class` was removed form the service container
 #### WorkflowBundle

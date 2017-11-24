@@ -70,8 +70,7 @@ class SidebarExtension extends \Twig_Extension implements FeatureToggleableInter
     public function getWidgetDefinitions($placement)
     {
         $definitions = $this->getWidgetDefinitionRegistry()
-            ->getWidgetDefinitionsByPlacement($placement)
-            ->toArray();
+            ->getWidgetDefinitionsByPlacement($placement);
         $translator = $this->getTranslator();
         $assetHelper = $this->getAssetHelper();
 
@@ -82,6 +81,9 @@ class SidebarExtension extends \Twig_Extension implements FeatureToggleableInter
             }
 
             $definition['title'] = $translator->trans($definition['title']);
+            if (!empty($definition['icon'])) {
+                $definition['icon'] = $assetHelper->getUrl($definition['icon']);
+            }
             if (!empty($definition['dialogIcon'])) {
                 $definition['dialogIcon'] = $assetHelper->getUrl($definition['dialogIcon']);
             }
