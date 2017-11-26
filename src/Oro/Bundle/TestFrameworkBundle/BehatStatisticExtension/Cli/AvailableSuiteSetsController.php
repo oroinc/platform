@@ -4,7 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Cli;
 
 use Behat\Testwork\Cli\Controller;
 use Behat\Testwork\Suite\Suite;
-use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\Repository\FeatureStatisticRepository;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\FeatureAvgTimeRegistry;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\FeaturePathLocator;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Suite\SuiteConfigurationRegistry;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
@@ -20,9 +20,9 @@ class AvailableSuiteSetsController implements Controller
     private $suiteConfigRegistry;
 
     /**
-     * @var FeatureStatisticRepository
+     * @var FeatureAvgTimeRegistry
      */
-    private $statisticRepository;
+    private $featureAvgTimeRegistry;
 
     /**
      * @var FeaturePathLocator
@@ -31,16 +31,16 @@ class AvailableSuiteSetsController implements Controller
 
     /**
      * @param SuiteConfigurationRegistry $suiteConfigRegistry
-     * @param FeatureStatisticRepository $statisticRepository
+     * @param FeatureAvgTimeRegistry $featureAvgTimeProvider
      * @param FeaturePathLocator $featurePathLocator
      */
     public function __construct(
         SuiteConfigurationRegistry $suiteConfigRegistry,
-        FeatureStatisticRepository $statisticRepository,
+        FeatureAvgTimeRegistry $featureAvgTimeProvider,
         FeaturePathLocator $featurePathLocator
     ) {
         $this->suiteConfigRegistry = $suiteConfigRegistry;
-        $this->statisticRepository = $statisticRepository;
+        $this->featureAvgTimeRegistry = $featureAvgTimeProvider;
         $this->featurePathLocator = $featurePathLocator;
     }
 
@@ -160,7 +160,7 @@ class AvailableSuiteSetsController implements Controller
     {
         foreach ($paths as $path) {
             $relativePath = $this->featurePathLocator->getRelativePath($path);
-            $time = $this->statisticRepository->getAverageTime($relativePath);
+            $time = $this->featureAvgTimeRegistry->getAverageTimeById($relativePath);
 
             $output->writeln(sprintf('        %s - %s sec', $path, $time));
         }

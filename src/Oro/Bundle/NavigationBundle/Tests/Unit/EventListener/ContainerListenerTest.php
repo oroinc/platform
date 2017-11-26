@@ -7,72 +7,90 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 use Oro\Bundle\NavigationBundle\EventListener\ContainerListener;
 use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
-
 use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class ContainerListenerTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigMetadataDumperInterface */
+    private $dumper;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigurationProvider */
+    private $configurationProvider;
+
     /** @var ContainerListener */
-    protected $listener;
-
-    /** @var ConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject */
-    protected $configurationProvider;
-
-    /** @var ConfigMetadataDumperInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $dumper;
+    private $listener;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->configurationProvider = $this->createMock(ConfigurationProvider::class);
         $this->dumper = $this->createMock(ConfigMetadataDumperInterface::class);
+        $this->configurationProvider = $this->createMock(ConfigurationProvider::class);
 
-        $this->listener = new ContainerListener($this->configurationProvider, $this->dumper);
+        $container = TestContainerBuilder::create()
+            ->add('oro_navigation.configuration.provider', $this->configurationProvider)
+            ->getContainer($this);
+
+        $this->listener = new ContainerListener($this->dumper, $container);
     }
 
-    public function testOnKernelRequest()
+    /**
+     * @param bool $isMasterRequest
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject|GetResponseEvent
+     */
+    private function getEvent($isMasterRequest = true)
     {
-        $this->dumper
-            ->expects($this->once())
+        $event = $this->createMock(GetResponseEvent::class);
+        $event->expects(self::any())
+            ->method('isMasterRequest')
+            ->willReturn($isMasterRequest);
+
+        return $event;
+    }
+
+    public function testOnKernelRequestIsNotFresh()
+    {
+        $this->dumper->expects(self::once())
             ->method('isFresh')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $container = new ContainerBuilder();
-
-        $this->configurationProvider
-            ->expects($this->once())
+        $this->configurationProvider->expects(self::once())
             ->method('loadConfiguration')
             ->with($container);
-
-        $this->dumper
-            ->expects($this->once())
+        $this->dumper->expects(self::once())
             ->method('dump')
             ->with($container);
 
-        /** @var GetResponseEvent|\PHPUnit_Framework_MockObject_MockObject $event */
-        $event = $this->createMock(GetResponseEvent::class);
-        $this->listener->onKernelRequest($event);
+        $this->listener->onKernelRequest($this->getEvent());
     }
 
     public function testOnKernelRequestIsFresh()
     {
-        $this->dumper
-            ->expects($this->once())
+        $this->dumper->expects(self::once())
             ->method('isFresh')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $this->configurationProvider
-            ->expects($this->never())
+        $this->configurationProvider->expects(self::never())
             ->method('loadConfiguration');
-
-        $this->dumper
-            ->expects($this->never())
+        $this->dumper->expects(self::never())
             ->method('dump');
 
-        /** @var GetResponseEvent|\PHPUnit_Framework_MockObject_MockObject $event */
-        $event = $this->createMock(GetResponseEvent::class);
-        $this->listener->onKernelRequest($event);
+        $this->listener->onKernelRequest($this->getEvent());
+    }
+
+    public function testOnKernelRequestForSubRequest()
+    {
+        $this->dumper->expects(self::never())
+            ->method('isFresh');
+        $this->configurationProvider->expects(self::never())
+            ->method('loadConfiguration');
+        $this->dumper->expects(self::never())
+            ->method('dump');
+
+        $this->listener->onKernelRequest($this->getEvent(false));
     }
 }

@@ -5,54 +5,92 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\EventListener;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
+use Oro\Bundle\LayoutBundle\EventListener\ContainerListener;
 use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 use Oro\Component\Layout\Extension\Theme\ResourceProvider\ResourceProviderInterface;
-
-use Oro\Bundle\LayoutBundle\EventListener\ContainerListener;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class ContainerListenerTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigMetadataDumperInterface */
+    private $dumper;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourceProviderInterface */
+    private $resourceProvider;
+
     /** @var ContainerListener */
-    protected $listener;
-
-    /** @var ResourceProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $provider;
-
-    /** @var ConfigMetadataDumperInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $dumper;
+    private $listener;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->provider = $this->createMock(ResourceProviderInterface::class);
         $this->dumper = $this->createMock(ConfigMetadataDumperInterface::class);
+        $this->resourceProvider = $this->createMock(ResourceProviderInterface::class);
 
-        $this->listener = new ContainerListener($this->provider, $this->dumper);
+        $container = TestContainerBuilder::create()
+            ->add('oro_layout.theme_extension.resource_provider.theme', $this->resourceProvider)
+            ->getContainer($this);
+
+        $this->listener = new ContainerListener($this->dumper, $container);
     }
 
-    public function testOnKernelRequest()
+    /**
+     * @param bool $isMasterRequest
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject|GetResponseEvent
+     */
+    private function getEvent($isMasterRequest = true)
     {
-        $this->dumper
-            ->expects($this->once())
+        $event = $this->createMock(GetResponseEvent::class);
+        $event->expects(self::any())
+            ->method('isMasterRequest')
+            ->willReturn($isMasterRequest);
+
+        return $event;
+    }
+
+    public function testOnKernelRequestIsNotFresh()
+    {
+        $this->dumper->expects(self::once())
             ->method('isFresh')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $container = new ContainerBuilder();
-
-        $this->provider
-            ->expects($this->once())
+        $this->resourceProvider->expects(self::once())
             ->method('loadResources')
             ->with($container);
-
-        $this->dumper
-            ->expects($this->once())
+        $this->dumper->expects(self::once())
             ->method('dump')
             ->with($container);
 
-        /** @var GetResponseEvent|\PHPUnit_Framework_MockObject_MockObject $event */
-        $event = $this->createMock(GetResponseEvent::class);
-        $this->listener->onKernelRequest($event);
+        $this->listener->onKernelRequest($this->getEvent());
+    }
+
+    public function testOnKernelRequestIsFresh()
+    {
+        $this->dumper->expects(self::once())
+            ->method('isFresh')
+            ->willReturn(true);
+
+        $this->resourceProvider->expects(self::never())
+            ->method('loadResources');
+        $this->dumper->expects(self::never())
+            ->method('dump');
+
+        $this->listener->onKernelRequest($this->getEvent());
+    }
+
+    public function testOnKernelRequestForSubRequest()
+    {
+        $this->dumper->expects(self::never())
+            ->method('isFresh');
+        $this->resourceProvider->expects(self::never())
+            ->method('loadResources');
+        $this->dumper->expects(self::never())
+            ->method('dump');
+
+        $this->listener->onKernelRequest($this->getEvent(false));
     }
 }

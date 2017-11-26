@@ -4,8 +4,11 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
+use Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
+use Oro\Bundle\EmailBundle\Util\ConfigurableTransport;
 
 class DirectMailerTest extends \PHPUnit_Framework_TestCase
 {
@@ -15,6 +18,9 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
     protected $container;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigurableTransport */
+    protected $configurableTransport;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|EmailOrigin */
     protected $emailOrigin;
 
@@ -22,6 +28,9 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
     {
         $this->baseMailer = $this->getMailerMock();
         $this->container  = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->configurableTransport = $this->getMockBuilder(ConfigurableTransport::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->emailOrigin =
             $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailOrigin')
@@ -62,7 +71,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $transport->expects($this->once())
             ->method('stop');
 
-        $mailer = new DirectMailer($this->baseMailer, $this->container);
+        $mailer = new DirectMailer($this->baseMailer, $this->container, $this->configurableTransport);
         $this->assertEquals(1, $mailer->send($message, $failedRecipients));
     }
 
@@ -111,9 +120,43 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $realTransport->expects($this->once())
             ->method('stop');
 
-        $mailer = new DirectMailer($this->baseMailer, $this->container);
+        $mailer = new DirectMailer($this->baseMailer, $this->container, $this->configurableTransport);
         $this->assertEquals(1, $mailer->send($message, $failedRecipients));
     }
+
+    public function testConfigManager()
+    {
+        $transport = $this->getMockBuilder('\Swift_Transport_SpoolTransport')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $realTransport = $this->createMock('\Swift_Transport_EsmtpTransport');
+
+        $this->baseMailer->expects($this->once())
+            ->method('getTransport')
+            ->will($this->returnValue($transport));
+
+        $this->configurableTransport->expects($this->once())
+            ->method('getDefaultTransport')
+            ->willReturn($realTransport);
+
+        $this->container->expects($this->once())
+            ->method('getParameter')
+            ->with('swiftmailer.mailers')
+            ->will($this->returnValue(['default' => null]));
+        $this->container->expects($this->any())
+            ->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['swiftmailer.mailer.default', 1, $this->baseMailer],
+                        ['swiftmailer.mailer.default.transport.real', 1, $realTransport]
+                    ]
+                )
+            );
+
+        new DirectMailer($this->baseMailer, $this->container, $this->configurableTransport);
+    }
+
 
     /**
      * @expectedException \Exception
@@ -145,7 +188,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $transport->expects($this->once())
             ->method('stop');
 
-        $mailer = new DirectMailer($this->baseMailer, $this->container);
+        $mailer = new DirectMailer($this->baseMailer, $this->container, $this->configurableTransport);
         $this->assertEquals(1, $mailer->send($message, $failedRecipients));
     }
 
@@ -177,7 +220,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn($dispatcher);
 
-        $mailer = new DirectMailer($this->baseMailer, $this->container);
+        $mailer = new DirectMailer($this->baseMailer, $this->container, $this->configurableTransport);
         $mailer->prepareEmailOriginSmtpTransport($this->emailOrigin);
         $smtpTransport = $mailer->getTransport();
 
@@ -195,7 +238,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
             ->method('getTransport')
             ->will($this->returnValue($transport));
 
-        $mailer = new DirectMailer($this->baseMailer, $this->container);
+        $mailer = new DirectMailer($this->baseMailer, $this->container, $this->configurableTransport);
         $plugin = $this->createMock('\Swift_Events_EventListener');
         $mailer->registerPlugin($plugin);
     }
