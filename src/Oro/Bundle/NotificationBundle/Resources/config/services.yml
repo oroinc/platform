@@ -210,8 +210,7 @@ services:
         public: false
         lazy: true
         arguments:
-            - '@doctrine'
-            - '@oro_entity_config.provider.entity'
+            - '@oro_entity_config.config_manager'
             - '@translator'
 
     oro_notification.form.subscriber.contact_information_emails:
