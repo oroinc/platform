@@ -60,3 +60,27 @@
         {{ block('container_widget') }}
     </div>
 {% endblock %}
+
+{% block logo_widget %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' logo'
+    }) %}
+    
+    {% set attr_img = attr_img|default({}) %}
+    {% set attr_img = layout_attr_defaults(attr_img, {
+        'src': asset('bundles/orofrontend/blank/images/logo/logo-oroacem.svg'),
+        '~class': ' logo-img',
+        'alt': 'oro_frontend.logo.alt.label'|trans
+    }) %}
+
+    {% if renderLink and app.request.attributes.get('_route') != route %}
+        <a href="{{ path(route) }}" {{ block('block_attributes') }}>
+            <img {{ UI.attributes(attr_img) }}>
+        </a>
+    {% else %}
+        <div {{ block('block_attributes') }}>
+            <img {{ UI.attributes(attr_img) }}>
+        </div>
+    {% endif %}
+{% endblock %}

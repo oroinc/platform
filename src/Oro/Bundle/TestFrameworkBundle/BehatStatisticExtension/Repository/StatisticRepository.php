@@ -1,14 +1,15 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\Repository;
+namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\StatisticModelInterface;
 
-class StatisticRepository implements StatisticRepositoryInterface, ObjectRepository
+class StatisticRepository implements BatchRepositoryInterface, ObjectRepository
 {
-    const MAX_LIMIT = 1000;
+    const MAX_LIMIT = 10000;
 
     /**
      * @var Connection
@@ -42,6 +43,56 @@ class StatisticRepository implements StatisticRepositoryInterface, ObjectReposit
         $this->collection[] = $model;
     }
 
+    public function getLastBuildIds($numberOfBuilds, array $criteria)
+    {
+        $buildIdsQueryBuilder = $this->connection->createQueryBuilder()
+            ->select("build_id")
+            ->from($this->className::getName())
+            ->groupBy('build_id')
+            ->orderBy('build_id', 'DESC')
+            ->setMaxResults($numberOfBuilds)
+        ;
+
+        if ($criteria) {
+            $this->addCriteria($criteria, $buildIdsQueryBuilder);
+        }
+        $ids = $buildIdsQueryBuilder->execute()->fetchAll();
+
+        $ids = array_map(function ($data) {
+            return $data['build_id'];
+        }, $ids);
+        $ids = array_filter($ids);
+
+        return $ids;
+    }
+
+    /**
+     * @param array $criteria
+     * @return array [ID:string|int => Time:int]
+     */
+    public function getAverageTimeTable(array $criteria)
+    {
+        $queryBuilder = $this->connection->createQueryBuilder()
+            ->select($this->className::getIdField().", avg(time) as time")
+            ->from($this->className::getName())
+            ->groupBy($this->className::getIdField())
+        ;
+
+        if ($criteria) {
+            $this->addCriteria($criteria, $queryBuilder);
+        }
+
+        $result = $queryBuilder->execute()->fetchAll();
+
+        $paths = [];
+
+        foreach ($result as $row) {
+            $paths[$row[$this->className::getIdField()]] = round($row['time']);
+        }
+
+        return $this->paths = $paths;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -68,10 +119,6 @@ class StatisticRepository implements StatisticRepositoryInterface, ObjectReposit
         $orderBy = $orderBy ?: ['id', 'DESC'];
         $limit = $limit ?: self::MAX_LIMIT;
 
-        if (empty($criteria)) {
-            throw new \RuntimeException('It\'s prohibited call "findBy" on statistics without criteria');
-        }
-
         if ($limit > self::MAX_LIMIT) {
             throw new \RuntimeException(sprintf('You should not set limit over then %s', self::MAX_LIMIT));
         }
@@ -81,21 +128,19 @@ class StatisticRepository implements StatisticRepositoryInterface, ObjectReposit
             ->from($this->className::getName())
         ;
 
-        $andExpr = $queryBuilder->expr()->andX();
+        $this->addCriteria($criteria, $queryBuilder);
 
-        foreach ($criteria as $field => $value) {
-            $filedKey = uniqid(':where_field_');
-            $valueKey = uniqid(':where_value_');
-            $andExpr->add($queryBuilder->expr()->eq($filedKey, $valueKey));
-            $queryBuilder->setParameter($filedKey, $field);
-            $queryBuilder->setParameter($valueKey, $value);
+        if ($orderBy) {
+            $queryBuilder->orderBy($orderBy[0], $orderBy[1]);
         }
 
-        $queryBuilder->where($andExpr)
-            ->setFirstResult($offset)
-            ->setMaxResults($limit)
-            ->orderBy($orderBy[0], $orderBy[1])
-        ;
+        if ($limit) {
+            $queryBuilder->setMaxResults($limit);
+        }
+
+        if ($offset) {
+            $queryBuilder->setFirstResult($offset);
+        }
 
         $result = $queryBuilder->execute()
             ->fetchAll()
@@ -170,5 +215,29 @@ class StatisticRepository implements StatisticRepositoryInterface, ObjectReposit
     public function setClassName($className)
     {
         $this->className = $className;
+    }
+
+    /**
+     * @param array $criteria
+     * @param QueryBuilder $queryBuilder
+     * @return void
+     */
+    private function addCriteria(array $criteria, QueryBuilder $queryBuilder)
+    {
+        $andExpr = $queryBuilder->expr()->andX();
+
+        foreach ($criteria as $field => $value) {
+            if (is_null($value)) {
+                $andExpr->add($queryBuilder->expr()->isNull($field));
+            } elseif (is_array($value)) {
+                $andExpr->add($queryBuilder->expr()->in($field, $value));
+            } else {
+                $valueKey = uniqid(':where_value_');
+                $andExpr->add($queryBuilder->expr()->eq($field, $valueKey));
+                $queryBuilder->setParameter($valueKey, $value);
+            }
+        }
+
+        $queryBuilder->andWhere($andExpr);
     }
 }

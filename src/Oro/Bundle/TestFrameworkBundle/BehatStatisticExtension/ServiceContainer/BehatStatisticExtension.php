@@ -48,9 +48,10 @@ final class BehatStatisticExtension implements TestworkExtension
         $builder
             ->children()
                 ->variableNode('connection')->info('Doctrine Dbal Connection for a DB')->end()
-                ->scalarNode('branch_name_env')->defaultNull()->end()
-                ->scalarNode('target_branch_env')->defaultNull()->end()
-                ->scalarNode('build_id_env')->defaultNull()->end()
+                ->arrayNode('criteria')
+                    ->useAttributeAsKey('name')
+                    ->prototype('scalar')->end()
+                ->end()
                 ->scalarNode('count_build_limit')
                     ->defaultValue(10)
                     ->info('The number of builds for select from db to get average time')
@@ -70,16 +71,30 @@ final class BehatStatisticExtension implements TestworkExtension
     public function load(ContainerBuilder $container, array $config)
     {
         $container->setParameter('oro_behat_statistic.connection', $config['connection']);
-        $container->setParameter('oro_behat_statistic.branch_name', getenv($config['branch_name_env']) ?: null);
-        $container->setParameter('oro_behat_statistic.target_branch', getenv($config['target_branch_env']) ?: null);
-        $container->setParameter('oro_behat_statistic.build_id', getenv($config['build_id_env']) ?: null);
-        $container->setParameter('oro_behat_statistic.count_build_limit', $config['count_build_limit']);
+        $criteria = $this->getEnvVars($config['criteria']);
+        $criteria['count_build_limit'] = $config['count_build_limit'];
+        $container->setParameter('oro_behat_statistic.criteria', $criteria);
         $this->loadSuiteSetConfiguration($container, $config['suite_sets']);
         $this->loadSuiteConfiguration($container);
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/config'));
         $loader->load('services.yml');
         $loader->load('cli_controllers.yml');
+        $loader->load('avg_time.yml');
+        $loader->load('avg_time_feature.yml');
+    }
+
+    /**
+     * @param array $criteria
+     * @return array
+     */
+    private function getEnvVars(array $criteria)
+    {
+        $vars =  array_map(function ($env) {
+            return getenv($env) ?: null;
+        }, $criteria);
+
+        return array_filter($vars);
     }
 
     /**
