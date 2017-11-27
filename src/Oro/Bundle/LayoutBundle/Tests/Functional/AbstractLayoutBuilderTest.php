@@ -18,11 +18,31 @@ use Oro\Component\Layout\LayoutContext;
 abstract class AbstractLayoutBuilderTest extends WebTestCase
 {
     /**
+     * @var ThemeManager
+     */
+    private $oldThemeManager;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
         $this->initClient();
+        $this->oldThemeManager = $this->getContainer()->get('oro_layout.theme_manager');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        $container = $this->getContainer();
+        // Revert overridden service
+        $container->set('oro_layout.theme_manager', $this->oldThemeManager);
+
+        // Clear caches that are changed in getLayout()
+        $container->get('oro_layout.cache.block_view_cache')->reset();
+        $container->get('oro_layout.theme_extension.resource_provider.cache')->deleteAll();
     }
 
     /**

@@ -60,22 +60,9 @@ class WorkflowDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
         $this->serializer->expects($this->never())->method('serialize');
         $this->serializer->expects($this->never())->method('deserialize');
 
-        $this->listener->postLoad($args);
+        $this->listener->postLoad($entity, $args);
 
         $this->assertAttributeSame($this->serializer, 'serializer', $entity);
-    }
-
-    public function testPostEntityNotSupported()
-    {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $entity = new \stdClass();
-        $args = new LifecycleEventArgs($entity, $em);
-
-        $this->serializer->expects($this->never())->method($this->anything());
-        $this->listener->postLoad($args);
     }
 
     /**

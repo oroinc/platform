@@ -54,7 +54,7 @@ class EmailAttachmentsType extends AbstractType
         $attachments = $event->getData();
         /** @var EmailAttachment $attachment */
         foreach ($attachments as $attachment) {
-            if (!$attachment->getId()) {
+            if (!$attachment) {
                 $attachments->removeElement($attachment);
             }
         }

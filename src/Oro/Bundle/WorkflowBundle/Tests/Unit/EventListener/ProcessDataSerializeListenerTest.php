@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
@@ -145,40 +146,15 @@ class ProcessDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($processJob->getData()->isModified());
     }
 
-    /**
-     * @dataProvider postLoadProvider
-     */
-    public function testPostLoad($entity)
+    public function testPostLoad()
     {
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entity = $this->createMock(ProcessJob::class);
 
-        $lifecycleEventArgs = new LifecycleEventArgs($entity, $entityManager);
-        $this->listener->postLoad($lifecycleEventArgs);
-    }
-
-    public function postLoadProvider()
-    {
-        return array(
-            'string instead class' => array(
-                'entity' => 'some class',
-            ),
-            'invalid class' => array(
-                'entity' => new \stdClass(),
-            ),
-            'valid class' => array(
-                'entity' => $this->getMockProcessJob(),
-            ),
-        );
-    }
-
-    protected function getMockProcessJob()
-    {
-        $processJob = $this->createMock('Oro\Bundle\WorkflowBundle\Entity\ProcessJob');
-        $processJob->expects($this->once())
+        $entity->expects(self::once())
             ->method('setSerializer')
-            ->will($this->returnSelf());
-        return $processJob;
+            ->with(self::identicalTo($this->serializer), 'json');
+
+        $lifecycleEventArgs = new LifecycleEventArgs($entity, $this->createMock(EntityManager::class));
+        $this->listener->postLoad($entity, $lifecycleEventArgs);
     }
 }
