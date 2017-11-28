@@ -34,8 +34,6 @@ class OroSidebarExtension extends Extension
         $loader->load('services.yml');
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
-
-        $this->addClassesToCompile(['Oro\Bundle\SidebarBundle\EventListener\RequestHandler']);
     }
 
     /**

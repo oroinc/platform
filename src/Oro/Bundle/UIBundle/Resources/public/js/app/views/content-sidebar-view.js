@@ -44,7 +44,7 @@ define(function(require) {
          * {@inheritDoc}
          */
         render: function() {
-            if (this.fixSidebarHeight) {
+            if (this.fixSidebarHeight && !tools.isMobile()) {
                 layoutHelper.setAvailableHeight(this.scrollbar, this.$el);
             }
 

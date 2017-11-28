@@ -2,23 +2,24 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-class SoapClient extends \SoapClient
+use Oro\Bundle\IntegrationBundle\Utils\NonPrintableCharsStringSanitizer;
+
+class NonPrintableCharsSanitizedSoapClient extends \SoapClient
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function __doRequest($request, $location, $action, $version, $one_way = 0)
     {
         $response = parent::__doRequest($request, $location, $action, $version, $one_way);
 
-        // Remove all non printable characters except whitespace characters
-        $response = preg_replace('/[^[:print:][:space:]]/u', '', $response);
+        $response = $this->removeNonPrintableCharacters($response);
 
         return $response;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function __soapCall(
         $function_name,
@@ -32,8 +33,7 @@ class SoapClient extends \SoapClient
                 $arguments,
                 function (&$item) {
                     if (is_string($item)) {
-                        // Remove all non printable characters except whitespace characters
-                        $item = preg_replace('/[^[:print:][:space:]]/u', '', $item);
+                        $item = $this->removeNonPrintableCharacters($item);
                     }
                 }
             );
@@ -46,5 +46,23 @@ class SoapClient extends \SoapClient
             $input_headers,
             $output_headers
         );
+    }
+
+    /**
+     * @param string $string
+     *
+     * @return string|null
+     */
+    private function removeNonPrintableCharacters($string)
+    {
+        return $this->getSanitizer()->removeNonPrintableCharacters($string);
+    }
+
+    /**
+     * @return NonPrintableCharsStringSanitizer
+     */
+    private function getSanitizer()
+    {
+        return new NonPrintableCharsStringSanitizer();
     }
 }
