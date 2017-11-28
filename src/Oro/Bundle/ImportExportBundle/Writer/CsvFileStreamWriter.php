@@ -18,6 +18,11 @@ abstract class CsvFileStreamWriter extends FileStreamWriter
     protected $enclosure = '"';
 
     /**
+     * @var string
+     */
+    protected $escape;
+
+    /**
      * @var bool
      */
     protected $firstLineIsHeader = true;
@@ -26,6 +31,20 @@ abstract class CsvFileStreamWriter extends FileStreamWriter
      * @var resource
      */
     protected $fileHandle;
+
+    public function __construct()
+    {
+        /**
+         * According to RFC4180 for CSV (https://tools.ietf.org/html/rfc4180)
+         * there's no special meaning for backslash character. As data for import/export is usually meant
+         * to be treated "as is" it was decided to set escape symbol as 0x0 character.
+         * This solves a problem when csv field contains single backslash character.
+         *
+         * If one wants to use other escape symbol then he or she needs to pass it via "escape" option
+         * and provide needed changes for correct csv reading/writing.
+         */
+        $this->escape = chr(0);
+    }
 
     /**
      * {@inheritdoc}
@@ -65,7 +84,7 @@ abstract class CsvFileStreamWriter extends FileStreamWriter
      */
     protected function writeLine(array $fields)
     {
-        $result = fputcsv($this->getFile(), $fields, $this->delimiter, $this->enclosure);
+        $result = fputcsv($this->getFile(), $fields, $this->delimiter, $this->enclosure, $this->escape);
         if ($result === false) {
             throw new RuntimeException('An error occurred while writing to the csv.');
         }
@@ -125,6 +144,10 @@ abstract class CsvFileStreamWriter extends FileStreamWriter
 
         if ($context->hasOption('enclosure')) {
             $this->enclosure = $context->getOption('enclosure');
+        }
+
+        if ($context->hasOption('escape')) {
+            $this->escape = $context->getOption('escape');
         }
 
         if ($context->hasOption('firstLineIsHeader')) {

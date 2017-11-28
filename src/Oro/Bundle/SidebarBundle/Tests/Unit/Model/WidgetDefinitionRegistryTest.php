@@ -15,15 +15,13 @@ class WidgetDefinitionRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetWidgetDefinitionsByPlacement(array $definitions, $placement, array $expected)
     {
         $registry = new WidgetDefinitionRegistry($definitions);
-        $actual = $registry->getWidgetDefinitionsByPlacement($placement);
-        $this->assertInstanceOf('Doctrine\Common\Collections\Collection', $actual);
-        $this->assertEquals($expected, $actual->toArray());
+        self::assertEquals($expected, $registry->getWidgetDefinitionsByPlacement($placement));
 
         $additionalDefinition = ['last' => ['icon' => 'icon.png']];
         $registry->setWidgetDefinitions($additionalDefinition);
-        $this->assertEquals(
+        self::assertEquals(
             array_merge($definitions, $additionalDefinition),
-            $registry->getWidgetDefinitions()->toArray()
+            $registry->getWidgetDefinitions()
         );
     }
 
@@ -32,86 +30,86 @@ class WidgetDefinitionRegistryTest extends \PHPUnit_Framework_TestCase
      */
     public function configurationDataProvider()
     {
-        return array(
-            'empty' => array(
-                array(),
+        return [
+            'empty' => [
+                [],
                 'left',
-                array()
-            ),
-            'full left' => array(
-                array(
-                    'foo' => array(
+                []
+            ],
+            'full left' => [
+                [
+                    'foo' => [
                         'title' => 'Foo',
                         'icon' => 'foo.ico',
                         'module' => 'widget/foo',
                         'placement' => 'left'
-                    ),
-                    'bar' => array(
+                    ],
+                    'bar' => [
                         'title' => 'Bar',
                         'icon' => 'bar.ico',
                         'module' => 'widget/bar',
                         'placement' => 'both'
-                    ),
-                    'bar2' => array(
+                    ],
+                    'bar2' => [
                         'title' => 'Bar2',
                         'icon' => 'bar2.ico',
                         'module' => 'widget/bar2',
                         'placement' => 'right'
-                    ),
-                ),
+                    ]
+                ],
                 'left',
-                array(
-                    'foo' => array(
+                [
+                    'foo' => [
                         'title' => 'Foo',
                         'icon' => 'foo.ico',
                         'module' => 'widget/foo',
                         'placement' => 'left'
-                    ),
-                    'bar' => array(
+                    ],
+                    'bar' => [
                         'title' => 'Bar',
                         'icon' => 'bar.ico',
                         'module' => 'widget/bar',
                         'placement' => 'both'
-                    )
-                )
-            ),
-            'full right' => array(
-                array(
-                    'foo' => array(
+                    ]
+                ]
+            ],
+            'full right' => [
+                [
+                    'foo' => [
                         'title' => 'Foo',
                         'icon' => 'foo.ico',
                         'module' => 'widget/foo',
                         'placement' => 'left'
-                    ),
-                    'bar' => array(
+                    ],
+                    'bar' => [
                         'title' => 'Bar',
                         'icon' => 'bar.ico',
                         'module' => 'widget/bar',
                         'placement' => 'both'
-                    ),
-                    'bar2' => array(
+                    ],
+                    'bar2' => [
                         'title' => 'Bar2',
                         'icon' => 'bar2.ico',
                         'module' => 'widget/bar2',
                         'placement' => 'right'
-                    ),
-                ),
+                    ]
+                ],
                 'right',
-                array(
-                    'bar' => array(
+                [
+                    'bar' => [
                         'title' => 'Bar',
                         'icon' => 'bar.ico',
                         'module' => 'widget/bar',
                         'placement' => 'both'
-                    ),
-                    'bar2' => array(
+                    ],
+                    'bar2' => [
                         'title' => 'Bar2',
                         'icon' => 'bar2.ico',
                         'module' => 'widget/bar2',
                         'placement' => 'right'
-                    ),
-                )
-            )
-        );
+                    ]
+                ]
+            ]
+        ];
     }
 }

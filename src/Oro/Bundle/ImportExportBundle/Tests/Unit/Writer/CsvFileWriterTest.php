@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Writer\CsvFileWriter;
 
 class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
@@ -18,13 +19,13 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
     protected $filePath;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var ContextRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $contextRegistry;
 
     protected function setUp()
     {
-        $this->contextRegistry = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextRegistry')
+        $this->contextRegistry = $this->getMockBuilder(ContextRegistry::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getByStepExecution'))
             ->getMock();
@@ -154,6 +155,28 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
                 __DIR__ . '/fixtures/no_header.csv'
             )
         );
+    }
+
+    public function testWriteBackslashWhenBackslashes()
+    {
+        $options = [
+            'filePath' => __DIR__ . '/fixtures/new_file.csv',
+            'firstLineIsHeader' => false
+        ];
+        $stepExecution = $this->getMockStepExecution($options);
+
+        $data = [['\\', 'other field', '\\\\', '\\notquote', 'back \\slash inside', '\"quoted\"']];
+        $expected = __DIR__ . '/fixtures/backslashes.csv';
+        $this->writer->setStepExecution($stepExecution);
+        $this->writer->write($data);
+        $this->assertFileExists($expected);
+        $expectedContent = file_get_contents($expected);
+        $actualContent = file_get_contents($options['filePath']);
+
+        $expectedContent = preg_replace('/\r\n?/', "\n", $expectedContent);
+        $actualContent = preg_replace('/\r\n?/', "\n", $actualContent);
+
+        $this->assertEquals($expectedContent, $actualContent);
     }
 
     /**

@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SidebarBundle\Tests\Unit\Twig;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Asset\Packages as AssetHelper;
@@ -52,66 +50,95 @@ class SidebarExtensionTest extends \PHPUnit_Framework_TestCase
             ->getContainer($this);
 
         $this->extension = new SidebarExtension($container);
+        $this->extension->setFeatureChecker($this->featureChecker);
     }
 
     public function testGetName()
     {
-        $this->assertEquals(SidebarExtension::NAME, $this->extension->getName());
+        self::assertEquals(SidebarExtension::NAME, $this->extension->getName());
     }
 
     public function testGetWidgetDefinitions()
     {
         $placement = 'left';
-        $title = 'Foo';
-        $definitions = new ArrayCollection();
-        $dialogIcon = 'test-icon.png';
 
         $definitionKey = 'test';
-        $definitions->set(
-            $definitionKey,
-            array(
-                'title' => $title,
+        $definitions = [
+            $definitionKey => [
+                'title' => 'Foo',
                 'icon' => 'test.ico',
                 'module' => 'widget/foo',
                 'placement' => 'left',
                 'description' => 'Simple',
-                'dialogIcon' => $dialogIcon
-            )
-        );
+                'dialogIcon' => 'test-icon.png'
+            ]
+        ];
 
-        $this->widgetDefinitionsRegistry->expects($this->once())
+        $this->widgetDefinitionsRegistry->expects(self::once())
             ->method('getWidgetDefinitionsByPlacement')
             ->with($placement)
-            ->will($this->returnValue($definitions));
-
-        $this->translator->expects($this->once())
-            ->method('trans')
-            ->with($title)
-            ->will($this->returnValue('trans' . $title));
-
-        $this->assetHelper->expects($this->once())
-            ->method('getUrl')
-            ->with($dialogIcon)
-            ->will($this->returnValue('/' . $dialogIcon));
-
-        $this->featureChecker
+            ->willReturn($definitions);
+        $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')
             ->with($definitionKey, 'sidebar_widgets')
             ->willReturn(true);
-        $this->extension->setFeatureChecker($this->featureChecker);
+        $this->translator->expects(self::any())
+            ->method('trans')
+            ->willReturnCallback(function ($label) {
+                return 'trans' . $label;
+            });
+        $this->assetHelper->expects(self::any())
+            ->method('getUrl')
+            ->willReturnCallback(function ($icon) {
+                return '/' . $icon;
+            });
 
-        $expected = array(
-            'test' => array(
-                'title' => 'transFoo',
+        self::assertEquals(
+            [
+                $definitionKey => [
+                    'title' => 'transFoo',
+                    'icon' => '/test.ico',
+                    'module' => 'widget/foo',
+                    'placement' => 'left',
+                    'description' => 'Simple',
+                    'dialogIcon' => "/test-icon.png"
+                ]
+            ],
+            self::callTwigFunction($this->extension, 'oro_sidebar_get_available_widgets', [$placement])
+        );
+    }
+
+    public function testGetWidgetDefinitionsForDisabledWidget()
+    {
+        $placement = 'left';
+
+        $definitionKey = 'test';
+        $definitions = [
+            $definitionKey => [
+                'title' => 'Foo',
                 'icon' => 'test.ico',
                 'module' => 'widget/foo',
                 'placement' => 'left',
                 'description' => 'Simple',
-                'dialogIcon' => "/test-icon.png"
-            )
-        );
-        $this->assertEquals(
-            $expected,
+                'dialogIcon' => 'test-icon.png'
+            ]
+        ];
+
+        $this->widgetDefinitionsRegistry->expects(self::once())
+            ->method('getWidgetDefinitionsByPlacement')
+            ->with($placement)
+            ->willReturn($definitions);
+        $this->featureChecker->expects(self::once())
+            ->method('isResourceEnabled')
+            ->with($definitionKey, 'sidebar_widgets')
+            ->willReturn(false);
+        $this->translator->expects(self::never())
+            ->method('trans');
+        $this->assetHelper->expects(self::never())
+            ->method('getUrl');
+
+        self::assertEquals(
+            [],
             self::callTwigFunction($this->extension, 'oro_sidebar_get_available_widgets', [$placement])
         );
     }
