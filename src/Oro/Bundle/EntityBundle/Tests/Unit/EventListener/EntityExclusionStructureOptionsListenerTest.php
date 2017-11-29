@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\EventListener;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
 use Oro\Bundle\EntityBundle\EventListener\EntityExclusionStructureOptionsListener;
+use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;
 use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Component\Testing\Unit\EntityTrait;
@@ -18,8 +18,8 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit_Framework_Tes
 {
     use EntityTrait;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    protected $managerRegistry;
 
     /** @var ExclusionProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $exclusionProvider;
@@ -32,10 +32,10 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit_Framework_Tes
      */
     protected function setUp()
     {
-        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
 
-        $this->listener = new EntityExclusionStructureOptionsListener($this->doctrineHelper, $this->exclusionProvider);
+        $this->listener = new EntityExclusionStructureOptionsListener($this->managerRegistry, $this->exclusionProvider);
     }
 
     public function testOnOptionsRequestExcluded()
@@ -50,30 +50,23 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit_Framework_Tes
 
         $metadata = $this->createMock(ClassMetadata::class);
 
-        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
-        $metadataFactory
-            ->expects($this->once())
-            ->method('getMetadataFor')
-            ->with(Item::class)
-            ->willReturn($metadata);
-
         $manager = $this->createMock(ObjectManager::class);
         $manager
             ->expects($this->once())
-            ->method('getMetadataFactory')
-            ->willReturn($metadataFactory);
+            ->method('getClassMetadata')
+            ->willReturn($metadata);
 
-        $this->doctrineHelper
+        $this->managerRegistry
             ->expects($this->once())
-            ->method('getEntityManager')
-            ->with(Item::class, false)
+            ->method('getManagerForClass')
+            ->with(Item::class)
             ->willReturn($manager);
 
         $this->exclusionProvider
             ->expects($this->once())
             ->method('isIgnoredEntity')
             ->with(Item::class)
-            ->willReturn(true);
+            ->willReturn(false);
 
         $this->exclusionProvider
             ->expects($this->once())
@@ -85,9 +78,7 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit_Framework_Tes
             EntityStructure::class,
             [
                 'className' => Item::class,
-                'options' => [
-                    EntityExclusionStructureOptionsListener::OPTION_NAME => true,
-                ],
+                'options' => [],
                 'fields' => [
                     $this->getEntity(
                         EntityFieldStructure::class,
@@ -110,13 +101,74 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit_Framework_Tes
         $this->assertEquals([$expectedEntityStructure], $event->getData());
     }
 
-    public function testOnOptionsRequestUnsupported()
+    public function testOnOptionsRequestExcludedByRelatedClass()
     {
-        $this->doctrineHelper
-            ->expects($this->never())
-            ->method($this->anything());
+        $entityStructure = $this->getEntity(
+            EntityStructure::class,
+            [
+                'className' => Item::class,
+                'fields' => [
+                    $this->getEntity(
+                        EntityFieldStructure::class,
+                        ['name' => 'field1', 'related_entity_name' => \stdClass::class]
+                    )
+                ]
+            ]
+        );
+
+        $metadata = $this->createMock(ClassMetadata::class);
+
+        $manager = $this->createMock(ObjectManager::class);
+        $manager
+            ->expects($this->once())
+            ->method('getClassMetadata')
+            ->willReturn($metadata);
+
+        $this->managerRegistry
+            ->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(Item::class)
+            ->willReturn($manager);
 
         $this->exclusionProvider
+            ->expects($this->exactly(2))
+            ->method('isIgnoredEntity')
+            ->willReturnMap([
+                [Item::class, false],
+                [\stdClass::class, true],
+            ]);
+
+        $expectedEntityStructure = $this->getEntity(
+            EntityStructure::class,
+            [
+                'className' => Item::class,
+                'options' => [],
+                'fields' => [
+                    $this->getEntity(
+                        EntityFieldStructure::class,
+                        [
+                            'name' => 'field1',
+                            'options' => [
+                                EntityExclusionStructureOptionsListener::OPTION_NAME => true,
+                            ],
+                            'related_entity_name' => \stdClass::class,
+                        ]
+                    )
+                ]
+            ]
+        );
+
+        $event = new EntityStructureOptionsEvent();
+        $event->setData([$entityStructure]);
+
+        $this->listener->onOptionsRequest($event);
+
+        $this->assertEquals([$expectedEntityStructure], $event->getData());
+    }
+
+    public function testOnOptionsRequestUnsupported()
+    {
+        $this->managerRegistry
             ->expects($this->never())
             ->method($this->anything());
 
@@ -132,7 +184,7 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit_Framework_Tes
         $this->assertEquals([new \stdClass()], $event->getData());
     }
 
-    public function testOnOptionsRequestWithoutObjectManager()
+    public function testOnOptionsRequestClassExcluded()
     {
         $entityStructure = $this->getEntity(
             EntityStructure::class,
@@ -141,12 +193,6 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit_Framework_Tes
                 'fields' => [$this->getEntity(EntityFieldStructure::class, ['name' => 'field1'])]
             ]
         );
-
-        $this->doctrineHelper
-            ->expects($this->once())
-            ->method('getEntityManager')
-            ->with(Item::class, false)
-            ->willReturn(null);
 
         $this->exclusionProvider
             ->expects($this->once())
@@ -165,6 +211,56 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit_Framework_Tes
                 'options' => [
                     EntityExclusionStructureOptionsListener::OPTION_NAME => true,
                 ],
+                'fields' => [
+                    $this->getEntity(
+                        EntityFieldStructure::class,
+                        [
+                            'name' => 'field1',
+                        ]
+                    )
+                ]
+            ]
+        );
+
+        $event = new EntityStructureOptionsEvent();
+        $event->setData([$entityStructure]);
+
+        $this->listener->onOptionsRequest($event);
+
+        $this->assertEquals([$expectedEntityStructure], $event->getData());
+    }
+
+    public function testOnOptionsRequestWithoutObjectManager()
+    {
+        $entityStructure = $this->getEntity(
+            EntityStructure::class,
+            [
+                'className' => Item::class,
+                'fields' => [$this->getEntity(EntityFieldStructure::class, ['name' => 'field1'])]
+            ]
+        );
+
+        $this->managerRegistry
+            ->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(Item::class)
+            ->willReturn(null);
+
+        $this->exclusionProvider
+            ->expects($this->once())
+            ->method('isIgnoredEntity')
+            ->with(Item::class)
+            ->willReturn(false);
+
+        $this->exclusionProvider
+            ->expects($this->never())
+            ->method('isIgnoredField');
+
+        $expectedEntityStructure = $this->getEntity(
+            EntityStructure::class,
+            [
+                'className' => Item::class,
+                'options' => [],
                 'fields' => [
                     $this->getEntity(
                         EntityFieldStructure::class,
@@ -194,30 +290,23 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit_Framework_Tes
             ]
         );
 
-        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
-        $metadataFactory
-            ->expects($this->once())
-            ->method('getMetadataFor')
-            ->with(Item::class)
-            ->willReturn(null);
-
         $manager = $this->createMock(ObjectManager::class);
         $manager
             ->expects($this->once())
-            ->method('getMetadataFactory')
-            ->willReturn($metadataFactory);
+            ->method('getClassMetadata')
+            ->willReturn(null);
 
-        $this->doctrineHelper
+        $this->managerRegistry
             ->expects($this->once())
-            ->method('getEntityManager')
-            ->with(Item::class, false)
+            ->method('getManagerForClass')
+            ->with(Item::class)
             ->willReturn($manager);
 
         $this->exclusionProvider
             ->expects($this->once())
             ->method('isIgnoredEntity')
             ->with(Item::class)
-            ->willReturn(true);
+            ->willReturn(false);
 
         $this->exclusionProvider
             ->expects($this->never())
@@ -227,14 +316,81 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit_Framework_Tes
             EntityStructure::class,
             [
                 'className' => Item::class,
-                'options' => [
-                    EntityExclusionStructureOptionsListener::OPTION_NAME => true,
-                ],
+                'options' => [],
                 'fields' => [
                     $this->getEntity(
                         EntityFieldStructure::class,
                         [
                             'name' => 'field1',
+                        ]
+                    )
+                ]
+            ]
+        );
+
+        $event = new EntityStructureOptionsEvent();
+        $event->setData([$entityStructure]);
+
+        $this->listener->onOptionsRequest($event);
+
+        $this->assertEquals([$expectedEntityStructure], $event->getData());
+    }
+
+    public function testOnOptionsRequestUnidirectional()
+    {
+        $fieldName = sprintf('class%sfield', UnidirectionalFieldHelper::DELIMITER);
+        $entityStructure = $this->getEntity(
+            EntityStructure::class,
+            [
+                'className' => Item::class,
+                'fields' => [$this->getEntity(EntityFieldStructure::class, ['name' => $fieldName])]
+            ]
+        );
+
+        $metadataEntity = $this->createMock(ClassMetadata::class);
+        $metadataField = $this->createMock(ClassMetadata::class);
+
+        $manager = $this->createMock(ObjectManager::class);
+        $manager
+            ->expects($this->exactly(2))
+            ->method('getClassMetadata')
+            ->willReturnMap([
+                [Item::class, $metadataEntity],
+                ['class', $metadataField],
+            ]);
+
+        $this->managerRegistry
+            ->expects($this->exactly(2))
+            ->method('getManagerForClass')
+            ->willReturnMap([
+                [Item::class, $manager],
+                ['class', $manager],
+            ]);
+
+        $this->exclusionProvider
+            ->expects($this->once())
+            ->method('isIgnoredEntity')
+            ->with(Item::class)
+            ->willReturn(false);
+
+        $this->exclusionProvider
+            ->expects($this->once())
+            ->method('isIgnoredField')
+            ->willReturn(true);
+
+        $expectedEntityStructure = $this->getEntity(
+            EntityStructure::class,
+            [
+                'className' => Item::class,
+                'options' => [],
+                'fields' => [
+                    $this->getEntity(
+                        EntityFieldStructure::class,
+                        [
+                            'name' => $fieldName,
+                            'options' => [
+                                EntityExclusionStructureOptionsListener::OPTION_NAME => true,
+                            ],
                         ]
                     )
                 ]

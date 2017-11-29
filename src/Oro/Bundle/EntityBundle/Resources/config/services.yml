@@ -517,7 +517,7 @@ services:
     oro_entity.listener.structure_options.exclusion:
         class: 'Oro\Bundle\EntityBundle\EventListener\EntityExclusionStructureOptionsListener'
         arguments:
-            - '@oro_entity.doctrine_helper'
+            - '@doctrine'
             - '@oro_entity.exclusion_provider'
         tags:
             - { name: kernel.event_listener, event: oro_entity.structure.options, method: onOptionsRequest }

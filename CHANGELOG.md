@@ -25,7 +25,8 @@
 * The parameter `oro_workflow.listener.process_data_serialize.class` was removed form the service container
 * The parameter `oro_workflow.listener.workflow_data_serialize.class` was removed form the service container
 
-## 2.5.0 (Unreleased)
+## 2.5.0 (2017-11-30)
+[Show detailed list of changes](incompatibilities-2-5.md)
 
 ### Added
 #### ActivityListBundle

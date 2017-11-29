@@ -44,6 +44,11 @@ class ThemeProvider
             return array_key_exists('output', $assets[$sectionName]) ? $assets[$sectionName]['output'] : null;
         }
 
+        $parentTheme = $this->getTheme($themeName)->getParentTheme();
+        if ($parentTheme) {
+            return $this->getStylesOutput($parentTheme);
+        }
+
         return null;
     }
 

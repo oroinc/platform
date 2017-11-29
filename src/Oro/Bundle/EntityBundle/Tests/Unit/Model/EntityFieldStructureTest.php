@@ -21,14 +21,10 @@ class EntityFieldStructureTest extends \PHPUnit_Framework_TestCase
         ]);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\OptionNotFoundException
-     * @expectedExceptionMessage Option "unknown" not found
-     */
-    public function testGetOptionThrowsException()
+    public function testGetNotExistingOption()
     {
         $item = new EntityFieldStructure();
         $this->assertFalse($item->hasOption('unknown'));
-        $item->getOption('unknown');
+        $this->assertNull($item->getOption('unknown'));
     }
 }
