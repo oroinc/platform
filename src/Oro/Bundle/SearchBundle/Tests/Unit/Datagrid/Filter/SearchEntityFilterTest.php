@@ -112,18 +112,21 @@ class SearchEntityFilterTest extends \PHPUnit_Framework_TestCase
         $fieldName = 'field';
         $entity1 = $this->getEntity(Item::class, ['id' => 1001]);
         $entity2 = $this->getEntity(Item::class, ['id' => 2002]);
+        $entity3 = $this->getEntity(Item::class, ['id' => null]);
 
         $value = new ArrayCollection([$entity1, $entity2]);
 
         $this->doctrineHelper->expects($this->exactly(2))
-            ->method('getEntityIdentifier')
+            ->method('getSingleEntityIdentifier')
             ->withConsecutive(
-                [$entity1],
-                [$entity2]
+                [$entity1, false],
+                [$entity2, false],
+                [$entity3, false]
             )
             ->willReturnOnConsecutiveCalls(
                 $entity1->getId(),
-                $entity2->getId()
+                $entity2->getId(),
+                $entity3->getId()
             );
 
         /** @var SearchFilterDatasourceAdapter|\PHPUnit_Framework_MockObject_MockObject $ds */

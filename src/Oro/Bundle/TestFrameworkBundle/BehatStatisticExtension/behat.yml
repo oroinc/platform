@@ -1,0 +1,7 @@
+default:
+  suites:
+      default:
+          contexts:
+              - Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Features\Context\StatisticContext
+          paths:
+              - Features

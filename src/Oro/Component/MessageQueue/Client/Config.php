@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Client;
 
 class Config
@@ -7,6 +8,7 @@ class Config
     const PARAMETER_PROCESSOR_NAME = 'oro.message_queue.client.processor_name';
     const PARAMETER_QUEUE_NAME = 'oro.message_queue.client.queue_name';
     const DEFAULT_QUEUE_NAME = 'default';
+    const DEFAULT_TOPIC_NAME = 'default';
 
     /**
      * @var string
@@ -29,17 +31,29 @@ class Config
     private $routerQueueName;
 
     /**
+     * @var string
+     */
+    private $defaultTopicName;
+
+    /**
      * @param string $prefix
      * @param string $routerMessageProcessorName
      * @param string $routerQueueName
      * @param string $defaultQueueName
+     * @param string $defaultTopicName
      */
-    public function __construct($prefix, $routerMessageProcessorName, $routerQueueName, $defaultQueueName)
-    {
+    public function __construct(
+        $prefix,
+        $routerMessageProcessorName,
+        $routerQueueName,
+        $defaultQueueName,
+        $defaultTopicName = self::DEFAULT_TOPIC_NAME
+    ) {
         $this->prefix = $prefix;
         $this->routerMessageProcessorName = $routerMessageProcessorName;
         $this->routerQueueName = $routerQueueName;
         $this->defaultQueueName = $defaultQueueName;
+        $this->defaultTopicName = $defaultQueueName;
     }
 
     /**
@@ -64,6 +78,14 @@ class Config
     public function getDefaultQueueName()
     {
         return $this->formatName($this->defaultQueueName);
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultTopicName()
+    {
+        return $this->formatName($this->defaultTopicName);
     }
 
     /**

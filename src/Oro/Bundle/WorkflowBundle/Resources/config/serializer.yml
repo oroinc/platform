@@ -25,6 +25,11 @@ services:
         calls:
           - [setWorkflowRegistry,  ['@oro_workflow.registry.system']]
 
+    oro_workflow.serializer.data.serializer.link:
+        public: false
+        tags:
+            - { name: oro_service_link, service: oro_workflow.serializer.data.serializer }
+
     oro_workflow.serializer.data.normalizer:
         class: %oro_workflow.serializer.data.normalizer.class%
 
@@ -79,6 +84,11 @@ services:
               - '@oro_workflow.serializer.process.normalizer.scalar'
 
           - ['@serializer.encoder.json']
+
+    oro_workflow.serializer.process.serializer.link:
+        public: false
+        tags:
+            - { name: oro_service_link, service: oro_workflow.serializer.process.serializer }
 
     oro_workflow.serializer.process.normalizer.process_data:
         class: %oro_workflow.serializer.process.normalizer.process_data.class%

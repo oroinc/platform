@@ -50,18 +50,10 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_message_queue.job.root_job_progress_calculator:
-        class: 'Oro\Component\MessageQueue\Job\RootJobProgressCalculator'
-        public: false
-        arguments:
-            - '@oro_message_queue.job.storage'
-
     oro_message_queue.job.calculate_root_job_progress_processor:
         class: 'Oro\Component\MessageQueue\Job\CalculateRootJobProgressProcessor'
         arguments:
             - '@oro_message_queue.job.storage'
-            - '@oro_message_queue.job.root_job_progress_calculator'
-            - '@oro_message_queue.client.message_producer'
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }

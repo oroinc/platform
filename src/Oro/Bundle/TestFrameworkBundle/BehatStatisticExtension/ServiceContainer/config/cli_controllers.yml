@@ -1,0 +1,47 @@
+services:
+    oro_behat_statistic.cli.schema_update_controller:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Cli\UpdateSchemaController
+        arguments:
+            - '@oro_behat_statistic.database.connection'
+            - '%oro_behat_statistic.models%'
+        tags:
+            - { name: cli.controller, priority: 800 }
+
+    oro_behat_statistic.cli.suite_configuration_filter:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Cli\SuiteConfigurationFilterController
+        arguments:
+            - '@oro_behat_statistic.suite.suite_configuration_registry'
+        tags:
+#            priority should be under 700 to make it load after Behat\Behat\Gherkin\Cli\FilterController
+            - { name: cli.controller, priority: 650 }
+
+    oro_behat_statistic.cli.suite_divider_controller:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Cli\SuiteDividerController
+        arguments:
+            - '@oro_behat_statistic.suite.suite_configuration_registry'
+        tags:
+            - { name: cli.controller, priority: 600 }
+
+    oro_behat_statistic.cli.suite_set_divider_controller:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Cli\SuiteSetDividerController
+        arguments:
+            - '@oro_behat_statistic.suite.suite_configuration_registry'
+        tags:
+            - { name: cli.controller, priority: 590 }
+
+    cli.controller.suite:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Cli\SuiteController
+        arguments:
+            - '@oro_behat_statistic.suite.suite_configuration_registry'
+            - '@suite.registry'
+        tags:
+            - { name: cli.controller, priority: 580 }
+
+    oro_behat_statistic.cli.available_suite_sets_controller:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Cli\AvailableSuiteSetsController
+        arguments:
+            - '@oro_behat_statistic.suite.suite_configuration_registry'
+            - '@oro_behat_statistic.feature_avg_time_provider.registry'
+            - '@oro_behat_statistic.specification.feature_path_locator'
+        tags:
+            - { name: cli.controller, priority: 550 }

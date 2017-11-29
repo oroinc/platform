@@ -66,8 +66,20 @@ class SchemaTest extends WebTestCase
                 // MySQL is blind for partial indices
                 'DROP INDEX idx_oro_product_featured ON oro_product',
                 'DROP INDEX idx_oro_product_new_arrival ON oro_product',
+                'DROP INDEX opportunity_created_idx ON orocrm_sales_opportunity',
+                'DROP INDEX lead_created_idx ON orocrm_sales_lead',
+                'DROP INDEX request_create_idx ON orocrm_contactus_request',
+                'DROP INDEX mageorder_created_idx ON orocrm_magento_order',
+                'DROP INDEX magecustomer_rev_name_idx ON orocrm_magento_customer',
+                'DROP INDEX magecart_updated_idx ON orocrm_magento_cart',
                 'CREATE INDEX idx_oro_product_featured ON oro_product (is_featured)',
-                'CREATE INDEX idx_oro_product_new_arrival ON oro_product (is_new_arrival)'
+                'CREATE INDEX idx_oro_product_new_arrival ON oro_product (is_new_arrival)',
+                'CREATE INDEX opportunity_created_idx ON orocrm_sales_opportunity (created_at, id)',
+                'CREATE INDEX lead_created_idx ON orocrm_sales_lead (createdAt, id)',
+                'CREATE INDEX request_create_idx ON orocrm_contactus_request (created_at, id)',
+                'CREATE INDEX mageorder_created_idx ON orocrm_magento_order (created_at, id)',
+                'CREATE INDEX magecustomer_rev_name_idx ON orocrm_magento_customer (last_name, first_name, id)',
+                'CREATE INDEX magecart_updated_idx ON orocrm_magento_cart (updatedAt, id)',
             ],
         ];
 

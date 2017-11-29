@@ -231,7 +231,9 @@ services:
             - '@oro_entity.doctrine_helper'
 
     oro_workflow.changes.event.dispatcher:
-        class: 'Symfony\Component\EventDispatcher\EventDispatcher'
+        class: 'Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher'
+        arguments:
+            - '@service_container'
 
     oro_workflow.handler.workflow_definition:
         class: 'Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler'

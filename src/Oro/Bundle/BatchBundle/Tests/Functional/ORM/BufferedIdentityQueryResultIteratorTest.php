@@ -11,6 +11,9 @@ use Oro\Bundle\BatchBundle\Tests\Functional\ORM\Constraint\IsEqualById;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @dbIsolationPerTest
+ */
 class BufferedIdentityQueryResultIteratorTest extends WebTestCase
 {
     /**
@@ -312,6 +315,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
 
     public function testChangingDataset()
     {
+        $this->markTestSkipped('Random failed test. Should be fixed in BAP-16058');
         $em = $this->getContainer()->get('doctrine');
 
         /** @var QueryBuilder $queryBuilder */

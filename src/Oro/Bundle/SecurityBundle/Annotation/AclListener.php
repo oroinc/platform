@@ -14,14 +14,19 @@ use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 
 class AclListener
 {
+    /** @var ConfigMetadataDumperInterface */
+    private $dumper;
+
     /** @var ContainerInterface */
     private $container;
 
     /**
-     * @param ContainerInterface $container
+     * @param ConfigMetadataDumperInterface $dumper
+     * @param ContainerInterface            $container
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ConfigMetadataDumperInterface $dumper, ContainerInterface $container)
     {
+        $this->dumper = $dumper;
         $this->container = $container;
     }
 
@@ -30,29 +35,23 @@ class AclListener
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        if (!$event->isMasterRequest()) {
-            return;
-        }
-
-        $dumper = $this->getConfigMetadataDumper();
-        if (!$dumper->isFresh()) {
+        if ($event->isMasterRequest() && !$this->dumper->isFresh()) {
             $this->getAclAnnotationProvider()->warmUpCache();
             $this->getActionMetadataProvider()->warmUpCache();
 
-            $tempAclContainer = new ContainerBuilder();
+            $container = new ContainerBuilder();
             $loader = AclAnnotationLoader::getAclAnnotationResourceLoader();
-            $loader->registerResources($tempAclContainer);
+            $loader->registerResources($container);
             $loader = OroSecurityExtension::getAclConfigLoader();
-            $loader->registerResources($tempAclContainer);
-
-            $dumper->dump($tempAclContainer);
+            $loader->registerResources($container);
+            $this->dumper->dump($container);
         }
     }
 
     /**
      * @return AclAnnotationProvider
      */
-    protected function getAclAnnotationProvider()
+    private function getAclAnnotationProvider()
     {
         return $this->container->get('oro_security.acl.annotation_provider');
     }
@@ -60,16 +59,8 @@ class AclListener
     /**
      * @return ActionMetadataProvider
      */
-    protected function getActionMetadataProvider()
+    private function getActionMetadataProvider()
     {
         return $this->container->get('oro_security.action_metadata_provider');
-    }
-
-    /**
-     * @return ConfigMetadataDumperInterface
-     */
-    protected function getConfigMetadataDumper()
-    {
-        return $this->container->get('oro_security.acl.annotation.metadata.dumper');
     }
 }

@@ -9,9 +9,7 @@ use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
 
 class ReminderListener
 {
-    /**
-     * @var ReminderManager
-     */
+    /** @var ReminderManager */
     protected $reminderManager;
 
     /**
@@ -30,7 +28,6 @@ class ReminderListener
     public function postLoad(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
-
         if ($entity instanceof RemindableInterface) {
             $this->reminderManager->loadReminders($entity);
         }
@@ -44,10 +41,8 @@ class ReminderListener
     public function postPersist(LifecycleEventArgs $event)
     {
         $entity = $event->getEntity();
-        if (!$entity instanceof RemindableInterface) {
-            return;
+        if ($entity instanceof RemindableInterface) {
+            $this->reminderManager->saveReminders($entity);
         }
-
-        $this->reminderManager->saveReminders($entity);
     }
 }

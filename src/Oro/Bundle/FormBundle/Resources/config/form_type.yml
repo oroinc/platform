@@ -344,6 +344,13 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_form.related_entity_validator }
 
+    oro_form.validator.unchangable_field:
+        class: Oro\Bundle\FormBundle\Validator\Constraints\UnchangeableFieldValidator
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_form.unchangable_field_validator }
+
     oro_form.related_entity.form.transformer.api:
         class: Oro\Bundle\FormBundle\Form\DataTransformer\RelatedEntityTransformer
         public: false
