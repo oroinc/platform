@@ -40,9 +40,7 @@ class ReindexDemoDataFixturesListener
      */
     public function onPreLoad(MigrationDataFixturesEvent $event)
     {
-        if ($event->isDemoFixtures()) {
-            $this->listenerManager->disableListener(self::INDEX_LISTENER);
-        }
+        $this->listenerManager->disableListener(self::INDEX_LISTENER);
     }
 
     /**
@@ -50,11 +48,10 @@ class ReindexDemoDataFixturesListener
      */
     public function onPostLoad(MigrationDataFixturesEvent $event)
     {
-        if ($event->isDemoFixtures()) {
-            $this->listenerManager->enableListener(self::INDEX_LISTENER);
+        $this->listenerManager->enableListener(self::INDEX_LISTENER);
 
-            $event->log('running full reindexation of search index');
-            $this->searchIndexer->reindex();
-        }
+        $event->log('running full reindexation of search index');
+
+        $this->searchIndexer->reindex();
     }
 }
