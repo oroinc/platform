@@ -167,6 +167,7 @@ config:
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
         'oroui/js/app/views/page/content-view': 'bundles/oroui/js/app/views/page/content-view.js'
+        'oroui/js/app/views/page/messages-view': 'bundles/oroui/js/app/views/page/messages-view.js'
         'oroui/js/app/views/datepicker/datetimepicker-view': 'bundles/oroui/js/app/views/datepicker/datetimepicker-view.js'
         'oroui/js/app/views/datepicker/datepicker-view': 'bundles/oroui/js/app/views/datepicker/datepicker-view.js'
         'oroui/js/app/views/tab-collection-view': 'bundles/oroui/js/app/views/tab-collection-view.js'

@@ -295,7 +295,8 @@ class UserAclHandler implements SearchHandlerInterface
                         ),
                         '?1'
                     ),
-                    $queryBuilder->expr()->like($queryBuilder->expr()->lower('user.username'), '?1')
+                    $queryBuilder->expr()->like($queryBuilder->expr()->lower('user.username'), '?1'),
+                    $queryBuilder->expr()->like($queryBuilder->expr()->lower('user.email'), '?1')
                 )
             )
             ->setParameter(1, '%' . str_replace(' ', '%', strtolower($search)) . '%');

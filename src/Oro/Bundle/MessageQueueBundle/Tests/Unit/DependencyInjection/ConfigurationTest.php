@@ -1,5 +1,10 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
+
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Processor;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Configuration;
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\Mocks\FooTransportFactory;
@@ -7,10 +12,10 @@ use Oro\Component\MessageQueue\DependencyInjection\DbalTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
 use Oro\Component\Testing\ClassExtensionTrait;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Config\Definition\Processor;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {
     use ClassExtensionTrait;
@@ -192,7 +197,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'router_destination' => 'default',
                 'default_destination' => 'default',
                 'traceable_producer' => false,
-                'redelivered_delay_time' => 10
+                'redelivered_delay_time' => 10,
+                'default_topic' => 'default'
             ],
             'persistent_services' => [],
             'persistent_processors' => [],
