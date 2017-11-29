@@ -9,10 +9,15 @@ use Oro\Bundle\SearchBundle\EventListener\ReindexDemoDataFixturesListener;
 
 class ReindexDemoDataFixturesListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    const LISTENERS = [
+        'test_listener_1',
+        'test_listener_2',
+    ];
+
+    /** @var OptionalListenerManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $listenerManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var SearchIndexerInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $searchIndexer;
 
     /** @var ReindexDemoDataFixturesListener */
@@ -23,17 +28,16 @@ class ReindexDemoDataFixturesListenerTest extends \PHPUnit_Framework_TestCase
         $this->listenerManager = $this->createMock(OptionalListenerManager::class);
         $this->searchIndexer = $this->createMock(SearchIndexerInterface::class);
 
-        $this->listener = new ReindexDemoDataFixturesListener(
-            $this->listenerManager,
-            $this->searchIndexer
-        );
+        $this->listener = new ReindexDemoDataFixturesListener($this->listenerManager, $this->searchIndexer);
+        $this->listener->disableListener(self::LISTENERS[0]);
+        $this->listener->disableListener(self::LISTENERS[1]);
     }
 
     public function testOnPreLoad()
     {
         $this->listenerManager->expects(self::once())
-            ->method('disableListener')
-            ->with(ReindexDemoDataFixturesListener::INDEX_LISTENER);
+            ->method('disableListeners')
+            ->with(self::LISTENERS);
 
         $this->listener->onPreLoad($this->createMock(MigrationDataFixturesEvent::class));
     }
@@ -46,8 +50,8 @@ class ReindexDemoDataFixturesListenerTest extends \PHPUnit_Framework_TestCase
             ->method('log')
             ->with('running full reindexation of search index');
         $this->listenerManager->expects(self::once())
-            ->method('enableListener')
-            ->with(ReindexDemoDataFixturesListener::INDEX_LISTENER);
+            ->method('enableListeners')
+            ->with(self::LISTENERS);
         $this->searchIndexer->expects(self::once())
             ->method('reindex');
 

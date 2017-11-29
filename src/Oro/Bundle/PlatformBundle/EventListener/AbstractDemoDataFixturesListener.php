@@ -7,10 +7,11 @@ use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 
 class AbstractDemoDataFixturesListener
 {
-    const LISTENERS = [];
-
     /** @var OptionalListenerManager */
     protected $listenerManager;
+
+    /** @var array */
+    protected $listeners = [];
 
     /**
      * @param OptionalListenerManager $listenerManager
@@ -18,6 +19,14 @@ class AbstractDemoDataFixturesListener
     public function __construct(OptionalListenerManager $listenerManager)
     {
         $this->listenerManager = $listenerManager;
+    }
+
+    /**
+     * @param string $listener
+     */
+    public function disableListener($listener)
+    {
+        $this->listeners[] = $listener;
     }
 
     /**
@@ -29,14 +38,22 @@ class AbstractDemoDataFixturesListener
             return;
         }
 
-        $this->listenerManager->disableListeners(static::LISTENERS);
-        $this->onPreLoadActions($event);
+        $this->beforeDisableListeners($event);
+        $this->listenerManager->disableListeners($this->listeners);
+        $this->afterDisableListeners($event);
     }
 
     /**
      * @param MigrationDataFixturesEvent $event
      */
-    protected function onPreLoadActions(MigrationDataFixturesEvent $event)
+    protected function beforeDisableListeners(MigrationDataFixturesEvent $event)
+    {
+    }
+
+    /**
+     * @param MigrationDataFixturesEvent $event
+     */
+    protected function afterDisableListeners(MigrationDataFixturesEvent $event)
     {
     }
 
@@ -49,14 +66,22 @@ class AbstractDemoDataFixturesListener
             return;
         }
 
-        $this->listenerManager->enableListeners(static::LISTENERS);
-        $this->onPostLoadActions($event);
+        $this->beforeEnableListeners($event);
+        $this->listenerManager->enableListeners($this->listeners);
+        $this->afterEnableListeners($event);
     }
 
     /**
      * @param MigrationDataFixturesEvent $event
      */
-    protected function onPostLoadActions(MigrationDataFixturesEvent $event)
+    protected function beforeEnableListeners(MigrationDataFixturesEvent $event)
+    {
+    }
+
+    /**
+     * @param MigrationDataFixturesEvent $event
+     */
+    protected function afterEnableListeners(MigrationDataFixturesEvent $event)
     {
     }
 }
