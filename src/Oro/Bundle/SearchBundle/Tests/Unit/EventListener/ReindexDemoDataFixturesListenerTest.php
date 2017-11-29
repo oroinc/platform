@@ -29,57 +29,19 @@ class ReindexDemoDataFixturesListenerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testOnPreLoadForNotDemoFixtures()
+    public function testOnPreLoad()
     {
-        $event = $this->createMock(MigrationDataFixturesEvent::class);
-
-        $event->expects(self::once())
-            ->method('isDemoFixtures')
-            ->willReturn(false);
-        $this->listenerManager->expects(self::never())
-            ->method('disableListener');
-
-        $this->listener->onPreLoad($event);
-    }
-
-    public function testOnPreLoadForDemoFixtures()
-    {
-        $event = $this->createMock(MigrationDataFixturesEvent::class);
-
-        $event->expects(self::once())
-            ->method('isDemoFixtures')
-            ->willReturn(true);
         $this->listenerManager->expects(self::once())
             ->method('disableListener')
             ->with(ReindexDemoDataFixturesListener::INDEX_LISTENER);
 
-        $this->listener->onPreLoad($event);
-    }
-
-    public function testOnPostLoadForNotDemoFixtures()
-    {
-        $event = $this->createMock(MigrationDataFixturesEvent::class);
-
-        $event->expects(self::once())
-            ->method('isDemoFixtures')
-            ->willReturn(false);
-        $event->expects(self::never())
-            ->method('log');
-        $this->listenerManager->expects(self::never())
-            ->method('enableListener');
-        $this->searchIndexer->expects(self::never())
-            ->method('reindex');
-
-        $this->listener->onPostLoad($event);
+        $this->listener->onPreLoad($this->createMock(MigrationDataFixturesEvent::class));
     }
 
     public function testOnPostLoadForDemoFixtures()
     {
         $event = $this->createMock(MigrationDataFixturesEvent::class);
 
-        $event->expects(self::once())
-            ->method('isDemoFixtures')
-            ->willReturn(true);
         $event->expects(self::once())
             ->method('log')
             ->with('running full reindexation of search index');

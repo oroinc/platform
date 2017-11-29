@@ -380,6 +380,11 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
      */
     private function setCascadeOptions(AssociationBuilder $builder, array $cascades)
     {
+        // option "noDetach" added possibility to disable force detach for relations
+        if (in_array('noDetach', $cascades, true)) {
+            $cascades = array_diff($cascades, ['noDetach', 'detach']);
+        }
+
         foreach ($cascades as $cascade) {
             $builder->{'cascade' . ucfirst($cascade)}();
         }
