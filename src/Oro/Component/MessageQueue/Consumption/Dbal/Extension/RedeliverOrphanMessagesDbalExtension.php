@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Consumption\Dbal\Extension;
 
 use Doctrine\DBAL\Connection;
@@ -18,9 +19,10 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
     private $checkInterval = 60; // 1 min
 
     /**
+     * Static for fix losing value during reset of container
      * @var int
      */
-    private $lastCheckTime = 0;
+    private static $lastCheckTime = 0;
 
     /**
      * @var bool
@@ -119,15 +121,13 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
     {
         // find orphan consumerIds
         $runningPids = $this->cliProcessManager->getListOfProcessesPids($this->consumerProcessPattern);
-        $orphanConsumerIds = [];
+        $runningConsumerIds = $orphanConsumerIds = [];
         foreach ($this->pidFileManager->getListOfPidsFileInfo() as $pidFileInfo) {
-            if (! in_array($pidFileInfo['pid'], $runningPids)) {
+            if (in_array($pidFileInfo['pid'], $runningPids, true)) {
+                $runningConsumerIds[] = $pidFileInfo['consumerId'];
+            } else {
                 $orphanConsumerIds[] = $pidFileInfo['consumerId'];
             }
-        }
-
-        if (! $orphanConsumerIds) {
-            return;
         }
 
         // redeliver orphan messages
@@ -136,17 +136,18 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
         $connection = $session->getConnection();
         $dbal = $connection->getDBALConnection();
 
+        // After server reboot tmp files was lost, so here we redeliver all messages without active consumer
         $sql = sprintf(
             'UPDATE %s SET consumer_id=NULL, redelivered=:isRedelivered '.
-            'WHERE consumer_id IN (:consumerIds)',
+            'WHERE consumer_id NOT IN (:consumerIds) AND consumer_id IS NOT NULL',
             $connection->getTableName()
         );
 
-        $dbal->executeUpdate(
+        $affectedRows = $dbal->executeUpdate(
             $sql,
             [
                 'isRedelivered' => true,
-                'consumerIds' => $orphanConsumerIds,
+                'consumerIds' => $runningConsumerIds,
             ],
             [
                 'isRedelivered' => Type::BOOLEAN,
@@ -159,10 +160,13 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
             $this->pidFileManager->removePidFile($consumerId);
         }
 
-        $context->getLogger()->critical(sprintf(
-            'Orphans were found and redelivered. consumerIds: "%s"',
-            implode(', ', $orphanConsumerIds)
-        ));
+        if ($affectedRows) {
+            $context->getLogger()->warning(sprintf(
+                'Orphans were found. Count of redelivered messages: %s. Running consumers: "%s"',
+                $affectedRows,
+                implode(', ', $runningConsumerIds)
+            ));
+        }
     }
 
     /**
@@ -172,11 +176,11 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
     {
         $time = time();
 
-        if (($time - $this->lastCheckTime) < $this->checkInterval) {
+        if (($time - self::$lastCheckTime) < $this->checkInterval) {
             return false;
         }
 
-        $this->lastCheckTime = $time;
+        self::$lastCheckTime = $time;
 
         return true;
     }
