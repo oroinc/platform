@@ -27,3 +27,8 @@ services:
         class: %oro_user.importexport.template_fixture.user.class%
         tags:
             - { name: oro_importexport.template_fixture }
+
+    oro_user.importexport.configuration_provider.user:
+        class: 'Oro\Bundle\UserBundle\ImportExport\Configuration\UserImportExportConfigurationProvider'
+        tags:
+            - { name: oro_importexport.configuration, alias: oro_user }
