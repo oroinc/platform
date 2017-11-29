@@ -74,4 +74,30 @@ class ThemeProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($this->provider->getStylesOutput($themeName));
     }
+
+    public function testGetStylesOutputWithFallback()
+    {
+        $grandParentThemeName = 'grand-parent';
+        $grandParentTheme = new Theme($grandParentThemeName);
+        $grandParentTheme->setConfig([
+            'assets' => [
+                'styles' => [
+                    'output' => 'grand/parent/theme/path/to/output/css'
+                ]
+            ],
+        ]);
+
+        $parentThemeName = 'parent';
+        $parentTheme = new Theme($parentThemeName, $grandParentThemeName);
+
+        $themeName = 'theme';
+        $theme = new Theme($themeName, $parentThemeName);
+
+        $this->themeManager->expects($this->any())
+            ->method('getTheme')
+            ->withConsecutive([$themeName], [$parentThemeName], [$grandParentThemeName])
+            ->willReturnOnConsecutiveCalls($theme, $parentTheme, $grandParentTheme);
+
+        $this->assertSame('grand/parent/theme/path/to/output/css', $this->provider->getStylesOutput($themeName));
+    }
 }

@@ -483,6 +483,7 @@ define(function(require) {
                     }
                 }, this));
             }
+            mediator.trigger(this.viewGroup + ':highlight-text:update', this.searchValue ? this.searchValue : '');
         },
 
         onAfterOpen: function(event, data) {

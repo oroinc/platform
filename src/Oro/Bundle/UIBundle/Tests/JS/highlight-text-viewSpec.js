@@ -47,6 +47,20 @@ define(function(require) {
                 mediator.trigger(':highlight-text:update', 'group');
                 expect(this.view.isElementContentHighlighted(this.view.$el)).toBeTruthy();
             });
+
+            it('check re-render highlight after mediator event change search value', function() {
+                this.view = createView({
+                    text: 'Groups',
+                    highlightSelectors: ['.group']
+                });
+                expect(this.view.isElementContentHighlighted(this.view.$el)).toBeFalsy();
+
+                mediator.trigger(':highlight-text:update', 'group');
+                expect(this.view.isElementContentHighlighted(this.view.$el)).toBeTruthy();
+
+                mediator.trigger(':highlight-text:update', '');
+                expect(this.view.isElementContentHighlighted(this.view.$el)).toBeFalsy();
+            });
         });
 
         describe('check elements toggle', function() {
