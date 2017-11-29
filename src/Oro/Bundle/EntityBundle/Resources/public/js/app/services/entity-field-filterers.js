@@ -33,6 +33,22 @@ define(function(require) {
         },
 
         /**
+         * Checks if the field is marked as exclude in optionsFilter, this option is inherited from entity
+         *  all fields of entity with exclude options are automatically
+         *
+         * @param {Object} field
+         * @param {string} entityClassName
+         * @return {boolean}
+         * @this EntityStructureDataProvider
+         */
+        exclude: function(field, entityClassName) {
+            var expected = this.optionsFilter.exclude;
+            var entity = this.collection.getEntityModelByClassName(entityClassName);
+            return expected ===
+                Boolean(entity && _.result(entity.get('options'), 'exclude') || _.result(field.options, 'exclude'));
+        },
+
+        /**
          * Checks if the field is unidirectional
          *
          * @param {Object} field
@@ -96,7 +112,7 @@ define(function(require) {
          * @return {boolean}
          * @this EntityStructureDataProvider
          */
-        exclude: function(field) {
+        excludeByRules: function(field) {
             return !fieldFilterers.anyRule(field, this.exclude);
         },
 
@@ -108,7 +124,7 @@ define(function(require) {
          * @return {boolean}
          * @this EntityStructureDataProvider
          */
-        include: function(field) {
+        includeByRules: function(field) {
             return fieldFilterers.anyRule(field, this.include);
         }
     };

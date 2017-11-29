@@ -1,9 +1,13 @@
-require([
-    'oroentity/js/app/services/entity-structure-data-provider'
-], function(EntityStructureDataProvider) {
+define(function(require) {
     'use strict';
 
+    var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
+
     EntityStructureDataProvider.defineFilterPreset('workflow', {
-        optionsFilter: {virtual: false, unidirectional: false, exclude: false}
+        optionsFilter: {unidirectional: false, configurable: true},
+        exclude: [
+            {relationType: 'manyToMany'},
+            {relationType: 'oneToMany'}
+        ]
     });
 });

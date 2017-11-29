@@ -207,11 +207,12 @@ define(function(require) {
          */
         setOptionsFilter: function(optionsFilter) {
             this.optionsFilter = optionsFilter || {};
-            this.regularOptionsFilter = _.omit(this.optionsFilter, 'unidirectional', 'auditable', 'relation');
+            var specialOptions = ['exclude', 'unidirectional', 'auditable', 'relation'];
+            this.regularOptionsFilter = _.omit(this.optionsFilter, specialOptions);
             this._toggleFilterer('options', !_.isEmpty(this.regularOptionsFilter));
-            this._toggleFilterer('unidirectional', 'unidirectional' in this.optionsFilter);
-            this._toggleFilterer('auditable', 'auditable' in this.optionsFilter);
-            this._toggleFilterer('relation', 'relation' in this.optionsFilter);
+            _.each(specialOptions, function(option) {
+                this._toggleFilterer(option, option in this.optionsFilter);
+            }, this);
         },
 
         /**
@@ -224,7 +225,7 @@ define(function(require) {
          */
         setExcludeRules: function(exclude) {
             this.exclude = exclude;
-            this._toggleFilterer('exclude', !_.isEmpty(this.exclude));
+            this._toggleFilterer('excludeByRules', !_.isEmpty(this.exclude));
         },
 
         /**
@@ -237,7 +238,7 @@ define(function(require) {
          */
         setIncludeRules: function(include) {
             this.include = include;
-            this._toggleFilterer('include', !_.isEmpty(this.include));
+            this._toggleFilterer('includeByRules', !_.isEmpty(this.include));
         },
 
         /**
