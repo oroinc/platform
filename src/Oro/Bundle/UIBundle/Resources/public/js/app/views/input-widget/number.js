@@ -16,47 +16,69 @@ define(function(require) {
             'keypress': '_addFraction'
         },
 
-        initializeWidget: function() {
-            this._convertField();
-            this.$el.trigger('input');
-        },
+        precision: null,
+
+        type: null,
+
+        pattern: null,
 
         findContainer: function() {
             return this.$el;
         },
 
-        disposeWidget: function() {
-            this.$el
-                .attr('type', 'number')
-                .removeAttr('pattern');
+        initializeWidget: function() {
+            this._setPrecision();
+            this._setAttr();
+            this.trigger('input');
+        },
 
+        disposeWidget: function() {
+            this._restoreAttr();
             return NumberInputWidget.__super__.disposeWidget.apply(this, arguments);
         },
 
-        _getDataPrecision: function() {
+        _setPrecision: function() {
             var precision = this.$el.data('precision');
-
-            return _.isUndefined(precision) ? null : precision;
+            this.precision = _.isUndefined(precision) ? null : precision;
         },
 
-        _convertField: function() {
-            if (_.isDesktop()) {
-                this.$el.attr('type', 'text');
+        _setAttr: function() {
+            this._rememberAttr();
+            this.$el.attr('type', _.isDesktop() && this.precision !== null ? 'text' : 'number')
+                .attr('pattern', this.precision === 0 ? '[0-9]*' : '');
+        },
+
+        _rememberAttr: function() {
+            this.pattern = this.$el.attr('pattern');
+            this.type = this.$el.attr('type');
+        },
+
+        _restoreAttr: function() {
+            this.$el.attr('type', this.type);
+            if (this.pattern) {
+                this.$el.attr('pattern', this.pattern);
             } else {
-                this.$el.attr('pattern', this._getDataPrecision() === 0 ? '[0-9]*' : '');
+                this.$el.removeAttr('pattern');
             }
         },
 
+        _useFilter: function() {
+            return this.$el.attr('type') !== 'number';
+        },
+
         _addFraction: function(event) {
-            var field = event.target;
+            if (!this._useFilter()) {
+                return;
+            }
+
+            var field = this.el;
             var originalValue = field.value;
-            var precision = this._getDataPrecision();
 
             //set fixed length start
             var keyName = event.key || String.fromCharCode(event.which);
-            if (precision > 0 && decimalSeparator === keyName &&
+            if (this.precision > 0 && decimalSeparator === keyName &&
                 field.value.length && field.selectionStart === field.value.length) {
-                field.value = parseInt(field.value).toFixed(precision);
+                field.value = parseInt(field.value).toFixed(this.precision);
 
                 if (decimalSeparator !== '.') {
                     field.value = field.value.replace('.', decimalSeparator);
@@ -64,7 +86,7 @@ define(function(require) {
 
                 if (!_.isUndefined(field.selectionStart)) {
                     field.selectionEnd = field.value.length;
-                    field.selectionStart = field.value.length - precision;
+                    field.selectionStart = field.value.length - this.precision;
                 }
 
                 this._triggerEventOnValueChange(event, originalValue);
@@ -77,29 +99,32 @@ define(function(require) {
         },
 
         _normalizeNumberFieldValue: function(event) {
-            var field = event.target;
+            if (!this._useFilter()) {
+                return;
+            }
+
+            var field = this.el;
             var originalValue = field.value;
-            var precision = this._getDataPrecision();
             if (_.isUndefined(field.value)) {
                 return;
             }
 
             //filter value start
-            if (precision === 0) {
+            if (this.precision === 0) {
                 field.value = field.value.replace(/^0*/g, '');
             }
 
             field.value = field.value.replace(/(?!\.)[?:\D+]/g, '');//clear not allowed symbols
 
-            if (field.value[0] === decimalSeparator && precision > 0) {
+            if (field.value[0] === decimalSeparator && this.precision > 0) {
                 field.value = '0' + field.value;
             }
             //filter value end
 
             //validate value start
             var regExpString = '^([0-9]*)';
-            if (precision > 0) {
-                regExpString += '(\\' + decimalSeparator + '{1})?([0-9]{1,' + precision + '})?';
+            if (this.precision > 0) {
+                regExpString += '(\\' + decimalSeparator + '{1})?([0-9]{1,' + this.precision + '})?';
             }
 
             var regExp = new RegExp(regExpString, 'g');
@@ -121,7 +146,6 @@ define(function(require) {
             var field = event.target;
             if (field.value !== value) {
                 $(field).trigger(event);
-                return;
             }
         }
     });

@@ -52,7 +52,20 @@ define(function(require) {
         expect(el.value).toEqual(expected);
     };
 
-    describe('oroproduct/js/app/product-helper', function() {
+    describe('oroui/js/app/views/input-widget/number', function() {
+        describe('check widget initialization and dispose', function() {
+            it('check attributes after initialization', function() {
+                expect($el.attr('type')).toEqual('text');
+                expect($el.attr('pattern')).toEqual('[0-9]*');
+            });
+
+            it('check attributes dispose initialization', function() {
+                $el.inputWidget('dispose');
+                expect($el.attr('type')).toEqual('number');
+                expect($el.attr('pattern')).toEqual(undefined);
+            });
+        });
+
         describe('check number field value normalization', function() {
             it('only numbers allowed when precision = 0', function() {
                 testValue('0', '');
@@ -62,7 +75,7 @@ define(function(require) {
             });
 
             it('numbers and separator allowed when precision > 0', function() {
-                $el.data('precision', 3);
+                $el.data('precision', 3).inputWidget('refresh');
 
                 testValue('.', '0.');
                 testValue('.12', '0.12');
