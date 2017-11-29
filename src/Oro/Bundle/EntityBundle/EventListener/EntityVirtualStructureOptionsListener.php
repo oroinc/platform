@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\EventListener;
 
 use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
+use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider;
 
@@ -37,8 +38,17 @@ class EntityVirtualStructureOptionsListener
 
             $fields = $entityStructure->getFields();
             foreach ($fields as $field) {
-                $isVirtualField = $this->virtualFieldProvider->isVirtualField($className, $field->getName());
-                $field->addOption(self::OPTION_NAME, $isVirtualField);
+                $fieldName = $field->getName();
+                if (UnidirectionalFieldHelper::isFieldUnidirectional($fieldName)) {
+                    $realFieldName = UnidirectionalFieldHelper::getRealFieldName($fieldName);
+                    $realFieldClass = UnidirectionalFieldHelper::getRealFieldClass($fieldName);
+                } else {
+                    $realFieldName = $fieldName;
+                    $realFieldClass = $className;
+                }
+                if ($this->virtualFieldProvider->isVirtualField($realFieldClass, $realFieldName)) {
+                    $field->addOption(self::OPTION_NAME, true);
+                }
             }
         }
 

@@ -34,7 +34,7 @@ class EntityStructureDataProviderTest extends WebTestCase
         $field = $this->getField($fields, 'owner_id');
 
         $this->assertNotNull($field);
-        $this->assertFalse($field->getOption('configurable'));
+        $this->assertNull($field->getOption('configurable'));
 
         // check that labels translated
         $this->assertEquals('User', $field->getLabel());

@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Model;
 
-use Oro\Bundle\EntityBundle\Exception\OptionNotFoundException;
-
 class EntityFieldStructure
 {
     /** @var string */
@@ -153,7 +151,7 @@ class EntityFieldStructure
     public function getOption($name)
     {
         if (!$this->hasOption($name)) {
-            throw new OptionNotFoundException($name);
+            return null;
         }
 
         return $this->options[$name];
