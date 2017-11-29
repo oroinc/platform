@@ -33,7 +33,7 @@ oro:
             errors_found:   "Errors found: %errors%"
             error %number%: "Error in row #%number%."
             label:          "Import file"
-            validation_label: "Validate Data File"
+            validation_label: "Validate"
             success:        "File was successfully imported."
             alert:          "%added% %entities% were added, %updated% %entities% were updated"
             entity:         Import %entityName%
@@ -41,6 +41,7 @@ oro:
             tempate:        Download Data Template
             file:           File
             strategy:       Strategy
+            strategy.tooltip: '<b>Add and Replace</b> strategy overrides the existing data with the new one from the imported file.'
             importance:     Important
             columns_notice: The file must be comma-separated only. Files containing other separators will be rejected.
             errors:
@@ -49,6 +50,9 @@ oro:
                 access_denied_property_entity: Access denied to property %property_name% of entity "%entity_name%"
                 wrong_owner: You have no access to set given owner
             postponed_rows: "There were %postponedRows% rows that could not be proccessed."
+            success.message: "Import started successfully. You will receive an email notification upon completion."
+            validate:
+                success.message: "Validation started successfully. You will receive an email notification upon completion."
         message:
             entities.label: "entities"
 

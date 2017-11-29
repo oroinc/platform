@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Oro\Bundle\UserBundle\DependencyInjection\OroUserExtension;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Parser;
 
-use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
-use Oro\Bundle\UserBundle\DependencyInjection\OroUserExtension;
-
-class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
+class OroUserExtensionTest extends ExtensionTestCase
 {
     /**
      * @var ContainerBuilder
@@ -27,6 +27,16 @@ class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
         $this->createFullConfiguration();
 
         $this->assertParameter(1800, 'oro_user.reset.ttl');
+    }
+
+    public function testLoadDefinitions()
+    {
+        $this->loadExtension(new OroUserExtension());
+
+        $expectedDefinitions = [
+            'oro_user.importexport.configuration_provider.user',
+        ];
+        $this->assertDefinitionsLoaded($expectedDefinitions);
     }
 
     public function testPrepend()
