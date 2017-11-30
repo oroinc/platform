@@ -28,7 +28,9 @@ class ConsumerHeartbeat
      */
     public function tick()
     {
-        $this->driver->setChangeStateDate(new \DateTime('now', new \DateTimeZone('UTC')));
+        $this->driver->setChangeStateDateWithTimeGap(
+            new \DateTime('now', new \DateTimeZone('UTC'))
+        );
     }
 
     /**

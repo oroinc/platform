@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CacheBundle\Tests\Unit\Consumption;
+namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption;
 
 use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
 use Oro\Bundle\MessageQueueBundle\Consumption\StateDriverInterface;
@@ -22,7 +22,7 @@ class ConsumerHeartbeatTest extends \PHPUnit_Framework_TestCase
     public function testTick()
     {
         $this->driver->expects(self::once())
-            ->method('setChangeStateDate')
+            ->method('setChangeStateDateWithTimeGap')
             ->with(self::isInstanceOf(\DateTime::class));
 
         $this->consumerHeartbeat->tick();
