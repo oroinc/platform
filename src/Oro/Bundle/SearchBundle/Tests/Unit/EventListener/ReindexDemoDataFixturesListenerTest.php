@@ -42,7 +42,7 @@ class ReindexDemoDataFixturesListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->onPreLoad($this->createMock(MigrationDataFixturesEvent::class));
     }
 
-    public function testOnPostLoadForDemoFixtures()
+    public function testOnPostLoad()
     {
         $event = $this->createMock(MigrationDataFixturesEvent::class);
 
