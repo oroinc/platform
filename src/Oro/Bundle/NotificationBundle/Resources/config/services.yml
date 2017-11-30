@@ -46,7 +46,6 @@ services:
         arguments:
             - '@oro_email.form.subscriber.emailtemplate'
             - '@oro_notification.form.subscriber.additional_emails'
-            - '@oro_entity_config.provider.ownership'
             - '@router'
             - '@oro_notification.form.subscriber.contact_information_emails'
         tags:
@@ -121,7 +120,6 @@ services:
         arguments:
             - '@oro_notification.manager.email_notification'
             - '@doctrine.orm.entity_manager'
-            - '@oro_entity_config.provider.ownership'
             - '@property_accessor'
         tags:
             - { name: notification.handler, alias: email_notification_handler }

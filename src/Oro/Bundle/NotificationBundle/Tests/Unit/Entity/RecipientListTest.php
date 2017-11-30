@@ -84,14 +84,6 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $this->entity->getEmail());
     }
 
-    public function testSetterGetterForOwner()
-    {
-        $this->assertNull($this->entity->getOwner());
-
-        $this->entity->setOwner(true);
-        $this->assertEquals(true, $this->entity->getOwner());
-    }
-
     public function testSetterGetterForEntityEmails()
     {
         $entityFields = ['field1', 'field2'];
@@ -106,13 +98,6 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
     {
         $group = $this->createMock('Oro\Bundle\UserBundle\Entity\Group');
         $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
-
-        // test when owner filled
-        $this->entity->setOwner(true);
-        $this->assertInternalType('string', $this->entity->__toString());
-        $this->assertNotEmpty($this->entity->__toString());
-        // clear owner
-        $this->entity->setOwner(null);
 
         // test when email filled
         $this->entity->setEmail('test email');
@@ -166,29 +151,24 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
         $context->expects($this->never())
             ->method('addViolationAt');
 
-        //only users
+        // Only users
         $this->entity->addUser($user);
         $this->entity->isValid($context);
         // clear users
         $this->entity->getUsers()->clear();
 
-        //only groups
+        // Only groups
         $this->entity->addGroup($group);
         $this->entity->isValid($context);
         // clear groups
         $this->entity->getGroups()->clear();
 
-        // only email
+        // Only email
         $this->entity->setEmail('test Email');
         $this->entity->isValid($context);
         $this->entity->setEmail(null);
 
-        // only owner
-        $this->entity->setOwner(true);
-        $this->entity->isValid($context);
-        $this->entity->setOwner(null);
-
-        //only entity emails
+        // Only entity emails
         $this->entity->setEntityEmails(['field1']);
         $this->entity->isValid($context);
         $this->entity->setEntityEmails([]);

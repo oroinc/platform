@@ -4,7 +4,6 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository;
@@ -28,9 +27,6 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
     private $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
-    private $configProvider;
-
     protected function setUp()
     {
         $this->entity = new EmailHolderStub();
@@ -40,15 +36,11 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
         $this->em = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->configProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
 
         $this->adapter = new EmailNotificationAdapter(
             $this->entity,
             $this->emailNotification,
             $this->em,
-            $this->configProvider,
             $this->getPropertyAccessor()
         );
     }

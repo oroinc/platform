@@ -25,7 +25,6 @@ oro:
                 user: Recipient users
                 group: Recipient groups
                 custom_email: Recipient email
-                owner: Recipient entity owner
 
         emailnotification:
             entity_label:                        Notification Rule
@@ -39,7 +38,6 @@ oro:
             template.label:                      Template
             recipient_list.label:                Recipient list
             email.label:                         Email
-            owner.label:                         Owner
             additional_email_associations.label: Additional associations
             additional_email_associations.label: Additional associations
             contact_emails.label:                Contact Emails

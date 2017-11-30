@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\NotificationBundle\Event\Handler;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\NotificationBundle\Model\EmailNotificationInterface;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
@@ -27,9 +25,6 @@ class EmailNotificationAdapter implements EmailNotificationInterface
     /** @var object */
     protected $entity;
 
-    /** @var ConfigProvider */
-    protected $configProvider;
-
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
@@ -37,20 +32,17 @@ class EmailNotificationAdapter implements EmailNotificationInterface
      * @param object $entity
      * @param EmailNotification $notification
      * @param EntityManager $em
-     * @param ConfigProvider $configProvider
      * @param PropertyAccessor $propertyAccessor
      */
     public function __construct(
         $entity,
         EmailNotification $notification,
         EntityManager $em,
-        ConfigProvider $configProvider,
         PropertyAccessor $propertyAccessor
     ) {
         $this->entity = $entity;
         $this->notification = $notification;
         $this->em = $em;
-        $this->configProvider = $configProvider;
         $this->propertyAccessor = $propertyAccessor;
     }
 
@@ -67,15 +59,11 @@ class EmailNotificationAdapter implements EmailNotificationInterface
      */
     public function getRecipientEmails()
     {
-        $class = ClassUtils::getClass($this->entity);
-        $ownerFieldName = $this->configProvider->hasConfig($class) ?
-            $this->configProvider->getConfig($class)->get('owner_field_name') :
-            null;
         $recipientList = $this->notification->getRecipientList();
 
         $emails = $this->em
             ->getRepository('Oro\Bundle\NotificationBundle\Entity\RecipientList')
-            ->getRecipientEmails($recipientList, $this->entity, $ownerFieldName);
+            ->getRecipientEmails($recipientList, $this->entity);
         $emails = array_merge(
             $emails,
             $this->getRecipientEmailsFromAdditionalAssociations($this->entity, $recipientList)

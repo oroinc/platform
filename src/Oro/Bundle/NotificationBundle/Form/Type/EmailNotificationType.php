@@ -6,20 +6,15 @@ use Doctrine\ORM\EntityRepository;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
 use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber;
-use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 
 class EmailNotificationType extends AbstractType
 {
@@ -31,9 +26,6 @@ class EmailNotificationType extends AbstractType
     /** @var AdditionalEmailsSubscriber */
     protected $additionalEmailsSubscriber;
 
-    /** @var ConfigProvider */
-    protected $ownershipConfigProvider;
-
     /** @var RouterInterface */
     private $router;
 
@@ -43,20 +35,17 @@ class EmailNotificationType extends AbstractType
     /**
      * @param BuildTemplateFormSubscriber $buildTemplateSubscriber
      * @param AdditionalEmailsSubscriber $additionalEmailsSubscriber
-     * @param ConfigProvider $ownershipConfigProvider
      * @param RouterInterface $router
      * @param ContactInformationEmailsSubscriber $contactInformationEmailsSubscriber
      */
     public function __construct(
         BuildTemplateFormSubscriber $buildTemplateSubscriber,
         AdditionalEmailsSubscriber $additionalEmailsSubscriber,
-        ConfigProvider $ownershipConfigProvider,
         RouterInterface $router,
         ContactInformationEmailsSubscriber $contactInformationEmailsSubscriber
     ) {
         $this->buildTemplateSubscriber = $buildTemplateSubscriber;
         $this->additionalEmailsSubscriber = $additionalEmailsSubscriber;
-        $this->ownershipConfigProvider = $ownershipConfigProvider;
         $this->router = $router;
         $this->contactInformationEmailsSubscriber = $contactInformationEmailsSubscriber;
     }
@@ -134,27 +123,6 @@ class EmailNotificationType extends AbstractType
                 'required' => true,
             ]
         );
-
-        $builder->addEventListener(
-            FormEvents::POST_SET_DATA,
-            function (FormEvent $event) {
-                $data = $event->getData();
-                if ($data instanceof EmailNotification) {
-                    $entityName = $data->getEntityName();
-                    $entities = $this->getOwnershipEntities();
-
-                    if ($entityName && !array_key_exists($entityName, $entities)) {
-                        $recipientList = $event->getForm()->get('recipientList');
-
-                        FormUtils::replaceField(
-                            $recipientList,
-                            'owner',
-                            array_merge($recipientList->get('owner')->getConfig()->getOptions(), ['disabled' => true])
-                        );
-                    }
-                }
-            }
-        );
     }
 
     /**
@@ -203,21 +171,5 @@ class EmailNotificationType extends AbstractType
     public function getBlockPrefix()
     {
         return self::NAME;
-    }
-
-    /**
-     * @return array
-     */
-    private function getOwnershipEntities()
-    {
-        $ownershipEntities = [];
-        foreach ($this->ownershipConfigProvider->getConfigs() as $config) {
-            $ownerType = $config->get('owner_type');
-            if (!empty($ownerType) && $ownerType !== OwnershipType::OWNER_TYPE_NONE) {
-                $ownershipEntities[$config->getId()->getClassName()] = true;
-            }
-        }
-
-        return $ownershipEntities;
     }
 }
