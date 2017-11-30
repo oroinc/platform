@@ -41,6 +41,9 @@ oro:
             additional_email_associations.label: Additional associations
             additional_email_associations.label: Additional associations
             contact_emails.label:                Contact Emails
+            additional_associations.tooltip: Field represents a list of related entities fields which have email contact information field.
+            additional_emails.tooltip: Field represents list of fields of current entity which are marked as "Contact information" with type "email". This can be configured on Entity Management page.
+
 
         massnotification:
             entity_label:         Maintenance Notification

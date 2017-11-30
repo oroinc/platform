@@ -91,6 +91,7 @@ class ContactInformationEmailsSubscriber implements EventSubscriberInterface
                 'multiple' => true,
                 'expanded' => true,
                 'choices' => $choices,
+                'tooltip'     => 'oro.notification.emailnotification.additional_emails.tooltip',
             ]
         );
     }
