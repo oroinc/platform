@@ -20,4 +20,14 @@ interface StateDriverInterface
      * @return \DateTime|null
      */
     public function getChangeStateDate();
+
+    /**
+     * Saves the date when a state was changed.
+     * The value will not be overwritten if it differs from the original for less than $gapPeriod seconds
+     *
+     * @param \DateTime $date
+     * @param integer $gapPeriod Gap period in seconds
+     *
+     */
+    public function setChangeStateDateWithTimeGap(\DateTime $date, $gapPeriod = 5);
 }

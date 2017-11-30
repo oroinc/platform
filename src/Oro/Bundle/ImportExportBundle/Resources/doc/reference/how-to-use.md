@@ -392,6 +392,88 @@ Import:
     } %}
 ```
 
+
+**Displaying import/export buttons for multiple entities:**
+
+In order to display import/export buttons for several entities, you need to create configuration
+providers for each entity with options, described in the beginning of the section:
+
+```php
+<?php
+
+namespace Oro\Bundle\ProductBundle\ImportExport\Configuration;
+
+use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfiguration;
+use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
+use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationProviderInterface;
+use Oro\Bundle\ProductBundle\Entity\Product;
+use Symfony\Component\Translation\TranslatorInterface;
+
+class ProductImportExportConfigurationProvider implements ImportExportConfigurationProviderInterface
+{
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function get(): ImportExportConfigurationInterface
+    {
+        return new ImportExportConfiguration([
+            ImportExportConfiguration::FIELD_ENTITY_CLASS => Product::class,
+            ImportExportConfiguration::FIELD_EXPORT_PROCESSOR_ALIAS => 'oro_product_product',
+            ImportExportConfiguration::FIELD_EXPORT_TEMPLATE_PROCESSOR_ALIAS => 'oro_product_product_export_template',
+            ImportExportConfiguration::FIELD_IMPORT_PROCESSOR_ALIAS => 'oro_product_product.add_or_replace',
+            ImportExportConfiguration::FIELD_DATA_GRID_NAME => 'products-grid',
+            ImportExportConfiguration::FIELD_IMPORT_BUTTON_LABEL =>
+                $this->translator->trans('oro.product.import.button.label'),
+            ImportExportConfiguration::FIELD_IMPORT_VALIDATION_BUTTON_LABEL =>
+                $this->translator->trans('oro.product.import_validation.button.label'),
+            ImportExportConfiguration::FIELD_EXPORT_TEMPLATE_BUTTON_LABEL =>
+                $this->translator->trans('oro.product.export_template.button.label'),
+            ImportExportConfiguration::FIELD_EXPORT_BUTTON_LABEL =>
+                $this->translator->trans('oro.product.export.button.label'),
+            ImportExportConfiguration::FIELD_IMPORT_POPUP_TITLE =>
+                $this->translator->trans('oro.product.import.popup.title'),
+        ]);
+    }
+}
+```
+
+Provider's service should have a tag with the name `oro_importexport.configuration` and some alias.
+The alias is used to group import/export buttons with different configurations on one page:
+
+```yaml
+oro_product.importexport.configuration_provider.product:
+    class: 'Oro\Bundle\ProductBundle\ImportExport\Configuration\ProductImportExportConfigurationProvider'
+    arguments:
+        - '@translator'
+    tags:
+        - { name: oro_importexport.configuration, alias: oro_product_index }
+```
+
+To show all import/export buttons on a page, which are defined by configuration providers with an alias,
+include following template:
+
+```twig
+{% include 'OroImportExportBundle:ImportExport:buttons_from_configuration.html.twig' with {
+    'alias': 'oro_product_index'
+} %}
+```
+
+
 **Import pop-up:**
 
 By using the default import configuration (like in the examples above) the user will have an import button displayed

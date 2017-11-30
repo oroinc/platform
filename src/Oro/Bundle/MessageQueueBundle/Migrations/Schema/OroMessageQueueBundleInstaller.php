@@ -23,7 +23,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
      */
     public function getMigrationVersion()
     {
-        return 'v1_6';
+        return 'v1_7';
     }
 
     /**
@@ -134,7 +134,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
         $queries->addPostQuery(
             new ParametrizedSqlMigrationQuery(
                 'INSERT INTO oro_message_queue_state (id, updated_at) VALUES (:id, :updated_at)',
-                ['id' => 'consumers', 'updated_at' => null],
+                ['id' => 'consumers', 'updated_at' => new \DateTime('2000-01-01')],
                 ['id' => Type::STRING, 'updated_at' => Type::DATETIME]
             )
         );

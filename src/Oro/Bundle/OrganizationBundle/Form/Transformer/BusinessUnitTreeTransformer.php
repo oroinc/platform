@@ -25,16 +25,17 @@ class BusinessUnitTreeTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        if (null === $value) {
-            return 0;
-        } elseif (is_array($value)) {
-            foreach ($value as &$val) {
-                if ($val === '') {
-                    $val = 0;
+        if (!$value) {
+            return null;
+        } elseif (is_array($value) || (is_object($value) && ($value instanceof Collection))) {
+            $ids = [];
+            foreach ($value as $val) {
+                if ($val) {
+                    $ids[] = $val;
                 }
             }
 
-            return $this->manager->getBusinessUnitRepo()->findBy(['id' => $value]);
+            return $this->manager->getBusinessUnitRepo()->findBy(['id' => $ids]);
         }
 
         return $this->manager->getBusinessUnitRepo()->find($value);
@@ -45,8 +46,8 @@ class BusinessUnitTreeTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        if (null === $value) {
-            return 0;
+        if (!is_array($value) && !$value) {
+            return null;
         }
 
         if (is_array($value) || (is_object($value) && ($value instanceof Collection))) {

@@ -25,6 +25,7 @@ class Client extends BaseClient
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function request(
         $method,
@@ -35,7 +36,7 @@ class Client extends BaseClient
         $content = null,
         $changeHistory = true
     ) {
-        if (strpos($uri, 'http://') === false) {
+        if (strpos($uri, 'http://') === false && strpos($uri, 'https://') === false) {
             $uri = self::LOCAL_URL . $uri;
         }
 

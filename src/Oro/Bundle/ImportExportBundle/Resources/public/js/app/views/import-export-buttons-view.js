@@ -4,6 +4,7 @@ define(function(require) {
     var ImportExportButtonsView;
     var BaseView = require('oroui/js/app/views/base/view');
     var _ = require('underscore');
+    var $ = require('jquery');
     var ImportExportManager = require('oroimportexport/js/importexport-manager');
 
     // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11701
@@ -13,6 +14,7 @@ define(function(require) {
          */
         options: {
             selectors: {
+                container: null,
                 importButton: '.import-btn',
                 importValidationButton: '.import-validation-btn',
                 exportButton: '.export-btn',
@@ -21,6 +23,7 @@ define(function(require) {
             data: {}
         },
 
+        $container: null,
         $importButton: null,
         $importValidationButton: null,
         $exportButton: null,
@@ -37,10 +40,15 @@ define(function(require) {
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 
-            this.$importButton = this.$el.find(this.options.selectors.importButton);
-            this.$importValidationButton = this.$el.find(this.options.selectors.importValidationButton);
-            this.$exportButton = this.$el.find(this.options.selectors.exportButton);
-            this.$templateButton = this.$el.find(this.options.selectors.templateButton);
+            this.$container = this.$el;
+            if (this.options.selectors.container) {
+                this.$container = $(this.options.selectors.container);
+            }
+
+            this.$importButton = this.$container.find(this.options.selectors.importButton);
+            this.$importValidationButton = this.$container.find(this.options.selectors.importValidationButton);
+            this.$exportButton = this.$container.find(this.options.selectors.exportButton);
+            this.$templateButton = this.$container.find(this.options.selectors.templateButton);
 
             this.$importButton.on('click' + this.eventNamespace(), _.bind(this.onImportClick, this));
             this.$importValidationButton.on(
