@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CacheBundle\Tests\Unit\Consumption;
+namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption;
 
 use Oro\Bundle\MessageQueueBundle\Consumption\CacheState;
 use Oro\Bundle\MessageQueueBundle\Consumption\StateDriverInterface;

@@ -6,6 +6,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\DriverException;
 
+use Doctrine\DBAL\Types\Type;
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\MessageQueueBundle\Consumption\StateDriverInterface;
@@ -70,6 +72,42 @@ class DbalStateDriver implements StateDriverInterface
 
             return null;
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setChangeStateDateWithTimeGap(\DateTime $date, $gapPeriod = 5)
+    {
+        try {
+            $this->saveChangeStateDateWithTimeGap($date, $gapPeriod);
+        } catch (DriverException $e) {
+            // ignore an unexpected exception from the database,
+            // e.g. when a server closed the connection unexpectedly
+            $this->logger->error(
+                'Cannot save the cache state date into the database.',
+                ['exception' => $e, 'date' => $date]
+            );
+        }
+    }
+
+    /**
+     * @param \DateTime $date
+     * @param integer $gapPeriod
+     */
+    private function saveChangeStateDateWithTimeGap(\DateTime $date, $gapPeriod)
+    {
+        $dateWithGap = clone $date;
+        $dateWithGap->sub(new \DateInterval('PT' . $gapPeriod . 'M'));
+
+        $querySQL = 'UPDATE oro_message_queue_state SET updated_at = :updatedAt'
+            . ' WHERE id = :id AND updated_at < :dateWithGap';
+
+        $this->getConnection()->executeUpdate(
+            $querySQL,
+            ['updatedAt' => $date, 'id' => $this->key, 'dateWithGap' => $dateWithGap],
+            ['updatedAt' => Type::DATETIME, 'id' => Type::INTEGER, 'dateWithGap' => Type::DATETIME]
+        );
     }
 
     /**
