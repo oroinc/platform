@@ -53,12 +53,27 @@ class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
         return array(
             'numeric attribute' => array(
                 'inputOptions'    => array(new PropertyPath(self::ATTRIBUTE_NAME)),
-                'expectedOptions' => array('attribute' => new PropertyPath(self::ATTRIBUTE_NAME)),
+                'expectedOptions' => array(
+                    'attribute' => new PropertyPath(self::ATTRIBUTE_NAME),
+                    'exceptionOnNotFound' => true
+                ),
             ),
             'string attribute' => array(
                 'inputOptions'    => array('attribute' => new PropertyPath(self::ATTRIBUTE_NAME)),
-                'expectedOptions' => array('attribute' => new PropertyPath(self::ATTRIBUTE_NAME)),
-            )
+                'expectedOptions' => array(
+                    'attribute' => new PropertyPath(self::ATTRIBUTE_NAME),
+                    'exceptionOnNotFound' => true),
+            ),
+            'exceptionOnNotFound false' => [
+                'inputOptions' => [
+                    'attribute' => new PropertyPath(self::ATTRIBUTE_NAME),
+                    'exceptionOnNotFound' => false,
+                ],
+                'expectedOptions' => [
+                    'attribute' => new PropertyPath(self::ATTRIBUTE_NAME),
+                    'exceptionOnNotFound' => false,
+                ],
+            ],
         );
     }
 
@@ -84,15 +99,16 @@ class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
             'no options' => array(
                 'options' => array(),
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
-                'exceptionMessage' => 'Only one attribute parameter must be defined',
+                'exceptionMessage' => 'Only one or two attribute parameters must be defined',
             ),
             'too many options' => array(
                 'options' => array(
                     'attribute' => new PropertyPath(self::ATTRIBUTE_NAME),
+                    'exceptionOnNotFound' => false,
                     'additional' => 'value'
                 ),
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
-                'exceptionMessage' => 'Only one attribute parameter must be defined',
+                'exceptionMessage' => 'Only one or two attribute parameters must be defined',
             ),
             'no attribute' => array(
                 'options' => array(
