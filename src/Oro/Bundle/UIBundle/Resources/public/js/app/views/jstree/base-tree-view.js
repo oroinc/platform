@@ -77,6 +77,11 @@ define(function(require) {
         /**
          * @property {Object}
          */
+        $searchContainer: null,
+
+        /**
+         * @property {Object}
+         */
         $searchField: null,
 
         /**
@@ -135,6 +140,7 @@ define(function(require) {
             }
 
             this.$tree = this.$('[data-role="jstree-container"]');
+            this.$searchContainer = this.$('[data-name="jstree-search-component"]');
             this.$searchField = this.$('[data-name="search"]');
             this.$clearSearchButton = this.$('[data-name="clear-search"]');
             this.$tree.data('treeView', this);
@@ -329,17 +335,17 @@ define(function(require) {
             this.jsTreeInstance.settings.autohideNeighbors = tools.isMobile() && _.isEmpty(value);
             this.jsTreeInstance.search(value);
 
-            this._toggleClearSearchButton(value);
+            this._toggleSearchState(value);
 
             this._changeUrlParam('search', value.length ? value : null);
             mediator.trigger(this.viewGroup + ':highlight-text:update', value);
         },
 
         /**
-         * Show/Hide clear search field button
+         * Toggle active-search class for search component
          */
-        _toggleClearSearchButton: function(str) {
-            this.$clearSearchButton.toggleClass('hide', str === '');
+        _toggleSearchState: function(str) {
+            this.$searchContainer.toggleClass('active-search', str !== '');
         },
 
         /**

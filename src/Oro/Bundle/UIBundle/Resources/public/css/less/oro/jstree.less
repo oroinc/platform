@@ -121,6 +121,15 @@
 .jstree-search-component {
   position: relative;
 
+  &.active-search & {
+    &__clear-icon {
+      display: block;
+    }
+    &__search-icon  {
+      display: none;
+    }
+  }
+
   &__input {
     width: 100%;
     height: 30px !important;
@@ -132,10 +141,12 @@
     }
   }
 
-  &__clear {
+  &__clear-icon,
+  &__search-icon {
+    display: none;
     position: absolute;
     top: 5px;
-    right: 30px;
+    right: 8px;
     font-size: 16px;
     z-index: 10;
     color: @treeIconColor;
@@ -146,16 +157,8 @@
     }
   }
 
-  &:before {
-    position: absolute;
-    font-family: 'FontAwesome';
-    font-size: 16px;
-    font-weight: normal;
-    font-style: normal;
-    content: '\f002';
-    color: @treeIconColor;
-    right: 10px;
-    top: 5px;
+  &__search-icon {
+    display: block;
     pointer-events: none;
   }
 }
