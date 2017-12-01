@@ -36,3 +36,9 @@
         border-color: $select-border-color-error-state;
     }
 }
+
+@-moz-document url-prefix() { 
+    .select {
+        padding: $select-moz-padding;
+    }
+}
