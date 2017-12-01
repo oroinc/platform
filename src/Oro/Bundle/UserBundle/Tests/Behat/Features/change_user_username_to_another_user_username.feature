@@ -1,6 +1,7 @@
 @regression
 @fixture-OroUserBundle:user.yml
 Feature: Change user username to another user username
+  ToDo: BAP-16103 Add missing descriptions to the Behat features
 
   Scenario: Customer user email change
     Given I login as "charlie" user
