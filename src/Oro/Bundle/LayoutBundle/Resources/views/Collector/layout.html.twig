@@ -64,8 +64,12 @@
     {{ parent() }}
 
     <style>
+        .container {
+            max-width: none;
+        }
+
         #tree-menu {
-            width: 480px;
+            width: calc(100% - 570px);
             position: relative;
         }
 
@@ -85,7 +89,7 @@
         }
 
         #tree-details-container {
-            margin-left: 500px;
+            margin-left: calc(100% - 550px);
             padding: 0;
             border: none;
             width: 550px;
@@ -94,6 +98,7 @@
         #tree-details-container.fixed {
             position: fixed;
             top: 5px;
+            right: 15px;
             height: 100%;
             overflow-y: auto;
             overflow-x: hidden;
