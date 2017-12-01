@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Faker\Provider;
 
 use Faker\Generator;
 use Faker\Provider\Base as BaseProvider;
+use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\TestFrameworkBundle\Provider\XssPayloadProvider;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
@@ -31,16 +32,24 @@ class XssProvider extends BaseProvider
     private $prefix = 'p';
 
     /**
+     * @var SymmetricCrypterInterface
+     */
+    private $crypter;
+
+    /**
      * @param Generator $generator
      * @param XssPayloadProvider $payloadProvider
+     * @param SymmetricCrypterInterface $crypter
      */
     public function __construct(
         Generator $generator,
-        XssPayloadProvider $payloadProvider
+        XssPayloadProvider $payloadProvider,
+        SymmetricCrypterInterface $crypter
     ) {
         parent::__construct($generator);
         $this->payloadProvider = $payloadProvider;
         $this->passwordEncoder = new MessageDigestPasswordEncoder();
+        $this->crypter = $crypter;
     }
 
     /**
@@ -67,6 +76,17 @@ class XssProvider extends BaseProvider
     public function userPassword($password, $salt)
     {
         return $this->passwordEncoder->encodePassword($password, $salt);
+    }
+
+    /**
+     * @param string $identifier
+     * @param string|null $payloadType
+     * @param null|string $elementId
+     * @return string
+     */
+    public function encodedXss($identifier = 'XSS', $payloadType = null, $elementId = null)
+    {
+        return $this->crypter->encryptData($this->xss($identifier, $payloadType, $elementId));
     }
 
     /**

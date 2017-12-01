@@ -111,11 +111,16 @@ services:
     oro_test.provider.xss_payload_provider:
         class: Oro\Bundle\TestFrameworkBundle\Provider\XssPayloadProvider
 
+    oro_test.encoder.mcrypt:
+        class: Oro\Bundle\SecurityBundle\Encoder\Mcrypt
+        arguments: [ %kernel.secret% ]
+
     oro_test.faker.provider.xss:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Faker\Provider\XssProvider
         arguments:
             - '@oro_test.faker_generator'
             - '@oro_test.provider.xss_payload_provider'
+            - '@oro_test.encoder.mcrypt'
 
     oro_test.alice_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader
