@@ -48,14 +48,17 @@ class EmailNotificationSender
         }
 
         foreach ($notification->getRecipientEmails() as $email) {
-            $this->sendQueryMessage([
-                'fromEmail' => $senderEmail,
-                'fromName' => $senderName,
-                'toEmail' => $email,
-                'subject' => $subject,
-                'body' => $body,
-                'contentType' => $contentType
-            ]);
+            // added RFC 822 check to avoid consumer fail
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $this->sendQueryMessage([
+                    'fromEmail' => $senderEmail,
+                    'fromName' => $senderName,
+                    'toEmail' => $email,
+                    'subject' => $subject,
+                    'body' => $body,
+                    'contentType' => $contentType
+                ]);
+            }
         }
     }
 

@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
@@ -19,27 +18,21 @@ class EmailNotificationHandler implements EventHandlerInterface
     /** @var EntityManager */
     protected $em;
 
-    /** @var ConfigProvider */
-    protected $configProvider;
-
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
     /**
      * @param EmailNotificationManager $manager
      * @param EntityManager $em
-     * @param ConfigProvider $configProvider
      * @param PropertyAccessor $propertyAccessor
      */
     public function __construct(
         EmailNotificationManager $manager,
         EntityManager $em,
-        ConfigProvider $configProvider,
         PropertyAccessor $propertyAccessor
     ) {
         $this->manager = $manager;
         $this->em = $em;
-        $this->configProvider = $configProvider;
         $this->propertyAccessor = $propertyAccessor;
     }
 
@@ -70,7 +63,6 @@ class EmailNotificationHandler implements EventHandlerInterface
             $event->getEntity(),
             $notification,
             $this->em,
-            $this->configProvider,
             $this->propertyAccessor
         );
     }

@@ -339,7 +339,7 @@ class EmailActivityListProvider implements
      */
     public function getTargetEntities($entity)
     {
-        return $entity->getActivityTargets();
+        return $entity->getActivityTargets() ?? [];
     }
 
     /**
@@ -382,9 +382,19 @@ class EmailActivityListProvider implements
         $targetEntities = $this->getTargetEntities($entity);
         $organizations = [$this->getOrganization($entity)];
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
+
+        foreach ($entity->getEmailUsers() as $emailUser) {
+            if (!in_array($emailUser->getOrganization(), $organizations, true)) {
+                $organizations[] = $emailUser->getOrganization();
+            }
+        }
+
         foreach ($targetEntities as $target) {
             try {
-                $organizations[] = $propertyAccessor->getValue($target, 'organization');
+                $organization = $propertyAccessor->getValue($target, 'organization');
+                if (!in_array($organization, $organizations, true)) {
+                    $organizations[] = $organization;
+                }
             } catch (\Exception $e) {
                 // skipp target
             }
@@ -393,7 +403,17 @@ class EmailActivityListProvider implements
             $filter['organization'] = $organizations;
         }
 
-        $activityArray = [];
+        return $this->collectActivityOwners($activityList, $filter);
+    }
+
+    /**
+     * @param ActivityList $activityList
+     * @param array $filter
+     * @return array
+     */
+    private function collectActivityOwners(ActivityList $activityList, array $filter)
+    {
+        $activityOwners = [];
         /** @var EmailUser[] $owners */
         $owners = $this->doctrineRegistryLink->getService()
             ->getRepository('OroEmailBundle:EmailUser')
@@ -414,17 +434,17 @@ class EmailActivityListProvider implements
                         }
                     }
                     $activityOwner->setUser($user);
-                    $activityArray[] = $activityOwner;
+                    $activityOwners[] = $activityOwner;
                 }
             }
         }
 
-        return $activityArray;
+        return $activityOwners;
     }
 
     /**
      * @param $entity
-     * @return mixed
+     * @return Email
      */
     protected function getEmailEntity($entity)
     {

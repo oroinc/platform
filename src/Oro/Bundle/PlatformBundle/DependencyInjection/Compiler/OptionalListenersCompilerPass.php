@@ -7,6 +7,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OptionalListenersCompilerPass implements CompilerPassInterface
 {
+    const KERNEL_LISTENER_TAG   = 'kernel.event_listener';
+    const KERNEL_SUBSCRIBER_TAG = 'kernel.event_subscriber';
+
+    const DOCTRINE_ORM_LISTENER_TAG = 'doctrine.orm.entity_listener';
     const DOCTRINE_LISTENER_TAG   = 'doctrine.event_listener';
     const DOCTRINE_SUBSCRIBER_TAG = 'doctrine.event_subscriber';
 
@@ -18,15 +22,18 @@ class OptionalListenersCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $doctrineListeners = array_keys(
+        $listeners = array_keys(
             array_merge(
+                $container->findTaggedServiceIds(self::KERNEL_LISTENER_TAG),
+                $container->findTaggedServiceIds(self::KERNEL_SUBSCRIBER_TAG),
+                $container->findTaggedServiceIds(self::DOCTRINE_ORM_LISTENER_TAG),
                 $container->findTaggedServiceIds(self::DOCTRINE_LISTENER_TAG),
                 $container->findTaggedServiceIds(self::DOCTRINE_SUBSCRIBER_TAG)
             )
         );
 
         $optionalListeners = [];
-        foreach ($doctrineListeners as $listener) {
+        foreach ($listeners as $listener) {
             $className = $container->getDefinition($listener)->getClass();
             $refClass = new \ReflectionClass($className);
             if ($refClass->implementsInterface(self::OPTIONAL_LISTENER_INTERFACE)) {
