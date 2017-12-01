@@ -19,7 +19,7 @@ require({
         {% if app.debug and oro_translation_debug_js_translations() %}
             'oro/translations': '{{ path('oro_translation_jstranslation')[0:-3]|raw }}'
         {% else %}
-            'oro/translations': '{{ asset_path('oro_translation_jstranslation')[0:-3]|raw }}'
+            'oro/translations': '{{ asset(asset_path('oro_translation_jstranslation'), 'translations')|raw }}'
         {% endif %}
     },
     config: {

@@ -30,7 +30,7 @@ class RecipientListTypeTest extends \PHPUnit_Framework_TestCase
     {
         /** @var FormBuilder|\PHPUnit_Framework_MockObject_MockObject $builder */
         $builder = $this->createMock(FormBuilder::class);
-        $builder->expects($this->exactly(4))->method('add');
+        $builder->expects($this->exactly(3))->method('add');
 
         $this->type->buildForm($builder, []);
     }

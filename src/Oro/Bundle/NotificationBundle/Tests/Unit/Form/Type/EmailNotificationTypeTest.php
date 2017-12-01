@@ -6,8 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -17,18 +15,19 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Entity\Event;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
+use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
+use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber;
 use Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationEntityChoiceType;
 use Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationType;
 use Oro\Bundle\NotificationBundle\Form\Type\RecipientListType;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+use Oro\Bundle\NotificationBundle\Provider\ContactInformationEmailsProvider;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
@@ -55,15 +54,7 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->expects($this->any())->method('getToken')->willReturn($this->getToken());
 
-        $configId = $this->createMock(ConfigIdInterface::class);
-        $configId->expects($this->any())->method('getClassName')->willReturn(User::class);
-
-        $config = $this->createMock(ConfigInterface::class);
-        $config->expects($this->any())->method('get')->willReturn(OwnershipType::OWNER_TYPE_BUSINESS_UNIT);
-        $config->expects($this->any())->method('getId')->willReturn($configId);
-
         $this->configProvider = $this->createMock(ConfigProvider::class);
-        $this->configProvider->expects($this->any())->method('getConfigs')->willReturn([$config]);
 
         /** @var RouterInterface|\PHPUnit_Framework_MockObject_MockObject $router */
         $router = $this->createMock(RouterInterface::class);
@@ -81,17 +72,21 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
             ->method('getClassMetadata')
             ->willReturn($classMetadata);
 
+        /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject $registry */
         $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($entityManager);
+        /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
         $configManager = $this->createMock(ConfigManager::class);
+
+        $contactInformationEmailsProvider = $this->createMock(ContactInformationEmailsProvider::class);
 
         $this->formType = new EmailNotificationType(
             new BuildTemplateFormSubscriber($tokenStorage),
             new AdditionalEmailsSubscriber($registry, $this->getTranslator(), $configManager),
-            $this->configProvider,
-            $router
+            $router,
+            new ContactInformationEmailsSubscriber($contactInformationEmailsProvider)
         );
 
         parent::setUp();
@@ -114,11 +109,6 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
         $form = $this->factory->create($this->formType, $defaultData);
 
         $this->assertEquals($defaultData, $form->getData());
-        if ($form->getData()->getEntityName() === \stdClass::class) {
-            $option = $form->get('recipientList')->get('owner')->getConfig()->getOption('disabled');
-
-            $this->assertTrue($option);
-        }
 
         $form->submit($submittedData);
 
@@ -148,7 +138,6 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
                     'template' => 200,
                     'recipientList' => [
                         'groups' => [1],
-                        'owner' => true,
                         'users' => '3',
                         'email' => 'test@example.com'
                     ]
@@ -165,30 +154,12 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
                             [
                                 'users' => new ArrayCollection([$this->getUser()]),
                                 'groups' => new ArrayCollection([new Group()]),
-                                'email' => 'test@example.com',
-                                'owner' => true
+                                'email' => 'test@example.com'
                             ]
                         )
                     ]
                 )
-            ],
-            'entity without ownership' => [
-                'defaultData' => $this->getEntity(
-                    EmailNotification::class,
-                    [
-                        'id' => 42,
-                        'entityName' => \stdClass::class
-                    ]
-                ),
-                'submittedData' => [],
-                'expectedData' => $this->getEntity(
-                    EmailNotification::class,
-                    [
-                        'id' => 42,
-                        'recipientList' => new RecipientList()
-                    ]
-                )
-            ],
+            ]
         ];
     }
 
