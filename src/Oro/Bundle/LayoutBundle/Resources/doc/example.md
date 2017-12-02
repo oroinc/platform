@@ -1,37 +1,39 @@
-Layout example implementation
-=============================
+# Layout Example Implementation
 
 The goal of this guide is to demonstrate the capabilities of the layout engine and show how different layout blocks can be used to implement a simple page.
-This guide is intended for those already familiar with layouts. So, please, read our [Quick Start guide](./quick_start.md) before proceeding.
 
-Our guide is divided into the following sections:
-* [Getting started](#getting-started)
-* [Customizing block rendering](#customizing-block-rendering)
-* [Iteration over data](#iteration-over-data)
-* [Access to any layout block by ID](#access-to-any-layout-block-by-id)
-* [Adding CSS and JS](#adding-css-and-js)
-* [Layout blocks positioning](#layout-blocks-positioning)
-* [Providing data for layout](#providing-data-for-layout)
-* [Ordering of layout blocks](#ordering-of-layout-blocks)
-* [Extending exiting block types](#extending-exiting-block-types)
-* [Working with lists](#working-with-lists)
-* [Working with forms](#working-with-forms)
-* [Creating new block types](#creating-new-block-types)
-* [Wrapping up](#wrapping-up)
-* [Simplify block attribute configuration](#simplify-block-attribute-configuration)
+This guide is intended for those who are already familiar with layouts. It is recommended to check out the  [Quick Start guide](./quick_start.md) before you proceed.
 
-Getting started
------------------------
+The guide is divided into the following sections:
 
-Let's consider an example of layout implementation. Imagine you need to create a product page that looks like this:
+- [Getting Started](#getting-started)
+- [Customizing Block Rendering](#customizing-block-rendering)
+- [Iterating Over Data](#iterating-over-data)
+- [Accessing Any layout Block by ID](#accessing-any-layout-block-by-id)
+- [Adding CSS and JS](#adding-css-and-js)
+- [Positioning Layout Blocks](#positioning-layout-blocks)
+- [Providing Data for Layout](#providing-data-for-layout)
+- [Ordering Layout Blocks](#ordering-layout-blocks)
+- [Extending Exiting Block Types](#extending-exiting-block-types)
+- [Working with Lists](#working-with-lists)
+- [Working with Forms](#working-with-forms)
+- [Creating New Block Types](#creating-new-block-types)
+- [Wrapping Up](#wrapping-up)
+- [Simplifying Block Attribute Configuration](#simplifying-block-attribute-configuration)
+
+## Getting Started
+
+In the following example we are going to create a product page with the next details:
 
 ![Product page example](./images/product_page.png "Product page example")
-The simplified page structure is presented by the following [picture](./images/sample_page_structure.gif)
 
-As described in the [Quick Start guide](./quick_start.md), you can create a new theme for this page or use the default one.
-Let's assume that we already have a new theme created and activated. And a test controller is set up according to the Quick Start guide.
-We start from creating the skeleton of the theme to hold the design of common page elements - head, body, header, footer, etc.
-For this we create a default layout update file and place it in `Resources/views/layouts` directory, for example `Resources/views/layouts/first_theme/default.yml`:
+A simplified page structure is presented by the following [picture](./images/sample_page_structure.gif).
+
+As described in the [Quick Start guide](./quick_start.md), you can create a new theme for this page, or use the default one.
+
+Assuming that we already have a new theme created and activated and a test controller set up according to the Quick Start guide, we start from creating the skeleton of the theme to hold the design of common page elements - head, body, header, footer, etc.
+
+For this, we should create a default layout update file and place it in the `Resources/views/layouts` directory, for example `Resources/views/layouts/first_theme/default.yml`:
 
 ```yaml
 layout:
@@ -116,13 +118,13 @@ layout:
                             footer: ~
 ```
 
-See [layout update](./layout_update.md) topic for more details.
+See the [layout update](./layout_update.md) topic for more details.
 
-Customizing block rendering
----------------------------------
+## Customizing Block Rendering
 
-As you have seen in the previous section we are using the `setBlockTheme` action in our layout update file. This is the block theme responsible for defining how layout blocks are rendered.
-Let's define some of the blocks in `Resources/views/layouts/first_theme/default.html.twig` file. Also you can use relative path for block theme like `default.html.twig`.
+As you have seen in the previous section, we use the `setBlockTheme` action in the layout update file. This is the block theme responsible for defining how layout blocks are rendered.
+
+We are now going to define some of the blocks in the `Resources/views/layouts/first_theme/default.html.twig` file. You can also use a relative path for the block theme, like `default.html.twig`.
 
 ```twig
 {% block _page_container_widget %}
@@ -176,7 +178,7 @@ Let's define some of the blocks in `Resources/views/layouts/first_theme/default.
 {% endblock %}
 ```
 
-When you open the test page in a browser you'll see the HTML like this:
+When you open the test page in a browser, you should see the HTML similar to this:
 
 ```html
 <!DOCTYPE html>
@@ -204,7 +206,7 @@ When you open the test page in a browser you'll see the HTML like this:
 </html>
 ```
 
-In our example we need to add `lang="en"` attribute to the `<html>` tag. For this we will redefine the `root_widget` block in our `default.html.twig`.
+In our example, we need to add the `lang="en"` attribute to the `<html>` tag. For this, we redefine the `root_widget` block in the `default.html.twig`.
 ```twig
 {% block root_widget %}
     <!DOCTYPE {{ doctype|default('html') }}>
@@ -213,7 +215,7 @@ In our example we need to add `lang="en"` attribute to the `<html>` tag. For thi
     </html>
 {% endblock %}
 ```
-Now we can set the `lang` attribute in our layout update file using `setOption` action:
+Now we can set the `lang` attribute in the layout update file using the `setOption` action:
  ```yaml
      - @setOption:
          id: root
@@ -221,11 +223,9 @@ Now we can set the `lang` attribute in our layout update file using `setOption` 
          optionValue: en
  ```
  
-Iteration over data
--------------------
+## Iterating Over Data
  
-If you need to iterate over some array or collection it should be done in a block template in a block theme file.
-Here is how it can look like:
+Iteration over an array or a collection should be done in a block template of a block theme file, for instance:
 
 ```twig
 {% block _attributes_container_widget %}
@@ -237,15 +237,11 @@ Here is how it can look like:
     </div>
 {% endblock %}
 ```
+This block will iterate over all values from the `attributes` collection, pass the `attribute` variable with the appropriate value to all children blocks, and render all children blocks for every existing attribute. 
 
-This block will iterate over all values from `attributes` collection, pass `attribute` variable with the
-appropriate value to all children blocks and render all children blocks for every existing attribute. 
+## Accessing Any layout Block by ID
 
-Access to any layout block by ID
-----------------------------------------
-
-You can access to any layout block from another block by ID
-and modify template based on the existence of another block or any of its properties.
+You can access any layout block from a different block using its ID, and modify the template based on the existing block, or any of its properties.
 
 ```twig
 {% block root_widget %}
@@ -261,10 +257,9 @@ and modify template based on the existence of another block or any of its proper
 {% endblock %}
 ```
 
-Adding CSS and JS
---------------------
+## Adding CSS and JS
 
-Let's add some CSS and JS to our page. For this we'll use `style` and `script` block types:
+To add some CSS and JS to our page, we use the `style` and `script` block types:
 
 ```yaml
 layout:
@@ -289,8 +284,10 @@ layout:
                 content: "Mage.Cookies.path = '/';"
 ```
 
-As you can see we can add inline CSS or JS using `content` option or load them from a separate resource specified in `src` option.
-For demonstration purpose, imagine that we need to add some scripts for IE only using conditional comments. In this case we can't use `script` block type but we can use default block type with a customized template.
+As you can see, we can add inline CSS or JS using the `content` option, or load them from a separate resource specified in the `src` option.
+
+For demonstration purposes, we will add some scripts for the IE using only  conditional comments. In this case, we cannot use the `script` block type but we can use the default one with a customized template.
+
 ```yaml
 layout:
     actions:
@@ -300,7 +297,7 @@ layout:
             blockType: block
 ```
 
-In our block theme file defined previously we add:
+In our block theme file defined previously, we add:
 ```twig
 {% block _script_ie_widget %}
     <!--[if lt IE 7]>
@@ -313,14 +310,15 @@ In our block theme file defined previously we add:
 {% endblock %}
 ```
 
-Layout blocks positioning
------------------------------------
+## Positioning Layout Blocks 
 
-Now we'll change the layout of our product page.
-For this we'll create the layout update file and place it in the `Resources/views/layouts/first_theme/demo_layout_test` directory, for example `DemoBundle/Resources/views/layouts/first_theme/demo_layout_test/default.yml`:
-Please note that the file is placed in the route specific folder and as the result it will be executed only for the `demo_layout_test` route.
+We are now going to change the layout of our product page.
 
-In our default theme we have a two-column layout. But for our example page we want just one column. Let's remove the `left_panel` block and change the class for `main_container`:
+For this, we create the layout update file and place it in the `Resources/views/layouts/first_theme/demo_layout_test` directory, for example `DemoBundle/Resources/views/layouts/first_theme/demo_layout_test/default.yml`.
+
+Please note that the file is placed in the route specific folder and as the result will be executed only for the `demo_layout_test` route.
+
+In our default theme we have a two-column layout, however, for our example page we want  one column. Let us remove the `left_panel` block and change the class for the `main_container`:
 ```yaml
 layout:
     actions:
@@ -333,7 +331,7 @@ layout:
             newOptionValue: col1-layout
 ```
 
-Here we know the option value that we need to replace. But in case if you just want to add another option to already existing ones you can use `appendOption` action:
+Here, we know the option value that we need to replace. But if you want to add another option to the already existing ones,  use the `appendOption` action:
 ```yaml
 layout:
     actions:
@@ -343,7 +341,7 @@ layout:
             optionValue: catalog-product-view
 ```
 
-Also for our example, we'll need to add a wrapper for the body content. For this we'll add a new `container` to the body and move the content into it.
+For our example, we also need to add a wrapper for the body content. For this,  we  add a new `container` to the body and move the content into it.
 ```yaml
 layout:
     actions:
@@ -355,7 +353,7 @@ layout:
             id: page_container
             parentId: body_wrapper
 ```
-Since `container` block type does not render any html, we'll add the template specifically for our new wrapper:
+Since the `container` block type does not render any html, we add the template specifically for the new wrapper:
 ```twig
 {% block _body_wrapper_widget %}
     <div class="wrapper">
@@ -364,7 +362,7 @@ Since `container` block type does not render any html, we'll add the template sp
 {% endblock %}
 ```
 
-Let's check what is rendered in the browser. You should be getting something like this:
+Let us check what is rendered in the browser. Your code should look similar to the following: 
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -404,14 +402,15 @@ Let's check what is rendered in the browser. You should be getting something lik
 </html>
 ```
 
-Providing data for layout
------------------------------------
+## Providing Data for Layout
 
-### Using the layout context ###
+### Using Layout Context 
 
 On our test page we have a "This is a demo store..." notice. It is clear that this block should be visible only on certain conditions.
+
 For simplicity, we will check if the application is running in debug mode by checking the `debug` value in the layout context which is added by [ApplicationContextConfigurator](../../Layout/Extension/ApplicationContextConfigurator.php).
-Let's add the following block template theme file:
+
+Let us add the following block template theme file:
 ```twig
 {% block _demo_notice_widget %}
     <div class="global-site-notice demo-notice">
@@ -432,10 +431,10 @@ layout:
 ```
 Note that if `visible` evaluates to false, the block will not be added to the final layout at all.
 
-Every product page is different since it contains product related data. The layout engine allows to operate this data in the layout update files.
-Please, make sure you are familiar with [layout context](layout_context.md) and [layout data](layout_data.md) topics.
+Every product page is different as it contains product related data. The layout engine allows to operate this data in the layout update files.
+Please, make sure you are familiar with the [layout context](layout_context.md) and [layout data](layout_data.md) topics.
 
-Since product data is page specific, we'll be adding it to `data` collection of the layout context using a [context configurator](layout_context.md#context-configurators).
+Since product data is page specific, we are be adding it to the `data` collection of the layout context using a [context configurator](layout_context.md#context-configurators).
 
 ```php
 namespace Acme\Bundle\ProductBundle\Layout\Extension;;
@@ -516,8 +515,9 @@ class ProductContextConfigurator implements ContextConfiguratorInterface
 }
 ```
 
-The product Id is received from the request, so for next examples will be adding `?product_id=99` to our test page url. Based on the product Id we obtain the rest of product data. It can be fetched from the database or other sources, but for simplicity we use a simple array here.
-To enable our context configurator we have to register it in the DI container with the `layout.context_configurator` tag:
+The product Id is received from the request, so for next examples will be adding `?product_id=99` to our test page url. Based on the product Id we obtain the rest of the product data. It can be fetched from the database or other sources, but for simplicity we use a simple array here.
+
+To enable our context configurator, we have to register it in the DI container with the `layout.context_configurator` tag:
 ```yaml
     acme_product.layout.context_configurator.product:
         class: Acme\Bundle\ProductBundle\Layout\Extension\ProductContextConfigurator
@@ -543,12 +543,13 @@ layout:
                 rel:  canonical
                 href: '=data["product"].getUrl()'
 ```
-Note how we use [Symfony expression syntax](http://symfony.com/doc/current/components/expression_language/syntax.html) to compose the page title from different product fields.
+Note how we use the [Symfony expression syntax](http://symfony.com/doc/current/components/expression_language/syntax.html) to compose the page title from different product fields.
 
-### Data providers ###
+### Data Providers 
 
-Let's consider another example of providing data to the layout.
-To implement a language switcher we'll create a separate data provider class, since this data is used throughout all pages.
+Let us consider another example of providing data to the layout.
+
+To implement a language switcher,  we create a separate data provider class, since this data is used throughout all pages.
 
 ```php
 namespace Acme\Bundle\LocaleBundle\Layout\Extension\Provider;
@@ -578,7 +579,7 @@ class LocaleDataProvider
 }
 ```
 
-We need to register our data provider in the DI container by `layout.data_provider` tag:
+We need to register our data provider in the DI container by the `layout.data_provider` tag:
 ```yaml
     acme_locale.layout.data_provider.locale:
         class: Acme\Bundle\LocaleBundle\Layout\DataProvider\LocaleProvider
@@ -623,8 +624,9 @@ We also need to create the block template for the language switcher:
 {% endblock %}
 ```
 
-This will render the language switcher in the browser but we won't know which language has been selected. To fix this we need to add another context configurator which will store the selected language.
-Similar to the `ProductContextConfigurator` we'll fetch the language code from the request and save it in the layout context.
+This will render the language switcher in the browser but we will not know which language has been selected. To fix this, we need to add another context configurator which will store the selected language.
+
+Similar to the `ProductContextConfigurator`,  we will fetch the language code from the request and save it in the layout context.
 
 ```php
 namespace Acme\Bundle\LocaleBundle\Layout\Extension;
@@ -680,7 +682,7 @@ Register the locale context configurator:
             - { name: layout.context_configurator }
 ```
 
-We also need to modify our block template to make sure that the language dropdown preselects the current value:
+We also need to modify the block template to make sure that the language dropdown preselects the current value:
 ```twig
     {% set lang = current_language is defined ? current_language : default_language %}
     <select id="select-language" title="Your Language" onchange="window.location.href=this.value">
@@ -700,13 +702,13 @@ layout:
             optionValue: '=data["current_language"]'
 ```
 
-Now if you go to `/layout/test?product_id=99&___store=french` url you'll see that French language is preselected.
+Now if you navigate to the `/layout/test?product_id=99&___store=french` url,  you will see that French language is preselected.
 
-Ordering of layout blocks
------------------------------------
+## Ordering Layout Blocks
 
-By default when adding or moving layout blocks they are placed at the last positon. But the layout engine lets you add or move blocks into any position by specifying the `siblingId`.
-For example, let's add the meta description block right after the main meta block.
+When you add or move the layout blocks, they are by default placed last. However, the layout engine lets you add or move blocks into any position by specifying the `siblingId`.
+
+As an example, we can add the meta description block right after the main meta block.
 
 ```yaml
 layout:
@@ -720,8 +722,10 @@ layout:
                 content: '=data["product"].getDescription()'
             siblingId: meta
 ```
-If you need to place some block before another one, you should use the `prepend: true` attribute.
-The same positioning can be achieved using `move` action. Let's move our language switcher before the header block:
+If you need to place a block before another one, use the `prepend: true` attribute.
+
+The same positioning can be achieved using the `move` action. As an example, we can move our language switcher before the header block:
+
 ```yaml
     - @move:
         id: lang_switch
@@ -729,10 +733,10 @@ The same positioning can be achieved using `move` action. Let's move our languag
         siblingId: ~
         prepend: true
 ```
-Note that if `siblingId` is not specified the block will be positioned as the first block in the container.
-In case when you need to place block at the last position, you should use the `prepand: false` with `siblingId: ~`.
+Note that if the `siblingId` is not specified, the block will be positioned as the first block in the container.
+When you need to place the block last, use the `prepand: false` with the `siblingId: ~`.
 
-Example (with different cases of ordering):
+Here is an example (with different cases of ordering):
 ```yaml
     - '@addTree':
         items:
@@ -801,7 +805,7 @@ Example (with different cases of ordering):
         prepend: true
 ```
 
-Result will be (tree):
+The following is the result (tree):
 ```yaml
     content:
         content_block_first_1: ~
@@ -813,12 +817,13 @@ Result will be (tree):
         content_block_last_2: ~
 ```
 
-Extending exiting block types
-----------------------------------
+## Extending Exiting Block Types
 
-Currently the [LinkType](../../Layout/Block/Type/LinkType.php) does not support adding an image inside the `<a>` tag.
-For our example we'll extend this block type to have such possibility.
-First, create a `LinkExtension` class in place it in: `Acme/Bundle/LayoutBundle/Layout/Block/Extension` dir.
+
+Currently, the [LinkType](../../Layout/Block/Type/LinkType.php) does not support adding an image inside the `<a>` tag.
+For our example, we will extend this block type to have such possibility.
+
+First, create a `LinkExtension` class and place it in the `Acme/Bundle/LayoutBundle/Layout/Block/Extension` dir.
 
 ```php
 namespace Acme\Bundle\LayoutBundle\Layout\Block\Extension;
@@ -866,7 +871,7 @@ class LinkExtension extends AbstractBlockTypeExtension
 }
 ```
 
-Then, we register it in our container using `layout.block_type_extension` tag:
+We then register it in the container using the `layout.block_type_extension` tag:
 ```yaml
     acme_layout.block_type_extension.link:
         class: Acme\Bundle\LayoutBundle\Layout\Block\Extension\LinkExtension
@@ -914,9 +919,9 @@ This will output the following html:
 <a class="logo" href="/"><img src="logo.png" class="large" alt="Madison Island"></a>
 ```
 
-Also when extending an existing block type it is possible to register an extra block prefix for it, which will provide better customization flexibility.
-At the moment, every time we need to wrap content into a `<div>` element, we have to add a `container` in the layout update and define its template in block theme file.
-This produces quite a lot of copy-paste code. Instead, let's make an extension for the `container` type and register a new block prefix for it depending on `type` option:
+To provide better customization flexibility, you can register an extra block prefix for it when you extend the existing block type.
+
+Currently, every time we want to wrap content into a `<div>` element, we have to add a `container` in the layout update and define its template in block theme file. This produces quite a lot of copy-paste code. Instead, we can make an extension for the `container` type and register a new block prefix for it depending on the `type` option:
 
 ```php
 namespace Acme\Bundle\LayoutBundle\Layout\Block\Extension;
@@ -967,7 +972,7 @@ class ContainerExtension extends AbstractBlockTypeExtension
 }
 ```
 
-Adding it to the DI container
+Add it to the DI container:
 ```yaml
     acme_layout.block_type_extension.container:
         class: Acme\Bundle\LayoutBundle\Layout\Block\Extension\ContainerExtension
@@ -975,7 +980,7 @@ Adding it to the DI container
             - { name: layout.block_type_extension, alias: container }
 ```
 
-Now we can define a template for wrapping container elements into a `<div>` tag:
+Define a template for wrapping container elements into a `<div>` tag:
 ```twig
 {% block div_container_widget %}
     <div{{ block('block_attributes') }}>
@@ -984,7 +989,7 @@ Now we can define a template for wrapping container elements into a `<div>` tag:
 {% endblock %}#}
 ```
 
-We can use it in the layout update file like this:
+We can use it in the layout update file:
 ```yaml
 layout:
     actions:
@@ -995,12 +1000,12 @@ layout:
             options:
                 type: div
 ```
-The `type` option serves as a prefix for the `blockType`. So the `type: div` option value tells us to look for the template in the `div_container_widget` block. If the `type` option is not specified, the standard block will be used for rendering.
+The `type` option serves as a prefix for the `blockType`. So the `type: div` option value tells us to look for the template in the `div_container_widget` block. If the `type` option is not specified, the standard block is used for rendering.
 
 
-Working with lists
------------------------------------
-As an example, we'll be adding navigation menu to the page using both ordered and unordered lists.
+## Working with Lists
+
+As an example, we are going to add a navigation menu to the page using both ordered and unordered lists.
 
 In the layout update file we do the following:
 ```yaml
@@ -1058,9 +1063,10 @@ layout:
 ```
 
 Note that we can use `list_item` block type to be able to add custom attributes (e.g. `class`) to the `<li>` tag and add child blocks.
+
 For the list items with no children we can add any other block type, `link` in our example, and it will be wrapped into the `<li>` tag.
 
-So our rendered HTML will look like this:
+The rendered HTML will look like this:
 ```html
 <nav id="nav">
     <ol class="nav-primary">
@@ -1075,7 +1081,7 @@ So our rendered HTML will look like this:
 </nav>
 ```
 
-Note: to customize the `nav_container` block to be rendered in `<nav>` tag we need to add a template in the block theme file:
+Note: to customize the `nav_container` block to be rendered in the `<nav>` tag, we need to add a template in the block theme file:
 ```twig
 {% block _nav_container_widget %}
     <nav id="nav">
@@ -1084,7 +1090,7 @@ Note: to customize the `nav_container` block to be rendered in `<nav>` tag we ne
 {% endblock %}
 ```
 
-Breadcrumbs is a special case of a list where items are separated by some symbol. We can customize rendering of the list by adding the following template to our block theme:
+Breadcrumbs is a special case of a list where items are separated by a symbol. We can customize rendering of the list by adding the following template to the block theme:
 ```twig
 {% block _breadcrumbs_widget -%}
     <div class="breadcrumbs">
@@ -1103,7 +1109,7 @@ Breadcrumbs is a special case of a list where items are separated by some symbol
 {%- endblock %}
 ```
 
-Now we can place the block with `breadcrumbs` Id in our layout update and add some child elements into it:
+We can now place the block with the `breadcrumbs` Id in the layout update and add some child elements into it:
 ```yaml
 layout:
     actions:
@@ -1140,13 +1146,15 @@ This should render into the following HTML:
 </div>
 ```
 
-Working with forms
------------------------------------
+## Working with Forms
 
-### Non page specific form ###
 
-Let's implement a simple search form by means of the layout engine.
-To use the form in layouts we need to create layout data provider first. 
+### Non Page Specific Form ###
+
+Let us implement a simple search form by means of the layout engine.
+
+To use the form in layouts, we need to create the layout data provider first. 
+
 Use abstract class [AbstractFormProvider](../../Layout/DataProvider/AbstractFormProvider.php).
 
 *Example*:
@@ -1174,7 +1182,7 @@ class SearchFormProvider extends AbstractFormProvider
 }
 ```
 
-Registering layout data provider in the DI container:
+Register layout data provider in the DI container:
 
 ```yaml
     acme_search.layout.data_provider.search_form:
@@ -1186,7 +1194,7 @@ Registering layout data provider in the DI container:
             - { name: layout.data_provider, alias: acme_search_form }
 ```
 
-Now we can add our search form into the layout.
+Now we can add the search form into the layout.
 
 ```yaml
 layout:
@@ -1226,10 +1234,11 @@ layout:
                     searh_form_end: ~
 ```
 
-Note that we are using separate block types `form_start`, `form_end` and `form_field` to render the form. This allows us to easily add content inside the form (e.g. autocomplete block).
-For all this block fields we need to specify `form_name` option to bind it to our custom `search_form` form. Also we can use only one block type `form` which will create three child block: `form_start`, `form_fields`, `form_end`.
+Note that we use separate block types `form_start`, `form_end` and `form_field` to render the form. This allows us to easily add content inside the form (e.g. autocomplete block).
 
-All that is left is to define the search autocomplete block in our block theme file we'll:
+For all this block fields we need to specify the `form_name` option to bind it to the custom `search_form` form. We can also use only one block type `form` which will create three child blocks: `form_start`, `form_fields`, `form_end`.
+
+Now define the search autocomplete block in the block theme file:
 ```twig
 {% block _search_autocomplete_widget -%}
     <div id="search_autocomplete" class="search-autocomplete"></div>
@@ -1240,7 +1249,7 @@ All that is left is to define the search autocomplete block in our block theme f
 {%- endblock %}
 ```
 
-As the result you'll be getting and HTML like this:
+You should get the result similar to the following code: 
 ```html
 <div id="header-search">
     <form id="search_mini_form" action="/catalogsearch/result/" method="get">
@@ -1261,12 +1270,14 @@ As the result you'll be getting and HTML like this:
 </div>
 ```
 
-### Page specific form ###
+### Page Specific Form ###
 
-For the case when the form is page specific, we need layout data provider that return form and form view.
-In our layout updates and templates we use FormView class and in controller we use the FormInterface from the same form.
-Let's try the second approach and create the form for adding a product to the shopping cart.
-First, we'll create a new form type and register it in the container:
+For the case when the form is page specific, we need a layout data provider that returns form and form view.
+In our layout updates and templates we use FormView class, and in the controller we use the FormInterface from the same form.
+
+Let us try the second approach and create the form for adding a product to the shopping cart.
+
+First, we create a new form type and register it in the container:
 
 ```php
 namespace Acme\Bundle\ProductBundle\Form\Type;
@@ -1314,7 +1325,7 @@ class ProductType extends AbstractType
 }
 ```
 
-Also we will register the form in the container using the newly created form type:
+We register the form in the container using the newly created form type:
 ```yaml
     acme_product.form.type.product:
         class: Acme\Bundle\ProductBundle\Form\Type\ProductType
@@ -1330,7 +1341,7 @@ Also we will register the form in the container using the newly created form typ
             - 'acme_product_product'
 ```
 
-Now we create layout data provider for getting form. Use abstract class [AbstractFormProvider](../../Layout/DataProvider/AbstractFormProvider.php).
+Now we create the layout data provider to get the form. Use the abstract class [AbstractFormProvider](../../Layout/DataProvider/AbstractFormProvider.php).
 ```php
 namespace Acme\Bundle\ProductBundle\Layout\DataProvider;
 
@@ -1366,7 +1377,7 @@ class ProductFormProvider extends AbstractFormProvider
 }
 ```
 
-Registering layout data provider in the DI container:
+Register the layout data provider in the DI container:
 
 ```yaml
     acme_product.layout.data_provider.product_form:
@@ -1378,7 +1389,7 @@ Registering layout data provider in the DI container:
             - { name: layout.data_provider, alias: acme_product_form }
 ```
 
-Now we can render this form by adding it to the layout update file:
+Render this form by adding it to the layout update file:
 ```yaml
 layout:
     actions:
@@ -1431,7 +1442,7 @@ layout:
                             form_end: ~
 ```
 
-This will output the similar HTML:
+This will output a similar HTML:
 ```html
 <div class="product-view">
     <div class="product-essential">
@@ -1457,7 +1468,7 @@ This will output the similar HTML:
 </div>
 ```
 
-In controller you can handle form from layout data provider:
+You can handle the form from the layout data provider in the controller:
 ```
     /**
      * @param Product $product
@@ -1475,14 +1486,13 @@ In controller you can handle form from layout data provider:
     }
 ```
 
-Creating new block types
------------------------------------
+## Creating New Block Types
 
-Since the existing layout block types are covering only basic scenarios, it is often required to create new ones.
+Since the existing layout block types cover only the basic scenarios, it is often required to create new ones.
 
-You can create custom block type by providing DI configuration for it. Configuration provides possibility to set name and name of a parent, and setup options of the block. See below examples.
+You can create a custom block type by providing the DI configuration for it. The configuration provides a possibility to set name and name of a parent, and setup options of the block. The examples are below.
 
-Simple block type:
+A simple block type:
 ```yaml
 services:
     acme_demo.block_type.datetime:
@@ -1494,11 +1504,11 @@ services:
             - { name: layout.block_type, alias: datetime }
 ```
 
-`setOptionsConfig` is associative array where key is the name of option, and value is a array with 'default' and 'require' possible keys. Also you can provide '~' as a value what mean define option.
+The `setOptionsConfig` is an associative array where the key is the name of the option, and the value is the array with the 'default' and 'require' possible keys. You can also provide '~' as a value which means defining the option.
 
-**IMPORTANT!** Note that options that have `null` value will be undefined in template.
+**IMPORTANT!** Note that options that have `null` value will be undefined in the template.
 
-Container block type:
+A container block type:
 ```yaml
 services:
     acme_demo.block_type.sidebar:
@@ -1509,7 +1519,7 @@ services:
             - { name: layout.block_type, alias: sidebar }
 ```
 
-Block type inherited from "text" type:
+The block type inherited from the "text" type:
 ```yaml
 services:
     acme_demo.block_type.title:
@@ -1522,7 +1532,7 @@ services:
             - { name: layout.block_type, alias: title }
 ```
 
-Also you can create block type extension via DI configuration. This configuration allows to setup additional options for block types.
+You can also create a block type extension via DI configuration. This configuration allows to setup additional options for the block types.
 
 ```yaml
 services:
@@ -1535,11 +1545,11 @@ services:
             - { name: layout.block_type_extension, alias: sidebar }
 ```
 
-Usually the definition of layout block types and types extension are located in `Resource\config\block_types.yml`, but you can use any file.
+The definition of the layout block types and type extension are usually located in `Resource\config\block_types.yml`, but you can use any file.
 
-If you want to create block type with custom properties mapping extend your block type class from `Oro\Component\Layout\Block\Type\AbstractType` or implement `Oro\Component\Layout\BlockTypeInterface`.
+If you want to create a block type with custom properties mapping, extend your block type class from `Oro\Component\Layout\Block\Type\AbstractType`, or implement `Oro\Component\Layout\BlockTypeInterface`.
 
-Let's see how this is done on the example of `ImageType` that will be responsible for rendering `<img>` elements.
+Let us see how this is done in the example of the `ImageType` that will be responsible for rendering the `<img>` elements.
 
 First, let's create the block type file itself and place it in the `Acme/Bundle/LayoutBundle/Layout/Block/Type` directory:
 ```php
@@ -1588,7 +1598,7 @@ class ImageType extends AbstractType
 }
 ```
 
-Now we should register it in the DI container using the `layout.block_type` tag:
+Register it in the DI container using the `layout.block_type` tag:
 ```yaml
     acme_layout.block_type.image:
         class: Acme\Bundle\LayoutBundle\Layout\Block\Type\ImageType
@@ -1596,14 +1606,14 @@ Now we should register it in the DI container using the `layout.block_type` tag:
              - { name: layout.block_type, alias: image }
 ```
 
-All that's left is to define the default template for our block type in `Resources/views/layouts/first_theme/default.html.twig`:
+Next, define the default template for the block type in `Resources/views/layouts/first_theme/default.html.twig`:
 ```twig
 {% block image_widget -%}
     <img src={{ path }}{% if alt is defined %} alt="{{ alt }}"{% endif %}{{ block('block_attributes') }} />
 {%- endblock %}
 ```
 
-Now we can add the product image box to our example page:
+We can now add the product image box to our example page:
 ```yaml
 layout:
     actions:
@@ -1687,9 +1697,9 @@ The resulting HTML will look as follows:
 </div>
 ```
 
-Wrapping up
--------------
-So far we've seen how the layout engine can be extended to suit every day needs. Now we can add the rest of the blocks to the layout to finish our sample product view page.
+## Wrapping Up
+
+So far, we have seen how the layout engine can be extended to suit every day needs. Now we can add the rest of the blocks to the layout to finish the sample product view page.
 
 ```yaml
 layout:
@@ -1912,7 +1922,7 @@ layout:
                 text: Facebook
 ```
 
-Our block theme will include the following blocks:
+The block theme will include the following blocks:
 ```twig
 {% block span_container_widget %}
     <span {{ block('block_attributes') }}>
@@ -1983,7 +1993,7 @@ Our block theme will include the following blocks:
 {%- endblock %}
 ```
 
-In the result we'll be getting the following HTML for the main content:
+As the result,  we should get the following HTML for the main content:
 ```html
 <div class="product-view">
     <div class="product-essential">
@@ -2071,7 +2081,7 @@ In the result we'll be getting the following HTML for the main content:
 </div>
 ```
 
-And the footer like this:
+The footer take the following form:
 ```html
 <div class="footer-container">
     <div class="footer">
@@ -2095,9 +2105,9 @@ And the footer like this:
 </div>
 ```
 
-Simplify block attribute configuration
--------------
-For simplify block attribute configuration use twig function `layout_attr_defaults(attr, default_attr)`:
+## Simplifying Block Attribute Configuration
+
+To simplify block attribute configuration, use the `layout_attr_defaults(attr, default_attr)` twig function :
 ```twig
 {% set attr = layout_attr_defaults(attr, {
     required: 'required',
@@ -2105,4 +2115,4 @@ For simplify block attribute configuration use twig function `layout_attr_defaul
     '~class': " input input--full input--size-m {{ class_prefix }}--another-modifier"
 }) %}
 ```
-If you use prefix `~` value `attr` concatenate `default_attr` value with this prefix.
+If you use prefix `~` value `attr`, concatenate `default_attr` value with this prefix.
