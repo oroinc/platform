@@ -1,5 +1,4 @@
-OroImportExportBundle Documentation
-===================================
+# OroImportExportBundle Documentation
 
 - [Overview](./reference/overview.md)
 - [Domain model](./reference/domain-model.md)
