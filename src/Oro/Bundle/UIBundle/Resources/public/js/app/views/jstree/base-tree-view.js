@@ -587,6 +587,7 @@ define(function(require) {
 
             delete this.$tree;
             delete this.$searchField;
+            delete this.$searchContainer;
             delete this.$clearSearchButton;
             delete this.jsTreeInstance;
             delete this.jsTreeConfig;
