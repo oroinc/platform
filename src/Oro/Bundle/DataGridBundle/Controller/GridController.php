@@ -6,6 +6,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -166,6 +168,12 @@ class GridController extends Controller
     public function massActionAction($gridName, $actionName)
     {
         $request = $this->getRequest();
+
+        /* @var $tokenManager CsrfTokenManagerInterface */
+        $tokenManager = $this->get('security.csrf.token_manager');
+        if (!$tokenManager->isTokenValid(new CsrfToken($actionName, $request->get('token')))) {
+            return new JsonResponse('Invalid CSRF Token', JsonResponse::HTTP_FORBIDDEN);
+        }
 
         /** @var MassActionDispatcher $massActionDispatcher */
         $massActionDispatcher = $this->get('oro_datagrid.mass_action.dispatcher');
