@@ -2,12 +2,14 @@
 
 $use-base-style-for-select: true !default;
 
-// Default
-$select-padding: 8px 24px 8px 9px !default;
-$select-moz-padding: 6px 24px 7px 9px !default;
+// Default State
 $select-font-size: $base-ui-element-font-size !default;
 $select-font-family: $base-ui-element-font-family !default;
 $select-line-height: $base-ui-element-line-height !default;
+
+$select-base-height: ($base-ui-element-border-size  * 2) + ($select-font-size * $select-line-height) + $offset-y;
+$select-padding: 8px 24px 8px 9px !default;
+
 $select-border: $base-ui-element-border !default;
 $select-border-radius: $base-ui-element-border-radius !default;
 $select-background-color: $base-ui-element-bg-color !default;
@@ -17,8 +19,8 @@ $select-bg: url('#{$global-url}/oroform/blank/images/icons/arrow-down--gray.png'
 
 $select-border-color-hover-state: get-color('additional', 'dark') !default;
 
-// Focus
+// Focus State
 $select-border-color-focus-state: $select-border-color-hover-state !default;
 
-// Error
+// Error State
 $select-border-color-error-state: get-color('ui', 'error-dark') !default;

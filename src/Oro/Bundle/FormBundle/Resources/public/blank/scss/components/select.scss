@@ -14,7 +14,7 @@
                             );
 
     background: $select-bg;
-    
+
     /* Hide expand button of select in IE11
      * Remove when stop supporting IE11
      */
@@ -37,8 +37,11 @@
     }
 }
 
-@-moz-document url-prefix() { 
+@-moz-document url-prefix() {
     .select {
-        padding: $select-moz-padding;
+    /**
+     * Set fixed height for Firefox
+     */
+        height: $select-base-height;
     }
 }
