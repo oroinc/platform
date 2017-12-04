@@ -5,4 +5,6 @@
     max-width: $page-area-container-max-width;
 
     @include make-container($gutter: $page-area-container-offset-inner);
+
+    @include safe-area-padding(0 ($page-area-container-offset-inner / 2));
 }
