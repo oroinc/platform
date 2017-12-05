@@ -7,7 +7,8 @@ $select-font-size: $base-ui-element-font-size !default;
 $select-font-family: $base-ui-element-font-family !default;
 $select-line-height: $base-ui-element-line-height !default;
 
-$select-base-height: ($base-ui-element-border-size  * 2) + ($select-font-size * $select-line-height) + $offset-y;
+$select-base-height: ($base-ui-element-border-size  * 2) + ($select-font-size * $select-line-height) + $offset-y !default;
+$select-base-line-height: #{$select-base-height} !important !default;
 $select-padding: 8px 24px 8px 9px !default;
 
 $select-border: $base-ui-element-border !default;
