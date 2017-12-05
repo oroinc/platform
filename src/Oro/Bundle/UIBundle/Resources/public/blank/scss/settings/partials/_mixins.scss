@@ -320,65 +320,57 @@
 // Set inner offset from the edges to include the safe-area
 // iPhone X
 // Use like native padding
-// Ex. @include safe-area-padding(10px 15px);
-// Ex. @include safe-area-padding(10px 15px 20px);
+// Ex. @include safe-area-offset(10px 15px);
+// Ex. @include safe-area-offset(10px 15px 20px);
 // Commas do not need!
-@mixin safe-area-padding($values...) {
-    @if (length($values) == 1) {
-        @each $var in $values {
+@mixin safe-area-offset($property, $values) {
+    @if ($property != null and $values != null and length($values) <= 4) {
+        $safe-area-offset-left: 0;
+        $safe-area-offset-right: 0;
 
-            @if (length($var) <= 4 and $var != null) {
-                $safe-area-padding-left: 0;
-                $safe-area-padding-right: 0;
+        #{$property}: #{$values};
 
-                padding: #{$var};
-
-                @if ($enable-safe-area) {
-                    @if (length($var) == 1) {
-                        $safe-area-padding-left: nth($var, 1);
-                        $safe-area-padding-right: nth($var, 1);
-                    } @else if (length($var) == 2 or length($var) == 3) {
-                        $safe-area-padding-left: nth($var, 2);
-                        $safe-area-padding-right: nth($var, 2);
-                    } @else if (length($var) == 4) {
-                        $safe-area-padding-left: nth($var, 4);
-                        $safe-area-padding-right: nth($var, 2);
-                    }
-                    
-                    /* Offset Left */
-                    @if ($safe-area-padding-left == 0) {
-                        /* iOS 11 */
-                        padding-left: constant(safe-area-inset-left);
-
-                        /* iOS 11.2+ */
-                        padding-left: env(safe-area-inset-left);
-                    } @else {
-                        /* iOS 11 */
-                        padding-left: calc(constant(safe-area-inset-left) + #{$safe-area-padding-left});
-
-                        /* iOS 11.2+ */
-                        padding-left: calc(env(safe-area-inset-left) + #{$safe-area-padding-left});
-                    }
-                    
-                    /* Offset Right */
-                    @if ($safe-area-padding-right == 0) {
-                        /* iOS 11 */
-                        padding-right: constant(safe-area-inset-right);
-
-                        /* iOS 11.2+ */
-                        padding-right: env(safe-area-inset-right);
-                    } @else {
-                        /* iOS 11 */
-                        padding-right: calc(constant(safe-area-inset-right) + #{$safe-area-padding-right});
-
-                        /* iOS 11.2+ */
-                        padding-right: calc(env(safe-area-inset-right) + #{$safe-area-padding-right});
-                    }
-                }
-            } @else if (length($var) > 4) {
-                @warn 'Incorrect arguments of mixin';
+        @if ($enable-safe-area) {
+            @if (length($values) == 1) {
+                $safe-area-offset-left: nth($values, 1);
+                $safe-area-offset-right: nth($values, 1);
+            } @else if (length($values) == 2 or length($values) == 3) {
+                $safe-area-offset-left: nth($values, 2);
+                $safe-area-offset-right: nth($values, 2);
+            } @else if (length($values) == 4) {
+                $safe-area-offset-left: nth($values, 4);
+                $safe-area-offset-right: nth($values, 2);
             }
+            
+            /* Offset Left */
+            @if ($safe-area-offset-left == 0) {
+                /* iOS 11 */
+                #{$property}-left: constant(safe-area-inset-left);
 
+                /* iOS 11.2+ */
+                #{$property}-left: env(safe-area-inset-left);
+            } @else {
+                /* iOS 11 */
+                #{$property}-left: calc(constant(safe-area-inset-left) + #{$safe-area-offset-left});
+
+                /* iOS 11.2+ */
+                #{$property}-left: calc(env(safe-area-inset-left) + #{$safe-area-offset-left});
+            }
+            
+            /* Offset Right */
+            @if ($safe-area-offset-right == 0) {
+                /* iOS 11 */
+                #{$property}-right: constant(safe-area-inset-right);
+
+                /* iOS 11.2+ */
+                #{$property}-right: env(safe-area-inset-right);
+            } @else {
+                /* iOS 11 */
+                #{$property}-right: calc(constant(safe-area-inset-right) + #{$safe-area-offset-right});
+
+                /* iOS 11.2+ */
+                #{$property}-right: calc(env(safe-area-inset-right) + #{$safe-area-offset-right});
+            }
         }
     } @else {
         @warn 'Incorrect arguments of mixin';
