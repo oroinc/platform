@@ -1,72 +1,58 @@
-Overview
-========
+## Overview
 
-Table of Contents
------------------
+# Table of Contents
+
  - [Main Components](#main-components)
  - [OroBatchBundle Configuration](#orobatchbundle-configuration)
  - [Supported Formats](#supported-formats)
  - [Dependencies](#dependencies)
 
 
-Main Components
----------------
+## Main Components
 
 ### Job
 
-OroImportExportBundle uses OroBatchBundle to organize execution of import/export operations.
-In the spotlight of OroBatchBundle is a job that can be configured with execution context and executed by client.
-Job is abstract by itself, it doesn't know specific details of what is going on during it's execution.
+OroImportExportBundle uses OroBatchBundle to organize the execution of the import/export operations.
+OroBatchBundle implements a job which is configured with execution context and is run by a client.
+The job is abstract by itself, it doesn't know specific details of what is going on during its execution.
 
 ### Step
 
-But every job consists of steps, and each step
-aggregates three crucial components:
+Every job consists of steps, and each step aggregates three crucial components:
  * **Reader**
  * **Processor**
  * **Writer**
 
-Each of this three component doesn't know of each other and has it's own responsibility. Step uses the reader
-to read data from source, give it to the processor and than take processed result and give it to
-the writer.
+Each component is independent, with its own area of responsibility. First, a step uses the reader
+to read the data from the source and gives it to the processor. Then, it obtains the processed results and give it to the writer.
 
 ### Reader
 
-Reads data from some source. In terms of import it can be a CSV file with imported data. In terms of export the source
-is a Doctrine entity, it's repository or more sophisticated query builder.
+The reader reads the data from a source. In terms of import, it can be a CSV file with imported data. In terms of export, the source is a Doctrine entity, its repository, or another query builder.
 
 ### Processor
 
-Processor is at the forefront of job execution. Main logic of specific job is concentrated here. Import processor
-converts array data to entity object. Export processor does the opposite - converts entity object to array
-representation.
+The processor is at the forefront of the job execution. The main logic of the specific job is concentrated here. The import processor converts array data to the entity object. The export processor does the opposite - converts the entity object to array representation.
 
 ### Writer
 
-Writer as the name implies is responsible for saving result in destination. In terms of import it's a storage,
-encapsulated with Doctrine. In terms of export it's a plain CSV file.
+The writer is responsible for saving the results at a specific destination. In terms of import, it is a storage encapsulated with Doctrine. In terms of export, it is a plain CSV file.
 
 ### Serializer
 
-Serializer namespace contains dummy encoder (encoding/decoding is not needed for csv import), normalizers
-(collection, datetime, entity) and required interfaces. It also contains Serializer class extended from
-`Symfony\Component\Serializer\Serializer` to use extended `supportsDenormalization` and `supportsNormalization` methods.
+The serializer namespace contains a dummy encoder (encoding/decoding is not needed for csv import), normalizers (collection, datetime, and entity), and required interfaces. It also contains the Serializer class extended from `Symfony\Component\Serializer\Serializer` to use both the extended `supportsDenormalization` and `supportsNormalization` methods.
 
 ### Strategy
 
-Strategy namespace contains strategy helper with generic import entities and ConfigurableAddOrReplaceStrategy that
-manages entity import. StrategyInterface defines interface for custom strategies.
+The strategy namespace contains a strategy helper with generic import entities and ConfigurableAddOrReplaceStrategy that manages the entity import. StrategyInterface defines an interface for custom strategies.
 
 ### TemplateFixture
 
-TemplateFixture namespace contains template fixtures functionality, TemplateFixtureInterface - interface used to create
-fixtures. TemplateManager is a storage for import template fixtures.
+The TemplateFixture namespace contains a fixture functionality template. TemplateFixtureInterface is an interface used to create fixtures. TemplateManager is a storage for the template fixtures import.
 
-OroBatchBundle Configuration
-----------------------------
+## OroBatchBundle Configuration
 
-This configuration is used by OroBatchBundle and encapsulates three jobs for importing entity from CSV file,
-validating import data and exporting entity to CSV file.
+This configuration is used by OroBatchBundle and encapsulates three jobs for importing the entity from a CSV file, validating the imported data and exporting the entity to a CSV file.
 
 ```
 connector:
@@ -102,15 +88,10 @@ connector:
                     writer:    oro_importexport.writer.entity
 ```
 
-### Supported Formats
+## Supported Formats
 
-This bundle supports format of CSV file on one side and Doctrine entity on another side.
+This bundle supports a CSV file format on the one hand and the Doctrine entity on the other hand.
 
-Dependencies
-------------
+## Dependencies
 
-As was mentioned previously OroBatchBundle is a major dependency of this bundle. OroBatchBundle is used to organize
-operations of import/export as batch. But when client bundle is using OroImportExportBundle it doesn't depend directly
-from any classes, interfaces or configuration files of OroBatchBundle. OroImportExportBundle provides it's own
-interfaces and domain models that client bundle should interact with and from perspective of client bundle it doesn't
-need to create any jobs configurations to have support of import/export of some entity.
+As was mentioned previously, OroBatchBundle is a major dependency of this bundle. OroBatchBundle is used to execute the import/export batch operations. But when a client bundle is using OroImportExportBundle, it doesn't depend directly on any classes, interfaces, or configuration files of OroBatchBundle. OroImportExportBundle provides its own interfaces and domain models for the client bundle to interact with. From the client bundle's perspective, it is not necessary to create any job configurations to support the import/export of an entity.

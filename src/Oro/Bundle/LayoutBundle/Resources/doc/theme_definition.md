@@ -2,9 +2,10 @@
 
 ## Overview
 
-This doc describes **what a theme is** and how to define and develop layout themes for *Oro Platform*.
+This documentation describes **what a theme is**, and how to define and develop layout themes for *Oro Platform*.
+
 A **theme** is a collection of files that declares the visual presentation for a single page or a group of pages.
-Basically, think of a **theme** as a skin for your application. Files, that the theme consists of, are [layout updates](./layout_update.md), **styles**, **scripts** and anything else related to the look & feel of the page.
+Basically, think of a **theme** as a skin for your application. Files, that the theme consists of, are [layout updates](./layout_update.md), **styles**, **scripts** and anything else related to the look and feel of the page.
 
 ## Configuration
 

@@ -3,6 +3,8 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction;
 
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
@@ -25,6 +27,9 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $authorizationChecker;
 
+    /** @var CsrfTokenManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenManager;
+
     /** @var MassActionExtension */
     protected $extension;
 
@@ -33,11 +38,13 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
         $this->actionFactory = $this->createMock(MassActionFactory::class);
         $this->actionMetadataFactory = $this->createMock(MassActionMetadataFactory::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->tokenManager = $this->createMock(CsrfTokenManagerInterface::class);
 
         $this->extension = new MassActionExtension(
             $this->actionFactory,
             $this->actionMetadataFactory,
-            $this->authorizationChecker
+            $this->authorizationChecker,
+            $this->tokenManager
         );
     }
 
@@ -65,6 +72,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1'];
+        $expectedActionConfig = ['type' => 'type1', 'token' => 'csrf-token'];
         $actionMetadata = ['type' => 'type1', 'label' => 'label1'];
 
         $config = DatagridConfiguration::create(
@@ -86,7 +94,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->actionFactory->expects(self::once())
             ->method('createAction')
-            ->with($actionName, $actionConfig)
+            ->with($actionName, $expectedActionConfig)
             ->willReturn($action);
         $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
@@ -94,6 +102,11 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createActionMetadata')
             ->with(self::identicalTo($action))
             ->willReturn($actionMetadata);
+
+        $this->tokenManager->expects(self::once())
+            ->method('getToken')
+            ->with($actionName)
+            ->willReturn(new CsrfToken($actionName, 'csrf-token'));
 
         $this->extension->visitMetadata($config, $metadata);
 
@@ -111,6 +124,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1'];
+        $expectedActionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1', 'token' => 'csrf-token'];
         $actionMetadata = ['type' => 'type1', 'label' => 'label1'];
 
         $config = DatagridConfiguration::create(
@@ -132,7 +146,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->actionFactory->expects(self::once())
             ->method('createAction')
-            ->with($actionName, $actionConfig)
+            ->with($actionName, $expectedActionConfig)
             ->willReturn($action);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
@@ -142,6 +156,11 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createActionMetadata')
             ->with(self::identicalTo($action))
             ->willReturn($actionMetadata);
+
+        $this->tokenManager->expects(self::once())
+            ->method('getToken')
+            ->with($actionName)
+            ->willReturn(new CsrfToken($actionName, 'csrf-token'));
 
         $this->extension->visitMetadata($config, $metadata);
 
@@ -159,6 +178,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1'];
+        $expectedActionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1', 'token' => 'csrf-token'];
 
         $config = DatagridConfiguration::create(
             [
@@ -176,7 +196,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->actionFactory->expects(self::once())
             ->method('createAction')
-            ->with($actionName, $actionConfig)
+            ->with($actionName, $expectedActionConfig)
             ->willReturn($action);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
@@ -184,6 +204,11 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturn(false);
         $this->actionMetadataFactory->expects(self::never())
             ->method('createActionMetadata');
+
+        $this->tokenManager->expects(self::once())
+            ->method('getToken')
+            ->with($actionName)
+            ->willReturn(new CsrfToken($actionName, 'csrf-token'));
 
         $this->extension->visitMetadata($config, $metadata);
 
@@ -200,6 +225,9 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
         $config = DatagridConfiguration::create([]);
         $result = ResultsObject::create([]);
 
+        $this->tokenManager->expects(self::never())
+            ->method('getToken');
+
         $this->extension->visitResult($config, $result);
 
         self::assertArrayHasKey('metadata', $result);
@@ -215,6 +243,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1'];
+        $expectedActionConfig = ['type' => 'type1', 'token' => 'csrf-token'];
         $actionMetadata = ['type' => 'type1', 'label' => 'label1'];
 
         $config = DatagridConfiguration::create(
@@ -236,7 +265,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->actionFactory->expects(self::once())
             ->method('createAction')
-            ->with($actionName, $actionConfig)
+            ->with($actionName, $expectedActionConfig)
             ->willReturn($action);
         $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
@@ -244,6 +273,11 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createActionMetadata')
             ->with(self::identicalTo($action))
             ->willReturn($actionMetadata);
+
+        $this->tokenManager->expects(self::once())
+            ->method('getToken')
+            ->with($actionName)
+            ->willReturn(new CsrfToken($actionName, 'csrf-token'));
 
         $this->extension->visitResult($config, $result);
 
@@ -262,6 +296,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1'];
+        $expectedActionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1', 'token' => 'csrf-token'];
         $actionMetadata = ['type' => 'type1', 'label' => 'label1'];
 
         $config = DatagridConfiguration::create(
@@ -283,7 +318,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->actionFactory->expects(self::once())
             ->method('createAction')
-            ->with($actionName, $actionConfig)
+            ->with($actionName, $expectedActionConfig)
             ->willReturn($action);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
@@ -293,6 +328,11 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createActionMetadata')
             ->with(self::identicalTo($action))
             ->willReturn($actionMetadata);
+
+        $this->tokenManager->expects(self::once())
+            ->method('getToken')
+            ->with($actionName)
+            ->willReturn(new CsrfToken($actionName, 'csrf-token'));
 
         $this->extension->visitResult($config, $result);
 
@@ -311,6 +351,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1'];
+        $expectedActionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1', 'token' => 'csrf-token'];
 
         $config = DatagridConfiguration::create(
             [
@@ -328,7 +369,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->actionFactory->expects(self::once())
             ->method('createAction')
-            ->with($actionName, $actionConfig)
+            ->with($actionName, $expectedActionConfig)
             ->willReturn($action);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
@@ -336,6 +377,11 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturn(false);
         $this->actionMetadataFactory->expects(self::never())
             ->method('createActionMetadata');
+
+        $this->tokenManager->expects(self::once())
+            ->method('getToken')
+            ->with($actionName)
+            ->willReturn(new CsrfToken($actionName, 'csrf-token'));
 
         $this->extension->visitResult($config, $result);
 
@@ -352,6 +398,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1'];
+        $expectedActionConfig = ['type' => 'type1', 'token' => 'csrf-token'];
         $actionMetadata = ['type' => 'type1', 'label' => 'label1'];
 
         $config = DatagridConfiguration::create(
@@ -374,7 +421,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->actionFactory->expects(self::once())
             ->method('createAction')
-            ->with($actionName, $actionConfig)
+            ->with($actionName, $expectedActionConfig)
             ->willReturn($action);
         $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
@@ -382,6 +429,11 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createActionMetadata')
             ->with(self::identicalTo($action))
             ->willReturn($actionMetadata);
+
+        $this->tokenManager->expects(self::once())
+            ->method('getToken')
+            ->with($actionName)
+            ->willReturn(new CsrfToken($actionName, 'csrf-token'));
 
         $this->extension->visitMetadata($config, $metadata);
         $this->extension->visitResult($config, $result);
@@ -409,6 +461,9 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->willReturn($config);
 
+        $this->tokenManager->expects(self::never())
+            ->method('getToken');
+
         self::assertNull(
             $this->extension->getMassAction('action1', $datagrid)
         );
@@ -418,6 +473,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1'];
+        $expectedActionConfig = ['type' => 'type1', 'token' => 'csrf-token'];
 
         $config = DatagridConfiguration::create(
             [
@@ -442,10 +498,15 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->actionFactory->expects(self::once())
             ->method('createAction')
-            ->with($actionName, $actionConfig)
+            ->with($actionName, $expectedActionConfig)
             ->willReturn($action);
         $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
+
+        $this->tokenManager->expects(self::once())
+            ->method('getToken')
+            ->with($actionName)
+            ->willReturn(new CsrfToken($actionName, 'csrf-token'));
 
         self::assertSame(
             $action,
@@ -457,6 +518,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1'];
+        $expectedActionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1', 'token' => 'csrf-token'];
 
         $config = DatagridConfiguration::create(
             [
@@ -481,12 +543,17 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->actionFactory->expects(self::once())
             ->method('createAction')
-            ->with($actionName, $actionConfig)
+            ->with($actionName, $expectedActionConfig)
             ->willReturn($action);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($actionConfig['acl_resource'])
             ->willReturn(true);
+
+        $this->tokenManager->expects(self::once())
+            ->method('getToken')
+            ->with($actionName)
+            ->willReturn(new CsrfToken($actionName, 'csrf-token'));
 
         self::assertSame(
             $action,
@@ -498,6 +565,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1'];
+        $expectedActionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1', 'token' => 'csrf-token'];
 
         $config = DatagridConfiguration::create(
             [
@@ -522,12 +590,17 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->actionFactory->expects(self::once())
             ->method('createAction')
-            ->with($actionName, $actionConfig)
+            ->with($actionName, $expectedActionConfig)
             ->willReturn($action);
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($actionConfig['acl_resource'])
             ->willReturn(false);
+
+        $this->tokenManager->expects(self::once())
+            ->method('getToken')
+            ->with($actionName)
+            ->willReturn(new CsrfToken($actionName, 'csrf-token'));
 
         self::assertNull(
             $this->extension->getMassAction($actionName, $datagrid)

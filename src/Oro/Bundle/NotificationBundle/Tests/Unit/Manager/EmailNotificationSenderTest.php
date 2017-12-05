@@ -21,7 +21,7 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSendMessageTakeSenderFromConfigManagerIfNotificationImplementsEmailNotificationInterface()
+    public function testSendWithNotNotificationInterface()
     {
         $testSenderEmail = 'test_sender@email.com';
         $testSenderName = 'Test Name';
@@ -67,7 +67,7 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testUseSenderFromCMIfSendingAwareEmailNotificationInterfaceAndNotificationSenderEmailNotNull()
+    public function testSendWithNotificationInterfaceAndSenderEmailNotNull()
     {
         $testSenderEmail = 'test_sender@email.com';
         $testSenderName = 'Test Name';
@@ -119,7 +119,7 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testUseSenderFromCMIfSendingAwareEmailNotificationInterfaceButNotificationSenderEmailIsNull()
+    public function testSendWithNotificationInterfaceAndSenderEmailIsNull()
     {
         $testSenderEmail = 'test_sender@email.com';
         $testSenderName = 'Test Name';
@@ -172,6 +172,51 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
                 'contentType' => 'text/html'
             ]
         );
+    }
+
+    public function testSendWithNotificationInterfaceAndWrongReceiverEmail()
+    {
+        $testSenderEmail = 'test_sender@email.com';
+        $testSenderName = 'Test Name';
+        $testSubject = 'test subject';
+        $testBody = 'test body';
+        $testReceiverEmail = 'test_receiver@email@com';
+        $testContentType = 'text/html';
+
+        $configManager = $this->createConfigManagerMock();
+        $configManager
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap([
+                ['oro_notification.email_notification_sender_email', false, false, null, $testSenderEmail],
+                ['oro_notification.email_notification_sender_name', false, false, null, $testSenderName ]
+            ])
+        ;
+
+        $notification = $this->createSenderAwareEmailNotificationMock();
+
+        $notification->expects($this->once())
+            ->method('getRecipientEmails')
+            ->will($this->returnValue([$testReceiverEmail]))
+        ;
+
+        $notification->expects($this->once())
+            ->method('getSenderEmail')
+            ->willReturn(null)
+        ;
+
+        $notification->expects($this->never())
+            ->method('getSenderName')
+        ;
+
+        $sender = new EmailNotificationSender(
+            $configManager,
+            self::getMessageProducer()
+        );
+
+        $sender->send($notification, $testSubject, $testBody, $testContentType);
+
+        self::assertMessagesCount(EmailNotificationSender::TOPIC, 0);
     }
 
     /**

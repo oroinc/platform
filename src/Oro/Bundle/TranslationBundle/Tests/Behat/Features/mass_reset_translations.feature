@@ -2,6 +2,7 @@
 @ticket-BAP-14097
 @automatically-ticket-tagged
 Feature: Mass reset translations
+  ToDo: BAP-16103 Add missing descriptions to the Behat features
   Scenario: Reset several translations
     Given I login as administrator
     When I go to System/Localization/Translations
