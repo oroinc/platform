@@ -213,6 +213,31 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Assert that provided validation errors for given fields appeared
+     * Example: Then I should not see validation errors:
+     *            | Subject         | This value should not be blank.  |
+     * Example: Then I should not see "Some Form" validation errors:
+     *            | Subject         | This value should not be blank.  |
+     *
+     * @Then /^(?:|I )should not see validation errors:$/
+     * @Then /^(?:|I )should not see "(?P<formName>(?:[^"]|\\")*)" validation errors:$/
+     */
+    public function iShouldNotSeeValidationErrors(TableNode $table, $formName = 'OroForm')
+    {
+        /** @var OroForm $form */
+        $form = $this->createElement($formName);
+
+        foreach ($table->getRows() as $row) {
+            list($label, $value) = $row;
+            $errors = $form->getAllFieldValidationErrors($label);
+            self::assertFalse(
+                in_array($value, $errors),
+                sprintf('Failed asserting that "%s" does not contain following error "%s"', $label, $value)
+            );
+        }
+    }
+
+    /**
      * Fill embed form
      * Example: And I fill in address:
      *            | Primary         | check         |

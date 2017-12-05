@@ -2,19 +2,21 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\OroImportExportExtension;
+use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
 
-class OroImportExportExtensionTest extends \PHPUnit_Framework_TestCase
+class OroImportExportExtensionTest extends ExtensionTestCase
 {
     public function testLoad()
     {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->loadExtension(new OroImportExportExtension());
 
-        $gridExtension = new OroImportExportExtension();
-        $configs = array();
-        $gridExtension->load($configs, $container);
+        $expectedDefinitions = [
+            'oro_importexport.configuration.registry',
+            'oro_importexport.twig_extension.get_import_export_configuration',
+            'oro_importexport.twig_extension.basename',
+        ];
+
+        $this->assertDefinitionsLoaded($expectedDefinitions);
     }
 }

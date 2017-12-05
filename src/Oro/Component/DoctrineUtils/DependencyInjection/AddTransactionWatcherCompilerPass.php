@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Doctrine\DBAL\Connection;
 
 use Oro\Component\DoctrineUtils\DBAL\ChainTransactionWatcher;
+use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherAwareInterface;
 use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherInterface;
 use Oro\Component\Testing\Doctrine\PersistentConnection;
 
@@ -211,6 +212,7 @@ class AddTransactionWatcherCompilerPass implements CompilerPassInterface
         }
 
         $transactionWatcherInterface = '\\' . TransactionWatcherInterface::class;
+        $transactionWatcherAwareInterface = '\\' . TransactionWatcherAwareInterface::class;
         $proxyNamespace = self::CONNECTION_PROXY_NAMESPACE;
         $proxyClass = self::CONNECTION_PROXY_CLASS . '_' . md5($connectionClass);
         $proxyFile = $proxyDir . DIRECTORY_SEPARATOR . $proxyClass . '.php';
@@ -222,11 +224,11 @@ class AddTransactionWatcherCompilerPass implements CompilerPassInterface
 <?php
 namespace $proxyNamespace;
 
-class $proxyClass extends $connectionClass
+class $proxyClass extends $connectionClass implements $transactionWatcherAwareInterface
 {
     private \$transactionWatcher;
 
-    public function setTransactionWatcher($transactionWatcherInterface \$transactionWatcher)
+    public function setTransactionWatcher($transactionWatcherInterface \$transactionWatcher = null)
     {
         \$this->transactionWatcher = \$transactionWatcher;
     }

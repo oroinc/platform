@@ -54,16 +54,16 @@ class RecipientList
     protected $email;
 
     /**
-     * @var boolean
-     * @ORM\Column(name="owner", type="boolean", nullable=true)
-     */
-    protected $owner;
-
-    /**
      * @var array
      * @ORM\Column(name="additional_email_associations", type="simple_array", nullable=true)
      */
     protected $additionalEmailAssociations = [];
+
+    /**
+     * @var array
+     * @ORM\Column(name="entity_emails", type="simple_array", nullable=true)
+     */
+    protected $entityEmails = [];
 
     public function __construct()
     {
@@ -184,30 +184,6 @@ class RecipientList
     }
 
     /**
-     * Setter for owner field
-     *
-     * @param boolean $owner
-     *
-     * @return $this
-     */
-    public function setOwner($owner)
-    {
-        $this->owner = $owner;
-
-        return $this;
-    }
-
-    /**
-     * Getter for owner field
-     *
-     * @return boolean
-     */
-    public function getOwner()
-    {
-        return $this->owner;
-    }
-
-    /**
      * @return array
      */
     public function getAdditionalEmailAssociations()
@@ -258,10 +234,6 @@ class RecipientList
             $results[] = sprintf('Custom email: <%s>', $this->getEmail());
         }
 
-        if ($this->getOwner()) {
-            $results[] = 'Entity owner';
-        }
-
         return implode(', ', $results);
     }
 
@@ -277,7 +249,7 @@ class RecipientList
             $this->getGroups()->isEmpty()
             && $this->getUsers()->isEmpty()
             && $this->getEmail() == null
-            && $this->getOwner() == null;
+            && $this->getEntityEmails() === [];
 
         if ($notValid) {
             $propertyPath = $context->getPropertyPath() . '.recipientList';
@@ -286,5 +258,21 @@ class RecipientList
                 'oro.notification.validators.recipient_list.empty.message'
             );
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getEntityEmails()
+    {
+        return $this->entityEmails;
+    }
+
+    /**
+     * @param array $entityEmails
+     */
+    public function setEntityEmails(array $entityEmails)
+    {
+        $this->entityEmails = $entityEmails;
     }
 }

@@ -95,3 +95,19 @@ services:
             - '@oro_importexport.context_registry'
         tags:
             - { name: 'oro_importexport.job.context.aggregator' }
+
+    oro_importexport.configuration.registry:
+        class: 'Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistry'
+
+    oro_importexport.twig_extension.get_import_export_configuration:
+        class: 'Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension'
+        arguments:
+            - '@oro_importexport.configuration.registry'
+        tags:
+            - { name: 'twig.extension' }
+
+    oro_importexport.twig_extension.basename:
+        class: 'Oro\Bundle\ImportExportBundle\Twig\BasenameTwigExtension'
+        public: false
+        tags:
+            - { name: twig.extension }
