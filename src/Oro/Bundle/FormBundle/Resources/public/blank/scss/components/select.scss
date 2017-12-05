@@ -42,7 +42,9 @@
     /**
      * Set fixed height for Firefox
      */
-        height: $select-base-height;
-        line-height: $select-base-line-height;
+        height: $select-firefox-height;
+        line-height: $select-firefox-line-height;
+        padding-top: $select-firefox-inner-offset-top;
+        padding-bottom: $select-firefox-inner-offset-bottom;
     }
 }
