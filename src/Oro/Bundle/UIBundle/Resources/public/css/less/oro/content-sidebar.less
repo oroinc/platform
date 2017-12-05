@@ -1,5 +1,5 @@
 @sidebarHeaderHeight: 31px;
-@sidebarHorizontalPadding: 10px;
+@sidebarHorizontalPadding: 12px;
 @sidebarWidth: 320px;
 @sidebarMinimizedWidth: 33px;
 @sidebarBorderColor: #f2f2f2;
@@ -82,7 +82,7 @@
             background-color: #f1f1f1;
 
             .content {
-                padding: 15px 15px 0;
+                padding: @contentPadding @contentPadding 0;
             }
         }
 
@@ -95,6 +95,13 @@
             }
         }
     }
+
+    &--sidebar {
+        .sidebar-items {
+            padding: 0 @sidebarHorizontalPadding;
+        }
+    }
+
 }
 
 .mobile-version .content-with-sidebar {
