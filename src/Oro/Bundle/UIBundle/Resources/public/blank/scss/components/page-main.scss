@@ -6,7 +6,7 @@
     &__content {
         display: flex;
 
-        padding: $page-main-inner-offset;
+        @include safe-area-padding($page-main-inner-offset);
 
         flex-wrap: wrap;
     }
