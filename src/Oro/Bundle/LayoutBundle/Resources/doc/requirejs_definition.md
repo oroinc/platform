@@ -1,19 +1,23 @@
-# RequireJS definition
+# RequireJS Definition
 
 ## Overview
-This doc describes how to organize and minimize your JavaScript files **for each theme** you have.
+
+This documentation describes how to organize and minimize your JavaScript files **for each theme** you have.
 
 ## Configuration
-The configuration file should be placed at theme folder and named `requirejs.yml`, for example `DemoBundle/Resources/views/layouts/base/requirejs.yml`
 
-### RequireJS configuration reference
-LayoutBundle is depends on [RequireJSBundle](../../../RequireJSBundle/README.md),
-that's why you can use configuration reference described in [Require.js config generation](../../../RequireJSBundle/README.md#requirejs-config-generation).
+The configuration file should be placed in theme folder and named `requirejs.yml`, for example `DemoBundle/Resources/views/layouts/base/requirejs.yml`
 
-### Additional configuration reference
+### RequireJS Configuration Reference
+
+The LayoutBundle depends on the [RequireJSBundle](../../../RequireJSBundle/README.md),
+that is why you can use configuration reference described in the [Require.js config generation](../../../RequireJSBundle/README.md#requirejs-config-generation).
+
+### Additional Configuration Reference
+
 | Option | Description | Required |
 |------- |-------------|----------|
-| `build_path` | Relative path from theme scripts folder (`web/js/layout/{theme_name}/`) | no |
+| `build_path` | Relative path from the theme scripts folder (`web/js/layout/{theme_name}/`) | no |
 
 **Example:**
 
@@ -36,16 +40,20 @@ config:
         'oroui/js/jquery-extend': 'bundles/oroui/js/jquery-extend.js'
 ```
 
-When you execute a command in console:
+When you execute the following command in the console,
+
 ```
 php app/console oro:requirejs:build
 ```
-Your result is `web/js/layout/base/scripts.min.js`
 
-## RequireJS config provider
-[RequireJSBundle](../../../RequireJSBundle/README.md) has its own config provider `oro_requirejs.provider.requirejs_config`
-and **used in theme by default** (`web/js/oro.min.js` minimized scripts by default).
-If you want use in theme your own minimized scripts you need to define block type `requires` with `provider_alias: 'oro_layout_requirejs_config_provider'`
+it produces `web/js/layout/base/scripts.min.js` as the result.
+
+## RequireJS Config Provider
+
+The [RequireJSBundle](../../../RequireJSBundle/README.md) has its own config provider `oro_requirejs.provider.requirejs_config`
+which is **used in the theme by default** (`web/js/oro.min.js` minimized scripts by default).
+
+If you want use your own minimized scripts in the theme, define the `requires`  block type with the `provider_alias: 'oro_layout_requirejs_config_provider'`.
 
 **Example:**
 
@@ -59,4 +67,4 @@ requirejs_scripts:
 ...
 ```
 
-`oro_layout_requirejs_config_provider` is alias of `oro_layout.provider.requirejs_config`
+The `oro_layout_requirejs_config_provider` is the alias of the `oro_layout.provider.requirejs_config`.

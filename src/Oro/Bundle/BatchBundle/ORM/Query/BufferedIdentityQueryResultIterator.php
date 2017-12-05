@@ -31,7 +31,7 @@ class BufferedIdentityQueryResultIterator extends AbstractBufferedQueryResultIte
     const DEFAULT_BUFFER_SIZE = 200;
 
     /** @var IdentityIterationStrategyInterface */
-    private $iterationStrategy;
+    protected $iterationStrategy;
 
     /** @var array */
     private $identifiers;

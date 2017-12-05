@@ -93,3 +93,13 @@ services:
             - '@oro_importexport.strategy.import.helper'
         tags:
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter }
+
+    oro_entity_config.importexport.configuration_provider.field_config_model:
+        class: 'Oro\Bundle\EntityConfigBundle\ImportExport\Configuration\FieldConfigModelImportExportConfigurationProvider'
+        tags:
+            - { name: oro_importexport.configuration, alias: oro_field_config_model }
+
+    oro_entity_config.importexport.configuration_provider.field_config_model_attribute:
+        class: 'Oro\Bundle\EntityConfigBundle\ImportExport\Configuration\AttributeImportExportConfigurationProvider'
+        tags:
+            - { name: oro_importexport.configuration, alias: oro_field_config_model_attribute }

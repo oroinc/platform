@@ -16,3 +16,7 @@
 .btn-group > .dropdown-menu > li > a:hover > .icon-download-alt {
     background-image: url("../img/glyphicons-halflings.png")!important;
 }
+
+.import-widget-content .tab-pane {
+    margin-top: 10px;
+}

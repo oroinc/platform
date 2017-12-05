@@ -31,19 +31,21 @@ class EntityStructureDataProviderTest extends WebTestCase
         $this->assertEquals('testactivities', $entityData->getPluralAlias());
 
         $fields = $entityData->getFields();
-        $field = $this->getField($fields, 'owner_id');
 
+        $field = $this->getField($fields, 'id');
+        $this->assertNotNull($field);
+        $this->assertTrue($field->getOption('identifier'));
+        $this->assertTrue($field->getOption('configurable'));
+
+        $field = $this->getField($fields, 'owner_id');
         $this->assertNotNull($field);
         $this->assertNull($field->getOption('configurable'));
-
         // check that labels translated
         $this->assertEquals('User', $field->getLabel());
 
         $field = $this->getField($fields, 'owner');
-
         $this->assertNotNull($field);
         $this->assertTrue($field->getOption('configurable'));
-
         // check extend entity
         $this->assertArrayHasKey('Extend\Entity\TestEntity1', $data);
 

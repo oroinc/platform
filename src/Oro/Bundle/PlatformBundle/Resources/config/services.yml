@@ -86,3 +86,9 @@ services:
             - "@oro_platform.optional_listeners.manager"
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
+
+    oro_platform.event_listener.demo_data_fixtures_listener.abstract:
+        class: 'Oro\Bundle\PlatformBundle\EventListener\AbstractDemoDataFixturesListener'
+        abstract: true
+        arguments:
+            - '@oro_platform.optional_listeners.manager'

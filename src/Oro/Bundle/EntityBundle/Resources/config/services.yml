@@ -522,6 +522,13 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_entity.structure.options, method: onOptionsRequest }
 
+    oro_entity.listener.structure_options.identifier:
+        class: 'Oro\Bundle\EntityBundle\EventListener\EntityIdentifierStructureOptionsListener'
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: kernel.event_listener, event: oro_entity.structure.options, method: onOptionsRequest }
+
     oro_entity.listener.structure_options.virtual:
         class: 'Oro\Bundle\EntityBundle\EventListener\EntityVirtualStructureOptionsListener'
         arguments:

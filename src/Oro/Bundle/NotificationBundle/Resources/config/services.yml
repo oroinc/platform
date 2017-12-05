@@ -46,8 +46,8 @@ services:
         arguments:
             - '@oro_email.form.subscriber.emailtemplate'
             - '@oro_notification.form.subscriber.additional_emails'
-            - '@oro_entity_config.provider.ownership'
             - '@router'
+            - '@oro_notification.form.subscriber.contact_information_emails'
         tags:
             - { name: form.type, alias: emailnotification }
 
@@ -120,7 +120,6 @@ services:
         arguments:
             - '@oro_notification.manager.email_notification'
             - '@doctrine.orm.entity_manager'
-            - '@oro_entity_config.provider.ownership'
             - '@property_accessor'
         tags:
             - { name: notification.handler, alias: email_notification_handler }
@@ -203,3 +202,16 @@ services:
         arguments:
             - '@oro_config.user'
             - '@oro_message_queue.client.message_producer'
+
+    oro_notification.provider.contact_information_emails:
+        class: 'Oro\Bundle\NotificationBundle\Provider\ContactInformationEmailsProvider'
+        public: false
+        lazy: true
+        arguments:
+            - '@oro_entity_config.config_manager'
+            - '@translator'
+
+    oro_notification.form.subscriber.contact_information_emails:
+        class: 'Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber'
+        arguments:
+            - '@oro_notification.provider.contact_information_emails'

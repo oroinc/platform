@@ -17,7 +17,7 @@ class OroNotificationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_3';
+        return 'v1_5';
     }
 
     /**
@@ -134,9 +134,16 @@ class OroNotificationBundleInstaller implements Installation
         $table = $schema->createTable('oro_notification_recip_list');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('email', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('owner', 'boolean', ['notnull' => false]);
         $table->addColumn(
             'additional_email_associations',
+            'simple_array',
+            [
+                'comment' => '(DC2Type:simple_array)',
+                'notnull' => false
+            ]
+        );
+        $table->addColumn(
+            'entity_emails',
             'simple_array',
             [
                 'comment' => '(DC2Type:simple_array)',
