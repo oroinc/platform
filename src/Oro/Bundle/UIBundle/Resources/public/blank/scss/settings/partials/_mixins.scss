@@ -320,9 +320,8 @@
 // Set inner offset from the edges to include the safe-area
 // iPhone X
 // Use like native padding
-// Ex. @include safe-area-offset(10px 15px);
-// Ex. @include safe-area-offset(10px 15px 20px);
-// Commas do not need!
+// Ex. @include safe-area-offset(padding, 10px 15px);
+// Ex. @include safe-area-offset(margin, 10px 15px 20px);
 @mixin safe-area-offset($property, $values) {
     @if ($property != null and $values != null and length($values) <= 4) {
         $safe-area-offset-left: 0;
