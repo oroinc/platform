@@ -1,15 +1,15 @@
-Table of Contents
------------------
+## Table of Contents
+
  - [Idea](#idea)
  - [Postponing in Strategy](#postponing-in-strategy)
  - [Postponing in Strategy Event](#postponing-in-strategy-event)
  
-Idea
-----
+## Idea
+
 When the data from one row in the import file depends on the data in another row (for example, a subsidiary Customer that has another headquarters Customer as a parent), it is critical to process the parent row first and proceed with importing the dependent row afterward. You can analyze the import file and track this kind of dependencies. You can postpone processing the row that precedes the data it depends on by adding the following logics in the Strategy or Strategy Event.
 
-Postponing in Strategy
-----------------------
+## Postponing in Strategy
+
 Example of usage
 
 ```php
@@ -38,8 +38,8 @@ class CustomAddOrReplaceStrategy extends ConfigurableAddOrReplaceStrategy
 }
 ```
 
-Postponing in Strategy Event
-----------------------------
+## Postponing in Strategy Event
+
 Example of usage
 
 ```php

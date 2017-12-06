@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Security\Csrf\CsrfToken;
 
 class GridControllerTest extends WebTestCase
 {
@@ -58,5 +59,43 @@ class GridControllerTest extends WebTestCase
                 FormatterProvider::FORMAT_TYPE => 'excel',
             ],
         ]);
+    }
+
+    public function testMassActionActionWithToken()
+    {
+        $this->client->disableReboot();
+
+        /* @var $token CsrfToken */
+        $token = $this->getContainer()->get('security.csrf.token_manager')->getToken('action1');
+
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_datagrid_mass_action',
+                [
+                    'gridName' => 'grid',
+                    'actionName' => 'action1',
+                    'token' => $token->getValue()
+                ]
+            )
+        );
+
+        $result = $this->client->getResponse();
+
+        $this->assertJsonResponseStatusCodeEquals($result, 403);
+        $this->assertEquals('{}', $result->getContent());
+    }
+
+    public function testMassActionActionWithInvalidToken()
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_datagrid_mass_action', ['gridName' => 'grid', 'actionName' => 'action2'])
+        );
+
+        $result = $this->client->getResponse();
+
+        $this->assertJsonResponseStatusCodeEquals($result, 403);
+        $this->assertEquals('Invalid CSRF Token', json_decode($result->getContent()));
     }
 }

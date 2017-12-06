@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
@@ -29,9 +28,6 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
     private $em;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
-    private $configProvider;
-
     /** @var WorkflowNotificationEvent|\PHPUnit_Framework_MockObject_MockObject */
     private $event;
 
@@ -44,7 +40,6 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->em = $this->createMock(EntityManager::class);
-        $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->entity = new \stdClass();
 
         $this->event = $this->createMock(WorkflowNotificationEvent::class);
@@ -55,7 +50,6 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
         $this->handler = new WorkflowNotificationHandler(
             $this->manager,
             $this->em,
-            $this->configProvider,
             new PropertyAccessor()
         );
     }
@@ -74,7 +68,6 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
                     $this->entity,
                     $notification,
                     $this->em,
-                    $this->configProvider,
                     new PropertyAccessor()
                 );
             },

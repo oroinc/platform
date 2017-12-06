@@ -6,7 +6,7 @@
   &__icon {
     position: absolute;
     left: 12px;
-    bottom: 10px;
+    top: 9px;
     z-index: z('base');
 
     font-size: $base-font-size--m;
@@ -21,5 +21,11 @@
     display: block;
     max-width: 130px;
     padding-left: 39px;
+  }
+
+  &--form-mode {
+    .datepicker-box__icon {
+      top: 35px;
+    }
   }
 }

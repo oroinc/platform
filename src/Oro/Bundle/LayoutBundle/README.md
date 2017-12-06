@@ -1,22 +1,20 @@
-OroLayoutBundle
-===============
+# OroLayoutBundle
 
-This bundle integrates **Oro Layout Component** into Oro Platform and brings **themes** functionality.
+This bundle integrates the **Oro Layout Component** into Oro Platform and brings the **themes** functionality.
 
-Table of content
-----------------
+## Table of contents
 
 * [What is layout?](./Resources/doc/what_is_layout.md)
-* [Quick start](./Resources/doc/quick_start.md)
-* [Layout context](./Resources/doc/layout_context.md)
-* [Layout data](./Resources/doc/layout_data.md)
+* [Quick Start](./Resources/doc/quick_start.md)
+* [Layout Context](./Resources/doc/layout_context.md)
+* [Layout Data](./Resources/doc/layout_data.md)
 * [Expressions](./Resources/doc/expressions.md)
-* [Theme definition](./Resources/doc/theme_definition.md)
-* [Config definition](./Resources/doc/config_definition.md)
-* [Layout update file](./Resources/doc/layout_update.md)
-* [Importing layout updates](./Resources/doc/imports.md)
-* [Layout implementation example of a product page](./Resources/doc/example.md)
+* [Theme Definition](./Resources/doc/theme_definition.md)
+* [Config Definition](./Resources/doc/config_definition.md)
+* [Layout Update File](./Resources/doc/layout_update.md)
+* [Importing Layout Updates](./Resources/doc/imports.md)
+* [Layout Implementation Example of a Product Page](./Resources/doc/example.md)
 * [Debug Information](./Resources/doc/debug_information.md)
-* [Using PHP Templating instead of Twig](./Resources/doc/php_templates.md)
-* [Layout cache](./Resources/doc/layout_cache.md)
-* [Returning custom status code](./Resources/doc/custom_status_code.md)
+* [Using PHP Templating Instead of Twig](./Resources/doc/php_templates.md)
+* [Layout Cache](./Resources/doc/layout_cache.md)
+* [Returning Custom Status Code](./Resources/doc/custom_status_code.md)

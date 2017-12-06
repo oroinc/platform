@@ -354,6 +354,39 @@ class Form extends Element
     }
 
     /**
+     * Retrieves validation error message text for provided field name
+     *
+     * @param string $fieldName
+     * @return array
+     */
+    public function getAllFieldValidationErrors($fieldName)
+    {
+        if (isset($this->options['mapping'][$fieldName])) {
+            $field = $this->findField($this->options['mapping'][$fieldName]);
+        } else {
+            $field = $this->findFieldByLabel($fieldName);
+        }
+        $fieldId = $field->getAttribute('id');
+
+        // This element doesn't count server side validation errors without "for" attribute
+        $errorSpans = $this->findAll('css', "span.validation-failed[id='$fieldId-error']");
+        $errorSpans = array_merge($this->findAll(
+            'xpath',
+            sprintf(
+                '%s%s',
+                $field->getXpath(),
+                '/following-sibling::span[@class="validation-failed"]'
+            )
+        ), $errorSpans);
+
+        self::assertNotEmpty($errorSpans, "Field $fieldName has no validation errors");
+
+        return array_map(function (NodeElement $error) {
+            return $error->getText();
+        }, $errorSpans);
+    }
+
+    /**
      * @param $label
      * @param NodeElement $field
      * @return NodeElement

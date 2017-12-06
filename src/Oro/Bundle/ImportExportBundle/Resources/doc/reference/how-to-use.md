@@ -1,8 +1,7 @@
-How To Use
-==========
+# How To Use
 
-Table of Contents
------------------
+## Table of Contents
+
  - [Adding Normalizers](#adding-normalizers)
  - [Adding Data Converter](#adding-data-converter)
  - [Export Processor](#export-processor)
@@ -12,24 +11,19 @@ Table of Contents
  - [Import and export UI setup](#import-and-export-ui-setup)
  - [Storage configuration](#storage-configuration)
 
-Adding Normalizers
-------------------
+## Adding Normalizers
 
-Serializer is involved both in import and export operations. It's extended from standard Symfony's `Serializer` and uses
-extended `DenormalizerInterface` and `NormalizerInterface` interfaces (with context support for `supportsNormalization`
-and `supportsDenormalization`). Responsibility of serializer is converting entities to plain/array representation
-(serialization) and vice versa converting plain/array representation to entity objects (deserialization).
+The serializer is involved both in the import and export operations. It is extended from the standard Symfony's `Serializer` and uses the extended `DenormalizerInterface` and `NormalizerInterface` interfaces (with a context support for `supportsNormalization` and `supportsDenormalization`). The serializer's responsibility is to convert the entities to a plain array representation (serialization) and vice versa converting the plain array representation to entity objects (deserialization).
 
-Serializer uses normalizers to perform converting of objects. So you need to provide normalizers for entities that
-will be imported/exported.
+The serializer uses normalizers for the entities that will be imported/exported to perform converting of objects. 
 
-Requirement to normalizer is to implement interfaces:
-* **Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface** - used in export
-* **Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface** - used in import
+The following requirements should be met for the normalizers to implement interfaces:
+* **Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface** - used in export.
+* **Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface** - used in import.
 
-Generally you should implement both interfaces if you need to add both import and export for entity.
+Generally, you should implement both interfaces if you need to add both import and export for the entity.
 
-**Example of simple normalizer**
+**Example of a Simple Normalizer**
 
 ```php
 <?php
@@ -69,10 +63,9 @@ class GroupNormalizer extends ConfigurableEntityNormalizer
 
 ```
 
-Serializer of OroImportExportBundle should be aware of it's normalizer. To make it possible use appropriate tag in DI
-configuration:
+The serializer of OroImportExportBundle should be aware of its normalizer. To make it possible, use the appropriate tag in the DI configuration:
 
-**Example of normalizer service configuration**
+**Example of Normalizer Service Configuration**
 
 ```yml
 parameters:
@@ -86,15 +79,11 @@ services:
 ```
 
 
-Adding Data Converter
----------------------
+## Adding Data Converter
 
-Data converter is responsible for converting header of import/export file. Assume that your entity has some properties
-that should be exposed in export file. You can use default Data Converter
-`Oro\Bundle\ImportExportBundle\Converter\DefaultDataConverter` but if there is a need to have custom labels instead of
-names of properties in export/import files, you can extend `Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter`
+The data converter is responsible for converting the header of the import/export file. Assuming that an entity has some properties to be exposed in the export file. You can use the default `Oro\Bundle\ImportExportBundle\Converter\DefaultDataConverter` Data Converter  however, if there is a necessity to have custom labels instead of the properties names in the export/import files, you can extend `Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter`.
 
-**Example Of Custom Data Converter**
+**Example Of a Custom Data Converter**
 
 ```php
 <?php
@@ -133,15 +122,12 @@ services:
         parent: oro_importexport.data_converter.configurable
 ```
 
-Look at more complex example of DataConverter in OroContactBundle
+Here, there is a more complex example of DataConverter in OroContactBundle
 `Oro\Bundle\MagentoBundle\ImportExport\Converter\OrderAddressDataConverter`.
 
+## Export Processor
 
-Export Processor
-----------------
-
-At this point after normalizers are registered and data converter is available export can be already configured using
-DI configuration.
+Once the normalizers are registered and the data converter is available, you can configure the export settings using the DI configuration.
 
 ```yml
 services:
@@ -153,11 +139,9 @@ services:
             - { name: oro_importexport.processor, type: export, entity: %orocrm_contact.group.entity.class%, alias: orocrm_contact_group }
 ```
 
-There is a controller in OroImportExportBundle that can be utilized to request export CSV file. See controller action
-OroImportExportBundle:ImportExport:instantExport (route **oro_importexport_export_instant**).
+There is a controller in OroImportExportBundle that is used to request a CSV file export. See the controller action, defined in the OroImportExportBundle:ImportExport:instantExport method, route **oro_importexport_export_instant**.
 
-Now if you'll send a request to URL **/export/instant/orocrm_contact_group** you will receive a response with URL
-of result exported file and some additional information:
+Now, if you send a request to the **/export/instant/orocrm_contact_group** URL  you will receive a response with the URL of the exported file results and some additional information:
 
 ```json
 {
@@ -168,14 +152,11 @@ of result exported file and some additional information:
 }
 ```
 
-Import Strategy
----------------
+## Import Strategy
 
-Strategy is a class that responsible for processing import logic. For example import could add new records or
-it can update only existed ones.
+The strategy is a class that is responsible for the import logic processing, such as adding new records or updating the existing ones.
 
-
-**Example of Import Strategy**
+**Example of the Import Strategy**
 
 ```php
 <?php
@@ -204,7 +185,7 @@ class ContactAddOrReplaceStrategy extends ConfigurableAddOrReplaceStrategy
     // other methods
 ```
 
-Also in strategy you may use [rows postponing](rows-postponing.md).
+Also, you can use [rows postponing](rows-postponing.md) in the strategy .
 
 **Service**
 
@@ -215,11 +196,9 @@ services:
         parent: oro_importexport.strategy.configurable_add_or_replace
 ```
 
-Import Processor
-----------------
+## Import Processor
 
-At this point after normalizers are registered, data converter is available and strategy is implemented import can be
-already configured using DI configuration.
+Once the normalizers are registered, the data converter is available, and the strategy is implemented, you can configure the import using the following DI configuration.
 
 ```yml
 services:
@@ -234,25 +213,19 @@ services:
             - { name: oro_importexport.processor, type: import_validation, entity: %orocrm_contact.entity.class%, alias: orocrm_contact.add_or_replace_group }
 ```
 
-Note that for import should be a processor for import validation as in example above.
+Note, that the import requires a processor for import validation as in the example above.
 
-Import can be done in three steps.
+The import can be done in three steps.
 
-At the first step user fill out the form with source file that he want to import and submit it. See controller action
-OroImportExportBundle:ImportExport:importForm (route "oro_importexport_import_form"), this action require parameter
-"entity" which is a class name of entity that will be imported.
+At the first step, a user fills out the form (defined in the OroImportExportBundle:ImportExport:importForm, route "oro_importexport_import_form") in a source file that they want to import and submits it. This action requires the "entity" parameter which is a class name of the imported entity.
 
-At the second step import validation is triggered. See controller action OroImportExportBundle:ImportExport:importValidate
-(route "oro_importexport_import_validate"). As a result a user will see all actions that will be performed by import and
-errors that were occurred. Records with errors can't be imported but errors not blocks valid records.
+At the second step, the import validation action (defined in the OroImportExportBundle:ImportExport:importValidate method, route "oro_importexport_import_validate") is triggered. As a result, all the actions performed by import and all the errors occurred are visible to the user. The records with errors cannot be imported, though the errors do not block further processing of the valid records.
 
-At the last step import is processed. See controller action OroImportExportBundle:ImportExport:importProcess
-(route "oro_importexport_import_process").
+At the last step, the import action (defined in the OroImportExportBundle:ImportExport:importProcess method, route "oro_importexport_import_process") is processed. 
 
-Fixture Services
-----------------
+## Fixture Services
 
-Fixtures implementation based on default import/export process.
+The fixture implementation is based on the default import/export process.
 
 **Create class:**
 
@@ -340,44 +313,37 @@ services:
 
 ```
 
-Import and export UI setup
-----------------
+## Import and export UI setup
 
-In order to have the import (and download template) and export buttons displayed on your page, you have to include the
-buttons generation template from the OroImportExportBundle. There are multiple options that can be used to configure the
-display of these buttons and the pup-ups that can be set to appear in certain cases (export and download template).
+In order to have the import (and download template) and export buttons displayed on your page, you have to include the buttons generation template from OroImportExportBundle. There are multiple options that can be used to configure the display of these buttons and the pop-ups that can be set to appear in certain cases (export and download template).
 
-
-**Options for import/export buttons configuration:**
+**Options for the import/export buttons configuration:**
 
 General:
-- refreshPageOnSuccess: set to true in order to refresh the page after successful import
-- afterRefreshPageMessage: the message that will be displayed if previous option is set
-- datagridName: the id of the grid that will be used to refresh the data after an import operation (alternative to previous refresh options)
-- options: options to pass to the import/export route
-- entity_class: the full class name of the entity
+- refreshPageOnSuccess: set to true in order to refresh the page after the successful import.
+- afterRefreshPageMessage: the message that is displayed if the previous option is set.
+- datagridName: the ID of the grid that is used to refresh the data after the import operation is completed (alternative to the previous refresh option).
+- options: options to pass to the import/export route.
+- entity_class: a full class name of the entity.
 
 Export:
-- exportJob: the id of the export job you have defined
-- exportProcessor: the alias id of the export processor or an array with the alias ids of the processors if they are more
-than one
-- exportLabel: the label that should be used for the export options pop-up (in case of multiple export processors)
+- exportJob: the ID of the export job you have defined.
+- exportProcessor: the alias ID of the export processor or an array with the alias IDs of the processors if they are more than one.
+- exportLabel: the label that should be used for the export options pop-up (in case of multiple export processors).
 
 Export template:
-- exportTemplateJob: the id of the export template job you have defined
-- exportTemplateProcessor: the alias id of the export template processor or an array with the alias ids of the processors
-if they are more than one
-- exportTemplateLabel: the label that should be used for the export template options pop-up (in case of multiple export
-processors)
+- exportTemplateJob: the ID of the export template job you have defined.
+- exportTemplateProcessor: the alias ID of the export template processor or an array with the alias IDs of the processors if they are more than one.
+- exportTemplateLabel: the label that should be used for the export template options pop-up (in case of multiple export processors).
 
 Import:
-- importProcessor: the alias id of the import processor
-- importLabel: the label used for import pop-up
-- importJob: the id of the import job you have defined
-- importValidateJob: the id of the import validation job you have defined
+- importProcessor: the alias ID of the import processor.
+- importLabel: the label used for the import pop-up.
+- importJob: the ID of the import job you have defined.
+- importValidateJob: the ID of the import validation job you have defined.
 
 
-**Displaying import/export buttons:**
+**Display import/export buttons:**
 
 ```twig
     {% include 'OroImportExportBundle:ImportExport:buttons.html.twig' with {
@@ -476,31 +442,22 @@ include following template:
 
 **Import pop-up:**
 
-By using the default import configuration (like in the examples above) the user will have an import button displayed
-on the configured page. By using this button, the user will see a pop-up where he must input a file for upload (and
-validation) as well as selecting the import strategy. As seen in the import strategy section, the import process needs
+By using the default import configuration (like in the examples above), a user has an import button displayed on the configured page. By clicking this button, a pop-up is displayed and the user needs to input a file for uploading (and validation) as well as selecting the import strategy. As described in the import strategy section, the import process requires
 a strategy, but it can also have multiple strategies defined.
 
-Each strategy is used by an import processor, so the strategy will have to be passed to the import processor defined
-for the current entity class. At the moment of generation the import pop-up, the framework will search for the defined
-import processors for the given entity class and will display them in the selection for strategies.
+Each strategy is used by an import processor, so the strategy has to be passed to the import processor defined for the current entity class. While generating the import pop-up, the framework is searching for the defined import processors for the given entity class and displays them in the selection of strategies.
 
 **Exceptional use cases:**
 
-The basic use case of import/export implies defining an import/export processor for an entity, which will be used when the user
-selects the import/export operation from the application.
+The basic use case of import/export implies defining an import/export processor for an entity which is used when the user selects the import/export operation from the application.
 
-The are also cases when the export operations needs to extract data in multiple ways or from multiple entities and you
-want to provide different export options to the user. In this situation you must define multiple export processors which
-will handle the types of exports that you want to offer to the user.
+There are also cases when the export operation needs to extract the data in multiple ways or from multiple entities and you
+want to provide different export options to the user. In this situation, you must define multiple export processors which can handle the types of exports that you want to offer to the user.
 
-If multiple export processors are defined for an entity, when the user wants to perform an export, the platform will
-display a pop-up which will have a select with options corresponding to the export processors defined. Depending on what
-option the user selects, the corresponding export processor will be used . You also have to define translation keys for
-the ids of the processors. These translation keys will be used in the select options in the pop-up.
+If multiple export processors are defined for an entity and the user wants to perform an export, the platform displays a pop-up with a possibility to select a required option corresponding to the defined export processors. Depending on the option selected, the corresponding export processor is used. You also have to define translation keys for
+the IDs of the processors. These translation keys are used in the selected option in the pop-up.
 
-The same thing is applicable for the export of the templates used for import. You can have multiple export template
-processors which will be displayed as options in a pop-up when user wants to download data template.
+The same thing is applicable for the export of the templates used for the import. You can have multiple export template processors which are displayed as options in a pop-up when the user wants to download a data template.
 
 *Export processors definition:*
 ```yml
@@ -519,15 +476,13 @@ processors which will be displayed as options in a pop-up when user wants to dow
             - { name: oro_importexport.processor, type: export, entity: %oro.some_entity.class%, alias: oro_another_type }
 ```
 
-*Translation keys for selections in export pop-up:*
+*Translation keys for selections in an export pop-up:*
 ```yml
    #messages.en.yml
    oro.importexport.export.oro_some_type: Some export type
    oro.importexport.export.oro_another_type: Some other export type
 ```
-In this case, you have to specify the processors that can be used as select options in the pop-up. On the configuration
-of the import/export buttons you have to specify the processors as array, like in the example bellow (**exportProcessors**
-and/or **exportTemplateProcessors**):
+In this case, you have to specify the processors that can be used as selected options in the pop-up. On the import/export buttons configuration, specify the processors as array, like in the example bellow (**exportProcessors** and/or **exportTemplateProcessors**):
 
 ```twig
     {% include 'OroImportExportBundle:ImportExport:buttons.html.twig' with {
@@ -538,13 +493,12 @@ and/or **exportTemplateProcessors**):
     } %}
 ```
 
-**Change import/export pop-up dialog:**
+**Change an import/export pop-up dialog:**
 
 
-*Import pop-up customization:*
+*Import a pop-up customization:*
 
-To implement custom behaviour of the import pop-up you can extend the default **ImportType** from the
-OroImportExportBundle and implement custom form appearence.
+To implement custom behaviour of the import pop-up, you can extend the default **ImportType** from OroImportExportBundle and implement a custom form appearance.
 
 ```php
 <?php
@@ -574,13 +528,12 @@ class CustomImportTypeExtension extends AbstractTypeExtension
 }
 ```
 
-*Export pop-up customization:*
+*Export a pop-up customization:*
 
-To display the export/export template options in a different way (other than the default select with
-options) you can extend the base types (**ExportType** and **ExportTemplateType**) from the ImportExport
-bundle. These types are used when displaying the form with options in the pop-up.
+To display the export/export template options in a different way (other than the default
+options selection), you can extend the base types (**ExportType** and **ExportTemplateType**) from the ImportExport bundle. These types are used when displaying the form with options in the pop-up.
 
-Example of displaying with choice(radio buttons):
+Example of displaying the form with choice (radio buttons):
 ```php
 <?php
 
@@ -609,9 +562,8 @@ class CustomExportTypeExtension extends AbstractTypeExtension
 }
 ```
 
-Storage configuration
----------------------
+## Storage configuration
 
 OroImportExportBundle uses [KnpGaufretteBundle](https://github.com/KnpLabs/KnpGaufretteBundle) to provide a filesystem abstraction layer.
 
-By default, it is configured to store files in the `app/import_export` directory of your project. You can change this in the `Resources/config/oro/app.yml` file. User can reconfigure these settings. More info about KnpGaufretteBundle configuration can be found in [documentation](https://github.com/KnpLabs/KnpGaufretteBundle/blob/master/README.markdown).
+By default, it is configured to store files in the `app/import_export` directory of your project. You can change it in the `Resources/config/oro/app.yml` file. A user can reconfigure these settings. More information about the KnpGaufretteBundle configuration can be found in [documentation](https://github.com/KnpLabs/KnpGaufretteBundle/blob/master/README.markdown).

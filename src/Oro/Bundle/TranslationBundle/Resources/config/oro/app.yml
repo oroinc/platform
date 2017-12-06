@@ -1,0 +1,6 @@
+framework:
+    templating:
+        packages:
+            translations:
+                version: %assets_version%
+                version_format: %%s?translations_version=%%s

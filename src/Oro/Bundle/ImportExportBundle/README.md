@@ -1,9 +1,5 @@
-OroImportExportBundle
-=====================
+# OroImportExportBundle
 
-Provides components for importing and exporting data. Uses OroBatchBundle and provides jobs for import, import
-validation and export. Has components for importing Doctrine entities from csv file and exporting Doctrine entities
-to csv file.
-
+ImportExportBundle uses OroBatchBundle to provide the components both for importing Doctrine entities from csv file and exporting the data to it. Also, the bundle provides jobs for import, import validation, and export.
 
 Please see [documentation](./Resources/doc/index.md) for more details.

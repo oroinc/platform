@@ -3,6 +3,7 @@
 @fixture-OroUserBundle:user.yml
 @fixture-OroTranslationBundle:LanguageFixture.yml
 Feature: Applying language settings in system configuration
+  ToDo: BAP-16103 Add missing descriptions to the Behat features
   Scenario: Reset user language settings when language no more allowed
     Given I login as "admin" user
     When I go to System/Configuration

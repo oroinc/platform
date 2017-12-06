@@ -12,13 +12,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
 
+use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherAwareInterface;
 use Oro\Component\PhpUtils\ReflectionUtil;
 use Oro\Bundle\EntityBundle\ORM\OroClassMetadataFactory;
 use Oro\Bundle\EntityBundle\ORM\Repository\EntityRepositoryFactory;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearerInterface;
 
 /**
- * Removes unnecessary ORM metadata factory to avoid keeping unnecesarry objects in the memory.
+ * Removes unnecessary ORM metadata factory to avoid keeping unnecessary objects in the memory.
  */
 class OrmMetadataFactoryClearer implements ClearerInterface
 {
@@ -45,17 +46,17 @@ class OrmMetadataFactoryClearer implements ClearerInterface
     {
         if ($this->container->initialized($this->metadataFactoryServiceId)) {
             $metadataFactory = $this->container->get($this->metadataFactoryServiceId);
-            if ($metadataFactory instanceof OroClassMetadataFactory && !$metadataFactory->isDisconected()) {
+            if ($metadataFactory instanceof OroClassMetadataFactory && !$metadataFactory->isDisconnected()) {
                 $em = $metadataFactory->getEntityManager();
                 if ($em instanceof EntityManager) {
                     if ($em->isOpen()) {
-                        $logger->info('Disconect ORM metadata factory');
+                        $logger->info('Disconnect ORM metadata factory');
                         $this->disconnectEntityManager($em, $logger);
-                        $metadataFactory->setDisconected(true);
+                        $metadataFactory->setDisconnected(true);
                     }
                 } else {
                     $logger->warning(sprintf(
-                        'Cannot disconect ORM metadata factory due to unexpected type of the EntityManager (%s)',
+                        'Cannot disconnect ORM metadata factory due to unexpected type of the EntityManager (%s)',
                         is_object($em) ? get_class($em) : gettype($em)
                     ));
                 }
@@ -72,7 +73,7 @@ class OrmMetadataFactoryClearer implements ClearerInterface
         $em->close();
         $this->clearRepositoryFactory($em);
         $this->clearEventManager($em, $logger);
-        $this->clearConnection($em, $logger);
+        $this->clearConnection($em->getConnection());
     }
 
     /**
@@ -92,7 +93,6 @@ class OrmMetadataFactoryClearer implements ClearerInterface
      */
     private function clearEventManager(EntityManager $em, LoggerInterface $logger)
     {
-        // all events except "loadClassMetadata" and "onClassMetadataNotFound"
         $eventsToKeep = [
             OrmEvents::loadClassMetadata,
             OrmEvents::onClassMetadataNotFound
@@ -100,23 +100,27 @@ class OrmMetadataFactoryClearer implements ClearerInterface
 
         $eventManager = $em->getEventManager();
         if ($eventManager instanceof ContainerAwareEventManager) {
-            $property = ReflectionUtil::getProperty(new \ReflectionClass($eventManager), 'listeners');
-            if (null !== $property) {
-                $property->setAccessible(true);
-                $listeners = $property->getValue($eventManager);
-                if (is_array($listeners)) {
+            $listenersProperty = ReflectionUtil::getProperty(new \ReflectionClass($eventManager), 'listeners');
+            $initializedProperty = ReflectionUtil::getProperty(new \ReflectionClass($eventManager), 'initialized');
+            if (null !== $listenersProperty && null !== $initializedProperty) {
+                $listenersProperty->setAccessible(true);
+                $listeners = $listenersProperty->getValue($eventManager);
+                $initializedProperty->setAccessible(true);
+                $initialized = $initializedProperty->getValue($eventManager);
+                if (is_array($listeners) && is_array($initialized)) {
                     $eventNames = array_keys($listeners);
                     foreach ($eventNames as $eventName) {
                         if (!in_array($eventName, $eventsToKeep, true)) {
-                            unset($listeners[$eventName]);
+                            unset($listeners[$eventName], $initialized[$eventName]);
                         }
                     }
-                    $property->setValue($eventManager, $listeners);
+                    $listenersProperty->setValue($eventManager, $listeners);
+                    $initializedProperty->setValue($eventManager, $initialized);
                 } else {
-                    $logger->warning('The EventManager "listeners" property should be an array');
+                    $logger->warning('The EventManager "listeners" and "initialized" properties should be an array');
                 }
             } else {
-                $logger->warning('The EventManager does not have "listeners" property');
+                $logger->warning('The EventManager does not have "listeners" and "initialized" properties');
             }
         }
 
@@ -124,25 +128,19 @@ class OrmMetadataFactoryClearer implements ClearerInterface
     }
 
     /**
-     * @param EntityManager   $em
-     * @param LoggerInterface $logger
+     * @param Connection $connection
      */
-    private function clearConnection(EntityManager $em, LoggerInterface $logger)
+    private function clearConnection(Connection $connection)
     {
-        $connectionProperty = ReflectionUtil::getProperty(new \ReflectionClass($em), 'conn');
-        if (null !== $connectionProperty) {
-            $connectionProperty->setAccessible(true);
-            $connection = $connectionProperty->getValue($em);
-            if (null !== $connection) {
-                // make sure that the connection is closed
-                if ($connection instanceof Connection && $connection->isConnected()) {
-                    $connection->close();
-                }
-                // remove a reference to the connection from the entoty manager
-                $connectionProperty->setValue($em, null);
-            }
-        } else {
-            $logger->warning('The EntityManager does not have "conn" property');
+        // make sure that the connection is closed
+        if ($connection->isConnected()) {
+            $connection->close();
+        }
+        // remove the SQL logger
+        $connection->getConfiguration()->setSQLLogger(null);
+        // remove the transaction watcher
+        if ($connection instanceof TransactionWatcherAwareInterface) {
+            $connection->setTransactionWatcher(null);
         }
     }
 }
