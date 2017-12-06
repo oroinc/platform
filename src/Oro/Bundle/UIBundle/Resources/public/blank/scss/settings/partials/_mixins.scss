@@ -340,46 +340,21 @@
                 $safe-area-offset-left: nth($values, 4);
                 $safe-area-offset-right: nth($values, 2);
             }
-            
-            /* Offset Left */
-            @if ($safe-area-offset-left == 0) {
-                /* iOS 11 */
-                #{$property}-left: constant(safe-area-inset-left);
 
-                /* iOS 11.2+ */
-                #{$property}-left: env(safe-area-inset-left);
-            } @else {
-                /* iOS 11 */
-                #{$property}-left: calc(constant(safe-area-inset-left) + #{$safe-area-offset-left});
-
-                /* iOS 11.2+ */
-                #{$property}-left: calc(env(safe-area-inset-left) + #{$safe-area-offset-left});
-            }
-            
-            /* Offset Right */
-            @if ($safe-area-offset-right == 0) {
-                /* iOS 11 */
-                #{$property}-right: constant(safe-area-inset-right);
-
-                /* iOS 11.2+ */
-                #{$property}-right: env(safe-area-inset-right);
-            } @else {
-                /* iOS 11 */
-                #{$property}-right: calc(constant(safe-area-inset-right) + #{$safe-area-offset-right});
-
-                /* iOS 11.2+ */
-                #{$property}-right: calc(env(safe-area-inset-right) + #{$safe-area-offset-right});
-            }
+            @include safe-area-property-left(#{$property}-left, $safe-area-offset-left, false);
+            @include safe-area-property-right(#{$property}-right, $safe-area-offset-right, false);
         }
     } @else if (length($values) > 4) {
         @warn 'Incorrect arguments of mixin';
     }
 }
 
-// Set any property with safe-area zone
-@mixin safe-area-property($property, $value: 0px) {
+// Set any property with left safe-area zone
+@mixin safe-area-property-left($property, $value: 0px, $default: true) {
     @if ($property != null or $value != null) {
-        #{$property}: #{$value};
+        @if ($default) {
+            #{$property}: #{$value};
+        }
 
         @if ($enable-safe-area) {
             @if ($value == 0) {
@@ -394,6 +369,31 @@
 
                 /* iOS 11.2+ */
                 #{$property}: calc(env(safe-area-inset-left) + #{$value});
+            }
+        }
+    }
+}
+
+// Set any property with right safe-area zone
+@mixin safe-area-property-right($property, $value: 0px, $default: true) {
+    @if ($property != null or $value != null) {
+        @if ($default) {
+            #{$property}: #{$value};
+        }
+
+        @if ($enable-safe-area) {
+            @if ($value == 0) {
+                /* iOS 11 */
+                #{$property}: constant(safe-area-inset-right);
+
+                /* iOS 11.2+ */
+                #{$property}: env(safe-area-inset-right);
+            } @else {
+                /* iOS 11 */
+                #{$property}: calc(constant(safe-area-inset-right) + #{$value});
+
+                /* iOS 11.2+ */
+                #{$property}: calc(env(safe-area-inset-right) + #{$value});
             }
         }
     }
