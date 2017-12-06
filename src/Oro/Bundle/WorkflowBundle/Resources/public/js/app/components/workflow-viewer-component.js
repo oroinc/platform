@@ -21,11 +21,9 @@ define(function(require) {
 
         options: {
             entity: {},
-            system_entities: {},
             chartOptions: {},
             connectionOptions: {},
-            entityFields: {},
-            availableDestinations: {},
+            availableDestinations: {}
         },
 
         /**

@@ -20,16 +20,9 @@ define(function(require) {
                 allowClear: false
             },
             /*
-             * Array of rule objects or strings that will be used for entries filtering
-             * examples:
-             *      ['relation_type'] - will exclude all entries that has 'relation_type' key (means relational fields)
-             *      [{name: 'id'}]    - will exclude all entries that has property "name" equals to "id"
+             * When is TRUE, user can see relation in fields section and select it as value
              */
-            exclude: [],
-            /*
-             * Format same as exclude option
-             */
-            include: []
+            allowSelectRelation: false
         },
 
         callbacks: {
@@ -38,9 +31,26 @@ define(function(require) {
             dataFilter: null
         },
 
+        /** @property {string} */
+        filterPreset: void 0,
+
+        /*
+         * Array of rule objects or strings that will be used for entries filtering
+         * examples:
+         *      ['relation_type'] - will exclude all entries that has 'relation_type' key (means relational fields)
+         *      [{name: 'id'}]    - will exclude all entries that has property "name" equals to "id"
+         */
+        exclude: null,
+        /*
+         * Format same as exclude option
+         */
+        include: null,
+
         initialize: function(options) {
             options = $.extend(true, {}, this.defaultOptions, options);
-            _.extend(this, _.pick(options, _.without(_.keys(this.defaultOptions), 'select2')));
+            var optionNames = _.without(_.keys(this.defaultOptions), 'select2');
+            optionNames.push('filterPreset', 'exclude', 'include');
+            _.extend(this, _.pick(options, optionNames));
             this.callbacks = _.pick(options, _.keys(this.callbacks));
             this.select2Config = this._prepareSelect2Options(options);
             FieldChoiceView.__super__.initialize.call(this, options);
@@ -53,9 +63,14 @@ define(function(require) {
 
         render: function() {
             this._deferredRender();
-            var providerOptions = _.extend({
+            var providerOptions = {
                 rootEntity: this.entity
-            }, _.pick(this, 'exclude', 'include'));
+            };
+            _.each(['filterPreset', 'exclude', 'include'], function(key) {
+                if (this[key]) {
+                    providerOptions[key] = this[key];
+                }
+            }, this);
             if (this.callbacks.dataFilter) {
                 providerOptions.fieldsFilterer = this.callbacks.dataFilter;
             }
@@ -195,7 +210,7 @@ define(function(require) {
             var entityFields;
 
             try {
-                chain = this.dataProvider.pathToEntityChain(path);
+                chain = this.dataProvider.pathToEntityChainExcludeTrailingField(path);
                 entityFields = _.result(_.last(chain).entity, 'fields');
             } catch (e) {
                 return results;
@@ -208,6 +223,9 @@ define(function(require) {
                     text: field.label
                 };
                 if (field.relatedEntityName) {
+                    if (this.allowSelectRelation) {
+                        fields.push(_.clone(item));
+                    }
                     chainItem.entity = {className: field.relatedEntityName};
                     item.pagePath = this.dataProvider.entityChainToPath(chain.concat(chainItem));
                     delete item.id;
@@ -220,7 +238,7 @@ define(function(require) {
             if (!_.isEmpty(fields)) {
                 results.push({
                     text: __('oro.entity.field_choice.fields'),
-                    children: fields
+                    children: _.sortBy(fields, 'text')
                 });
             }
 

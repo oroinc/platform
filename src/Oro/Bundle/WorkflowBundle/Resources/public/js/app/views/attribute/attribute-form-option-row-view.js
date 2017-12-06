@@ -17,7 +17,6 @@ define(function(require) {
         },
 
         options: {
-            workflow: null,
             template: null,
             data: {
                 'label': null,
@@ -30,7 +29,11 @@ define(function(require) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#attribute-form-option-row-template').html();
             this.template = _.template(template);
-            this.options.data.view_id = this.cid;
+        },
+
+        update: function(data) {
+            this.options.data = data;
+            this.render();
         },
 
         triggerEdit: function(e) {
@@ -51,11 +54,8 @@ define(function(require) {
             confirm.open();
         },
 
-        render: function() {
-            var rowHtml = $(this.template(this.options.data));
-            this.$el.html(rowHtml);
-
-            return this;
+        getTemplateData: function() {
+            return this.options.data;
         }
     });
 

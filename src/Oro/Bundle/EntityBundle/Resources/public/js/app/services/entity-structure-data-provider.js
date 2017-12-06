@@ -344,8 +344,9 @@ define(function(require) {
          *
          * @param {string} fieldId
          * @return {Array.<Object>}
+         * @protected
          */
-        pathToEntityChain: function(fieldId) {
+        _pathToEntityChain: function(fieldId) {
             var entityModel;
             if (!this.rootEntity) {
                 return [];
@@ -361,49 +362,125 @@ define(function(require) {
                 return this.rootEntity ? chain : [];
             }
 
-            try {
-                _.each(fieldId.split('+'), function(part, i) {
-                    var fieldName;
-                    var entityClassName;
-                    var pos;
+            _.each(fieldId.split('+'), function(part, i) {
+                var fieldName;
+                var entityClassName;
+                var pos;
 
-                    if (i === 0) {
-                        // first item is always just a field name
-                        fieldName = part;
+                if (i === 0) {
+                    // first item is always just a field name
+                    fieldName = part;
+                } else {
+                    pos = part.indexOf('::');
+                    if (pos !== -1) {
+                        entityClassName = part.slice(0, pos);
+                        fieldName = part.slice(pos + 2);
                     } else {
-                        pos = part.indexOf('::');
-                        if (pos !== -1) {
-                            entityClassName = part.slice(0, pos);
-                            fieldName = part.slice(pos + 2);
-                        } else {
-                            entityClassName = part;
-                        }
+                        entityClassName = part;
                     }
+                }
 
-                    if (entityClassName) {
-                        // set entity for previous chain part
-                        entityModel = this.collection.getEntityModelByClassName(entityClassName);
-                        chain[i].entity = this._extractEntityData(entityModel);
-                    }
+                if (entityClassName) {
+                    // set entity for previous chain part
+                    entityModel = this.collection.getEntityModelByClassName(entityClassName);
+                    chain[i].entity = this._extractEntityData(entityModel);
+                }
 
-                    if (fieldName) {
-                        part = {
-                            // take field from entity of previous chain part
-                            field: _.find(chain[i].entity.fields, {name: fieldName})
-                        };
-                        chain.push(part);
-                        part.path = this.entityChainToPath(chain);
-                        if (part.field.relatedEntityName) {
-                            part.basePath = part.path + '+' + part.field.relatedEntityName;
-                        }
+                if (fieldName) {
+                    part = {
+                        // take field from entity of previous chain part
+                        field: _.find(chain[i].entity.fields, {name: fieldName})
+                    };
+                    chain.push(part);
+                    part.path = this._entityChainToPath(chain);
+                    if (part.field.relatedEntityName) {
+                        part.basePath = part.path + '+' + part.field.relatedEntityName;
                     }
-                }, this);
-            } catch (e) {
+                }
+            }, this);
+
+            return chain;
+        },
+
+        /**
+         * Parses path-string and returns array of objects
+         *
+         * Field Path:
+         *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
+         * Returns Chain:
+         *  [{
+         *      entity: {Object},
+         *      path: "",
+         *      basePath: ""
+         *  }, {
+         *      entity: {Object},
+         *      field: {Object},
+         *      path: "account",
+         *      basePath: "account+Oro\[...]\Account"
+         *  }, {
+         *      entity: {Object},
+         *      field: {Object},
+         *      path: "account+Oro\[...]\Account::contacts",
+         *      basePath: "account+Oro\[...]\Account::contacts+Oro\[...]Contact"
+         *  }, {
+         *      field: {Object},
+         *      path: "account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName"
+         *  }]
+         *
+         * @param {string} fieldId
+         * @return {(Array.<Object>|null)}
+         */
+        pathToEntityChain: function(fieldId) {
+            var chain = null;
+
+            try {
+                chain = this._pathToEntityChain(fieldId);
+            } catch (ex) {
                 EntityStructureDataProvider.errorHandler();
                 throw new EntityError('Can not build entity chain by given path "' + fieldId + '"');
             }
 
             return chain;
+        },
+
+        /**
+         * Check path-string if it is valid
+         *
+         * Field Path:
+         *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
+         * Returns Chain:
+         *  [{
+         *      entity: {Object},
+         *      path: "",
+         *      basePath: ""
+         *  }, {
+         *      entity: {Object},
+         *      field: {Object},
+         *      path: "account",
+         *      basePath: "account+Oro\[...]\Account"
+         *  }, {
+         *      entity: {Object},
+         *      field: {Object},
+         *      path: "account+Oro\[...]\Account::contacts",
+         *      basePath: "account+Oro\[...]\Account::contacts+Oro\[...]Contact"
+         *  }, {
+         *      field: {Object},
+         *      path: "account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName"
+         *  }]
+         *
+         * @param {string} fieldId
+         * @return {boolean}
+         */
+        validatePath: function(fieldId) {
+            var isValid = true;
+
+            try {
+                this._pathToEntityChain(fieldId);
+            } catch (ex) {
+                isValid = false;
+            }
+
+            return isValid;
         },
 
         /**
@@ -465,24 +542,59 @@ define(function(require) {
          *
          * @param {Array.<Object>} chain
          * @return {string}
+         * @protected
+         */
+        _entityChainToPath: function(chain) {
+            chain = _.map(chain.slice(1), function(part) {
+                var result = part.field.name;
+                if (part.entity) {
+                    result += '+' + part.entity.className;
+                }
+                return result;
+            });
+            var path = chain.join('::');
+
+            return path;
+        },
+
+        /**
+         * Combines path-string from array of objects
+         *
+         * Chain:
+         *  [{
+         *      entity: {Object},
+         *      path: "",
+         *      basePath: ""
+         *  }, {
+         *      entity: {Object},
+         *      field: {Object},
+         *      path: "account",
+         *      basePath: "account+Oro\[...]\Account"
+         *  }, {
+         *      entity: {Object},
+         *      field: {Object},
+         *      path: "account+Oro\[...]\Account::contacts",
+         *      basePath: "account+Oro\[...]\Account::contacts+Oro\[...]Contact"
+         *  }, {
+         *      field: {Object},
+         *      path: "account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName"
+         *  }]
+         *
+         *  Returns Field Path:
+         *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
+         *
+         * @param {Array.<Object>} chain
+         * @return {string}
          */
         entityChainToPath: function(chain) {
             var path;
 
             try {
-                chain = _.map(chain.slice(1), function(part) {
-                    var result = part.field.name;
-                    if (part.entity) {
-                        result += '+' + part.entity.className;
-                    }
-                    return result;
-                });
+                path = this._entityChainToPath(chain);
             } catch (e) {
                 EntityStructureDataProvider.errorHandler();
-                chain = [];
+                path = '';
             }
-
-            path = chain.join('::');
 
             return path;
         },
