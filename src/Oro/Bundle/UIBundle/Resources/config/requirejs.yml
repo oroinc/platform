@@ -258,7 +258,7 @@ config:
         'oroui/js/app/views/input-widget/number': 'bundles/oroui/js/app/views/input-widget/number.js'
 
         'oroui/js/fuzzy-search': 'bundles/oroui/js/fuzzy-search.js'
-        'Fuse': '//cdnjs.cloudflare.com/ajax/libs/fuse.js/3.0.4/fuse.js'
+        'Fuse': 'bundles/bowerassets/fuse/dist/fuse.js'
 
         'oroui/js/content-processor/pinned-dropdown-button': 'oroui/js/content-processor/pinned-dropdown-button.js'
 

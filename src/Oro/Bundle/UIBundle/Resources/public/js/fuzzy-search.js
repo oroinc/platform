@@ -40,7 +40,6 @@ define(function(require) {
             if (cache.queries[query] === undefined) {
                 var matches = cache.searchEngine.search(query);
                 cache.queries[query] = this._filterMatches(matches);
-                if(cache.queries[query].length) console.info(str + ':' + matches[0].score)
             }
 
             return cache.queries[query];
