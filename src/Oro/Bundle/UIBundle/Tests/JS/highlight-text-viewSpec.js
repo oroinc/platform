@@ -2,10 +2,18 @@ define(function(require) {
     'use strict';
 
     require('jasmine-jquery');
+    var $ = require('jquery');
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var HighlightTextView = require('oroui/js/app/views/highlight-text-view');
-
+    var Fuse;
+    var deferredLoad = $.Deferred();
+    require(['//cdnjs.cloudflare.com/ajax/libs/fuse.js/3.0.4/fuse.js'], function() {
+        require(['Fuse'], function(module) {
+            Fuse = module;
+            deferredLoad.resolve();
+        });
+    });
     //fixtures
     var html = require('text!./Fixture/highlight-text-view.html');
 
@@ -21,6 +29,33 @@ define(function(require) {
 
         return createView.view;
     };
+
+    function getItems() {
+        return $('#settings label').get().map(function(item) {
+            return item.innerText;
+        });
+    }
+
+    function fuzzySearch(value) {
+        var matches = {};
+        var fuse = new Fuse(getItems(), {
+            caseSensitive: false,
+            threshold: 0.6,
+            location: 0,
+            distance: 30,
+            includeMatches: true,
+            minMatchCharLength: 2,
+            includeScore: true
+        });
+
+        var result = fuse.search(value);
+
+        _.each(result, function(r) {
+            matches[getItems()[r.item]] = r;
+        });
+
+        return matches;
+    }
 
     describe('oroui/js/app/views/highlight-text-view', function() {
         describe('check text highlight', function() {
@@ -102,6 +137,50 @@ define(function(require) {
                 mediator.trigger(':highlight-text:update', 'Group 2.Field 2.1');
                 expect(this.view.$(this.view.findNotFoundClass).length).toEqual(0);
                 expect(this.view.$(this.view.findFoundClass).length).toEqual(0);
+            });
+        });
+
+        deferredLoad.done(function() {
+            describe('check fuzzy search', function() {
+                beforeEach(function() {
+                    this.view = createView({
+                        highlightSelectors: ['.settings-title', '.group', '.field'],
+                        toggleSelectors: {
+                            '.field': '.fields',
+                            '.group': '.settings-content'
+                        }
+                    });
+                });
+
+                it('text found in toggle elements with fuzzy search', function() {
+                    mediator.trigger(':highlight-text:update', 'Grp', {
+                        fuzzySearch: true
+                    });
+
+                    expect(this.view.isElementContentHighlighted(this.view.$el)).toBeTruthy();
+                    expect(this.view.$(':contains("Group 1")').hasClass(this.view.foundClass)).toBeTruthy();
+                    expect(this.view.$(':contains("Group 2")').hasClass(this.view.foundClass)).toBeTruthy();
+                    expect(this.view.$(':contains("Group 2.Field 1")').hasClass(this.view.foundClass)).toBeTruthy();
+                    expect(this.view.$(':contains("Group 2.Field 2")').hasClass(this.view.foundClass)).toBeTruthy();
+                    expect(this.view.$(':contains("Test 1")').hasClass(this.view.notFoundClass)).toBeTruthy();
+
+                    mediator.trigger(':highlight-text:update', 'Feld', {
+                        fuzzySearch: true
+                    });
+
+                    expect(this.view.$(':contains("Group 2.Field 1")').hasClass(this.view.foundClass)).toBeTruthy();
+                    expect(this.view.$(':contains("Group 2.Field 2")').hasClass(this.view.foundClass)).toBeTruthy();
+                    expect(this.view.$(':contains("Group 1")').hasClass(this.view.notFoundClass)).toBeTruthy();
+                    expect(this.view.$(':contains("Group 2")').hasClass(this.view.notFoundClass)).toBeTruthy();
+                    expect(this.view.$(':contains("Test 1")').hasClass(this.view.notFoundClass)).toBeTruthy();
+
+                    mediator.trigger(':highlight-text:update', 'Tst', {
+                        fuzzySearch: true
+                    });
+
+                    expect(this.view.$(':contains("Test 1")').hasClass(this.view.foundClass)).toBeTruthy();
+                    expect(this.view.$(':contains("Group 1")').hasClass(this.view.notFoundClass)).toBeTruthy();
+                });
             });
         });
     });

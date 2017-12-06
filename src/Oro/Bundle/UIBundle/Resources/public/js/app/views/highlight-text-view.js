@@ -6,6 +6,7 @@ define(function(require) {
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var BaseView = require('oroui/js/app/views/base/view');
+    var FuzzySearch = require('oroui/js/fuzzy-search');
 
     HighlightTextView = BaseView.extend({
         /**
@@ -13,6 +14,7 @@ define(function(require) {
          */
         optionNames: BaseView.prototype.optionNames.concat([
             'text',
+            'fuzzySearch',
             'viewGroup',
             'highlightClass', 'elementHighlightClass', 'notFoundClass', 'foundClass',
             'highlightSelectors', 'toggleSelectors'
@@ -27,6 +29,11 @@ define(function(require) {
          * @property {RegExp|null}
          */
         findText: null,
+
+        /**
+         * @property {String}
+         */
+        fuzzySearch: false,
 
         /**
          * @property {String}
@@ -99,9 +106,17 @@ define(function(require) {
          *
          * @param {String} text
          */
-        update: function(text) {
+        update: function(text, options) {
+            if (options) {
+                _.extend(this, options);
+            }
             this.text = text;
-            this.findText = this.text.length ? new RegExp(this.text, 'gi') : null;
+            var regexp = this.text;
+            if (this.fuzzySearch) {
+                regexp = this.text.toLowerCase().replace(/\s/g, '').split('');
+                regexp = '[' + _.uniq(regexp).join('') + ']';
+            }
+            this.findText = this.text.length ? new RegExp(regexp, 'gi') : null;
 
             this.render();
         },
@@ -268,8 +283,11 @@ define(function(require) {
             _.each($content.contents(), function(children) {
                 var $children = $(children);
                 if (children.nodeName === '#text') {
-                    var text = $children.text().replace(this.findText, this.replaceBy);
-                    $children.replaceWith(text);
+                    var text = $children.text();
+                    if (!this.fuzzySearch || FuzzySearch.isMatched(text, this.text)) {
+                        text = text.replace(this.findText, this.replaceBy);
+                        $children.replaceWith(text);
+                    }
                 } else {
                     this.highlightElementContent($children);
                 }

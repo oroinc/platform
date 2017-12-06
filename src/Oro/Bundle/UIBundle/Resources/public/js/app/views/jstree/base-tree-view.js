@@ -9,6 +9,7 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var tools = require('oroui/js/tools');
     var Chaplin = require('chaplin');
+    var FuzzySearch = require('oroui/js/fuzzy-search');
 
     require('jquery.jstree');
 
@@ -125,9 +126,14 @@ define(function(require) {
         searchTimeout: 250,
 
         /**
-         * @property {Object}
+         * @property {Boolean}
          */
-        originalSearchEngine: {},
+        _fuzzySearch: false,
+
+        /**
+         * @property {Boolean}
+         */
+        _foundNodes: false,
 
         /**
          * @param {Object} options
@@ -290,28 +296,27 @@ define(function(require) {
             return this.onSearch(e);
         },
 
-        _getOriginalSearchEngine: function(str) {
-            var callback = this.originalSearchEngine[str];
-            if (!callback) {
-                var settings = this.jsTreeInstance.settings.search;
-                callback = this.originalSearchEngine[str] = new $.vakata.search(str, true, {
-                    caseSensitive: settings.case_sensitive,
-                    fuzzy: settings.fuzzy
-                });
-            }
-
-            return callback;
-        },
-
-        searchCallback: function(str, node) {
-            var original = this._getOriginalSearchEngine(str);
-            if (original.search(node.text).isMatch) {
-                return true;
-            }
-
+        searchCallback: function(query, node) {
             var searchBy = node.original.search_by || [];
+            searchBy.unshift(node.text);
+            searchBy = _.uniq(searchBy);
+
+            query = query.toLowerCase();
+
+            var search;
+            if (this._fuzzySearch) {
+                search = function(str) {
+                    return FuzzySearch.isMatched(str, query);
+                };
+            } else {
+                search = function(str) {
+                    return str.toLowerCase().indexOf(query) !== -1;
+                };
+            }
+
             for (var i = 0, length = searchBy.length; i < length; i++) {
-                if (original.search(searchBy[i]).isMatch) {
+                if (search(searchBy[i])) {
+                    this._foundNodes = true;
                     return true;
                 }
             }
@@ -327,18 +332,27 @@ define(function(require) {
             }
             this.searchValue = value;
 
-            if (this.jsTreeInstance.allNodesHidden) {
-                this.jsTreeInstance.show_all();
-                this.jsTreeInstance.allNodesHidden = false;
-            }
             this.jsTreeInstance.searchValue = value;
             this.jsTreeInstance.settings.autohideNeighbors = tools.isMobile() && _.isEmpty(value);
+
+            this._fuzzySearch = false;
+            this._foundNodes = false;
+
+            this.jsTreeInstance.show_all();
             this.jsTreeInstance.search(value);
+            if (!this._foundNodes) {
+                this._fuzzySearch = true;
+
+                this.jsTreeInstance.show_all();
+                this.jsTreeInstance.search(value);
+            }
 
             this._toggleSearchState(value);
 
             this._changeUrlParam('search', value.length ? value : null);
-            mediator.trigger(this.viewGroup + ':highlight-text:update', value);
+            mediator.trigger(this.viewGroup + ':highlight-text:update', value, {
+                fuzzySearch: this._fuzzySearch
+            });
         },
 
         /**
@@ -367,7 +381,7 @@ define(function(require) {
                 return;
             }
 
-            if (data.res.length) {
+            if (this._foundNodes) {
                 this.addChildToSearchResults(data.res);
             } else {
                 this.showSearchResultMessage(_.__('oro.ui.jstree.search.search_no_found'));
@@ -429,7 +443,6 @@ define(function(require) {
                 message = '';
             }
             this.jsTreeInstance.hide_all();
-            this.jsTreeInstance.allNodesHidden = true;
             this.$tree.append(
                 $('<div />', {
                     'class': 'search-no-results',
@@ -591,7 +604,6 @@ define(function(require) {
             delete this.$clearSearchButton;
             delete this.jsTreeInstance;
             delete this.jsTreeConfig;
-            delete this.originalSearchEngine;
 
             return BaseTreeView.__super__.dispose.call(this);
         }
