@@ -263,9 +263,7 @@ class DataGridExtension extends \Twig_Extension
         $gridParams['i'] = $page;
         $queryStringComponents['grid'][$grid->getName()] = http_build_query($gridParams);
 
-        $route = $request->get('_route');
-
-        return $this->getRouter()->generate($route, $queryStringComponents);
+        return $request->getPathInfo() . '?' . http_build_query($queryStringComponents);
     }
 
     /**
