@@ -357,7 +357,7 @@
         }
 
         @if ($enable-safe-area) {
-            @if ($value == 0) {
+            @if (strip-units($value) == 0) {
                 /* iOS 11 */
                 #{$property}: constant(safe-area-inset-left);
 
@@ -382,7 +382,7 @@
         }
 
         @if ($enable-safe-area) {
-            @if ($value == 0) {
+            @if (strip-units($value) == 0) {
                 /* iOS 11 */
                 #{$property}: constant(safe-area-inset-right);
 
