@@ -105,10 +105,11 @@ define(function(require) {
          * Refresh highlight using new text
          *
          * @param {String} text
+         * @param {Boolean|null} fuzzySearch
          */
-        update: function(text, options) {
-            if (options) {
-                _.extend(this, options);
+        update: function(text, fuzzySearch) {
+            if (fuzzySearch !== undefined) {
+                this.fuzzySearch = fuzzySearch;
             }
             this.text = text;
             var regexp = this.text;
@@ -284,7 +285,7 @@ define(function(require) {
                 var $children = $(children);
                 if (children.nodeName === '#text') {
                     var text = $children.text();
-                    if (!this.fuzzySearch || FuzzySearch.isMatched(text, this.text)) {
+                    if (!this.fuzzySearch || FuzzySearch.isMatched(_.trim(text), this.text)) {
                         text = text.replace(this.findText, this.replaceBy);
                         $children.replaceWith(text);
                     }

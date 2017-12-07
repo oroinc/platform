@@ -350,9 +350,7 @@ define(function(require) {
             this._toggleSearchState(value);
 
             this._changeUrlParam('search', value.length ? value : null);
-            mediator.trigger(this.viewGroup + ':highlight-text:update', value, {
-                fuzzySearch: this._fuzzySearch
-            });
+            mediator.trigger(this.viewGroup + ':highlight-text:update', value, this._fuzzySearch);
         },
 
         /**

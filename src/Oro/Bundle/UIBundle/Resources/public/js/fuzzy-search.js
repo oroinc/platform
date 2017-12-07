@@ -8,7 +8,6 @@ define(function(require) {
     var config = _.extend({
         checkScore: 0.49,
         engineOptions: {
-            includeMatches: true,
             includeScore: true
         }
     }, require('module').config() || {});
