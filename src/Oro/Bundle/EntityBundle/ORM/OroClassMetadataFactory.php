@@ -21,7 +21,7 @@ class OroClassMetadataFactory extends ClassMetadataFactory
     protected $logger;
 
     /** @var bool */
-    private $disconected = false;
+    private $disconnected = false;
 
     /**
      * Indicates whether this metadata factory is in the disconnected state.
@@ -30,9 +30,9 @@ class OroClassMetadataFactory extends ClassMetadataFactory
      *
      * @return bool
      */
-    public function isDisconected()
+    public function isDisconnected()
     {
-        return $this->disconected;
+        return $this->disconnected;
     }
 
     /**
@@ -40,11 +40,11 @@ class OroClassMetadataFactory extends ClassMetadataFactory
      *
      * @internal this method is intended to be used only to memory usage oprimization of the message queue consumer
      *
-     * @param $disconected
+     * @param $disconnected
      */
-    public function setDisconected($disconected)
+    public function setDisconnected($disconnected)
     {
-        $this->disconected = $disconected;
+        $this->disconnected = $disconnected;
     }
 
     /**
@@ -64,7 +64,7 @@ class OroClassMetadataFactory extends ClassMetadataFactory
      */
     public function setEntityManager(EntityManagerInterface $em)
     {
-        if (!$this->disconected) {
+        if (!$this->disconnected) {
             parent::setEntityManager($em);
             $this->entityManager = $em;
         }

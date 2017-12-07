@@ -8,6 +8,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Mode;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 abstract class AbstractMapper
 {
@@ -33,6 +34,11 @@ abstract class AbstractMapper
     protected $propertyAccessor;
 
     /**
+     * @var HtmlTagHelper
+     */
+    protected $htmlTagHelper;
+
+    /**
      * @param SearchMappingProvider $mappingProvider
      */
     public function setMappingProvider(SearchMappingProvider $mappingProvider)
@@ -46,6 +52,14 @@ abstract class AbstractMapper
     public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor)
     {
         $this->propertyAccessor = $propertyAccessor;
+    }
+
+    /**
+     * @param HtmlTagHelper $htmlTagHelper
+     */
+    public function setHtmlTagHelper(HtmlTagHelper $htmlTagHelper)
+    {
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**
@@ -210,12 +224,20 @@ abstract class AbstractMapper
     }
 
     /**
+     * @param string $fieldName
+     * @param mixed $value
+     * @return string
+     */
+    abstract protected function clearTextValue($fieldName, $value);
+
+    /**
      * @param string $original
      * @param string $addition
      * @return string
      */
     public function buildAllDataField($original, $addition)
     {
+        $addition = $this->clearTextValue(Indexer::TEXT_ALL_DATA_FIELD, $addition);
         $clearedAddition = Query::clearString($addition);
 
         $original .= sprintf(' %s %s ', $addition, $clearedAddition);

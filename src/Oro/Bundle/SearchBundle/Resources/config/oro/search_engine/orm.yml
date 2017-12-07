@@ -17,5 +17,5 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_entity.doctrine_helper'
-            - '@oro_search.mapper'
+            - '@oro_search.text_filtered_mapper'
             - '@oro_entity.entity_name_resolver'

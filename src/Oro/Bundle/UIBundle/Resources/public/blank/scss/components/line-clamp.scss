@@ -15,13 +15,16 @@
         overflow: hidden;
 
         &::after {
-            position: absolute;
-            top: 20px;
+            bottom: 0;
             right: 0;
+
             width: 50%;
-            height: 20px;
-            content: '';
-            background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 50%);
+            height: ceil($base-font-size * $base-line-height);
+
+            background: linear-gradient(to right, rgba(get-color('additional', 'ultra'), 0),
+                                                  rgba(get-color('additional', 'ultra'), 1) 50%);
+
+            @include after();
         }
     }
 }

@@ -1,4 +1,4 @@
-# Using PHP instead of Twig for templates
+# Using PHP Instead of Twig for Templates
 
 Symfony defaults to Twig for its template engine, but you can still use plain PHP templates if necessary. Symfony provides equally good support of both templating engines.
 
@@ -20,7 +20,7 @@ oro_layout:
             enabled: false
 ```
 
-## Modify layouts to use PHP templates
+## Modify layouts to Use PHP Templates
 
 The default ["base"](https://github.com/orocrm/platform/blob/84b1d81ac3a7198bdd0eed3dd76db48a72c10cd3/src/Oro/Bundle/UIBundle/Resources/views/layouts/base/page/layout.yml#L3-L4]) OroPlatform theme uses Twig templates. You should use a different approach in your default.yml file in your theme's folder: 
 
@@ -65,7 +65,7 @@ The example above creates a standard web page structure (head, metadata, and bod
             themes: 'MyBundle:layouts/first_theme/php'
 ```
 
-## Creating templates
+## Creating Templates
 
 As you are not using Twig anymore, you should provide the PHP templates for the blocks used in the layout.
 
@@ -103,6 +103,6 @@ The layout and templates from our examples will produce the following HTML outpu
 </html>
 ```
 
-A number of fully working PHP templates for various block types is already included in OroLayoutBundle - check the [`src/Oro/Bundle/LayoutBundle/Resources/views/Layout/php`](https://github.com/orocrm/platform/tree/master/src/Oro/Bundle/LayoutBundle/Resources/views/Layout/php) folder to see all the examples.
+A number of fully working PHP templates for various block types is already included in the OroLayoutBundle - check the [`src/Oro/Bundle/LayoutBundle/Resources/views/Layout/php`](https://github.com/orocrm/platform/tree/master/src/Oro/Bundle/LayoutBundle/Resources/views/Layout/php) folder to see all the examples.
 
-We prefer to use Twig in our products (e.g. see the [default theme](https://github.com/orocommerce/orocommerce/tree/master/src/OroB2B/Bundle/FrontendBundle/Resources/views/layouts/default) in [OroCommerce](https://www.orocommerce.com/)) to better express presentation and to avoid including the program logic in the templates. Your choice may be different based on the needs of your customers and the approach you selected to build your OroPlatform-based application.
+We prefer to use Twig in our products (e.g. see the [default theme](https://github.com/orocommerce/orocommerce/tree/master/src/OroB2B/Bundle/FrontendBundle/Resources/views/layouts/default) in [OroCommerce](https://www.orocommerce.com/)) to better express presentation and avoid including the program logic in the templates. Your choice may be different based on the needs of your customers and the approach you selected to build your OroPlatform-based application.

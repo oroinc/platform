@@ -2,6 +2,7 @@
 @ticket-BAP-12348
 @automatically-ticket-tagged
 Feature: Options in Grid View
+  ToDo: BAP-16103 Add missing descriptions to the Behat features
 
   Scenario: Create new not default grid view
     Given I login as administrator

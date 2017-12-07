@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\Async\Manager;
 
 use Doctrine\ORM\EntityManager;
@@ -33,6 +34,16 @@ class AssociationManager
     /** @var MessageProducerInterface */
     protected $producer;
 
+    /** @var bool */
+    protected $queued = true;
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     * @param EmailActivityManager $emailActivityManager
+     * @param EmailOwnersProvider $emailOwnersProvider
+     * @param EmailManager $emailManager
+     * @param MessageProducerInterface $producer
+     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EmailActivityManager $emailActivityManager,
@@ -45,6 +56,14 @@ class AssociationManager
         $this->emailOwnersProvider = $emailOwnersProvider;
         $this->emailManager = $emailManager;
         $this->producer = $producer;
+    }
+
+    /**
+     * @param bool $queued
+     */
+    public function setQueued($queued)
+    {
+        $this->queued = $queued;
     }
 
     /**
@@ -97,13 +116,18 @@ class AssociationManager
             $ownerIds = (new BufferedIdentityQueryResultIterator($ownerIdsQb))
                 ->setBufferSize(self::OWNER_IDS_BUFFER_SIZE)
                 ->setPageLoadedCallback(function (array $rows) use ($emailOwnerClassName) {
-                    $this->producer->send(
-                        Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS,
-                        [
-                            'ownerClass' => $emailOwnerClassName,
-                            'ownerIds' => array_map('current', $rows),
-                        ]
-                    );
+                    $ownerIds = array_map('current', $rows);
+                    if ($this->queued) {
+                        $this->producer->send(
+                            Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS,
+                            [
+                                'ownerClass' => $emailOwnerClassName,
+                                'ownerIds' => $ownerIds,
+                            ]
+                        );
+                    } else {
+                        $this->processUpdateEmailOwner($emailOwnerClassName, $ownerIds);
+                    }
                 });
 
             // iterate through ownerIds to call pageLoadedCallback
@@ -141,11 +165,15 @@ class AssociationManager
                     ) {
                         $this->clear();
 
-                        $this->producer->send(Topics::ADD_ASSOCIATION_TO_EMAILS, [
-                            'emailIds' => $emailIds,
-                            'targetClass' => $ownerClassName,
-                            'targetId' => $owner->getId(),
-                        ]);
+                        if ($this->queued) {
+                            $this->producer->send(Topics::ADD_ASSOCIATION_TO_EMAILS, [
+                                'emailIds' => $emailIds,
+                                'targetClass' => $ownerClassName,
+                                'targetId' => $owner->getId(),
+                            ]);
+                        } else {
+                            $this->processAddAssociation($emailIds, $ownerClassName, $owner->getId());
+                        }
 
                         $emailIds = [];
                         $countNewMessages++;

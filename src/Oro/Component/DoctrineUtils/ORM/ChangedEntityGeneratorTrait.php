@@ -31,42 +31,6 @@ trait ChangedEntityGeneratorTrait
      *
      * @return \Generator
      */
-    protected function getCreatedEntities(UnitOfWork $uow)
-    {
-        foreach ($uow->getScheduledEntityInsertions() as $entity) {
-            yield $entity;
-        }
-    }
-
-    /**
-     * @param UnitOfWork $uow
-     *
-     * @return \Generator
-     */
-    protected function getUpdatedEntities(UnitOfWork $uow)
-    {
-        foreach ($uow->getScheduledEntityUpdates() as $entity) {
-            yield $entity;
-        }
-    }
-
-    /**
-     * @param UnitOfWork $uow
-     *
-     * @return \Generator
-     */
-    protected function getDeletedEntities(UnitOfWork $uow)
-    {
-        foreach ($uow->getScheduledEntityDeletions() as $entity) {
-            yield $entity;
-        }
-    }
-
-    /**
-     * @param UnitOfWork $uow
-     *
-     * @return \Generator
-     */
     protected function getCreatedAndDeletedEntities(UnitOfWork $uow)
     {
         foreach ($uow->getScheduledEntityInsertions() as $entity) {

@@ -1,15 +1,17 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Tests\Unit\Async;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Async;
 
 use Psr\Log\LoggerInterface;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Configuration as DbalConfiguration;
+use Doctrine\DBAL\Logging\SQLLogger;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
-use Doctrine\ORM\Configuration;
+use Doctrine\ORM\Configuration as OrmConfiguration;
 use Doctrine\ORM\Events as OrmEvents;
 use Doctrine\ORM\Mapping\EntityListenerResolver;
 
@@ -37,6 +39,18 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
             $this->container,
             'foo_metadata_factory'
         );
+    }
+
+    /**
+     * @param object $object
+     * @param string $propertyName
+     * @param mixed  $propertyValue
+     */
+    private function setPrivateProperty($object, $propertyName, $propertyValue)
+    {
+        $property = ReflectionUtil::getProperty(new \ReflectionClass($object), $propertyName);
+        $property->setAccessible(true);
+        $property->setValue($object, $propertyValue);
     }
 
     public function testShouldNotGetUninitializedMetadataFactoryFromContainer()
@@ -99,7 +113,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
             ->with('foo_metadata_factory')
             ->willReturn($metadataFactory);
         $metadataFactory->expects(self::once())
-            ->method('isDisconected')
+            ->method('isDisconnected')
             ->willReturn(true);
 
         $this->clearer->clear($logger);
@@ -116,7 +130,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
         $logger->expects(self::once())
             ->method('warning')
             ->with(sprintf(
-                'Cannot disconect ORM metadata factory due to unexpected type of the EntityManager (%s)',
+                'Cannot disconnect ORM metadata factory due to unexpected type of the EntityManager (%s)',
                 get_class($em)
             ));
 
@@ -129,7 +143,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
             ->with('foo_metadata_factory')
             ->willReturn($metadataFactory);
         $metadataFactory->expects(self::once())
-            ->method('isDisconected')
+            ->method('isDisconnected')
             ->willReturn(false);
         $metadataFactory->expects(self::once())
             ->method('getEntityManager')
@@ -158,7 +172,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
             ->with('foo_metadata_factory')
             ->willReturn($metadataFactory);
         $metadataFactory->expects(self::once())
-            ->method('isDisconected')
+            ->method('isDisconnected')
             ->willReturn(false);
         $metadataFactory->expects(self::once())
             ->method('getEntityManager')
@@ -176,9 +190,22 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
         $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
         $em = $this->createMock(EntityManager::class);
 
+        $connection = $this->createMock(Connection::class);
+        $connection->expects(self::once())
+            ->method('getConfiguration')
+            ->willReturn(new DbalConfiguration());
+        $connection->expects(self::once())
+            ->method('isConnected')
+            ->willReturn(true);
+        $connection->expects(self::once())
+            ->method('close');
+        $em->expects(self::once())
+            ->method('getConnection')
+            ->willReturn($connection);
+
         $logger->expects(self::once())
             ->method('info')
-            ->with('Disconect ORM metadata factory');
+            ->with('Disconnect ORM metadata factory');
         $logger->expects(self::never())
             ->method('warning');
 
@@ -191,7 +218,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
             ->with('foo_metadata_factory')
             ->willReturn($metadataFactory);
         $metadataFactory->expects(self::once())
-            ->method('isDisconected')
+            ->method('isDisconnected')
             ->willReturn(false);
         $metadataFactory->expects(self::once())
             ->method('getEntityManager')
@@ -201,7 +228,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
         $em->expects(self::any())
             ->method('getConfiguration')
-            ->willReturn(new Configuration());
+            ->willReturn(new OrmConfiguration());
         $em->expects(self::once())
             ->method('close');
 
@@ -213,13 +240,26 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
         $logger = $this->createMock(LoggerInterface::class);
         $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
         $em = $this->createMock(EntityManager::class);
-        $configuration = new Configuration();
+        $configuration = new OrmConfiguration();
         $repositoryFactory = $this->createMock(EntityRepositoryFactory::class);
         $configuration->setRepositoryFactory($repositoryFactory);
 
+        $connection = $this->createMock(Connection::class);
+        $connection->expects(self::once())
+            ->method('getConfiguration')
+            ->willReturn(new DbalConfiguration());
+        $connection->expects(self::once())
+            ->method('isConnected')
+            ->willReturn(true);
+        $connection->expects(self::once())
+            ->method('close');
+        $em->expects(self::once())
+            ->method('getConnection')
+            ->willReturn($connection);
+
         $logger->expects(self::once())
             ->method('info')
-            ->with('Disconect ORM metadata factory');
+            ->with('Disconnect ORM metadata factory');
         $logger->expects(self::never())
             ->method('warning');
 
@@ -232,7 +272,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
             ->with('foo_metadata_factory')
             ->willReturn($metadataFactory);
         $metadataFactory->expects(self::once())
-            ->method('isDisconected')
+            ->method('isDisconnected')
             ->willReturn(false);
         $metadataFactory->expects(self::once())
             ->method('getEntityManager')
@@ -249,23 +289,47 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testShouldRemoveUnneddedListenersIfEventManagerIsInstanceOfContainerAwareEventManagerClass()
+    public function testShouldRemoveUnneededListenersIfEventManagerIsInstanceOfContainerAwareEventManagerClass()
     {
         $logger = $this->createMock(LoggerInterface::class);
         $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
         $em = $this->createMock(EntityManager::class);
         $eventManager = new ContainerAwareEventManager($this->container);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects(self::once())
+            ->method('getConfiguration')
+            ->willReturn(new DbalConfiguration());
+        $connection->expects(self::once())
+            ->method('isConnected')
+            ->willReturn(true);
+        $connection->expects(self::once())
+            ->method('close');
+        $em->expects(self::once())
+            ->method('getConnection')
+            ->willReturn($connection);
+
+        // guard
+        self::assertObjectHasAttribute('listeners', $eventManager);
+        self::assertObjectHasAttribute('initialized', $eventManager);
+
         $eventManager->addEventListener(
             [OrmEvents::onFlush, OrmEvents::loadClassMetadata, OrmEvents::onClassMetadataNotFound],
             'foo_listener'
         );
-
-        // guard
-        self::assertObjectHasAttribute('listeners', $eventManager);
+        $this->setPrivateProperty(
+            $eventManager,
+            'initialized',
+            [
+                OrmEvents::onFlush                 => true,
+                OrmEvents::loadClassMetadata       => true,
+                OrmEvents::onClassMetadataNotFound => true
+            ]
+        );
 
         $logger->expects(self::once())
             ->method('info')
-            ->with('Disconect ORM metadata factory');
+            ->with('Disconnect ORM metadata factory');
         $logger->expects(self::never())
             ->method('warning');
 
@@ -278,7 +342,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
             ->with('foo_metadata_factory')
             ->willReturn($metadataFactory);
         $metadataFactory->expects(self::once())
-            ->method('isDisconected')
+            ->method('isDisconnected')
             ->willReturn(false);
         $metadataFactory->expects(self::once())
             ->method('getEntityManager')
@@ -288,7 +352,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
         $em->expects(self::any())
             ->method('getConfiguration')
-            ->willReturn(new Configuration());
+            ->willReturn(new OrmConfiguration());
         $em->expects(self::once())
             ->method('getEventManager')
             ->willReturn($eventManager);
@@ -307,6 +371,14 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
             'listeners',
             $eventManager
         );
+        self::assertAttributeEquals(
+            [
+                OrmEvents::loadClassMetadata       => true,
+                OrmEvents::onClassMetadataNotFound => true
+            ],
+            'initialized',
+            $eventManager
+        );
     }
 
     public function testShouldLogWarningIfListenersPropertyOfEventManagerIsNotArray()
@@ -316,19 +388,32 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
         $em = $this->createMock(EntityManager::class);
         $eventManager = new ContainerAwareEventManager($this->container);
 
+        $connection = $this->createMock(Connection::class);
+        $connection->expects(self::once())
+            ->method('getConfiguration')
+            ->willReturn(new DbalConfiguration());
+        $connection->expects(self::once())
+            ->method('isConnected')
+            ->willReturn(true);
+        $connection->expects(self::once())
+            ->method('close');
+        $em->expects(self::once())
+            ->method('getConnection')
+            ->willReturn($connection);
+
         // guard
         self::assertObjectHasAttribute('listeners', $eventManager);
+        self::assertObjectHasAttribute('initialized', $eventManager);
 
-        $property = ReflectionUtil::getProperty(new \ReflectionClass($eventManager), 'listeners');
-        $property->setAccessible(true);
-        $property->setValue($eventManager, new ArrayCollection());
+        $this->setPrivateProperty($eventManager, 'listeners', new ArrayCollection());
+        $this->setPrivateProperty($eventManager, 'initialized', []);
 
         $logger->expects(self::once())
             ->method('info')
-            ->with('Disconect ORM metadata factory');
+            ->with('Disconnect ORM metadata factory');
         $logger->expects(self::once())
             ->method('warning')
-            ->with('The EventManager "listeners" property should be an array');
+            ->with('The EventManager "listeners" and "initialized" properties should be an array');
 
         $this->container->expects(self::once())
             ->method('initialized')
@@ -339,7 +424,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
             ->with('foo_metadata_factory')
             ->willReturn($metadataFactory);
         $metadataFactory->expects(self::once())
-            ->method('isDisconected')
+            ->method('isDisconnected')
             ->willReturn(false);
         $metadataFactory->expects(self::once())
             ->method('getEntityManager')
@@ -349,7 +434,68 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
         $em->expects(self::any())
             ->method('getConfiguration')
-            ->willReturn(new Configuration());
+            ->willReturn(new OrmConfiguration());
+        $em->expects(self::once())
+            ->method('getEventManager')
+            ->willReturn($eventManager);
+
+        $this->clearer->clear($logger);
+    }
+
+    public function testShouldLogWarningIfInitializedPropertyOfEventManagerIsNotArray()
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
+        $em = $this->createMock(EntityManager::class);
+        $eventManager = new ContainerAwareEventManager($this->container);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects(self::once())
+            ->method('getConfiguration')
+            ->willReturn(new DbalConfiguration());
+        $connection->expects(self::once())
+            ->method('isConnected')
+            ->willReturn(true);
+        $connection->expects(self::once())
+            ->method('close');
+        $em->expects(self::once())
+            ->method('getConnection')
+            ->willReturn($connection);
+
+        // guard
+        self::assertObjectHasAttribute('listeners', $eventManager);
+        self::assertObjectHasAttribute('initialized', $eventManager);
+
+        $this->setPrivateProperty($eventManager, 'listeners', []);
+        $this->setPrivateProperty($eventManager, 'initialized', new ArrayCollection());
+
+        $logger->expects(self::once())
+            ->method('info')
+            ->with('Disconnect ORM metadata factory');
+        $logger->expects(self::once())
+            ->method('warning')
+            ->with('The EventManager "listeners" and "initialized" properties should be an array');
+
+        $this->container->expects(self::once())
+            ->method('initialized')
+            ->with('foo_metadata_factory')
+            ->willReturn(true);
+        $this->container->expects(self::once())
+            ->method('get')
+            ->with('foo_metadata_factory')
+            ->willReturn($metadataFactory);
+        $metadataFactory->expects(self::once())
+            ->method('isDisconnected')
+            ->willReturn(false);
+        $metadataFactory->expects(self::once())
+            ->method('getEntityManager')
+            ->willReturn($em);
+        $em->expects(self::once())
+            ->method('isOpen')
+            ->willReturn(true);
+        $em->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn(new OrmConfiguration());
         $em->expects(self::once())
             ->method('getEventManager')
             ->willReturn($eventManager);
@@ -362,13 +508,26 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
         $logger = $this->createMock(LoggerInterface::class);
         $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
         $em = $this->createMock(EntityManager::class);
-        $configuration = new Configuration();
+        $configuration = new OrmConfiguration();
         $entityListenerResolver = $this->createMock(EntityListenerResolver::class);
         $configuration->setEntityListenerResolver($entityListenerResolver);
 
+        $connection = $this->createMock(Connection::class);
+        $connection->expects(self::once())
+            ->method('getConfiguration')
+            ->willReturn(new DbalConfiguration());
+        $connection->expects(self::once())
+            ->method('isConnected')
+            ->willReturn(true);
+        $connection->expects(self::once())
+            ->method('close');
+        $em->expects(self::once())
+            ->method('getConnection')
+            ->willReturn($connection);
+
         $logger->expects(self::once())
             ->method('info')
-            ->with('Disconect ORM metadata factory');
+            ->with('Disconnect ORM metadata factory');
         $logger->expects(self::never())
             ->method('warning');
 
@@ -381,7 +540,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
             ->with('foo_metadata_factory')
             ->willReturn($metadataFactory);
         $metadataFactory->expects(self::once())
-            ->method('isDisconected')
+            ->method('isDisconnected')
             ->willReturn(false);
         $metadataFactory->expects(self::once())
             ->method('getEntityManager')
@@ -399,63 +558,17 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testShouldRemoveConnectionFromEntityManager()
-    {
-        $logger = $this->createMock(LoggerInterface::class);
-        $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
-        $em = $this->createMock(EntityManager::class);
-        $connection = $this->createMock(Connection::class);
-
-        $property = ReflectionUtil::getProperty(new \ReflectionClass($em), 'conn');
-        $property->setAccessible(true);
-        $property->setValue($em, $connection);
-
-        $logger->expects(self::once())
-            ->method('info')
-            ->with('Disconect ORM metadata factory');
-        $logger->expects(self::never())
-            ->method('warning');
-
-        $this->container->expects(self::once())
-            ->method('initialized')
-            ->with('foo_metadata_factory')
-            ->willReturn(true);
-        $this->container->expects(self::once())
-            ->method('get')
-            ->with('foo_metadata_factory')
-            ->willReturn($metadataFactory);
-        $metadataFactory->expects(self::once())
-            ->method('isDisconected')
-            ->willReturn(false);
-        $metadataFactory->expects(self::once())
-            ->method('getEntityManager')
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('isOpen')
-            ->willReturn(true);
-        $em->expects(self::any())
-            ->method('getConfiguration')
-            ->willReturn(new Configuration());
-
-        $this->clearer->clear($logger);
-
-        self::assertAttributeSame(null, 'conn', $em);
-    }
-
     public function testShouldNotCloseConnectionIfItIsAlreadyClosed()
     {
         $logger = $this->createMock(LoggerInterface::class);
         $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
         $em = $this->createMock(EntityManager::class);
         $connection = $this->createMock(Connection::class);
-
-        $property = ReflectionUtil::getProperty(new \ReflectionClass($em), 'conn');
-        $property->setAccessible(true);
-        $property->setValue($em, $connection);
+        $em->expects(self::once())->method('getConnection')->willReturn($connection);
 
         $logger->expects(self::once())
             ->method('info')
-            ->with('Disconect ORM metadata factory');
+            ->with('Disconnect ORM metadata factory');
         $logger->expects(self::never())
             ->method('warning');
 
@@ -468,7 +581,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
             ->with('foo_metadata_factory')
             ->willReturn($metadataFactory);
         $metadataFactory->expects(self::once())
-            ->method('isDisconected')
+            ->method('isDisconnected')
             ->willReturn(false);
         $metadataFactory->expects(self::once())
             ->method('getEntityManager')
@@ -478,7 +591,10 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
         $em->expects(self::any())
             ->method('getConfiguration')
-            ->willReturn(new Configuration());
+            ->willReturn(new OrmConfiguration());
+        $connection->expects(self::once())
+            ->method('getConfiguration')
+            ->willReturn(new DbalConfiguration());
         $connection->expects(self::once())
             ->method('isConnected')
             ->willReturn(false);
@@ -495,13 +611,11 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
         $em = $this->createMock(EntityManager::class);
         $connection = $this->createMock(Connection::class);
 
-        $property = ReflectionUtil::getProperty(new \ReflectionClass($em), 'conn');
-        $property->setAccessible(true);
-        $property->setValue($em, $connection);
+        $em->expects(self::once())->method('getConnection')->willReturn($connection);
 
         $logger->expects(self::once())
             ->method('info')
-            ->with('Disconect ORM metadata factory');
+            ->with('Disconnect ORM metadata factory');
         $logger->expects(self::never())
             ->method('warning');
 
@@ -514,7 +628,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
             ->with('foo_metadata_factory')
             ->willReturn($metadataFactory);
         $metadataFactory->expects(self::once())
-            ->method('isDisconected')
+            ->method('isDisconnected')
             ->willReturn(false);
         $metadataFactory->expects(self::once())
             ->method('getEntityManager')
@@ -524,12 +638,106 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
         $em->expects(self::any())
             ->method('getConfiguration')
-            ->willReturn(new Configuration());
+            ->willReturn(new OrmConfiguration());
+        $connection->expects(self::once())
+            ->method('getConfiguration')
+            ->willReturn(new DbalConfiguration());
         $connection->expects(self::once())
             ->method('isConnected')
             ->willReturn(true);
         $connection->expects(self::once())
             ->method('close');
+
+        $this->clearer->clear($logger);
+    }
+
+    public function testShouldRemoveSqlLoggerFromConnection()
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
+        $em = $this->createMock(EntityManager::class);
+        $connection = $this->createMock(Connection::class);
+        $configuration = new DbalConfiguration();
+        $configuration->setSQLLogger($this->createMock(SQLLogger::class));
+
+        $em->expects(self::once())->method('getConnection')->willReturn($connection);
+
+        $logger->expects(self::once())
+            ->method('info')
+            ->with('Disconnect ORM metadata factory');
+        $logger->expects(self::never())
+            ->method('warning');
+
+        $this->container->expects(self::once())
+            ->method('initialized')
+            ->with('foo_metadata_factory')
+            ->willReturn(true);
+        $this->container->expects(self::once())
+            ->method('get')
+            ->with('foo_metadata_factory')
+            ->willReturn($metadataFactory);
+        $metadataFactory->expects(self::once())
+            ->method('isDisconnected')
+            ->willReturn(false);
+        $metadataFactory->expects(self::once())
+            ->method('getEntityManager')
+            ->willReturn($em);
+        $em->expects(self::once())
+            ->method('isOpen')
+            ->willReturn(true);
+        $em->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn(new OrmConfiguration());
+        $connection->expects(self::once())
+            ->method('getConfiguration')
+            ->willReturn($configuration);
+
+        $this->clearer->clear($logger);
+
+        self::assertNull($configuration->getSQLLogger());
+    }
+
+    public function testShouldRemoveTransactionWatcherFromConnection()
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
+        $em = $this->createMock(EntityManager::class);
+        $connection = $this->createMock(ConnectionWithTransactionWatcher::class);
+
+        $em->expects(self::once())->method('getConnection')->willReturn($connection);
+
+        $logger->expects(self::once())
+            ->method('info')
+            ->with('Disconnect ORM metadata factory');
+        $logger->expects(self::never())
+            ->method('warning');
+
+        $this->container->expects(self::once())
+            ->method('initialized')
+            ->with('foo_metadata_factory')
+            ->willReturn(true);
+        $this->container->expects(self::once())
+            ->method('get')
+            ->with('foo_metadata_factory')
+            ->willReturn($metadataFactory);
+        $metadataFactory->expects(self::once())
+            ->method('isDisconnected')
+            ->willReturn(false);
+        $metadataFactory->expects(self::once())
+            ->method('getEntityManager')
+            ->willReturn($em);
+        $em->expects(self::once())
+            ->method('isOpen')
+            ->willReturn(true);
+        $em->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn(new OrmConfiguration());
+        $connection->expects(self::once())
+            ->method('getConfiguration')
+            ->willReturn(new DbalConfiguration());
+        $connection->expects(self::once())
+            ->method('setTransactionWatcher')
+            ->with(self::isNull());
 
         $this->clearer->clear($logger);
     }

@@ -788,6 +788,7 @@ services:
             index_1: '@oro_security.acl.permission_granting_strategy'
         calls:
             - [setUnderlyingCache, ['@security.acl.underlying.cache']]
+            - [setEventDispatcher, ['@event_dispatcher']]
 
     oro_security.acl.voter.basic_permissions:
         class: Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter
