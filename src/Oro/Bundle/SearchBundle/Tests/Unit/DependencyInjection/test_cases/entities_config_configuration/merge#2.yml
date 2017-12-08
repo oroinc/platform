@@ -43,4 +43,3 @@ expected:
                 relation_fields: {}
                 target_fields:
                     - subject
-                target_fields: {}
