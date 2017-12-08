@@ -7,7 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 class FeatureContext extends OroFeatureContext
 {
     /**
-     * Example: Then the documentation "www.orocrm.com/documentation/current" will opened
+     * Example: Then the documentation "https://oroinc.com/doc/orocrm/current" will opened
      * @Then /^the documentation "([^"]*)" will opened$/
      *
      * @param string $url

@@ -159,15 +159,17 @@ trait AbstractMessageQueueAssertTrait
 
     /**
      * @param string $expectedTopic
+     * @param bool $extractBodies
      * @return mixed[]
      */
-    protected static function getSentMessagesByTopic($expectedTopic)
+    protected static function getSentMessagesByTopic($expectedTopic, $extractBodies = false)
     {
         $topicMessages = [];
         $sentMessages = self::getSentMessages();
         foreach ($sentMessages as $sentMessage) {
             if ($sentMessage['topic'] === $expectedTopic) {
-                $topicMessages[] = $sentMessage['message'];
+                $message = $sentMessage['message'];
+                $topicMessages[] = $extractBodies && $message instanceof Message ? $message->getBody() : $message;
             }
         }
 

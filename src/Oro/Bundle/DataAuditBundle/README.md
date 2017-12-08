@@ -108,4 +108,4 @@ class Product implements AuditAdditionalFieldsInterface
 
 ### User documentation
 
-For full documentation visit http://www.orocrm.com/documentation/index/current/book/data-audits
+For full documentation visit http://www.oroinc.com/doc/orocrm/current/book/data-audits
