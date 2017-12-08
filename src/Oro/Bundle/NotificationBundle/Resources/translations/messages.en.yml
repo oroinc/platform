@@ -25,7 +25,6 @@ oro:
                 user: Recipient users
                 group: Recipient groups
                 custom_email: Recipient email
-                owner: Recipient entity owner
 
         emailnotification:
             entity_label:                        Notification Rule
@@ -39,8 +38,11 @@ oro:
             template.label:                      Template
             recipient_list.label:                Recipient list
             email.label:                         Email
-            owner.label:                         Owner
             additional_email_associations.label: Additional associations
+            additional_email_associations.label: Additional associations
+            contact_emails.label:                Contact Emails
+            additional_associations.tooltip: <b>Additional Associations</b>: Additional notification may be sent to the emails available in the associated entities records, if selected.
+            additional_emails.tooltip: <b>Contact Emails</b>: A list of the selected entity fields marked as email contact information.
 
         massnotification:
             entity_label:         Maintenance Notification

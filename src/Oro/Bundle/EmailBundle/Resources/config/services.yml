@@ -1272,10 +1272,13 @@ services:
             - { name: oro_email.emailtemplate.variable_processor, alias: entity_routes }
 
     oro_email.migration.demo_data_fixtures_listener.email_associations:
+        parent: oro_platform.event_listener.demo_data_fixtures_listener.abstract
         class: Oro\Bundle\EmailBundle\EventListener\EmailAssociationsDemoDataFixturesListener
         arguments:
-            - '@oro_platform.optional_listeners.manager'
-            - '@oro_message_queue.client.message_producer'
+            - '@oro_email.async.manager.association_manager'
+        calls:
+            # this listener is disabled to prevent a lot of UpdateEmailAssociations messages
+            - [disableListener, ['oro_email.listener.entity_listener']]
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }

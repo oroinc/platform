@@ -385,7 +385,11 @@ define(function(require) {
                 $placement.find('.' + this.errorClass);
                 label.appendTo($placement);
             } else {
-                $placement.next('.' + this.errorClass).remove();
+                if (this.settings) {
+                    $placement.next('.' + this.settings.errorClass).remove();
+                } else {
+                    $placement.next('.' + this.errorClass).remove();
+                }
                 label.insertAfter($placement);
             }
         },

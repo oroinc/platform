@@ -67,6 +67,9 @@ class JsLogSubscriber implements EventSubscriberInterface
     public function log(AfterStepTested $event)
     {
         $newLogs = $this->getLogs();
+        if (!$newLogs) {
+            return;
+        }
         $logs = array_slice($newLogs, count($this->savedLogs));
 
         if (!$logs) {

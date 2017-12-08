@@ -1,12 +1,10 @@
-Quick start
-===========
+# Quick Start
 
-The following examples may help to start using layouts in your application.
+The following examples can be helpful if you wish to use layouts in your application.
 
-Create the layout theme
------------------------
+## Create Layout Theme
 
-The theme definition should be placed at theme folder and named `theme.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/theme.yml`
+The theme definition should be placed in theme folder and named `theme.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/theme.yml`
 
 ```yaml
 #DemoBundle/Resources/views/layouts/first_theme/theme.yml
@@ -14,29 +12,26 @@ label:  Test Theme
 icon:   bundles/demo/images/favicon.ico
 groups: [ main ]
 ```
-See [theme definition](./theme_definition.md) topic for more details.
+See the [theme definition](./theme_definition.md) topic for more details.
 
-Use layout theme configuration
------------------------
+## Use Layout Theme Configuration
 
-Configuration files such as **assets**, **images** or **requirejs** should be placed in `layout/{theme_name}/config` folder.
+Configuration files such as **assets**, **images** or **requirejs** should be placed in the `layout/{theme_name}/config` folder.
 
-See [config definition](./config_definition.md) topic for more details.
+See the [config definition](./config_definition.md) topic for more details.
 
-Set default theme
------------------
+## Set Default Theme
 
-Now you need to setup your layout theme as the default one for your application. To do this you need to add the following configuration to the `app/config/config.yml` file:
+To set a default layout theme for your application, add the following configuration to the `app/config/config.yml` file:
 
 ```yaml
 oro_layout:
     active_theme: first_theme
 ```
 
-Create layout update files
---------------------------
+## Create Layout Update Files
 
-To create a skeleton of your layout theme create a layout update file and place it in `Resources/views/layouts` directory, for example `Resources/views/layouts/first_theme/default.yml`:
+To build a frame of your layout theme, create a layout update file and place it in the `Resources/views/layouts` directory, for example `Resources/views/layouts/first_theme/default.yml`:
 
 ```yaml
 layout:
@@ -98,12 +93,13 @@ layout:
                         footer: ~
 ```
 
-See [layout update](./layout_update.md) topic for more details.
+See the [layout update](./layout_update.md) topic for more details.
 
-Customize rendering of your theme
----------------------------------
+## Customize Rendering of Your Theme
 
-As you have seen in the previous section we have added `setBlockTheme` action there. The block theme responsible for defining how layout blocks are rendered. Let's create a simple block theme and place it in `Resources/views/layouts/first_theme/default.html.twig`:
+In the previous section, we added the `setBlockTheme` action. The block theme is responsible for defining the way layout blocks are rendered. 
+
+As an example, we are going to create a simple block theme and place it in `Resources/views/layouts/first_theme/default.html.twig`:
 
 ```twig
 {% block head_widget %}
@@ -147,12 +143,11 @@ As you have seen in the previous section we have added `setBlockTheme` action th
 {% endblock %}
 ```
 
-The rendering of the layouts is very similar to Symfony Forms, but `block_` prefix is used instead of `form_` prefix. Read appropriate topics in Symfony documentation, for example [How to Customize Form Rendering](http://symfony.com/doc/current/cookbook/form/form_customization.html).
+The rendering of the layouts is very similar to Symfony Forms, but the `block_` prefix is used instead of the `form_` prefix. You can find more information on customizing form rendering in the relevant Symfony documentation:[How to Customize Form Rendering](http://symfony.com/doc/current/cookbook/form/form_customization.html).
 
-Create a controller
--------------------
+## Create a Controller
 
-Now the layout is ready to work. To test it let's create a test controller:
+The layout is now ready. To test, we create a test controller:
 
 ```php
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -172,7 +167,8 @@ class UserController extends Controller
 }
 ```
 
-When you open this page in a browser you can see the HTML like this:
+The following HTML output is produced: 
+
 
 ```html
 <!DOCTYPE html>
@@ -200,13 +196,13 @@ When you open this page in a browser you can see the HTML like this:
 </html>
 ```
 
-Now let's make three simple changes to the layout of this page:
+We now make three simple changes to the layout of this page:
 
  - Set the title
  - Add some text in the content area
  - Add additional CSS class to the main panel
 
-To do this just create the layout update file and place it in the `Resources/views/layouts/first_theme/demo_layout_test` directory, for example `DemoBundle/Resources/views/layouts/first_theme/demo_layout_test/test.yml`:
+To do this, we create the layout update file and place it in the `Resources/views/layouts/first_theme/demo_layout_test` directory, for example `DemoBundle/Resources/views/layouts/first_theme/demo_layout_test/test.yml`:
 
 ```yaml
 layout:
@@ -227,9 +223,9 @@ layout:
             optionValue: test-css-class
 ```
 
-Please note that the file is placed in the route specific folder and as the result it will be executed only if you go to `demo_layout_test` route.
+As the file is placed in the route specific folder, the update will apply only to the page related to the `demo_layout_test` route.
 
-Now when you open the test page in a browser you can see the HTML like this:
+When you open the test page in a browser, the following HTML output is produced:
 
 ```html
 <!DOCTYPE html>

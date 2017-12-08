@@ -1,8 +1,8 @@
-Domain Model
-============
+# Domain Model
 
-Table of Contents
------------------
+
+## Table of Contents
+
  - [Job](#job)
     - [Job Executor](#job-executor)
     - [Job Result](#job-result)
@@ -57,26 +57,27 @@ Table of Contents
     - [Template Fixture Interface](#template-fixture-interface)
     - [Template Fixture Registry](#template-fixture-registry)
 
-Job
----
+## Job
+
 
 ### Job Executor
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Job\JobExecutor
 
 **Description:**
-This class should be used to run import/export operations. It encapsulates all interaction with OroBatchBundle
-and take care of all details of processing Job in OroBatchBundle. Adds support of transactional execution of jobs
-and error handing on exceptions. As a result of execution import/export operation returns instance of Job Result.
+
+This class should be used to run import/export operations. It encapsulates all interactions with OroBatchBundle and is responsible for all job processing details in OroBatchBundle. It also supports the jobs transactional execution and handles exceptions and errors. As a result of the execution, the import/export operation returns the job result data.
 
 **Methods:**
-* **executeJob(jobType, jobName, configuration)** - executes a job and returns Job Result
 
-Parameters *jobType* and *jobName* of executeJob method corresponds to configuration of jobs of OroBatchBundle.
-Parameter *configuration* is a specific configuration of job, that will be passed to Context. Reader, Processor and
-Writer aware of Context and can obtain their configuration from it.
+* **executeJob(jobType, jobName, configuration)** - executes a job and returns the job result data.
 
-#### Parameters jobType and jobName in jobs configuration of OroBatchBundle
+The *jobType* and *jobName* parameters of the executeJob method correspond to the OroBatchBundle jobs configuration.
+The *configuration* parameter is a specific configuration of a job obtained by Context. Reader, Processor, and Writer have access to Context and can also acquire their configuration from it.
+
+#### The jobType and jobName parameters in jobs configuration of OroBatchBundle
 
 ```
 connector:
@@ -94,187 +95,224 @@ connector:
 ```
 
 ### Job Result
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Job\JobResult
 
 **Description:**
-Encapsulates results of import/export execution. When import/export is executed as a result instance of Job Result is
-returned. This object contains detailed information about import/export execution status, such as operation
-success status, execution context, failure exceptions, job code.
 
-Context
--------
+The JobResult parameter encapsulates the results of the import/export execution. Upon import/export execution, the JobResult data is returned. It contains detailed information about the import/export execution status, such as an operation success status, an execution context, failure exceptions, and a job code.
+
+## Context
 
 ### Context Interface
+
 **Interface:**
+
 Oro\Bundle\ImportExportBundle\Context\ContextInterface
 
 **Description:**
-Provide interface for accessing different kind of data that is shared during processing import/export
-operation. Such data are:
- * counters (how much records were read/wrote/added/deleted/replaced/updated)
- * errors (error messages and failure exception messages)
- * configuration (set up by controller and used by any class that involved in processing import/export and aware of context)
- * options (custom data that could be accessed by any context aware object)
+
+Th context interface provides an interface for accessing different kinds of data and is shared during the import/export operation processing. 
+
+The following data are available to access:
+ * counters (how many records were read/written/added/deleted/replaced/updated);
+ * errors (error messages and failure exception messages);
+ * configuration (set up by a controller, used by any class that is involved in the import/export processing, and reads the context information);
+ * options (the custom data that are reached by any context accessing objects).
 
 ### Step Execution Proxy Context
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext
 
 **Description:**
-Implementation of Oro\Bundle\ImportExportBundle\Context\ContextInterface. It is a wrapper of
-instance of Akeneo\Bundle\BatchBundle\Entity\StepExecution from AkeneoBatchBundle.
+
+StepExecutionProxyContext is a wrapper of the Akeneo\Bundle\BatchBundle\Entity\StepExecution instance from AkeneoBatchBundle.
 
 **Akeneo\Bundle\BatchBundle\Entity\StepExecution**
-Instance of this class can store data of step execution, such as number of records were read/write, errors, exceptions,
-read warnings and execution context (Akeneo\Bundle\BatchBundle\Item\ExecutionContext), a storage for abstract data generated during execution.
 
-As import/export domain has it's own terms, ContextInterface expands Akeneo\Bundle\BatchBundle\Entity\StepExecution
-interface and decouples it's clients from knowing about OroBatchBundle.
+The instance of this class can store the data of step execution, such as a number of records that were read/written, errors, exceptions, warnings, and an execution context (Akeneo\Bundle\BatchBundle\Item\ExecutionContext) as well as the abstract data generated during the execution.
+
+As the import/export domain has its own terms, ContextInterface expands the Akeneo\Bundle\BatchBundle\Entity\StepExecution interface and separates its clients from OroBatchBundle.
 
 ### Context Registry
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Context\ContextRegistry
 
 **Description:**
-A storage which gets specific instance of context based on Akeneo\Bundle\BatchBundle\Entity\StepExecution.
-Provides interface to get single instances Contexts using Akeneo\Bundle\BatchBundle\Entity\StepExecution.
 
-Reader
-------
+ContextRegistry is a storage which gets a specific instance of the context based on Akeneo\Bundle\BatchBundle\Entity\StepExecution and provides the interface to get a single instance context using Akeneo\Bundle\BatchBundle\Entity\StepExecution.
+
+## Reader
 
 ### Reader Interface
+
 **Interface:**
+
 Oro\Bundle\ImportExportBundle\Reader\ReaderInterface
 
 **Description:**
-Interface for class that is responsible for reading data from some source. Extends from reader of OroBatchBundle.
+
+The reader interface is a class interface that is responsible for reading the data from some source. It is extended from the OroBatchBundle reader.
 
 ### CSV File Reader
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Reader\CsvFileReader
 
 **Description:**
-Reads data from CSV file. Result of read operation is an array that represents read line from file and keys of this
-array are taken from first row or custom header option.
+
+The CSV file reader reads the data from a CSV file. The result of the operation is an array that represents a read line from the file. The keys of this array are taken from the first row or a custom header option.
 
 **Configuration Options**
 
-* **filePath** - path to source file
-* **delimiter** - CSV delimiter symbol (default ,)
-* **enclosure** - CSV enclosure symbol (default ")
-* **escape** - CSV escape symbol (default \)
-* **firstLineIsHeader** - a flag tells that the first line of CSV file is a header (default true)
-* **header** - a custom header
+* **filePath** - path to a source file;
+* **delimiter** - a CSV delimiter symbol (default ,);
+* **enclosure** - a CSV enclosure symbol (default ");
+* **escape** - a CSV escape symbol (default \);
+* **firstLineIsHeader** - a flag that indicates that the first line of the CSV file is a header (default true);
+* **header** - a custom header.
 
 ### Entity Reader
 
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Reader\EntityReader
 
 **Description:**
-Reads entities using Doctrine. To allow handling large amounts of data without memory lack errors  reading is performed
-using Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator which loads data partially using internal batch.
+
+The entity reader reads entities using Doctrine. The Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator action is used to perform the reading which loads the data partially using internal batch and allows handling a large amount of data without memory lack errors. 
 
 **Configuration Options**
 
-* **entityName** - the name or class name of entity to read
-* **queryBuilder** - and instance of custom Doctrine\ORM\QueryBuilder
-* **query** - and instance of custom Doctrine\ORM\Query
+* **entityName** - the name or class name of the entity;
+* **queryBuilder** - an instance of custom Doctrine\ORM\QueryBuilder;
+* **query** - an instance of custom Doctrine\ORM\Query.
 
-One option is required, options are mutually exclusive.
+One option is required, the options are mutually exclusive.
 
 ### Template Fixture Reader
 
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Reader\TemplateFixtureReader
 
 **Description:**
-Reads import templates data for given entity.
+
+The fixture reader reads the import template data for the corresponding entity.
 
 **Configuration Options:**
-* **entityName** - the name or class name of entity for which fixture loaded
 
-Processor
----------
+* **entityName** - the name or class name of the entity for which the fixture is loaded.
+
+## Processor
 
 ### Context Aware Processor
+
 **Interface:**
+
 Oro\Bundle\ImportExportBundle\Processor\ContextAwareProcessor
 
 **Description:**
-Interface used to work with context inside processors. Aggregates ProcessorInterface and ContextAwareInterface
+
+The context aware processor is an interface used to work with a context inside processors. It aggregates ProcessorInterface and ContextAwareInterface.
 
 **Methods:**
-* **setImportExportContext(context)** - context setter
-* **process(item)** - process import/export operation. Parameter named item comes from reader, it could be an array
-read from CSV file or one of the entities queries from Doctrine.
+
+* **setImportExportContext(context)** - a context setter;
+
+* **process(item)** - a process of the import/export operation. The item parameter comes from the reader, it can be an array read from a CSV file or one of the entity queries from Doctrine.
 
 ### Entity Name Aware Interface
+
 **Interface:**
+
 Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface
 
 **Description:**
-Interface used to work with entity class inside processors.
+
+EntityNameAwareInterface is an interface used to work with an entity class inside processors.
 
 **Methods:**
-* **setEntityName(entityName)** - entity name setter
+
+* **setEntityName(entityName)** - an entity name setter.
 
 ### Entity Name Aware Processor
+
 **Interface:**
+
 Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareProcessor
 
 **Description:**
-Interface used to work with entity class inside processors. Aggregates ProcessorInterface and EntityNameAwareInterface
+
+EntityNameAwareProcessor is an interface used to work with an entity class inside processors. It aggregates ProcessorInterface and EntityNameAwareInterface.
 
 **Methods:**
-* **setEntityName(entityName)** - entity name setter
-* **process(item)** - process import/export operation. Parameter named item comes from reader, it could be an array
-read from CSV file or one of the entities queries from Doctrine.
+
+* **setEntityName(entityName)** - an entity name setter;
+
+* **process(item)** - a process of the import/export operation. The item parameter comes from the reader, it can be an array read from a CSV file or one of the entity queries from Doctrine.
 
 ### Processor Interface
+
 **Interface:**
+
 Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface
 
 **Description:**
-Interface for class that is processing import/export operation. Extends from processor of OroBatchBundle.
+
+ProcessorInterface is an interface for a class that is processing the import/export operation. It is extended from the OroBatchBundle processor.
 
 **Methods:**
-* **process(item)** - process import/export operation. Parameter named item comes from reader, it could be an array
-read from CSV file or one of the entities queries from Doctrine.
+
+* **process(item)** - a process of the import/export operation. The item parameter comes from the reader, it can be an array read from a CSV file or one of the entity queries from Doctrine.
 
 ### Import Processor
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Processor\ImportProcessor
 
 **Classes:**
-* **Context** - to manage import configuration and results
-* **Serializer** - to deserialize output of Data Converter to entity object
-* **Data Converter** - to convert array of reader format to array of serializer format.
-* **Strategy** - to perform main logic of import with deserialized entity (Add/Update/Replace/Delete entities)
+
+* **Context** - manages the import configuration and its results;
+* **Serializer** - deserializes the output of Data Converter to the entity object;
+* **Data Converter** - converts the array of a reader format to the array of a serializer format;
+* **Strategy** - performs a main logic of the import with a deserialized entity (Add/Update/Replace/Delete entities).
 
 **Options:**
-* **Class Name** - imported entity class
+
+* **Class Name** - an imported entity class.
 
 ### Export Processor
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Processor\ExportProcessor
 
 **Classes:**
-* **Context** - to manage export configuration and results
-* **Serializer** - to serialize input entity to array/scalar representation
-* **Data Converter** - to convert serialized array to format of writer
+
+* **Context** - manages the export configuration and its results;
+* **Serializer** - serializes the input entity to an array/scalar representation;
+* **Data Converter** - converts a serialized array to a required format.
 
 **Options:**
-* **Class Name** - exported entity class
+
+* **Class Name** - an exported entity class.
 
 ### Processor Registry
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry
 
-Provide a storage of all registered processors that declared by client bundles. Specific processor of some entity
-extends basic one (Import Processor or Export Processor) and contains it's own components (Serializer, Data Converter,
-Strategy). Such processor should be registered in DIC with tag:
+ProcessorRegistry provides a storage of all registered processors declared by the client bundles. A specific processor of an entity extends the basic one (Import Processor or Export Processor) and contains its own components (Serializer, Data Converter, Strategy). Such processor should be registered in DIC with the following tag:
 
 ```
 services:
@@ -287,133 +325,147 @@ services:
 ```
 
 **Methods:**
-* **registerProcessor(ProcessorInterface, type, entityName, alias)** - register processor using input parameters
-* **unregisterProcessor(type, entityName, alias)** - unregister processor using input parameters
-* **hasProcessor(type, alias)** - checks that processor registered
-* **getProcessor(type, alias)** - gets registered processor
-* **getProcessorsByEntity(type, entityName)** - gets registered processor by entity, import could have several
-processors for some entity, for example one processor for "Add and Replace" import behaviour and other for "Delete"
-import behaviour,
-* **getProcessorAliasesByEntity(type, entityName)** - get all processors aliases by type and entity name
-* **getProcessorEntityName(type, alias)** - get entity name by processor type and alias
+
+* **registerProcessor(ProcessorInterface, type, entityName, alias)** - registers a processor using the input parameters;
+* **unregisterProcessor(type, entityName, alias)** - unregisters the processor using the input parameters;
+* **hasProcessor(type, alias)** - checks that the processor is registered;
+* **getProcessor(type, alias)** - gets the registered processor;
+* **getProcessorsByEntity(type, entityName)** - gets the registered processor by an entity. The import can have several processors for an entity, for example, one processor for the "Add and Replace" import behaviour and the other for the "Delete" import behaviour;
+* **getProcessorAliasesByEntity(type, entityName)** - gets all processors aliases by a type and entity name;
+* **getProcessorEntityName(type, alias)** - gets an entity name by the processor type and alias.
 
 ### Registry Delegate Processor
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Processor\RegistryDelegateProcessor
 
 **Description:**
-This processor uses Processor Registry and configuration options from Context to delegate processing.
+
+RegistryDelegateProcessor uses the registry processor and configuration options from Context to delegate the processing.
 
 **Classes:**
-* **Processor Registry** - processor storage
-* **Context Registry** - context storage
-* **Step Execution** - batch domain object representation the execution of a step
+
+* **Processor Registry** - a processor storage;
+* **Context Registry** - a context storage;
+* **Step Execution** - a batch domain object representation of the step execution.
 
 **Options:**
-* **delegateType** - delegate type (import, import_validation, export, export_template)
-* **processorAlias** - alias of processor in Processor Registry
 
-Writer
-------
+* **delegateType** - delegates a type (import, import_validation, export, export_template);
+* **processorAlias** - an alias of a processor in Processor Registry.
+
+##Writer
 
 ### Writer Interface
+
 **Interface:**
+
 Oro\Bundle\ImportExportBundle\Writer\WriterInterface
 
 **Description:**
-Interface for class that is responsible for writing data to destination place. Called at the end of each batch
-with items, that were first read by Reader and than processed by Processor.
+
+WriterInterface is an interface for a class that is responsible for recording the data to its destination place. It is triggered at the end of a query process chain, after Reader and Processor complete their operations. 
 
 ### Csv File Writer
+
 **Interface:**
+
 Oro\Bundle\ImportExportBundle\Writer\CsvFileWriter
 
 **Description:**
-This class performs writing of data to CSV file. It is used in export job, when entities are exported to CSV file.
+
+This class records the data to a CSV file. It is used in the export job when entities are exported to the CSV file.
 
 ### Entity Writer
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Writer\EntityWriter
 
 **Description:**
-Used in import job. Persists and flushes Doctrine entities, than After clears Doctrine to make possible operations
-with large amounts of data without memory limit errors.
+
+EntityWriter is used in the import job. It persists and flushes the Doctrine entities enabling to perform the operations  with large amount of data without memory limit errors.
 
 **Warning**
-Clearing Doctrine can be dangerous and lead to errors with detached entities in Doctrine's Unit of Work. To eliminate
-such errors make sure that doctrine listeners doesn't set values to entities from sources other than Doctrine's
-repositories.
+
+Clearing Doctrine can be dangerous and can lead to errors with detached entities in Doctrine's Unit of Work. To eliminate such errors, make sure that doctrine listeners do not set any values to the entities from the sources other than the Doctrine's repositories.
 
 ### Doctrine Clear Writer
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Writer\DoctrineClearWriter
 
 **Description:**
-Clears Doctrine on each batch. Used in import validation job.
 
+DoctrineClearWriter clears Doctrine on each batch. It is used in the import validation job.
 
-Converter
----------
+## Converter
 
 ### Abstract Table Data Converter
+
 **Interface:**
+
 Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter
 
 **Description:**
-Abstract class that is responsible for headers and conversion rules.
-Can be extended and used in more complex use cases when you need to provide human readable
-names of headers in import/export files. Configured with the rules that will be used to convert data to import/export
-formats. See Oro\Bundle\ContactBundle\ImportExport\Converter\ContactDataConverter as an example of usage of this
-class.
+
+AbstractTableDataConverter is an abstract class that is responsible for headers and conversion rules. It is extended and used in more complex use cases when you need to provide human-readable names of headers in the import/export files. The rules for AbstractTableDataConverter are configured to enable the corresponding data converting to the import/export formats. See Oro\Bundle\ContactBundle\ImportExport\Converter\ContactDataConverter as an example of the usage of this class.
 
 **Methods:**
-* **convertToExportFormat(exportedRecord, skipNullValues)** - converts exportedRecord to format that will be written
-by Writer to destination place
-* **convertToImportFormat(importedRecord, skipNullValues)** - converts importedRecord to format that will be used to
-deserialize entity from array
+
+* **convertToExportFormat(exportedRecord, skipNullValues)** - converts exportedRecord to the format expected by its destination;
+* **convertToImportFormat(importedRecord, skipNullValues)** - converts importedRecord to the format which is used to deserialize the entity from the array.
 
 ### Configurable Table Data Converter
+
 **Interface:**
+
 Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter
 
 **Description:**
-Class that is responsible for data conversion
+
+ConfigurableTableDataConverter is a class that is responsible for the data conversion.
 
 **Methods:**
-* **convertToExportFormat(exportedRecord, skipNullValues)** - converts exportedRecord to format that will be written
-by Writer to destination place
-* **convertToImportFormat(importedRecord, skipNullValues)** - converts importedRecord to format that will be used to
-deserialize entity from array
+
+* **convertToExportFormat(exportedRecord, skipNullValues)** - converts exportedRecord to the format expected by its destination;
+* **convertToImportFormat(importedRecord, skipNullValues)** - converts importedRecord to the format which is used to deserialize the entity from the array.
 
 **Classes:**
-* **FieldHelper** - helper to work with entity config
-* **RelationCalculator** class that is responsible for collection size calculation
+
+* **FieldHelper** - a helper that works with the entity configuration;
+* **RelationCalculator** - a class that calculates a relation collection size.
 
 **Options:**
-* **entityClass** - entity class
+
+* **entityClass** - an entity class.
 
 ### Data Converter Interface
+
 **Interface:**
+
 Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface
 
 **Description:**
-Interface for class that is responsible for converting data to export/import format. Used Processor that generally
-has it's own Data Converter. Format of input data depends on Serializer results.
+
+DataConverterInterface is an interface for a class that is responsible for converting the data to the export/import format. It uses Processor that generally has its own Data Converter. The format of the input data depends on the serializer results.
 
 **Methods:**
-* **convertToExportFormat(exportedRecord, skipNullValues)** - converts exportedRecord to format that will be written
-by Writer to destination place
-* **convertToImportFormat(importedRecord, skipNullValues)** - converts importedRecord to format that will be used to
-deserialize entity from array
+
+* **convertToExportFormat(exportedRecord, skipNullValues)** - converts exportedRecord to the format expected by its destination;
+* **convertToImportFormat(importedRecord, skipNullValues)** - converts importedRecord to the format which is used to deserialize the entity from the array.
 
 ### Default Data Converter
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Converter\DefaultDataConverter
 
 **Description:**
-Default converted that is applicable in simple cases of import/export. Can convert data between two
-representations: one dimensional vs multi-dimensional arrays. Uses delimiter ":" in keys to convert between these
-two formats.
+
+DefaultDataConverter is applicable in simple cases of import/export. It can convert the data between two representations: one dimensional vs multi-dimensional arrays. It uses the ":" delimiter in keys to be converted between these two formats.
 
 **Example of formats:**
 
@@ -433,121 +485,153 @@ array(
 ```
 
 **Methods:**
-* **convertToExportFormat(exportedRecord, skipNullValues)** - converts exportedRecord array to one-dimensional array
-* **convertToImportFormat(importedRecord, skipNullValues)** - converts importedRecord array to multi-dimensional array
+
+* **convertToExportFormat(exportedRecord, skipNullValues)** - converts the exportedRecord array to a one-dimensional array;
+* **convertToImportFormat(importedRecord, skipNullValues)** - converts the importedRecord array to a multi-dimensional array.
 
 ### Query Builder Aware Interface
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Converter\QueryBuilderAwareInterface
 
 **Description:**
-Interface used to specify whether need to set query builder to converter to perform additional adjustments
+
+QueryBuilderAwareInterface is used to specify whether need to set query builder to the converter to perform additional adjustments.
 
 **Methods:**
-* **setQueryBuilder(queryBuilder)** - set query builder to converter
+
+* **setQueryBuilder(queryBuilder)** - sets a query builder to the converter.
 
 ### Relation Calculator
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Converter\RelationCalculator
 
 **Description:**
-Class used to count collections and countable items
+
+RelationCalculator is a class used to count the collections and countable items.
 
 **Methods:**
-* **getMaxRelatedEntities(entityName, fieldName)** - count entities in relation
+
+* **getMaxRelatedEntities(entityName, fieldName)** - counts the entities in relations.
 
 **Classes:**
-* **ManagerRegistry** - contract covering object managers for a Doctrine persistence layer ManagerRegistry class to implement.
-* **FieldHelper** - helper to work with entity config
+
+* **ManagerRegistry** - contracts covering object managers for a Doctrine persistence layer ManagerRegistry class to implement.
+* **FieldHelper** - a helper that works with the entity configuration.
 
 ### Relation Calculator Interface
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Converter\RelationCalculatorInterface
 
 **Description:**
-Interface used to count collections and countable items
+
+RelationCalculatorInterface is an interface used to count the collections and countable items.
 
 **Methods:**
-* **getMaxRelatedEntities(entityName, fieldName)** - count entities in relation
+
+* **getMaxRelatedEntities(entityName, fieldName)** - counts the entities in relations.
 
 ### Template Fixture Relation Calculator
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Converter\TemplateFixtureRelationCalculator
 
 **Description:**
-Class used to count collections and countable items inside import templates
+
+TemplateFixtureRelationCalculator is a class used to count the collections and countable items inside the import templates.
 
 **Methods:**
-* **getMaxRelatedEntities(entityName, fieldName)** - count entities in relation
+
+* **getMaxRelatedEntities(entityName, fieldName)** - counts the entities in relations.
 
 **Classes:**
-* **TemplateManager** - fixture storage
-* **FieldHelper** - helper to work with entity config
 
-Strategy
---------
+* **TemplateManager** - fixture storage;
+* **FieldHelper** - a helper that works with the entity configuration.
+
+## Strategy
 
 ### Strategy Interface
+
 **Interface:**
+
 Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface
 
 **Description:**
-Interface for class that is responsible for performing import logic operations with entities that were read and
-deserialized. The logic could be anything that import should do, for example add all read entities as new, or try to
-search entities and if there were found - update them.
+
+StrategyInterface is an interface for a class that is responsible for performing the import logic operations with the entities that were read and deserialized, for example, adding all read entities as new ones or updating the existing ones.
 
 **Methods:**
-* **process(entity)** - process entity with some logic
+
+* **process(entity)** - processes the entity with a specific logic.
 
 ### Import Strategy Helper
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Strategy\ImportStrategyHelper
 
 **Description:**
-A helper class that could be used by specific strategy to perform some generic operations imported records.
+
+A helper class that is used by a specific strategy to perform some generic operations for the imported records.
 
 **Methods:**
-* **importEntity(basicEntity, importedEntity, excludedProperties)** - import values of basicEntity to importedEntity
-using Doctrine metadata
-* **validateEntity(entity)** - get list of validation errors
-* **addValidationErrors(validationErrors, ContextInterface, errorPrefix)** - add validation errors to Context
+
+* **importEntity(basicEntity, importedEntity, excludedProperties)** - imports values of basicEntity to importedEntity using the Doctrine metadata;
+* **validateEntity(entity)** - gets a list of validation errors;
+* **addValidationErrors(validationErrors, ContextInterface, errorPrefix)** - adds validation errors to Context.
 
 
 ### Configurable Add Or Replace Strategy
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Strategy\ConfigurableAddOrReplaceStrategy
 
 **Description:**
-Default strategy used for import. Updates existing entities or adds new ones.
+The default strategy is used for the import. It updates the existing entities or adds new ones.
 
 **Methods:**
-* **process(entity)** - process entity with some logic
+
+* **process(entity)** - processes the entity with a specific logic.
 
 **Classes:**
-* **ContextInterface** - execution context
-* **ImportStrategyHelper** - strategy helper for generic import operations
-* **FieldHelper** - helper to work with entity config
+
+* **ContextInterface** - an execution context;
+* **ImportStrategyHelper** - a strategy helper for generic import operations;
+* **FieldHelper** - a helper that works with the entity configuration.
 
 **Options:**
-* **entityName** - entity class
 
-Serializer
-----------
+* **entityName** - an entity class.
+
+## Serializer
 
 ### Dummy Encoder
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Serializer\Encoder\DummyEncoder
 
 **Description:**
-This encoder is used by import/export processor, no encoding/decoding is required, all work is done by normalizers
+
+This encoder is used by the import/export processor, no encoding/decoding is required, all work is done by normalizers.
 
 ### Serializer
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Serializer\Serializer
 
 **Description:**
-Class that extends from standard Symfony's serializer and used instead of it to do serialization/deserialization. Has
-it's own normalizers/denormalizers that can be added using tags in DI configuration:
+
+Serializer is a class extended from a standard Symfony's serializer and used instead of it to perform serialization/deserialization. It has its own normalizers/denormalizers that are added using the following tags in the DI configuration:
 
 ```
 services:
@@ -557,121 +641,141 @@ services:
             - { name: oro_importexport.normalizer }
 ```
 
-Each entity that you want to export/import should be supported by import/export Serializer. It means that you should
-add normalizers/denormalizers that will take care of converting your entity to array/scalar representation
-(normalization during serialization) and vice verse converting array to entity object representation (denormalization
-during deserialization).
+Each entity that you want to export/import should be supported by the import/export serializer. It means that you should add normalizers/denormalizers that are responsible for converting your entity to the array/scalar representation (normalization during serialization), and vice versa, converting the array to the entity object representation (denormalization during deserialization).
 
 ### Normalizer
 
-Namespace for normalizers
+It is a namespace for normalizers.
 
 ### Abstract Context Mode Aware Normalizer
+
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Serializer\Normalizer\AbstractContextModeAwareNormalizer
 
 **Description:**
-Abstract normalizer that manages normalizers available and default modes
+
+AbstractContextModeAwareNormalizer ia an abstract normalizer that manages the available normalizers and default modes.
 
 **Methods:**
-* **normalize(object, format, context)** - method used convert object ot array
-* **denormalize(data, class, format, context)** - method used convert array to instance of `class` instance
+
+* **normalize(object, format, context)** - a method used to convert objects to arrays;
+* **denormalize(data, class, format, context)** - a method used to convert arrays to the `class` instance.
 
 ### Collection Normalizer
 
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Serializer\Normalizer\CollectionNormalizer
 
 **Description:**
-Collection normalizer
+
+Collection normalizer.
 
 **Methods:**
-* **normalize(object, format, context)** - method used convert object ot array
-* **denormalize(data, class, format, context)** - method used convert array to instance of `class` instance
-* **supportsNormalization(data, format, context)** - method used check normalization support
-* **supportsDenormalization(data, format, context)** - method used check denormalization support
+
+* **normalize(object, format, context)** - a method used to convert objects to arrays;
+* **denormalize(data, class, format, context)** - a method used to convert arrays to the `class` instance;
+* **supportsNormalization(data, format, context)** - a method used to check a normalization support;
+* **supportsDenormalization(data, format, context)** - a method used to check a denormalization support.
 
 ### Configurable Entity Normalizer
 
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer
 
 **Description:**
-Entity normalizer that manages entity normalization and denormalization, resolves entity class DateTime or relation,
-manages related entity normalization
+
+Entity normalizer manages the entity normalization and denormalization and resolves the entity DateTime class or relation.
 
 **Methods:**
-* **normalize(object, format, context)** - method used convert object ot array
-* **denormalize(data, class, format, context)** - method used convert array to instance of `class` instance
-* **supportsNormalization(data, format, context)** - method used check normalization support
-* **supportsDenormalization(data, format, context)** - method used check denormalization support
-* **setSerializer(serializer)** - serializer setter from SerializerAwareInterface
+
+* **normalize(object, format, context)** - a method used to convert objects to arrays;
+* **denormalize(data, class, format, context)** - a method used to convert arrays to the `class` instance;
+* **supportsNormalization(data, format, context)** - a method used to check a normalization support;
+* **supportsDenormalization(data, format, context)** - a method used to check a denormalization support;
+* **setSerializer(serializer)** - a serializer setter from SerializerAwareInterface.
 
 **Classes:**
-* **FieldHelper** - helper to work with entity config
+
+* **FieldHelper** - a helper that works with the entity configuration.
 
 ### DateTime Normalizer
 
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DateTimeNormalizer
 
 **Description:**
-Normalizer for DateTime objects
+
+DateTimeNormalizer is a normalizer for the DateTime objects.
 
 **Methods:**
-* **normalize(object, format, context)** - method used convert object ot array
-* **denormalize(data, class, format, context)** - method used convert array to instance of `class` instance
-* **supportsNormalization(data, format, context)** - method used check normalization support
-* **supportsDenormalization(data, format, context)** - method used check denormalization support
+
+* **normalize(object, format, context)** - a method used to convert objects to arrays;
+* **denormalize(data, class, format, context)** - a method used to convert arrays to the `class` instance;
+* **supportsNormalization(data, format, context)** - a method used to check a normalization support;
+* **supportsDenormalization(data, format, context)** - a method used to check a denormalization support.
 
 ### Denormalizer Interface
 
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface
 
 **Description:**
-Extends `Symfony\Component\Serializer\Normalizer\DenormalizerInterface` used to pass context to `supportsDenormalization`
-method, add more flexibility in case we need to use more than one normalizer
+
+DenormalizerInterface extends `Symfony\Component\Serializer\Normalizer\DenormalizerInterface` and is used to pass the context to the `supportsDenormalization` method, providing more flexibility if more than one normalizer is used.
 
 **Methods:**
-* **supportsDenormalization(data, format, context)** - method used check denormalization support
+
+* **supportsDenormalization(data, format, context)** - a method used to check a denormalization support.
 
 ### Normalizer Interface
 
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface
 
 **Description:**
-Extends `Symfony\Component\Serializer\Normalizer\NormalizerInterface` used to pass context to `supportsNormalization`
-method, add more flexibility in case we need to use more than one normalizer
+
+NormalizerInterface extends `Symfony\Component\Serializer\Normalizer\NormalizerInterface` and is used to pass the context to the `supportsDenormalization` method, providing more flexibility if more than one normalizer is used.
 
 **Methods:**
-* **supportsNormalization(data, format, context)** - method used check normalization support
 
-TemplateFixture
----------------
-Classes for import template functionality
+* **supportsNormalization(data, format, context)** - a method used to check a normalization support.
+
+## TemplateFixture
+
+Classes for the import template functionality.
 
 ### Template Fixture Interface
 
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Serializer\Normalizer\TemplateFixtureInterface
 
 **Description:**
-Interface for import fixtures
+
+TemplateFixtureInterface is an interface for the import fixtures.
 
 **Methods:**
-* **getData()** - return fixture date
+
+* **getData()** - returns the fixture data.
 
 ### Template Fixture Registry
 
 **Class:**
+
 Oro\Bundle\ImportExportBundle\Serializer\Normalizer\TemplateManager
 
 **Description:**
-Fixtures registry
+
+Template for a fixtures registry.
 
 **Methods:**
-* **addEntityRepository(fixture)**  - add repository to registry
-* **hasEntityFixture(entityClass)** - check that fixture exist for given `entityClass`
-* **getEntityFixture(entityClass)** - returns fixture for given `entityClass`
+
+* **addEntityRepository(fixture)**  - adds a repository to a registry;
+* **hasEntityFixture(entityClass)** - checks whether the fixture exists for given `entityClass`;
+* **getEntityFixture(entityClass)** - returns the fixture for given `entityClass`.

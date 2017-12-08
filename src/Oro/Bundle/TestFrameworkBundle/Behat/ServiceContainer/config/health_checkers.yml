@@ -8,6 +8,11 @@ services:
     tags:
       - { name: 'behat_health_checker' }
 
+  oro_behat_extension.health_checker.feature_cs_ckecker:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\FeatureCSChecker
+    tags:
+      - { name: 'behat_health_checker' }
+
   oro_behat_extension.health_checker.result_printer_subscriber:
     class: Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\ResultPrinterSubscriber
     arguments:

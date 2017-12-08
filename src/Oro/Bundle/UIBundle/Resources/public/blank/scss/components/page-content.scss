@@ -2,8 +2,6 @@
 
 .page-content {
     width: $page-content-width;
-
-    box-sizing: border-box;
     
     @include clearfix();
 

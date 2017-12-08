@@ -88,7 +88,7 @@ define(function(require) {
 
             this.$el.data('inputWidget', this)
                 .attr('data-bound-input-widget', this.widgetFunctionName || 'no-name');
-            if (!this.widgetFunction) {
+            if (!this.widgetFunction && this.widgetFunctionName) {
                 this.widgetFunction = _.bind(this.$el[this.widgetFunctionName], this.$el);
             }
 

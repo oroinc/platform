@@ -1,19 +1,19 @@
-Layout data
------------
+# Layout data
 
-In most cases you need use the same layout to show different data. For example, the same layout can be used to show different products. To achieve this you need a way to get data and to bind them to layout elements.
-This topic describes what the layout data are and how to work with them. Please make sure that you are familiar with the [layout context](layout_context.md) before learning of the layout data.
+In most cases, you need use the same layout to show different data. For example, the same layout can be used to show different products. To achieve this, you need a way to get data and to bind them to layout elements.
 
-Data providers types
---------------------
+This topic describes what the layout data are and how to work with them. Please make sure that you are familiar with the [layout context](layout_context.md) before proceeding to the layout data.
 
-There are two ways how to provide data for layouts:
+## Types of Data Providers
 
-- Add them to `data` collection of the [layout context](../../../../Component/Layout/ContextInterface.php). This method can be used for page specific data or the data retrieved from the HTTP request.
-- Create standalone data provider. This method is useful if some data is used on many pages and the data source is a database, HTTP session, external web service, etc.
+You can provide data for layouts in two ways:
 
-Using the layout context as data provider
------------------------------------------
+
+- By adding them to the `data` collection of the [layout context](../../../../Component/Layout/ContextInterface.php). This method can be used for page specific data, or the data retrieved from the HTTP request.
+- By creating a standalone data provider. This method is useful if data is used on many pages and the data source is a database, HTTP session, external web service, etc.
+
+## Using the Layout Context as Data Provider
+
 
 If you want to add some data to the layout context you can use `data` method of [ContextInterface](../../../../Component/Layout/ContextInterface.php). This method returns an instance of [ContextDataCollection](../../../../Component/Layout/ContextDataCollection.php). Use `set` method of this collection to add data:
 
@@ -47,13 +47,12 @@ $context->data()->setDefault(
 The `setDefault` method has the following arguments:
 
 - `$name` - A string which can be used to access the data.
-- `$value` - The data. The data can be any type, for example an array, object or some scalar type. Also you can use the callback method to get the data. The callback definition: `function (array|\ArrayAccess $options) : mixed`, where where `$options` argument represents the context variables.
+- `$value` - The data. The data can be any type, for example an array, object or some scalar type. You can also use the callback method to get the data. The callback definition is as follows: `function (array|\ArrayAccess $options) : mixed`, where the `$options` argument represents the context variables.
 
 
-Defining a data provider
-------------------------
+## Defining a Data Provider
 
-As example, let's consider a data provider that returns product details:
+As example, consider a data provider that returns product details:
 
 ```php
 namespace Acme\Bundle\ProductBundle\Layout\Extension;
@@ -72,14 +71,13 @@ class ProductDataProvider
 }
 ```
 
-Also you can implement [AbstractFormProvider](../../Layout/DataProvider/AbstractFormProvider.php) if you use forms.
+You can also implement the [AbstractFormProvider](../../Layout/DataProvider/AbstractFormProvider.php) if you use forms.
 
-**IMPORTANT:**  DataProvider provider method should begin with `get`, `has` or `is`.
+**IMPORTANT:** The DataProvider provider method should begin with `get`, `has` or `is`.
 
-Registering a data provider
----------------------------
+## Registering a Data Provider
 
-To make the layout engine aware of your data provider it should be registered as a service in DI container with the tag `layout.data_provider`:
+To make the layout engine aware of your data provider, register it as a service in the DI container with the `layout.data_provider` tag:
 
 ```yaml
 acme_product.layout.data_provider.product:
@@ -88,14 +86,14 @@ acme_product.layout.data_provider.product:
         - { name: layout.data_provider, alias: product }
 ```
 
-The `alias` key of the tag is required and should be unique for each data provider. This alias is used to get a data provider from the registry.
+The `alias` key of the tag is required and should be unique for each data provider. This alias is used to get the data provider from the registry.
 
-Accessing data
---------------
+## Accessing Data
 
-There are few ways how data could be accessed. Most common ways are the following:
+There are few ways to access data. The most common ways are:
  
- - Access data from the [BlockInterface](../../../../Component/Layout/BlockInterface.php) instance. For example, when it is needed to get data during view building.
+ - Accessing data from the [BlockInterface](../../../../Component/Layout/BlockInterface.php) instance. For example, when you need to get data when building the view.
+ 
    Example:
 
    ```php
@@ -110,8 +108,8 @@ There are few ways how data could be accessed. Most common ways are the followin
     }
    ```
    
- - Access data using [Symfony expression component](http://symfony.com/doc/current/components/expression_language/introduction.html) by providing 
-   expression as an option for some block.
+ - Accessing data using the [Symfony expression component](http://symfony.com/doc/current/components/expression_language/introduction.html) by providing the expression as an option for a block.
+ 
    Example:
 
    ```yaml
