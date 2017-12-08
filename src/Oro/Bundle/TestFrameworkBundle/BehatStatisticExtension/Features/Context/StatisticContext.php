@@ -7,6 +7,8 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Behat\Context\Context;
 use Doctrine\DBAL\DriverManager;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\ServiceContainer\BehatStatisticExtension;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
@@ -64,7 +66,7 @@ class StatisticContext implements Context
     /**
      * Runs behat command with provided parameters
      *
-     * @When /^I run "behat(?: ((?:\"|[^"])*))?"$/
+     * @When /^(?:|I )run "behat(?: ((?:\"|[^"])*))?"$/
      *
      * @param   string $argumentsString
      */
@@ -215,6 +217,29 @@ class StatisticContext implements Context
     }
 
     /**
+     * @Given /^(mysql|pgsql) database exists$/
+     */
+    public function databaseExists()
+    {
+        if (!isset($this->dbConfig['dbname'])) {
+            throw new RuntimeException('No db name in configuration');
+        }
+
+        $dbName =  $this->dbConfig['dbname'];
+        $dbConfig = $this->dbConfig;
+        $dbConfig['dbname'] = null;
+
+        $conn = DriverManager::getConnection($dbConfig);
+        $sm = $conn->getSchemaManager();
+
+        if (in_array($dbName, $sm->listDatabases())) {
+            $sm->dropDatabase($dbName);
+        }
+
+        $conn->getSchemaManager()->createDatabase($dbName);
+    }
+
+    /**
      * @Then :tableName table should contains records:
      */
     public function iDbShouldContainsRecords($tableName, TableNode $table)
@@ -301,5 +326,17 @@ class StatisticContext implements Context
             $row = array_shift($data);
             $conn->insert($tableName, array_combine($headers, $row));
         } while (!empty($data));
+    }
+
+    /**
+     * @Given /^(?:|I )reconfigure (StatisticExtension):$/
+     */
+    public function iReconfigureStatisticExtension(PyStringNode $extensionConfig)
+    {
+        $config = Yaml::parse(file_get_contents($this->testAppPath.'/behat.yml'));
+        $extensionConfig = Yaml::parse($extensionConfig->getRaw());
+        $config['default']['extensions'][BehatStatisticExtension::class] = $extensionConfig;
+
+        file_put_contents($this->testAppPath.'/behat.yml', Yaml::dump($config, 6));
     }
 }
