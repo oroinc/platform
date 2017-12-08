@@ -26,7 +26,7 @@ security:
 
 oro_api:
     api_doc_views: ['default', 'rest_json_api', 'rest_plain']
-    documentation_path: https://www.orocrm.com/documentation/index/current/book/data-api
+    documentation_path: https://www.oroinc.com/doc/orocrm/current/book/data-api
 
     config_extensions:
         - oro_api.config_extension.filters
