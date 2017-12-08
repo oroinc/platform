@@ -472,7 +472,7 @@ acme_api_get_my_resource:
 
 An information about `ApiDoc` annotation can be found in [Symfony documentation](https://symfony.com/doc/current/bundles/NelmioApiDocBundle/the-apidoc-annotation.html). To find all possible properties of `fields` option take a look at [AbstractFormatter class in NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle/blob/2.x/Formatter/AbstractFormatter.php). Please note that `fields` option can be used inside `input` and `output` options.
 
-Use [oro:api:doc:cache:clear](./commands.md#oroapidoccacheclear) command to apply changes in `ApiDoc` annotation to [API Sandbox](https://www.orocrm.com/documentation/current/book/data-api#api-sandbox).
+Use [oro:api:doc:cache:clear](./commands.md#oroapidoccacheclear) command to apply changes in `ApiDoc` annotation to [API Sandbox](https://oroinc.com/doc/orocrm/current/book/data-api#api-sandbox).
 
 Using a non-primary key to identify an entity
 ---------------------------------------------
