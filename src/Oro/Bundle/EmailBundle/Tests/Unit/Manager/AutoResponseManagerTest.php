@@ -148,6 +148,7 @@ class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
     {
         $expected = [
             'name' => 'email',
+            'label' => 'oro.email.entity_label',
             'fields' => [
                 [
                     'label' => 'oro.email.subject.label',

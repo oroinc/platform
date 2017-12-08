@@ -3,6 +3,7 @@
         column_chain_template_selector: '#column-chain-template',
         field_choice_filter_preset: 'querydesigner',
     }|merge(params) %}
+    {% set fieldConditionModule = params.fieldConditionModule|default('oroquerydesigner/js/app/views/field-condition-view') %}
     {% set fieldConditionOptions = {
         filters: params.metadata.filters|default([]),
         hierarchy: params.metadata.hierarchy|default({}),
@@ -15,7 +16,7 @@
         },
     }|merge_recursive(params.fieldConditionOptions|default({})) %}
     {% set conditionBuilderOptions = {
-        fieldsRelatedCriteria: ['condition-item'],
+        fieldsRelatedCriteria: ['condition-item']
     }|merge_recursive(params.conditionBuilderOptions|default({})) %}
     <div class="condition-builder left-panel-container"
          data-page-component-module="oroquerydesigner/js/app/components/condition-builder-component"
@@ -26,7 +27,7 @@
                 <div class="hint">{{ 'oro.query_designer.condition_builder.criteria.drag_hint'|trans }}</div>
                 <ul class="criteria-list">
                     <li class="option" data-criteria="condition-item"
-                        data-module="oroquerydesigner/js/app/views/field-condition-view"
+                        data-module="{{ fieldConditionModule }}"
                         data-options="{{ fieldConditionOptions|json_encode }}">
                         {{ 'oro.query_designer.condition_builder.criteria.field_condition'|trans }}
                     </li>
