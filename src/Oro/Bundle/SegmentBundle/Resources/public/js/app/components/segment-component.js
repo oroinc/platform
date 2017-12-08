@@ -7,16 +7,12 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
     var tools = require('oroui/js/tools');
     var BaseComponent = require('oroui/js/app/components/base/component');
-    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
     var EntityFieldsCollection = require('oroquerydesigner/js/app/models/entity-fields-collection');
     var GroupingModel = require('oroquerydesigner/js/app/models/grouping-model');
     var ColumnModel = require('oroquerydesigner/js/app/models/column-model');
     var DeleteConfirmation = require('oroui/js/delete-confirmation');
-    var EntityFieldsUtil = require('oroentity/js/entity-fields-util');
     var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
     var ColumnFormView = require('oroquerydesigner/js/app/views/column-form-view');
-
-    require('oroentity/js/fields-loader');
     require('oroui/js/items-manager/editor');
     require('oroui/js/items-manager/table');
 
@@ -32,14 +28,7 @@ define(function(require) {
         defaults: {
             entityChoice: '',
             valueSource: '',
-            fieldsLoader: {
-                loadingMaskParent: '',
-                router: null,
-                routingParams: {},
-                fieldsData: [],
-                confirmMessage: '',
-                loadEvent: 'fieldsLoaded'
-            },
+            dataProviderFilterPreset: 'querydesigner',
             grouping: {
                 editor: {},
                 form: '',
@@ -53,10 +42,15 @@ define(function(require) {
                 itemTemplate: ''
             },
             select2FieldChoiceTemplate: '',
-            entities: [],
             metadata: {},
             initEntityChangeEvents: true
         },
+
+        /**
+         * Class name of currently selected entity
+         * @type {string}
+         */
+        entityClassName: void 0,
 
         /**
          * @type {EntityStructureDataProvider}
@@ -90,32 +84,17 @@ define(function(require) {
             }, this);
 
             this.initStorage();
-            this.initEntityFieldsUtil();
-            this.$fieldsLoader = this.initFieldsLoader();
+            this.initEntityChangeEvents();
             this.setupDataProvider();
             this.initGrouping();
             this.initDateGrouping();
             this.initColumn();
             var promise = this.configureFilters();
-            if (this.options.initEntityChangeEvents) {
-                this.initEntityChangeEvents();
-            }
 
             this.form = this.$storage.parents('form');
             this.form.submit(_.bind(this.onBeforeSubmit, this));
 
             return promise;
-        },
-
-        _getInitFieldsData: function() {
-            var fieldsLoaderOpts = this.options.fieldsLoader;
-            if (fieldsLoaderOpts) {
-                if (_.isString(fieldsLoaderOpts.fieldsData) && !_.isEmpty(fieldsLoaderOpts.fieldsData)) {
-                    return JSON.parse(fieldsLoaderOpts.fieldsData);
-                } else {
-                    return fieldsLoaderOpts.fieldsData;
-                }
-            }
         },
 
         initStorage: function() {
@@ -126,53 +105,51 @@ define(function(require) {
         },
 
         initEntityChangeEvents: function() {
-            var confirm = new DeleteConfirmation({
-                title: __('Change Entity Confirmation'),
-                okText: __('Yes'),
-                content: __(this.options.fieldsLoader.confirmMessage)
-            });
+            var $entityChoice = $(this.options.entityChoice);
+            this.entityClassName = $entityChoice.val();
 
-            var self = this;
-            this.$entityChoice.on('change', function(e, extraArgs) {
-                _.extend(e, extraArgs);
+            var handleEntityChange = function() {
+                this.entityClassName = $entityChoice.val();
+                var data = {};
+                this.trigger('resetData', data);
+                this.save(data);
+                this.trigger('entityChange', this.entityClassName);
+            }.bind(this);
 
-                var data = self.load() || [];
-                var requiresConfirm = _.some(data, function(value) {
+            var onEntityChoiceChange = function(e) {
+                if (this.entityClassName === $entityChoice.val()) {
+                    // there's nothing to confirm
+                    return;
+                }
+
+                var confirm;
+                var oldVal = _.result(e.removed, 'id');
+                var requiresConfirm = _.some(this.load() || [], function(value) {
                     return !_.isEmpty(value);
                 });
 
-                var ok = _.partial(_.bind(self._onEntityChangeConfirm, self), e, _.pick(e, 'val', 'removed'));
-
-                var cancel = function() {
-                    var oldVal = (e.removed && e.removed.id) || null;
-                    self.$entityChoice.val(oldVal).change();
-                };
-
-                if (requiresConfirm) {
-                    confirm.on('ok', ok);
-                    confirm.on('cancel', cancel);
-                    confirm.once('hidden', function() {
-                        confirm.off('ok');
-                        confirm.off('cancel');
+                if (this.options.initEntityChangeEvents && requiresConfirm) {
+                    confirm = new DeleteConfirmation({
+                        title: __('Change Entity Confirmation'),
+                        okText: __('Yes'),
+                        content: __(this.options.entityChangeConfirmMessage)
                     });
+
+                    confirm.on('ok', handleEntityChange);
+                    confirm.on('cancel', function() {
+                        $entityChoice.val(oldVal).change();
+                    });
+                    confirm.once('hidden', confirm.dispose.bind(confirm));
                     confirm.open();
                 } else {
-                    ok();
+                    handleEntityChange();
                 }
-            });
+            }.bind(this);
 
+            $entityChoice.on('change', onEntityChoiceChange);
             this.once('dispose:before', function() {
-                confirm.dispose();
-            });
-
-            this.trigger(
-                this.options.fieldsLoader.loadEvent,
-                this.$fieldsLoader.val(),
-                this.$fieldsLoader.fieldsLoader('getFieldsData'));
-        },
-
-        _onEntityChangeConfirm: function(e, additionalOptions) {
-            this.$fieldsLoader.val(e.val).trigger('change', additionalOptions);
+                $entityChoice.off('change', onEntityChoiceChange);
+            }, this);
         },
 
         onBeforeSubmit: function(e) {
@@ -244,7 +221,7 @@ define(function(require) {
         formatChoice: function(value, template) {
             var data;
             if (value) {
-                data = this.entityFieldsUtil.pathToEntityChain(value);
+                data = this.dataProvider.pathToEntityChain(value);
             }
             return data ? template(data) : value;
         },
@@ -301,81 +278,19 @@ define(function(require) {
         },
 
         setupDataProvider: function() {
-            // this.dataProvider.setFilterPreset('some preset');
-            this.dataProvider.setRootEntityClassName(this.$entityChoice.val());
-            this.$entityChoice.on('change', function() {
-                this.dataProvider.setRootEntityClassName(this.$entityChoice.val());
-            }.bind(this));
-        },
-
-        /**
-         * Initializes EntityFieldsUtil
-         */
-        initEntityFieldsUtil: function() {
-            this.entityFieldsUtil = new EntityFieldsUtil();
-            this.on('fieldsLoaded', this.entityFieldsUtil.init, this.entityFieldsUtil);
-            this.once('dispose:before', function() {
-                delete this.entityFieldsUtil;
+            if (this.options.dataProviderFilterPreset) {
+                this.dataProvider.setFilterPreset(this.options.dataProviderFilterPreset);
+            }
+            this.dataProvider.setRootEntityClassName(this.entityClassName);
+            this.on('entityChange', function(entityClassName) {
+                this.dataProvider.setRootEntityClassName(entityClassName);
             });
-        },
-
-        /**
-         * Initializes FieldsLoader on entityChoice element
-         */
-        initFieldsLoader: function(loaderOptions) {
-            var self = this;
-            var options = loaderOptions || this.options.fieldsLoader;
-            var loadingMask = new LoadingMask({
-                container: $(options.loadingMaskParent)
-            });
-
-            this.$entityChoice = $(options.entityChoice);
-
-            var entityChoiceCloneId = this.$entityChoice.data('ftid') + options.router;
-            var $entityChoiceClone = $('<input>').attr({
-                'id': entityChoiceCloneId,
-                'class': 'hide',
-                'data-ftid': entityChoiceCloneId
-            });
-            this.$entityChoice.after($entityChoiceClone.prop('outerHTML'));
-            var $entityChoice = $('#' + entityChoiceCloneId);
-            $entityChoice.val(this.$entityChoice.val());
-            $entityChoice.data('relatedChoice', this.$entityChoice);
-
-            $entityChoice
-                .fieldsLoader({
-                    router: options.router,
-                    routingParams: options.routingParams
-                })
-                .on('fieldsloaderstart', _.bind(loadingMask.show, loadingMask))
-                .on('fieldsloadercomplete', _.bind(loadingMask.hide, loadingMask))
-                .on('fieldsloaderupdate', function(e, data) {
-                    if (!loaderOptions) {
-                        self.$entityChoice.trigger('fieldsloaderupdate', data);
-                    }
-                    self.trigger(options.loadEvent, $(e.target).val(), data);
-                })
-                .on('fieldsloadercomplete', function() {
-                    var data = {};
-                    self.trigger('resetData', data);
-                    self.save(data);
-                });
-
-            $entityChoice.fieldsLoader('setFieldsData', this._getInitFieldsData());
-
-            this.once('dispose:before', function() {
-                loadingMask.dispose();
-                delete this.$entityChoice;
-            }, this);
-
-            return $entityChoice;
         },
 
         /**
          * Initializes Fields Grouping component
          */
         initGrouping: function() {
-            var self = this;
             var options = this.options.grouping;
             var $table = $(options.itemContainer);
             var $editor = $(options.form);
@@ -385,11 +300,9 @@ define(function(require) {
                 return;
             }
 
-            var groupingFieldChoiceView = this.groupingFieldChoiceComponent.view;
-            groupingFieldChoiceView.setEntity(this.$entityChoice.val());
-
-            this.listenTo(this, 'fieldsLoaded', function(entity) {
-                this.groupingFieldChoiceComponent.view.setEntity(entity);
+            this.groupingFieldChoiceComponent.view.setEntity(this.entityClassName);
+            this.on('entityChange', function(entityClassName) {
+                this.groupingFieldChoiceComponent.view.setEntity(entityClassName);
             });
 
             // prepare collection for Items Manager
@@ -430,7 +343,7 @@ define(function(require) {
                 }
             });
 
-            this.on('before-submit', function() {
+            this.once('before-submit', function() {
                 collection.removeInvalidModels();
                 $editor.itemsManagerEditor('reset');
             });
@@ -442,13 +355,13 @@ define(function(require) {
                 itemTemplate: $(options.itemTemplate).html(),
                 itemRender: function(tmpl, data) {
                     try {
-                        data.name = self.formatChoice(data.name, template);
+                        data.name = this.formatChoice(data.name, template);
                     } catch (e) {
                         data.name = __('oro.querydesigner.field_not_found');
                         data.deleted = true;
                     }
                     return tmpl(data);
-                },
+                }.bind(this),
                 deleteHandler: function(model, data) {
                     confirm.setContent(data.message);
                     confirm.model = model;
@@ -476,10 +389,9 @@ define(function(require) {
                 return;
             }
 
-            this.dateGroupingFieldChoiceComponent.view.setEntity(this.$entityChoice.val());
-
-            this.listenTo(this, 'fieldsLoaded', function(entity, data) {
-                this.dateGroupingFieldChoiceComponent.view.setEntity(entity);
+            this.dateGroupingFieldChoiceComponent.view.setEntity(this.entityClassName);
+            this.on('entityChange', function(entityClassName) {
+                this.dateGroupingFieldChoiceComponent.view.setEntity(entityClassName);
             });
         },
 
@@ -487,7 +399,6 @@ define(function(require) {
          * Initializes Columns component
          */
         initColumn: function() {
-            var self = this;
             var options = this.options.column;
             var metadata = this.options.metadata;
             var $table = $(options.itemContainer);
@@ -499,25 +410,23 @@ define(function(require) {
             }
 
             // setup FieldChoice of Items Manager Editor
-            var fieldChoiceView = this.columnFieldChoiceComponent.view;
+            this.columnFieldChoiceComponent.view.setEntity(this.entityClassName);
+            this.on('entityChange', function(entityClassName) {
+                this.columnFieldChoiceComponent.view.setEntity(entityClassName);
+            });
+
             var functionChoiceView = null;
             if (this.columnFunctionChoiceComponent) {
                 functionChoiceView = this.columnFunctionChoiceComponent.view;
             }
-            fieldChoiceView.setEntity(this.$entityChoice.val());
-
             this.columnFormView = new ColumnFormView({
                 el: $form,
                 autoRender: true,
-                fieldChoiceView: fieldChoiceView,
+                fieldChoiceView: this.columnFieldChoiceComponent.view,
                 functionChoiceView: functionChoiceView
             });
 
             var $editor = this.columnFormView.$el;
-
-            this.listenTo(this, 'fieldsLoaded', function(entity, data) {
-                this.columnFieldChoiceComponent.view.setEntity(entity);
-            });
 
             // prepare collection for Items Manager
             var collection = new EntityFieldsCollection(this.load('columns'), {
@@ -582,7 +491,7 @@ define(function(require) {
                 }
             });
 
-            this.on('before-submit', function() {
+            this.once('before-submit', function() {
                 collection.removeInvalidModels();
                 $editor.itemsManagerEditor('reset');
             });
@@ -597,7 +506,7 @@ define(function(require) {
                     var func = data.func;
 
                     try {
-                        data.name = self.formatChoice(data.name, template);
+                        data.name = this.formatChoice(data.name, template);
                     } catch (e) {
                         data.name = __('oro.querydesigner.field_not_found');
                         data.deleted = true;
@@ -619,7 +528,7 @@ define(function(require) {
                     }
 
                     return tmpl(data);
-                },
+                }.bind(this),
                 deleteHandler: function(model, data) {
                     confirm.setContent(data.message);
                     confirm.model = model;
@@ -647,14 +556,10 @@ define(function(require) {
                 return $.when();
             }
 
-            var setRootEntity = function(entity) {
-                // defines the selected entity in the options of all criteria conditions
-                this.conditionBuilderComponent.view.updateCriteriaOptions({
-                    rootEntity: entity
-                });
-            }.bind(this);
-            setRootEntity(this.entityFieldsUtil.entity);
-            this.on('fieldsLoaded', setRootEntity);
+            this.conditionBuilderComponent.setEntity(this.entityClassName);
+            this.on('entityChange', function(entityClassName) {
+                this.conditionBuilderComponent.setEntity(entityClassName);
+            });
 
             this.conditionBuilderComponent.view.setValue(this.load('filters'));
             this.listenTo(this.conditionBuilderComponent.view, 'change', function(value) {

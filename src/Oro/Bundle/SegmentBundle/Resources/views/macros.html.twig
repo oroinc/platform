@@ -1,6 +1,7 @@
 {% macro query_designer_condition_builder(params) %}
     {% set params = {
         column_chain_template_selector: '#column-chain-template',
+        field_choice_filter_preset: 'querydesigner',
     }|merge(params) %}
     {% set segment_selection_template_id = 'segment-template' %}
     {% set segmentConditionOptions = {
@@ -15,15 +16,11 @@
                 },
                 pageLimit: params.page_limit|default(10)
             },
-            fieldsLoaderSelector: '[data-ftid=' ~ params.entity_choice_id ~ 'oro_api_querydesigner_fields_entity]',
             currentSegment: params.currentSegmentId|default(null)
         }
     }|merge_recursive(params.segmentConditionOptions|default({})) %}
     {% set conditionBuilderOptions = {
-        criteriaListSelector: '.criteria-list',
-        conditionContainerSelector: '.condition-container',
-        entityChoiceSelector: '[data-ftid=' ~ params.entity_choice_id ~ ']',
-        fieldsRelatedCriteria: ['condition-item', 'condition-segment', 'conditions-group'],
+        fieldsRelatedCriteria: ['condition-item', 'condition-segment'],
     }|merge_recursive(params.conditionBuilderOptions|default({})) %}
     {% set conditionBuilderOptions = update_segment_condition_builder_options(conditionBuilderOptions) %}
 
@@ -110,35 +107,19 @@
     @param array    entities
     @param array    metadata
 #}
-{% macro initJsWidgets(type, form, entities, metadata, entityFieldsRouteParams = {}) %}
-    {# Rertrieving fields data(actually this code works for already saved entities that's going to edit)#}
-    {% set fieldsData = {} %}
-    {% if not form.entity.vars.value is empty %}
-        {% set encodedEntityName = form.entity.vars.value|replace({'\\': '_'}) %}
-        {% set routeParams       = entityFieldsRouteParams|merge({'entityName': encodedEntityName}) %}
-
-        {% set fieldsData = render(path('oro_api_querydesigner_fields_entity', routeParams)) %}
-    {% endif %}
-
+{% macro initJsWidgets(type, form, entities, metadata) %}
     {% set widgetOptions = {
-        valueSource: '[data-ftid=' ~ type ~ '_form_definition]',
-        fieldsLoader: {
-            entityChoice:      '[data-ftid=' ~ type ~ '_form_entity]',
-            loadingMaskParent: '#' ~ form.vars.id,
-            router:            'oro_api_querydesigner_fields_entity',
-            routingParams:     entityFieldsRouteParams,
-            fieldsData:        fieldsData,
-            confirmMessage:    type|replace('_', '.') ~ '.change_entity_confirmation',
-        },
+        valueSource:                '[data-ftid=' ~ type ~ '_form_definition]',
+        entityChoice:               '[data-ftid=' ~ type ~ '_form_entity]',
+        entityChangeConfirmMessage: type|replace('_', '.') ~ '.change_entity_confirmation',
         column: {
             editor:        { namePattern: '^' ~ type ~ '_form\\[column\\]\\[([\\w\\W]*)\\]$' },
             form:          '#' ~ type ~ '-column-form',
             itemContainer: '#' ~ type ~ '-column-list .item-container',
             itemTemplate:  '#' ~ type ~ '-column-row'
         },
-        select2FieldChoiceTemplate:   '#column-chain-template',
-        entities:                     entities,
-        metadata:                     metadata
+        select2FieldChoiceTemplate: '#column-chain-template',
+        metadata:                   metadata,
     } %}
 
     {% if type == 'oro_report' %}

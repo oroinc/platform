@@ -182,6 +182,8 @@ define(function(require) {
         var close = prototype.close;
         var prepareOpts = prototype.prepareOpts;
         var init = prototype.init;
+        var destroy = prototype.destroy;
+
         prototype.prepareOpts = function(options) {
             if (options.collapsibleResults) {
                 options.populateResults = populateCollapsibleResults;
@@ -226,6 +228,15 @@ define(function(require) {
                 e.stopPropagation();
             }, this));
             this.dropdown.prepend(this.breadcrumbs);
+        };
+
+        prototype.destroy = function() {
+            if (this.propertyObserver) {
+                this.propertyObserver.disconnect();
+                delete this.propertyObserver;
+                this.propertyObserver = null;
+            }
+            destroy.call(this);
         };
 
         prototype.updateBreadcrumbs = function() {

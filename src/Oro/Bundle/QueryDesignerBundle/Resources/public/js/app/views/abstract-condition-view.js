@@ -125,7 +125,7 @@ define(function(require) {
         },
 
         _matchApplicable: function(applicable, criteria) {
-            var hierarchy = this.options.hierarchy[criteria.entity];
+            var hierarchy = this.options.hierarchy[criteria.entity] || [];
             return _.find(applicable, function(item) {
                 return _.every(item, function(value, key) {
                     if (key === 'entity' && hierarchy.length) {

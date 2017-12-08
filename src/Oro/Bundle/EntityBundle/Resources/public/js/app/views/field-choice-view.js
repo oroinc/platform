@@ -56,6 +56,18 @@ define(function(require) {
             FieldChoiceView.__super__.initialize.call(this, options);
         },
 
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+            delete this.dataProvider;
+            delete this.callbacks;
+            delete this.exclude;
+            delete this.include;
+            delete this.dataFilter;
+            FieldChoiceView.__super__.dispose.call(this);
+        },
+
         onChange: function(e) {
             var selectedItem = e.added || this.getData();
             this.trigger('change', selectedItem);
@@ -75,7 +87,11 @@ define(function(require) {
                 providerOptions.fieldsFilterer = this.callbacks.dataFilter;
             }
             EntityStructureDataProvider.getOwnDataContainer(this, providerOptions).then(function(provider) {
-                if (this.entity) {
+                if (this.disposed) {
+                    this._rejectDeferredRender();
+                    return;
+                }
+                if (this.entity !== provider.rootEntityClassName) {
                     provider.setRootEntityClassName(this.entity);
                 }
                 this.dataProvider = provider;
@@ -154,10 +170,13 @@ define(function(require) {
                     return label;
                 },
                 breadcrumbs: function(pagePath) {
-                    var chain = this.dataProvider.pathToEntityChainExcludeTrailingField(pagePath);
-                    $.each(chain, function(i, item) {
-                        item.pagePath = item.basePath;
-                    });
+                    var chain = [];
+                    if (this.entity) {
+                        chain = this.dataProvider.pathToEntityChainExcludeTrailingField(pagePath);
+                        _.each(chain, function(item) {
+                            item.pagePath = item.basePath;
+                        });
+                    }
                     return chain;
                 }.bind(this)
             });
@@ -222,7 +241,7 @@ define(function(require) {
                     id: this.dataProvider.entityChainToPath(chain.concat(chainItem)),
                     text: field.label
                 };
-                if (field.relatedEntityName) {
+                if (field.relationType) {
                     if (this.allowSelectRelation) {
                         fields.push(_.clone(item));
                     }

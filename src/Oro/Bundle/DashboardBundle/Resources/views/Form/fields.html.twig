@@ -152,25 +152,10 @@
                     'column_chain_template_selector': '#' ~ column_chain_template_id,
                 }) }}
 
-                {% set fieldsData = {} %}
-                {% if not form.entity.vars.value is empty %}
-                    {% set encodedEntityName = form.entity.vars.value|replace({'\\': '_'}) %}
-                    {% set routeParams       = {}|merge({'entityName': encodedEntityName}) %}
-
-                    {% set fieldsData = render(path('oro_api_querydesigner_fields_entity', routeParams)) %}
-                {% endif %}
-
                 {% set widgetOptions = {
-                    valueSource: '[data-ftid=' ~ widgetType ~ '_' ~ name ~ '_definition]',
-                    fieldsLoader: {
-                        entityChoice:      '[data-ftid=' ~ widgetType ~ '_' ~ name ~ '_entity]',
-                        loadingMaskParent: '#' ~ form.vars.id,
-                        router:            'oro_api_querydesigner_fields_entity',
-                        routingParams:     {},
-                        fieldsData:        fieldsData,
-                        confirmMessage:    name|replace('_', '.') ~ '.change_entity_confirmation',
-                    },
-                    entities:                   oro_query_filter_entities(),
+                    valueSource:                '[data-ftid=' ~ widgetType ~ '_' ~ name ~ '_definition]',
+                    entityChoice:               '[data-ftid=' ~ widgetType ~ '_' ~ name ~ '_entity]',
+                    entityChangeConfirmMessage: name|replace('_', '.') ~ '.change_entity_confirmation',
                     metadata:                   metadata,
                     disable_audit:              true,
                     initEntityChangeEvents:     false,

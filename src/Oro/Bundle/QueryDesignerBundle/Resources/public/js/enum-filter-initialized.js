@@ -1,6 +1,8 @@
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'oroui/js/messenger'
-    ], function($, _, __, routing, messenger) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
 
     /**
      * Resolves filter options
@@ -11,11 +13,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
      * @return {jQuery.Deferred} promise
      */
     return function(filterOptions, context) {
-        var promise = new $.Deferred();
-        var className = _.last(context).field.related_entity_name;
+        var className = _.last(context).field.relatedEntityName;
         filterOptions.filterParams = {'class': className};
-        promise.resolveWith(filterOptions);
-
-        return promise;
+        return $.when(filterOptions);
     };
 });

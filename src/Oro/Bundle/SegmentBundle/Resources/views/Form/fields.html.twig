@@ -34,24 +34,10 @@
         'column_chain_template_selector': '#' ~ column_chain_template_id
     }) }}
 
-    {% set fieldsData = {} %}
-    {% if not form.entity.vars.value is empty %}
-        {% set encodedEntityName = form.entity.vars.value|replace({'\\': '_'}) %}
-        {% set routeParams = {}|merge({'entityName': encodedEntityName}) %}
-        {% set fieldsData = render(path('oro_api_querydesigner_fields_entity', routeParams)) %}
-    {% endif %}
-
     {% set widgetOptions = {
-        valueSource: '[data-ftid=' ~ definitionId ~ ']',
-        fieldsLoader: {
-            entityChoice:      '[data-ftid=' ~ entityChoiceId ~ ']',
-            loadingMaskParent: '#' ~ form.vars.id,
-            router:            'oro_api_querydesigner_fields_entity',
-            routingParams:     {},
-            fieldsData:        fieldsData,
-            confirmMessage:    'oro.segment.condition_builder.confirm_message'|trans,
-        },
-        entities:                   oro_query_filter_entities(),
+        valueSource:                '[data-ftid=' ~ definitionId ~ ']',
+        entityChoice:               '[data-ftid=' ~ entityChoiceId ~ ']',
+        entityChangeConfirmMessage: 'oro.segment.condition_builder.confirm_message'|trans,
         metadata:                   metadata,
         initEntityChangeEvents:     false,
         select2FieldChoiceTemplate: '#' ~ column_chain_template_id,

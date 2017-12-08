@@ -3,7 +3,6 @@ define(function(require) {
 
     var ColumnFormView;
     var _ = require('underscore');
-    var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
 
     ColumnFormView = BaseView.extend({
@@ -28,10 +27,8 @@ define(function(require) {
 
         updateFunctionChoices: function(fieldId) {
             if (this.functionChoiceView) {
-                $.when(this.fieldChoiceView.deferredRender).then(function() {
-                    var criteria = this.fieldChoiceView.getApplicableConditions(fieldId);
-                    this.functionChoiceView.setActiveFunctions(criteria);
-                }.bind(this));
+                var criteria = this.fieldChoiceView.getApplicableConditions(fieldId);
+                this.functionChoiceView.setActiveFunctions(criteria);
             }
         },
 

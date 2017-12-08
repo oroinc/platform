@@ -51,7 +51,12 @@ define(function(require) {
         },
 
         dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+            delete this.select2Config;
             this.$el.inputWidget('dispose');
+            Select2View.__super__.dispose.call(this);
         },
 
         onChange: function(e) {

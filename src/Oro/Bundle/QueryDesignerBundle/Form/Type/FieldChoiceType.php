@@ -39,6 +39,10 @@ class FieldChoiceType extends AbstractType
             $componentOptions['exclude'] = $options['exclude_fields'];
         }
 
+        if (isset($options['filter_preset'])) {
+            $componentOptions['filterPreset'] = $options['filter_preset'];
+        }
+
         $view->vars['page_component_options'] = $componentOptions;
     }
 
@@ -57,6 +61,7 @@ class FieldChoiceType extends AbstractType
             'placeholder'            => 'oro.entity.form.choose_entity_field',
             'exclude_fields'         => [],
             'include_fields'         => [],
+            'filter_preset'          => 'querydesigner',
             'page_component'         => 'oroui/js/app/components/view-component',
             'page_component_options' => [
                 'view'         => 'oroentity/js/app/views/field-choice-view',

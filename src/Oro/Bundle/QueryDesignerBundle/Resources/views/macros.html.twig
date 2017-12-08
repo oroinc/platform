@@ -1,23 +1,21 @@
 {% macro query_designer_condition_builder(params) %}
     {% set params = {
         column_chain_template_selector: '#column-chain-template',
+        field_choice_filter_preset: 'querydesigner',
     }|merge(params) %}
     {% set fieldConditionOptions = {
         filters: params.metadata.filters|default([]),
         hierarchy: params.metadata.hierarchy|default({}),
         fieldChoice: {
+            filterPreset: params.field_choice_filter_preset,
             select2: {
                 placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans,
                 formatSelectionTemplateSelector: params.column_chain_template_selector|default(null),
             },
-            fieldsLoaderSelector: '[data-ftid=' ~ params.entity_choice_id ~ ']',
         },
     }|merge_recursive(params.fieldConditionOptions|default({})) %}
     {% set conditionBuilderOptions = {
-        criteriaListSelector: '.criteria-list',
-        conditionContainerSelector: '.condition-container',
-        entityChoiceSelector: '[data-ftid=' ~ params.entity_choice_id ~ ']',
-        fieldsRelatedCriteria: ['condition-item', 'conditions-group'],
+        fieldsRelatedCriteria: ['condition-item'],
     }|merge_recursive(params.conditionBuilderOptions|default({})) %}
     <div class="condition-builder left-panel-container"
          data-page-component-module="oroquerydesigner/js/app/components/condition-builder-component"

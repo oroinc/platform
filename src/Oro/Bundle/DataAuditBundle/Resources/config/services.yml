@@ -64,11 +64,8 @@ services:
     oro_dataaudit.event_listener.segment_widget_options_listener:
         class: 'Oro\Bundle\DataAuditBundle\EventListener\SegmentWidgetOptionsListener'
         arguments:
-            - '@http_kernel'
             - '@security.authorization_checker'
             - '@oro_dataaudit.segment_widget.context_checker'
-        calls:
-            - ['setRequest', ["@?request="]]
         tags:
             - { name: kernel.event_listener, event: oro_segment.widget_options_load, method: onLoad }
 

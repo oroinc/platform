@@ -1,66 +1,31 @@
-define([
-    'jquery',
-    'underscore'
-], function($, _) {
+define(function(require) {
     'use strict';
 
+    var _ = require('underscore');
+
     return {
-        load: function(segment) {
-            segment.defaults = $.extend(true, segment.defaults, {
-                defaults: {
-                    auditFieldsLoader: {
-                        loadingMaskParent: '',
-                        router: null,
-                        routingParams: {},
-                        fieldsData: [],
-                        loadEvent: 'auditFieldsLoaded'
-                    }
+        load: function(segmentComponent) {
+            segmentComponent.configureFilters = _.compose(segmentComponent.configureFilters, function() {
+                if (!this.conditionBuilderComponent) {
+                    return;
                 }
-            });
-
-            var originalInitFieldsLoader = segment.initFieldsLoader;
-            segment.initFieldsLoader = function() {
-                var auditFieldsLoaderOptions = this.options.auditFieldsLoader;
-                this.$auditFieldsLoader = originalInitFieldsLoader.call(this, auditFieldsLoaderOptions);
-
-                return originalInitFieldsLoader.apply(this, arguments);
-            };
-
-            var originalConfigureFilters = segment.configureFilters;
-            segment.configureFilters = function() {
                 var $condition = this.conditionBuilderComponent.view.getCriteriaOrigin('condition-data-audit');
                 if ($condition.length) {
-                    var toggleCondition = function(entityClassName, data) {
-                        $condition.toggle(entityClassName in data);
+                    var collection = this.dataProvider.collection;
+                    var toggleCondition = function(entityClassName) {
+                        var isAvailable = false;
+                        var entityModel;
+                        if (entityClassName) {
+                            entityModel = collection.getEntityModelByClassName(entityClassName);
+                            isAvailable = _.result(entityModel.get('options'), 'auditable');
+                        }
+                        $condition.toggle(isAvailable);
                     };
-                    toggleCondition(this.$entityChoice.val(), this.$auditFieldsLoader.fieldsLoader('getFieldsData'));
-                    this.on(this.options.auditFieldsLoader.loadEvent, toggleCondition);
+
+                    toggleCondition(this.entityClassName);
+                    this.on('entityChange', toggleCondition);
                 }
-                return originalConfigureFilters.apply(this, arguments);
-            };
-
-            var originalInitEntityChangeEvents = segment.initEntityChangeEvents;
-            segment.initEntityChangeEvents = function() {
-                var loadHandler = function() {
-                    this.trigger(
-                        this.options.auditFieldsLoader.loadEvent,
-                        this.$auditFieldsLoader.val(),
-                        this.$auditFieldsLoader.fieldsLoader('getFieldsData')
-                    );
-                }.bind(this);
-
-                loadHandler();
-                this.$auditFieldsLoader.on('fieldsloaderupdate', loadHandler);
-
-                return originalInitEntityChangeEvents.apply(this, arguments);
-            };
-
-            var originalOnEntityChangeConfirm = segment._onEntityChangeConfirm;
-            segment._onEntityChangeConfirm = function(e, additionalOptions) {
-                this.$auditFieldsLoader.val(e.val).trigger('change', additionalOptions);
-
-                return originalOnEntityChangeConfirm.apply(this, arguments);
-            };
+            });
         }
     };
 });

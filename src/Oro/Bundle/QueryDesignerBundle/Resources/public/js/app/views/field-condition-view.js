@@ -59,7 +59,7 @@ define(function(require) {
 
             if (!_.isEmpty(conditions) && !(conditions.entity === 'Oro\\Bundle\\AccountBundle\\Entity\\Account' &&
                 conditions.field === 'lifetimeValue')) {
-                filterOptions = this.options.filters[this._getApplicableFilterId(conditions)];
+                filterOptions = _.clone(this.options.filters[this._getApplicableFilterId(conditions)]);
             }
 
             if (!filterOptions) {

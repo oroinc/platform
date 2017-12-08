@@ -126,6 +126,18 @@ define(function(require) {
          */
         includeByRules: function(field) {
             return fieldFilterers.anyRule(field, this.include);
+        },
+
+        /**
+         * In case field has name of related entity -- checks if that entity is available
+         *
+         * @param {Object} field
+         * @return {boolean}
+         * @this EntityStructureDataProvider
+         */
+        relationToAvailableEntity: function(field) {
+            var entityName = field.relatedEntityName;
+            return Boolean(!entityName || !field.relationType || this.collection.getEntityModelByClassName(entityName));
         }
     };
 

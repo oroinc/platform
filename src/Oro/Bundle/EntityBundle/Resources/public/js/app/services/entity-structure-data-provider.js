@@ -128,6 +128,7 @@ define(function(require) {
             }
 
             this.fieldFilterers = {};
+            this._toggleFilterer('relationToAvailableEntity', true);
             if (options.filterPreset) {
                 this.setFilterPreset(options.filterPreset);
             }
@@ -156,7 +157,7 @@ define(function(require) {
          */
         onCollectionSync: function() {
             var className = this.rootEntityClassName;
-            if (className && (!this.rootEntity || this.rootEntity.get('className') !== className)) {
+            if (!this.disposed && className && (!this.rootEntity || this.rootEntity.get('className') !== className)) {
                 this.setRootEntityClassName(className);
             }
         },
@@ -300,14 +301,20 @@ define(function(require) {
          */
         _extractEntityData: function(entityModel) {
             var attrs = entityModel.getAttributes();
-            attrs.fields = this.filterEntityFields(attrs.fields, entityModel.get('className'))
-                .map(function(fieldData) {
-                    fieldData = _.clone(fieldData);
-                    if (fieldData.options) {
-                        fieldData.options = _.clone(fieldData.options);
-                    }
-                    return fieldData;
-                });
+            attrs.fields = attrs.fields.map(function(fieldData) {
+                fieldData = _.clone(fieldData);
+                fieldData.entity = attrs;
+                if (fieldData.relationType && fieldData.type === 'enum') {
+                    // @todo, should be fixed in API
+                    // `enum` field has to be with empty relationType, same as `tag` and `dictionary` types
+                    fieldData.relationType = '';
+                }
+                if (fieldData.options) {
+                    fieldData.options = _.clone(fieldData.options);
+                }
+                return fieldData;
+            });
+            attrs.fields = this.filterEntityFields(attrs.fields, entityModel.get('className'));
             if (attrs.options) {
                 attrs.options = _.clone(attrs.options);
             }
