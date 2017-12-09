@@ -1,6 +1,5 @@
 ## SearchApiAccessor
 
-<a name="module_SearchApiAccessor"></a>
 **SearchApiAccessor** ⇐ [ApiAccessor](./api-accessor.md)
 Provides access to the search API for autocompletes.
 This class is by design to be initiated from server configuration.
@@ -19,14 +18,17 @@ This class is by design to be initiated from server configuration.
   * [.prepareUrlParameters()](#module_SearchApiAccessor#prepareUrlParameters)
   * [.formatResult(response)](#module_SearchApiAccessor#formatResult) ⇒ `Object`
 
-<a name="module_SearchApiAccessor#prepareUrlParameters"></a>
+
 ### searchApiAccessor.prepareUrlParameters()
+
 **Kind**: instance method of [SearchApiAccessor](#module_SearchApiAccessor)  
-<a name="module_SearchApiAccessor#formatResult"></a>
+
+
 ### searchApiAccessor.formatResult(response) ⇒ `Object`
 Formats response before it is sent out from this api accessor.
 Converts it to form
-``` javascipt
+
+``` javascript
 {
     results: [{id: '<value>', label: '<label>'}, ...],
     more: '<more>'

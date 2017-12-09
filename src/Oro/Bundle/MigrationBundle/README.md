@@ -208,6 +208,7 @@ Create own extensions for database structure migrations
 To create your own extension you need too do the following simple steps:
 
  - Create an extension class in `YourBundle/Migration/Extension` directory. Using `YourBundle/Migration/Extension` directory is not mandatory, but highly recommended. For example:
+ 
 ``` php
 <?php
 
@@ -227,7 +228,9 @@ class MyExtension
     }
 }
 ```
+
  - Create `*AwareInterface` in the same namespase. It is important that the interface name should be `{ExtensionClass}AwareInterface` and set method should be `set{ExtensionClass}({ExtensionClass} ${extensionName})`. For example:
+ 
 ``` php
 <?php
 
@@ -246,7 +249,9 @@ interface MyExtensionAwareInterface
     public function setMyExtension(MyExtension $myExtension);
 }
 ```
+
  - Register an extension in dependency container. For example
+ 
 ``` yaml
 parameters:
     acme_test.migration.extension.my.class: Acme\Bundle\TestBundle\Migration\Extension\MyExtension

@@ -51,13 +51,12 @@ Sample:
 | Param | Type | Description |
 | --- | --- | --- |
 | options | `Object` | Options container |
-| options._sourceElement | `Object` | The element to which the view should be connected (passed automatically when                                          page component is [connected through DOM attributes](../../../../UIBundle/Resources/doc/reference/page-component.md)) |
+| options.\_sourceElement | `Object` | The element to which the view should be connected (passed automatically when page component is [connected through DOM attributes](../../../../UIBundle/Resources/doc/reference/page-component.md)) |
 | options.frontend_type | `string` | frontend type, please find [available keys here](../../public/js/tools/frontend-type-map.js) |
 | options.value | `*` | value to edit |
 | options.fieldName | `string` | field name to use when sending value to server |
 | options.metadata | `Object` | Editor metadata |
-| options.metadata.inline_editing | `Object` | inline-editing configuration |
-
+| options.metadata.inline_editing | `Object` | inline-editing configurat
 
 * [InlineEditableViewComponent](#module_InlineEditableViewComponent) ⇐ `BaseComponent`
   * [.initialize](#module_InlineEditableViewComponent#initialize)
