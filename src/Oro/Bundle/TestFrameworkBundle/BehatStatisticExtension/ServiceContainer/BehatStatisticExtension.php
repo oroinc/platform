@@ -22,6 +22,8 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -29,6 +31,8 @@ final class BehatStatisticExtension implements TestworkExtension
 {
     const SUITE_SET_ENV_VAR = 'BEHAT_SUITE_SETS';
     const SUITE_ENV_VAR     = 'BEHAT_SUITES';
+    const AVG_STRATEGY_TAG  = 'avg_strategy';
+    const AVG_STRATEGY_AWARE_TAG = 'avg_strategy_aware';
 
     /**
      * {@inheritdoc}
@@ -52,6 +56,10 @@ final class BehatStatisticExtension implements TestworkExtension
                     ->useAttributeAsKey('name')
                     ->prototype('scalar')->end()
                 ->end()
+                ->enumNode('average_strategy')
+                    ->values(['AVG', 'AVG+STD'])
+                    ->defaultValue('AVG')
+                ->end()
                 ->scalarNode('count_build_limit')
                     ->defaultValue(10)
                     ->info('The number of builds for select from db to get average time')
@@ -74,6 +82,7 @@ final class BehatStatisticExtension implements TestworkExtension
         $criteria = $this->getEnvVars($config['criteria']);
         $criteria['count_build_limit'] = $config['count_build_limit'];
         $container->setParameter('oro_behat_statistic.criteria', $criteria);
+        $container->setParameter('oro_behat_statistic.average_strategy', $config['average_strategy']);
         $this->loadSuiteSetConfiguration($container, $config['suite_sets']);
         $this->loadSuiteConfiguration($container);
 
@@ -168,14 +177,53 @@ final class BehatStatisticExtension implements TestworkExtension
     {
         $this->addGeneratorsToConfigurationRegistry($container);
         $this->addSuiteConfigurations($container);
+
         try {
             $this->pingConnection($container);
+            $this->processAvgStrategy($container);
         } catch (ConnectionException $e) {
+            // We should never fail build in case if statistic db connection is broken
             $this->skipStatisticSubscribers($container);
             $this->showAlert($container->get('cli.output'), $e);
 
             return;
         }
+    }
+
+    private function processAvgStrategy(ContainerBuilder $container)
+    {
+        $strategyAwareIds = array_keys($container->findTaggedServiceIds(self::AVG_STRATEGY_AWARE_TAG));
+
+        if (empty($strategyAwareIds)) {
+            return;
+        }
+
+        $strategies = $container->findTaggedServiceIds(self::AVG_STRATEGY_TAG);
+        $configuredStrategy = $container->getParameter('oro_behat_statistic.average_strategy');
+        /** @var Connection $connection */
+        $connection = $container->get('oro_behat_statistic.database.connection');
+        $platformName = $connection->getDatabasePlatform()->getName();
+
+        foreach ($strategies as $serviceId => $tags) {
+            if ($tags[0]['strategy'] === $configuredStrategy) {
+                if (isset($tags[0]['platform']) && $platformName != $tags[0]['platform']) {
+                    continue;
+                }
+                foreach ($strategyAwareIds as $strategyAwareId) {
+                    $container
+                        ->getDefinition($strategyAwareId)
+                        ->addMethodCall('setAvgStrategy', [new Reference($serviceId)]);
+                }
+
+                return;
+            }
+        }
+
+        throw new InvalidArgumentException(sprintf(
+            'There is no "%s" strategy for "%s" platform to inject into aware service(s)',
+            $configuredStrategy,
+            $platformName
+        ));
     }
 
     /**
