@@ -140,7 +140,7 @@ abstract class OroKernel extends Kernel
             $import = Yaml::parse(file_get_contents($file));
             if (!empty($import)) {
                 if (!empty($import['bundles'])) {
-                    $bundles = array_merge($bundles, $this->getBundlesMapping($import['bundles']));
+                    $bundles = array_merge($bundles, $this->getBundlesMapping($import['bundles'], true));
                 }
                 if (!empty($import['exclusions'])) {
                     $exclusions = array_merge($exclusions, $this->getBundlesMapping($import['exclusions']));
@@ -152,15 +152,35 @@ abstract class OroKernel extends Kernel
 
         uasort($bundles, array($this, 'compareBundles'));
 
+        do {
+            $bundleNames = array_keys($bundles);
+            $removedBundles = array_filter($bundles, function ($config) use ($bundleNames) {
+                if (!isset($config['dependencies'])) {
+                    return false;
+                }
+
+                foreach ($config['dependencies'] as $dependency) {
+                    if (!in_array($dependency, $bundleNames)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }, ARRAY_FILTER_USE_BOTH);
+
+            $bundles = array_diff_key($bundles, $removedBundles);
+        } while (count($removedBundles) > 0);
+
         return $bundles;
     }
 
     /**
-     * @param $bundles
+     * @param array $bundles
+     * @param bool $withDependencies
      *
      * @return array
      */
-    protected function getBundlesMapping(array $bundles)
+    protected function getBundlesMapping(array $bundles, bool $withDependencies = false)
     {
         $result = array();
         foreach ($bundles as $bundle) {
@@ -180,6 +200,13 @@ abstract class OroKernel extends Kernel
                 'kernel'   => $kernel,
                 'priority' => $priority,
             );
+
+            if ($withDependencies === true && isset($bundle['dependencies']) && is_array($bundle['dependencies'])) {
+                $result[$class]['dependencies'] = [];
+                foreach ($bundle['dependencies'] as $dependency) {
+                    $result[$class]['dependencies'][] = (string) $dependency;
+                }
+            }
         }
 
         return $result;
