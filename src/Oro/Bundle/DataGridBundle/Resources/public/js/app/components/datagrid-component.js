@@ -454,6 +454,7 @@ define(function(require) {
                 exportOptions: metadata.options.export || {},
                 routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled,
                 multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || massActions.length,
+                rowClickAction: metadata.options.rowClickAction || false,
                 metadata: this.metadata,
                 metadataModel: this.metadataModel,
                 plugins: plugins,
