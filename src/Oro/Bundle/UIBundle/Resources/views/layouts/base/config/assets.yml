@@ -4,7 +4,6 @@ styles:
         - 'bundles/bowerassets/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css'
         - 'bundles/oroui/css/less/uniform.less'
         - 'bundles/oroui/css/less/font-awesome.less'
-        - 'bundles/oroui/css/less/base.less'
         - 'bundles/oroui/css/less/desktop/form.less'
     filters: ['cssrewrite', 'cssmin']
     output: 'css/layout/base/styles.css'
