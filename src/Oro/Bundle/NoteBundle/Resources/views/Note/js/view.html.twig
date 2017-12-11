@@ -31,7 +31,7 @@
             <div class="details">
                 <div>
                     <%= _.template(
-                        {{ 'oro.note.updated_by'|trans|json_encode|raw }},
+                        {{ 'oro.note.widget_updated_by'|trans|json_encode|raw }},
                         { interpolate: /\{\{(.+?)\}\}/g }
                     )({
                         user: updatedBy_url

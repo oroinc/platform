@@ -1,6 +1,8 @@
 <?php
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Cache;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\SecurityBundle\Acl\Cache\AclCache;
 
 class AclCacheTest extends \PHPUnit_Framework_TestCase
@@ -12,6 +14,7 @@ class AclCacheTest extends \PHPUnit_Framework_TestCase
     protected $permissionGrantingStrategy;
     protected $prefix;
     protected $underlyingCache;
+    protected $eventDispatcher;
 
     protected function setUp()
     {
@@ -24,14 +27,18 @@ class AclCacheTest extends \PHPUnit_Framework_TestCase
         $this->permissionGrantingStrategy =
             $this->getMockForAbstractClass('Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface');
         $this->prefix = 'test_prefix';
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->aclCache = new AclCache($this->cacheProvider, $this->permissionGrantingStrategy, $this->prefix);
         $this->aclCache->setUnderlyingCache($this->underlyingCache);
+        $this->aclCache->setEventDispatcher($this->eventDispatcher);
     }
 
     public function testClearCache()
     {
         $this->cacheProvider->expects($this->once())->method('deleteAll');
         $this->underlyingCache->expects($this->once())->method('clearCache');
+        $this->eventDispatcher->expects($this->once())->method('dispatch')
+            ->with(AclCache::CACHE_CLEAR_EVENT);
 
         $this->aclCache->clearCache();
     }
