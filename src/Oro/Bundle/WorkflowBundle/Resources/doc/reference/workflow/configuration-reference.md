@@ -778,11 +778,9 @@ form dialog, and actual transitions are used to validate form content after subm
 Alias of condition starts from "@" symbol and must refer to registered condition. For example "@or" refers to logical
 OR condition.
 
-Options can refer to values of Workflow Data using "$" prefix. For example "$call_timeout" refers to value of
-"call_timeout" attribute of Workflow Item that is processed in condition.
+Options can refer to values of Workflow Data using the `$` prefix. For example, `$call_timeout` refers to value of the `call_timeout` attribute of Workflow Item that is processed in condition.
 
-Also it is possible to refer to any property of Workflow Item using "$." prefix. For example to refer date time when
-Workflow Item was created a string "$.created" can be used.
+Also it is possible to refer to any property of Workflow Item using "$." prefix. For example, to refer date time when the Workflow Item was created, string `$.created` can be used.
 
 Example
 -------

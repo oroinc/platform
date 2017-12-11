@@ -106,8 +106,8 @@ oro:
 "Manage Custom Reports": Manage Custom Reports
 "Manage Custom Reports - Reports": Manage Custom Reports - Reports
 "Create Report - Reports": Create Report - Reports
-"%report.name% - Edit - Reports": %report.name% - Edit - Reports
-"%report.name% - Reports": %report.name% - Reports
+"%report.name% - Edit - Reports": '%report.name% - Edit - Reports'
+"%report.name% - Reports": '%report.name% - Reports'
 
 "Edit report": Edit report
 "Delete report": Delete report
