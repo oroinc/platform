@@ -588,7 +588,10 @@ define(function(require) {
 
             part = _.last(chain);
             if (part && part.field) {
-                signature = _.pick(part.field, 'type', 'relationType', 'identifier');
+                signature = _.pick(part.field, 'type', 'relationType');
+                if (_.result(part.field.options, 'identifier')) {
+                    signature.identifier = true;
+                }
                 signature.field = part.field.name;
                 signature.entity = chain[chain.length - 2].entity.className;
                 if (chain.length > 2) {

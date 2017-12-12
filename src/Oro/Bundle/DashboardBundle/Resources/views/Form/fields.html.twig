@@ -146,7 +146,6 @@
                 {% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
                 {{ segmentQD.query_designer_condition_builder({
                     'id': name ~ '-condition-builder',
-                    'entity_choice_id': widgetType ~ '_' ~ name ~ '_entity',
                     'disable_audit': true,
                     'metadata': metadata,
                     'column_chain_template_selector': '#' ~ column_chain_template_id,

@@ -26,7 +26,6 @@
     {{ QD.query_designer_column_chain_template(column_chain_template_id) }}
     {{ segmentQD.query_designer_condition_builder({
         'id': coditionBuilderId,
-        'entity_choice_id': entityChoiceId,
         'currentSegmentId': segment.id|default(null),
         'page_limit': constant('\\Oro\\Bundle\\SegmentBundle\\Entity\\Manager\\SegmentManager::PER_PAGE'),
         'conditionBuilderOptions': condition_builder_options,

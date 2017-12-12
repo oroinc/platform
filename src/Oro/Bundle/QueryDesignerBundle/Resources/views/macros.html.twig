@@ -159,7 +159,6 @@
         {{ form_row(form.name, {
             'label': 'oro.query_designer.form.column',
             'attr': {
-                'data-fields-loader-selector': '[data-ftid=' ~ params.entity_choice_id ~ ']',
                 'data-purpose': 'column-selector',
                 'data-validation': { NotBlank: null }|json_encode
             }
@@ -224,7 +223,6 @@
         {{ form_row(form.columnNames, {
             'label': 'oro.query_designer.form.grouping_columns',
             'attr': {
-                'data-fields-loader-selector': '[data-ftid=' ~ params.entity_choice_id ~ ']',
                 'data-purpose': 'column-selector',
                 'data-validation': { NotBlank: null }|json_encode
             }
@@ -260,7 +258,6 @@
         {{ form_row(form.useDateGroupFilter) }}
         {{ form_row(form.fieldName, {
             'attr': {
-                'data-fields-loader-selector': '[data-ftid=' ~ params.entity_choice_id ~ ']',
                 'data-purpose': 'date-grouping-selector'
             }
         }) }}
