@@ -6,8 +6,10 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\StatisticModelInterface;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\AvgStrategy\AvgStrategyAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\AvgStrategy\AvgStrategyInterface;
 
-class StatisticRepository implements BatchRepositoryInterface, ObjectRepository
+class StatisticRepository implements BatchRepositoryInterface, ObjectRepository, AvgStrategyAwareInterface
 {
     const MAX_LIMIT = 10000;
 
@@ -25,6 +27,11 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository
      * @var StatisticModelInterface
      */
     protected $className;
+
+    /**
+     * @var AvgStrategyInterface
+     */
+    protected $avgStrategy;
 
     /**
      * StatisticRepository constructor.
@@ -73,10 +80,12 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository
     public function getAverageTimeTable(array $criteria)
     {
         $queryBuilder = $this->connection->createQueryBuilder()
-            ->select($this->className::getIdField().", avg(time) as time")
+            ->select($this->className::getIdField())
             ->from($this->className::getName())
             ->groupBy($this->className::getIdField())
         ;
+
+        $this->avgStrategy->addSelect($queryBuilder);
 
         if ($criteria) {
             $this->addCriteria($criteria, $queryBuilder);
@@ -87,7 +96,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository
         $paths = [];
 
         foreach ($result as $row) {
-            $paths[$row[$this->className::getIdField()]] = round($row['time']);
+            $paths[$row[$this->className::getIdField()]] = round($row[AvgStrategyInterface::TIME_FIELD_NAME]);
         }
 
         return $this->paths = $paths;
@@ -215,6 +224,14 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository
     public function setClassName($className)
     {
         $this->className = $className;
+    }
+
+    /**
+     * @param AvgStrategyInterface $avgStrategy
+     */
+    public function setAvgStrategy(AvgStrategyInterface $avgStrategy)
+    {
+        $this->avgStrategy = $avgStrategy;
     }
 
     /**

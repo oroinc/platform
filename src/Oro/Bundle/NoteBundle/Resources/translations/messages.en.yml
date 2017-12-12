@@ -30,7 +30,7 @@ oro:
             remove:           Remove note
 
         no_notes_exist:       No notes found
-        updated_by:           Updated by {{ user }}
+        widget_updated_by:    Updated by {{ user }}
         note_added_by:        added by {{ user }}
         note_updated_by:      added by {{ user }}, updated by {{ editor }}
         note_update:          Update {{ entity }}
