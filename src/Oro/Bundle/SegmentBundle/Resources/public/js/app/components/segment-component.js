@@ -139,7 +139,9 @@ define(function(require) {
                     confirm.on('cancel', function() {
                         $entityChoice.val(oldVal).change();
                     });
-                    confirm.once('hidden', confirm.dispose.bind(confirm));
+                    confirm.once('hidden', function() {
+                        _.defer(confirm.dispose.bind(confirm));
+                    });
                     confirm.open();
                 } else {
                     handleEntityChange();
