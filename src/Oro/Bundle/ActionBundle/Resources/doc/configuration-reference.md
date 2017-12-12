@@ -296,7 +296,7 @@ Frontend Options Configuration
 
 Frontend Options allow to override operation dialog or page template, title and set widget options.
 
-Frontend Options configuration has next options:
+Frontend Options configuration has the following options:
 
 * **template**
     *string*
@@ -314,8 +314,8 @@ Frontend Options configuration has next options:
     *maximizedHeightDecreaseBy*, *width*, etc.
 * **confirmation**
     *string*
-    You can show confirmation message before start operation`s execution. Translate constant should be available
-    for JS - placed in jsmessages.*.yml
+    You can show confirmation message before start operation's execution. Translate constant should be available
+    for JS - placed in `jsmessages.*.yml`.
 * **show_dialog**
     *boolean*
     By default this value is `true`. It mean that on operation execution, if form parameters are set, will be shown
@@ -419,7 +419,7 @@ operation.
 
 * **mass_action_provider**
     *string*
-    Service name. This service must be marked with "oro_action.datagrid.mass_action_provider" tag. Also it must
+    Service name. This service must be marked with `oro_action.datagrid.mass_action_provider` tag. Also it must
     implements Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface. Method "getActions" of this
     provider must return array of mass action configurations.
 * **mass_action**
@@ -510,14 +510,14 @@ when operation could not be performed.
 There are two types of conditions - preconditions and actually operation conditions. Preconditions are using to check
 whether operation should be allowed to show, and actual conditions used to check whether operation can be done.
 
-Alias of condition starts from "@" symbol and must refer to registered condition. For example "@or" refers to logical
+Alias of condition starts from `@` symbol and must refer to registered condition. For example `@or` refers to logical
 OR condition.
 
-Options can refer to values of main entity in Action Data using "$" prefix. For example "$some_value" refers to value
+Options can refer to values of main entity in Action Data using `$` prefix. For example `$some_value` refers to value
 of "callsome_value" attribute of entity that is processed in condition.
 
-Also it is possible to refer to any property of Action Data using "$." prefix. For example to refer date attribute
-with date can be used string "$.created".
+Also it is possible to refer to any property of Action Data using `$.` prefix. For example to refer date attribute
+with date can be used string `$.created`.
 
 Example
 -------
@@ -546,8 +546,8 @@ Pre Actions, Form Init Actions and Actions Configuration
     Configuration of Actions that must be performed after all previous steps are performed. This is main operation step
     that must contain operation logic. It will be performed only after conditions will be qualified.
 
-Similarly to Conditions - alias of Action starts from "@" symbol and must refer to registered Actions. For example
-"@assign_value" refers to Action which set specified value to attribute in Action Data.
+Similarly to Conditions - alias of Action starts from `@` symbol and must refer to registered Actions. For example
+`@assign_value` refers to Action which set specified value to attribute in Action Data.
 
 Example
 -------

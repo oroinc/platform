@@ -34,3 +34,5 @@ services:
             - '@oro_behat_statistic.database.connection'
         calls:
             - [setClassName, ['Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatistic']]
+        tags:
+            - { name: 'avg_strategy_aware' }

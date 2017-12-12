@@ -12,7 +12,6 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
-use Oro\Bundle\EmailBundle\Util\ConfigurableTransport;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Component\DependencyInjection\ServiceLink;
 
@@ -34,8 +33,8 @@ class DirectMailer extends \Swift_Mailer
     /** @var ServiceLink  */
     protected $loggerLink;
 
-    /** @var ConfigurableTransport */
-    protected $configurableTransport;
+    /** @var \Swift_Transport */
+    private $transport;
 
     /**
      * Constructor
@@ -45,30 +44,10 @@ class DirectMailer extends \Swift_Mailer
      */
     public function __construct(
         \Swift_Mailer $baseMailer,
-        ContainerInterface $container,
-        ConfigurableTransport $configurableTransport
+        ContainerInterface $container
     ) {
         $this->baseMailer = $baseMailer;
         $this->container  = $container;
-        $this->configurableTransport = $configurableTransport;
-
-        $transport = $this->baseMailer->getTransport();
-        if ($transport instanceof \Swift_Transport_SpoolTransport) {
-            $transport = $this->findRealTransport();
-            if (!$transport) {
-                $transport = \Swift_NullTransport::newInstance();
-            }
-        }
-
-        if ($transport instanceof \Swift_Transport_EsmtpTransport) {
-            $this->addXOAuth2Authenticator($transport);
-        }
-
-        if ($transport instanceof \Swift_Transport_AbstractSmtpTransport) {
-            $this->configureTransportLocalDomain($transport);
-        }
-
-        parent::__construct($transport);
     }
 
     /**
@@ -176,7 +155,28 @@ class DirectMailer extends \Swift_Mailer
         if ($this->smtpTransport) {
             return $this->smtpTransport;
         }
-        return parent::getTransport();
+
+        if (!$this->transport) {
+            $transport = $this->baseMailer->getTransport();
+            if ($transport instanceof \Swift_Transport_SpoolTransport) {
+                $transport = $this->findRealTransport();
+                if (!$transport) {
+                    $transport = \Swift_NullTransport::newInstance();
+                }
+            }
+
+            if ($transport instanceof \Swift_Transport_EsmtpTransport) {
+                $this->addXOAuth2Authenticator($transport);
+            }
+
+            if ($transport instanceof \Swift_Transport_AbstractSmtpTransport) {
+                $this->configureTransportLocalDomain($transport);
+            }
+
+            $this->transport = $transport;
+        }
+
+        return $this->transport;
     }
 
     /**
@@ -217,7 +217,8 @@ class DirectMailer extends \Swift_Mailer
             if ($this->smtpTransport) {
                 $result = $this->smtpTransport->send($message, $failedRecipients);
             } else {
-                $result = parent::send($message, $failedRecipients);
+                $mailerInstance = new \Swift_Mailer($this->getTransport());
+                $result = $mailerInstance->send($message, $failedRecipients);
             }
         } catch (\Swift_TransportException $transportException) {
             $logger = $this->getLogger();
@@ -267,7 +268,8 @@ class DirectMailer extends \Swift_Mailer
             $mailer = $this->container->get(sprintf('swiftmailer.mailer.%s', $name));
             if ($mailer === $this->baseMailer) {
                 if ($name === 'default') {
-                    $realTransport = $this->configurableTransport->getDefaultTransport();
+                    $realTransport = $this->container->get('oro_email.util.configurable_transport')
+                        ->getDefaultTransport();
                 } else {
                     $realTransport = $this->container->get(sprintf('swiftmailer.mailer.%s.transport.real', $name));
                 }

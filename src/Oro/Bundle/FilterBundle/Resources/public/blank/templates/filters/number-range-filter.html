@@ -1,0 +1,44 @@
+<div class="choice-filter number-range-filter" data-number-range-filter-template>
+    <div class="filter-select-oro-wrapper">
+        <select name="<%= name %>"
+                data-choice-value-select
+
+            <% if (renderMode === 'toggle-mode') { %>
+                data-skip-input-widgets
+                class="select select--size-m select--full"
+            <% } else { %>
+                class="select select--size-m"
+            <% } %>
+
+        >
+            <% _.each(choices, function (option) { %>
+                <option value="<%= option.value %>"
+
+                    <% if (option.value == selectedChoice) { %>
+                        selected="selected"
+                    <% } %>
+                >
+                    <%- option.label %>
+                </option>
+            <% }); %>
+        </select>
+    </div>
+    <div class="value-field-frame">
+        <div class="filter-value">
+            <div class="filter-start">
+                <input class="input input--size-m input--full" type="number" class="" value="<%= value.value %>" name="value">
+            </div>
+            <span class="filter-separator">-</span>
+            <div class="filter-end">
+                <input class="input input--size-m input--full" type="number" value="<%= value.value_end %>" name="value_end">
+            </div>
+        </div>
+        <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>
+
+        <% if (renderMode !== 'toggle-mode') { %>
+            <div class="filter-action-row">
+                <button type="button" class="btn btn--action filter-update"><%- _.__("Update") %></button>
+            </div>
+        <% } %>
+    </div>
+</div>
