@@ -59,6 +59,9 @@ define(function(require) {
             data.isSystemLabel = !data.label;
 
             if (fieldId && hasEntityField) {
+                if (!data.label) {
+                    data.label = _.result(_.last(fieldChoiceView.splitFieldId(fieldId)).field, 'label');
+                }
                 data.entityField = fieldChoiceView.formatChoice(fieldId, this.entityFieldTemplate);
             } else {
                 if (!data.label && data.attribute_name) {
@@ -74,7 +77,10 @@ define(function(require) {
                 }
             }
 
-            if (!data.itemId) {
+            var collectionItem = data.itemId ? _.findWhere(collection, {'itemId': data.itemId}) : null;
+            if (collectionItem) {
+                _.extend(collectionItem, data);
+            } else {
                 data.itemId = _.uniqueId();
                 collection.push(data);
             }

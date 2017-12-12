@@ -143,12 +143,19 @@ define(function(require) {
                 this.options.workflow.ensureAttributeByPropertyPath(item.property_path);
                 var attribute = this.options.workflow.getAttributeByPropertyPath(item.property_path);
                 var attributeName = attribute.get('name');
-                var formOptionsData = {};
+                var formOptionsData = _.pick(item, 'options');
                 if (item.required) {
-                    formOptionsData = _.extend({}, formOptionsData, {options: {required: true}});
+                    formOptionsData.options = _.extend({}, formOptionsData.options, {required: true});
+                } else if (formOptionsData.options) {
+                    delete formOptionsData.options.required;
+                    delete formOptionsData.options.constraints;
                 }
-                if (item.label) {
+
+                if (item.label && item.isLabelUpdated) {
                     formOptionsData.label = item.label;
+                    if (formOptionsData.options) {
+                        delete formOptionsData.options.label;
+                    }
                 }
 
                 attributeFields[attributeName] = formOptionsData;
@@ -197,6 +204,9 @@ define(function(require) {
             } else {
                 attributeName = this.options.workflow.generateAttributeName(data.property_path);
             }
+            if (data.label) {
+                data.isLabelUpdated = true;
+            }
             data.attribute_name = attributeName;
             data.is_entity_attribute = true;
 
@@ -213,7 +223,6 @@ define(function(require) {
                 entityFieldsProvider: this.options.entityFieldsProvider
             });
 
-            this.listenTo(attributesList, 'removeFormOption', this.removeFormOption);
             this.listenTo(attributesList, 'editFormOption', this.editFormOption);
             this.subview('attributes-list-view', attributesList);
         },
@@ -223,7 +232,7 @@ define(function(require) {
         },
 
         getFormOptions: function() {
-            var result = [];
+            var results = [];
             var entityPropertyPathPrefix = this.options.workflow.get('entity_attribute') + '.';
             _.each(this.model.get('form_options').attribute_fields, function(formOption, attributeName) {
                 formOption = formOption || {};
@@ -240,19 +249,23 @@ define(function(require) {
                 if (!label && options.hasOwnProperty('label')) {
                     label = options.label;
                 }
-
-                result.push({
+                var result = {
                     'itemId': _.uniqueId(),
                     'is_entity_attribute': isEntityAttribute,
                     'attribute_name': attributeName,
                     'property_path': propertyPath || attributeName,
                     'required': isRequired,
                     'label': label,
+                    'isLabelUpdated': false,
                     'translateLinks': attribute.attributes.translateLinks[this.model.get('name')]
-                });
+                };
+                if ('options' in formOption) {
+                    result.options = _.clone(formOption.options);
+                }
+                results.push(result);
             }, this);
 
-            return result;
+            return results;
         },
 
         onCancel: function() {

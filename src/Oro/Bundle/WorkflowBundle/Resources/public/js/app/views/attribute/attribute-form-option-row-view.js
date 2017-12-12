@@ -49,7 +49,6 @@ define(function(require) {
             });
             confirm.on('ok', _.bind(function() {
                 this.trigger('removeFormOption', this.options.data);
-                this.remove();
             }, this));
             confirm.open();
         },
