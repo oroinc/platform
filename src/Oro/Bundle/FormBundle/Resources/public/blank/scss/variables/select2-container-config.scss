@@ -1,0 +1,28 @@
+// @theme: blank;
+
+$select2-container-arrow-height: 18px !default;
+$select2-container-arrow-size: 5px !default;
+$select2-container-size-l: 12px 11px !default;
+$select2-container-size-m: 10px !default;
+$select2-container-size-s: 8px !default;
+$select2-container-input-inner-offset: 6px 8px !default;
+
+$select2-container-border-radius: null !default;
+$select2-container-drop-above-box-shadow: 0 -3px 5px rgba(0,0,0,0.15) !default;
+
+$select2-container-input-border: 1px solid get-color(additional, 'light') !default;
+
+$select2-container-input-focus-border: 1px solid get-color('ui', 'normal') !default;
+$select2-container-input-focus-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
+                                     0 0 8px rgba(102, 175, 233, 0.6) !default;
+
+$select2-container-input-error-border: 1px solid get-color('ui', 'error-dark') !default;
+$select2-container-input-error-box-shadow: 0 1px 7px 0 rgba(223,96,96,.6) !default;
+
+$select2-container-input-warning-border: 1px solid get-color('secondary', 'dark') !default;
+$select2-container-input-warning-box-shadow: 0 1px 7px 0 rgba(126,166,164,.35) !default;
+
+$select2-container-input-success-border: 1px solid get-color('secondary', 'light') !default;
+
+$select2-drop-border-radius: null !default;
+$select2-drop-above-border-radius: null !default;
