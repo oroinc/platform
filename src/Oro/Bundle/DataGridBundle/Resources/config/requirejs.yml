@@ -94,4 +94,4 @@ config:
         'orodatagrid/js/app/transitions/abstract-transition': 'bundles/orodatagrid/js/app/transitions/abstract-transition.js'
         'orodatagrid/js/app/components/multi-grid-component': 'bundles/orodatagrid/js/app/components/multi-grid-component.js'
         'orodatagrid/js/app/views/multi-grid-view': 'bundles/orodatagrid/js/app/views/multi-grid-view.js'
-        'orodatagrid/js/app/views/datagrid-row-select-widget-view': 'bundles/orodatagrid/js/app/views/datagrid-row-select-widget-view.js'
+        'orodatagrid/js/row-select-for-widget/builder': 'bundles/orodatagrid/js/row-select-for-widget/builder.js'

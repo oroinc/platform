@@ -16,6 +16,11 @@ class Select2Entity extends Element implements ClearableInterface
     protected $attempts;
 
     /**
+     * @var string
+     */
+    protected $searchInputSelector = '.select2-search input';
+
+    /**
      * {@inheritdoc}
      */
     public function setValue($value)
@@ -242,7 +247,7 @@ class Select2Entity extends Element implements ClearableInterface
     private function getSearchInput()
     {
         $inputs = array_filter(
-            $this->getPage()->findAll('css', '.select2-search input'),
+            $this->getPage()->findAll('css', $this->searchInputSelector),
             function (NodeElement $element) {
                 return $element->isVisible();
             }
