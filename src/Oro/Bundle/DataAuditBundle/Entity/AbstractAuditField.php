@@ -60,6 +60,13 @@ abstract class AbstractAuditField
     protected $dataType;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="translation_domain", type="string", length=100, nullable=true)
+     */
+    protected $translationDomain;
+
+    /**
      * @param string $field
      * @param string $dataType
      * @param mixed $newValue
@@ -140,6 +147,25 @@ abstract class AbstractAuditField
     public function getDataType()
     {
         return $this->dataType;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTranslationDomain()
+    {
+        return $this->translationDomain;
+    }
+
+    /**
+     * @param string $translationDomain
+     * @return $this
+     */
+    public function setTranslationDomain(string $translationDomain)
+    {
+        $this->translationDomain = $translationDomain;
+
+        return $this;
     }
 
     /**

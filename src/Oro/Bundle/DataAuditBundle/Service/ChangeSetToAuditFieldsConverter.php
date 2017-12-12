@@ -4,9 +4,11 @@ namespace Oro\Bundle\DataAuditBundle\Service;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\DBAL\Types\Type as DbalType;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAuditField;
+use Oro\Bundle\DataAuditBundle\Event\CollectAuditFieldsEvent;
 use Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ChangeSetToAuditFieldsConverter
 {
@@ -18,6 +20,9 @@ class ChangeSetToAuditFieldsConverter
 
     /** @var EntityNameProvider */
     private $entityNameProvider;
+
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
 
     /**
      * @param AuditEntityMapper   $auditEntityMapper
@@ -35,6 +40,14 @@ class ChangeSetToAuditFieldsConverter
     }
 
     /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
      * @param string        $auditEntryClass The class name of the audit entity
      * @param ClassMetadata $entityMetadata  The metadata of the audited entity
      * @param array         $changeSet       The changed data
@@ -48,6 +61,13 @@ class ChangeSetToAuditFieldsConverter
             if ($this->configProvider->isAuditableField($entityMetadata->name, $fieldName)) {
                 $this->convertChangeSet($auditEntryClass, $entityMetadata, $fieldName, $change, $fields);
             }
+        }
+
+        if ($this->eventDispatcher) {
+            $auditEntryFieldClass = $this->auditEntityMapper->getAuditEntryFieldClassForAuditEntry($auditEntryClass);
+            $event = new CollectAuditFieldsEvent($auditEntryFieldClass, $changeSet, $fields);
+            $this->eventDispatcher->dispatch(CollectAuditFieldsEvent::NAME, $event);
+            $fields = $event->getFields();
         }
 
         return $fields;
