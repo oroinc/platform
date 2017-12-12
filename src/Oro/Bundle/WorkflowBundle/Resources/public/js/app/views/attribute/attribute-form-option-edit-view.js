@@ -86,7 +86,7 @@ define(function(require) {
         editRow: function(data) {
             this.fieldSelectorEl.inputWidget(
                 'val',
-                this.options.entityFieldsProvider.getPathByPropertyPath(data.property_path)
+                this.options.entityFieldsProvider.getPathByPropertyPathSafely(data.property_path)
             );
             this.form.find('[name=itemId]').val(data.itemId || '');
             this.labelEl.val(data.isSystemLabel ? '' : data.label);

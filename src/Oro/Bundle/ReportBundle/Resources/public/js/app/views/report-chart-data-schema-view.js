@@ -131,7 +131,7 @@ define(function(require) {
                     var value = element.val();
                     var index = value.indexOf('(');
                     var fieldId = index > 0 ? value.substr(0, index) : value;
-                    var node = _.last(this.dataProvider.pathToEntityChain(fieldId));
+                    var node = _.last(this.dataProvider.pathToEntityChainSafely(fieldId));
                     callback({
                         id: value,
                         text: node.field.label
@@ -156,7 +156,7 @@ define(function(require) {
 
             _.each(columns, function(column) {
                 var options = column.func;
-                var chain = this.dataProvider.pathToEntityChain(column.name).slice(1);
+                var chain = this.dataProvider.pathToEntityChainSafely(column.name).slice(1);
                 var entity = chain[chain.length - 1];
                 var items = data.results;
                 var updatedLabel = column.label;

@@ -3,9 +3,8 @@ define(function(require) {
 
     var EntityStructureDataProvider;
     var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
     var EntityError = require('oroentity/js/entity-error');
+    var errorHandler = require('oroentity/js/app/services/entity-structure-error-handler');
     /** @type {Registry} */
     var registry = require('oroui/js/app/services/registry');
     var EntityStructuresCollection = require('oroentity/js/app/models/entitystructures-collection');
@@ -45,8 +44,63 @@ define(function(require) {
      * @property {boolean} [identifier] - flag of field is the identifier of entity
      */
 
+    /**
+     * Error handler object used to handle EntityError in the safe methods
+     *
+     * @typedef {Object} ErrorHandler
+     * @property {function(EntityError)} handle
+     */
+
+    /**
+     * Parsed field path to the chain with an extra information for each part
+     * Example:
+     *  [{
+     *      entity: {Object},
+     *      path: "",
+     *      basePath: ""
+     *  }, {
+     *      entity: {Object},
+     *      field: {Object},
+     *      path: "account",
+     *      basePath: "account+Oro\[...]\Account"
+     *  }, {
+     *      entity: {Object},
+     *      field: {Object},
+     *      path: "account+Oro\[...]\Account::contacts",
+     *      basePath: "account+Oro\[...]\Account::contacts+Oro\[...]Contact"
+     *  }, {
+     *      field: {Object},
+     *      path: "account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName"
+     *  }]
+     *
+     * @typedef {Array.<{entity: {Object}, field: {Object}, path: {string}, basePath: {string}}>} EntityFieldChain
+     */
+
+    /**
+     * Identifier of field (field path), goes from root entity and consist of
+     *  '`fieldName`+`entityName`::`fieldName`+`entityName`::`fieldName`'
+     * Example:
+     *  account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
+     *
+     * @typedef {string} fieldId
+     */
+
+    /**
+     * Property path of field, goes from root entity and consist of
+     *  '`fieldName`.`fieldName`.`fieldName`'
+     * Example:
+     *  account.contacts.firstName
+     *
+     * @typedef {string} propertyPath
+     */
+
     EntityStructureDataProvider = BaseClass.extend(/** @lends EntityStructureDataProvider.prototype */{
         cidPrefix: 'esdp',
+
+        /**
+         * @type {ErrorHandler}
+         */
+        errorHandler: errorHandler,
 
         /**
          * @type {EntityStructuresCollection}
@@ -122,7 +176,7 @@ define(function(require) {
          * @param {fieldsFilterer} [options.fieldsFilterer]
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, 'collection', 'fieldsFilterer'));
+            _.extend(this, _.pick(options, 'collection', 'fieldsFilterer', 'errorHandler'));
             if (!(this.collection instanceof EntityStructuresCollection)) {
                 throw new TypeError('The option `collection` has to be an instance of `EntityStructuresCollection`');
             }
@@ -326,34 +380,13 @@ define(function(require) {
 
         /**
          * Parses path-string and returns array of objects
+         *  in case fieldId is invalid, throws EntityError with proper error message
          *
-         * Field Path:
-         *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
-         * Returns Chain:
-         *  [{
-         *      entity: {Object},
-         *      path: "",
-         *      basePath: ""
-         *  }, {
-         *      entity: {Object},
-         *      field: {Object},
-         *      path: "account",
-         *      basePath: "account+Oro\[...]\Account"
-         *  }, {
-         *      entity: {Object},
-         *      field: {Object},
-         *      path: "account+Oro\[...]\Account::contacts",
-         *      basePath: "account+Oro\[...]\Account::contacts+Oro\[...]Contact"
-         *  }, {
-         *      field: {Object},
-         *      path: "account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName"
-         *  }]
-         *
-         * @param {string} fieldId
-         * @return {Array.<Object>}
-         * @protected
+         * @param {fieldId} fieldId
+         * @return {EntityFieldChain}
+         * @throws {EntityError} -- in case invalid fieldId
          */
-        _pathToEntityChain: function(fieldId) {
+        pathToEntityChain: function(fieldId) {
             var entityModel;
             if (!this.rootEntity) {
                 return [];
@@ -369,81 +402,44 @@ define(function(require) {
                 return this.rootEntity ? chain : [];
             }
 
-            _.each(fieldId.split('+'), function(part, i) {
-                var fieldName;
-                var entityClassName;
-                var pos;
-
-                if (i === 0) {
-                    // first item is always just a field name
-                    fieldName = part;
-                } else {
-                    pos = part.indexOf('::');
-                    if (pos !== -1) {
-                        entityClassName = part.slice(0, pos);
-                        fieldName = part.slice(pos + 2);
-                    } else {
-                        entityClassName = part;
-                    }
-                }
-
-                if (entityClassName) {
-                    // set entity for previous chain part
-                    entityModel = this.collection.getEntityModelByClassName(entityClassName);
-                    chain[i].entity = this._extractEntityData(entityModel);
-                }
-
-                if (fieldName) {
-                    part = {
-                        // take field from entity of previous chain part
-                        field: _.find(chain[i].entity.fields, {name: fieldName})
-                    };
-                    chain.push(part);
-                    part.path = this._entityChainToPath(chain);
-                    if (part.field.relatedEntityName) {
-                        part.basePath = part.path + '+' + part.field.relatedEntityName;
-                    }
-                }
-            }, this);
-
-            return chain;
-        },
-
-        /**
-         * Parses path-string and returns array of objects
-         *
-         * Field Path:
-         *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
-         * Returns Chain:
-         *  [{
-         *      entity: {Object},
-         *      path: "",
-         *      basePath: ""
-         *  }, {
-         *      entity: {Object},
-         *      field: {Object},
-         *      path: "account",
-         *      basePath: "account+Oro\[...]\Account"
-         *  }, {
-         *      entity: {Object},
-         *      field: {Object},
-         *      path: "account+Oro\[...]\Account::contacts",
-         *      basePath: "account+Oro\[...]\Account::contacts+Oro\[...]Contact"
-         *  }, {
-         *      field: {Object},
-         *      path: "account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName"
-         *  }]
-         *
-         * @param {string} fieldId
-         * @return {(Array.<Object>|null)}
-         */
-        pathToEntityChain: function(fieldId) {
-            var chain = null;
-
             try {
-                chain = this._pathToEntityChain(fieldId);
-            } catch (ex) {
-                EntityStructureDataProvider.errorHandler();
+                _.each(fieldId.split('+'), function(part, i) {
+                    var fieldName;
+                    var entityClassName;
+                    var pos;
+
+                    if (i === 0) {
+                        // first item is always just a field name
+                        fieldName = part;
+                    } else {
+                        pos = part.indexOf('::');
+                        if (pos !== -1) {
+                            entityClassName = part.slice(0, pos);
+                            fieldName = part.slice(pos + 2);
+                        } else {
+                            entityClassName = part;
+                        }
+                    }
+
+                    if (entityClassName) {
+                        // set entity for previous chain part
+                        entityModel = this.collection.getEntityModelByClassName(entityClassName);
+                        chain[i].entity = this._extractEntityData(entityModel);
+                    }
+
+                    if (fieldName) {
+                        part = {
+                            // take field from entity of previous chain part
+                            field: _.find(chain[i].entity.fields, {name: fieldName})
+                        };
+                        chain.push(part);
+                        part.path = this.entityChainToPath(chain);
+                        if (part.field.relatedEntityName) {
+                            part.basePath = part.path + '+' + part.field.relatedEntityName;
+                        }
+                    }
+                }, this);
+            } catch (e) {
                 throw new EntityError('Can not build entity chain by given path "' + fieldId + '"');
             }
 
@@ -451,38 +447,35 @@ define(function(require) {
         },
 
         /**
+         * Parses path-string and returns array of objects
+         *  in case fieldId is invalid, handles the error and returns empty chain
+         *
+         * @param {fieldId} fieldId
+         * @return {EntityFieldChain}
+         */
+        pathToEntityChainSafely: function(fieldId) {
+            var chain;
+
+            try {
+                chain = this.pathToEntityChain(fieldId);
+            } catch (error) {
+                this.errorHandler.handle(error);
+            }
+
+            return chain || [];
+        },
+
+        /**
          * Check path-string if it is valid
          *
-         * Field Path:
-         *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
-         * Returns Chain:
-         *  [{
-         *      entity: {Object},
-         *      path: "",
-         *      basePath: ""
-         *  }, {
-         *      entity: {Object},
-         *      field: {Object},
-         *      path: "account",
-         *      basePath: "account+Oro\[...]\Account"
-         *  }, {
-         *      entity: {Object},
-         *      field: {Object},
-         *      path: "account+Oro\[...]\Account::contacts",
-         *      basePath: "account+Oro\[...]\Account::contacts+Oro\[...]Contact"
-         *  }, {
-         *      field: {Object},
-         *      path: "account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName"
-         *  }]
-         *
-         * @param {string} fieldId
+         * @param {fieldId} fieldId
          * @return {boolean}
          */
         validatePath: function(fieldId) {
             var isValid = true;
 
             try {
-                this._pathToEntityChain(fieldId);
+                this.pathToEntityChain(fieldId);
             } catch (ex) {
                 isValid = false;
             }
@@ -492,28 +485,11 @@ define(function(require) {
 
         /**
          * Parses path-string and returns array of objects and trims trailing field
+         *  in case fieldId is invalid, throws EntityError with proper error message
          *
-         * Field Path:
-         *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
-         * Returns Chain:
-         *  [{
-         *      entity: {Object},
-         *      path: "",
-         *      basePath: ""
-         *  }, {
-         *      entity: {Object},
-         *      field: {Object},
-         *      path: "account",
-         *      basePath: "account+Oro\[...]\Account"
-         *  }, {
-         *      entity: {Object},
-         *      field: {Object},
-         *      path: "account+Oro\[...]\Account::contacts",
-         *      basePath: "account+Oro\[...]\Account::contacts+Oro\[...]Contact"
-         *  }]
-         *
-         * @param {string} fieldId
-         * @return {Array.<Object>}
+         * @param {fieldId} fieldId
+         * @return {EntityFieldChain}
+         * @throws {EntityError} -- in case invalid fieldId
          */
         pathToEntityChainExcludeTrailingField: function(fieldId) {
             var chain = this.pathToEntityChain(fieldId);
@@ -522,98 +498,79 @@ define(function(require) {
         },
 
         /**
-         * Combines path-string from array of objects
+         * Parses path-string and returns array of objects and trims trailing field
+         *  in case fieldId is invalid, handles the error and returns empty chain
          *
-         * Chain:
-         *  [{
-         *      entity: {Object},
-         *      path: "",
-         *      basePath: ""
-         *  }, {
-         *      entity: {Object},
-         *      field: {Object},
-         *      path: "account",
-         *      basePath: "account+Oro\[...]\Account"
-         *  }, {
-         *      entity: {Object},
-         *      field: {Object},
-         *      path: "account+Oro\[...]\Account::contacts",
-         *      basePath: "account+Oro\[...]\Account::contacts+Oro\[...]Contact"
-         *  }, {
-         *      field: {Object},
-         *      path: "account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName"
-         *  }]
-         *
-         *  Returns Field Path:
-         *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
-         *
-         * @param {Array.<Object>} chain
-         * @return {string}
-         * @protected
+         * @param {fieldId} fieldId
+         * @return {EntityFieldChain}
          */
-        _entityChainToPath: function(chain) {
-            chain = _.map(chain.slice(1), function(part) {
-                var result = part.field.name;
-                if (part.entity) {
-                    result += '+' + part.entity.className;
-                }
-                return result;
-            });
-            var path = chain.join('::');
+        pathToEntityChainExcludeTrailingFieldSafely: function(fieldId) {
+            var chain;
 
-            return path;
+            try {
+                chain = this.pathToEntityChainExcludeTrailingField(fieldId);
+            } catch (error) {
+                this.errorHandler.handle(error);
+            }
+
+            return chain || [];
         },
 
         /**
          * Combines path-string from array of objects
+         *  in case entity field chain is invalid, throws EntityError with proper error message
          *
-         * Chain:
-         *  [{
-         *      entity: {Object},
-         *      path: "",
-         *      basePath: ""
-         *  }, {
-         *      entity: {Object},
-         *      field: {Object},
-         *      path: "account",
-         *      basePath: "account+Oro\[...]\Account"
-         *  }, {
-         *      entity: {Object},
-         *      field: {Object},
-         *      path: "account+Oro\[...]\Account::contacts",
-         *      basePath: "account+Oro\[...]\Account::contacts+Oro\[...]Contact"
-         *  }, {
-         *      field: {Object},
-         *      path: "account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName"
-         *  }]
-         *
-         *  Returns Field Path:
-         *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
-         *
-         * @param {Array.<Object>} chain
-         * @return {string}
+         * @param {EntityFieldChain} chain
+         * @return {fieldId}
+         * @throws {EntityError} -- in case invalid chain
          */
         entityChainToPath: function(chain) {
             var path;
 
             try {
-                path = this._entityChainToPath(chain);
+                chain = _.map(chain.slice(1), function(part) {
+                    var result = part.field.name;
+                    if (part.entity) {
+                        result += '+' + part.entity.className;
+                    }
+                    return result;
+                });
             } catch (e) {
-                EntityStructureDataProvider.errorHandler();
-                path = '';
+                throw new EntityError('Can not build field path from given chain');
             }
+
+            path = chain.join('::');
 
             return path;
         },
 
         /**
-         * Prepares the object with field's info which can be matched for conditions
+         * Combines path-string from array of objects
+         *  in case entity field chain is invalid, handles the error and returns empty field path
          *
-         * @param {string} fieldId - Field Path, such as
-         *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
+         * @param {EntityFieldChain} chain
+         * @return {fieldId}
+         */
+        entityChainToPathSafely: function(chain) {
+            var path;
+
+            try {
+                path = this.entityChainToPath(chain);
+            } catch (error) {
+                this.errorHandler.handle(error);
+            }
+
+            return path || '';
+        },
+
+        /**
+         * Prepares the object with field's info which can be matched for conditions
+         *  in case invalid entity field path, handles the error and returns null as field signature
+         *
+         * @param {fieldId} fieldId - field Path
          * @return {FieldSignature|null}
          */
-        getFieldSignature: function(fieldId) {
+        getFieldSignatureSafely: function(fieldId) {
             var signature = null;
             var chain;
             var part;
@@ -624,7 +581,8 @@ define(function(require) {
 
             try {
                 chain = this.pathToEntityChain(fieldId);
-            } catch (e) {
+            } catch (error) {
+                this.errorHandler.handle(error);
                 return signature;
             }
 
@@ -644,13 +602,8 @@ define(function(require) {
         /**
          * Converts Field Path to Property Path
          *
-         * Field Path:
-         *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
-         * Returns Property Path:
-         *      account.contacts.firstName
-         *
-         * @param {string} fieldId
-         * @return {string}
+         * @param {fieldId} fieldId
+         * @return {propertyPath}
          */
         getPropertyPathByPath: function(fieldId) {
             var fields = [];
@@ -674,15 +627,12 @@ define(function(require) {
         },
 
         /**
-         * Converts Property Path to Field Path
+         * Converts property path to field path
+         *  in case invalid property path, throws EntityError with proper error message
          *
-         * Property Path:
-         *      account.contacts.firstName
-         * Returns Field Path:
-         *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
-         *
-         * @param {string} propertyPath
-         * @return {string}
+         * @param {propertyPath} propertyPath
+         * @return {fieldId}
+         * @throws {EntityError} -- in case invalid property path
          */
         getPathByPropertyPath: function(propertyPath) {
             var parts;
@@ -701,10 +651,28 @@ define(function(require) {
 
                 parts.push(properties[properties.length - 1]);
             } catch (e) {
-                EntityStructureDataProvider.errorHandler();
-                throw new EntityError('Can not define entity path by given property path "' + properties + '"');
+                throw new EntityError('Can not define field path by given property path "' + propertyPath + '"');
             }
             return parts.join('::');
+        },
+
+        /**
+         * Converts property path to field path
+         *  in case invalid property path, handles the error and returns empty field path
+         *
+         * @param {propertyPath} propertyPath
+         * @return {fieldId}
+         */
+        getPathByPropertyPathSafely: function(propertyPath) {
+            var fieldId;
+
+            try {
+                fieldId = this.getPathByPropertyPath(propertyPath);
+            } catch (error) {
+                this.errorHandler.handle(error);
+            }
+
+            return fieldId || '';
         }
     }, /** @lends EntityStructureDataProvider */{
         /**
@@ -776,12 +744,6 @@ define(function(require) {
             EntityStructureDataProvider.filterPresets[name] = config;
         }
     });
-
-    EntityStructureDataProvider.errorHandler = (function() {
-        var message = __('oro.entity.not_exist');
-        var handler = _.bind(mediator.execute, mediator, 'showErrorMessage', message);
-        return _.throttle(handler, 100, {trailing: false});
-    }());
 
     /**
      * @export oroentity/js/app/services/entity-structure-data-provider

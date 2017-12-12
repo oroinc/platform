@@ -172,7 +172,7 @@ define(function(require) {
                 breadcrumbs: function(pagePath) {
                     var chain = [];
                     if (this.entity) {
-                        chain = this.dataProvider.pathToEntityChainExcludeTrailingField(pagePath);
+                        chain = this.dataProvider.pathToEntityChainExcludeTrailingFieldSafely(pagePath);
                         _.each(chain, function(item) {
                             item.pagePath = item.basePath;
                         });
@@ -197,18 +197,18 @@ define(function(require) {
             var data;
             if (value) {
                 try {
-                    data = this.dataProvider.pathToEntityChain(value);
+                    data = this.dataProvider.pathToEntityChainSafely(value);
                 } catch (e) {}
             }
             return data ? template(data) : value;
         },
 
         splitFieldId: function(fieldId) {
-            return this.dataProvider.pathToEntityChain(fieldId);
+            return this.dataProvider.pathToEntityChainSafely(fieldId);
         },
 
         getApplicableConditions: function(fieldId) {
-            var applicableConditions = this.dataProvider.getFieldSignature(fieldId);
+            var applicableConditions = this.dataProvider.getFieldSignatureSafely(fieldId);
             if (_.isFunction(this.callbacks.applicableConditionsCallback)) {
                 applicableConditions = this.callbacks.applicableConditionsCallback(applicableConditions, fieldId);
             }
@@ -238,7 +238,7 @@ define(function(require) {
             _.each(entityFields, function(field) {
                 var chainItem = {field: field};
                 var item = {
-                    id: this.dataProvider.entityChainToPath(chain.concat(chainItem)),
+                    id: this.dataProvider.entityChainToPathSafely(chain.concat(chainItem)),
                     text: field.label
                 };
                 if (field.relationType) {
@@ -246,7 +246,7 @@ define(function(require) {
                         fields.push(_.clone(item));
                     }
                     chainItem.entity = {className: field.relatedEntityName};
-                    item.pagePath = this.dataProvider.entityChainToPath(chain.concat(chainItem));
+                    item.pagePath = this.dataProvider.entityChainToPathSafely(chain.concat(chainItem));
                     delete item.id;
                     relations.push(item);
                 } else {

@@ -221,7 +221,7 @@ define(function(require) {
         formatChoice: function(value, template) {
             var data;
             if (value) {
-                data = this.dataProvider.pathToEntityChain(value);
+                data = this.dataProvider.pathToEntityChainSafely(value);
             }
             return data ? template(data) : value;
         },

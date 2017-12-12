@@ -166,21 +166,21 @@ define(function(require) {
             });
 
             it('defines field signature from entity fieldId path', function() {
-                expect(dataProvider.getFieldSignature(fieldId)).toEqual({
+                expect(dataProvider.getFieldSignatureSafely(fieldId)).toEqual({
                     type: 'string',
                     field: 'name',
                     entity: 'Oro\\Bundle\\UserBundle\\Entity\\Group',
                     parent_entity: 'Oro\\Bundle\\UserBundle\\Entity\\Role'
                 });
 
-                expect(dataProvider.getFieldSignature(fieldIdParts.slice(0, 2).join('+'))).toEqual({
+                expect(dataProvider.getFieldSignatureSafely(fieldIdParts.slice(0, 2).join('+'))).toEqual({
                     relationType: 'manyToMany',
                     field: 'Oro\\Bundle\\UserBundle\\Entity\\Group::roles',
                     entity: 'Oro\\Bundle\\UserBundle\\Entity\\Role',
                     parent_entity: 'Oro\\Bundle\\UserBundle\\Entity\\User'
                 });
 
-                expect(dataProvider.getFieldSignature(fieldIdParts[0])).toEqual({
+                expect(dataProvider.getFieldSignatureSafely(fieldIdParts[0])).toEqual({
                     relationType: 'manyToMany',
                     field: 'roles',
                     entity: 'Oro\\Bundle\\UserBundle\\Entity\\User'
@@ -415,6 +415,50 @@ define(function(require) {
                 expect(chain[0].entity.fields).toEqual([
                     jasmine.objectContaining({name: 'name', label: 'Name'})
                 ]);
+            });
+        });
+
+        describe('handle errors of invalid input data for entity structures data provider', function() {
+            var errorHandler;
+            var dataProvider;
+            var initialRootEntityClassName = 'Oro\\Bundle\\UserBundle\\Entity\\User';
+
+            beforeEach(function(done) {
+                errorHandler = jasmine.createSpyObj('errorHandler', ['handle']);
+                EntityStructureDataProvider.getOwnDataContainer(applicant1, {
+                    rootEntity: initialRootEntityClassName,
+                    errorHandler: errorHandler
+                }).then(function(provider) {
+                    dataProvider = provider;
+                    done();
+                });
+            });
+
+            it('error on invalid path to entity chain', function() {
+                var fieldId = 'roles+Some\\Bundle\\Role::roles';
+                expect(dataProvider.pathToEntityChainSafely(fieldId)).toEqual([]);
+                expect(errorHandler.handle).toHaveBeenCalledWith(jasmine.any(Error));
+                expect(function() {
+                    dataProvider.pathToEntityChain(fieldId);
+                }).toThrow(jasmine.any(Error));
+            });
+
+            it('error on invalid entity chain to path', function() {
+                var chain = [{foo: 'test'}, {bar: 'baz'}];
+                expect(dataProvider.entityChainToPathSafely(chain)).toEqual('');
+                expect(errorHandler.handle).toHaveBeenCalledWith(jasmine.any(Error));
+                expect(function() {
+                    dataProvider.entityChainToPath(chain);
+                }).toThrow(jasmine.any(Error));
+            });
+
+            it('error on invalid property path to path', function() {
+                var propertyPath = 'foo.bar';
+                expect(dataProvider.getPathByPropertyPathSafely(propertyPath)).toEqual('');
+                expect(errorHandler.handle).toHaveBeenCalledWith(jasmine.any(Error));
+                expect(function() {
+                    dataProvider.getPathByPropertyPath(propertyPath);
+                }).toThrow(jasmine.any(Error));
             });
         });
     });
