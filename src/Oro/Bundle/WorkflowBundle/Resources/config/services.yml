@@ -3,6 +3,7 @@ parameters:
     oro_workflow.entity.process_trigger.class: Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger
     oro_workflow.entity.workflow_definition.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
     oro_workflow.entity.workflow_item.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowItem
+    oro_workflow.entity.workflow_transition_record.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord
     oro_workflow.entity.transition_trigger_cron.class: Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger
     oro_workflow.entity.transition_trigger_event.class: Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger
 
@@ -603,3 +604,17 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Formatter\WorkflowVariableFormatter'
         arguments:
             - "@translator"
+
+    oro_workflow.event_listener.collect_audit_fields:
+        class: Oro\Bundle\WorkflowBundle\EventListener\CollectAuditFieldsListener
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: kernel.event_listener, event: oro_audit.collect_audit_fields, method: onCollectAuditFields }
+
+    oro_workflow.event_listener.send_workflow_step_changes_to_audit:
+        class: Oro\Bundle\WorkflowBundle\EventListener\SendWorkflowStepChangesToAuditListener
+        arguments:
+            - '@oro_dataaudit.model.additional_entity_changes_to_audit_storage'
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_transition_record.class%', event: postPersist }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
@@ -82,7 +83,7 @@ class IterableResultFactory implements IterableResultFactoryInterface
             $qb = $this->aclHelper->apply($qb);
         }
 
-        return new IterableResult($qb);
+        return $this->getIterableResult($qb);
     }
 
     /**
@@ -106,5 +107,14 @@ class IterableResultFactory implements IterableResultFactoryInterface
     private function getObjectIdentifier(ActionConfiguration $actionConfiguration)
     {
         return $actionConfiguration->offsetGetOr('object_identifier');
+    }
+
+    /**
+     * @param Query|QueryBuilder $qb
+     * @return IterableResult
+     */
+    protected function getIterableResult($qb): IterableResult
+    {
+        return new IterableResult($qb);
     }
 }
