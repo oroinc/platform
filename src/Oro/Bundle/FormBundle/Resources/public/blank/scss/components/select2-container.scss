@@ -221,6 +221,8 @@
 }
 
 .select2-results {
+    max-height: 300px;
+
     color: get-color('additional', 'dark');
 
     overflow-x: hidden;
