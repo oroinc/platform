@@ -1,10 +1,8 @@
-Documenting API Resources
-=========================
+# Documenting API Resources
 
-Overview
---------
+## Overview
 
-You need to provide detailed documentation for your API resources because it is an important part of API and it could help a lot to developers to use your API.
+Documentation is an important part of API and helps developers to use your API. Therefore, it is necessary to provide detailed documentation for your API resources.
 
 The Oro Platform collects documentation for API resources from several sources:
 
@@ -12,7 +10,7 @@ The Oro Platform collects documentation for API resources from several sources:
 * A [Markdown](https://daringfireball.net/projects/markdown/) document. The detailed information you can find bellow in this document.
 * System-wide descriptions of [configurable entities and fields](./../../../EntityConfigBundle/README.md).
 
-The most priority source is the configuration file. The documentation provided there overrides all other sources. But as it is YAML file it is not the best way to write a big multi-line texts there. The more appropriate place for the documentation is a separate [Markdown](https://daringfireball.net/projects/markdown/) file. To use such file you need to provide a link to it in the configuration file, e.g.:
+The source with the highest priority is the configuration file. The documentation provided there overrides all other sources. However, it is a YAML file and therefore, it is not fully suitable for big multi-line texts. The more appropriate place for the documentation is a separate [Markdown](https://daringfireball.net/projects/markdown/) file. To use a custom markdown file, provide a link to it in the configuration file, e.g.:
 
 ```yaml
 api:
@@ -21,7 +19,7 @@ api:
             documentation_resource: '@AcmeAppBundle/Resources/doc/api/acme_entity.md'
 ```
 
-If the documentation was not found neither the configuration file nor the documentation file, the Oro Platform will try to use system-wide descriptions of entities and fields. These descriptions are usually provided in translation files and, actually, they are the best way to document fields, because these descriptions can be used not only in API. Here is an example of a translation file contains descriptions for entities and fields:
+If the documentation was not found neither the configuration file nor in the Markdown documentation file, the Oro Platform tries to use system-wide descriptions of entities and fields. These descriptions are usually provided in translation files. This is the best way to document fields because the descriptions can be used in other places, not only in API. Here is an example of a translation file that contains descriptions for entities and fields:
 
 ```yaml
 # Acme/Bundle/AppBundle/Resources/translations/messages.en.yml
@@ -33,7 +31,7 @@ oro:
         opportunity:
             entity_label:         Opportunity
             entity_plural_label:  Opportunities
-            entity_description:   The Opportunity represent highly probable potential or actual sales to a new or established customer
+            entity_description:   The Opportunity represents highly probable potential or actual sales to a new or established customer
             id.label:             Id
             name:
                 label:            Opportunity name
@@ -46,24 +44,23 @@ oro:
                 description:      The perceived probability of opportunity being successfully closed
 ```
 
-Please note that after changing a documentation you need to run `oro:api:doc:cache:clear` CLI command to apply the changes to API sandbox.
+**Important:** Please note that after changing a documentation you need to run the `oro:api:doc:cache:clear` CLI command to apply the changes to the API sandbox.
 
-Documentation File Format
--------------------------
+## Documentation File Format
 
-The documentation file is a [Markdown](https://daringfireball.net/projects/markdown/) document that contains description about one or multiple API resources. Please note that the [Markdown Extra](https://michelf.ca/projects/php-markdown/extra/) syntax is supported in the documentation file as well.
+The documentation file is a [Markdown](https://daringfireball.net/projects/markdown/) document that contains description of one or multiple API resources. Please note that the [Markdown Extra](https://michelf.ca/projects/php-markdown/extra/) syntax is supported in the documentation file as well.
 
-The only requirement for such document is it should be written in particular format.
+The only requirement for such document is that it should be written in a particular format.
 
-Each resource documentation should starts from '#' (h1) header that contains Fully-Qualified Class Name (FQCN) of the resource, e.g.:
+Each resource documentation should start with the `#` (h1) header that contains Fully-Qualified Class Name (FQCN) of the resource, e.g.:
 
 ```markdown
 # Acme\Bundle\AcmeBundle\Entity\AcmeEntity
 ```
 
-As already mentioned above, a single documentation file may contain documentations for several resource. In general, this can be used to document a main resource and related resources. For example, you can document resources for User and UseStatus entities in one file.
+As already mentioned above, a single documentation file may contain documentation for several resources. In general, such approach is used to document the main resource and related resources. For example, you can document resources for the User and UseStatus entities in the same file.
 
-At the next level `##` (h2) one of the documentation sections should be specified, e.g.:
+Start the next level with the `##` (h2) header and use it to announce on of the documentation sections, e.g.:
 
 ```markdown
 # Acme\Bundle\AcmeBundle\Entity\AcmeEntity
@@ -78,24 +75,25 @@ At the next level `##` (h2) one of the documentation sections should be specifie
 ...
 ```
 
-The section name is case insensitive. They are used only by documentation parser to identify the documentation part.  
+The section name is case insensitive. They are used only by the documentation parser to identify the documentation part.  
 The following table describes the purposes of each documentation section:
 
 | Section name | Description |
 | --- | --- |
-| ACTIONS | Contains a documentation of actions. |
-| FIELDS | Contains a description of fields. |
-| FILTERS | Contains a description of filters. |
-| SUBRESOURCES | Contains a documentation of sub-resources. |
+| ACTIONS | Contains actions documentation. |
+| FIELDS | Contains fields descriptions. |
+| FILTERS | Contains filters description. |
+| SUBRESOURCES | Contains a documentation for sub-resources. |
 
-The third level `###` (h3) header depends on the section type and can be action name, field name, filter name or sub-resource name.
+The third level `###` (h3) header depends on the section type and can be an action name, field name, filter name, or sub-resource name.
 
-The fourth level `####` (h4) header can be used only for **FIELDS** and **SUBRESOURCES** sections.
-For **FIELDS** section it can be used for the case when it is needed to specify the description for a field in a particular action. For **SUBRESOURCES** section it is a sub-resource action name.
+The fourth level `####` (h4) header can be used only for the **FIELDS** and **SUBRESOURCES** sections.
+Use it for the **FIELDS** section when you need to specify a description for a field in a particular action. 
+Use it for the **SUBRESOURCES** section when you need to specify a sub-resource action name.
 
-The action names in **FIELDS** section can be combined using comma, e.g.: "Create, Update". It allows to avoid copy-paste when you need the same description for several actions.
+The action names in **FIELDS** section can be combined using comma, e.g. "Create, Update". It helps avoid copy-pasting when you need the same description for several actions.
 
-An example:
+**Example:**
 
 ```markdown
 # Acme\Bundle\AcmeBundle\Entity\AcmeEntity
@@ -104,35 +102,31 @@ An example:
 
 ### get
 
-The documentation for an action, in this example for "get" action.
-May contain any formatting e.g.: ordered or unordered lists,
- request or response examples, links, text in bold or italic, etc.
+The documentation for an action. In this example, it is the "get" action.
+It may contain any formatting like ordered or unordered lists, request or response examples, links, text in bold or italic, etc.
 
 ## FIELDS
 
 ### name
 
-The description for "name" field.
-May contain any formatting e.g.: ordered or unordered lists,
- request or response examples, links, text in bold or italic, etc.
+The description for the "name" field.
+May contain any formatting like ordered or unordered lists, request or response examples, links, text in bold or italic, etc.
 
 #### get
 
-The description for "name" field for "get" action.
-May contain any formatting e.g.: ordered or unordered lists,
- request or response examples, links, text in bold or italic, etc.
+The description for the "name" field of the "get" action.
+May contain any formatting like ordered or unordered lists, request or response examples, links, text in bold or italic, etc.
 
 #### create, update
 
-The description for "name" field for "create" and "update" actions.
-May contain any formatting e.g.: ordered or unordered lists,
- request or response examples, links, text in bold or italic, etc.
+The description for the "name" field of the "create" and "update" actions.
+May contain any formatting like ordered or unordered lists, request or response examples, links, text in bold or italic, etc.
 
 ## FILTERS
 
 ### name
 
-The description for a filter by "name" field.
+The description for a filter by the "name" field.
 The formatting is not allowed here.
 
 ## SUBRESOURCES
@@ -141,14 +135,13 @@ The formatting is not allowed here.
 
 #### get_subresource
 
-The documentation for a sub-resource, in this example for "get_subresource" action for "contacts" sub-resource.
-May contain any formatting e.g.: ordered or unordered lists,
- request or response examples, links, text in bold or italic, etc.
+The documentation for a sub-resource action. It is a "get_subresource" action for "contacts" sub-resource in this example.
+May contain any formatting e.g.: ordered or unordered lists, request or response examples, links, text in bold or italic, etc.
 ```
 
-The `{@inheritdoc}` placeholder can be used to get common documentation for an action or a field. This placeholder works only for **ACTIONS** and **FIELDS** sections.
+Use the `{@inheritdoc}` placeholder to get the common documentation for an action or a field. This placeholder works only for the **ACTIONS** and **FIELDS** sections.
 
-An example:
+**Example:**
 
 ```markdown
 # Acme\Bundle\AcmeBundle\Entity\AcmeEntity
@@ -157,7 +150,7 @@ An example:
 
 ### create
 
-Create a new acme entity record.
+Create a new Acme entity record.
 The created record is returned in the response.
 
 {@inheritdoc}
@@ -173,15 +166,15 @@ The created record is returned in the response.
 **The required field**
 ```
 
-The `{@request}` tag can be used to add documentation depends on the request type. The full signature of this tag is `{@request:expression}some text{@/request}`. The expression can contain the following operators:
+Use the `{@request}` tag to add documentation depending on the request type. The full signature of this tag is `{@request:expression}some text{@/request}`. The expression can contain the following operators:
 
 - `&` - logical AND
 - `|` - logical OR
 - `!` - logical NOT
 
-For example if it is required to add text for JSON API request type, but only if it is not REST API request, the following expression can be used: `json_api&!rest`.
+For example, to add a text for the JSON API request type for all requests excluding REST API, use the following expression: `json_api&!rest`.
 
-An example:
+**Example:**
 
 ```markdown
 # Acme\Bundle\AcmeBundle\Entity\AcmeEntity
@@ -190,7 +183,7 @@ An example:
 
 ### create
 
-Create a new acme entity record.
+Create a new Acme entity record.
 The created record is returned in the response.
 
 {@inheritdoc}

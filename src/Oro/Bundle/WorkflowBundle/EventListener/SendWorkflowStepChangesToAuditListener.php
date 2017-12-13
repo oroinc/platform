@@ -43,6 +43,10 @@ class SendWorkflowStepChangesToAuditListener implements OptionalListenerInterfac
      */
     public function postPersist(WorkflowTransitionRecord $transitionRecord, LifecycleEventArgs $eventArgs)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $workflowEntity = $transitionRecord->getWorkflowItem()->getEntity();
         $this->storage->addEntityUpdate(
             $eventArgs->getEntityManager(),

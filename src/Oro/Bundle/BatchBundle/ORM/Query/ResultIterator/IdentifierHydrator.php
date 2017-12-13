@@ -16,7 +16,7 @@ class IdentifierHydrator extends AbstractHydrator
     {
         $result = [];
         while ($data = $this->_stmt->fetch(\PDO::FETCH_COLUMN)) {
-            $result[] = (int)$data;
+            $result[] = $data;
         }
 
         return $result;
