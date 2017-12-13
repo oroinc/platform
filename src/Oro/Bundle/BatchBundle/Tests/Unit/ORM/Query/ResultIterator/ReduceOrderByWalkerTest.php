@@ -105,12 +105,4 @@ class ReduceOrderByWalkerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($AST->orderByClause);
     }
-
-    /**
-     * @return string
-     */
-    protected function getClassName(): string
-    {
-        return 'Some/Class/Name';
-    }
 }
