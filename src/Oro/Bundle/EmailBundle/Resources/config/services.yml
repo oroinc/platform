@@ -442,7 +442,6 @@ services:
 
     oro_email.util.configurable_transport:
         class: Oro\Bundle\EmailBundle\Util\ConfigurableTransport
-        public: false
         arguments:
             - '@oro_email.provider.smtp_settings'
             - '@swiftmailer.mailer.default.transport.real'
@@ -452,7 +451,6 @@ services:
         arguments:
             - '@mailer'
             - '@service_container'
-            - '@oro_email.util.configurable_transport'
         calls:
             - [setLogger, ['@oro_email.logger.link']]
 

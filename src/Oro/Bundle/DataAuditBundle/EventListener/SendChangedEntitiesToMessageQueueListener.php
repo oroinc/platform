@@ -10,11 +10,10 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\PersistentCollection;
-
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
 use Oro\Bundle\DataAuditBundle\Async\Topics;
+use Oro\Bundle\DataAuditBundle\Model\AdditionalEntityChangesToAuditStorage;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Service\EntityToEntityChangeArrayConverter;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
@@ -70,6 +69,11 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     private $allTokens;
 
     /**
+     * @var AdditionalEntityChangesToAuditStorage
+     */
+    private $additionalEntityChangesStorage;
+
+    /**
      * @param MessageProducerInterface           $messageProducer
      * @param TokenStorageInterface              $tokenStorage
      * @param EntityToEntityChangeArrayConverter $entityToArrayConverter
@@ -102,6 +106,15 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     public function setEnabled($enabled = true)
     {
         $this->enabled = $enabled;
+    }
+
+    /**
+     * @param AdditionalEntityChangesToAuditStorage $additionalEntityChangesStorage
+     */
+    public function setAdditionalEntityChangesStorage(
+        AdditionalEntityChangesToAuditStorage $additionalEntityChangesStorage
+    ) {
+        $this->additionalEntityChangesStorage = $additionalEntityChangesStorage;
     }
 
     /**
@@ -368,28 +381,77 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
      */
     private function processUpdates(EntityManager $em)
     {
-        if (!$this->allUpdates->contains($em)) {
-            return [];
-        }
-
         $updates = [];
-        foreach ($this->allUpdates[$em] as $entity) {
-            $changeSet = $this->allUpdates[$em][$entity];
-            $update = $this->convertEntityToArray($em, $entity, $changeSet);
-            if ($update['entity_id']) {
-                $updates[] = $this->convertEntityToArray($em, $entity, $changeSet);
-            } else {
-                $this->logger->error(
-                    sprintf(
-                        'The entity %s has an empty id. Possibly $entity->setId(null) was executed',
-                        $update['entity_class']
-                    ),
-                    ['entity' => $entity, 'update' => $update]
-                );
+        if ($this->allUpdates->contains($em)) {
+            foreach ($this->allUpdates[$em] as $entity) {
+                $changeSet = $this->allUpdates[$em][$entity];
+                $update = $this->processUpdate($em, $entity, $changeSet);
+                if (!$update) {
+                    continue;
+                }
+
+                $updates[] = $update;
             }
         }
 
+        if (!$this->additionalEntityChangesStorage->hasEntityUpdates($em)) {
+            return $updates;
+        }
+
+        $additionalUpdates = $this->additionalEntityChangesStorage->getEntityUpdates($em);
+        foreach ($additionalUpdates as $entity) {
+            $changeSet = $additionalUpdates->offsetGet($entity);
+            $additionalUpdate = $this->processUpdate($em, $entity, $changeSet);
+            if (!$additionalUpdate) {
+                continue;
+            }
+
+            foreach ($updates as $key => $existingUpdate) {
+                if ($existingUpdate['entity_id'] === $additionalUpdate['entity_id']
+                    && $existingUpdate['entity_class'] === $additionalUpdate['entity_class']) {
+                    $existingUpdateForMerge = &$updates[$key];
+
+                    break;
+                }
+            }
+
+            if (!empty($existingUpdateForMerge)) {
+                $existingUpdateForMerge['change_set'] = array_merge(
+                    $existingUpdateForMerge['change_set'],
+                    $additionalUpdate['change_set']
+                );
+            } else {
+                $updates[] = $additionalUpdate;
+            }
+
+            unset($existingUpdateForMerge);
+        }
+        $this->additionalEntityChangesStorage->clear($em);
+
         return $updates;
+    }
+
+    /**
+     * @param object $entity
+     * @param array $changeSet
+     * @return null|array
+     */
+    private function processUpdate(EntityManager $entityManager, $entity, array $changeSet)
+    {
+        $update = $this->convertEntityToArray($entityManager, $entity, $changeSet);
+        if ($update['entity_id']) {
+            return $update;
+        }
+
+        $this->logger->error(
+            sprintf(
+                'The entity %s has an empty id. Possibly $entity->setId(null) was executed',
+                $update['entity_class']
+            ),
+            ['entity' => $entity, 'update' => $update]
+        );
+
+        return null;
     }
 
     /**

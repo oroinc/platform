@@ -17,22 +17,26 @@ Backbone provides little structure above simple routing, individual models, view
 
 See [Chaplin documentation](http://docs.chaplinjs.org/).
 
-<a name="application"></a>
+
 ## Application
 Application gets initialized requiring `oroui/js/app` module on a page (it's required from `OroUIBundle:Default:index.html.twig`):
+
 ```
     <script type="text/javascript">
         require(['oroui/js/app']);
     </script>
 ```
+
 This module exports an instance of `Application` (extend of `Chaplin.Application`), depends on:
- 1. `oroui/js/app/application`, Application class
- 1. `oroui/js/app/routes`, collection of routers
- 1. `oroui/js/app`'s configuration
- 1. and some `app modules` (optional), see [App modules](#app-modules)
+
+- `oroui/js/app/application`, Application class
+- `oroui/js/app/routes`, collection of routers
+- `oroui/js/app`'s configuration
+- and some `app modules` (optional), see [App modules](#app-modules)
 
 ### Routes
 Routes module (`oroui/js/app/routes`) it's an array with only one route, which matches any URL and refers to `index` method of `controllers/page-controller`:
+
 ```
     [
         ['*pathname', 'page#index']
@@ -41,6 +45,7 @@ Routes module (`oroui/js/app/routes`) it's an array with only one route, which m
 
 ### Application configuration
 RequireJS [module configuration](http://requirejs.org/docs/api.html#config-moduleconfig) approach is utilized for passing options to application's constructor. Configuration is placed in `OroUIBundle::requirejs.config.js.twig` template and looks something like:
+
 ```
 require({
     config: {
@@ -58,6 +63,7 @@ require({
     }
 });
 ```
+
 It's placed in a twig-template in order to get access to backend variables in runtime. Which is impossible to do in `requirejs.yml` file.
 
 
@@ -71,16 +77,19 @@ App modules are atomic parts of general application, responsible for:
 App modules export nothing, they are just callback functions that are executed right before the application is started.
 
 App modules are declared in `requirejs.yml` configuration file, in custom section `appmodules`:
+
 ```
 config:
     appmodules:
         - oroui/js/app/modules/views-module
         - oroui/js/app/modules/messenger-module
 ```
+
 This approach allows to define in each bundle code which should be executed on the application start.
 
 ### Example 1
 `oroui/js/app/modules/views-module` - declares global views which will be instantiated right before an action point of controller gains control
+
 ```javascript
 define([
     'oroui/js/app/controllers/base/controller'
@@ -101,8 +110,10 @@ define([
     /* ... */
 });
 ```
+
 ### Example 2
 `oroui/js/app/modules/messenger-module` - registers messenger's public methods as handlers in `mediator`
+
 ```javascript
 define([
     'oroui/js/mediator',
