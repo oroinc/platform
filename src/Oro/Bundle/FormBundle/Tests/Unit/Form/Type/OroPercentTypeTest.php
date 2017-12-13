@@ -89,4 +89,72 @@ class OroPercentTypeTest extends FormIntegrationTestCase
             ),
         );
     }
+
+    /**
+     * @param float $data
+     * @param array $expectedData
+     * @param array $options
+     * @dataProvider submitFormDataProvider
+     */
+    public function testSubmitForm(
+        $data,
+        $expectedData,
+        array $options = array()
+    ) {
+        $form = $this->factory->create($this->formType, null, $options);
+        $form->submit($data);
+        self::assertTrue($form->isSynchronized());
+        self::assertSame($expectedData, $form->getData());
+    }
+
+    /**
+     * @return array
+     */
+    public function submitFormDataProvider()
+    {
+        return [
+            'unspecified precision, with numbers after decimal point'                                       => [
+                'data'         => (string)123.45,
+                'expectedData' => 1.2345
+            ],
+            'unspecified precision, without numbers after decimal point'                                    => [
+                'data'         => (string)123,
+                'expectedData' => 1.23
+            ],
+            'unspecified precision, without numbers after decimal point, value can be converted to integer' => [
+                'data'         => (string)100,
+                'expectedData' => (float)1
+            ],
+            'zero precision, with numbers after decimal point'                                              => [
+                'data'         => (string)123.45,
+                'expectedData' => 1.2345,
+                'options'      => ['precision' => 0]
+            ],
+            'zero precision, without numbers after decimal point'                                           => [
+                'data'         => (string)123,
+                'expectedData' => 1.23,
+                'options'      => ['precision' => 0]
+            ],
+            'zero precision, without numbers after decimal point, value can be converted to integer'        => [
+                'data'         => 100,
+                'expectedData' => (float)1,
+                'options'      => ['precision' => 0]
+            ],
+            'custom precision, with numbers after decimal point'                                            => [
+                'data'         => (string)123.45,
+                'expectedData' => 1.2345,
+                'options'      => ['precision' => 1]
+            ],
+            'custom precision, without numbers after decimal point'                                         => [
+                'data'         => (string)123,
+                'expectedData' => 1.23,
+                'options'      => ['precision' => 1]
+            ],
+            'custom precision, without numbers after decimal point, value can be converted to integer'      => [
+                'data'         => (string)100,
+                'expectedData' => (float)1,
+                'options'      => ['precision' => 1]
+            ],
+        ];
+    }
 }

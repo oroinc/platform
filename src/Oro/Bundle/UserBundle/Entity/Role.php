@@ -93,15 +93,9 @@ class Role extends ExtendRole implements \Serializable
         $this->users = new ArrayCollection();
     }
 
-    /**
-     * Unset the id on copy
-     */
     public function __clone()
     {
-        if ($this->id) {
-            $this->id = null;
-            $this->setRole($this->role);
-        }
+        $this->id = null;
     }
 
     /**
