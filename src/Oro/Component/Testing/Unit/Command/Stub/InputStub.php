@@ -146,6 +146,6 @@ class InputStub implements InputInterface
      */
     public function __toString()
     {
-        return $this->command;
+        return (string)$this->command;
     }
 }
