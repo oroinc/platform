@@ -201,11 +201,17 @@ class ConfigManager
 
     /**
      * Save changes made with set or reset methods in a database
+     *
      * @param null|int|object $scopeIdentifier
      */
     public function flush($scopeIdentifier = null)
     {
-        $this->save($this->getScopeManager()->getChanges($scopeIdentifier), $scopeIdentifier);
+        $identifiers = null === $scopeIdentifier
+            ? $this->getScopeManager()->getChangedScopeIdentifiers()
+            : [$scopeIdentifier];
+        foreach ($identifiers as $identifier) {
+            $this->save($this->getScopeManager()->getChanges($identifier), $identifier);
+        }
     }
 
     /**
@@ -225,7 +231,7 @@ class ConfigManager
 
         $oldValues = [];
         foreach ($settings as $name => $setting) {
-            $oldValues[$name] = $this->getValue($name, false, false, $scopeIdentifier);
+            $oldValues[$name] = $this->getValue($name, false, false, $scopeIdentifier, true);
 
             $eventName = sprintf('%s.%s', ConfigSettingsUpdateEvent::BEFORE_SAVE, $name);
             $settings[$name] = $this->dispatchConfigSettingsUpdateEvent($eventName, $setting);
@@ -383,17 +389,18 @@ class ConfigManager
      * @param bool $default
      * @param bool $full
      * @param null|int $scopeIdentifier
+     * @param bool $skipChanges
      *
      * @return mixed
      */
-    protected function getValue($name, $default = false, $full = false, $scopeIdentifier = null)
+    protected function getValue($name, $default = false, $full = false, $scopeIdentifier = null, $skipChanges = false)
     {
         $value = null;
         $scopeId = $this->resolveIdentifier($scopeIdentifier);
         $managers = $this->getScopeManagersToGetValue($default);
         $settingValue = null;
         foreach ($managers as $scopeName => $manager) {
-            $settingValue = $manager->getSettingValue($name, true, $scopeIdentifier);
+            $settingValue = $manager->getSettingValue($name, true, $scopeIdentifier, $skipChanges);
             if (null !== $settingValue) {
                 // in case if we get value not from current scope,
                 // we should mark value that it was get from another scope

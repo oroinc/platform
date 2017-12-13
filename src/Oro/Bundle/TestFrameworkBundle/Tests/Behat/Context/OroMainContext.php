@@ -1773,4 +1773,16 @@ class OroMainContext extends MinkContext implements
         self::assertEquals($status, $element->getText());
         self::assertEquals($color, $element->getColor());
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertPageAddress($page)
+    {
+        $this->spin(function () use ($page) {
+            parent::assertPageAddress($page);
+        }, 10);
+
+        parent::assertPageAddress($page);
+    }
 }

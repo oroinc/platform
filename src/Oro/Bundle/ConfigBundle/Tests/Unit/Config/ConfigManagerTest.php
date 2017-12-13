@@ -133,6 +133,14 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             $greetingKey => $greetingValue
         ];
 
+        $expectedScopeIdentifier = $scopeIdentifier;
+        if (null === $scopeIdentifier) {
+            $expectedScopeIdentifier = $idValue;
+            $this->userScopeManager->expects($this->once())
+                ->method('getChangedScopeIdentifiers')
+                ->willReturn([$idValue]);
+        }
+
         $this->userScopeManager->expects($this->once())
             ->method('getSettingValue')
             ->with($greetingKey)
@@ -158,13 +166,11 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->userScopeManager->expects($this->once())
             ->method('save')
-            ->with($changes, $scopeIdentifier)
-            ->willReturn(
-                [
-                    [$greetingKey => 'updated value'],
-                    []
-                ]
-            );
+            ->with($changes, $expectedScopeIdentifier)
+            ->willReturn([
+                [$greetingKey => 'updated value'],
+                []
+            ]);
 
         $this->dispatcher->expects($this->exactly(5))
             ->method('dispatch')
@@ -221,12 +227,10 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($idValue);
         $this->userScopeManager->expects($this->exactly(2))
             ->method('getSettingValue')
-            ->willReturnMap(
-                [
-                    [$greetingKey, true, $scopeIdentifier, ['value' => 'old value']],
-                    [$levelKey, true, $scopeIdentifier, ['value' => 2000]]
-                ]
-            );
+            ->willReturnMap([
+                [$greetingKey, true, $scopeIdentifier, true, ['value' => 'old value']],
+                [$levelKey, true, $scopeIdentifier, true, ['value' => 2000]]
+            ]);
 
         $singleKeyGreetingEvent = new ConfigSettingsUpdateEvent($this->manager, $greetingsValue);
         $singleKeyLevelEvent = new ConfigSettingsUpdateEvent($this->manager, $levelValue);
@@ -246,12 +250,10 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->userScopeManager->expects($this->once())
             ->method('save')
             ->with($normalizedData)
-            ->willReturn(
-                [
-                    [$greetingKey => 'updated value'],
-                    [$levelKey]
-                ]
-            );
+            ->willReturn([
+                [$greetingKey => 'updated value'],
+                [$levelKey]
+            ]);
 
         $this->dispatcher->expects($this->exactly(10))
             ->method('dispatch')
@@ -484,21 +486,17 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->userScopeManager->expects($this->any())
             ->method('resolveIdentifier')
-            ->willReturnMap(
-                [
-                    [$entity1, 33],
-                    [$entity2, 55]
-                ]
-            );
+            ->willReturnMap([
+                [$entity1, 33],
+                [$entity2, 55]
+            ]);
 
         $this->userScopeManager->expects($this->exactly(2))
             ->method('getSettingValue')
-            ->willReturnMap(
-                [
-                    [$parameterName, true, $entity1, ['value' => 'val1']],
-                    [$parameterName, true, $entity2, ['value' => 'val2']]
-                ]
-            );
+            ->willReturnMap([
+                [$parameterName, true, $entity1, false, ['value' => 'val1']],
+                [$parameterName, true, $entity2, false, ['value' => 'val2']]
+            ]);
 
         $this->globalScopeManager->expects($this->never())
             ->method('getSettingValue');

@@ -126,18 +126,6 @@ oro:
                 label: Enable HTML purifier
                 tooltip: Disabling HTML purifier will allow users to paste any HTML code into template or email body editor without tag stripping.
 
-            smtp_settings:
-                host:
-                    label: Host
-                port:
-                    label: Port
-                encryption:
-                    label: Encryption
-                username:
-                    label: Username
-                password:
-                    label: Password
-
         emailtemplate:
             entity_label:        Email Template
             entity_plural_label: Email Templates

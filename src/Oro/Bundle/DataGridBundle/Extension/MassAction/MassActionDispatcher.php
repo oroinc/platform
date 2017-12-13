@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResultInterface;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\DTO\SelectedItems;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
+
 use Symfony\Component\HttpFoundation\Request;
 
 class MassActionDispatcher
@@ -104,15 +108,30 @@ class MassActionDispatcher
         $handler = $this->massActionHelper->getHandler($massAction);
 
         // Call service
-        $resultIterator = $this->iterableResultFactoryRegistry->createIterableResult(
+        $resultIterator = $this->getIterator($datagrid, $massAction, $selectedItems);
+
+        $handlerArgs = new MassActionHandlerArgs($massAction, $datagrid, $resultIterator, $data);
+
+        return $handler->handle($handlerArgs);
+    }
+
+    /**
+     * @param DatagridInterface $datagrid
+     * @param MassActionInterface $massAction
+     * @param SelectedItems $selectedItems
+     * @return IterableResultInterface
+     * @throws LogicException
+     */
+    protected function getIterator(
+        DatagridInterface $datagrid,
+        MassActionInterface $massAction,
+        SelectedItems $selectedItems
+    ): IterableResultInterface {
+        return $this->iterableResultFactoryRegistry->createIterableResult(
             $datagrid->getAcceptedDatasource(),
             $massAction->getOptions(),
             $datagrid->getConfig(),
             $selectedItems
         );
-
-        $handlerArgs = new MassActionHandlerArgs($massAction, $datagrid, $resultIterator, $data);
-
-        return $handler->handle($handlerArgs);
     }
 }

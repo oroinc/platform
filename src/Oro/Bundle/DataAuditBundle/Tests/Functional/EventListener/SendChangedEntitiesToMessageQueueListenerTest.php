@@ -1,14 +1,12 @@
 <?php
 
-namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Listener;
+namespace Oro\Bundle\DataAuditBundle\Tests\Functional\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\UserInterface;
-
 use Oro\Bundle\DataAuditBundle\Async\Topics;
 use Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
@@ -850,5 +848,71 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         self::assertArrayHasKey('impersonation_id', $body);
         self::assertSame(69, $body['impersonation_id']);
+    }
+
+    public function testShouldSendAdditionalUpdates()
+    {
+        $em = $this->getEntityManager();
+        $entity = new TestAuditDataOwner();
+        $entity->setStringProperty('string');
+        $em->persist($entity);
+        $em->flush();
+
+        $sentMessages = self::getSentMessages();
+        $this->assertCount(1, $sentMessages);
+
+        $additionalChanges = ['additionalChanges' => ['old', 'new']];
+        $storage = self::getContainer()->get('oro_dataaudit.model.additional_entity_changes_to_audit_storage');
+        $storage->addEntityUpdate($em, $entity, $additionalChanges);
+
+        $em->flush();
+
+        $sentMessages = self::getSentMessages();
+        $this->assertCount(2, $sentMessages);
+        $additionalMessage = end($sentMessages);
+        $this->assertEquals(Topics::ENTITIES_CHANGED, $additionalMessage['topic']);
+        $expectedEntitiesUpdated = [
+            [
+                'entity_class' => TestAuditDataOwner::class,
+                'entity_id' => $entity->getId(),
+                'change_set' => $additionalChanges,
+                'additional_fields' => [],
+            ]
+        ];
+        $this->assertEquals($expectedEntitiesUpdated, $additionalMessage['message']->getBody()['entities_updated']);
+    }
+
+    public function testShouldSendEntityChangesWithAdditionalUpdates()
+    {
+        $em = $this->getEntityManager();
+        $entity = new TestAuditDataOwner();
+        $entity->setStringProperty('string');
+        $em->persist($entity);
+        $em->flush();
+
+        $sentMessages = self::getSentMessages();
+        $this->assertCount(1, $sentMessages);
+
+        $additionalChanges = ['additionalChanges' => ['old', 'new']];
+        $storage = self::getContainer()->get('oro_dataaudit.model.additional_entity_changes_to_audit_storage');
+        $storage->addEntityUpdate($em, $entity, $additionalChanges);
+
+        $entity->setStringProperty('new string');
+        $em->persist($entity);
+        $em->flush();
+
+        $sentMessages = self::getSentMessages();
+        $this->assertCount(2, $sentMessages);
+        $additionalMessage = end($sentMessages);
+        $this->assertEquals(Topics::ENTITIES_CHANGED, $additionalMessage['topic']);
+        $expectedEntitiesUpdated = [
+            [
+                'entity_class' => TestAuditDataOwner::class,
+                'entity_id' => $entity->getId(),
+                'change_set' => array_merge(['stringProperty' => ['string', 'new string']], $additionalChanges),
+                'additional_fields' => [],
+            ]
+        ];
+        $this->assertEquals($expectedEntitiesUpdated, $additionalMessage['message']->getBody()['entities_updated']);
     }
 }

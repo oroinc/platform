@@ -35,6 +35,8 @@ services:
             - '@oro_dataaudit.converter.entity_to_entity_change_array'
             - '@oro_dataaudit.audit_config_provider'
             - '@logger'
+        calls:
+            - [setAdditionalEntityChangesStorage, ['@oro_dataaudit.model.additional_entity_changes_to_audit_storage']]
         tags:
             - { name: doctrine.event_listener, event: onFlush, priority: -255 }
             - { name: doctrine.event_listener, event: postFlush, priority: -255 }
@@ -130,6 +132,8 @@ services:
             - '@oro_dataaudit.loggable.audit_entity_mapper'
             - '@oro_dataaudit.audit_config_provider'
             - '@oro_dataaudit.entity_name_provider'
+        calls:
+            - [setEventDispatcher, ['@event_dispatcher']]
 
     oro_dataaudit.converter.entity_changes_to_audit_entry:
         class: 'Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter'
@@ -172,3 +176,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }
+
+    oro_dataaudit.model.additional_entity_changes_to_audit_storage:
+        class: Oro\Bundle\DataAuditBundle\Model\AdditionalEntityChangesToAuditStorage

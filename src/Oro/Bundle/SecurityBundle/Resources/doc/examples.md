@@ -204,12 +204,23 @@ If user **Robert** will login into the **Main organization**, he should see the 
 
 If user **Robert** will login into the **Second organization**, he should see the next data:
 
+| Access level       | Data                 |
+|:------------------ | :------------------- |
+| **Business Unit**  | Account A, Account B |
+| **Division**       | Account A, Account B |
+| **Organization**   | Account A, Account B |
+
 | Access level       | Data                            |
 |:------------------ | :------------------------------ |
 | **Business Unit**  | Account D, Account E            |
 | **Division**       | Account C, Account D, Account E |
 | **Organization**   | Account C, Account D, Account E |
-   
+
+Column1 | Column2 | Column3
+---|---|---
+Text | Text | Text
+Text2 | Text2 | Text2
+
 ### Mark
 
 User **Mark** can not login into the **Main organization**.
@@ -221,10 +232,17 @@ If user **Mark** will login into the **Second organization**, he should see the 
 | **Business Unit**  | -                               |
 | **Division**       | -                               |
 | **Organization**   | Account C, Account D, Account E |
-      
+
+
+| Access level       | Data                            |
+|:------------------ | :------------------------------ |
+| **Business Unit**  | -                               |
+| **Division**       | -                               |
+| **Organization**   | Account C, Account D, Account E |
+
    
-Organization ownersip type
----------
+Organization Ownership type
+---------------------------
 
 Ownreship type for accounts is **Organization**.
 

@@ -58,4 +58,4 @@ oro:
             activity_unite: Append
             activity_replace: Replace
     activity:
-        merge.label: %activity% Activity
+        merge.label: '%activity% Activity'
