@@ -41,9 +41,6 @@ oro:
                 label:               Owner
                 description:         An user who is the owner of the file.
             extension.label:         Extension
-
-            file.label:              File
-
             delete_file.label:       Delete
             file_size:
                 label:               File size

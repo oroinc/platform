@@ -18,7 +18,7 @@ response:
         -
           c1: admin
           id: 1
-          view_link: %oro_default_prefix%user/view/1
+          view_link: '%oro_default_prefix%user/view/1'
 export:
         - [admin]
 export_filter:

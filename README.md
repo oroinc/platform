@@ -25,4 +25,4 @@ simplifies initial project setup and configuration.
 
 ## Documentation
   
-The documentation for OroPlatform can be found [here](http://www.orocrm.com/documentation/).
+The documentation for OroPlatform can be found [here](http://www.oroinc.com/doc/orocrm/).
