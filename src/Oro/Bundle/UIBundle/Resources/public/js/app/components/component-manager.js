@@ -1,13 +1,15 @@
-define(function(require) {
+define([
+    'require',
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/tools',
+    'oroui/js/app/components/base/component',
+    'oroui/js/component-shortcuts-manager',
+    'chaplin' // it is a circular dependency, so there's no local variable assigned
+], function(require, $, _, __, tools, BaseComponent, ComponentShortcutsManager) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Chaplin = require('chaplin');
-    var __ = require('orotranslation/js/translator');
-    var tools = require('oroui/js/tools');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var ComponentShortcutsManager = require('oroui/js/component-shortcuts-manager');
     var console = window.console;
 
     function ComponentManager($el) {
@@ -438,7 +440,8 @@ define(function(require) {
                 }
             } else if (error) {
                 // if there is unhandled error -- show user message
-                Chaplin.mediator.execute('showMessage', 'error', __('oro.ui.components.initialization_error'));
+                require('chaplin').mediator
+                    .execute('showMessage', 'error', __('oro.ui.components.initialization_error'));
             }
         },
 

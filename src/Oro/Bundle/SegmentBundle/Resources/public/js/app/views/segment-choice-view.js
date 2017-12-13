@@ -5,14 +5,15 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var routing = require('routing');
-    var BaseView = require('oroui/js/app/views/base/view');
-    require('jquery-ui');
-    require('jquery.select2');
+    var Select2View = require('oroform/js/app/views/select2-view');
 
-    SegmentChoiceView = BaseView.extend({
-        defaults: {
-            entity: undefined,
-            currentSegment: undefined
+    SegmentChoiceView = Select2View.extend({
+        defaultOptions: {
+            entity: void 0,
+            currentSegment: void 0,
+            select2: {
+                allowClear: false
+            }
         },
 
         events: {
@@ -20,9 +21,9 @@ define(function(require) {
         },
 
         initialize: function(options) {
-            options = _.defaults({}, options, this.defaults);
-            _.extend(this, _.pick(options, _.keys(this.defaults)));
-            this.select2Options = this._processSelect2Options(options);
+            options = $.extend(true, {}, this.defaultOptions, options);
+            _.extend(this, _.pick(options, _.without(_.keys(this.defaultOptions), 'select2')));
+            this.select2Config = this._processSelect2Options(options);
             SegmentChoiceView.__super__.initialize.call(this, options);
         },
 
@@ -69,24 +70,8 @@ define(function(require) {
         },
 
         onChange: function(e) {
-            var selectedItem = e.added || this.$el.inputWidget('data');
+            var selectedItem = e.added || this.getData();
             this.trigger('change', selectedItem);
-        },
-
-        render: function() {
-            this.$el.inputWidget('create', 'select2', {initializeOptions: this.select2Options});
-        },
-
-        setValue: function(value) {
-            this.$el.inputWidget('val', value, true);
-        },
-
-        setSelectedData: function(data) {
-            this.$el.inputWidget('data', data);
-        },
-
-        getSelectedData: function() {
-            return this.$el.inputWidget('data');
         }
     });
 

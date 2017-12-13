@@ -33,7 +33,7 @@ define(function(require) {
                 var filterValue = this._getFilterValue();
                 var label = this.filter.getSelectedLabel();
                 if (filterValue && label) {
-                    choiceInputView.setSelectedData({
+                    choiceInputView.setData({
                         id: 'segment_' + filterValue.value,
                         text: label
                     });
@@ -45,7 +45,7 @@ define(function(require) {
             var segmentId = fieldId.split('_')[1];
             var filterId = this._getSegmentFilterId();
 
-            var data = this.subview('choice-input').getSelectedData();
+            var data = this.subview('choice-input').getData();
             if (_.has(data, 'id')) {
                 data.value = segmentId;
                 // pre-set data

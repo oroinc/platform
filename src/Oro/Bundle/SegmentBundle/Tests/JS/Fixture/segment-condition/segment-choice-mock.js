@@ -14,7 +14,7 @@ define(function(require) {
         constructor: function() {
             SegmentChoiceMock.lastCreatedInstance = this;
             spyOn(this, 'setValue').and.callThrough();
-            spyOn(this, 'setSelectedData').and.callThrough();
+            spyOn(this, 'setData').and.callThrough();
             SegmentChoiceMock.__super__.constructor.apply(this, arguments);
         },
 
@@ -32,12 +32,12 @@ define(function(require) {
             this.trigger('change', {id: value});
         },
 
-        setSelectedData: function(data) {
+        setData: function(data) {
             this.data = data;
             this.value = data.id;
         },
 
-        getSelectedData: function() {
+        getData: function() {
             return this.data;
         }
     });

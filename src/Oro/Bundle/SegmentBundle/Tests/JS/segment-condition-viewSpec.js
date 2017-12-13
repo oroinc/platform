@@ -107,7 +107,7 @@ define(function(require) {
 
             it('sets correct value into segment choice', function() {
                 expect(SegmentChoiceMock.lastCreatedInstance.setValue).toHaveBeenCalledWith('id');
-                expect(SegmentChoiceMock.lastCreatedInstance.setSelectedData).toHaveBeenCalledWith({
+                expect(SegmentChoiceMock.lastCreatedInstance.setData).toHaveBeenCalledWith({
                     id: 'segment_2',
                     text: 'Segment 2'
                 });

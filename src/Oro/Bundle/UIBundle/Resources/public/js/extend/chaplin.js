@@ -2,7 +2,8 @@ define([
     'jquery',
     'underscore',
     'oroui/js/tools',
-    'chaplin'
+    'chaplin',
+    'oroui/js/extend/backbone' // it is a circular dependency, required just to make sure that backbone is extended
 ], function($, _, tools, Chaplin) {
     'use strict';
 

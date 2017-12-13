@@ -89,6 +89,10 @@ define(function(require) {
             return this.$el.inputWidget('data');
         },
 
+        setData: function(data) {
+            this.$el.inputWidget('data', data);
+        },
+
         refresh: function() {
             return this.$el.inputWidget('refresh');
         }
