@@ -13,6 +13,7 @@ oro_behat_extension:
     OroReportBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroDataGridBundle::GridContext
         - OroQueryDesignerBundle::QueryDesignerContext
         - OroFilterBundle::FilterContext
         - OroFormBundle::FormContext

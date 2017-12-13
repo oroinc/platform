@@ -1,29 +1,24 @@
-Forms and Validators Configuration
-==================================
+# Forms and Validators Configuration
 
-Table of Contents
------------------
  - [Overview](#overview)
  - [Validation](#validation)
  - [Forms](#forms)
 
-Overview
---------
+## Overview
 
-The Symfony [Validation Component](http://symfony.com/doc/current/book/validation.html) and [Forms Component](http://symfony.com/doc/current/book/forms.html) are used to validate and transform input data to an entity in [create](./actions.md#create-action), [update](./actions.md#update-action), [update_relationship](./actions.md#update_relationship-action), [add_relationship](./actions.md#add_relationship-action) and [delete_relationship](./actions.md#delete_relationship-action) actions.
+The Symfony [Validation Component](http://symfony.com/doc/current/book/validation.html) and [Forms Component](http://symfony.com/doc/current/book/forms.html) are used to validate and transform the input data in the [create](./actions.md#create-action), [update](./actions.md#update-action), [update_relationship](./actions.md#update_relationship-action), [add_relationship](./actions.md#add_relationship-action), and [delete_relationship](./actions.md#delete_relationship-action) actions.
 
-Validation
-----------
+## Validation
 
-The validation rules are loaded from `Resources/config/validation.yml` and annotations as it is commonly done in Symfony applications. So, all validation rules defined for an entity are applicable in Data API as well.
-Also, by default, Data API uses two validation groups: **Default** and **api**. If you need to add validation constrains that should be applicable in Data API only you should add them in **api** validation group.
+The validation rules are loaded from `Resources/config/validation.yml` and annotations as it is commonly done in Symfony applications. So, all validation rules defined for an entity apply to the data API as well.
+By default, the data API uses two validation groups: **Default** and **api**. If you need to add validation constraints that should apply to the data API only, add them to the **api** validation group.
 
-In case if input data violates some validation constraints, these constraints will be automatically converted to [validation errors](./processors.md#error-handling) which are used to build correct response of Data API. The conversion is performed by [CollectFormErrors](../../Processor/Shared/CollectFormErrors.php) processor. By default the HTTP status code for validation errors is `400 Bad Request`. But, if needed, there are several ways to change it:
+If the input data violates validation constraints, they will be automatically converted to [validation errors](./processors.md#error-handling) that help build the correct response of the data API. The conversion is performed by the [CollectFormErrors](../../Processor/Shared/CollectFormErrors.php) processor. By default, the HTTP status code for validation errors is `400 Bad Request`. If you need to change it, you can do it in the following ways:
 
-- Implement [ConstraintWithStatusCodeInterface](../../Validator/Constraints/ConstraintWithStatusCodeInterface.php) in you constraint class.
-- Implement own constraint text extractor. The API bundle has the [default implementation of constraint text extractor](../../Request/ConstraintTextExtractor.php). To add new extractor just create a class implements [ConstraintTextExtractorInterface](../../Request/ConstraintTextExtractorInterface.php) and tag it with the `oro.api.constraint_text_extractor` in the dependency injection container. Also this service can be used to change an error code and type for a validation constraint.
+- Implement [ConstraintWithStatusCodeInterface](../../Validator/Constraints/ConstraintWithStatusCodeInterface.php) in your constraint class.
+- Implement a custom constraint text extractor. The API bundle has the [default implementation of constraint text extractor](../../Request/ConstraintTextExtractor.php). To add a new extractor, create a class that implements [ConstraintTextExtractorInterface](../../Request/ConstraintTextExtractorInterface.php) and tag it with the `oro.api.constraint_text_extractor` in the dependency injection container. This service can be also used to change an error code and type for a validation constraint.
 
-Here are several examples how to add validation constraints to API resources using `Resources/config/oro/api.yml` configuration file:
+The following example shows how to add validation constraints to API resources using the `Resources/config/oro/api.yml` configuration file:
 
 ```yaml
 api:
@@ -47,16 +42,15 @@ api:
 ```
 
 
-Forms
------
+## Forms
 
-The Data API forms are isolated from UI forms. It is done to avoid collisions between them and to prevent unnecessary performance overhead in Data API.
-And as result all Data API form types, extensions and guessers should be registered separately. There are two ways how it can be done:
+The data API forms are isolated from the UI forms. This helps avoid collisions and prevent unnecessary performance overhead in the data API.
+Consequently, all the data API form types, extensions, and guessers should be registered separately. There are two ways of how to complete this:
 
-- using application configuration file
-- tagging form elements by appropriate tag in the dependency injection container
+- Use the application configuration file.
+- Tag the form elements by appropriate tags in the dependency injection container.
 
-To register new form elements using application configuration file you can add `Resources/config/oro/app.yml` in any bundle or use *app/config/config.yml* of your application. The following example shows how it can be done:
+To register a new form elements using the application configuration file, add `Resources/config/oro/app.yml` in any bundle or use `app/config/config.yml` of your application:
 
 ```yaml
 api:
@@ -77,38 +71,38 @@ api:
                 format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ" # HTML5
 ```
 
-Already registered Data API form elements you can find in [Resources/config/oro/app.yml](../config/oro/app.yml).
+You can find the already registered data API form elements in [Resources/config/oro/app.yml](../config/oro/app.yml).
 
-Also new form elements can be added using appropriate dependency injection tags. The following table shows all available tags.
+If you need to add new form elements can by tagging them in the dependency injection container, use the tags from the following table:
 
 | Tag | Description |
 | --- | --- |
-| oro.api.form.type | Create a new form type |
-| oro.api.form.type_extension | Create a new form extension |
-| oro.api.form.type_guesser | Add your own logic for "form type guessing" |
+| oro.api.form.type | Create a new form type. |
+| oro.api.form.type_extension | Create a new form extension. |
+| oro.api.form.type_guesser | Add a custom logic for the "form type guessing". |
 
-An example:
+**Example:**
 
 ```yaml
     acme.form.type.datetime:
         class: Acme\Bundle\AcmeBundle\Form\Type\DateTimeType
         tags:
-            - { name: form.type, alias: acme_datetime } # allow to use the form type on UI 
-            - { name: oro.api.form.type, alias: acme_datetime } # allow to use the form type in Data API
+            - { name: form.type, alias: acme_datetime } # Enable usage of the form type on the UI.
+            - { name: oro.api.form.type, alias: acme_datetime } # Enable usage of the form type in the data API.
 
     acme.form.extension.datetime:
         class: Acme\Bundle\AcmeBundle\Form\Extension\DateTimeExtension
         tags:
-            - { name: form.type_extension, alias: acme_datetime } # add the form extension to UI forms
-            - { name: oro.api.form.type_extension, alias: acme_datetime } # add the form extension to Data API forms
+            - { name: form.type_extension, alias: acme_datetime } # Add the form extension to the UI forms.
+            - { name: oro.api.form.type_extension, alias: acme_datetime } # Add the form extension to the data API forms.
 
     acme.form.guesser.test:
         class: Acme\Bundle\AcmeBundle\Form\Guesser\TestGuesser
         tags:
-            - { name: form.type_guesser } # add the form type guesser to UI forms
-            - { name: oro.api.form.type_guesser } # add the form type guesser to Data API forms
+            - { name: form.type_guesser } # Add the form type guesser to the UI forms.
+            - { name: oro.api.form.type_guesser } # Add the form type guesser to the data API forms.
 ```
 
-To switch between general and Data API forms [Processor\Shared\InitializeApiFormExtension](../../Processor/Shared/InitializeApiFormExtension.php) and [Processor\Shared\RestoreDefaultFormExtension](../../Processor/Shared/RestoreDefaultFormExtension.php) processors can be used.
+To switch between the general and data API forms, use the [Processor\Shared\InitializeApiFormExtension](../../Processor/Shared/InitializeApiFormExtension.php) and [Processor\Shared\RestoreDefaultFormExtension](../../Processor/Shared/RestoreDefaultFormExtension.php) processors.
 
-A form for a particular entity is built on the fly based on [Data API configuration](./configuration.md) and an entity metadata. It is performed by [Processor\Shared\BuildFormBuilder](../../Processor/Shared/BuildFormBuilder.php) processor.
+The [Processor\Shared\BuildFormBuilder](../../Processor/Shared/BuildFormBuilder.php) processor builds the form for a particular entity on the fly based on the [data API configuration](./configuration.md) and the entity metadata.
