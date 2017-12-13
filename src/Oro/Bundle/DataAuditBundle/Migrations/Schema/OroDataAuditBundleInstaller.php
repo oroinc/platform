@@ -15,7 +15,7 @@ class OroDataAuditBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v2_3';
+        return 'v2_4';
     }
 
     /**
@@ -132,6 +132,7 @@ class OroDataAuditBundleInstaller implements Installation
             'notnull' => false,
             'comment' => '(DC2Type:json_array)',
         ]);
+        $auditFieldTable->addColumn('translation_domain', 'string', ['length' => 100, 'notnull' => false]);
         $auditFieldTable->setPrimaryKey(['id']);
         $auditFieldTable->addIndex(['audit_id'], 'IDX_9A31A824BD29F359', []);
 

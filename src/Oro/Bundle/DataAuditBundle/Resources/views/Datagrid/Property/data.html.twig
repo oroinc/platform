@@ -14,9 +14,9 @@
         {% endfor %}
     {% else %}
         <li>
-            <b>{{ oro_field_config_value(record.getValue('objectClass'), fieldKey, 'label')|default(fieldKey)|trans }}:</b>
-            <s>{{ dataAudit.renderFieldValue(fieldValue.old) }}</s>
-            {{ dataAudit.renderFieldValue(fieldValue.new) }}
+            <b>{{ dataAudit.renderFieldName(record.getValue('objectClass'), fieldKey, fieldValue) }}</b>
+            <s>{{ dataAudit.renderFieldValue(fieldValue.old, fieldValue) }}</s>
+            {{ dataAudit.renderFieldValue(fieldValue.new, fieldValue) }}
         </li>
     {% endif %}
 {% endfor %}

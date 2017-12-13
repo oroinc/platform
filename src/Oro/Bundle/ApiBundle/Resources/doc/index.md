@@ -1,5 +1,4 @@
-OroApiBundle Documentation
-==========================
+# OroApiBundle Documentation
 
  - [CLI Commands](./commands.md)
  - [Configure Stateless Security Firewalls](./security.md)

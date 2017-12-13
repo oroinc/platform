@@ -1,4 +1,4 @@
-{% macro renderFieldValue(fieldValue) %}
+{% macro renderFieldValue(fieldValue, field) %}
     {%- set type = null %}
     {%- if fieldValue.type is defined -%}
         {% set type = fieldValue.type %}
@@ -14,6 +14,24 @@
     {%- elseif type == 'boolean' or fieldValue is same as(true) or fieldValue is same as(false) -%}
         {{ fieldValue ? 'Yes'|trans : 'No'|trans }}
     {%- else -%}
-        {% if fieldValue is iterable %}{{ fieldValue|join(', ') }}{% else %}{{ fieldValue|default('') }}{% endif %}
+        {% if fieldValue is iterable %}
+            {{ fieldValue|join(', ') }}
+        {% else %}
+            {% if field.translationDomain is defined %}
+                {{ fieldValue|trans({}, field.translationDomain)|default('') }}
+            {% else %}
+                {{ fieldValue|default('') }}
+            {% endif %}
+        {% endif %}
     {%- endif -%}
+{% endmacro %}
+
+{% macro renderFieldName(objectClass, fieldKey, fieldValue) %}
+    {% set fieldLabel = oro_field_config_value(objectClass, fieldKey, 'label')|default(fieldKey) %}
+    {% if fieldValue.translationDomain is defined %}
+        {% set fieldLabel = fieldKey|trans({}, fieldValue.translationDomain) %}
+    {% else %}
+        {% set fieldLabel = fieldKey|trans %}
+    {% endif %}
+    {{- fieldLabel -}}:
 {% endmacro %}

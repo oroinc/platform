@@ -122,7 +122,7 @@ Name |  Type |  Description
 -----|-------|-------------
 key | string | action name
 section | string | section name
-actionElement | HTMLElement |
+actionElement | HTMLElement | -
 
 ##### getAction(key, section, callback)
 
@@ -183,8 +183,8 @@ Parameters:
 
 Name |  Type |  Description
 -----|-------|-------------
-data | Object or null |
-method | String or null |
+data | Object or null | -
+method | String or null | -
 
 
 ##### remove()
@@ -214,7 +214,7 @@ Parameters:
 
 Name |  Type |  Description
 -----|-------|-------------
-title | string |
+title | string | -
 
 ##### setUrl(url)
 
@@ -224,7 +224,7 @@ Parameters:
 
 Name |  Type |  Description
 -----|-------|-------------
-url | string |
+url | string | -
 
 ##### setWidToElement(el)
 
@@ -234,7 +234,7 @@ Parameters:
 
 Name |  Type |  Description
 -----|-------|-------------
-el | HTMLElement |
+el | HTMLElement | -
 
 ##### show()
 

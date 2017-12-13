@@ -1,64 +1,63 @@
-CLI Commands
-============
+# CLI Commands
 
-oro:api:cache:clear
--------------------
+## oro:api:cache:clear
 
-This command command clears Data API cache.
+This command clears the data API cache.
 
-Usually you need to run this command when you add a new entity to `Resources/config/oro/api.yml` or you add a new processor that changes a list of available through Data API resources.
+Run this command when you add:
+ 
+* a new entity to `Resources/config/oro/api.yml`, 
+* a new processor that changes a list of  resources available via the data API.
 
 ```bash
 php app/console oro:api:cache:clear
 ```
 
-oro:api:doc:cache:clear
------------------------
+## oro:api:doc:cache:clear
 
-This command allows to clear or warm-up API documentation cache.
+This command clears or warms-up the API documentation cache.
 
-If this command is launched without parameters it warm-ups all API documentation caches:
+If this command is launched without parameters it warm-ups all the API documentation caches:
 
 ```bash
 php app/console oro:api:doc:cache:clear
 ```
 
-Also you can use `--no-warmup` option if you need to clear the cache, but do not need to warm-up it:
+To clear the cache without then warming it up, use the `--no-warmup` option:
 
 ```bash
 php app/console oro:api:doc:cache:clear --no-warmup
 ```
 
-To work only with the specified [API documentation views](https://github.com/nelmio/NelmioApiDocBundle/blob/master/Resources/doc/multiple-api-doc.rst) use `--view` option:
+To work only with the specified [API documentation views](https://github.com/nelmio/NelmioApiDocBundle/blob/master/Resources/doc/multiple-api-doc.rst) use the `--view` option:
 
 ```bash
 php app/console oro:api:doc:cache:clear --view=rest_json_api
 ```
 
-oro:api:dump
-------------
+## oro:api:dump
 
-This command shows all resources accessible through Data API.
+This command shows all resources accessible via the data API.
 
-Run this command without parameters to see all available resources:
+Run this command without parameters to display all available resources:
 
 ```bash
 php app/console oro:api:dump
 ```
 
-or specify the `request-type` option if you need to know resources for a particular request type:
+To display resources for a particular request type, specify the `--request-type` option:
 
 ```bash
 php app/console oro:api:dump --request-type=rest --request-type=json_api
 ```
 
-Also the `sub-resources` option can be used to show all available sub-resources:
+To show all available sub-resources, use the `--sub-resources` option:
 
 ```bash
 php app/console oro:api:dump --sub-resources
 ```
 
-If you are interested in information about a concrete entity, you can specify entity class or entity alias as an argument:
+If you are interested in information about a particular entity, specify an entity class or entity alias as an argument:
 
 ```bash
 php app/console oro:api:dump "Oro\Bundle\UserBundle\Entity\User" --sub-resources
@@ -70,41 +69,39 @@ or
 php app/console oro:api:dump users --sub-resources
 ```
 
-In additional you can use this command to get all entities that are not accessible through Data API. Use `--not-accessible` option for this:
+To get all entities that are not accessible via the data API, see the `--not-accessible` option:
 
 ```bash
 php app/console oro:api:dump --not-accessible
 ```
 
-oro:api:debug
--------------
+## oro:api:debug
 
-This command shows details about registered Data API actions and processors.
+This command shows details about the registered Data API actions and processors.
 
-If you want to know all actions run this command without parameters:
+To display all actions, run this command without parameters:
 
 ```bash
 php app/console oro:api:debug
 ```
 
-If you want to know which processors are registered for a particular action run this command with the action name as an argument:
+To display processors registered for a particular action, run this command with the action name as an argument:
 
 ```bash
 php app/console oro:api:debug get_list
 ```
 
-The `request-type` option can be used to see the processors which will be executed for a particular request type:
+Use the `request-type` option to display the processors related to a particular request type:
 
 ```bash
 php app/console oro:api:debug get_list --request-type=rest --request-type=json_api
 ```
 
-oro:api:config:dump
--------------------
+## oro:api:config:dump
 
 This command shows configuration for a particular entity.
 
-Run this command and specify entity class or entity alias as an argument:
+Execute this command with an entity class or entity alias specified as an argument:
 
 ```bash
 php app/console oro:api:config:dump "Oro\Bundle\UserBundle\Entity\User"
@@ -116,55 +113,61 @@ or
 php app/console oro:api:config:dump users
 ```
 
-If you want to see the configuration that is used for a particular action you can use the `action` option (please note that the default value for this option is `get`):
+To display the configuration used for a particular action, use the `--action` option (please note that the default value for this option is `get`):
 
 ```bash
 php app/console oro:api:config:dump users --action=update
 ```
 
-To see the configuration for a particular request type you can use the `request-type` option:
+To display the configuration for a particular request type, use the `--request-type` option:
 
 ```bash
 php app/console oro:api:config:dump users --request-type=rest --request-type=json_api
 ```
 
-The `section` option can be used to see a configuration of an entity when it is referenced by another entity:
+To display a configuration of an entity referenced by another entity, use the `--section` option:
 
 ```bash
 php app/console oro:api:config:dump addresses --section=relations
 ```
 
-By default no extra configuration data are added into output, but they can be added with the `--extra` option.
-The value for `extra` option can be: actions, definition, filters, sorters, descriptions or the full name of a class implements [ConfigExtraInterface](../../Config/ConfigExtraInterface.php), e.g.
+By default, no extra configuration data are added to the output. To add an extra data, use the `--extra` option.
+The value for  the`extra` option can be: 
+
+* actions, 
+* definition, 
+* filters, 
+* sorters, 
+* descriptions, or
+* the full name of a class implements [ConfigExtraInterface](../../Config/ConfigExtraInterface.php).
 
 ```bash
 php app/console oro:api:config:dump users --extra=filters --extra=sorters
 ```
 
-to see human-readable representation of an entity and its fields
+To display the human-readable representation of an entity and its fields:
 
 ```bash
 php app/console oro:api:config:dump users --extra=descriptions
 ```
 
-or if a new extra section was added just pass the FQCN of a ConfigExtra
+If a new extra section was added, pass the FQCN of a ConfigExtra:
 
 ```bash
 php app/console oro:api:config:dump users --extra="Acme\Bundle\AcmeBundle\Config\AcmeConfigExtra"
 ```
 
-or it's also possible to pass multiple options
+You can pass multiple options:
 
 ```bash
 php app/console oro:api:config:dump users --extra=sorters --extra=descriptions --extra=filters --extra="Acme\Bundle\AcmeBundle\Config\AcmeConfigExtra"
 ```
 
-oro:api:metadata:dump
----------------------
+## oro:api:metadata:dump
 
-This command shows metadata for a particular entity.
+This command shows the metadata for a particular entity.
 
-To see metadata run this command and specify entity class or entity alias as an argument:
+To display the metadata, run this command with an entity class or entity alias specified as an argument:
 
 ```bash
 php app/console oro:api:metadata:dump "Oro\Bundle\UserBundle\Entity\User"
@@ -176,20 +179,19 @@ or
 php app/console oro:api:metadata:dump users
 ```
 
-If you want to see entity metadata that is used for a particular action you can use the `action` option (please note that the default value for this option is `get`):
+To display the entity metadata used for a particular action, use the `--action` option (please note that the default value for this option is `get`):
 
 ```bash
 php app/console oro:api:metadata:dump users --action=update
 ```
 
-If you want to see entity metadata that is used for a particular request type you can use the `request-type` option:
+To display the entity metadata used for a particular request type, use the `--request-type` option:
 
 ```bash
 php app/console oro:api:metadata:dump users --request-type=rest --request-type=json_api
 ```
 
-oro:api:config:dump-reference
------------------------------
+## oro:api:config:dump-reference
 
 This command shows the structure of `Resources/config/oro/api.yml`.
 

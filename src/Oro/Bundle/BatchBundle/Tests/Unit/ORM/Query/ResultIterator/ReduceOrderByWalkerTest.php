@@ -9,7 +9,7 @@ use Doctrine\ORM\Query\AST\OrderByClause;
 use Doctrine\ORM\Query\AST\OrderByItem;
 use Doctrine\ORM\Query\AST\PathExpression;
 use Oro\Bundle\BatchBundle\ORM\Query\ResultIterator\ReduceOrderByWalker;
-use Oro\Bundle\InventoryBundle\Tests\Unit\ORM\Query\ResultIterator\SqlWalkerHelperTrait;
+use Oro\Bundle\TestFrameworkBundle\Tests\Unit\ORM\Query\ResultIterator\SqlWalkerHelperTrait;
 
 class ReduceOrderByWalkerTest extends \PHPUnit_Framework_TestCase
 {
