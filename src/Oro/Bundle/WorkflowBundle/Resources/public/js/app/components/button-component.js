@@ -49,13 +49,13 @@ define(function(require) {
                     this.$button.on('click', function(e) {
                         e.preventDefault();
 
-                        self._onClickButtonEnabledDisplayTypeDialog(this);
+                        self._onClickButtonExecutor(this);
                     });
                 } else {
                     this.$button.on('click', function(e) {
                         e.preventDefault();
 
-                        self._onClickButtonEnabledDisplayTypeNotDialog(this);
+                        self._onClickButtonRedirect(this);
                     });
                 }
             } else {
@@ -79,7 +79,7 @@ define(function(require) {
          * @param clickedButton
          * @private
          */
-        _onClickButtonEnabledDisplayTypeDialog: function(clickedButton) {
+        _onClickButtonExecutor: function(clickedButton) {
             $(clickedButton).data('executor').call();
         },
 
@@ -87,7 +87,7 @@ define(function(require) {
          * @param clickedButton
          * @private
          */
-        _onClickButtonEnabledDisplayTypeNotDialog: function(clickedButton) {
+        _onClickButtonRedirect: function(clickedButton) {
             mediator.execute('redirectTo', {url: this.$button.data('transition-url')}, {redirect: true});
         },
 
