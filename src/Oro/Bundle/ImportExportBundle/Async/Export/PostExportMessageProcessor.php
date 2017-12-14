@@ -108,10 +108,10 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
                 $body['outputFormat'],
                 $files
             );
-        } catch (RuntimeException $exception) {
+        } catch (RuntimeException $e) {
             $this->logger->critical(
-                sprintf('Error occurred during export merge: %s', $exception->getMessage()),
-                ['exception' => $exception]
+                sprintf('Error occurred during export merge: %s', $e->getMessage()),
+                ['exception' => $e]
             );
         }
 

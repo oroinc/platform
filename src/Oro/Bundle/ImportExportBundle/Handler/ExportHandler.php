@@ -113,9 +113,6 @@ class ExportHandler extends AbstractHandler
                     $options
                 )
         ];
-        $errorsCount = 0;
-        $readsCount = 0;
-        $errors = [];
 
         $jobResult = $this->jobExecutor->executeJob(
             $processorType,
@@ -131,17 +128,20 @@ class ExportHandler extends AbstractHandler
             @unlink($filePath);
         }
 
-        if ($context = $jobResult->getContext()) {
+        $errors = [];
+        $readsCount = 0;
+        $context = $jobResult->getContext();
+        if ($context) {
             $errors = $context->getErrors();
-        }
-        if ($jobResult->getFailureExceptions()) {
-            $errors = array_merge($errors, $jobResult->getFailureExceptions());
+
+            if ($jobResult->isSuccessful()) {
+                $readsCount = $context->getReadCount();
+            }
         }
 
-        if ($jobResult->isSuccessful() && ($context = $jobResult->getContext())) {
-            $readsCount = $context->getReadCount();
-        } else {
-            $errorsCount = count($jobResult->getFailureExceptions());
+        $errorsCount = count($jobResult->getFailureExceptions());
+        if ($errorsCount > 0) {
+            $errors = array_merge($errors, $jobResult->getFailureExceptions());
         }
         
         $errors = array_slice($errors, 0, 100);
