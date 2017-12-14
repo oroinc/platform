@@ -2,8 +2,6 @@
 
 namespace Oro\Component\ConfigExpression\Condition;
 
-use Oro\Component\ConfigExpression\Exception;
-
 /**
  * Checks array or collection has elements.
  */
