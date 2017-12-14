@@ -100,6 +100,7 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
             }
         }
 
+        $fileName = null;
         try {
             $fileName = $this->exportHandler->exportResultFileMerge(
                 $body['jobName'],
@@ -107,18 +108,20 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
                 $body['outputFormat'],
                 $files
             );
+        } catch (RuntimeException $exception) {
+            $this->logger->critical(
+                sprintf('Error occurred during export merge: %s', $exception->getMessage()),
+                ['exception' => $exception]
+            );
+        }
 
+        if ($fileName !== null) {
             $summary = $this->importExportResultSummarizer
                 ->processSummaryExportResultForNotification($job, $fileName);
 
             $this->sendNotification($body['email'], $summary);
 
             $this->logger->info('Sent notification email.');
-        } catch (RuntimeException $exception) {
-            $this->logger->critical(
-                sprintf('Error occurred during export merge: %s', $exception->getMessage()),
-                ['exception' => $exception]
-            );
         }
 
         return self::ACK;
