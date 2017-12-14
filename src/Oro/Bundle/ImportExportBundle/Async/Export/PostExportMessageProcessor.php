@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
 use Psr\Log\LoggerInterface;
@@ -6,6 +7,7 @@ use Psr\Log\LoggerInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -98,19 +100,26 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
             }
         }
 
-        $fileName = $this->exportHandler->exportResultFileMerge(
-            $body['jobName'],
-            $body['exportType'],
-            $body['outputFormat'],
-            $files
-        );
+        try {
+            $fileName = $this->exportHandler->exportResultFileMerge(
+                $body['jobName'],
+                $body['exportType'],
+                $body['outputFormat'],
+                $files
+            );
 
-        $summary = $this->importExportResultSummarizer
-            ->processSummaryExportResultForNotification($job, $fileName);
+            $summary = $this->importExportResultSummarizer
+                ->processSummaryExportResultForNotification($job, $fileName);
 
-        $this->sendNotification($body['email'], $summary);
+            $this->sendNotification($body['email'], $summary);
 
-        $this->logger->info('Sent notification email.');
+            $this->logger->info('Sent notification email.');
+        } catch (RuntimeException $exception) {
+            $this->logger->critical(
+                sprintf('Error occurred during export merge: %s', $exception->getMessage()),
+                ['exception' => $exception]
+            );
+        }
 
         return self::ACK;
     }

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Handler;
 
 use Gaufrette\Exception\FileNotFound;
 
+use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -122,15 +123,20 @@ class ExportHandler extends AbstractHandler
             $configuration
         );
 
+        try {
+            $this->fileManager->writeFileToStorage($filePath, $fileName);
+        } catch (\Exception $exception) {
+            $jobResult->addFailureException($exception);
+        } finally {
+            @unlink($filePath);
+        }
+
         if ($context = $jobResult->getContext()) {
             $errors = $context->getErrors();
         }
         if ($jobResult->getFailureExceptions()) {
             $errors = array_merge($errors, $jobResult->getFailureExceptions());
         }
-
-        $this->fileManager->writeFileToStorage($filePath, $fileName);
-        @unlink($filePath);
 
         if ($jobResult->isSuccessful() && ($context = $jobResult->getContext())) {
             $readsCount = $context->getReadCount();
@@ -182,8 +188,11 @@ class ExportHandler extends AbstractHandler
      * @param string $jobName
      * @param string $processorType
      * @param string $outputFormat
-     * @param array $files
+     * @param array  $files
+     *
      * @return string
+     *
+     * @throws \Oro\Bundle\ImportExportBundle\Exception\RuntimeException
      */
     public function exportResultFileMerge($jobName, $processorType, $outputFormat, array $files)
     {
@@ -201,20 +210,25 @@ class ExportHandler extends AbstractHandler
 
         $localFiles = [];
 
-        foreach ($files as $file) {
-            $localFiles[] = $this->fileManager->writeToTmpLocalStorage($file);
-        }
-        $this->batchFileManager->mergeFiles($localFiles, $localFilePath);
+        try {
+            foreach ($files as $file) {
+                $localFiles[] = $this->fileManager->writeToTmpLocalStorage($file);
+            }
+            $this->batchFileManager->mergeFiles($localFiles, $localFilePath);
 
-        $this->fileManager->writeFileToStorage($localFilePath, $fileName, true);
+            $this->fileManager->writeFileToStorage($localFilePath, $fileName, true);
 
-        foreach ($files as $file) {
-            $this->fileManager->deleteFile($file);
+            foreach ($files as $file) {
+                $this->fileManager->deleteFile($file);
+            }
+        } catch (\Exception $exception) {
+            throw new RuntimeException('Cannot merge export files into single summary file', 0, $exception);
+        } finally {
+            foreach ($localFiles as $localFile) {
+                @unlink($localFile);
+            }
+            @unlink($localFilePath);
         }
-        foreach ($localFiles as $localFile) {
-            @unlink($localFile);
-        }
-        @unlink($localFilePath);
 
         return $fileName;
     }
