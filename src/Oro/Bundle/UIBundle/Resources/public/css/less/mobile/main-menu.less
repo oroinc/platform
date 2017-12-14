@@ -23,12 +23,15 @@
       display: none !important;
     }
   }
-  ul {
+  > .main-menu {
     margin-left: 0;
     /* iOS 11 */
     margin-left: constant(safe-area-inset-left);
     /* iOS 11.2+ */
     margin-left: env(safe-area-inset-left);
+  }
+  ul {
+    margin-left: 0;
   }
   a {
     display: block;
