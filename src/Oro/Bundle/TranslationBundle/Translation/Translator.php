@@ -8,6 +8,7 @@ use Doctrine\Common\Cache\ClearableCache;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\MessageSelector;
 
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
@@ -335,9 +336,22 @@ class Translator extends BaseTranslator
      */
     protected function initialize()
     {
-        parent::initialize();
-        // add dynamic resources to the end to make sure that they override static translations
+        // add dynamic resources just before the initialization
+        // to be sure that they overrides static translations
         $this->registerDynamicResources();
+
+        parent::initialize();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function initializeCatalogue($locale)
+    {
+        parent::initializeCatalogue($locale);
+        if (!isset($this->catalogues[$locale])) {
+            $this->catalogues[$locale] = new MessageCatalogue($locale);
+        }
     }
 
     /**
@@ -395,7 +409,7 @@ class Translator extends BaseTranslator
             }
         }
 
-        //prevents loding default locale many times (Default locale should be is default fallback locale)
+        // prevents loading default locale many times (Default locale should be in default fallback locale)
         if ($defaultLocale && !isset($this->catalogues[Translator::DEFAULT_LOCALE])) {
             $this->catalogues[Translator::DEFAULT_LOCALE] = $defaultLocale;
         }

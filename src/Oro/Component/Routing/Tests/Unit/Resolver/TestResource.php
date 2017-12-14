@@ -22,7 +22,7 @@ class TestResource implements ResourceInterface
      */
     public function __toString()
     {
-        return $this->name;
+        return (string)$this->name;
     }
 
     /**

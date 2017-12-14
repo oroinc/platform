@@ -10,8 +10,6 @@ use Doctrine\ORM\Query\AST\SelectClause;
 use Doctrine\ORM\Query\AST\SelectExpression;
 use Doctrine\ORM\Query\AST\SelectStatement;
 
-use Oro\Bundle\ProductBundle\Entity\Product;
-
 trait SqlWalkerHelperTrait
 {
     /**
@@ -21,7 +19,7 @@ trait SqlWalkerHelperTrait
     {
         $selectExpr = new SelectExpression('o', 'test', null);
         $selectClause = new SelectClause([$selectExpr], false);
-        $rangeVarDeclaration = new RangeVariableDeclaration(Product::class, 'o');
+        $rangeVarDeclaration = new RangeVariableDeclaration('Schema\Name', 'o');
         $from1 = new IdentificationVariableDeclaration($rangeVarDeclaration, null, []);
         $fromClause = new FromClause([$from1]);
 
@@ -33,9 +31,9 @@ trait SqlWalkerHelperTrait
      */
     protected function getQueryComponents()
     {
-        $rootMetadata = new ClassMetadata($this->getClassName());
+        $rootMetadata = new ClassMetadata('Class\Name');
         $rootMetadata->setIdentifier(['o']);
-        $otherMetadata = new ClassMetadata($this->getClassName());
+        $otherMetadata = new ClassMetadata('Class\Name');
         $otherMetadata->setIdentifier(['i']);
 
         return [
@@ -54,9 +52,4 @@ trait SqlWalkerHelperTrait
             ],
         ];
     }
-
-    /**
-     * @return string
-     */
-    abstract protected function getClassName(): string;
 }

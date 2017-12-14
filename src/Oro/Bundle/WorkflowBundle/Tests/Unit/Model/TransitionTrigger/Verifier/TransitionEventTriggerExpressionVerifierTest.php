@@ -85,11 +85,12 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit_Framework_Te
         return [
             'other' => [
                 'Requirement field: "entity.a w < a.b" - syntax error: ' .
-                '"Unexpected token "name" of value "w" around position 10."',
+                '"Unexpected token "name" of value "w" around position 10 for expression `entity.a w < a.b`."',
                 $this->buildEventTriggerWithExpression('entity.a w < a.b', EntityStub::class, EntityStub::class)
             ],
             'variable' => [
-                'Requirement field: "e.a < a.b" - syntax error: "Variable "e" is not valid around position 1.". ' .
+                'Requirement field: "e.a < a.b" - syntax error: ' .
+                '"Variable "e" is not valid around position 1 for expression `e.a < a.b`.". ' .
                 'Valid context variables are: ' .
                 'wd [Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition], ' .
                 'wi [Oro\Bundle\WorkflowBundle\Entity\WorkflowItem], ' .
