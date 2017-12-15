@@ -48,6 +48,10 @@ class SendWorkflowStepChangesToAuditListener implements OptionalListenerInterfac
         }
 
         $workflowEntity = $transitionRecord->getWorkflowItem()->getEntity();
+        if (!$workflowEntity) {
+            return;
+        }
+
         $this->storage->addEntityUpdate(
             $eventArgs->getEntityManager(),
             $workflowEntity,
