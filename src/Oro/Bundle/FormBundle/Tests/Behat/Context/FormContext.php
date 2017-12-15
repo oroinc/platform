@@ -20,6 +20,7 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class FormContext extends OroFeatureContext implements OroPageObjectAware
 {
@@ -431,21 +432,45 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @param string    $field
      * @param TableNode $options
+     * @param string    $formName
      */
-    public function shouldSeeTheFollowingOptionsForSelect($field, TableNode $options)
+    public function shouldSeeTheFollowingOptionsForSelect($field, TableNode $options, $formName = 'OroForm')
     {
-        $this->assertSelectContainsOptions($field, array_merge(...$options->getRows()));
+        $optionLabels = array_merge(...$options->getRows());
+
+        /** @var Select2Entity|Select $element */
+        $element = $this->getFieldInForm($field, $formName);
+        if ($element instanceof Select2Entity) {
+            $options = $element->getSuggestedValues();
+            foreach ($optionLabels as $optionLabel) {
+                static::assertContains($optionLabel, $options);
+            }
+        } else {
+            $this->assertSelectContainsOptions($field, $optionLabels);
+        }
     }
 
     /**
      * @Then /^(?:|I )should not see the following options for "(?P<field>[^"]*)" select:$/
      *
-     * @param string $field
+     * @param string    $field
      * @param TableNode $options
+     * @param string    $formName
      */
-    public function shouldNotSeeTheFollowingOptionsForSelect($field, TableNode $options)
+    public function shouldNotSeeTheFollowingOptionsForSelect($field, TableNode $options, $formName = 'OroForm')
     {
-        $this->assertSelectNotContainsOptions($field, array_merge(...$options->getRows()));
+        $optionLabels = array_merge(...$options->getRows());
+
+        /** @var Select2Entity|Select $element */
+        $element = $this->getFieldInForm($field, $formName);
+        if ($element instanceof Select2Entity) {
+            $options = $element->getSuggestedValues();
+            foreach ($optionLabels as $optionLabel) {
+                static::assertNotContains($optionLabel, $options);
+            }
+        } else {
+            $this->assertSelectNotContainsOptions($field, $optionLabels);
+        }
     }
 
     /**
