@@ -1,0 +1,36 @@
+<div class="choice-filter" data-many-to-many-filter-template>
+    <div class="filter-select-oro-wrapper">
+        <select name="<%= name %>"
+
+            <% if (renderMode === 'toggle-mode') { %>
+                data-skip-input-widgets
+                class="select select--size-m select--full"
+            <% } else { %>
+                class="select select--size-m"
+            <% } %>
+
+                data-choice-value-select
+        >
+            <% _.each(choices, function (option) { %>
+                <option value="<%= option.value %>"
+
+                    <% if (option.value == selectedChoice) { %>
+                        selected="selected"
+                    <% } %>
+
+                >
+                    <%- option.label %>
+                </option>
+            <% }); %>
+        </select>
+    </div>
+    <div class="value-field-frame">
+        <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>
+
+        <% if (renderMode !== 'toggle-mode') { %>
+            <div class="filter-action-row">
+                <button type="button" class="btn btn--action filter-update"><%- _.__("Update") %></button>
+            </div>
+        <% } %>
+    </div>
+</div>
