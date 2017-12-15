@@ -4,6 +4,7 @@ define(function(require) {
     var EntityRelationshipCollection;
     var _ = require('underscore');
     var routing = require('routing');
+    var registry = require('oroui/js/app/services/registry');
     var EntityCollection = require('oroentity/js/app/models/entity-collection');
 
     /**
@@ -105,30 +106,29 @@ define(function(require) {
          * Retrieves a EntityRelationshipCollection from registry by its identifier if it exists,
          * or create an instance of collection and add it to registry
          *
-         * @param {Object} registry
          * @param {Object} params
          * @param {RegistryApplicant} applicant
          * @return {EntityRelationshipCollection}
          */
-        getEntityRelationshipCollection: function(registry, params, applicant) {
+        getEntityRelationshipCollection: function(params, applicant) {
             var identifier = _.pick(params, 'type', 'id', 'association');
             if (!EntityRelationshipCollection.isValidIdentifier(identifier)) {
                 throw new TypeError('params should contain valid name of association, type and id of an entity');
             }
 
             var globalId = EntityRelationshipCollection.globalId(identifier);
-            var entry = registry.getEntry(globalId, applicant);
+            var collection = registry.fetch(globalId, applicant);
 
             var options = _.omit(params, 'data');
             var rawData = params.data ? {data: params.data} : null;
-            if (!entry) {
-                var collection = new EntityRelationshipCollection(rawData, options);
-                entry = registry.registerInstance(collection, applicant);
+            if (!collection) {
+                collection = new EntityRelationshipCollection(rawData, options);
+                registry.put(collection, applicant);
             } else if (rawData) {
-                entry.instance.reset(rawData, _.extend({parse: true}, options));
+                collection.reset(rawData, _.extend({parse: true}, options));
             }
 
-            return entry.instance;
+            return collection;
         }
     });
 

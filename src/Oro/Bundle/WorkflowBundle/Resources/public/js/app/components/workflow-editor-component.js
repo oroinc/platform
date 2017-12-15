@@ -57,7 +57,7 @@ define(function(require) {
             if ('entity' in this.options) {
                 providerOptions.rootEntity = _.result(this.options.entity, 'entity');
             }
-            EntityStructureDataProvider.getOwnDataContainer(this, providerOptions).then(function(provider) {
+            EntityStructureDataProvider.createDataProvider(providerOptions, this).then(function(provider) {
                 this.entityFieldsProvider = provider;
                 this.workflowManagementView = new WorkflowManagementView({
                     autoRender: true,

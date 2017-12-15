@@ -86,7 +86,7 @@ define(function(require) {
             if (this.callbacks.dataFilter) {
                 providerOptions.fieldsFilterer = this.callbacks.dataFilter;
             }
-            EntityStructureDataProvider.getOwnDataContainer(this, providerOptions).then(function(provider) {
+            EntityStructureDataProvider.createDataProvider(providerOptions, this).then(function(provider) {
                 if (this.disposed) {
                     this._rejectDeferredRender();
                     return;

@@ -8,6 +8,7 @@ define(function(require) {
     /** @type {Registry} */
     var registry = require('oroui/js/app/services/registry');
     var entitySync = require('oroentity/js/app/models/entity-sync');
+    var EntityModel = require('oroentity/js/app/models/entity-model');
     var BaseCollection = require('oroui/js/app/models/base/collection');
 
     /**
@@ -139,7 +140,7 @@ define(function(require) {
             }
             var params = _.defaults({data: attrs.data},
                 options ? _.pick(options, 'parse', 'silent') : {});
-            var model = registry.getEntity(params, this);
+            var model = EntityModel.getEntityModel(params, this);
             if (!model.validationError) {
                 return model;
             }

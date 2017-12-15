@@ -7,6 +7,7 @@ define(function(require) {
     var routing = require('routing');
     /** @type {Registry} */
     var registry = require('oroui/js/app/services/registry');
+    var mediator = require('oroui/js/mediator');
     var entitySync = require('oroentity/js/app/models/entity-sync');
     var entitySerializer = require('oroentity/js/app/models/entity-serializer');
     var BaseModel = require('oroui/js/app/models/base/model');
@@ -271,10 +272,10 @@ define(function(require) {
 
                 if (_.isArray(data)) {
                     params = _.extend({data: _.map(data, findData), association: name}, this.identifier);
-                    relation = registry.getEntityRelationshipCollection(params, this);
+                    relation = mediator.execute('getEntityRelationshipCollection', params, this);
                 } else if (_.isObject(data)) {
                     params = {data: findData(data)};
-                    relation = registry.getEntity(params, this);
+                    relation = EntityModel.getEntityModel(params, this);
                 } else {
                     relation = null;
                 }
@@ -327,45 +328,46 @@ define(function(require) {
          * Retrieves a EntityModel from registry by its identifier if it exists,
          * or create an instance of collection and add it to registry
          *
-         * @param {Object} registry
          * @param {Object} params
          * @param {RegistryApplicant} applicant
          * @return {EntityModel}
          */
-        getEntity: function(registry, params, applicant) {
+        getEntityModel: function(params, applicant) {
             var identifier = _.pick(params.data || params, 'type', 'id');
             if (!EntityModel.isValidIdentifier(identifier)) {
                 throw new TypeError('params should contain valid type and id of entity');
             }
 
             var globalId = EntityModel.globalId(identifier);
-            var entry = registry.getEntry(globalId, applicant);
+            var model = registry.fetch(globalId, applicant);
 
             var options = _.extend(_.omit(params, 'data'), identifier);
             // params.data might be a null, that's why it is checked over 'data' in params
             var rawData = 'data' in params ? {data: params.data} : null;
-            if (!entry) {
-                var model = new EntityModel(rawData, options);
+            if (!model) {
+                model = new EntityModel(rawData, options);
                 try {
-                    entry = registry.registerInstance(model, applicant);
-                } catch (e) {
+                    registry.put(model, applicant);
+                } catch (error) {
                     /*
                      * there's might be a case when a model has relationship on itself and an entry for it
                      * was already registered during creating relationships objects inside model's constructor
                      */
-                    if (/is already registered/.test(e.message) && rawData) {
-                        // retrieve entry for already registered model and update it
-                        entry = registry.getEntry(globalId, applicant);
-                        entry.instance.reset(rawData, _.extend({parse: true}, options));
+                    if (/is already registered/.test(error.message) && rawData) {
                         // drop duplicated model
                         model.dispose();
+                        // retrieve entry for already registered model and update it
+                        model = registry.fetch(globalId, applicant);
+                        model.reset(rawData, _.extend({parse: true}, options));
+                    } else {
+                        throw error;
                     }
                 }
             } else if (rawData) {
-                entry.instance.reset(rawData, _.extend({parse: true}, options));
+                model.reset(rawData, _.extend({parse: true}, options));
             }
 
-            return entry.instance;
+            return model;
         }
     });
 

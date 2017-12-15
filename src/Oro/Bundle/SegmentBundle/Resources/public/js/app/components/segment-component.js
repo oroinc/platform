@@ -63,7 +63,7 @@ define(function(require) {
         columnFormView: null,
 
         initialize: function(options) {
-            var providerPromise = EntityStructureDataProvider.getOwnDataContainer(this);
+            var providerPromise = EntityStructureDataProvider.createDataProvider({}, this);
             var modulesPromise = !options.extensions ? [] : tools.loadModules(options.extensions).then(function() {
                 // promise always has to return array of extensions, even if there's only one extension module
                 return _.values(arguments);

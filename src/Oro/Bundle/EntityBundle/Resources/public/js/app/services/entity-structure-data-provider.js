@@ -684,9 +684,8 @@ define(function(require) {
         filterPresets: {},
 
         /**
-         * Creates instance of data provider and returns it with thepromise object
+         * Creates instance of data provider and returns it with the promise object
          *
-         * @param {RegistryApplicant} applicant
          * @param {Object=} options
          * @param {string} [options.rootEntity] class name of root entity
          * @param {string} [options.filterPreset] name of filter preset
@@ -694,18 +693,22 @@ define(function(require) {
          *  example:
          *      {auditable: true, configurable: true, unidirectional: false}
          * @param {[Object|string]} [options.exclude]
+         *  examples:
+         *      ['relationType'] - will exclude all entries that has 'relationType' key (means relational fields)
+         *      [{type: 'date'}] - will exclude all entries that has property "type" equals to "date"
          * @param {[Object|string]} [options.include]
+         *  examples:
+         *      ['relationType'] - will include all entries that has 'relationType' key (means relational fields)
+         *      [{type: 'date'}] - will include all entries that has property "type" equals to "date"
          * @param {fieldsFilterer} [options.fieldsFilterer]
+         * @param {RegistryApplicant} applicant
          * @return {Promise.<EntityStructureDataProvider>}
          */
-        getOwnDataContainer: function(applicant, options) {
-            var collection;
-            var entry = registry.getEntry(EntityStructuresCollection.prototype.globalId, applicant);
-            if (entry) {
-                collection = entry.instance;
-            } else {
+        createDataProvider: function(options, applicant) {
+            var collection = registry.fetch(EntityStructuresCollection.prototype.globalId, applicant);
+            if (!collection) {
                 collection = new EntityStructuresCollection();
-                registry.registerInstance(collection, applicant);
+                registry.put(collection, applicant);
             }
 
             var provider = new EntityStructureDataProvider(_.defaults({

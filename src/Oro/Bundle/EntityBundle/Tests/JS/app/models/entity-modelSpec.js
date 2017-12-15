@@ -16,10 +16,6 @@ define(function(require) {
             applicant1 = Object.create(Backbone.Events);
             applicant2 = Object.create(Backbone.Events);
             registryMock = new RegistryMock();
-            registryMock.getEntity = function(params, applicant) {
-                return EntityModel.getEntity(registryMock, params, applicant);
-            };
-            spyOn(registryMock, 'getEntity').and.callThrough();
             exposure.substitute('registry').by(registryMock);
         });
 
@@ -42,15 +38,15 @@ define(function(require) {
             expect(EntityModel.isValidIdentifier({type: 'priority', id: null})).toBe(false);
         });
 
-        describe('static method EntityModel.getEntity', function() {
+        describe('static method EntityModel.getEntityModel', function() {
             it('catch error on invalid identifier', function() {
                 expect(function() {
-                    EntityModel.getEntity(registryMock, {type: 'test', id: null}, applicant1);
+                    EntityModel.getEntityModel({type: 'test', id: null}, applicant1);
                 }).toThrow();
             });
 
             it('get unsynced model', function() {
-                var entity = EntityModel.getEntity(registryMock, {
+                var entity = EntityModel.getEntityModel({
                     data: {
                         type: 'test',
                         id: '13'
@@ -61,7 +57,7 @@ define(function(require) {
             });
 
             it('get synced model', function() {
-                var entity = EntityModel.getEntity(registryMock, {
+                var entity = EntityModel.getEntityModel({
                     data: {
                         type: 'test',
                         id: '13',
@@ -75,9 +71,9 @@ define(function(require) {
             });
 
             it('create new entity model', function() {
-                var entity = EntityModel.getEntity(registryMock, {type: 'test', id: '13'}, applicant1);
-                expect(registryMock.getEntry).toHaveBeenCalledWith('test::13', applicant1);
-                expect(registryMock.registerInstance).toHaveBeenCalledWith(jasmine.any(EntityModel), applicant1);
+                var entity = EntityModel.getEntityModel({type: 'test', id: '13'}, applicant1);
+                expect(registryMock.fetch).toHaveBeenCalledWith('test::13', applicant1);
+                expect(registryMock.put).toHaveBeenCalledWith(jasmine.any(EntityModel), applicant1);
                 expect(entity).toEqual(jasmine.any(EntityModel));
             });
 
@@ -85,14 +81,14 @@ define(function(require) {
                 var model = new EntityModel(null, {type: 'test', id: '13'});
                 registryMock._entries[model.globalId] = {instance: model};
 
-                var entity = EntityModel.getEntity(registryMock, {type: 'test', id: '13'}, applicant1);
-                expect(registryMock.getEntry).toHaveBeenCalledWith('test::13', applicant1);
-                expect(registryMock.registerInstance).not.toHaveBeenCalled();
+                var entity = EntityModel.getEntityModel({type: 'test', id: '13'}, applicant1);
+                expect(registryMock.fetch).toHaveBeenCalledWith('test::13', applicant1);
+                expect(registryMock.put).not.toHaveBeenCalled();
                 expect(entity).toBe(model);
             });
 
             it('retrieve entity model with self reference relation', function() {
-                var entity = EntityModel.getEntity(registryMock, {
+                var entity = EntityModel.getEntityModel({
                     data: {
                         type: 'test',
                         id: '13',
@@ -113,28 +109,26 @@ define(function(require) {
                 expect(entity).toEqual(jasmine.any(EntityModel));
                 expect(entity.getRelationship('ref', applicant1)).toBe(entity);
 
-                expect(registryMock.getEntry.calls.count()).toBe(4);
-                expect(registryMock.getEntry.calls.argsFor(0)).toEqual(['test::13', applicant1]);
-                expect(registryMock.getEntry.calls.all()[0].returnValue).toBe(undefined);
-                expect(registryMock.getEntry.calls.argsFor(1)).toEqual(['test::13', jasmine.any(EntityModel)]);
-                expect(registryMock.getEntry.calls.all()[1].returnValue).toBe(undefined);
-                expect(registryMock.getEntry.calls.argsFor(2)).toEqual(['test::13', applicant1]);
-                expect(registryMock.getEntry.calls.all()[2].returnValue).toEqual({instance: entity});
-                expect(registryMock.getEntry.calls.argsFor(3)).toEqual(['test::13', entity]);
-                expect(registryMock.getEntry.calls.all()[3].returnValue).toEqual({instance: entity});
+                expect(registryMock.fetch.calls.count()).toBe(4);
+                expect(registryMock.fetch.calls.argsFor(0)).toEqual(['test::13', applicant1]);
+                expect(registryMock.fetch.calls.all()[0].returnValue).toBe(null);
+                expect(registryMock.fetch.calls.argsFor(1)).toEqual(['test::13', jasmine.any(EntityModel)]);
+                expect(registryMock.fetch.calls.all()[1].returnValue).toBe(null);
+                expect(registryMock.fetch.calls.argsFor(2)).toEqual(['test::13', applicant1]);
+                expect(registryMock.fetch.calls.all()[2].returnValue).toEqual(entity);
+                expect(registryMock.fetch.calls.argsFor(3)).toEqual(['test::13', entity]);
+                expect(registryMock.fetch.calls.all()[3].returnValue).toEqual(entity);
 
-                expect(registryMock.registerInstance.calls.count()).toBe(2);
-                expect(registryMock.registerInstance.calls.first().args)
-                    .toEqual([entity, jasmine.any(EntityModel)]);
-                expect(registryMock.registerInstance.calls.first().returnValue).toEqual({instance: entity});
-                expect(registryMock.registerInstance.calls.mostRecent().args)
-                    .toEqual([jasmine.any(EntityModel), applicant1]);
-                expect(registryMock.registerInstance.calls.mostRecent().returnValue).toBe(undefined);
+                expect(registryMock.put.calls.count()).toBe(2);
+                expect(registryMock.put.calls.first().args).toEqual([entity, jasmine.any(EntityModel)]);
+                expect(registryMock.put.calls.first().returnValue).toEqual({instance: entity});
+                expect(registryMock.put.calls.mostRecent().args).toEqual([jasmine.any(EntityModel), applicant1]);
+                expect(registryMock.put.calls.mostRecent().returnValue).toBe(undefined);
             });
 
             it('retrieve existing entity model with attributes update', function() {
-                var entity1 = EntityModel.getEntity(registryMock, {type: 'test', id: '13'}, applicant1);
-                var entity2 = EntityModel.getEntity(registryMock, {
+                var entity1 = EntityModel.getEntityModel({type: 'test', id: '13'}, applicant1);
+                var entity2 = EntityModel.getEntityModel({
                     data: {
                         type: 'test',
                         id: '13',
@@ -149,7 +143,7 @@ define(function(require) {
             });
 
             it('retrieve existing entity model without attributes update', function() {
-                var entity1 = EntityModel.getEntity(registryMock, {
+                var entity1 = EntityModel.getEntityModel({
                     data: {
                         type: 'test',
                         id: '13',
@@ -158,7 +152,7 @@ define(function(require) {
                         }
                     }
                 }, applicant2);
-                var entity2 = EntityModel.getEntity(registryMock, {type: 'test', id: '13'}, applicant1);
+                var entity2 = EntityModel.getEntityModel({type: 'test', id: '13'}, applicant1);
 
                 expect(entity1).toBe(entity2);
                 expect(entity1.get('title')).toBe('Synced entity');
@@ -212,16 +206,17 @@ define(function(require) {
             };
 
             beforeEach(function() {
+                spyOn(EntityModel, 'getEntityModel').and.callThrough();
                 entityModel = new EntityModel(rawData);
             });
 
             it('init relationships', function() {
-                expect(registryMock.getEntity.calls.count()).toBe(2);
-                expect(registryMock.getEntity).toHaveBeenCalledWith({data: {type: 'users', id: '1'}}, entityModel);
-                expect(registryMock.getEntity.calls.all()[0].returnValue).toEqual(jasmine.any(EntityModel));
-                expect(registryMock.getEntity).toHaveBeenCalledWith(
+                expect(EntityModel.getEntityModel.calls.count()).toBe(2);
+                expect(EntityModel.getEntityModel).toHaveBeenCalledWith({data: {type: 'users', id: '1'}}, entityModel);
+                expect(EntityModel.getEntityModel.calls.all()[0].returnValue).toEqual(jasmine.any(EntityModel));
+                expect(EntityModel.getEntityModel).toHaveBeenCalledWith(
                     {data: {type: 'organizations', id: '1'}}, entityModel);
-                expect(registryMock.getEntity.calls.all()[1].returnValue).toEqual(jasmine.any(EntityModel));
+                expect(EntityModel.getEntityModel.calls.all()[1].returnValue).toEqual(jasmine.any(EntityModel));
             });
 
             it('get relationships', function() {
@@ -256,6 +251,7 @@ define(function(require) {
         });
 
         describe('init model with raw data with includes', function() {
+            var getEntityRelationshipCollection;
             var entityModel;
             var rawData = {
                 data: {
@@ -324,13 +320,30 @@ define(function(require) {
             };
 
             beforeEach(function() {
+                spyOn(EntityModel, 'getEntityModel').and.callThrough();
+                getEntityRelationshipCollection = jasmine.createSpy('getEntityRelationshipCollection').and
+                    .callFake(function(params, applicant) {
+                        return new Backbone.Collection(params.data);
+                    });
+                exposure.substitute('mediator').by({
+                    execute: function(name, params, applicant) {
+                        if (name === 'getEntityRelationshipCollection') {
+                            return getEntityRelationshipCollection(params, applicant);
+                        }
+                    }
+                });
+
                 entityModel = new EntityModel(rawData);
             });
 
+            afterEach(function() {
+                exposure.recover('mediator');
+            });
+
             it('init relationships', function() {
-                expect(registryMock.getEntity.calls.count()).toBe(3);
-                expect(registryMock.getEntityRelationshipCollection.calls.count()).toBe(1);
-                expect(registryMock.getEntity.calls.argsFor(0))
+                expect(EntityModel.getEntityModel.calls.count()).toBe(3);
+                expect(getEntityRelationshipCollection.calls.count()).toBe(1);
+                expect(EntityModel.getEntityModel.calls.argsFor(0))
                     .toEqual([{
                         data: {
                             type: 'users',
@@ -347,7 +360,7 @@ define(function(require) {
                         }
                     }, entityModel]);
 
-                expect(registryMock.getEntity.calls.argsFor(1))
+                expect(EntityModel.getEntityModel.calls.argsFor(1))
                     .toEqual([{
                         data: {
                             type: 'organizations',
@@ -355,7 +368,7 @@ define(function(require) {
                         }
                     }, jasmine.any(EntityModel)]);
 
-                expect(registryMock.getEntity.calls.argsFor(2))
+                expect(EntityModel.getEntityModel.calls.argsFor(2))
                     .toEqual([{
                         data: {
                             type: 'organizations',
@@ -374,7 +387,7 @@ define(function(require) {
                         }
                     }, jasmine.any(EntityModel)]);
 
-                expect(registryMock.getEntityRelationshipCollection.calls.argsFor(0))
+                expect(getEntityRelationshipCollection.calls.argsFor(0))
                     .toEqual([{
                         association: 'users',
                         type: 'organizations',

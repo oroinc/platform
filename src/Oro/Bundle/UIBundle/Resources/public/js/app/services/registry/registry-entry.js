@@ -46,7 +46,7 @@ define(function(require) {
             var index = this.applicants.indexOf(applicant);
             if (index !== -1) {
                 this.applicants.splice(index, 1);
-                this.trigger('removeApplicant', this);
+                this.trigger('removeApplicant', this, applicant);
             }
         }
     });

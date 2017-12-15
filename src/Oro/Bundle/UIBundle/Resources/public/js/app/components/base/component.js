@@ -19,7 +19,7 @@ define(function(require) {
      * @param {Object} options - Options container
      */
     BaseComponent = function(options) {
-        this.cid = _.uniqueId('component');
+        this.cid = _.uniqueId(this.cidPrefix);
         _.extend(this, _.pick(options, _.result(this, 'optionNames')));
         _.extend(this, options[BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME]);
         this.initialize(options);
@@ -95,6 +95,8 @@ define(function(require) {
     // defines own properties and methods
     _.extend(BaseComponent.prototype, /** @lends BaseComponent.prototype */ {
         AUXILIARY_OPTIONS: ['_sourceElement', '_subPromises', 'name'],
+
+        cidPrefix: 'component',
 
         /**
          * Defer object, helps to notify environment that component is initialized

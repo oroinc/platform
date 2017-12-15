@@ -13,7 +13,7 @@ config:
         'oroentity/js/app/models/entity-collection': 'bundles/oroentity/js/app/models/entity-collection.js'
         'oroentity/js/app/models/entity-relationship-collection': 'bundles/oroentity/js/app/models/entity-relationship-collection.js'
         'oroentity/js/app/models/entitystructures-collection': 'bundles/oroentity/js/app/models/entitystructures-collection.js'
-        'oroentity/js/app/modules/registry-module': 'bundles/oroentity/js/app/modules/registry-module.js'
+        'oroentity/js/app/modules/entity-model-module': 'bundles/oroentity/js/app/modules/entity-model-module.js'
         'oroentity/js/app/services/entity-structure-data-provider': 'bundles/oroentity/js/app/services/entity-structure-data-provider.js'
         'oroentity/js/app/services/entity-structure-error-handler': 'bundles/oroentity/js/app/services/entity-structure-error-handler.js'
         'oro/select2-entity-field-component': 'bundles/oroentity/js/components/select2-entity-field-component.js'
@@ -21,4 +21,4 @@ config:
         'oro/select2-entity-field-select-component': 'bundles/oroentity/js/components/select2-entity-field-select-component.js'
         'oroentity/js/tools/entity-select-search-api-accessor': 'bundles/oroentity/js/tools/entity-select-search-api-accessor.js'
     appmodules:
-        - oroentity/js/app/modules/registry-module
+        - oroentity/js/app/modules/entity-model-module

@@ -6,7 +6,13 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var EntityError = require('./entity-error');
 
-    function Util(entity, data) {
+    /**
+     * @deprecated
+     * @param {string} entity
+     * @param {Object} data
+     * @constructor
+     */
+    function EntityFieldsUtil(entity, data) {
         this.init(entity, data);
     }
 
@@ -19,7 +25,7 @@ define(function(require) {
      * @returns {Object}
      * @static
      */
-    Util.filterFields = function(fields, rules, include) {
+    EntityFieldsUtil.filterFields = function(fields, rules, include) {
         fields = _.filter(fields, function(item) {
             var result;
             result = _.some(rules, function(rule) {
@@ -44,7 +50,7 @@ define(function(require) {
         return fields;
     };
 
-    Util.errorHandler = (function() {
+    EntityFieldsUtil.errorHandler = (function() {
         var message = __('oro.entity.not_exist');
         var handler = _.bind(mediator.execute, mediator, 'showErrorMessage', message);
         return _.throttle(handler, 100, {trailing: false});
@@ -57,7 +63,7 @@ define(function(require) {
      * @returns {Array}
      * @private
      */
-    Util.convertData = function(data) {
+    EntityFieldsUtil.convertData = function(data) {
         _.each(data, function(entity) {
             entity.fieldsIndex = {};
             _.each(entity.fields, function(field) {
@@ -72,7 +78,7 @@ define(function(require) {
         return data;
     };
 
-    Util.prototype = {
+    EntityFieldsUtil.prototype = {
 
         init: function(entity, data) {
             this.entity = entity;
@@ -175,7 +181,7 @@ define(function(require) {
                     }
                 });
             } catch (e) {
-                Util.errorHandler();
+                EntityFieldsUtil.errorHandler();
                 throw new EntityError('Can not build entity chain by given path "' + path + '"');
             }
 
@@ -230,7 +236,7 @@ define(function(require) {
                     return result;
                 });
             } catch (e) {
-                Util.errorHandler();
+                EntityFieldsUtil.errorHandler();
                 chain = [];
             }
 
@@ -353,12 +359,12 @@ define(function(require) {
 
                 fieldIdParts.push(pathData[pathData.length - 1]);
             } catch (e) {
-                Util.errorHandler();
+                EntityFieldsUtil.errorHandler();
                 throw new EntityError('Can not define entity path by given property path "' + pathData + '"');
             }
             return fieldIdParts.join('::');
         }
     };
 
-    return Util;
+    return EntityFieldsUtil;
 });

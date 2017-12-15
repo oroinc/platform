@@ -25,10 +25,6 @@ define(function(require) {
             applicant2 = Object.create(Backbone.Events);
 
             registryMock = new RegistryMock();
-            registryMock.getEntity = function(params, applicant) {
-                return EntityModel.getEntity(registryMock, params, applicant);
-            };
-            spyOn(registryMock, 'getEntity').and.callThrough();
             providerExposure.substitute('registry').by(registryMock);
             collectionExposure.substitute('registry').by(registryMock);
 
@@ -120,9 +116,9 @@ define(function(require) {
             });
 
             beforeEach(function(done) {
-                EntityStructureDataProvider.getOwnDataContainer(applicant1, {
+                EntityStructureDataProvider.createDataProvider({
                     rootEntity: initialRootEntityClassName
-                }).then(function(provider) {
+                }, applicant1).then(function(provider) {
                     dataProvider = provider;
                     done();
                 });
@@ -131,7 +127,7 @@ define(function(require) {
             it('data provider is instance of `EntityStructureDataProvider`', function() {
                 expect(dataProvider).toEqual(jasmine.any(EntityStructureDataProvider));
                 expect(dataProvider.collection).toEqual(jasmine.any(EntityStructuresCollection));
-                expect(registryMock.registerInstance).toHaveBeenCalledWith(dataProvider.collection, applicant1);
+                expect(registryMock.put).toHaveBeenCalledWith(dataProvider.collection, applicant1);
             });
 
             it('data provider\'s destructor does not dispose collection', function() {
@@ -201,7 +197,7 @@ define(function(require) {
                 var dataProvider2;
 
                 beforeEach(function(done) {
-                    EntityStructureDataProvider.getOwnDataContainer(applicant2).then(function(provider) {
+                    EntityStructureDataProvider.createDataProvider({}, applicant2).then(function(provider) {
                         dataProvider2 = provider;
                         done();
                     });
@@ -229,12 +225,12 @@ define(function(require) {
             var initialRootEntityClassName = 'Oro\\Bundle\\UserBundle\\Entity\\User';
 
             beforeEach(function(done) {
-                EntityStructureDataProvider.getOwnDataContainer(applicant1, {
+                EntityStructureDataProvider.createDataProvider({
                     rootEntity: initialRootEntityClassName,
                     optionsFilter: {configurable: true},
                     exclude: [{name: 'createdAt'}],
                     include: ['type']
-                }).then(function(provider) {
+                }, applicant1).then(function(provider) {
                     dataProvider = provider;
                     done();
                 });
@@ -305,9 +301,9 @@ define(function(require) {
             var dataProvider;
 
             beforeEach(function(done) {
-                EntityStructureDataProvider.getOwnDataContainer(applicant1, {
+                EntityStructureDataProvider.createDataProvider({
                     rootEntity: 'Oro\\Bundle\\UserBundle\\Entity\\Group'
-                }).then(function(provider) {
+                }, applicant1).then(function(provider) {
                     dataProvider = provider;
                     done();
                 });
@@ -388,10 +384,10 @@ define(function(require) {
                     include: [],
                     exclude: [{relationType: 'manyToMany'}]
                 });
-                EntityStructureDataProvider.getOwnDataContainer(applicant1, {
+                EntityStructureDataProvider.createDataProvider({
                     rootEntity: 'Oro\\Bundle\\UserBundle\\Entity\\Group',
                     filterPreset: 'first-custom-fields-set'
-                }).then(function(provider) {
+                }, applicant1).then(function(provider) {
                     dataProvider = provider;
                     done();
                 });
@@ -425,10 +421,10 @@ define(function(require) {
 
             beforeEach(function(done) {
                 errorHandler = jasmine.createSpyObj('errorHandler', ['handle']);
-                EntityStructureDataProvider.getOwnDataContainer(applicant1, {
+                EntityStructureDataProvider.createDataProvider({
                     rootEntity: initialRootEntityClassName,
                     errorHandler: errorHandler
-                }).then(function(provider) {
+                }, applicant1).then(function(provider) {
                     dataProvider = provider;
                     done();
                 });

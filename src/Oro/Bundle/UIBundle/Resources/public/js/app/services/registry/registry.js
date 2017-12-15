@@ -30,18 +30,16 @@ define(function(require) {
         },
 
         /**
-         * Adds applicant relation to registry entry of instance
+         * Adds applicant relation to registry for the instance
          *
          * @param {{globalId: string}} instance
          * @param {RegistryApplicant} applicant
-         * @return {RegistryEntry}
          */
         retain: function(instance, applicant) {
-            var entry = this.getEntry(instance.globalId, applicant);
-            if (!entry) {
-                entry = this.registerInstance(instance, applicant);
+            var obj = this.fetch(instance.globalId, applicant);
+            if (!obj) {
+                this.put(instance, applicant);
             }
-            return entry;
         },
 
         /**
@@ -58,28 +56,28 @@ define(function(require) {
         },
 
         /**
-         * Fetches entry from registry by globalId
+         * Fetches instance from registry by globalId
          *
          * @param {string} globalId
          * @param {RegistryApplicant} applicant
-         * @return {RegistryEntry|undefined}
+         * @return {Object|null}
          */
-        getEntry: function(globalId, applicant) {
+        fetch: function(globalId, applicant) {
             var entry = this._entries[globalId];
             if (entry) {
                 entry.addApplicant(applicant);
             }
-            return entry;
+            return entry ? entry.instance : null;
         },
 
         /**
-         * Creates entry for an instance with related applicant and stores entry in the registry
+         * Puts the instance with related applicant to the registry
          *
          * @param {{globalId: string}} instance
          * @param {RegistryApplicant} applicant
-         * @return {RegistryEntry}
+         * @throws {Error} invalid instance or instance already exists in registry
          */
-        registerInstance: function(instance, applicant) {
+        put: function(instance, applicant) {
             var globalId = instance.globalId;
             if (!globalId) {
                 throw new Error('globalId "' + globalId + '" of instance have not to be empty');
@@ -90,15 +88,15 @@ define(function(require) {
             var entry = this._entries[globalId] = new RegistryEntry(instance);
             entry.addApplicant(applicant);
             this.listenToOnce(instance, 'dispose', function() {
-                this.removeEntry(entry);
+                this._removeEntry(entry);
             });
-            this.listenTo(entry, 'removeApplicant', function() {
+            this.listenTo(entry, 'removeApplicant', function(entry) {
+                var instance = entry.instance;
                 if (!entry.applicants.length || !this._hasExternalRequester(entry)) {
-                    entry.instance.dispose();
-                    this.removeEntry(entry);
+                    this._removeEntry(entry);
+                    instance.dispose();
                 }
             });
-            return entry;
         },
 
         /**
@@ -133,8 +131,9 @@ define(function(require) {
          * Removes an entry from registry
          *
          * @param {RegistryEntry} entry
+         * @protected
          */
-        removeEntry: function(entry) {
+        _removeEntry: function(entry) {
             var globalId = _.findKey(this._entries, entry);
             this.stopListening(entry);
             entry.dispose();

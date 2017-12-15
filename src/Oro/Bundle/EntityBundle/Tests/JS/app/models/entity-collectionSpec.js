@@ -5,6 +5,7 @@ define(function(require) {
     var exposure = require('requirejs-exposure')
         .disclose('oroentity/js/app/models/entity-collection');
     var RegistryMock = require('../../Fixture/app/services/registry/registry-mock');
+    var EntityModel = require('oroentity/js/app/models/entity-model');
     var EntityCollection = require('oroentity/js/app/models/entity-collection');
 
     describe('oroentity/js/app/models/entity-collection', function() {
@@ -54,6 +55,7 @@ define(function(require) {
             var collection;
 
             beforeEach(function() {
+                spyOn(EntityModel, 'getEntityModel').and.callThrough();
                 collection = new EntityCollection({data: [
                     {type: 'users', id: '1', attributes: {name: 'John'}},
                     {type: 'users', id: '2', attributes: {name: 'Jack'}}
@@ -61,12 +63,12 @@ define(function(require) {
             });
 
             it('retrieve models from registry', function() {
-                expect(registryMock.getEntity.calls.count()).toBe(2);
-                expect(registryMock.getEntity).toHaveBeenCalledWith(
+                expect(EntityModel.getEntityModel.calls.count()).toBe(2);
+                expect(EntityModel.getEntityModel).toHaveBeenCalledWith(
                     jasmine.objectContaining({data: {type: 'users', id: '1', attributes: {name: 'John'}}}),
                     collection
                 );
-                expect(registryMock.getEntity).toHaveBeenCalledWith(
+                expect(EntityModel.getEntityModel).toHaveBeenCalledWith(
                     jasmine.objectContaining({data: {type: 'users', id: '2', attributes: {name: 'Jack'}}}),
                     collection
                 );
@@ -102,10 +104,14 @@ define(function(require) {
             });
 
             it('serialize collection', function() {
-                expect(collection.serialize()).toEqual([
-                    {type: 'users', id: '1', attributes: {name: 'John'}},
-                    {type: 'users', id: '2', attributes: {name: 'Jack'}}
-                ]);
+                var data = collection.serialize();
+                expect(data).toEqual([{}, {}]);
+                expect(Object.getPrototypeOf(data[0])).toEqual({
+                    type: 'users', id: '1', name: 'John', toString: jasmine.any(Function)
+                });
+                expect(Object.getPrototypeOf(data[1])).toEqual({
+                    type: 'users', id: '2', name: 'Jack', toString: jasmine.any(Function)
+                });
             });
         });
     });

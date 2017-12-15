@@ -66,75 +66,63 @@ define(function(require) {
 
         it('throw error on invalid instance', function() {
             expect(function() {
-                registry.registerInstance({}, applicant2);
+                registry.put({}, applicant2);
             }).toThrowError(/globalId/);
         });
 
         it('throw error on attempt to register existing instance', function() {
             expect(function() {
-                registry.registerInstance(instance1, applicant2);
+                registry.put(instance1, applicant2);
             }).not.toThrowError();
 
             expect(function() {
-                registry.registerInstance(instance1, applicant3);
+                registry.put(instance1, applicant3);
             }).toThrowError(/(globalId)[\w\W]+(is already registered)/);
         });
 
         it('register instance', function() {
-            var entry = registry.registerInstance(instance1, applicant2);
+            registry.put(instance1, applicant2);
             expect(MockRegistryEntry).toHaveBeenCalledWith(instance1);
+            var entry = MockRegistryEntry.calls.mostRecent().returnValue;
             expect(entry.addApplicant).toHaveBeenCalledWith(applicant2);
         });
 
         it('register instance over retain method', function() {
-            var entry = registry.retain(instance1, applicant2);
+            registry.retain(instance1, applicant2);
             expect(MockRegistryEntry).toHaveBeenCalledWith(instance1);
+            var entry = MockRegistryEntry.calls.mostRecent().returnValue;
             expect(entry.addApplicant).toHaveBeenCalledWith(applicant2);
         });
 
-        it('get entry from registry', function() {
-            var entry1 = registry.getEntry(instance1.globalId, applicant2);
-            expect(entry1).toBe(undefined);
+        it('fetch instance from registry', function() {
+            var instanceA = registry.fetch(instance1.globalId, applicant2);
+            expect(instanceA).toBe(null);
 
-            entry1 = registry.registerInstance(instance1, applicant2);
+            registry.put(instance1, applicant2);
             expect(MockRegistryEntry).toHaveBeenCalledWith(instance1);
 
-            var entry2 = registry.getEntry(instance1.globalId, applicant3);
-            expect(entry2).toBe(entry1);
-
-            var entry3 = registry.retain(instance1, applicant3);
-            expect(entry3).toBe(entry1);
+            var instanceB = registry.fetch(instance1.globalId, applicant3);
+            expect(instanceB).toBe(instance1);
             expect(MockRegistryEntry.calls.count()).toBe(1);
         });
 
-        it('remove entry from registry', function() {
-            var entry = registry.registerInstance(instance1, applicant2);
-
-            var entry1 = registry.getEntry(instance1.globalId, applicant2);
-            expect(entry1).not.toBe(undefined);
-
-            registry.removeEntry(entry);
-            expect(entry.dispose).toHaveBeenCalled();
-
-            var entry2 = registry.getEntry(instance1.globalId, applicant2);
-            expect(entry2).toBe(undefined);
-        });
-
         it('relieve an instance action removes applicant', function() {
-            var entry = registry.registerInstance(instance1, applicant2);
-
+            registry.put(instance1, applicant2);
+            var entry = MockRegistryEntry.calls.mostRecent().returnValue;
             registry.relieve(instance1, applicant2);
             expect(entry.removeApplicant).toHaveBeenCalledWith(applicant2);
         });
 
         it('dispose instance', function() {
-            var entry = registry.registerInstance(instance1, applicant2);
+            registry.put(instance1, applicant2);
+            var entry = MockRegistryEntry.calls.mostRecent().returnValue;
             instance1.trigger('dispose', instance1);
             expect(entry.dispose).toHaveBeenCalled();
         });
 
         it('remove last applicant action disposes entry and disposes instance', function() {
-            var entry = registry.registerInstance(instance1, applicant2);
+            registry.put(instance1, applicant2);
+            var entry = MockRegistryEntry.calls.mostRecent().returnValue;
             registry.retain(instance1, applicant3);
 
             entry.removeApplicant(applicant2);
@@ -147,7 +135,8 @@ define(function(require) {
         });
 
         it('remove last external applicant action disposes entry and disposes instance', function() {
-            var entry = registry.registerInstance(instance1, applicant2);
+            registry.put(instance1, applicant2);
+            var entry = MockRegistryEntry.calls.mostRecent().returnValue;
             registry.retain(instance1, instance3);
 
             entry.removeApplicant(applicant2);

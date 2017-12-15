@@ -73,8 +73,7 @@ define(function(require) {
                 entry.removeApplicant(applicant2);
                 expect(entry.applicants).not.toContain(applicant2);
                 expect(entry.applicants.length).toBe(2);
-                expect(entry.trigger)
-                    .toHaveBeenCalledWith('removeApplicant', entry);
+                expect(entry.trigger).toHaveBeenCalledWith('removeApplicant', entry, applicant2);
 
                 entry.removeApplicant(applicant1);
                 entry.removeApplicant(applicant3);

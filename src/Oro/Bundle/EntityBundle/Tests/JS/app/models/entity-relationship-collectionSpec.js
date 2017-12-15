@@ -3,7 +3,8 @@ define(function(require) {
 
     var Backbone = require('backbone');
     var exposure = require('requirejs-exposure')
-        .disclose('oroentity/js/app/models/entity-collection');
+        .disclose('oroentity/js/app/models/entity-relationship-collection');
+    var EntityModel = require('oroentity/js/app/models/entity-model');
     var RegistryMock = require('../../Fixture/app/services/registry/registry-mock');
     var EntityRelationshipCollection = require('oroentity/js/app/models/entity-relationship-collection');
 
@@ -16,11 +17,6 @@ define(function(require) {
             applicant1 = Object.create(Backbone.Events);
             applicant2 = Object.create(Backbone.Events);
             registryMock = new RegistryMock();
-            registryMock.getEntityRelationshipCollection = function(params, applicant) {
-                return EntityRelationshipCollection
-                    .getEntityRelationshipCollection(registryMock, params, applicant);
-            };
-            spyOn(registryMock, 'getEntityRelationshipCollection').and.callThrough();
             exposure.substitute('registry').by(registryMock);
         });
 
@@ -52,15 +48,19 @@ define(function(require) {
         });
 
         describe('static method EntityRelationshipCollection.getEntityRelationshipCollection', function() {
+            beforeEach(function() {
+                spyOn(EntityModel, 'getEntityModel').and.callThrough();
+            });
+
             it('catch error on invalid identifier', function() {
                 expect(function() {
-                    EntityRelationshipCollection.getEntityRelationshipCollection(
-                        registryMock, {type: 'test', id: '13', association: null}, applicant1);
+                    EntityRelationshipCollection
+                        .getEntityRelationshipCollection({type: 'test', id: '13', association: null}, applicant1);
                 }).toThrow();
             });
 
             it('get synced collection with models', function() {
-                var collection = EntityRelationshipCollection.getEntityRelationshipCollection(registryMock, {
+                var collection = EntityRelationshipCollection.getEntityRelationshipCollection({
                     type: 'test',
                     id: '13',
                     association: 'users',
@@ -73,20 +73,19 @@ define(function(require) {
                 expect(collection.isSynced()).toBe(true);
                 expect(collection.syncState()).toBe('synced');
 
-                expect(registryMock.getEntity.calls.count()).toBe(2);
-                expect(registryMock.getEntity).toHaveBeenCalledWith(
+                expect(EntityModel.getEntityModel.calls.count()).toBe(2);
+                expect(EntityModel.getEntityModel).toHaveBeenCalledWith(
                     jasmine.objectContaining({data: {type: 'users', id: '1'}}), collection);
-                expect(registryMock.getEntity).toHaveBeenCalledWith(
+                expect(EntityModel.getEntityModel).toHaveBeenCalledWith(
                     jasmine.objectContaining({data: {type: 'users', id: '2'}}), collection);
             });
 
             it('create new relationship collection', function() {
-                var collection = EntityRelationshipCollection.getEntityRelationshipCollection(
-                    registryMock, {type: 'test', id: '13', association: 'users'}, applicant1);
+                var collection = EntityRelationshipCollection
+                    .getEntityRelationshipCollection({type: 'test', id: '13', association: 'users'}, applicant1);
 
-                expect(registryMock.getEntry).toHaveBeenCalledWith('test::13::users', applicant1);
-                expect(registryMock.registerInstance)
-                    .toHaveBeenCalledWith(jasmine.any(EntityRelationshipCollection), applicant1);
+                expect(registryMock.fetch).toHaveBeenCalledWith('test::13::users', applicant1);
+                expect(registryMock.put).toHaveBeenCalledWith(jasmine.any(EntityRelationshipCollection), applicant1);
                 expect(collection).toEqual(jasmine.any(EntityRelationshipCollection));
             });
 
@@ -95,37 +94,38 @@ define(function(require) {
                     null, {type: 'test', id: '13', association: 'users'});
                 registryMock._entries[collection1.globalId] = {instance: collection1};
 
-                var collection2 = EntityRelationshipCollection.getEntityRelationshipCollection(
-                    registryMock, {type: 'test', id: '13', association: 'users'}, applicant1);
+                var collection2 = EntityRelationshipCollection
+                    .getEntityRelationshipCollection({type: 'test', id: '13', association: 'users'}, applicant1);
 
-                expect(registryMock.getEntry).toHaveBeenCalledWith('test::13::users', applicant1);
-                expect(registryMock.registerInstance).not.toHaveBeenCalled();
+                expect(registryMock.fetch).toHaveBeenCalledWith('test::13::users', applicant1);
+                expect(registryMock.retain).not.toHaveBeenCalled();
                 expect(collection2).toBe(collection1);
             });
 
             it('retrieve existing relationship collection with update', function() {
-                var collection1 = EntityRelationshipCollection.getEntityRelationshipCollection(
-                    registryMock, {type: 'test', id: '13', association: 'users'}, applicant1);
-                var collection2 = EntityRelationshipCollection.getEntityRelationshipCollection(registryMock, {
-                    type: 'test',
-                    id: '13',
-                    association: 'users',
-                    data: [{type: 'users', id: '1'}, {type: 'users', id: '2'}]
-                }, applicant2);
+                var collection1 = EntityRelationshipCollection
+                    .getEntityRelationshipCollection({type: 'test', id: '13', association: 'users'}, applicant1);
+                var collection2 = EntityRelationshipCollection
+                    .getEntityRelationshipCollection({
+                        type: 'test',
+                        id: '13',
+                        association: 'users',
+                        data: [{type: 'users', id: '1'}, {type: 'users', id: '2'}]
+                    }, applicant2);
 
                 expect(collection1).toBe(collection2);
                 expect(collection1.size()).toBe(2);
             });
 
             it('retrieve existing relationship collection without update', function() {
-                var collection1 = EntityRelationshipCollection.getEntityRelationshipCollection(registryMock, {
+                var collection1 = EntityRelationshipCollection.getEntityRelationshipCollection({
                     type: 'test',
                     id: '13',
                     association: 'users',
                     data: [{type: 'users', id: '1'}, {type: 'users', id: '2'}]
                 }, applicant2);
-                var collection2 = EntityRelationshipCollection.getEntityRelationshipCollection(
-                    registryMock, {type: 'test', id: '13', association: 'users'}, applicant1);
+                var collection2 = EntityRelationshipCollection
+                    .getEntityRelationshipCollection({type: 'test', id: '13', association: 'users'}, applicant1);
 
                 expect(collection1).toBe(collection2);
                 expect(collection2.size()).toBe(2);
