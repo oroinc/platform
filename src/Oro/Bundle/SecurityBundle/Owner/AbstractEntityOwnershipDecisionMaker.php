@@ -165,7 +165,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements AccessLevelOwners
             return false;
         }
 
-        $allowedOrganizationIds = $organizationId ? [$organizationId] : $userOrganizationIds;
+        $allowedOrganizationIds = $this->getAllowedOrganizationIds($user, $domainObject, $organization);
 
         if ($this->isOrganization($domainObject)) {
             return in_array(
@@ -500,5 +500,29 @@ abstract class AbstractEntityOwnershipDecisionMaker implements AccessLevelOwners
         }
 
         return null;
+    }
+
+    /**
+     * @param object $user
+     * @param object $domainObject
+     * @param object|null $organization
+     * @return int[]|string[]
+     */
+    protected function getAllowedOrganizationIds($user, $domainObject, $organization = null)
+    {
+        $organizationId = null;
+        if ($organization) {
+            $organizationId = $this->getOrganizationId($organization);
+        }
+
+        if ($organizationId) {
+            return [$organizationId];
+        }
+
+        $tree = $this->treeProvider->getTree();
+
+        $userOrganizationIds = $tree->getUserOrganizationIds($this->getObjectId($user));
+
+        return $userOrganizationIds;
     }
 }

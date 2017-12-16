@@ -1686,6 +1686,11 @@ footer {
   }
   .ui-dialog-titlebar-buttonpane {
     right: 7px !important;
+    /* iOS 11 */
+    right: calc(constant(safe-area-inset-right) + 7px) !important;
+    /* iOS 11.2+ */
+    right: calc(env(safe-area-inset-right) + 7px) !important;
+
     top: 5px !important;
     margin: 0 !important;
     border:1px solid #272e36;

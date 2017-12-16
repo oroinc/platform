@@ -4,7 +4,6 @@
 "Current Step": "Current Step"
 "Status": "Status"
 "Workflow Name": "Workflow Name"
-"Current Step": "Current Step"
 "Start Date": "Start Date"
 "Are you sure you want to delete this workflow item?": "Are you sure you want to delete this workflow item?"
 "Delete workflow item": "Delete workflow item"
@@ -107,7 +106,7 @@ oro:
             view:
                 process:
                     trigger:
-                        description: %when% after the %after% has been %event%
+                        description: '%when% after the %after% has been %event%'
                         when:
                             immediately: Immediately
                         after:
@@ -333,7 +332,6 @@ oro:
             entity_field.label: Entity field
             label.label: Label
             required.label: Required
-            name.label: Name
             position.label: Position
             final.label: Final
             exclusive_active_groups.tooltip: "Only one of same exclusive active group workflows can be activated in the system at the same time"

@@ -209,18 +209,6 @@
             margin-left: $offset-y-m;
         }
     }
-
-    &--baseline {
-        vertical-align: baseline;
-    }
-
-    &--clip-text {
-        overflow: hidden;
-
-        white-space: nowrap;
-
-        text-overflow: ellipsis;
-    }
 }
 
 @include breakpoint('mobile-landscape') {

@@ -10,8 +10,7 @@
 .content-with-sidebar {
     &--sidebar {
         position: absolute;
-        border-top: 1px solid @sidebarBorderColor;
-        border-right: 1px solid @sidebarBorderColor;
+        border: 1px solid @sidebarBorderColor;
         width: @sidebarWidth;
         overflow: auto;
         background: #fff;
@@ -107,6 +106,7 @@
 .mobile-version .content-with-sidebar {
     &--container {
         margin-top: -10px;
+        .safe-area-padding(0);
 
         .scrollspy.container-fluid {
             margin-top: 0;

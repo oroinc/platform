@@ -13,8 +13,8 @@
         {% endif %}
     {% else %}
         <li>
-            <b>{{ oro_field_config_value(record.getValue('objectClass'), fieldKey, 'label')|default(fieldKey)|trans }}:</b>
-            {{ dataAudit.renderFieldValue(fieldValue.new) }}
+            <b>{{ dataAudit.renderFieldName(record.getValue('objectClass'), fieldKey, fieldValue) }}</b>
+            {{ dataAudit.renderFieldValue(fieldValue.new, fieldValue) }}
         </li>
     {% endif %}
 {% endfor %}

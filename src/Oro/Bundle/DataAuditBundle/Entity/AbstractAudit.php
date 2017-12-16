@@ -435,6 +435,10 @@ abstract class AbstractAudit
                 'old' => $oldValue,
                 'new' => $newValue,
             ];
+
+            if ($field->getTranslationDomain()) {
+                $data[$field->getField()]['translationDomain'] = $field->getTranslationDomain();
+            }
         }
         return $data;
     }

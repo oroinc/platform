@@ -1,27 +1,22 @@
-Processors
-==========
+# Processors
 
-Table of Contents
------------------
  - [Overview](#overview)
- - [Creating a processor](#creating-a-processor)
- - [Processor conditions](#processor-conditions)
- - [Examples of processor conditions](#examples-of-processor-conditions)
- - [Error handling](#error-handling)
+ - [Creating a Processor](#creating-a-processor)
+ - [Processor Conditions](#processor-conditions)
+ - [Examples of Processor Conditions](#examples-of-processor-conditions)
+ - [Error Handling](#error-handling)
 
-Overview
---------
+## Overview
 
-A processor is the main element where a business logic of Data API is implemented. Each processor must implement [ProcessorInterface](../../../../Component/ChainProcessor/ProcessorInterface.php) and be registered in the dependency injection container using the `oro.api.processor` tag.
+A processor is the main element that implements the business logic of the data API. Each processor must implement [ProcessorInterface](../../../../Component/ChainProcessor/ProcessorInterface.php) and be registered in the dependency injection container using the `oro.api.processor` tag.
 
 Please see [actions](./actions.md) section for more details about where and how processors are used.
 
-Also you can use the [oro:api:debug](./commands.md#oroapidebug) command to see all actions and processors.
+Execute the [oro:api:debug](./commands.md#oroapidebug) command to display all actions and processors.
 
-Creating a processor
---------------------
+## Creating a processor
 
-To create a new processor just create a class implements [ProcessorInterface](../../../../Component/ChainProcessor/ProcessorInterface.php) and [tag](http://symfony.com/doc/current/book/service_container.html#book-service-container-tags) it with the `oro.api.processor` name.
+To create a new processor, create a class that implements [ProcessorInterface](../../../../Component/ChainProcessor/ProcessorInterface.php) and [tag](http://symfony.com/doc/current/book/service_container.html#book-service-container-tags) it with the `oro.api.processor` name.
 
 ```php
 <?php
@@ -58,9 +53,9 @@ Please note that:
 
 - The name of a processor usually starts with a verb and the `Processor` suffix is not used.
 - A processor must be a public service because it is loaded on demand.
-- The `priority` attribute is used to control the order in which processors are executed. The highest the priority, the earlier a processor is executed. Default value is 0. The possible range is from -255 to 255. But for some types of processors the range can be different. More details you can find in the [documentation of the ChainProcessor](../../../../Component/ChainProcessor/README.md#types-of-processors) component. If several processors have the same priority the order they are executed is unpredictable.
-- Each processor should check whether its' work is already done, because there can be a processor with higher priority which does the same but in another way. For example such processors can be created for customization purposes.
-- As Data API resources can be created for any type of objects, not only ORM entities, it is always a good idea to check whether a processor is applicable for ORM entities. This check is very fast and allows to avoid possible logic issues and performance impact. Please use the `oro_api.doctrine_helper` service to get an instance of [Oro\Bundle\ApiBundle\Util\DoctrineHelper](../../Util/DoctrineHelper.php) as this class is optimized to be used in Data API stack. An example:
+- The `priority` attribute is used to control the order in which processors are executed. The higherst the priority, the earlier a processor is executed. The default value is 0. The possible range is from -255 to 255. However, for some types of processors the range can be different. For more details, see the [documentation of the ChainProcessor](../../../../Component/ChainProcessor/README.md#types-of-processors) component. If several processors have the same priority, the order in which they are executed is unpredictable.
+- Each processor should check whether its work is already done because there can be a processor with a higher priority which does the same but in another way. For example, such processors can be created for customization purposes.
+- As the data API resources can be created for any type of objects, not only ORM entities, it is always a good idea to check whether a processor is applicable for ORM entities. This check is very fast and allows avoiding possible logic issues and performance impact. Please use the `oro_api.doctrine_helper` service to get an instance of [Oro\Bundle\ApiBundle\Util\DoctrineHelper](../../Util/DoctrineHelper.php) as this class is optimized to be used in the data API stack. An example:
 
 ```php
     public function process(ContextInterface $context)
@@ -75,12 +70,13 @@ Please note that:
     }
 ```
 
-The list of all existing processors you can find in the [Processor](../../Processor) folder.
+The list of all existing processors you can find in the [Processor](../../Processor) directory.
 
-Processor conditions
---------------------
+## Processor Conditions
 
-When you register a processor in the dependency injection container you can specify conditions when the processor should be executed. The attributes of the `oro.api.processor` tag is used to specify conditions. Any context property which is scalar, array or object (instance of the [ToArrayInterface](../../../../Component/ChainProcessor/ToArrayInterface.php)) can be used in the conditions. Lets see a very simple condition which is used to filter processors by the action:
+When you register a processor in the dependency injection container, you can specify conditions when the processor should be executed. Use the attributes of the `oro.api.processor` tag to specify conditions. Any context property which is scalar, array, or object (instance of the [ToArrayInterface](../../../../Component/ChainProcessor/ToArrayInterface.php)) can be used in the conditions. 
+
+For example, a very simple condition which is used to filter processors by the action:
 
 ```yaml
 services:
@@ -90,20 +86,19 @@ services:
             - { name: oro.api.processor, action: get }
 ```
 
-In this case the `acme.api.processor.do_something` will be executed only in scope of the `get` action, for other actions this processor will be skipped.
+In this case, the `acme.api.processor.do_something` is executed only in scope of the `get` action, for other actions this processor is skipped.
 
-The main goal of the conditions is to provide a simple way to specify which processors are required to accomplish some work. Also it is very important to understand that the processors are not fit the conditions will not be loaded from the dependency injection container at all. So, using of the conditions allows to create fast Data API.
+Conditions provide a simple way to specify which processors are required to accomplish a work. Pay attention that the dependency injection container does not load processors that does not fit the conditions. Use conditions to create the fast data API.
 
-This allows to build conditions based on any attribute from the context.
+This allows building conditions based on any attribute from the context.
 
-The types of conditions depend on registered [Applicable Checkers](../../../../Component/ChainProcessor/README.md#applicable-checkers). By default the following checkers are registered:
+The types of conditions depend on the registered [Applicable Checkers](../../../../Component/ChainProcessor/README.md#applicable-checkers). By default, the following checkers are registered:
 
 - [MatchApplicableChecker](../../Processor/MatchApplicableChecker.php)
 
-Also, by performance reasons, the functionality of [SkipGroupApplicableChecker](../../../../Component/ChainProcessor/SkipGroupApplicableChecker.php) and [GroupRangeApplicableChecker](../../../../Component/ChainProcessor/GroupRangeApplicableChecker.php) was implemented as part of [OptimizedProcessorIterator](../../Processor/OptimizedProcessorIterator.php).
+For performance reasons, the functionality of [SkipGroupApplicableChecker](../../../../Component/ChainProcessor/SkipGroupApplicableChecker.php) and [GroupRangeApplicableChecker](../../../../Component/ChainProcessor/GroupRangeApplicableChecker.php) was implemented as part of [OptimizedProcessorIterator](../../Processor/OptimizedProcessorIterator.php).
 
-Examples of processor conditions
---------------------------------
+## Examples of Processor Conditions
 
 - No conditions. A processor is executed for all actions.
 
@@ -126,7 +121,7 @@ Examples of processor conditions
         - { name: oro.api.processor, action: get_list, group: initialize }
 ```
 
-- A processor is executed only for a specified action, group and request type.
+- A processor is executed only for a specified action, group, and request type.
 
 ```yaml
     tags:
@@ -140,14 +135,14 @@ Examples of processor conditions
         - { name: oro.api.processor, action: get_list, group: initialize, requestType: !rest }
 ```
 
--  A processor is executed only for REST requests conform [JSON.API](http://jsonapi.org/) specification.
+-  A processor is executed only for REST requests that conform to the [JSON.API](http://jsonapi.org/) specification.
 
 ```yaml
     tags:
         - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest&json_api }
 ```
 
--  A processor is executed either for REST requests or requests conform [JSON.API](http://jsonapi.org/) specification.
+-  A processor is executed either for REST requests or requests that conform to the [JSON.API](http://jsonapi.org/) specification.
 
 ```yaml
     tags:
@@ -156,7 +151,7 @@ Examples of processor conditions
 
 **Please note** that a value can contain either `&` (logical AND) or `|` (logical OR) operators, but it is not possible to combine them.
 
--  A processor is executed for all REST requests excluding requests conform [JSON.API](http://jsonapi.org/) specification.
+-  A processor is executed for all REST requests excluding requests that conform to the [JSON.API](http://jsonapi.org/) specification.
 
 ```yaml
     tags:
@@ -178,25 +173,24 @@ Examples of processor conditions
         - { name: oro.api.processor, action: get_list, group: initialize, class: 'Oro\Bundle\UserBundle\Entity\User' }
 ```
 
-- A processor is executed only for entities that implement some interface or extend some base class. Currently there are two attributes that being compared by **instance of** instead of **equal** operator. These attributes are **class** and **parentClass**.
+- A processor is executed only for entities that implement a certain interface or extend a certain base class. Currently, there are two attributes that compared by the **instance of** instead of **equal** operator. These attributes are **class** and **parentClass**.
 
 ```yaml
     tags:
         - { name: oro.api.processor, action: get_list, group: initialize, class: 'Oro\Bundle\UserBundle\Entity\AbstractUser' }
 ```
 
-More examples you can find in [configuration of existing processors](../config). See `processors.*.yml` files.
+For more examples, see the [configuration of existing processors](../config). See `processors.*.yml` files.
 
-Error handling
---------------
+## Error Handling
 
-There are several types of errors that may occur during the process of a request:
+There are several types of errors that may occur during the processing of a request:
 
-- **Validation errors**. A validation error will occur if a request has some invalid parameters, headers or data.
-- **Security errors**. This type of error will occur if an access is denied to a requested, updating or deleting entity.
-- **Unexpected errors**. These errors will occur if some unpredictable problem happens. E.g. no access to a database or a file system, requested entity does not exist, updating entity is blocked, etc.
+- **Validation errors** - A validation error occurs if a request has some invalid parameters, headers, or data.
+- **Security errors** - This type of error occurs if an access is denied to a requested, updating, or deleting entity.
+- **Unexpected errors** - These errors occurs if an unpredictable problem happens. For example, no access to a database or a file system, requested entity does not exist, updating entity is blocked, etc.
 
-Please note that to validate input data for [create](./actions.md#create-action) and [update](./actions.md#update-action) actions the best solution is to use validation constraints. In most cases it allows to not write any PHP code and configure required validation rules in `Resources/config/oro/api.yml`. The detailed information how to add own validation constraints can be found in [Forms and Validators Configuration](./forms.md) document. The following example shows how to add a validation constraint via `Resources/config/oro/api.yml`:
+Please note that to validate the input data for the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions the best solution is to use validation constraints. In most cases it helps avoid writing any PHP code and configuring the required validation rules in `Resources/config/oro/api.yml`. For the detailed information on how to add custom validation constraints, see the [Forms and Validators Configuration](./forms.md) topic. The following example shows how to add a validation constraint via `Resources/config/oro/api.yml`:
 
 ```yaml
 api:
@@ -211,41 +205,41 @@ api:
 ```
 
 
-If an error occurs in a processor, the main execution flow is interrupted and the control is passed to a special group of processors, that is named **normalize_result**. This is true for all types of errors. But there are some exceptions for this rule for the errors that occur in any processor of the **normalize_result** group. The execution flow is interrupted only if any of these processors raises an exception. However, these processors can safely add new errors into the [Context](./actions.md#context-class) and the execution of the next processors will not be interrupted. For implementation details see [RequestActionProcessor](../../Processor/RequestActionProcessor.php).
+If an error occurs in a processor, the main execution flow is interrupted and the control is passed to a special group of processors named **normalize_result**. This is true for all types of errors except for the errors that occur in processors of the **normalize_result** group. if If any of the processors of this group raises an exception this groups, the execution flow is interrupted. However, these processors can safely add new errors into the [Context](./actions.md#context-class) and the execution of the next processors will not be interrupted. For the implementation details, see [RequestActionProcessor](../../Processor/RequestActionProcessor.php).
 
-An error is represented by [Error](../../Model/Error.php) class. Also there is [ErrorSource](../../Model/ErrorSource.php) class that can be used to specify a source of an error, e.g. the name of URI parameter or the path to a property in request data. These classes have the following methods:
+An error is represented by the [Error](../../Model/Error.php) class. Additionally, the [ErrorSource](../../Model/ErrorSource.php) class can be used to specify a source of an error, e.g. the name of a URI parameter or the path to a property in the  data. These classes have the following methods:
 
 **Error** class
 
-- **create(title, detail)** *static* - Creates an instance of **Error** class.
-- **createValidationError(title, detail)** *static* - Creates an instance of **Error** class represents a violation of validation constraint.
-- **createByException(exception)** *static* - Creates an instance of **Error** class based on a given exception object.
-- **getStatusCode()** - Gets the HTTP status code applicable to this problem.
-- **getCode()** - Gets an application-specific error code.
+- **create(title, detail)** *static* - Creates an instance of the **Error** class.
+- **createValidationError(title, detail)** *static* - Creates an instance of the **Error** class that represents a violation of a validation constraint.
+- **createByException(exception)** *static* - Creates an instance of the **Error** class based on a given exception object.
+- **getStatusCode()** - Retrieves the HTTP status code applicable to this problem.
+- **getCode()** - Retrieves an application-specific error code.
 - **setCode(code)** - Sets an application-specific error code.
-- **getTitle()** - Gets a short, human-readable summary of the problem that should not change from occurrence to occurrence of the problem.
+- **getTitle()** - Retrieves a short, human-readable summary of the problem that should not change from occurrence to occurrence of the problem.
 - **setTitle(title)** - Sets a short, human-readable summary of the problem that should not change from occurrence to occurrence of the problem.
-- **getDetail()** - Gets a human-readable explanation specific to this occurrence of the problem.
+- **getDetail()** - Retrieves a human-readable explanation specific to this occurrence of the problem.
 - **setDetail(detail)** - Sets a human-readable explanation specific to this occurrence of the problem.
-- **getSource()** - Gets instance of [ErrorSource](../../Model/ErrorSource.php) represents a source of this occurrence of the problem.
-- **setSource(source)** - Sets instance of [ErrorSource](../../Model/ErrorSource.php) represents a source of this occurrence of the problem.
-- **getInnerException()** - Gets an exception object that caused this occurrence of the problem.
+- **getSource()** - Retrieves the instance of [ErrorSource](../../Model/ErrorSource.php) that represents a source of this occurrence of the problem.
+- **setSource(source)** - Sets the instance of [ErrorSource](../../Model/ErrorSource.php) that represents a source of this occurrence of the problem.
+- **getInnerException()** - Gets Retrieves an exception object that caused this occurrence of the problem.
 - **setInnerException(exception)** - Sets an exception object that caused this occurrence of the problem.
 - **trans(translator)** - Translates all attributes that are represented by the [Label](../../Model/Label.php) object.
 
 **ErrorSource** class
 
-- **createByPropertyPath(propertyPath)** *static* - Creates an instance of **ErrorSource** class represents the path to a property caused the error.
-- **createByPointer(pointer)** *static* - Creates an instance of **ErrorSource** class represents a pointer to a property in the request document caused the error.
-- **createByParameter(parameter)** *static* - Creates an instance of **ErrorSource** class represents URI query parameter caused the error.
-- **getPropertyPath()** - Gets the path to a property caused the error. E.g. "title", or "author.name".
-- **setPropertyPath(propertyPath)** - Sets the path to a property caused the error.
-- **getPointer()** - Gets a pointer to a property in the request document caused the error. For JSON documents the pointer conforms [RFC 6901](https://tools.ietf.org/html/rfc6901). E.g. "/data" for a primary data object, or "/data/attributes/title" for a specific attribute.
-- **setPointer(pointer)** - Sets a pointer to a property in the request document caused the error.
-- **getParameter()** - Gets URI query parameter caused the error.
-- **setParameter(parameter)** - Sets URI query parameter caused the error.
+- **createByPropertyPath(propertyPath)** *static* - Creates an instance of the **ErrorSource** class that represents the path to a property caused the error.
+- **createByPointer(pointer)** *static* - Creates an instance of the **ErrorSource** class that represents a pointer to a property in the request document that caused the error.
+- **createByParameter(parameter)** *static* - Creates an instance of the **ErrorSource** class that represents the URI query parameter that caused the error.
+- **getPropertyPath()** - Retrieves the path to a property that caused the error. For example, "title" or "author.name".
+- **setPropertyPath(propertyPath)** - Sets the path to a property that caused the error.
+- **getPointer()** - Retrieves a pointer to a property in the request document that caused the error. For JSON , the pointer conforms to the [RFC 6901](https://tools.ietf.org/html/rfc6901). For example, "/data" for a primary data object or "/data/attributes/title" for a specific attribute.
+- **setPointer(pointer)** - Sets a pointer to a property in the request document that caused the error.
+- **getParameter()** - Retrieves URI query parameter that caused the error.
+- **setParameter(parameter)** - Sets URI query parameter that caused the error.
 
-Lets consider how a processor can inform that some error is occurred.
+Let us consider how a processor can inform that some error is occurred.
 
 The simplest way is just throw an exception. For example:
 
@@ -320,9 +314,9 @@ class LoadEntityByEntitySerializer implements ProcessorInterface
 }
 ```
 
-This way is good to for unexpected and security errors (for security errors just throw `Symfony\Component\Security\Core\Exception\AccessDeniedException`). The raised exception will be converted to the **Error** object automatically by [RequestActionProcessor](../../Processor/RequestActionProcessor.php). The all sensible properties of such error objects, like HTTP status code, title and description, are filed based on the underlying exception object. This is done automatically by services that is named as exception text extractors. The default implementation of such extractor is [ExceptionTextExtractor](../../Request/ExceptionTextExtractor.php). To add new extractor just create a class implements [ExceptionTextExtractorInterface](../../Request/ExceptionTextExtractorInterface.php) and tag it with the `oro.api.exception_text_extractor` in the dependency injection container.
+This way is good to for unexpected and security errors (for security errors just throw `Symfony\Component\Security\Core\Exception\AccessDeniedException`). The raised exception is converted to the **Error** object automatically by [RequestActionProcessor](../../Processor/RequestActionProcessor.php). The services named as exception text extractors automatically fill the meaningful properties of the error objects (like HTTP status code, title, and description) based on the underlying exception object. The default implementation of such extractor is [ExceptionTextExtractor](../../Request/ExceptionTextExtractor.php). To add a new extractor, create a class that implements [ExceptionTextExtractorInterface](../../Request/ExceptionTextExtractorInterface.php) and tag it with `oro.api.exception_text_extractor` in the dependency injection container.
 
-The another way is to add an **Error** object to the context. This way is good for validation errors because it allows to add several errors. The following example demonstrate it:
+Another way to add an **Error** object to the context is good for validation errors because it allows you to add several errors:
 
 ```php
 <?php
@@ -360,11 +354,11 @@ class ValidateEntityIdExists implements ProcessorInterface
 }
 ```
 
-Please note that by default the HTTP status code for validation errors is `400 Bad Request`. But, if needed, an another HTTP status code can be set, e.g. by passing it as a third argument of the `Error::createValidationError` method.
+Please note that the default HTTP status code for validation errors is `400 Bad Request`. If needed, another HTTP status code can be set, e.g. by passing it as a third argument of the `Error::createValidationError` method.
 
-Also there is the [Constraint](../../Request/Constraint.php) class that contains titles for different kind of validation errors. As you can see all titles end with **constraint** word. So, while adding own types please do the same. This is not a strict rule, but it allows to keep Data API consistency.
+The [Constraint](../../Request/Constraint.php) class contains titles for different kind of validation errors. All titles end with word *constraint*. It is recommended to use the same template when adding custom types. 
 
-Sometime you may need to use Data API logger directly in your processors. Actually all Data API logs are written into **api** channel. So, injecting the logger into your processor or other service can be done in a [common way](http://symfony.com/doc/current/reference/dic_tags.html#monolog-logger). For example:
+All data API logs are written into the **api** channel. To inject the data API logger directly to your processors, use the [common way](http://symfony.com/doc/current/reference/dic_tags.html#monolog-logger). For example:
 
 ```yaml
     acme.api.some_processor:

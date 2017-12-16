@@ -26,10 +26,12 @@ class AuditFieldTest extends \PHPUnit_Framework_TestCase
     public function testAuditField($field, $dataType, $newValue, $oldValue, $expectedDataType)
     {
         $auditField = new AuditField($field, $dataType, $newValue, $oldValue);
+        $auditField->setTranslationDomain('message');
         $this->assertEquals($expectedDataType, $auditField->getDataType());
         $this->assertEquals($field, $auditField->getField());
         $this->assertEquals($newValue, $auditField->getNewValue());
         $this->assertEquals($oldValue, $auditField->getOldValue());
+        $this->assertEquals('message', $auditField->getTranslationDomain());
     }
 
     public function provider()
