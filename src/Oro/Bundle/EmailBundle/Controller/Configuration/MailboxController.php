@@ -16,14 +16,13 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * Class MailboxController
  *
  * Actions in this controller are protected by MailboxAuthorizationListener because access to them is determined
  * by access to Organization entity which is not even always available.
- * @see Oro\Bundle\EmailBundle\EventListener\MailboxAuthorizationListener
+ * @see \Oro\Bundle\EmailBundle\EventListener\MailboxAuthorizationListener
  *
  * @package Oro\Bundle\EmailBundle\Controller\Configuration
  */
@@ -100,34 +99,16 @@ class MailboxController extends Controller
     }
 
     /**
-     * @Route(
-     *      "/mailbox/create/{organization_id}",
-     *      name="oro_email_mailbox_create",
-     *      defaults={"organization_id"=null}
-     * )
-     * @ParamConverter(
-     *      "organization",
-     *      class="OroOrganizationBundle:Organization",
-     *      isOptional=true,
-     *      options={"id"="organization_id"}
-     * )
+     * @Route("/mailbox/create", name="oro_email_mailbox_create")
      * @Template("OroEmailBundle:Configuration/Mailbox:update.html.twig")
      *
      * @param Request      $request
-     * @param Organization $organization
      *
      * @return array
      */
-    public function createAction(Request $request, Organization $organization = null)
+    public function createAction(Request $request)
     {
-        $data = new Mailbox();
-        if ($organization != null) {
-            $data->setOrganization($organization);
-        } else {
-            $data->setOrganization($this->get('oro_security.token_accessor')->getOrganization());
-        }
-
-        return $this->update($data, $request);
+        return $this->update(new Mailbox(), $request);
     }
 
     /**

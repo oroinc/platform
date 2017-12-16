@@ -77,15 +77,16 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
     protected function isAccessGranted($triggeredMask, $object, TokenInterface $securityToken)
     {
         $organization = null;
+        $accessLevel = $this->getAccessLevel($triggeredMask);
         if ($securityToken instanceof OrganizationContextTokenInterface) {
-            if ($this->isAccessDeniedByOrganizationContext($object, $securityToken)) {
+            if ($this->isAccessDeniedByOrganizationContext($object, $securityToken, $accessLevel)) {
                 return false;
             }
             $organization = $securityToken->getOrganizationContext();
         }
 
         return $this->isAccessGrantedByAccessLevel(
-            $this->getAccessLevel($triggeredMask),
+            $accessLevel,
             $object,
             $securityToken->getUser(),
             $organization
@@ -232,11 +233,15 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
      *
      * @param object                            $object
      * @param OrganizationContextTokenInterface $securityToken
+     * @param string                            $accessLevel
      *
      * @return bool
      */
-    protected function isAccessDeniedByOrganizationContext($object, OrganizationContextTokenInterface $securityToken)
-    {
+    protected function isAccessDeniedByOrganizationContext(
+        $object,
+        OrganizationContextTokenInterface $securityToken,
+        $accessLevel
+    ) {
         $objectOrganizationId = $this->getOrganizationId($object);
 
         // check entity organization with current organization
