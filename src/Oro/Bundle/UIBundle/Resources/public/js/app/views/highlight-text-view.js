@@ -6,6 +6,7 @@ define(function(require) {
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var BaseView = require('oroui/js/app/views/base/view');
+    var FuzzySearch = require('oroui/js/fuzzy-search');
 
     HighlightTextView = BaseView.extend({
         /**
@@ -13,6 +14,7 @@ define(function(require) {
          */
         optionNames: BaseView.prototype.optionNames.concat([
             'text',
+            'fuzzySearch',
             'viewGroup',
             'highlightClass', 'elementHighlightClass', 'notFoundClass', 'foundClass',
             'highlightSelectors', 'toggleSelectors'
@@ -27,6 +29,11 @@ define(function(require) {
          * @property {RegExp|null}
          */
         findText: null,
+
+        /**
+         * @property {String}
+         */
+        fuzzySearch: false,
 
         /**
          * @property {String}
@@ -98,10 +105,19 @@ define(function(require) {
          * Refresh highlight using new text
          *
          * @param {String} text
+         * @param {Boolean|null} fuzzySearch
          */
-        update: function(text) {
+        update: function(text, fuzzySearch) {
+            if (fuzzySearch !== undefined) {
+                this.fuzzySearch = fuzzySearch;
+            }
             this.text = text;
-            this.findText = this.text.length ? new RegExp(this.text, 'gi') : null;
+            var regexp = this.text;
+            if (this.fuzzySearch) {
+                regexp = this.text.toLowerCase().replace(/\s/g, '').split('');
+                regexp = '[' + _.uniq(regexp).join('') + ']';
+            }
+            this.findText = this.text.length ? new RegExp(regexp, 'gi') : null;
 
             this.render();
         },
@@ -257,6 +273,19 @@ define(function(require) {
                 $el.html($content.html());
                 $el.toggleClass(this.elementHighlightClass, this.isElementContentHighlighted($el));
             }
+
+            /*
+            fix text-transform: capitalize issue in Chrome
+            input text "Email Settings"
+            after highlight we get "Email Sett<span>ing</span>S" with capitalized "S" symbol
+            after fix we get "Email Sett<span>ing</span>s"
+             */
+            if ($el.css('text-transform') === 'capitalize') {
+                $el.css('text-transform', 'none');
+                setTimeout(function() {
+                    $el.css('text-transform', 'capitalize');
+                }, 0);
+            }
         },
 
         /**
@@ -268,8 +297,11 @@ define(function(require) {
             _.each($content.contents(), function(children) {
                 var $children = $(children);
                 if (children.nodeName === '#text') {
-                    var text = $children.text().replace(this.findText, this.replaceBy);
-                    $children.replaceWith(text);
+                    var text = $children.text();
+                    if (!this.fuzzySearch || FuzzySearch.isMatched(_.trim(text), this.text)) {
+                        text = text.replace(this.findText, this.replaceBy);
+                        $children.replaceWith(text);
+                    }
                 } else {
                     this.highlightElementContent($children);
                 }

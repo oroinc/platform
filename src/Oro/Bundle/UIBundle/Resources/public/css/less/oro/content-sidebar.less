@@ -1,5 +1,5 @@
 @sidebarHeaderHeight: 31px;
-@sidebarHorizontalPadding: 10px;
+@sidebarHorizontalPadding: 12px;
 @sidebarWidth: 320px;
 @sidebarMinimizedWidth: 33px;
 @sidebarBorderColor: #f2f2f2;
@@ -81,19 +81,26 @@
             background-color: #f1f1f1;
 
             .content {
-                padding: 15px 15px 0;
+                padding: @contentPadding @contentPadding 0;
             }
         }
 
         .responsive-section {
-            margin: 0 -20px;
-            padding-right: 20px;
+            margin: 0 -@contentPadding;
+            padding-right: @contentPadding;
 
             .form-horizontal {
                 padding: @contentPadding 0;
             }
         }
     }
+
+    &--sidebar {
+        .sidebar-items {
+            padding: 0 @sidebarHorizontalPadding;
+        }
+    }
+
 }
 
 .mobile-version .content-with-sidebar {
