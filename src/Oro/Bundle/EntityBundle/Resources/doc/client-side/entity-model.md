@@ -37,8 +37,8 @@ During the initialization, a model has to be created manually, with the `new Ent
 
 Once the model is saved, it gets the id and the entity type assigned, and can now be requested from registry.
 
-If an identifier of an entity model (id and type) is known, the model have to be requested from the registry. An instance that going to use this model 
-have to be provided to the registry as a applicant argument, to bind life cycle with a model.
+If an identifier of an entity model (id and type) is known, the model have to be requested from the registry. An instance that is going to use this model 
+have to be provided to the registry as an `applicant` argument, to bind life cycle with a model.
 
 ### Update a model
 

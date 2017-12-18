@@ -1,13 +1,13 @@
 # Registry
 
 **Registry**:
- - Is singleton service that allows to share some instances with unique identifiers (with property `globalId`)
+ - Is a singleton service that allows to share some instances with unique identifiers (with property `globalId`)
  - Takes care of the lifecycle for shared instances.
- Collects information about those who requested the instance and removes it once the list of applicants gets empty. 
+ - Collects information about those who requested the instance and removes it once the list of applicants gets empty. 
 
 ### Registry API
 
-The `put` method is used to add the objects with unique `globalId` value to the registry.
+The `put` method is used to add the objects with the unique `globalId` value to the registry.
 The second parameter, `applicant`, is an instance of `PageComponent`, `Model`, `Collection`, `View` or any other instance that has life cycle and triggers `dispose` event at the end.
 
 It is used by the registry to preserve only the objects (instances, passed in a first parameter) that are still in use by any applicant. If all the applicants for the object are disposed, the registry disposes the object as well.                                      
@@ -66,7 +66,7 @@ It is pretty common case when these two methods are used together to fetch exist
     
 ```
 
-There are two other methods that allow maintain the up to date information in the list of actual applicants:
+There are two other methods that allow maintain the up-to-date information in the list of actual applicants:
 
 ```js
     /**
@@ -85,8 +85,8 @@ There are two other methods that allow maintain the up to date information in th
      */
     relieve: function(instance, applicant) { ... }
 ```
-If the instance was passed in the options and you need to preserve it in the property for the future use. The
-registry needs to be notified that the new applicant holds the instance.
+If the instance was passed in the options and you need to preserve it in the property for the future use, the
+registry has to be notified that the new applicant holds the instance.
 
 ```js
         initialize: function(options) {
