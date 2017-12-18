@@ -26,7 +26,6 @@ module.exports = function(config) {
       {pattern: 'web/bundles/**/*.js', included: false},
       {pattern: 'web/bundles/**/*.html', included: false},
       {pattern: '**/Tests/JS/**/*Spec.js', included: false}
-
     ],
 
     // list of files to exclude
