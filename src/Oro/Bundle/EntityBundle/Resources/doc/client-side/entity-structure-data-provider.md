@@ -1,11 +1,11 @@
-#EntityStructureDataProvider
+# EntityStructureDataProvider
 
 **EntityStructureDataProvider**:
  - provides access over `EntityStructuresCollection` to [EntityStructure API](../entity_structure_data_provider.md).
  - shares same instance of `EntityStructuresCollection` between providers
  - contains pack of helper methods to filters and navigate across entity relations
 
-###Get the EntityStructureDataProvider instance
+### Get the EntityStructureDataProvider instance
 There's static method `createDataProvider` of `EntityStructureDataProvider` that allows to get provider's instance:
 ```javascript
 var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
@@ -60,7 +60,7 @@ The method works asynchronously, it returns provider instance within promise.
 The promise assures the instance `EntityStructuresCollection` of the provider already contains 
 fetched data from the server and the provider is ready to use.
 
-###Define filter's preset 
+### Define filter's preset 
 It is common situation, when several providers use same filters configuration.
 For such cases it is possible to define filter preset:  
 ```js

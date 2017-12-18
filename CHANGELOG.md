@@ -17,46 +17,46 @@
 ### Changed
 
 #### SegmentBundle
-* Refactored `SegmentComponent` js-component to use `EntityStructureDataProvider`
+* Refactored `SegmentComponent` js-component to use `EntityStructureDataProvider`.
 #### SidebarBundle
-* Class `Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry`
-    * the return type for methods `getWidgetDefinitions` and `getWidgetDefinitionsByPlacement` were changed from `ArrayCollection` to `array`
+* In the `Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry` class, the return type in the `getWidgetDefinitions` and `getWidgetDefinitionsByPlacement` methods were changed from `ArrayCollection` to `array`.
 #### UIBundle
-* method `loadModules` of `'oroui/js/tools'` js-module now returns promise object
-* `keepElement` property of `Chaplin.View` is set to `null` by default. In case it was not specified and the element came over options -- `keepElement` gets `true`
+* The `loadModules` method of the `'oroui/js/tools'` js-module now returns a promise object.
+* The default value for the `keepElement` property of a `Chaplin.View` has changed from `false` to `null` when no element is provided, and from `false` to `true` when the element is provided in the options.
 #### WorkflowBundle
-* Refactored `WorkflowEditorComponent` and `WorkflowViewerComponent` js-components to use `EntityStructureDataProvider`
+* Refactored the `WorkflowEditorComponent` and `WorkflowViewerComponent` js-components to use `EntityStructureDataProvider`.
 
 ### Deprecated
 #### EntityBundle
-* JS util `EntityFieldsUtil` is deprecated in favor of `EntityStructureDataProvider`
+* JS util `EntityFieldsUtil` is deprecated in favor of `EntityStructureDataProvider`.
 
 ### Removed
 #### AttachmentBundle
-* The parameter `oro_attachment.listener.file_listener.class` was removed form the service container
+* The parameter `oro_attachment.listener.file_listener.class` was removed form the service container.
 #### CommentBundle
-* The parameter `oro_comment.comment_lifecycle_listener.class` was removed form the service container
+* The parameter `oro_comment.comment_lifecycle_listener.class` was removed form the service container.
 #### EntityBundle
-* jQuery widget `oroentity.fieldChoice` replaced with `FieldChoiceView` Backbone view
-* jQuery widget `oroentity.fieldsLoader` is removed, in favor of `EntityStructureDataProvider`
+* A jQuery widget `oroentity.fieldChoice` is replaced with the `FieldChoiceView` Backbone view.
+* A jQuery widget `oroentity.fieldsLoader` is removed. Please use `EntityStructureDataProvider` instead.
 #### ImapBundle
 * The parameter `oro_imap.listener.user_email_origin.class` was removed form the service container
 #### QueryDesignerBundle
-* jQuery widget `oroquerydesigner.functionChoice` replaced with `FunctionChoiceView` Backbone view
+* A jQuery widget `oroquerydesigner.functionChoice` is replaced with the `FunctionChoiceView` Backbone view.
 #### ReminderBundle
-* The parameter `oro_reminder.event_listener.reminder_listener.class` was removed form the service container
+* The parameter `oro_reminder.event_listener.reminder_listener.class` was removed form the service container.
 #### SegmentBundle
-* jQuery widget `orosegment.segmentChoice` replaced with `SegmentChoiceView` Backbone view
+* A jQuery widget `orosegment.segmentChoice` is replaced with the `SegmentChoiceView` Backbone view.
 #### SidebarBundle
-* The parameter `oro_sidebar.widget_definition.registry.class` was removed form the service container
-* The service `oro_sidebar.request.handler` was removed
+* The parameter `oro_sidebar.widget_definition.registry.class` was removed form the service container.
+* The service `oro_sidebar.request.handler` was removed.
 #### SSOBundle
-* The parameter `oro_sso.event_listener.user_email_change_listener.class` was removed form the service container
+* The parameter `oro_sso.event_listener.user_email_change_listener.class` was removed form the service container.
 #### UIBundle
-* removed methods `loadModule` from `'oroui/js/tools'` js-module, in favor of `loadModules` of same module
+* Removed the `loadModule` methods from `'oroui/js/tools'` js-module.  Please use `loadModules` instead.
+
 #### WorkflowBundle
-* The parameter `oro_workflow.listener.process_data_serialize.class` was removed form the service container
-* The parameter `oro_workflow.listener.workflow_data_serialize.class` was removed form the service container
+* The parameter `oro_workflow.listener.process_data_serialize.class` was removed form the service container.
+* The parameter `oro_workflow.listener.workflow_data_serialize.class` was removed form the service container.
 
 ## 2.5.0 (2017-11-30)
 [Show detailed list of changes](incompatibilities-2-5.md)

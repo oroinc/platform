@@ -6,15 +6,15 @@
 
 Get action is restricted.
 
+Entity structure contains information about configurable entities (their aliases, translated labels, fields, options, and routes.
+
 {@inheritdoc}
 
 ### get_list
 
-Retrieve a collection of entities structure.
+Retrieve a collection of entities structure items.
 
-{@inheritdoc}
-
-Returns data about aliases, labels, fields of the entity
+Entity structure contains information about configurable entities (their aliases, translated labels, fields, options, and routes.
 
 ## FIELDS
 

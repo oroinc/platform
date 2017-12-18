@@ -9,7 +9,7 @@ Provides data of all configurable entities. Collects the following data (see `Or
 - Entity options (for example `auditable`)
 - Entity routes.
 
-For every field provided:
+For every field, the following information is provided:
 - name
 - type
 - label (translated)

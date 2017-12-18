@@ -1,10 +1,13 @@
 # EntityModel
 
 **EntityModel**:
- - provides approach to work with backend over JSON API
- - with the help of registry, allows to share data over user interface
+ - Provides an approach to work with backend over JSON API
+ - With the help of registry, allows to share data over the user interface
 
 ### Create a new model
+
+During the initialization, a model has to be created manually, with the `new EntityModel(null, {type: '...'})`.  
+
 ```javascript
     var registry = requirejs('oroui/js/app/services/registry');
     var EntityModel = requirejs('oroentity/js/app/models/entity-model');
@@ -31,12 +34,14 @@
             });
     }
 ```
-It is the only case, when a model has to be created manually, over `new EntityModel(null, {type: '...'})`. 
-Because it doe's not have an id yet and cannot be requested from registry. If an identifier of an entity (id and type)
-is known, the model have to be requested from the registry. An instance that going to use this model 
+
+Once the model is saved, it gets the id and the entity type assigned, and can now be requested from registry.
+
+If an identifier of an entity model (id and type) is known, the model have to be requested from the registry. An instance that going to use this model 
 have to be provided to the registry as a applicant argument, to bind life cycle with a model.
 
 ### Update a model
+
 ```javascript
     var EntityModel = requirejs('oroentity/js/app/models/entity-model');
     
@@ -51,12 +56,15 @@ have to be provided to the registry as a applicant argument, to bind life cycle 
         this.taskModel.save();
     }
 ```
+
 Once applicant object gets disposed, registry will dispose all previously requested models and relationshipCollections
-automatically, if they don't have any other instances that have requested them.
+automatically, if they were not requested by any other instances.
 
 ### Retain and Relieve entityModel with the help registry
-If an entityModel has been obtained somehow differently from a direct `EntityModel.getEntityModel()`
+
+Sometimes, an entityModel may be obtained without calling the `EntityModel.getEntityModel()`
 (e.g. received within options):
+
 ```javascript
     initialize: function(options) {
         _.extend(this, _.pick(options, 'entityModel'));
@@ -64,8 +72,9 @@ If an entityModel has been obtained somehow differently from a direct `EntityMod
         // ...
     }
 ```
-The registry has to be notified that the model in use of some instance. Otherwise registry can unexpectedly dispose
-the model, once all object-applicants got disposed.
+
+In this case, the registry has to be notified that the model is in use by some instance. Otherwise registry can unexpectedly dispose
+the model as soon as all object-applicants got disposed.
 
 The registry has a method to unbind life cycles of an instance and a model, in case model is not in use any more:
 
@@ -78,7 +87,9 @@ The registry has a method to unbind life cycles of an instance and a model, in c
 ```
 
 # EntityRelationshipCollection
-EntityRelationshipCollection instance can be requested with the help of `getEntityRelationshipCollection` static method, using an identifier object:
+
+EntityRelationshipCollection instance can either be requested with the help of `getEntityRelationshipCollection` static method using an identifier object:
+
 ```javascript
     var EntityRelationshipCollection = requirejs('oroentity/js/app/models/entity-relationship-collection');
     // ...
@@ -93,17 +104,22 @@ EntityRelationshipCollection instance can be requested with the help of `getEnti
         this.accountContacts.fetch();
     }
 ```
+
 Or taken from parent model:
+
 ```javascript
     initialize: function(options) {
         this.accountContacts = options.accountModel.getRelationship('contacts', this);
         this.accountContacts.fetch();
     }
 ```
-In both cases, applicant has to be specified, to allow registry synchronize life cycles of collection and applicant
+
+In both cases, applicant has to be specified, to allow registry synchronize life cycles of the collection and the applicant.
 
 ### Add and remove models from EntityRelationshipCollection
-Here's example how models can be added into collection:
+
+Here is an example of how models can be added into collection:
+
 ```javascript
     addContacts: function(accountModel) {
         this.accountContacts = accountModel.getRelationship('contacts', this);
