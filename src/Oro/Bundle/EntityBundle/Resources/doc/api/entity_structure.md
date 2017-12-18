@@ -6,7 +6,7 @@
 
 Get action is restricted.
 
-Entity structure contains information about configurable entities (their aliases, translated labels, fields, options, and routes.
+Entity structure contains information about configurable entities (their aliases, translated labels, fields, options, and routes).
 
 {@inheritdoc}
 
@@ -14,7 +14,7 @@ Entity structure contains information about configurable entities (their aliases
 
 Retrieve a collection of entities structure items.
 
-Entity structure contains information about configurable entities (their aliases, translated labels, fields, options, and routes.
+Entity structure contains information about configurable entities (their aliases, translated labels, fields, options, and routes).
 
 ## FIELDS
 
