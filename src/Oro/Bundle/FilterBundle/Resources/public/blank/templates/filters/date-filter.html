@@ -1,0 +1,56 @@
+<div class="data-filter-choice" data-date-filter-template>
+    <%= parts.join('') %>
+
+    <% if (renderMode === 'toggle-mode') { %>
+        <div class="filter-date-range">
+            <div class="filter-start-date">
+                <input type="text"
+                       class="<%= inputClass %>"
+                       value="<%= value.value.start %>"
+                       name="start"
+                       placeholder="<%- _.__('from') %>"
+                >
+            </div>
+            <span class="filter-separator">-</span>
+            <div class="filter-end-date">
+                <input type="text"
+                       class="<%= inputClass %>"
+                       value="<%= value.value.end %>"
+                       name="end"
+                       placeholder="<%- _.__('to') %>"
+                >
+            </div>
+        </div>
+    <% } else { %>
+        <div class="filter-date-range">
+            <div class="filter-start-date">
+                <div class="datepicker-box">
+                                <span class="datepicker-box__icon">
+                                    <i class="fa-calendar"></i></span>
+                    <input type="text"
+                           class="<%= inputClass %>"
+                           value="<%= value.value.start %>"
+                           name="start"
+                           placeholder="<%- _.__('from') %>"
+                    >
+                </div>
+            </div>
+            <span class="filter-separator">-</span>
+            <div class="filter-end-date">
+                <div class="datepicker-box">
+                    <span class="datepicker-box__icon">
+                        <i class="fa-calendar"></i>
+                    </span>
+                    <input type="text" class="<%= inputClass %>"
+                           value="<%= value.value.end %>"
+                           name="end"
+                           placeholder="<%- _.__('to') %>"
+                    >
+                </div>
+            </div>
+        </div>
+        <div class="filter-action-row">
+            <button type="button" class="btn btn--action filter-update"><%- _.__("Update") %></button>
+        </div>
+    <% } %>
+</div>

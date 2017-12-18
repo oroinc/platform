@@ -20,7 +20,7 @@ use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 class OrganizationFormExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
-    
+
     /** @var ManagerRegistry */
     protected $registry;
 

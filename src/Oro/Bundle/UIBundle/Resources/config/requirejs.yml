@@ -257,6 +257,9 @@ config:
         'oroui/js/app/views/input-widget/select2': 'bundles/oroui/js/app/views/input-widget/select2.js'
         'oroui/js/app/views/input-widget/number': 'bundles/oroui/js/app/views/input-widget/number.js'
 
+        'oroui/js/fuzzy-search': 'bundles/oroui/js/fuzzy-search.js'
+        'Fuse': 'bundles/bowerassets/fuse/dist/fuse.js'
+
         'oroui/js/content-processor/pinned-dropdown-button': 'oroui/js/content-processor/pinned-dropdown-button.js'
 
         'oroui/js/app/views/widget-picker/widget-picker-collection-view': 'bundles/oroui/js/app/views/widget-picker/widget-picker-collection-view.js'

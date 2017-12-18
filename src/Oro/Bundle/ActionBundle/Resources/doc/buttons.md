@@ -32,5 +32,5 @@ You might control button presentation (view) through the button template `Button
 
 #### Button Match Event
 For logic injection purposes you can rely on event `oro_action.button_provider.on_buttons_matched` 
-witch is dispatched with general `@event_dispatcher` service and emits currently matched buttons collection wrapped 
+which is dispatched with general `@event_dispatcher` service and emits currently matched buttons collection wrapped 
 with [`OnButtonsMatched`](../../Provider/Event/OnButtonsMatched.php) event object.
