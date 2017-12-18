@@ -233,3 +233,63 @@
   }
 }
 
+.safe-area-padding(@trbl) {
+  padding: @trbl;
+
+  .safe-area-padding-left(@trbl);
+  .safe-area-padding-right(@trbl);
+}
+
+.safe-area-padding(@tb, @lr) {
+  padding: @tb @lr;
+
+  .safe-area-padding-left(@lr);
+  .safe-area-padding-right(@lr);
+}
+
+.safe-area-padding(@top, @lr, @bottom) {
+  padding: @top @lr @bottom;
+
+  .safe-area-padding-left(@lr);
+  .safe-area-padding-right(@lr);
+}
+
+.safe-area-padding(@top, @right, @bottom, @left) {
+  padding: @top @right @bottom @left;
+
+  .safe-area-padding-left(@left);
+  .safe-area-padding-right(@right);
+}
+
+.safe-area-padding-left(@value) when not (@value = 0) {
+  /* iOS 11 */
+  padding-left: calc(constant(safe-area-inset-left) + @value);
+
+  /* iOS 11.2+ */
+  padding-left: calc(env(safe-area-inset-left) + @value);
+}
+
+.safe-area-padding-left(@value) when (@value = 0) {
+  /* iOS 11 */
+  padding-left: constant(safe-area-inset-left);
+
+  /* iOS 11.2+ */
+  padding-left: env(safe-area-inset-left);
+}
+
+.safe-area-padding-right(@value) when not (@value = 0) {
+  /* iOS 11 */
+  padding-right: calc(constant(safe-area-inset-right) + @value);
+
+  /* iOS 11.2+ */
+  padding-right: calc(env(safe-area-inset-right) + @value);
+}
+
+.safe-area-padding-right(@value) when (@value = 0) {
+  /* iOS 11 */
+  padding-right: constant(safe-area-inset-right);
+
+  /* iOS 11.2+ */
+  padding-right: env(safe-area-inset-right);
+}
+

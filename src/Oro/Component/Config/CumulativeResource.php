@@ -147,7 +147,7 @@ class CumulativeResource implements ResourceInterface, \Serializable
      */
     public function __toString()
     {
-        return $this->resource;
+        return (string)$this->resource;
     }
 
     /**

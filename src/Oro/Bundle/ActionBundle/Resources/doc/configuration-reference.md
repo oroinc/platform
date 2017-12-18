@@ -143,7 +143,7 @@ Single operation configuration has next properties:
     Flag that determines that current operation should be matched for all datagrids if any present.
 * **exclude_datagrids**
     *array*
-    Define a list of datagrid names witch should be excluded from matching with current operation.
+    Define a list of datagrid names which should be excluded from matching with current operation.
 * **order**
     *integer*
     Parameter that specifies the display order of operations buttons.

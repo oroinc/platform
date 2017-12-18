@@ -1,4 +1,26 @@
 config:
+    map:
+        '*':
+            # Filters templates
+            'orofilter/templates/filters-container.html': 'orofilter/blank/templates/filters/filters-container.html'
+            'orofilter/templates/filter/filter-hint.html': 'orofilter/blank/templates/filters/filter-hint.html'
+            'orofilter/templates/filter/filter-wrapper.html': 'orofilter/blank/templates/filters/filter-wrapper.html'
+            'orofilter/templates/filter/choice-filter.html': 'orofilter/blank/templates/filters/choice-filter.html'
+            'orofilter/templates/filter/number-range-filter.html': 'orofilter/blank/templates/filters/number-range-filter.html'
+            'orofilter/templates/filter/many-to-many-filter.html': 'orofilter/blank/templates/filters/many-to-many-filter.html'
+            'orofilter/templates/filter/dictionary-filter.html': 'orofilter/blank/templates/filters/dictionary-filter.html'
+            'orofilter/templates/filter/select-filter.html': 'orofilter/blank/templates/filters/select-filter.html'
+            'orofilter/templates/filter/embedded/simple-choice-filter.html': 'orofilter/blank/templates/filters/embedded/simple-choice-filter.html'
+            'orofilter/templates/filter/choice-tree.html': 'orofilter/blank/templates/filters/choice-tree.html'
+            'orofilter/templates/filter/date-filter.html': 'orofilter/blank/templates/filters/date-filter.html'
+            'orofilter/templates/filter/date-filter-dropdown.html': 'orofilter/blank/templates/filters/date-filter-dropdown.html'
+            'orofilter/templates/filter/date-picker.html': 'orofilter/blank/templates/filters/date-picker.html'
+            'orofilter/templates/filter/multiselect-filter.html': 'orofilter/blank/templates/filters/multiselect-filter.html'
+            'orofilter/templates/filter/none-filter.html': 'orofilter/blank/templates/filters/none-filter.html'
+            'orofilter/templates/filter/select-field.html': 'orofilter/blank/templates/filters/select-field.html'
+            'orofilter/templates/filter/text-filter.html': 'orofilter/blank/templates/filters/text-filter.html'
+            # Filters templates END
+
     paths:
         'oro/filter/abstract-filter': 'bundles/orofilter/js/filter/abstract-filter.js'
         'oro/filter/choice-filter': 'bundles/orofilter/js/filter/choice-filter.js'

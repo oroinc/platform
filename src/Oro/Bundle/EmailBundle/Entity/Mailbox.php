@@ -433,7 +433,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      */
     public function __toString()
     {
-        return $this->getLabel();
+        return (string)$this->getLabel();
     }
 
     /**

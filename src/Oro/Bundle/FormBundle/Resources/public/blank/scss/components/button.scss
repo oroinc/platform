@@ -34,4 +34,16 @@
     @include element-state('disabled') {
         @include base-disabled-style(.75);
     }
+
+    &--baseline {
+        vertical-align: baseline;
+    }
+
+    &--clip-text {
+        overflow: hidden;
+
+        white-space: nowrap;
+
+        text-overflow: ellipsis;
+    }
 }

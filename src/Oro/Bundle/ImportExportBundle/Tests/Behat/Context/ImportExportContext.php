@@ -268,6 +268,45 @@ class ImportExportContext extends OroFeatureContext implements
     }
 
     /**
+     * This method makes non-strict comparison of data from the downloaded file.
+     *
+     * Checks whether the listed rows (in any order) with given columns and corresponding data is present.
+     *
+     * @Given /^Exported file for "(?P<entity>([\w\s]+))" contains following rows in any order:$/
+     *
+     * @param string    $entity
+     * @param TableNode $expectedEntities
+     * @param string    $processorName
+     */
+    public function exportedFileContainsFollowingRowsIAnyOrder(
+        $entity,
+        TableNode $expectedEntities,
+        $processorName = null
+    ) {
+        $filePath = $this->performExport($entity, $processorName);
+
+        try {
+            $exportedFile = new \SplFileObject($filePath, 'rb');
+            // Treat file as CSV, skip empty lines.
+            $exportedFile->setFlags(\SplFileObject::READ_CSV
+                | \SplFileObject::READ_AHEAD
+                | \SplFileObject::SKIP_EMPTY
+                | \SplFileObject::DROP_NEW_LINE);
+
+            $expectedRows = $expectedEntities->getRows();
+            foreach ($exportedFile as $line => $entityDataFromCsv) {
+                static::assertNotFalse(array_search($entityDataFromCsv, $expectedRows));
+            }
+
+            static::assertCount($exportedFile->key(), $expectedEntities->getRows());
+        } finally {
+            // We have to release SplFileObject before trying to delete the underlying file.
+            $exportedFile = null;
+            unlink($filePath);
+        }
+    }
+
+    /**
      * @param string $entityName
      * @return string
      */

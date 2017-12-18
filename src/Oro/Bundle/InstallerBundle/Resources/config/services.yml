@@ -33,3 +33,12 @@ services:
         class: 'Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigration'
         arguments:
             - '@doctrine'
+
+    oro_installer.assets_install_command_listener:
+        class: Oro\Bundle\InstallerBundle\EventListener\AssetsInstallCommandListener
+        arguments:
+            - '@filesystem'
+            - '%kernel.root_dir%'
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: beforeExecute }
+            - { name: kernel.event_listener, event: console.terminate, method: afterExecute }

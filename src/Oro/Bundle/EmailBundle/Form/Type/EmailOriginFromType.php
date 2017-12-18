@@ -207,7 +207,10 @@ class EmailOriginFromType extends AbstractType
         $mailboxes = $this->mailboxManager->findAvailableMailboxes($user, $this->tokenAccessor->getOrganization());
         foreach ($mailboxes as $mailbox) {
             $origin = $mailbox->getOrigin();
-            if ($origin->isActive()) {
+            /**
+             * if in mailbox configuration neither of IMAP or SMTP was configured, origin will be NULL
+             */
+            if ($origin && $origin->isActive()) {
                 $email = $mailbox->getEmail();
                 $this->helper->preciseFullEmailAddress($email);
                 $email .= ' (Mailbox)';

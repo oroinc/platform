@@ -28,6 +28,33 @@ class SendWorkflowStepChangesToAuditListenerTest extends \PHPUnit_Framework_Test
         $this->listener = new SendWorkflowStepChangesToAuditListener($this->storage);
     }
 
+    public function testPostPersistWhenDisabled()
+    {
+        /** @var EntityManagerInterface $entityManager */
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $workflowTransitionRecord = new WorkflowTransitionRecord();
+        $event = new LifecycleEventArgs($workflowTransitionRecord, $entityManager);
+        $this->listener->setEnabled(false);
+        $this->listener->postPersist($workflowTransitionRecord, $event);
+        $this->listener->setEnabled(true);
+
+        $expectedUpdates = new \SplObjectStorage();
+        $this->assertEquals($expectedUpdates, $this->storage->getEntityUpdates($entityManager));
+    }
+
+    public function testPostPersistWhenNoEntityInWorkflowItem()
+    {
+        /** @var EntityManagerInterface $entityManager */
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $workflowTransitionRecord = new WorkflowTransitionRecord();
+        $workflowItem = new WorkflowItem();
+        $workflowItem->addTransitionRecord($workflowTransitionRecord);
+        $event = new LifecycleEventArgs($workflowTransitionRecord, $entityManager);
+        $this->listener->postPersist($workflowTransitionRecord, $event);
+
+        $this->assertEquals(new \SplObjectStorage(), $this->storage->getEntityUpdates($entityManager));
+    }
+
     public function testPostPersist()
     {
         $entity = new \stdClass();

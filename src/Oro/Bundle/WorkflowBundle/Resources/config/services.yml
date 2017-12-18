@@ -618,3 +618,11 @@ services:
             - '@oro_dataaudit.model.additional_entity_changes_to_audit_storage'
         tags:
             - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_transition_record.class%', event: postPersist }
+
+    oro_workflow.migration.demo_data_fixtures_listener.send_workflow_step_changes_to_audit:
+        parent: oro_platform.event_listener.demo_data_fixtures_listener.abstract
+        calls:
+            - [disableListener, ['oro_workflow.event_listener.send_workflow_step_changes_to_audit']]
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }

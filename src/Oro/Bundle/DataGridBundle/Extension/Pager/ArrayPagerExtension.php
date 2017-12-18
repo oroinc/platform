@@ -22,7 +22,7 @@ class ArrayPagerExtension extends AbstractPagerExtension
      */
     public function getPriority()
     {
-        // ArrayPagerExtension must be executed after ArraySorterExtension witch has parent value - 260
+        // ArrayPagerExtension must be executed after ArraySorterExtension which has parent value - 260
         return -270;
     }
 
