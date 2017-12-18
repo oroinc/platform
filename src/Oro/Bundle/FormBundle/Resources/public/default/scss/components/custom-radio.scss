@@ -26,12 +26,13 @@
             }
         }
     }
+
     &__text {
         display: inline-block;
 
         vertical-align: middle;
 
-        word-break: break-all;
+        word-break: break-word;
 
         &:before {
             display: inline-block;

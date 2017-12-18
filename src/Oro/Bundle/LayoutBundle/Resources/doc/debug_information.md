@@ -2,49 +2,52 @@
 
 ## Symfony Profiler
 
-In **Symfony Profiler** page you can find section **Layout** that contains:
+The **Layout** section of the **Symfony Profiler** page contains:
+
  - **Layout Tree**
  - **Not Applied Actions**
  - **Context**
  
-**IMPORTANT:** [Layout data collector](../../DataCollector/LayoutDataCollector.php) collect debug information only if layout cache is fresh. 
-See [Layout cache](./layout_cache.md) section.
+**IMPORTANT:** The [Layout data collector](../../DataCollector/LayoutDataCollector.php) collects debug information only if the layout cache is fresh. See the  [Layout cache](./layout_cache.md) section for more information.
 
 ### Layout Tree
 
-In left part of **Layout Tree** section you can see tree of **block views** with **block id** and **block type**.
-In the right part of **Layout Tree** section you can find information of chosen **block view**.
-It contains such blocks:
- - **Build Block Options** - collected when [buildBlock](../../../../Component/Layout/BlockTypeExtensionInterface.php) method is triggered
- - **Build View Options** - collected when [buildView](../../../../Component/Layout/BlockTypeExtensionInterface.php) method is triggered
+The tree of **block views** with **block id** and **block type** is located in the left part of the **Layout Tree** section.
+
+The right part of **Layout Tree** section contains information about the selected **block view**.
+
+It contains the following blocks:
+
+ - **Build Block Options** - collected when the [buildBlock](../../../../Component/Layout/BlockTypeExtensionInterface.php) method is triggered.
+ - **Build View Options** - collected when the  [buildView](../../../../Component/Layout/BlockTypeExtensionInterface.php) method is triggered.
  - **View Variables** - [BlockView](../../../../Component/Layout/BlockView.php) vars
 
 ![Symfony Profiler - Layout](./images/symfony_profiler_layout.png "Symfony Profiler - Layout")
 
-Also you can disable **Layout Tree** in developer toolbar, go to `System - Configuration - Development Settings - Generate Layout Tree Dump For The Developer Toolbar`
+To disable the **Layout Tree** in the developer toolbar, navigate to `System - Configuration - Development Settings - Generate Layout Tree Dump For The Developer Toolbar`.
 
-**IMPORTANT:** This options works with debug mode enabled only
+**IMPORTANT:** This options works only when the debug mode is enabled.
 
 ### Not Applied Actions
 
-In **Not Applied Actions** you can find all actions that was not applied when generating layout tree. 
+The **Not Applied Actions** section contains all actions that were not applied when generating the layout tree. 
 
-## Developer toolbar
+## Developer Toolbar
 
-In the developer toolbar panel you can find icon that shows **count of block views** for current page. On mouse over it shows **layout context items** information.
+The developer toolbar panel contains the icon that shows the **count of block views** for the current page. When you hover over the **count of block views**, it shows the **layout context items** information.
 
 ![Layout developer toolbar](./images/developer_toolbar_panel.png "Layout developer toolbar")
 
-## Debug layout blocks
+## Debug Layout Blocks
 
-You can enable **block debug information**, go to `System - Configuration - Development Settings - Include Block Debug Info Into HTML`
+To enable **block debug information**, navigate to `System - Configuration - Development Settings - Include Block Debug Info Into HTML`.
 
 Each block in HTML has data attributes:
 
-- `data-layout-debug-block-id` - unique identifier of current block
-- `data-layout-debug-block-template` - template of current block that was rendered
+- `data-layout-debug-block-id` - a unique identifier of the current block
+- `data-layout-debug-block-template` - the template of the current block that was rendered
 
-**IMPORTANT:** If you want to render block debug information in HTML, you need to define `{{ block('block_attributes') }}` **for each twig block you have**.
+**IMPORTANT:** If you want to render block debug information in HTML, you need to define the `{{ block('block_attributes') }}` **for each twig block you have**.
 
 **Example:**
 

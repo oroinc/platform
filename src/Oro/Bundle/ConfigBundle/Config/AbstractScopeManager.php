@@ -49,13 +49,14 @@ abstract class AbstractScopeManager
      * @param string $name Setting name, for example "oro_user.level"
      * @param bool $full
      * @param null|int|object $scopeIdentifier
+     * @param bool $skipChanges
      *
      * @return array|null|string
      */
-    public function getSettingValue($name, $full = false, $scopeIdentifier = null)
+    public function getSettingValue($name, $full = false, $scopeIdentifier = null, $skipChanges = false)
     {
         $entityId = $this->resolveIdentifier($scopeIdentifier);
-        $setting = $this->getCachedSetting($entityId, $name);
+        $setting = $this->getCachedSetting($entityId, $name, $skipChanges);
 
         $result = null;
 
@@ -109,9 +110,11 @@ abstract class AbstractScopeManager
     /**
      * @param int|null $entityId
      * @param string $name
+     * @param bool $skipChanges
+     *
      * @return array|null
      */
-    protected function getCachedSetting($entityId, $name)
+    protected function getCachedSetting($entityId, $name, $skipChanges = false)
     {
         $cacheKey = $this->getCacheKey($this->getScopedEntityName(), $entityId);
         list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
@@ -129,7 +132,7 @@ abstract class AbstractScopeManager
             $keySetting = $settings[$section][$key];
         }
 
-        if (isset($this->changedSettings[$entityId][$name][ConfigManager::VALUE_KEY])) {
+        if (!$skipChanges && isset($this->changedSettings[$entityId][$name][ConfigManager::VALUE_KEY])) {
             if (null === $keySetting) {
                 $keySetting = [];
             }
@@ -185,6 +188,14 @@ abstract class AbstractScopeManager
         }
         
         return [];
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getChangedScopeIdentifiers()
+    {
+        return array_keys($this->changedSettings);
     }
 
     /**

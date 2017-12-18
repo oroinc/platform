@@ -1,0 +1,11 @@
+<div class="filter-item choice-tree-filter" data-choice-tree-template>
+    <input type="hidden" name="value">
+    <input type="hidden" name="type">
+
+    <% if (renderMode !== 'toggle-mode') { %>
+        <div class="filter-action-row">
+            <button type="button" class="btn btn--action filter-update"><%- _.__("Update") %></button>
+        </div>
+    <% } %>
+
+</div>

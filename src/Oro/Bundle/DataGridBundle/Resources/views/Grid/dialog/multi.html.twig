@@ -64,7 +64,7 @@
                     params.grid_query.params|default({})|merge({
                         gridName: itemsArray|first['gridName'],
                         params: {entity_class: itemsArray|first['className']},
-                    })
+                    })|merge(params|default({}))
                 ),
                 'alias': gridWidgetName,
             }) }}

@@ -1,18 +1,16 @@
 {% extends 'OroDataGridBundle:Grid/widget:widget.html.twig' %}
 
 {% block widget_content %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% set renderParams = renderParams|merge({
+        routerEnabled: false,
+        requireJSModules: ['orodatagrid/js/row-select-for-widget/builder'],
+        gridBuildersOptions: {
+            rowSelectForWidget: {
+                wid: app.request.get('_wid'),
+                multiSelect: false
+            }
+        }
+    }) %}
 
-    <div {{ UI.renderPageComponentAttributes({
-        view: 'orodatagrid/js/app/views/datagrid-row-select-widget-view',
-        options: {
-            wid: app.request.get('_wid'),
-            gridName: gridName,
-            multiSelect: false
-        },
-        layout: 'separate'
-    }) }}>
-        {% set renderParams = renderParams|merge({'routerEnabled': false}) %}
-        {{ parent() }}
-    </div>
+    {{ parent() }}
 {% endblock %}

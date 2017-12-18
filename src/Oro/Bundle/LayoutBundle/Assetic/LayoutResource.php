@@ -222,7 +222,7 @@ class LayoutResource implements ResourceInterface
         }
         $inputs = array_merge($settingsInputs, $variablesInputs, $restInputs);
 
-        $file = realpath($this->outputDir) . '/' . $output . '.'. $extension;
+        $file = $this->outputDir . '/' . $output . '.'. $extension;
 
         $mtime = $this->getLastModified($inputs);
         if (!array_key_exists($file, $this->mtimeOutputs) || $this->mtimeOutputs[$file] < $mtime) {

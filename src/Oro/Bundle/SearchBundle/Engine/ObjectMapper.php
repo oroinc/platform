@@ -295,4 +295,18 @@ class ObjectMapper extends AbstractMapper
 
         return $objectData;
     }
+
+    /**
+     * Keep HTML in text fields except all_text* fields
+     *
+     * {@inheritdoc}
+     */
+    protected function clearTextValue($fieldName, $value)
+    {
+        if (strpos($fieldName, Indexer::TEXT_ALL_DATA_FIELD) === 0) {
+            $value = $this->htmlTagHelper->stripTags((string)$value);
+        }
+
+        return $value;
+    }
 }

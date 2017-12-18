@@ -2,18 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
@@ -29,7 +17,22 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class ImportExportController extends Controller
 {
     /**
@@ -82,6 +85,83 @@ class ImportExportController extends Controller
             'options' => $this->getOptionsFromRequest($request),
             'importJob' => $importJob,
             'importValidateJob' => $importValidateJob
+        ];
+    }
+
+    /**
+     * @Route("/import_validate_export", name="oro_importexport_import_validate_export_template_form")
+     * @AclAncestor("oro_importexport_import")
+     * @Template("OroImportExportBundle:ImportExport/widget:importValidateExportTemplate.html.twig")
+     *
+     * @param Request $request
+     *
+     * @return array|Response
+     */
+    public function importValidateExportTemplateFormAction(Request $request)
+    {
+        $configAlias = $request->get('alias');
+
+        if (!$configAlias) {
+            throw new BadRequestHttpException('Alias should be provided in request');
+        }
+
+        $isValidate = $request->request->getBoolean('isValidateJob', false);
+
+        $entityName = $request->get('entity');
+
+        $configurationsByAlias = $this
+            ->get('oro_importexport.twig_extension.get_import_export_configuration')
+            ->getConfiguration($configAlias);
+
+        $configsWithForm = [];
+
+        $importForm = null;
+
+        foreach ($configurationsByAlias as $configuration) {
+            $form = $this->getImportForm($configuration->getEntityClass());
+
+            if ($configuration->getEntityClass() === $entityName) {
+                $importForm = $form;
+            }
+
+            $configsWithForm[] = ['form' => $form, 'configuration' => $configuration];
+        }
+
+        if ($entityName && null !== $importForm && $request->isMethod('POST')) {
+            $importForm->submit($request);
+
+            if ($importForm->isValid()) {
+                /** @var ImportData $data */
+                $data           = $importForm->getData();
+                $file           = $data->getFile();
+                $processorAlias = $data->getProcessorAlias();
+                if ($file->getClientOriginalExtension() === 'csv') {
+                    $file = $this->getCsvFileHandler()->normalizeLineEndings($file);
+                }
+                $fileName = $this->getFileManager()->saveImportingFile($file);
+
+                $importForward = 'OroImportExportBundle:ImportExport:importProcess';
+                $validateForward = 'OroImportExportBundle:ImportExport:importValidate';
+
+                $forward = $isValidate ? $validateForward : $importForward;
+
+                return $this->forward(
+                    $forward,
+                    [
+                        'processorAlias' => $processorAlias,
+                        'fileName' => $fileName,
+                        'originFileName' => $file->getClientOriginalName()
+                    ],
+                    $request->query->all()
+                );
+            }
+        }
+
+        return [
+            'options' => $this->getOptionsFromRequest($request),
+            'alias' => $configAlias,
+            'configsWithForm' => $configsWithForm,
+            'chosenEntityName' => $entityName
         ];
     }
 
@@ -175,7 +255,10 @@ class ImportExportController extends Controller
             ]
         );
 
-        return new JsonResponse(['success' => true]);
+        return new JsonResponse([
+            'success' => true,
+            'message' => $this->get('translator')->trans('oro.importexport.import.validate.success.message'),
+        ]);
     }
 
     /**
@@ -206,7 +289,10 @@ class ImportExportController extends Controller
             ]
         );
 
-        return new JsonResponse(['success' => true]);
+        return new JsonResponse([
+            'success' => true,
+            'message' => $this->get('translator')->trans('oro.importexport.import.success.message'),
+        ]);
     }
 
     /**

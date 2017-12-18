@@ -1,0 +1,46 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% set exportButtonsHtml = '' %}
+{% set showExportButtons = false %}
+
+{% for configuration in get_import_export_configuration(alias) %}
+    {% set hasExportProcessor = configuration.exportProcessorAlias is defined and configuration.exportProcessorAlias is not empty %}
+    {% set exportAllowed = hasExportProcessor and is_granted('oro_importexport_export') %}
+    {% set exportProcessor = configuration.exportProcessorAlias is iterable ? configuration.exportProcessorAlias|first : configuration.exportProcessorAlias %}
+    {% set isExportPopupRequired = configuration.exportProcessorAlias is iterable %}
+    {% set exportLabel = configuration.exportButtonLabel|default('oro.importexport.export.label'|trans) %}
+
+    {% if exportAllowed %}
+        {% set showExportButtons = true %}
+
+        {% set html %}
+            <a type="button"
+               href="#"
+               class="btn export-btn icons-holder-text no-hash"
+               data-page-component-module="oroui/js/app/components/view-component"
+               data-page-component-options="{{ {
+                   'view': 'oroimportexport/js/app/views/export-button-view',
+                   'entity': configuration.entityClass,
+                   'routeOptions': configuration.routeOptions|default({}),
+                   'exportTitle': configuration.exportPopupTitle|default(exportLabel),
+                   'exportProcessor': exportProcessor|default(null),
+                   'exportJob': configuration.exportJobName|default(null),
+                   'isExportPopupRequired': isExportPopupRequired|default(false),
+                   'filePrefix': configuration.filePrefix|default(null)
+               }|json_encode }}"
+            >
+                <i class="fa-upload hide-text">{{ exportLabel }}</i>{{ exportLabel }}
+            </a>
+        {% endset %}
+
+        {% set exportButtonsHtml = exportButtonsHtml ~ html %}
+    {% endif %}
+{% endfor %}
+
+{% if showExportButtons %}
+    <div class="btn-group">
+        {{ UI.pinnedDropdownButton({
+            'html': exportButtonsHtml
+        }) }}
+    </div>
+{% endif %}

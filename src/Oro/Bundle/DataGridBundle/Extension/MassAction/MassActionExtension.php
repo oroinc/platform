@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
@@ -25,6 +25,9 @@ class MassActionExtension extends AbstractExtension
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
+    /** @var CsrfTokenManagerInterface */
+    protected $tokenManager;
+
     /** @var bool */
     protected $isMetadataVisited = false;
 
@@ -32,15 +35,18 @@ class MassActionExtension extends AbstractExtension
      * @param MassActionFactory             $actionFactory
      * @param MassActionMetadataFactory     $actionMetadataFactory
      * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param CsrfTokenManagerInterface     $tokenManager
      */
     public function __construct(
         MassActionFactory $actionFactory,
         MassActionMetadataFactory $actionMetadataFactory,
-        AuthorizationCheckerInterface $authorizationChecker
+        AuthorizationCheckerInterface $authorizationChecker,
+        CsrfTokenManagerInterface $tokenManager
     ) {
         $this->actionFactory = $actionFactory;
         $this->actionMetadataFactory = $actionMetadataFactory;
         $this->authorizationChecker = $authorizationChecker;
+        $this->tokenManager = $tokenManager;
     }
 
     /**
@@ -131,6 +137,8 @@ class MassActionExtension extends AbstractExtension
      */
     protected function createAction($actionName, array $actionConfig)
     {
+        $actionConfig['token'] = $this->tokenManager->getToken($actionName)->getValue();
+
         $action = $this->actionFactory->createAction($actionName, $actionConfig);
 
         $aclResource = $action->getAclResource();

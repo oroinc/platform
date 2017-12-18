@@ -84,6 +84,7 @@ class OroMessageQueueExtension extends Extension
                 $config['client']['router_processor'],
                 $config['client']['router_destination'],
                 $config['client']['default_destination'],
+                $config['client']['default_topic'],
             ]);
 
             if (false == empty($config['client']['traceable_producer'])) {

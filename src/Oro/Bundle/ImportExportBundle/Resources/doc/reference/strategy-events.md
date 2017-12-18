@@ -1,19 +1,18 @@
-Strategy events
-======
+#Strategy events
 
-Table of Contents
------------------
- - [Where to find](#where-to-find)
- - [How to use](#how-to-use)
+## Table of Contents
+
+ - [Where to Find](#where-to-find)
+ - [How to Use](#how-to-use)
  - [PROCESS_BEFORE](#process-before)
  - [PROCESS_AFTER](#process-after)
 
-Where to find
---------
-All strategy events are available in Oro\Bundle\ImportExportBundle\Event\StrategyEvent class.
+# Where to Find
 
-How to use
-----------
+All strategy events are available in the Oro\Bundle\ImportExportBundle\Event\StrategyEvent class.
+
+# How to Use
+
 ```php
 <?php
 
@@ -41,12 +40,12 @@ class CustomImportExportSubscriber implements EventSubscriberInterface {
 }
 ```
 
-PROCESS_BEFORE
---------------
-This event occurs just before entity strategy is run.
-Can be used to prepare entity before it will be processed by strategy.
+# PROCESS_BEFORE
 
-PROCESS_AFTER
--------------
-This event occurs after entity strategy finishes it job.
-It can be used to provide additional validation of the entity.
+This event occurs just before the entity strategy is run.
+It is used to prepare the entity before it is processed by the strategy.
+
+# PROCESS_AFTER
+
+This event occurs after the job of the entity strategy is finished.
+It is used to provide additional validation of the entity.

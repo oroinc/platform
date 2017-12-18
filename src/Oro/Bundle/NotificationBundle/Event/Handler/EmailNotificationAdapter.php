@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\NotificationBundle\Event\Handler;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\NotificationBundle\Model\EmailNotificationInterface;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
@@ -27,9 +25,6 @@ class EmailNotificationAdapter implements EmailNotificationInterface
     /** @var object */
     protected $entity;
 
-    /** @var ConfigProvider */
-    protected $configProvider;
-
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
@@ -37,20 +32,17 @@ class EmailNotificationAdapter implements EmailNotificationInterface
      * @param object $entity
      * @param EmailNotification $notification
      * @param EntityManager $em
-     * @param ConfigProvider $configProvider
      * @param PropertyAccessor $propertyAccessor
      */
     public function __construct(
         $entity,
         EmailNotification $notification,
         EntityManager $em,
-        ConfigProvider $configProvider,
         PropertyAccessor $propertyAccessor
     ) {
         $this->entity = $entity;
         $this->notification = $notification;
         $this->em = $em;
-        $this->configProvider = $configProvider;
         $this->propertyAccessor = $propertyAccessor;
     }
 
@@ -67,18 +59,18 @@ class EmailNotificationAdapter implements EmailNotificationInterface
      */
     public function getRecipientEmails()
     {
-        $class = ClassUtils::getClass($this->entity);
-        $ownerFieldName = $this->configProvider->hasConfig($class) ?
-            $this->configProvider->getConfig($class)->get('owner_field_name') :
-            null;
         $recipientList = $this->notification->getRecipientList();
 
         $emails = $this->em
             ->getRepository('Oro\Bundle\NotificationBundle\Entity\RecipientList')
-            ->getRecipientEmails($recipientList, $this->entity, $ownerFieldName);
+            ->getRecipientEmails($recipientList, $this->entity);
         $emails = array_merge(
             $emails,
             $this->getRecipientEmailsFromAdditionalAssociations($this->entity, $recipientList)
+        );
+        $emails = array_merge(
+            $emails,
+            $this->getRecipientEmailsFromEntityEmails($this->entity, $recipientList)
         );
 
         return array_unique($emails);
@@ -121,5 +113,58 @@ class EmailNotificationAdapter implements EmailNotificationInterface
         );
 
         return array_filter($emails);
+    }
+
+    /**
+     * Get array of emails by field marked as contact information with type "email"
+     *
+     * @param mixed         $entity
+     * @param RecipientList $recipientList
+     *
+     * @return array
+     */
+    private function getRecipientEmailsFromEntityEmails($entity, RecipientList $recipientList)
+    {
+        $values = [];
+        // Getting values from fields that marked as entity email
+        foreach ($recipientList->getEntityEmails() as $propertyPath) {
+            $values = array_merge($values, $this->getEntityEmailValue($entity, $propertyPath));
+        }
+
+        // Recursively leave only string values
+        array_walk_recursive(
+            $values,
+            function (&$item) {
+                if ($item instanceof EmailHolderInterface) {
+                    $item = $item->getEmail();
+                }
+                if (!is_string($item)) {
+                    $item = null;
+                }
+            }
+        );
+
+        // Flatten multidimensional array
+        $emails = iterator_to_array(new \RecursiveIteratorIterator(new \RecursiveArrayIterator($values)), false);
+
+        return array_filter($emails);
+    }
+
+    /**
+     * Get email address value from entity by property path
+     *
+     * @param mixed  $entity
+     * @param string $propertyPath
+     *
+     * @return array|\Traversable
+     */
+    private function getEntityEmailValue($entity, $propertyPath)
+    {
+        $value = [];
+        if ($this->propertyAccessor->isReadable($entity, $propertyPath)) {
+            $value = $this->propertyAccessor->getValue($entity, $propertyPath);
+        }
+
+        return is_array($value) || $value instanceof \Traversable ? $value : [$value];
     }
 }

@@ -97,6 +97,7 @@ services:
             - '@oro_datagrid.extension.mass_action.factory'
             - '@oro_datagrid.extension.mass_action.metadata_factory'
             - '@security.authorization_checker'
+            - '@security.csrf.token_manager'
         tags:
             - { name: oro_datagrid.extension }
 

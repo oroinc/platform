@@ -8,7 +8,7 @@ oro.locale:
     localization:
         entity_label:               'Localization'
         entity_plural_label:        'Localizations'
-        entity_description:         Localization item stores locale-specific congiuration: the language code of the locale's main language, a formatting code that is used for the locale, and a parent localization that is used by default whenever the translation for the main language is missing.
+        entity_description:         "Localization item stores locale-specific congiuration: the language code of the locale's main language, a formatting code that is used for the locale, and a parent localization that is used by default whenever the translation for the main language is missing."
         id.label:                   'Id'
         name:
             label:                  'Name'

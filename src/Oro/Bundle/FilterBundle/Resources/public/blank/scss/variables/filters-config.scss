@@ -1,6 +1,6 @@
 // @theme: blank;
 
-$filter-criteria-selector-icon-color: lighten(get-color('additional', 'dark'), 20%) !default;
+$filter-criteria-selector-icon-color: null !default;
 $filter-criteria-hint-max-width: 250px !default;
 $filter-criteria-hint-item-color: get-color('additional', 'ultra') !default;
 $filter-criteria-hint-item-bg: get-color('additional', 'middle') !default;
@@ -15,8 +15,8 @@ $filter-date-range-offset: null !default;
 $filter-separator-width: 22px !default;
 $filter-separator-text-align: center !default;
 
-$filter-reset-color: get-color('additional', 'ultra') !default;
-$filter-reset-hover-color: darken(get-color('additional', 'ultra'), 10%) !default;
+$filter-reset-color: get-color('additional', 'darker') !default;
+$filter-reset-hover-color: get-color('additional', 'dark') !default;
 
 $filter-start-end-max-width: 95px !default;
 $filter-start-end-display: inline-block !default;

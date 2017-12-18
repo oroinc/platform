@@ -21,6 +21,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element as OroElement;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -75,6 +76,33 @@ class ImportExportContext extends OroFeatureContext implements
      */
     protected $importFile;
 
+    /**
+     * Open specific tab on multi-import modal
+     *
+     * @When /^(?:|I )open "(?P<tabLabel>([\w\s]+))" import tab$/
+     * @param string $tabLabel
+     */
+    public function IOpenImportTab($tabLabel)
+    {
+        $this->openImportModalAndReturnImportSubmitButton();
+
+        if (false === $this->isMultiImportModal()) {
+            return;
+        }
+
+        $activeTab = $this->getPage()->find('css', '.import-widget-content .nav-tabs .active a');
+        $tabToBeActivated = $this->getPage()->findLink($tabLabel);
+
+        self::assertNotNull($activeTab, 'There are currently no active tabs');
+        self::assertNotNull($tabToBeActivated, 'Tab to be opened was not found');
+
+        if ($tabToBeActivated->getText() === $activeTab->getText()) {
+            return;
+        }
+
+        $tabToBeActivated->click();
+    }
+
     //@codingStandardsIgnoreStart
     /**
      * Download data template from entity grid page with custom processor
@@ -86,7 +114,7 @@ class ImportExportContext extends OroFeatureContext implements
     //@codingStandardsIgnoreEnd
     public function iDownloadDataTemplateFileWithProcessor($entity, $processorName)
     {
-        $this->iDownloadDataTemplateFileWithOptions($entity, null, $processorName);
+        $this->downloadTemplateFile($entity, $processorName);
     }
 
     /**
@@ -97,37 +125,15 @@ class ImportExportContext extends OroFeatureContext implements
      */
     public function iDownloadDataTemplateFile($entity)
     {
-        $this->iDownloadDataTemplateFileWithOptions($entity);
+        $this->downloadTemplateFile($entity);
     }
 
-    //@codingStandardsIgnoreStart
     /**
-     * Download data template from entity grid page with specified button
-     *
-     * @When /^(?:|I )download "(?P<entity>([\w\s]+))" Data Template file through "(?P<importButtonLabel>([\w\s]+))" button$/
      * @param string $entity
-     * @param string $importButtonLabel
+     * @param null   $processorName
      */
-    //@codingStandardsIgnoreEnd
-    public function iDownloadDataTemplateFileWithSpecifiedButton($entity, $importButtonLabel)
+    public function downloadTemplateFile($entity, $processorName = null)
     {
-        $importButton = $this->getSession()
-            ->getPage()
-            ->find('xpath', "//a[contains(text(), '$importButtonLabel') and not(contains(@class, 'dropdown-item'))]");
-
-        $this->iDownloadDataTemplateFileWithOptions($entity, $importButton);
-    }
-
-    /**
-     * @param string $entity
-     * @param string|null $processorName
-     * @param NodeElement|null $importButton
-     */
-    protected function iDownloadDataTemplateFileWithOptions(
-        $entity,
-        NodeElement $importButton = null,
-        $processorName = null
-    ) {
         $entityClass = $this->aliasResolver->getClassByAlias($this->convertEntityNameToAlias($entity));
         $processors = $this->processorRegistry->getProcessorAliasesByEntity('export_template', $entityClass);
 
@@ -147,18 +153,10 @@ class ImportExportContext extends OroFeatureContext implements
             $processor = $processorName;
         }
 
-        $importButton = $importButton instanceof NodeElement
-            ? $importButton
-            : $this->getSession()->getPage()->findLink('Import');
-        self::assertNotNull($importButton);
+        $this->openImportModalAndReturnImportSubmitButton();
 
-        $importButton
-            ->getParent()
-            ->find('css', 'a.dropdown-toggle')
-            ->click();
-        $link = $importButton->getParent()->findLink('Download Data Template');
-
-        self::assertNotNull($link);
+        $exportButton = $this->createElement('ActiveExportTemplateButton');
+        self::assertTrue($exportButton->isIsset(), "Export template link was not found");
 
         $url = $this->locatePath($this->getContainer()->get('router')->generate(
             'oro_importexport_export_template',
@@ -270,6 +268,45 @@ class ImportExportContext extends OroFeatureContext implements
     }
 
     /**
+     * This method makes non-strict comparison of data from the downloaded file.
+     *
+     * Checks whether the listed rows (in any order) with given columns and corresponding data is present.
+     *
+     * @Given /^Exported file for "(?P<entity>([\w\s]+))" contains following rows in any order:$/
+     *
+     * @param string    $entity
+     * @param TableNode $expectedEntities
+     * @param string    $processorName
+     */
+    public function exportedFileContainsFollowingRowsIAnyOrder(
+        $entity,
+        TableNode $expectedEntities,
+        $processorName = null
+    ) {
+        $filePath = $this->performExport($entity, $processorName);
+
+        try {
+            $exportedFile = new \SplFileObject($filePath, 'rb');
+            // Treat file as CSV, skip empty lines.
+            $exportedFile->setFlags(\SplFileObject::READ_CSV
+                | \SplFileObject::READ_AHEAD
+                | \SplFileObject::SKIP_EMPTY
+                | \SplFileObject::DROP_NEW_LINE);
+
+            $expectedRows = $expectedEntities->getRows();
+            foreach ($exportedFile as $line => $entityDataFromCsv) {
+                static::assertNotFalse(array_search($entityDataFromCsv, $expectedRows));
+            }
+
+            static::assertCount($exportedFile->key(), $expectedEntities->getRows());
+        } finally {
+            // We have to release SplFileObject before trying to delete the underlying file.
+            $exportedFile = null;
+            unlink($filePath);
+        }
+    }
+
+    /**
      * @param string $entityName
      * @return string
      */
@@ -348,13 +385,12 @@ class ImportExportContext extends OroFeatureContext implements
      * Import filled file
      *
      * @When /^(?:|I )import file$/
-     * @When /^(?:|I )import file with "(?P<importButtonLabel>([\w\s]+))" button$/
      */
-    public function iImportFile($importButtonLabel = null)
+    public function iImportFile()
     {
-        $this->tryImportFile($importButtonLabel);
+        $this->tryImportFile();
 
-        $flashMessage = 'Import started successfully. You will receive email notification upon completion.';
+        $flashMessage = 'Import started successfully. You will receive an email notification upon completion.';
         $this->oroMainContext->iShouldSeeFlashMessage($flashMessage);
     }
 
@@ -363,14 +399,13 @@ class ImportExportContext extends OroFeatureContext implements
      *
      * @When /^(?:|I )try import file$/
      */
-    public function tryImportFile($importButtonLabel = null)
+    public function tryImportFile()
     {
-        $importButtonLabel = $importButtonLabel ?? 'Import file';
-        $page = $this->getSession()->getPage();
-        $page->clickLink($importButtonLabel);
-        $this->waitForAjax();
-        $this->createElement('ImportFileField')->attachFile($this->importFile);
-        $page->pressButton('Submit');
+        $importSubmitButton = $this->openImportModalAndReturnImportSubmitButton();
+
+        $this->createElement('ActiveImportFileField')->attachFile($this->importFile);
+
+        $importSubmitButton->press();
         $this->waitForAjax();
     }
 
@@ -432,6 +467,31 @@ class ImportExportContext extends OroFeatureContext implements
             $validationMessage,
             implode('", "', $existedErrors)
         ));
+    }
+
+    /**
+     * @return OroElement
+     */
+    protected function openImportModalAndReturnImportSubmitButton()
+    {
+        $importSubmitButton = $this->createElement('ImportModalImportFileButton');
+
+        if (false === $importSubmitButton->isIsset()) {
+            $mainImportButton =$this->createElement('MainImportFileButton');
+            self::assertNotNull($mainImportButton, 'Main import button was not found');
+            $mainImportButton->click();
+            $this->waitForAjax();
+        }
+
+        return $importSubmitButton;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isMultiImportModal(): bool
+    {
+        return $this->createElement('ImportNavTabsContainer')->isIsset();
     }
 
     /**

@@ -20,6 +20,7 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class FormContext extends OroFeatureContext implements OroPageObjectAware
 {
@@ -208,6 +209,31 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
                 $value,
                 $error,
                 "Failed asserting that $label has error $value"
+            );
+        }
+    }
+
+    /**
+     * Assert that provided validation errors for given fields appeared
+     * Example: Then I should not see validation errors:
+     *            | Subject         | This value should not be blank.  |
+     * Example: Then I should not see "Some Form" validation errors:
+     *            | Subject         | This value should not be blank.  |
+     *
+     * @Then /^(?:|I )should not see validation errors:$/
+     * @Then /^(?:|I )should not see "(?P<formName>(?:[^"]|\\")*)" validation errors:$/
+     */
+    public function iShouldNotSeeValidationErrors(TableNode $table, $formName = 'OroForm')
+    {
+        /** @var OroForm $form */
+        $form = $this->createElement($formName);
+
+        foreach ($table->getRows() as $row) {
+            list($label, $value) = $row;
+            $errors = $form->getAllFieldValidationErrors($label);
+            self::assertFalse(
+                in_array($value, $errors),
+                sprintf('Failed asserting that "%s" does not contain following error "%s"', $label, $value)
             );
         }
     }
@@ -406,21 +432,45 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @param string    $field
      * @param TableNode $options
+     * @param string    $formName
      */
-    public function shouldSeeTheFollowingOptionsForSelect($field, TableNode $options)
+    public function shouldSeeTheFollowingOptionsForSelect($field, TableNode $options, $formName = 'OroForm')
     {
-        $this->assertSelectContainsOptions($field, array_merge(...$options->getRows()));
+        $optionLabels = array_merge(...$options->getRows());
+
+        /** @var Select2Entity|Select $element */
+        $element = $this->getFieldInForm($field, $formName);
+        if ($element instanceof Select2Entity) {
+            $options = $element->getSuggestedValues();
+            foreach ($optionLabels as $optionLabel) {
+                static::assertContains($optionLabel, $options);
+            }
+        } else {
+            $this->assertSelectContainsOptions($field, $optionLabels);
+        }
     }
 
     /**
      * @Then /^(?:|I )should not see the following options for "(?P<field>[^"]*)" select:$/
      *
-     * @param string $field
+     * @param string    $field
      * @param TableNode $options
+     * @param string    $formName
      */
-    public function shouldNotSeeTheFollowingOptionsForSelect($field, TableNode $options)
+    public function shouldNotSeeTheFollowingOptionsForSelect($field, TableNode $options, $formName = 'OroForm')
     {
-        $this->assertSelectNotContainsOptions($field, array_merge(...$options->getRows()));
+        $optionLabels = array_merge(...$options->getRows());
+
+        /** @var Select2Entity|Select $element */
+        $element = $this->getFieldInForm($field, $formName);
+        if ($element instanceof Select2Entity) {
+            $options = $element->getSuggestedValues();
+            foreach ($optionLabels as $optionLabel) {
+                static::assertNotContains($optionLabel, $options);
+            }
+        } else {
+            $this->assertSelectNotContainsOptions($field, $optionLabels);
+        }
     }
 
     /**

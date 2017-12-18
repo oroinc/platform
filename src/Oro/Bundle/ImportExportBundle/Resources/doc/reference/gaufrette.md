@@ -1,13 +1,11 @@
-Gaufrette
-=========
+## Gaufrette
 
 The ImportExport bundle uses [Gaufrette](https://github.com/KnpLabs/Gaufrette) for the file storage. 
-The gaufrette configuration is stored in the `Resources/config/oro/app.yml`. 
+The gaufrette configuration is stored in `Resources/config/oro/app.yml`. 
 
 ## The Gaufrette configuration for the local filesystem
 
-This configuration allows to use local filesystem for the importing and exporting. It is applicable if
-all the consumers run on the same server.
+This configuration allows to use local filesystem for the importing and exporting. It is applicable if all the consumers run on the same server.
 
 ### Example
 ```
@@ -22,12 +20,11 @@ knp_gaufrette:
             alias:      importexport_filesystem
 ```
 
-The importing, exporting and temporary files will be stored in the cache directory of the project.
+The importing, exporting, and temporary files are stored in the cache directory of the project.
 
 ## The gaufrette configuration for the Amazon S3 storage
 
-This configuration allows to use Amazon S3 cloud service for the importing and exporting. It is 
-applicable if consumers can run on the different servers.
+This configuration allows to use Amazon S3 cloud service for the importing and exporting. It is applicable if consumers run on different servers.
 
 ### Example
 

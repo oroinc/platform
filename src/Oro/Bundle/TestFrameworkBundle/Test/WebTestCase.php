@@ -14,6 +14,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\BrowserKit\Cookie;
 
@@ -230,6 +231,15 @@ abstract class WebTestCase extends BaseWebTestCase
         $options['debug'] = false;
 
         return parent::createKernel($options);
+    }
+
+    /**
+     * @param string $tokenId
+     * @return CsrfToken
+     */
+    protected function getCsrfToken($tokenId)
+    {
+        return $this->getContainer()->get('security.csrf.token_manager')->getToken($tokenId);
     }
 
     /**

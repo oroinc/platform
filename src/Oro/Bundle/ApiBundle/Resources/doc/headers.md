@@ -1,24 +1,20 @@
-Headers
-=======
+# Headers
 
-Table of Contents
------------------
  - [Overview](#overview)
- - [Existing **X-Include** keys](#existing-x-include-keys)
- - [Add new **X-Include** key](#add-new-x-include-key)
+ - [Existing **X-Include** Keys](#existing-x-include-keys)
+ - [Add new **X-Include** Key](#add-new-x-include-key)
 
-Overview
---------
+## Overview
 
-For some types of REST API requests you can get an additional information like the total number of records, the number of affected records, etc. For these purposes the `X-Include` request header can be used. The value of this header should contains *keys* separated by semicolon (;).
+For some types of the REST API requests, you can retrieve an additional information like the total number of records, the number of affected records, etc. To do this, use the `X-Include` request header. The value of this header should contain keys separated by a semicolon (;).
 
-The following example shows how to get the total number of account:
+The following example shows how to get the total number of accounts:
 
 ```bash
 curl "http://orocrm.loc/app_dev.php/api/accounts?page=1&limit=2" -v --header "X-Include:totalCount" --header "X-WSSE:..."
 ```
 
-It will return
+The corresponding response:
 
 ```
 < HTTP/1.1 200 OK
@@ -27,14 +23,13 @@ It will return
 ...
 ```
 
-Notes:
-- to generate WSSE header you can run `php app/console oro:wsse:generate-header YOUR_API_KEY`
+**Hint:** To generate a WSSE header, run: `php app/console oro:wsse:generate-header YOUR_API_KEY`.
 
-Existing X-Include keys
------------------------
+## Existing X-Include Keys
 
 The following table describes all existing *keys* for `X-Include` header.
 
+```html
 <table>
 <tr>
     <th nowrap>Request Type</th>
@@ -60,13 +55,13 @@ The following table describes all existing *keys* for `X-Include` header.
 	<td>Returns the number of deleted entities</td>
 </tr>
 </table>
+```
 
-Add new X-Include key
----------------------
+## Add new X-Include Key
 
-Also it is possible to add own *key* to the `X-Include` header. To do this you have to:
+To add a custom key to the `X-Include` header:
 
-- create a processor that will handle your *key*
+1. Create a processor to handle your key:
 
 ```php
 <?php
@@ -78,8 +73,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 
 /**
- * Calculates and sets the total number of deleted records to "X-Include-Deleted-Count" response header,
- * in case if it was requested by "X-Include: deletedCount" request header.
+ * Calculates and inserts the total number of deleted records into the "X-Include-Deleted-Count" response header
+ * when it was requested by the "X-Include: deletedCount" request header.
  */
 class SetDeletedCountHeader implements ProcessorInterface
 {
@@ -94,13 +89,13 @@ class SetDeletedCountHeader implements ProcessorInterface
         /** @var DeleteListContext $context */
 
         if ($context->getResponseHeaders()->has(self::RESPONSE_HEADER_NAME)) {
-            // the deleted records count header is already set
+            // The deleted records count header is already set.
             return;
         }
 
         $xInclude = $context->getRequestHeaders()->get(Context::INCLUDE_HEADER);
         if (empty($xInclude) || !in_array(self::REQUEST_HEADER_VALUE, $xInclude, true)) {
-            // the deleted records count is not requested
+            // The deleted records count is not requested.
             return;
         }
 
@@ -119,7 +114,7 @@ class SetDeletedCountHeader implements ProcessorInterface
             - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -10 }
 ```
 
-- create a processor that will remove your response header in case if an error occurs
+2. Create a processor to remove your response header when an error occurs:
 
 ```php
 <?php

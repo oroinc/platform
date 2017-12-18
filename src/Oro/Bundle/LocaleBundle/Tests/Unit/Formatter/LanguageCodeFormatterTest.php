@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
+use PHPUnit\Framework\TestCase;
+
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 
-class LanguageCodeFormatterTest extends \PHPUnit_Framework_TestCase
+class LanguageCodeFormatterTest extends TestCase
 {
     /** @var LanguageCodeFormatter */
     protected $formatter;

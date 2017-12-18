@@ -190,6 +190,7 @@ class ImportExportTest extends WebTestCase
         $this->assertEquals(
             [
                 'success' => true,
+                'message' => 'Import started successfully. You will receive an email notification upon completion.'
             ],
             $data
         );

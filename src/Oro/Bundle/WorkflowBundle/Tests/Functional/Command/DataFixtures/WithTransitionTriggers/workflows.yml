@@ -29,7 +29,6 @@ workflows:
     second_workflow:
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         start_step: second_step
-        start_step: second_step
         defaults:
             active: true
         steps:
