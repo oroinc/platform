@@ -24,6 +24,7 @@ User interface layouts and controls.
 - [Input Widgets](./Resources/doc/reference/input-widgets.md)
 - [Component Shorcuts](./Resources/doc/reference/component-shortcuts.md)
 - [Error Handler](./Resources/doc/reference/error-handler.md)
+- [Objects Registry](./Resources/doc/reference/client-side/registry.md)
 
 ## Configuration Settings
 

@@ -44,7 +44,10 @@
                             <div class="controls">
                                 {{ QD.query_designer_condition_builder({
                                     'id': 'oro_email_autoresponserule-condition-builder',
-                                    'entity_choice_id': 'oro_email_autoresponserule_entity',
+                                    'fieldConditionModule': 'oroemail/js/app/views/email-field-condition-view',
+                                    'fieldConditionOptions': {
+                                        'entityData': emailEntityData
+                                    },
                                     'metadata': metadata
                                 }) }}
                             </div>
@@ -60,10 +63,7 @@
             {{ form_end(form) }}
             {{ oro_form_js_validation(form) }}
             <div{{ UI.renderPageComponentAttributes({
-                'module': 'oroemail/js/app/components/auto-response-rule-component',
-                'options': {
-                    data: data
-                }
+                'module': 'oroemail/js/app/components/auto-response-rule-component'
             }) }}></div>
         </div>
     </div>

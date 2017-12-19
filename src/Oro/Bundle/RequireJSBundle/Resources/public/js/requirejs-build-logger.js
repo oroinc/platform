@@ -5,7 +5,7 @@
 
     var original = req.load;
     req.load = function(context, moduleName, url) {
-        if (excludeList !== undefined && excludeList.indexOf(moduleName) === -1) {
+        if (!context.config.paths[moduleName] && (!excludeList || excludeList.indexOf(moduleName) === -1)) {
             //excludeList already loaded and moduleName not found
             var message = '"' + moduleName + '" not found in built JS file. ' +
                 'Add this file into RequireJS "paths" config';

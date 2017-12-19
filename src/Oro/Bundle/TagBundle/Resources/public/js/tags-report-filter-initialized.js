@@ -1,6 +1,8 @@
-define(['jquery', 'underscore'
-], function($, _) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
 
     /**
      * Resolves filter options
@@ -11,15 +13,9 @@ define(['jquery', 'underscore'
      * @return {jQuery.Deferred} promise
      */
     return function(filterOptions, context) {
-        var promise = new $.Deferred();
-        var className = _.last(context).field.related_entity_name;
-        var entityClass = _.last(context).field.entity.name;
-
+        var className = _.last(context).field.relatedEntityName;
+        var entityClass = _.last(context).field.entity.className;
         filterOptions.filterParams = {'class': className, 'entityClass': entityClass};
-
-        // mark promise as resolved
-        promise.resolveWith(filterOptions);
-
-        return promise;
+        return $.when(filterOptions);
     };
 });

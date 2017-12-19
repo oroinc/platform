@@ -191,6 +191,7 @@ config:
         'oroui/js/app/modules/component-shortcuts-module': 'bundles/oroui/js/app/modules/component-shortcuts-module.js'
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
+        'oroui/js/app/services/registry': 'bundles/oroui/js/app/services/registry.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
         'oroui/js/app/views/hidden-initialization-view': 'bundles/oroui/js/app/views/hidden-initialization-view.js'
         'oroui/js/app/views/page-center-title-view': 'bundles/oroui/js/app/views/page-center-title-view.js'

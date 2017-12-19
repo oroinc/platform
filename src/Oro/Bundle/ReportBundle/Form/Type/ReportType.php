@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ReportBundle\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
 use Oro\Bundle\ReportBundle\Form\EventListener\DateGroupingFormSubscriber;
@@ -50,13 +50,16 @@ class ReportType extends AbstractQueryDesignerType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
+        parent::configureOptions($resolver);
+
         $options = array_merge(
             $this->getDefaultOptions(),
             array(
                 'data_class'         => 'Oro\Bundle\ReportBundle\Entity\Report',
                 'intention'          => 'report',
+                'query_type'         => 'report',
             )
         );
 

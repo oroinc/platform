@@ -109,7 +109,7 @@ class AutoResponseRuleController extends Controller
         return [
             'form'  => $form->createView(),
             'saved' => $form->isValid(),
-            'data'  => [$entity['name'] => $entity],
+            'emailEntityData' => $entity,
             'metadata' => $this->get('oro_query_designer.query_designer.manager')->getMetadata('string')
         ];
     }

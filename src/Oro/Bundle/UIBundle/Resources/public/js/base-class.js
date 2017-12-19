@@ -1,4 +1,3 @@
-/** @lends BaseClass */
 define(function(require) {
     'use strict';
 
@@ -16,11 +15,9 @@ define(function(require) {
      * @class
      * @param {Object} options - Options container
      * @param {Object} options.listen - Optional. Events to bind
-     * @exports BaseClass
      */
     function BaseClass(options) {
-        options = options || {};
-        this.cid = _.uniqueId('class');
+        this.cid = _.uniqueId(this.cidPrefix);
         if (!options) {
             options = {};
         }
@@ -32,6 +29,8 @@ define(function(require) {
     }
 
     BaseClass.prototype = {
+        cidPrefix: 'class',
+
         constructor: BaseClass,
 
         /**

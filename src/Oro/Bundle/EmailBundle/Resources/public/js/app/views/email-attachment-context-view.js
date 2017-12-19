@@ -20,7 +20,9 @@ define(function(require) {
         },
 
         undelegateEvents: function() {
-            this.$enableAttachment.off(this.eventNamespace());
+            if (this.$enableAttachment) {
+                this.$enableAttachment.off(this.eventNamespace());
+            }
             EmailAttachmentContextView.__super__.undelegateEvents.call(this);
         },
 

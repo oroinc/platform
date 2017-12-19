@@ -85,21 +85,25 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
         $this->type->buildForm($builder, []);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(
                 [
+                    'column_column_field_choice_options' => [
+                        'exclude_fields' => ['relation_type'],
+                    ],
                     'column_column_choice_type'   => 'hidden',
                     'filter_column_choice_type'   => 'oro_entity_field_select',
                     'data_class'                  => 'Oro\Bundle\SegmentBundle\Entity\Segment',
                     'intention'                   => 'segment',
+                    'query_type'                  => 'segment',
                 ]
             );
 
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
     }
 
     public function testGetName()
