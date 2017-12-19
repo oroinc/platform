@@ -13,7 +13,7 @@
     }
 
     > .dropdown-menu {
-      display: block !important;;
+      display: block !important;
 
       position: relative;
       top: 0 !important;
@@ -29,8 +29,6 @@
     }
 
     &__scrollable {
-      display: none;
-
       overflow-x: hidden;
       overflow-y: auto;
 
@@ -112,9 +110,14 @@
     height: 30px;
   }
 
-  .dropdown-menu-wrapper__placeholder {
-    position: absolute;
-    .box-shadow(1px 2px 4px rgba(0, 0, 0, 0.3));
+  .dropdown-menu-wrapper {
+    &__scrollable {
+      display: none;
+    }
+    &__placeholder {
+      position: absolute;
+      .box-shadow(1px 2px 4px rgba(0, 0, 0, 0.3));
+    }
   }
 
   width: 100%;
@@ -366,6 +369,25 @@
         font-weight: normal;
         line-height: 20px;
       }
+      a.accordion-heading {
+        position: relative;
+        // left side corner
+        > span {
+          padding-left: 14px;
+          &.collapsed:before {
+            content: "\f054";
+          }
+          &:before {
+            content: "\f078";
+            font-family: 'FontAwesome';
+            display: block;
+            font-size: 8px;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+          }
+        }
+      }
     }
     .accordion-body > a {
       display: none;
@@ -393,8 +415,6 @@
       #gradient > .vertical(lighten(@headerIconButtonColorStart, 5%), lighten(@headerIconButtonColorEnd, 1%));
       border-top-color: darken(@headerIconButtonColorStart, 1%);
       border-bottom-color: darken(@headerIconButtonColorEnd, 8%);
-      color: #fff;
-      font-weight: bold;
       padding: 0 20px;
       &.collapsed {
         background-image: none;
@@ -412,6 +432,11 @@
       }
     }
     > li.accordion-group {
+      .dropdown-menu-wrapper__child {
+        position: relative;
+        display: block;
+        height: auto;
+      }
       a {
         color: @menuItemFirstLevelTextColor;
         &:hover {
@@ -510,7 +535,7 @@
           }
         }
       }
-      .active > a{
+      .active > a:not(.accordion-heading) {
         color: #fff;
         font-weight: bold;
       }
@@ -596,10 +621,6 @@
     .accordion-heading {
       .accordion-toggle{
         padding: 0;
-        &:not(.collapsed) {
-          font-weight: bold;
-          color: #fff;
-        }
       }
     }
     .accordion-group {
