@@ -197,5 +197,6 @@ oro_behat_extension:
         - OroFormBundle::FormContext
         - OroDataGridBundle::GridContext
         - OroUIBundle::ContextSelectorContext
+        - OroSecurityBundle::ACLContext
       paths:
         - '@OroDataGridBundle/Tests/Behat/Features'
