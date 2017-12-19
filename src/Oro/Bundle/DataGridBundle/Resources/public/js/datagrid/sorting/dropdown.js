@@ -40,6 +40,8 @@ define(function(require) {
 
         dropdownClassName: config.dropdownClassName,
 
+        select2Config: {},
+
         /** @property */
         enabled: true,
 
@@ -264,6 +266,16 @@ define(function(require) {
         },
 
         /**
+         * Init sorting subview
+         */
+        initSubview: function() {
+            this.subview('select2', new Select2View({
+                el: this.$('select'),
+                select2Config: this.select2Config
+            }));
+        },
+
+        /**
          * @returns {orodatagrid.datagrid.SortingDropdown}
          */
         render: function() {
@@ -273,7 +285,7 @@ define(function(require) {
             }
             SortingDropdown.__super__.render.call(this);
 
-            var select2Config = {
+            this.select2Config = {
                 dropdownCssClass: _.result(this, 'dropdownClassName'),
                 dropdownAutoWidth: true
             };
@@ -283,13 +295,10 @@ define(function(require) {
             }
 
             if (this.columns.where({sortable: true, renderable: true}).length < searchCapabilityGate) {
-                select2Config.minimumResultsForSearch = -1;
+                this.select2Config.minimumResultsForSearch = -1;
             }
 
-            this.subview('select2', new Select2View({
-                el: this.$('select'),
-                select2Config: select2Config
-            }));
+            this.initSubview();
 
             this._updateDisplayDirection();
 
