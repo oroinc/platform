@@ -95,7 +95,7 @@ registry has to be notified that the new applicant holds the instance.
         }
 ```
 
-When the applicant does not need a shared instance any more, it can notify the registry with s disable function:
+When the applicant does not need a shared instance any more, it can notify the registry with `relieve` method:
 
 ```js
         disable: function() {
