@@ -51,6 +51,9 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function($, Backbone, 
             var $groups = $root.find('.dropdown');
 
             $root.find('.dropdown-menu').removeClass('dropdown-menu').addClass('accordion-body collapse');
+            $root.find('.dropdown-menu-wrapper').removeClass('hidden');
+            $root.find('.dropdown-menu-wrapper__scrollable').css({'max-height': 'none'});
+            $root.find('.dropdown-menu-wrapper__child').css({'margin-left': 0, 'margin-top': 0});
             $groups.removeClass('dropdown').addClass('accordion-group');
 
             var self = this;
