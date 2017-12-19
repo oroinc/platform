@@ -7,6 +7,7 @@ use Behat\Behat\EventDispatcher\Event\AfterStepTested;
 use Behat\Mink\Mink;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use WebDriver\Exception\UnknownCommand;
 use WebDriver\LogType;
 
 /**
@@ -66,7 +67,13 @@ class JsLogSubscriber implements EventSubscriberInterface
      */
     public function log(AfterStepTested $event)
     {
-        $newLogs = $this->getLogs();
+        try {
+            $newLogs = $this->getLogs();
+        } catch (UnknownCommand $e) {
+            // get browser log is not supported by driver
+            return;
+        }
+
         if (!$newLogs) {
             return;
         }
