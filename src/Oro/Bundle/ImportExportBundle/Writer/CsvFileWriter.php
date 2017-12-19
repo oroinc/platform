@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Writer;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
+use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
@@ -74,13 +75,13 @@ class CsvFileWriter extends CsvFileStreamWriter implements StepExecutionAwareInt
      */
     public function setImportExportContext(ContextInterface $context)
     {
-        if (!$context->hasOption('filePath')) {
+        if (!$context->hasOption(Context::OPTION_FILE_PATH)) {
             throw new InvalidConfigurationException(
                 'Configuration of CSV writer must contain "filePath".'
             );
-        } else {
-            $this->setFilePath($context->getOption('filePath'));
         }
+
+        $this->setFilePath($context->getOption(Context::OPTION_FILE_PATH));
 
         parent::setImportExportContext($context);
     }

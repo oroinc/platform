@@ -29,6 +29,11 @@ class BatchFileManager
     protected $fileManager;
 
     /**
+     * @var array
+     */
+    protected $configurationOptions = [];
+
+    /**
      * @param FileManager $fileManager
      * @param integer $sizeOfBatch
      */
@@ -55,6 +60,14 @@ class BatchFileManager
     }
 
     /**
+     * @param array $options
+     */
+    public function setConfigurationOptions(array $options)
+    {
+        $this->configurationOptions = $options;
+    }
+
+    /**
      * This method split file on chunk, and return file name array.
      *
      * @param string $pathFile
@@ -65,8 +78,13 @@ class BatchFileManager
         if (! ($this->writer && $this->reader)) {
             throw new InvalidConfigurationException('Reader and Writer must be configured.');
         }
-        $context = new Context(['filePath' => $pathFile]);
+
+        $context = new Context(array_merge(
+            [Context::OPTION_FILE_PATH => $pathFile],
+            $this->configurationOptions
+        ));
         $this->reader->initializeByContext($context);
+
         $data = [];
         $i = 0;
         $header = null;
@@ -100,10 +118,18 @@ class BatchFileManager
     {
         $batchFileName = FileManager::generateUniqueFileName($extension);
         $batchFilePath = FileManager::generateTmpFilePath($batchFileName);
-        $writerContext = new Context(['filePath'=> $batchFilePath, 'header' => $header]);
+
+        $writerContext = new Context(array_merge(
+            [
+                Context::OPTION_FILE_PATH => $batchFilePath,
+                Context::OPTION_HEADER => $header
+            ],
+            $this->configurationOptions
+        ));
         $this->writer->setImportExportContext($writerContext);
         $this->writer->write($data);
         $this->writer->close();
+
         $this->fileManager->writeFileToStorage($batchFilePath, $batchFileName);
         @unlink($batchFilePath);
 

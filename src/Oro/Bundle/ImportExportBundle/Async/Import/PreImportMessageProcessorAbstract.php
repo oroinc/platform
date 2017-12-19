@@ -143,7 +143,10 @@ abstract class PreImportMessageProcessorAbstract implements MessageProcessorInte
 
         try {
             $filePath = $this->fileManager->writeToTmpLocalStorage($body['fileName']);
+
             $this->importHandler->setImportingFileName($filePath);
+            $this->importHandler->setConfigurationOptions($body['options']);
+
             $files = $this->importHandler->splitImportFile(
                 $body['jobName'],
                 $body['process'],
