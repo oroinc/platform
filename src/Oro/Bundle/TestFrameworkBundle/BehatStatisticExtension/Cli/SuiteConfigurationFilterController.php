@@ -19,11 +19,25 @@ class SuiteConfigurationFilterController implements Controller
     private $suiteConfigRegistry;
 
     /**
-     * @param SuiteConfigurationRegistry $suiteConfigRegistry
+     * @var array
      */
-    public function __construct(SuiteConfigurationRegistry $suiteConfigRegistry)
+    private $suiteConfig;
+
+    /**
+     * @var array
+     */
+    private $sets;
+
+    /**
+     * @param SuiteConfigurationRegistry $suiteConfigRegistry
+     * @param array $suiteConfig
+     * @param array $sets
+     */
+    public function __construct(SuiteConfigurationRegistry $suiteConfigRegistry, array $suiteConfig, array $sets)
     {
         $this->suiteConfigRegistry = $suiteConfigRegistry;
+        $this->suiteConfig = $suiteConfig;
+        $this->sets = $sets;
     }
 
     /**
@@ -38,6 +52,8 @@ class SuiteConfigurationFilterController implements Controller
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->suiteConfigRegistry->setSuiteConfigurations($this->suiteConfig);
         $this->suiteConfigRegistry->filterConfiguration();
+        $this->suiteConfigRegistry->setSets($this->sets);
     }
 }
