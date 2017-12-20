@@ -196,7 +196,7 @@ class ScrollData
     {
         $this->assertSubBlockDefined($blockId, $subBlockID);
 
-        if ($fieldName) {
+        if ($fieldName !== null) {
             $this->data[self::DATA_BLOCKS][$blockId][self::SUB_BLOCKS][$subBlockID][self::DATA][$fieldName] = $html;
         } else {
             $this->data[self::DATA_BLOCKS][$blockId][self::SUB_BLOCKS][$subBlockID][self::DATA][] = $html;
