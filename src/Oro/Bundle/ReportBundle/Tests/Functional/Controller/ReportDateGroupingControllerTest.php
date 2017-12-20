@@ -62,8 +62,7 @@ class ReportDateGroupingControllerTest extends WebTestCase
         $this->assertGreaterThan(5, $options['data']['data']);
 
         $firstData = reset($options['data']['data']);
-        $this->assertArrayHasKey('cDate', $firstData);
-        $this->assertArrayHasKey('dateGrouping', $firstData);
+        $this->assertArrayHasKey('timePeriod', $firstData);
         $this->assertArrayHasKey('metadata', $options);
         $this->assertArrayHasKey('columns', $options['metadata']);
         $this->assertArrayHasKey('filters', $options['metadata']);

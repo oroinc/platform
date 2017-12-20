@@ -23,6 +23,7 @@ services:
             - '@oro_report.grid.datagrid_configuration_builder'
             - '@doctrine'
             - '@oro_report.cache'
+            - '@oro_datagrid.provider.resolver'
             - '%oro_report.cache.report_grid_config_key%'
         tags:
             - { name: oro_datagrid.configuration.provider }
@@ -73,7 +74,7 @@ services:
     oro_report.grid.date_grouping_builder:
         class: Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder
         arguments:
-            - "%oro_report.calendar_date.entity.class%"
+            - '%oro_report.calendar_date.entity.class%'
 
     oro_report.listener.segment_subscriber:
         class: %oro_report.listener.segment_subscriber.class%
