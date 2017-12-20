@@ -63,6 +63,12 @@ define(function(require) {
             this.listenTo(steps, 'reset', this.setWorkflowToCollection);
             this.listenTo(transitions, 'reset', this.setWorkflowToCollection);
             WorkflowModel.__super__.initialize.apply(this, arguments);
+
+            // Add an initial state to history for an already created workflow
+            var startStep = this.getStartStep();
+            if (startStep.length) {
+                this.onStateChange();
+            }
         },
 
         setWorkflow: function(item) {
