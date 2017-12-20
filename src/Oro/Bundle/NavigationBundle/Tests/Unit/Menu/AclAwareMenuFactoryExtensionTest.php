@@ -6,32 +6,33 @@ use Knp\Menu\MenuFactory;
 
 use Psr\Log\LoggerInterface;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\CacheProvider;
 
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
 use Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension;
+use Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Stub\UrlGeneratorStub;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|RouterInterface */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|Router */
     protected $router;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ClassAuthorizationChecker */
     protected $classAuthorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenAccessorInterface */
     protected $tokenAccessor;
 
     /** @var MenuFactory */
@@ -48,14 +49,10 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->router = $this->createMock('Symfony\Component\Routing\RouterInterface');
+        $this->router = $this->createMock(Router::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->classAuthorizationChecker = $this->createMock(ClassAuthorizationChecker::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-
-        $this->tokenAccessor->expects($this->any())
-            ->method('getToken')
-            ->willReturn($this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
 
         $this->logger = $this->createMock(LoggerInterface::class);
 
@@ -63,9 +60,9 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
             $this->router,
             $this->authorizationChecker,
             $this->classAuthorizationChecker,
-            $this->tokenAccessor
+            $this->tokenAccessor,
+            $this->logger
         );
-        $this->factoryExtension->setLogger($this->logger);
 
         $this->factory = new MenuFactory();
         $this->factory->addExtension($this->factoryExtension);
@@ -78,6 +75,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildOptionsWithResourceId($options, $isAllowed)
     {
+        $this->mockToken();
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
             ->willReturn(true);
@@ -141,6 +139,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildOptionsWithoutLoggedUser($options, $isAllowed)
     {
+        $this->mockToken();
         $this->tokenAccessor->expects($this->any())
             ->method('hasUser')
             ->willReturn(false);
@@ -180,21 +179,15 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $options = ['route' => 'no-route'];
 
+        $this->mockToken();
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
             ->willReturn(true);
 
-        $routeCollection = $this->getMockBuilder('Symfony\Component\Routing\RouteCollection')
-            ->getMock();
-
-        $routeCollection->expects($this->once())
-            ->method('get')
-            ->with('no-route')
-            ->will($this->returnValue(null));
-
+        $generator = new UrlGeneratorStub();
         $this->router->expects($this->once())
-            ->method('getRouteCollection')
-            ->will($this->returnValue($routeCollection));
+            ->method('getGenerator')
+            ->willReturn($generator);
 
         $this->classAuthorizationChecker->expects($this->never())
             ->method('isClassMethodGranted');
@@ -212,6 +205,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
+        $this->mockToken();
         $this->tokenAccessor->expects($this->never())
             ->method('hasUser');
 
@@ -226,6 +220,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testDefaultPolicyOverride(array $options, $expected)
     {
+        $this->mockToken();
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
             ->willReturn(true);
@@ -252,6 +247,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $options = ['uri' => '#'];
 
+        $this->mockToken();
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
             ->willReturn(true);
@@ -276,14 +272,21 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
      * @dataProvider optionsWithRouteDataProvider
      * @param array   $options
      * @param boolean $isAllowed
+     * @param int     $callsCount
      */
-    public function testBuildOptionsWithRoute($options, $isAllowed)
+    public function testBuildOptionsWithRoute($options, $isAllowed, $callsCount)
     {
+        $this->mockToken();
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
             ->willReturn(true);
 
-        $this->assertRouteByRouteNameCalls($isAllowed, $options['route'], 'controller', 'action', 1);
+        $generator = new UrlGeneratorStub();
+        $this->router->expects($this->once())
+            ->method('getGenerator')
+            ->willReturn($generator);
+
+        $this->assertClassAuthorizationCheckerCalls($isAllowed, $callsCount);
 
         $item = $this->factory->createItem('test', $options);
         $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
@@ -291,48 +294,12 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Assert ACL and route calls are present when route option is present.
-     *
      * @param boolean $isAllowed
-     * @param string  $routeName
-     * @param string  $class
-     * @param string  $method
      * @param int     $callsCount
      */
-    protected function assertRouteByRouteNameCalls($isAllowed, $routeName, $class, $method, $callsCount)
+    private function assertClassAuthorizationCheckerCalls($isAllowed, $callsCount)
     {
-        $route = $this->getMockBuilder('Symfony\Component\Routing\Route')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        if ($callsCount > 0) {
-            $route->expects($this->exactly($callsCount))
-                ->method('getDefault')
-                ->with('_controller')
-                ->will($this->returnValue($class . '::' . $method));
-        } else {
-            $route->expects($this->never())
-                ->method('getDefault');
-        }
-
-        $routeCollection = $this->getMockBuilder('Symfony\Component\Routing\RouteCollection')
-            ->getMock();
-
-        if ($callsCount > 0) {
-            $routeCollection->expects($this->exactly($callsCount))
-                ->method('get')
-                ->with($routeName)
-                ->will($this->returnValue($route));
-        } else {
-            $routeCollection->expects($this->never())
-                ->method('get');
-        }
-
-        $this->router->expects($this->exactly($callsCount))
-            ->method('getRouteCollection')
-            ->will($this->returnValue($routeCollection));
-
-        $this->classAuthorizationChecker->expects($this->once())
+        $this->classAuthorizationChecker->expects($this->exactly($callsCount))
             ->method('isClassMethodGranted')
             ->with('controller', 'action')
             ->will($this->returnValue($isAllowed));
@@ -345,16 +312,19 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'allowed with route' => [
-                ['route' => 'test'], true
+                ['route' => 'route_name'], true, 1
             ],
             'not allowed with route' => [
-                ['route' => 'test'], false
+                ['route' => 'route_name'], false, 1
             ],
             'allowed with route and uri' => [
-                ['uri' => '#', 'route' => 'test'], true
+                ['uri' => '#', 'route' => 'route_name'], true, 1
             ],
             'not allowed with route and uri' => [
-                ['uri' => '#', 'route' => 'test'], false
+                ['uri' => '#', 'route' => 'route_name'], false, 1
+            ],
+            'default with route and controller without delimiter' => [
+                ['uri' => '#', 'route' => 'test'], AclAwareMenuFactoryExtension::DEFAULT_ACL_POLICY, 0
             ],
         ];
     }
@@ -369,6 +339,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
         $class = 'controller';
         $method = 'action';
 
+        $this->mockToken();
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
             ->willReturn(true);
@@ -406,6 +377,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $options = ['extras' => ['acl_resource_id' => 'resource_id']];
 
+        $this->mockToken();
         $this->tokenAccessor->expects($this->any())
             ->method('hasUser')
             ->willReturn(true);
@@ -421,10 +393,10 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
         }
 
-        $this->assertAttributeCount(1, 'aclCache', $this->factoryExtension);
+        $this->assertAttributeCount(1, 'existingACLChecks', $this->factoryExtension);
         $this->assertAttributeEquals(
             [$options['extras']['acl_resource_id'] => true],
-            'aclCache',
+            'existingACLChecks',
             $this->factoryExtension
         );
     }
@@ -433,11 +405,17 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $options = ['route' => 'route_name'];
 
+        $this->mockToken();
         $this->tokenAccessor->expects($this->any())
             ->method('hasUser')
             ->willReturn(true);
 
-        $this->assertRouteByRouteNameCalls(true, 'route_name', 'controller', 'action', 2);
+        $generator = new UrlGeneratorStub();
+        $this->router->expects($this->once())
+            ->method('getGenerator')
+            ->willReturn($generator);
+
+        $this->assertClassAuthorizationCheckerCalls(true, 1);
 
         $item = $this->factory->createItem('test', $options);
         $this->assertTrue($item->getExtra('isAllowed'));
@@ -448,151 +426,30 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($item->getExtra('isAllowed'));
         $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
 
-        $this->assertAttributeCount(1, 'aclCache', $this->factoryExtension);
-        $this->assertAttributeEquals(['controller::action' => true], 'aclCache', $this->factoryExtension);
+        $this->assertAttributeCount(1, 'existingACLChecks', $this->factoryExtension);
+        $this->assertAttributeEquals(['controller::action' => true], 'existingACLChecks', $this->factoryExtension);
     }
 
-    /**
-     * @dataProvider hasInCacheDataProvider
-     * @param boolean $hasInCache
-     */
-    public function testUriCaching($hasInCache)
+    public function testBuildOptionsWithoutToken()
     {
-        $cacheKey = md5('uri_acl:#');
-        $globalCacheKey = md5(
-            'global:' . serialize([true, true, null, null, '#', false, true, false, false, null])
-        );
+        $options = ['route' => 'no-route', 'check_access_not_logged_in' => true];
 
-        $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->willReturn(true);
+        $this->tokenAccessor->expects($this->never())
+            ->method('hasUser');
 
-        $cache = $this->createMock(ArrayCache::class);
-
-        $cache->expects($this->exactly(1))
-            ->method('contains')
-            ->willReturnMap([
-                [$globalCacheKey, false],
-                [$cacheKey, $hasInCache],
-            ]);
-
-        if ($hasInCache) {
-            $cache->expects($this->once())
-                ->method('fetch')
-                ->with($cacheKey)
-                ->willReturnMap([
-                    $this->returnValue('controller::action')
-                ]);
-        } else {
-            $cache->expects($this->exactly(1))
-                ->method('save')
-                ->willReturnMap([
-                    [$cacheKey, 'controller::action'],
-                    [$globalCacheKey],
-                ]);
-        }
-
-        $this->factoryExtension->setCache($cache);
-
-        $options = ['uri' => '#'];
-
-        if ($hasInCache) {
-            $this->classAuthorizationChecker->expects($this->never())
-                ->method('isClassMethodGranted');
-
-            $this->router->expects($this->never())
-                ->method('match');
-        } else {
-            $this->router->expects($this->once())
-                ->method('match')
-                ->will($this->returnValue(['_controller' => 'controller::action']));
-
-            $this->classAuthorizationChecker->expects($this->once())
-                ->method('isClassMethodGranted')
-                ->with('controller', 'action')
-                ->will($this->returnValue(true));
-        }
+        $this->tokenAccessor->expects($this->any())
+            ->method('getToken')
+            ->willReturn(null);
 
         $item = $this->factory->createItem('test', $options);
-        $this->assertTrue($item->getExtra('isAllowed'));
         $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
+        $this->assertEquals(AclAwareMenuFactoryExtension::DEFAULT_ACL_POLICY, $item->getExtra('isAllowed'));
     }
 
-    /**
-     * @dataProvider hasInCacheDataProvider
-     * @param boolean $hasInCache
-     */
-    public function testRouteCaching($hasInCache)
+    private function mockToken()
     {
-        $params = ['id' => 20];
-        $uriKey = md5('route_uri:route_name' . serialize($params));
-        $aclKey = md5('route_acl:route_name');
-        $globalCacheKey = md5(
-            'global:' . serialize([true, true, 'route_name', $params, null, false, true, false, false, null])
-        );
-
-        $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->willReturn(true);
-
-        $cache = $this->createMock(ArrayCache::class);
-
-        $cache->expects($this->exactly(2))
-            ->method('contains')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$globalCacheKey, false],
-                        [$uriKey, $hasInCache],
-                        [$aclKey, $hasInCache],
-                    ]
-                )
-            );
-
-        if ($hasInCache) {
-            $cache->expects($this->exactly(2))
-                ->method('fetch')
-                ->will(
-                    $this->returnValueMap(
-                        [
-                            [$uriKey, '/'],
-                            [$aclKey, 'controller::action'],
-                        ]
-                    )
-                );
-        } else {
-            $cache->expects($this->exactly(2))
-                ->method('save')
-                ->with(
-                    $this->logicalOr(
-                        $this->equalTo($aclKey),
-                        $this->equalTo('controller::action'),
-                        $this->equalTo($uriKey),
-                        $this->equalTo('/'),
-                        $this->equalTo($globalCacheKey)
-                    )
-                );
-        }
-
-        $this->factoryExtension->setCache($cache);
-
-        $options = ['route' => 'route_name', 'routeParameters' => $params];
-
-        $this->assertRouteByRouteNameCalls(true, 'route_name', 'controller', 'action', (int) !$hasInCache);
-
-        $item = $this->factory->createItem('test', $options);
-        $this->assertTrue($item->getExtra('isAllowed'));
-        $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
-    }
-
-    /**
-     * @return array
-     */
-    public function hasInCacheDataProvider()
-    {
-        return [
-            'in cache' => [true],
-            'not in cache' => [false]
-        ];
+        $this->tokenAccessor->expects($this->any())
+            ->method('getToken')
+            ->willReturn($this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
     }
 }
