@@ -114,8 +114,7 @@
                         [
                             QD.query_designer_column_form(
                                 form.column,
-                                {'id': type ~ '-column-form'},
-                                {'entity_choice_id': 'oro_report_form_entity'}
+                                {'id': type ~ '-column-form'}
                             ),
                             QD.query_designer_column_list(
                                 {
@@ -133,8 +132,7 @@
                         [
                             QD.query_designer_grouping_form(
                                 form.grouping,
-                                {'id': type ~ '-grouping-form'},
-                                {'entity_choice_id': 'oro_report_form_entity'}
+                                {'id': type ~ '-grouping-form'}
                             ),
                             QD.query_designer_grouping_list({'id': type ~ '-grouping-list'}),
                             QD.query_designer_grouping_item_template(type ~ '-grouping-item-row'),
@@ -147,8 +145,7 @@
                         'oro.report.form.date_group_section.label'|trans,
                         [
                             QD.query_designer_date_grouping_form(
-                                form.dateGrouping,
-                                {'entity_choice_id': 'oro_report_form_entity'}
+                                form.dateGrouping
                             )
                         ],
                         '',
@@ -163,7 +160,6 @@
                 'data': [
                     segmentQD.query_designer_condition_builder({
                         'id': type ~ '-condition-builder',
-                        'entity_choice_id': 'oro_report_form_entity',
                         'page_limit': constant('\\Oro\\Bundle\\SegmentBundle\\Entity\\Manager\\SegmentManager::PER_PAGE'),
                         'metadata': metadata,
                     })

@@ -2,11 +2,9 @@
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
-use Oro\Bundle\ImportExportBundle\File\FileManager;
+use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotifcationTopics;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Job\Job;
@@ -50,7 +48,7 @@ class PreHttpImportMessageProcessor extends PreImportMessageProcessorAbstract
             'options' => [],
         ], $body);
 
-        $body['options']['batch_size'] = $this->batchSize;
+        $body['options'][Context::OPTION_BATCH_SIZE] = $this->batchSize;
 
         return $body;
     }

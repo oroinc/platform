@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
+use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 
@@ -138,24 +139,24 @@ abstract class CsvFileStreamWriter extends FileStreamWriter
      */
     public function setImportExportContext(ContextInterface $context)
     {
-        if ($context->hasOption('delimiter')) {
-            $this->delimiter = $context->getOption('delimiter');
+        if ($context->hasOption(Context::OPTION_DELIMITER)) {
+            $this->delimiter = $context->getOption(Context::OPTION_DELIMITER);
         }
 
-        if ($context->hasOption('enclosure')) {
-            $this->enclosure = $context->getOption('enclosure');
+        if ($context->hasOption(Context::OPTION_ENCLOSURE)) {
+            $this->enclosure = $context->getOption(Context::OPTION_ENCLOSURE);
         }
 
-        if ($context->hasOption('escape')) {
-            $this->escape = $context->getOption('escape');
+        if ($context->hasOption(Context::OPTION_ESCAPE)) {
+            $this->escape = $context->getOption(Context::OPTION_ESCAPE);
         }
 
-        if ($context->hasOption('firstLineIsHeader')) {
-            $this->firstLineIsHeader = (bool)$context->getOption('firstLineIsHeader');
+        if ($context->hasOption(Context::OPTION_FIRST_LINE_IS_HEADER)) {
+            $this->firstLineIsHeader = (bool)$context->getOption(Context::OPTION_FIRST_LINE_IS_HEADER);
         }
 
-        if ($context->hasOption('header')) {
-            $this->header = $context->getOption('header');
+        if ($context->hasOption(Context::OPTION_HEADER)) {
+            $this->header = $context->getOption(Context::OPTION_HEADER);
         }
     }
 }

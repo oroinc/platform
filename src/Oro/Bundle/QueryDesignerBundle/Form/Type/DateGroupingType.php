@@ -27,8 +27,9 @@ class DateGroupingType extends AbstractType
                 static::FIELD_NAME_ID,
                 DateFieldChoiceType::class,
                 [
-                    'required' => true,
-                    'label' => 'oro.report.form.date_grouping_field.label',
+                    'required'            => true,
+                    'label'               => 'oro.report.form.date_grouping_field.label',
+                    'page_component_name' => 'date-grouping-field-choice',
                 ]
             )
             ->add(

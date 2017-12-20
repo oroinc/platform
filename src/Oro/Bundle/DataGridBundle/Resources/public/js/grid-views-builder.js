@@ -48,7 +48,7 @@ define(function(require) {
 
             if (_.isString(self.GridViewsView)) {
                 self.buildViews = _.wrap(self.buildViews, function(buildViews, grid) {
-                    tools.loadModule(this.GridViewsView)
+                    tools.loadModules(this.GridViewsView)
                         .then(_.bind(function(GridViewsView) {
                             this.GridViewsView = GridViewsView;
                             buildViews.call(this, grid);

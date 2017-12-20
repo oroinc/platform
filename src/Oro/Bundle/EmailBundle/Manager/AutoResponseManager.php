@@ -147,6 +147,7 @@ class AutoResponseManager
     {
         return [
             'name' => 'email',
+            'label' => $this->translator->trans('oro.email.entity_label'),
             'fields' => [
                 $this->createField('subject', 'oro.email.subject.label'),
                 $this->createField('emailBody.bodyContent', 'oro.email.email_body.label'),

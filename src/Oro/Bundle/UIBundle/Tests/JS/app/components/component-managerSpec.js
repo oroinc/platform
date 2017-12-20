@@ -51,14 +51,14 @@ define(function(require) {
 
         describe('required sibling components', function() {
             var tools = exposure.retrieve('tools');
-            var originalLoadModule = tools.loadModule;
+            var originalLoadModules = tools.loadModules;
 
             beforeEach(function() {
-                tools.loadModule = jasmine.createSpy().and.callFake(componentsLoadModule);
+                tools.loadModules = jasmine.createSpy().and.callFake(componentsLoadModule);
             });
 
             afterEach(function() {
-                exposure.retrieve('tools').loadModule = originalLoadModule;
+                exposure.retrieve('tools').loadModules = originalLoadModules;
             });
 
             describe('override required componentName with options', function() {

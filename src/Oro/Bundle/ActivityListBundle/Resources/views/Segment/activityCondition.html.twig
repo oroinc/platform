@@ -1,6 +1,5 @@
 {% set activityConditionOptions = {
     filters: params.metadata.filters|default([]),
-    hierarchy: params.metadata.hierarchy|default({}),
     fieldChoice: {
         select2: {
             formatSelectionTemplateSelector: params.column_chain_template_selector|default(null),

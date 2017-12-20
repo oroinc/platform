@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\ImportExportBundle\Context\Context;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -172,11 +173,25 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $writerChain = new WriterChain();
         $writerChain->addWriter($writer, 'csv');
 
+        $options = [
+            Context::OPTION_ENCLOSURE => '|',
+            Context::OPTION_DELIMITER => ';',
+        ];
+
         $handler = $this->createHttpImportHandlerMock();
         $handler
             ->expects($this->once())
             ->method('setImportingFileName')
             ->with('12345.csv')
+        ;
+        $handler
+            ->expects($this->once())
+            ->method('setConfigurationOptions')
+            ->with([
+                Context::OPTION_ENCLOSURE => '|',
+                Context::OPTION_DELIMITER => ';',
+                Context::OPTION_BATCH_SIZE => 100,
+            ])
         ;
         $handler
             ->expects($this->once())
@@ -207,7 +222,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
                 'jobName' => 'test',
                 'processorAlias' => 'test',
                 'process' => 'import',
-                'options' => [],
+                'options' => $options,
             ]))
         ;
 

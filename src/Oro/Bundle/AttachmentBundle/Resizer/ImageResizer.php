@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Resizer;
 
 use Liip\ImagineBundle\Binary\BinaryInterface;
+use Imagine\Exception\RuntimeException;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFileContentFactoryInterface;
@@ -69,6 +70,23 @@ class ImageResizer implements LoggerAwareInterface
         }
         $binary = $this->imagineBinaryFactory->createImagineBinary($content);
 
-        return $this->imagineBinaryFilter->applyFilter($binary, $filterName);
+        try {
+            $filteredBinary = $this->imagineBinaryFilter->applyFilter($binary, $filterName);
+        } catch (RuntimeException $e) {
+            if (null !== $this->logger) {
+                $this->logger->warning(
+                    sprintf(
+                        'Image (id: %d, filename: %s) is broken. Skipped during resize.',
+                        $image->getId(),
+                        $image->getFilename()
+                    ),
+                    ['exception' => $e]
+                );
+            }
+
+            return false;
+        }
+
+        return $filteredBinary;
     }
 }
