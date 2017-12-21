@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Tests\Unit\Handler;
+namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Handler;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ImportExportBundle\File\BatchFileManager;
