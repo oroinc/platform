@@ -6,7 +6,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\AbstractSorterExtension;
 use Oro\Bundle\FilterBundle\Filter\DateGroupingFilter;
 use Oro\Bundle\FilterBundle\Filter\SkipEmptyPeriodsFilter;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\DateGroupingFilterType;
 use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
@@ -27,7 +26,7 @@ class DatagridDateGroupingBuilder
     const COLUMNS_KEY_NAME = 'columns';
     const CALENDAR_DATE_COLUMN_ALIAS = 'cDate';
     const CALENDAR_TABLE_JOIN_CONDITION_TEMPLATE = 'CAST(%s as DATE) = CAST(%s.%s as DATE)';
-    const CALENDAR_DATE_GRID_COLUMN_NAME = 'dateGrouping';
+    const CALENDAR_DATE_GRID_COLUMN_NAME = 'timePeriod';
     const DATE_PERIOD_FILTER = 'datePeriodFilter';
     const DEFAULT_GROUP_BY_FIELD = 'id';
 
@@ -37,10 +36,15 @@ class DatagridDateGroupingBuilder
     protected $calendarDateClass;
 
     /**
-     * @param string $calendarDateEntity
-     * @param null $joinIdHelper
+     * @var JoinIdentifierHelper|null
      */
-    public function __construct($calendarDateEntity, $joinIdHelper = null)
+    protected $joinIdHelper;
+
+    /**
+     * @param string $calendarDateEntity
+     * @param JoinIdentifierHelper|null $joinIdHelper
+     */
+    public function __construct($calendarDateEntity, JoinIdentifierHelper $joinIdHelper = null)
     {
         $this->calendarDateClass = $calendarDateEntity;
         $this->joinIdHelper = $joinIdHelper;
@@ -93,7 +97,6 @@ class DatagridDateGroupingBuilder
             $dateGroupDefinition[DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID],
             $notNullableField
         );
-        $this->changeGroupBySection($config);
         $this->removeViewLink($config);
     }
 
@@ -138,7 +141,7 @@ class DatagridDateGroupingBuilder
         $dateFieldName,
         $dateFieldTableAlias,
         $notNullableField,
-        $defaultFilterValue = DateGroupingFilterType::TYPE_DAY
+        $defaultFilterValue = DateGroupingFilter::TYPE_DAY
     ) {
         $filters = $config->offsetGet(static::FILTERS_KEY_NAME);
 
@@ -152,12 +155,23 @@ class DatagridDateGroupingBuilder
             'not_nullable_field' => $notNullableField,
             'joined_column' => $dateFieldName,
             'joined_table' => $dateFieldTableAlias,
+            'options' => [
+                'field_options' => [
+                    'choices' => [
+                        'day' => 'Day',
+                        'month' => 'Month',
+                        'quarter' => 'Quarter',
+                        'year' => 'Year',
+                    ]
+                ],
+                'default_value' => 'Day'
+            ]
         ];
         if (!array_key_exists(static::DATE_PERIOD_FILTER, $filters['columns'])) {
             $filters['columns'][static::DATE_PERIOD_FILTER] = [
                 'label' => 'oro.report.datagrid.column.time_period.label',
                 'type' => 'datetime',
-                'data_name' => $this->getCalendarDateFieldReferenceString(),
+                'data_name' => sprintf('%s.%s', $dateFieldTableAlias, $dateFieldName),
             ];
         }
 
@@ -187,9 +201,17 @@ class DatagridDateGroupingBuilder
         $filters = $config->offsetGet(static::FILTERS_KEY_NAME);
         $filters['columns'][SkipEmptyPeriodsFilter::NAME] = [
             'type' => SkipEmptyPeriodsFilter::NAME,
-            'data_name' => $this->getCalendarDateFieldReferenceString(),
+            'data_name' => $notNullableField,
             'label' => 'oro.report.filter.skip_empty_periods.label',
-            'not_nullable_field' => $notNullableField,
+            'options' => [
+                'field_options' => [
+                    'choices' => [
+                        'No',
+                        'Yes'
+                    ]
+                ],
+                'default_value' => 'Yes'
+            ]
         ];
         $filters['default'][SkipEmptyPeriodsFilter::NAME] = ['value' => 1];
         $config->offsetSet(static::FILTERS_KEY_NAME, $filters);
@@ -224,11 +246,9 @@ class DatagridDateGroupingBuilder
     protected function changeSortersSection(DatagridConfiguration $config)
     {
         $sorters = $config->offsetGet(static::SORTERS_KEY_NAME);
-        $sorters['columns'][static::CALENDAR_DATE_COLUMN_ALIAS] = [
-            'data_name' => $this->getCalendarDateFieldReferenceString(),
-        ];
         $sorters['columns'][static::CALENDAR_DATE_GRID_COLUMN_NAME] = [
-            'data_name' => $this->getCalendarDateFieldReferenceString(),
+            'data_name' => static::CALENDAR_DATE_GRID_COLUMN_NAME,
+            'apply_callback' => ['@oro_filter.date_grouping_filter', 'applyOrderBy']
         ];
         if (!array_key_exists('default', $sorters)) {
             $sorters['default'] = [];
@@ -251,7 +271,7 @@ class DatagridDateGroupingBuilder
         $source = $config->offsetGet(static::SOURCE_KEY_NAME);
         $from = $source['query']['from'][0];
         $newFrom = [
-            'alias' => DateGroupingFilter::CALENDAR_TABLE,
+            'alias' => 'calendarDate',
             'table' => $this->calendarDateClass,
         ];
         $source['query']['from'][0] = $newFrom;
@@ -272,21 +292,6 @@ class DatagridDateGroupingBuilder
             $newLeftJoins[] = $join;
         }
         $source['query']['join']['left'] = $newLeftJoins;
-        array_unshift($source['query']['select'], $this->getCalenderSelectProperty());
-        $config->offsetSet(static::SOURCE_KEY_NAME, $source);
-    }
-
-    /**
-     * Add group by for calendarDate.date, which is required by postgresql
-     *
-     * @param DatagridConfiguration $config
-     */
-    protected function changeGroupBySection(DatagridConfiguration $config)
-    {
-        $source = $config->offsetGet(static::SOURCE_KEY_NAME);
-        $groupBy = explode(',', $source['query']['groupBy']);
-        $groupBy[] = 'calendarDate.date';
-        $source['query']['groupBy'] = implode(',', $groupBy);
         $config->offsetSet(static::SOURCE_KEY_NAME, $source);
     }
 
@@ -310,7 +315,7 @@ class DatagridDateGroupingBuilder
      */
     protected function getCalendarDateFieldReferenceString()
     {
-        return sprintf('%s.date', DateGroupingFilter::CALENDAR_TABLE);
+        return sprintf('%s.date', 'calendarDate');
     }
 
     /**
