@@ -5,20 +5,43 @@ namespace Oro\Bundle\QueryDesignerBundle\Form\Type;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormEvent;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 
 class GroupingType extends AbstractType
 {
     const NAME = 'oro_query_designer_grouping';
+
+    /** @var Manager */
+    protected $manager;
+
+    /**
+     * @param Manager $manager
+     */
+    public function __construct(Manager $manager)
+    {
+        $this->manager = $manager;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $options = [
+            'required'            => true,
+            'page_component_name' => 'grouping-field-choice',
+        ];
+
+        $metadata = $this->manager->getMetadataForGrouping();
+        if (isset($metadata['include'])) {
+            $options['include_fields'] = $metadata['include'];
+        }
+        if (isset($metadata['exclude'])) {
+            $options['exclude_fields'] = $metadata['exclude'];
+        }
+
         $builder
-            ->add('columnNames', 'oro_field_choice', array('required' => true));
+            ->add('columnNames', 'oro_field_choice', $options);
     }
 
     /**

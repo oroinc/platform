@@ -94,20 +94,11 @@ class WorkflowDefinitionController extends Controller
         $form = $this->get('oro_workflow.form.workflow_definition');
         $form->setData($workflowDefinition);
 
-        $entityFields = [];
-        if (null !== $workflowDefinition->getRelatedEntity()) {
-            /* @var $provider EntityWithFieldsProvider */
-            $provider = $this->get('oro_workflow.entity_field_list_provider');
-            $entityFields = $provider->getFields(false, false, true, false, true, true);
-        }
-
         return [
             'form' => $form->createView(),
             'entity' => $workflowDefinition,
-            'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
             'delete_allowed' => true,
             'translateLinks' => $translateLinks,
-            'entityFields' => $entityFields,
             'availableDestinations' => DestinationPageResolver::AVAILABLE_DESTINATIONS,
         ];
     }
@@ -183,7 +174,6 @@ class WorkflowDefinitionController extends Controller
 
         return [
             'entity' => $workflowDefinition,
-            'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
             'translateLinks' => $translateLinks,
             'variables' => $workflow->getVariables(true),
             'edit_allowed' => $this->isEditable($workflowDefinition)

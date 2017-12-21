@@ -1,0 +1,174 @@
+{
+  "data": [
+    {
+      "type": "entitystructures",
+      "id": "Oro_Bundle_UserBundle_Entity_User",
+      "attributes": {
+        "label": "User",
+        "pluralLabel": "Users",
+        "alias": "user",
+        "pluralAlias": "users",
+        "className": "Oro\\Bundle\\UserBundle\\Entity\\User",
+        "icon": "fa-user",
+        "options": {
+          "auditable": true
+        },
+        "routes": {
+          "name": "oro_user_index",
+          "view": "oro_user_view"
+        },
+        "fields": [
+          {
+            "label": "Id",
+            "name": "id",
+            "type": "integer",
+            "options": {
+              "configurable": true
+            }
+          },
+          {
+            "label": "First name",
+            "name": "firstName",
+            "type": "string",
+            "options": {
+              "configurable": true,
+              "auditable": true
+            }
+          },
+          {
+            "label": "Created At",
+            "name": "createdAt",
+            "type": "datetime"
+          },
+          {
+            "label": "Updated At",
+            "name": "updatedAt",
+            "type": "datetime"
+          },
+          {
+            "label": "Groups",
+            "name": "groups",
+            "relationType": "manyToMany",
+            "relatedEntityName": "Oro\\Bundle\\UserBundle\\Entity\\Group",
+            "options": {
+              "configurable": true,
+              "auditable": true
+            }
+          },
+          {
+            "label": "Roles",
+            "name": "roles",
+            "relationType": "manyToMany",
+            "relatedEntityName": "Oro\\Bundle\\UserBundle\\Entity\\Role",
+            "options": {
+              "configurable": true,
+              "auditable": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "entitystructures",
+      "id": "Oro_Bundle_UserBundle_Entity_Role",
+      "attributes": {
+        "label": "Role",
+        "pluralLabel": "Roles",
+        "alias": "userrole",
+        "pluralAlias": "userroles",
+        "className": "Oro\\Bundle\\UserBundle\\Entity\\Role",
+        "icon": null,
+        "routes": {
+          "name": "oro_user_role_index",
+          "view": "oro_user_role_update"
+        },
+        "fields": [
+          {
+            "label": "Id",
+            "name": "id",
+            "type": "integer",
+            "options": {
+              "configurable": true
+            }
+          },
+          {
+            "label": "Role",
+            "name": "role",
+            "type": "string",
+            "options": {
+              "configurable": true
+            }
+          },
+          {
+            "label": "Roles (Groups)",
+            "name": "Oro\\Bundle\\UserBundle\\Entity\\Group::roles",
+            "relationType": "manyToMany",
+            "relatedEntityName": "Oro\\Bundle\\UserBundle\\Entity\\Group"
+          },
+          {
+            "label": "Users",
+            "name": "users",
+            "relationType": "manyToMany",
+            "relatedEntityName": "Oro\\Bundle\\UserBundle\\Entity\\User",
+            "options": {
+              "configurable": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "entitystructures",
+      "id": "Oro_Bundle_UserBundle_Entity_Group",
+      "attributes": {
+        "label": "Group",
+        "pluralLabel": "Groups",
+        "alias": "usergroup",
+        "pluralAlias": "usergroups",
+        "className": "Oro\\Bundle\\UserBundle\\Entity\\Group",
+        "icon": null,
+        "options": {
+          "auditable": true
+        },
+        "routes": {
+          "name": "oro_user_group_index"
+        },
+        "fields": [
+          {
+            "label": "Id",
+            "name": "id",
+            "type": "integer",
+            "options": {
+              "configurable": true
+            }
+          },
+          {
+            "label": "Name",
+            "name": "name",
+            "type": "string",
+            "options": {
+              "configurable": true,
+              "virtual": true,
+              "auditable": true
+            }
+          },
+          {
+            "label": "Groups (Users)",
+            "name": "Oro\\Bundle\\UserBundle\\Entity\\User::groups",
+            "relationType": "manyToMany",
+            "relatedEntityName": "Oro\\Bundle\\UserBundle\\Entity\\User"
+          },
+          {
+            "label": "Roles",
+            "name": "roles",
+            "relationType": "manyToMany",
+            "relatedEntityName": "Oro\\Bundle\\UserBundle\\Entity\\Role",
+            "options": {
+              "configurable": true
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

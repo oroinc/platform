@@ -75,7 +75,7 @@ define(function(require) {
             this.auditFilter._updateTooltipVisibility(changedToValueMode ? '' : 'value');
             if (changedToValueMode) {
                 var selectedField = this.$('input.select').inputWidget('val');
-                var conditions = this.getChoiceInputWidget().getApplicableConditions(selectedField);
+                var conditions = this.subview('choice-input').getApplicableConditions(selectedField);
                 if (_.contains(['date', 'datetime'], conditions.type)) {
                     this.$el.addClass('date-condition-type');
                 }

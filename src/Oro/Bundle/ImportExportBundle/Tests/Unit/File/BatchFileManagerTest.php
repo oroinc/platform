@@ -15,12 +15,20 @@ class BatchFileManagerTest extends \PHPUnit_Framework_TestCase
         $reader
             ->expects($this->once())
             ->method('initializeByContext')
-            ->with(new Context(['filePath' => 'test.csv']));
+            ->with(new Context([
+                Context::OPTION_FILE_PATH => 'test.csv',
+                Context::OPTION_DELIMITER => ';',
+                Context::OPTION_ENCLOSURE => '|',
+            ]));
 
         $reader
             ->expects($this->exactly(3))
             ->method('read')
-            ->with(new Context(['filePath' => 'test.csv']))
+            ->with(new Context([
+                Context::OPTION_FILE_PATH => 'test.csv',
+                Context::OPTION_DELIMITER => ';',
+                Context::OPTION_ENCLOSURE => '|',
+            ]))
             ->willReturnOnConsecutiveCalls([1, 2], [3, 4], false);
         $reader
             ->expects($this->once())
@@ -44,6 +52,10 @@ class BatchFileManagerTest extends \PHPUnit_Framework_TestCase
         $batchFileManager = new BatchFileManager($fileManagerMock, 1);
         $batchFileManager->setReader($reader);
         $batchFileManager->setWriter($writer);
+        $batchFileManager->setConfigurationOptions([
+            Context::OPTION_DELIMITER => ';',
+            Context::OPTION_ENCLOSURE => '|',
+        ]);
         $splittedFiles = $batchFileManager->splitFile('test.csv');
         $this->assertCount(2, $splittedFiles);
     }

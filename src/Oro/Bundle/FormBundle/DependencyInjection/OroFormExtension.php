@@ -23,6 +23,11 @@ class OroFormExtension extends Extension
         $loader->load('importexport.yml');
         $loader->load('services.yml');
 
+        if (isset($config['wysiwyg']['html_allowed_elements'])) {
+            $definition = $container->getDefinition('oro_form.provider.html_tag_provider');
+            $definition->replaceArgument(0, $config['wysiwyg']['html_allowed_elements']);
+        }
+
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
 }

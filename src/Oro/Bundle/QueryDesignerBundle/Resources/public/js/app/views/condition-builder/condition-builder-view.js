@@ -257,13 +257,24 @@ define(function(require) {
         },
 
         /**
-         * Enables/disables a criteria in the list of condition builder
+         * Enables/disables the criteria in the list of condition builder
          *
          * @param {string} criteriaName
          * @param {boolean} isEnabled
          */
         toggleCriteria: function(criteriaName, isEnabled) {
             this.$criteriaList.find('[data-criteria="' + criteriaName + '"]').toggleClass('disabled', !isEnabled);
+        },
+
+        /**
+         * Applies options update for the criteria in the list of condition builder
+         *
+         * @param {string} criteriaName
+         * @param {Object} optionsUpdate
+         */
+        updateCriteriaOptions: function(criteriaName, optionsUpdate) {
+            var $criteria = this.$criteriaList.find('[data-criteria="' + criteriaName + '"]');
+            _.extend($criteria.data('options'), optionsUpdate);
         },
 
         _initCriteriaList: function() {

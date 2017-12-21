@@ -368,8 +368,8 @@ define(function(require) {
      * @param {string|Array.<string>} module name of AMD module or list of modules
      */
     $.validator.loadMethod = function(module) {
-        tools.loadModules($.makeArray(module), function(validators) {
-            _.each(validators, function(args) {
+        tools.loadModules($.makeArray(module), function() {
+            _.each(arguments, function(args) {
                 $.validator.addMethod.apply($.validator, args);
             });
         });

@@ -7,6 +7,7 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
+    var CustomsetFieldChoiceView = require('oroentity/js/app/views/customset-field-choice-view');
     var ChoiceFilter = require('oro/filter/choice-filter');
     var MultiSelectFilter = require('oro/filter/multiselect-filter');
     var activityConditionTemplate = require('tpl!oroactivitylist/templates/activity-condition.html');
@@ -14,6 +15,20 @@ define(function(require) {
     ActivityConditionView = FieldConditionView.extend({
         TYPE_CHOICE_ENTITY: '$activity',
         template: activityConditionTemplate,
+        choiceSelectionTemplate: '<span class="entity-field-path"><span></span><b><%=text %></b></span>',
+        choiceInputData: [{
+            text: __('oro.entity.field_choice.fields'),
+            children: [
+                {
+                    id: '$createdAt',
+                    text: __('oro.activitylist.created_at.label')
+                }, {
+                    id: '$updatedAt',
+                    text: __('oro.activitylist.updated_at.label')
+                }
+            ]
+        }],
+
         getDefaultOptions: function() {
             var defaultOptions = ActivityConditionView.__super__.getDefaultOptions.call(this);
             return _.extend({}, defaultOptions, {
@@ -26,18 +41,15 @@ define(function(require) {
             });
         },
 
-        render: function() {
-            this.$fieldsLoader = $(this.options.fieldsLoaderSelector);
-
+        initialize: function(options) {
+            ActivityConditionView.__super__.initialize.call(this, options);
             _.extend(this.options.fieldChoice, {
-                entity: this.TYPE_CHOICE_ENTITY,
-                data: _.object([this.TYPE_CHOICE_ENTITY], [this._createTypeChoiceEntityData()]),
-                select2ResultsCallback: this.fieldChoiceResultsCallback.bind(this),
                 applicableConditionsCallback: this.applicableConditionsCallback.bind(this)
             });
+        },
 
-            ActivityConditionView.__super__.render.call(this);
-            this._updateFieldChoice();
+        onChoiceInputReady: function(provider) {
+            ActivityConditionView.__super__.onChoiceInputReady.call(this, provider);
 
             var data = $.extend(true, {
                 criterion: {
@@ -98,24 +110,12 @@ define(function(require) {
             var newEntity = this.TYPE_CHOICE_ENTITY;
 
             if (oldEntity !== newEntity) {
-                this.getChoiceInputWidget().setValue('');
+                this.subview('choice-input').setValue('');
                 this.$filterContainer.empty();
                 if (this.filter) {
                     this.filter.reset();
                 }
             }
-
-            this.getChoiceInputWidget().updateData(newEntity, this.$fieldsLoader.data('fields'));
-        },
-
-        _updateFieldChoice: function() {
-            var data = this.$fieldsLoader.data('fields');
-            if (this.TYPE_CHOICE_ENTITY in data) {
-                return;
-            }
-            data[this.TYPE_CHOICE_ENTITY] = this._createTypeChoiceEntityData();
-            this.$fieldsLoader.data('fields', data);
-            this.getChoiceInputWidget().updateData(this.TYPE_CHOICE_ENTITY, data);
         },
 
         fieldChoiceResultsCallback: function(results) {
@@ -156,30 +156,6 @@ define(function(require) {
             return result;
         },
 
-        _createTypeChoiceEntityData: function() {
-            var fieldsIndex = {
-                $createdAt: {
-                    label: __('oro.activitylist.created_at.label'),
-                    name: '$createdAt',
-                    type: 'datetime',
-                    entity: this.TYPE_CHOICE_ENTITY
-                },
-                $updatedAt: {
-                    label: __('oro.activitylist.updated_at.label'),
-                    name: '$updatedAt',
-                    type: 'datetime',
-                    entity: this.TYPE_CHOICE_ENTITY
-                }
-            };
-            return {
-                fields: _.values(fieldsIndex),
-                fieldsIndex: fieldsIndex,
-                label: '',
-                name: this.TYPE_CHOICE_ENTITY,
-                plural_label: ''
-            };
-        },
-
         _getFilterCriterion: function() {
             var filter = {
                 filter: this.filter.name,
@@ -197,7 +173,7 @@ define(function(require) {
                     activityType: this.typeFilter.getValue(),
                     filter: filter,
                     entityClassName: $(this.options.entitySelector).val(),
-                    activityFieldName: this.getChoiceInputValue()
+                    activityFieldName: this.getColumnName()
                 }
             };
         },
@@ -216,6 +192,12 @@ define(function(require) {
             }
         },
 
+        getApplicableConditions: function() {
+            return {
+                type: 'datetime'
+            };
+        },
+
         _collectValue: function() {
             var value = ActivityConditionView.__super__._collectValue.call(this);
             return _.omit(value, 'columnName');
@@ -227,6 +209,19 @@ define(function(require) {
 
         setActivityTypes: function(values) {
             this.typeFilter.setValue({value: values});
+        },
+
+        initChoiceInputView: function() {
+            var fieldChoiceView = new CustomsetFieldChoiceView({
+                autoRender: true,
+                el: this.$choiceInput,
+                select2: _.extend({}, this.options.fieldChoice.select2, {
+                    data: this.choiceInputData,
+                    formatSelectionTemplate: this.choiceSelectionTemplate
+                })
+            });
+
+            return $.when(fieldChoiceView);
         }
     });
 

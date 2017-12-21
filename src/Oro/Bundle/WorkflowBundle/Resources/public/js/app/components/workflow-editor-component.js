@@ -19,6 +19,7 @@ define(function(require) {
     var StepEditView = require('../views/step/step-edit-view');
     var StepModel = require('../models/step-model');
     var workflowModelFactory = require('../../tools/workflow-model-factory');
+    var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
     var DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     /**
@@ -28,28 +29,6 @@ define(function(require) {
      * @augments WorkflowViewerComponent
      */
     WorkflowEditorComponent = WorkflowViewerComponent.extend(/** @lends WorkflowEditorComponent.prototype */{
-
-        /**
-         * @inheritDoc
-         */
-        initViews: function($el, flowchartOptions) {
-            this.workflowManagementView = new WorkflowManagementView({
-                el: $el,
-                stepsEl: '.workflow-definition-steps-list-container',
-                model: this.model,
-                entityFields: this.options.entityFields
-            });
-            this.historyManager = new HistoryNavigationComponent({
-                observedModel: this.model,
-                _sourceElement: $el.find('.workflow-history-container')
-            });
-            this.workflowManagementView.render();
-            if (this.flowchartEnabled) {
-                this.FlowchartWorkflowView = FlowchartEditorWorkflowView;
-            }
-            WorkflowEditorComponent.__super__.initViews.apply(this, arguments);
-        },
-
         /**
          * @inheritDoc
          */
@@ -63,8 +42,41 @@ define(function(require) {
             'requestRemoveTransition model': 'removeTransition',
             'requestCloneTransition model': 'cloneTransition',
             'requestEditTransition model': 'openManageTransitionForm',
-            'change:entity model': 'resetWorkflow',
+            'change:entity model': 'onEntityChange',
             'saveWorkflow model': 'saveConfiguration'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        initViews: function($el, flowchartOptions) {
+            this._deferredInit();
+            var providerOptions = {
+                filterPreset: 'workflow'
+            };
+            if ('entity' in this.options) {
+                providerOptions.rootEntity = _.result(this.options.entity, 'entity');
+            }
+            EntityStructureDataProvider.createDataProvider(providerOptions, this).then(function(provider) {
+                this.entityFieldsProvider = provider;
+                this.workflowManagementView = new WorkflowManagementView({
+                    autoRender: true,
+                    el: $el,
+                    stepsEl: '.workflow-definition-steps-list-container',
+                    model: this.model,
+                    entityFieldsProvider: provider
+                });
+                this.historyManager = new HistoryNavigationComponent({
+                    observedModel: this.model,
+                    _sourceElement: $el.find('.workflow-history-container')
+                });
+                if (this.flowchartEnabled) {
+                    this.FlowchartWorkflowView = FlowchartEditorWorkflowView;
+                }
+                this._resolveDeferredInit();
+            }.bind(this));
+
+            WorkflowEditorComponent.__super__.initViews.apply(this, arguments);
         },
 
         /**
@@ -106,15 +118,16 @@ define(function(require) {
             }
 
             var transitionEditView = new TransitionEditFormView({
-                'model': transition,
-                'workflow': this.model,
-                'step_from': stepFrom,
-                'step_to': stepTo,
-                'entity_select_el': this.workflowManagementView.getEntitySelect(),
-                'workflowContainer': this.workflowManagementView.$el
+                autoRender: true,
+                model: transition,
+                workflow: this.model,
+                entityFieldsProvider: this.entityFieldsProvider,
+                step_from: stepFrom,
+                step_to: stepTo,
+                entity: this.workflowManagementView.getEntitySelectValue(),
+                workflowContainer: this.workflowManagementView.$el
             });
             transitionEditView.on('transitionAdd', this.addTransition, this);
-            transitionEditView.render();
         },
 
         /**
@@ -200,6 +213,11 @@ define(function(require) {
                 model.destroy();
             });
             confirm.open();
+        },
+
+        onEntityChange: function(model, value) {
+            this.entityFieldsProvider.setRootEntityClassName(value);
+            this.resetWorkflow();
         },
 
         /**

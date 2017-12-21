@@ -2,17 +2,20 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
-use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
-use Oro\Bundle\ImportExportBundle\File\FileManager;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 
 abstract class AbstractImportHandler extends AbstractHandler
 {
+    /**
+     * @var array
+     */
+    protected $configurationOptions = [];
+
     /**
      * @param string $process
      * @param string $jobName
@@ -50,6 +53,7 @@ abstract class AbstractImportHandler extends AbstractHandler
         }
         $this->batchFileManager->setReader($reader);
         $this->batchFileManager->setWriter($writer);
+        $this->batchFileManager->setConfigurationOptions($this->configurationOptions);
 
         return $this->batchFileManager->splitFile($this->getImportingFileName());
     }
@@ -103,6 +107,14 @@ abstract class AbstractImportHandler extends AbstractHandler
     public function setImportingFileName($fileName)
     {
         $this->importingFileName = $fileName;
+    }
+
+    /**
+     * @param array $options
+     */
+    public function setConfigurationOptions(array $options)
+    {
+        $this->configurationOptions = $options;
     }
 
     /**

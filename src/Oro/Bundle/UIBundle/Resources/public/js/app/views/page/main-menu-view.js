@@ -79,7 +79,7 @@ define([
          */
         hideDropdownScroll: function($link) {
             var $scrollable = $link.closest('.dropdown-menu-wrapper__scrollable');
-            if (!$scrollable.length) {
+            if (!$scrollable.length || $scrollable.parent().hasClass('accordion')) {
                 return;
             }
             $scrollable.addClass('hidden');
@@ -265,6 +265,7 @@ define([
                     .removeClass('active');
                 item.addClass('active');
                 item.parents('.dropdown').addClass('active');
+                item.parents('.accordion-group').addClass('active');
             }
         },
 

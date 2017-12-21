@@ -216,6 +216,9 @@ class ScrollDataTest extends \PHPUnit_Framework_TestCase
         $expectedFieldNameData = $expectedData = $initialData;
         $expectedData[ScrollData::DATA_BLOCKS][0][ScrollData::SUB_BLOCKS][0][ScrollData::DATA][] = $html;
 
+        $expectedData0 = $initialData;
+        $expectedData0[ScrollData::DATA_BLOCKS][0][ScrollData::SUB_BLOCKS][0][ScrollData::DATA][0] = $html;
+
         $fieldName = 'someFieldName';
         $expectedFieldNameData[ScrollData::DATA_BLOCKS][0][ScrollData::SUB_BLOCKS][0][ScrollData::DATA][$fieldName]
             = $html;
@@ -227,6 +230,13 @@ class ScrollDataTest extends \PHPUnit_Framework_TestCase
                 'expectedId' => 1,
                 'initialData' => $initialData,
                 'expectedData' => $expectedData
+            ],
+            [
+                'html' => $html,
+                'fieldName' => 0,
+                'expectedId' => 0,
+                'initialData' => $initialData,
+                'expectedData' => $expectedData0
             ],
             [
                 'html' => $html,

@@ -11,16 +11,22 @@ parameters:
 services:
     oro_query_designer.form.type.field_choice:
         class: %oro_query_designer.form.type.field_choice.class%
+        arguments:
+            - '@translator'
         tags:
             - { name: form.type, alias: oro_field_choice }
 
     oro_query_designer.form.type.date_field_choice:
         class: %oro_query_designer.form.type.date_field_choice.class%
+        arguments:
+            - '@translator'
         tags:
             - { name: form.type, alias: oro_date_field_choice }
 
     oro_query_designer.form.type.function_choice:
         class: %oro_query_designer.form.type.function_choice.class%
+        arguments:
+            - '@oro_query_designer.query_designer.manager'
         tags:
             - { name: form.type, alias: oro_function_choice }
 
@@ -41,6 +47,8 @@ services:
 
     oro_query_designer.form.type.query_designer_grouping:
         class: %oro_query_designer.form.type.query_designer_grouping.class%
+        arguments:
+            - '@oro_query_designer.query_designer.manager'
         tags:
             - { name: form.type, alias: oro_query_designer_grouping }
 
