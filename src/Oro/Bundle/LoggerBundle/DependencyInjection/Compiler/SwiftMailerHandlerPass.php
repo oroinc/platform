@@ -5,6 +5,7 @@ namespace Oro\Bundle\LoggerBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * This compiler pass hides detailed logs handler's nested handler for all channels
@@ -43,6 +44,6 @@ class SwiftMailerHandlerPass implements CompilerPassInterface
         $container->setDefinition($pluginName, $definitionDecorator);
 
         $container->getDefinition($mailer)
-            ->addMethodCall('registerPlugin', [$container->getDefinition($pluginName)]);
+            ->addMethodCall('registerPlugin', [new Reference($pluginName)]);
     }
 }
