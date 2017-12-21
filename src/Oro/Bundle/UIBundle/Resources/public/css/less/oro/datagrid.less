@@ -289,17 +289,25 @@
     text-shadow:0 1px 0 darken(#ffffff,5%);
   }
 }
-.table-hover tbody .grid-info:hover >  td {
-  background-color: #fff;
-}
 .grid-info-frame {
   margin: 0 0 20px;
 }
-.table-hover tbody tr > td {
-  background-color: #fff;
-}
-.table-hover tbody tr.row-selected > td {
-  background-color: inherit;
+.table-hover tbody {
+  .grid-info:hover >  td {
+    background-color: #fff;
+  }
+
+  tr:hover .renderable {
+    background-color: @cellLoadingBackground;
+  }
+
+  tr > td {
+    background-color: #fff;
+  }
+
+  tr.row-selected > td {
+    background-color: inherit;
+  }
 }
 .grid {
   .open-tr td {
