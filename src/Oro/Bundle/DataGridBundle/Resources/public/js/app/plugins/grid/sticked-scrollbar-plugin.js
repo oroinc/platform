@@ -182,7 +182,6 @@ define(function(require) {
             var $scrollbar = this.domCache.$scrollbar;
             var containerWidth = this.domCache.$container.width();
             var containerLeftOffset = this.domCache.$container.offset().left;
-            var documentWidth = this.domCache.$document.width();
             $scrollbar.removeAttr('style');
 
             $scrollbar.css({
