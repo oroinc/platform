@@ -50,15 +50,20 @@ services:
     oro_menu_acl_extension:
         class: %oro_menu.factory.acl_extension.class%
         arguments:
-            - '@router'
+            - '@router.default'
             - '@security.authorization_checker'
             - '@oro_security.class_authorization_checker'
             - '@oro_security.token_accessor'
-        calls:
-            - [ setCache, [ '@oro_menu.cache' ] ]
-            - [ setLogger, [ '@logger' ] ]
+            - '@logger'
         tags:
             - { name: oro_navigation.menu_extension, priority: 100 }
+
+    oro_navigation.menu_extension.routing:
+        class: 'Oro\Bundle\NavigationBundle\Menu\RoutingAwareMenuFactoryExtension'
+        arguments:
+            - '@router.default'
+        tags:
+            - { name: oro_navigation.menu_extension, priority: 110 }
 
     oro_menu.factory:
         class: '%oro_menu.factory.class%'
@@ -509,22 +514,6 @@ services:
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_navigation_configuration' ] ]
-
-    oro_navigation.event_listener.container_listener:
-        class: Oro\Bundle\NavigationBundle\EventListener\ContainerListener
-        arguments:
-            - '@oro_navigation.configuration.provider'
-            - '@oro_navigation.config.dumper'
-        tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
-
-    oro_navigation.config.dumper:
-        class: Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper
-        public: false
-        arguments:
-            - '%kernel.cache_dir%'
-            - '%kernel.debug%'
-            - 'oro_navigation'
 
     oro_navigation.event_listener.scope_grid_listener:
         class: 'Oro\Bundle\NavigationBundle\EventListener\MenuGridListener'

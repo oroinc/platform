@@ -64,8 +64,8 @@ class HealthCheckController implements Controller, HealthCheckerAwareInterface
             ->addOption(
                 '--check',
                 null,
-                InputOption::VALUE_NONE,
-                'Check behat tests without executing'
+                InputOption::VALUE_OPTIONAL,
+                'cs,fixtures'
             );
     }
 
@@ -74,10 +74,11 @@ class HealthCheckController implements Controller, HealthCheckerAwareInterface
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$input->getOption('check')) {
+        if (false === $input->getParameterOption('--check')) {
             return null;
         }
 
+        $this->filterHealthCheckers($input);
         $input->setOption('dry-run', true);
 
         foreach ($this->healthCheckers as $healthChecker) {
@@ -86,5 +87,25 @@ class HealthCheckController implements Controller, HealthCheckerAwareInterface
 
         $this->dispatcher->addSubscriber($this->resultPrinterSubscriber);
         $this->resultInterpreter->registerResultInterpretation($this->resultInterpretation);
+    }
+
+    /**
+     * Filter health checkers according to parameter value
+     * @param InputInterface $input
+     * @return void
+     */
+    private function filterHealthCheckers(InputInterface $input)
+    {
+        if (null === $input->getOption('check')) {
+            return;
+        }
+
+        $healthCheckers = array_map('trim', explode(',', $input->getOption('check')));
+
+        foreach ($this->healthCheckers as $key => $healthChecker) {
+            if (!in_array($healthChecker->getName(), $healthCheckers)) {
+                unset($this->healthCheckers[$key]);
+            }
+        }
     }
 }

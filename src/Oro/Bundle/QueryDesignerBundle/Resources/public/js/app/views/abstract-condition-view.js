@@ -25,14 +25,13 @@ define(function(require) {
 
         events: function() {
             var events = {};
-            events['changed .' + this.options.choiceInputClass] = '_onChoiceInputChanged';
             events['change .' + this.options.filterContainerClass] = '_onFilterChange';
             return events;
         },
 
         constructor: function(options) {
             this.options = _.defaults({}, options, this.getDefaultOptions());
-            _.extend(this, _.defaults(_.pick(options, 'value')));
+            _.extend(this, _.pick(options, 'value'));
             AbstractConditionView.__super__.constructor.call(this, options);
         },
 
@@ -43,37 +42,47 @@ define(function(require) {
         },
 
         render: function() {
+            var choiceInputView = this.subview('choice-input');
+            if (choiceInputView) {
+                this.stopListening(choiceInputView);
+                this.removeSubview('choice-input');
+            }
             AbstractConditionView.__super__.render.call(this);
 
             this.$choiceInput = this.$('.' + this.options.choiceInputClass);
-            this.initChoiceInput();
+            this._deferredRender();
+            this.initChoiceInputView().then(this.onChoiceInputReady.bind(this));
+
+            return this;
+        },
+
+        onChoiceInputReady: function(choiceInputView) {
+            this.subview('choice-input', choiceInputView);
+            this.listenTo(choiceInputView, 'change', this._onChoiceInputChanged);
             this.$filterContainer = this.$('.' + this.options.filterContainerClass);
 
             var choiceInputValue = this._getInitialChoiceInputValue();
 
             if (choiceInputValue) {
-                this._deferredRender();
                 this.setChoiceInputValue(choiceInputValue);
                 this.once('filter-appended', function() {
                     this._resolveDeferredRender();
                 }.bind(this));
                 this._renderFilter(choiceInputValue);
+            } else {
+                this._resolveDeferredRender();
             }
-
-            return this;
         },
 
-        _onChoiceInputChanged: function(e, fieldId) {
+        _onChoiceInputChanged: function(selectedItem) {
             var choiceInputValue = this._getInitialChoiceInputValue();
-            if (!fieldId) {
+            if (!selectedItem) {
                 this._removeFilter();
-                e.stopPropagation();
-            } else if (choiceInputValue !== fieldId) {
+            } else if (choiceInputValue !== selectedItem.id) {
                 $(':focus').blur();
                 // reset current value on field change
                 this.setValue({});
-                this._renderFilter(fieldId);
-                e.stopPropagation();
+                this._renderFilter(selectedItem.id);
             }
         },
 
@@ -116,7 +125,7 @@ define(function(require) {
         },
 
         _matchApplicable: function(applicable, criteria) {
-            var hierarchy = this.options.hierarchy[criteria.entity];
+            var hierarchy = this.options.hierarchy[criteria.entity] || [];
             return _.find(applicable, function(item) {
                 return _.every(item, function(value, key) {
                     if (key === 'entity' && hierarchy.length) {
@@ -172,7 +181,7 @@ define(function(require) {
 
             if (!this._hasEmptyFilter()) {
                 value = {
-                    columnName: this.getChoiceInputValue(),
+                    columnName: this.getColumnName(),
                     criterion: this._getFilterCriterion()
                 };
             }
@@ -210,8 +219,12 @@ define(function(require) {
             } else {
                 deferred.resolve();
             }
-            this.getChoiceInputWidget().setValue(name);
+            this._setChoiceInputValue(name);
             return deferred.promise();
+        },
+
+        _setChoiceInputValue: function(value) {
+            this.subview('choice-input').setValue(value);
         },
 
         getValue: function() {
@@ -224,26 +237,21 @@ define(function(require) {
         },
 
         getChoiceInputValue: function() {
-            return this.$choiceInput.inputWidget('val');
+            return this.subview('choice-input').getValue();
+        },
+
+        getColumnName: function() {
+            return this.getChoiceInputValue();
         },
 
         /**
-         * Inits particular jQuery widget on $choiceInput element
+         * Inits particular view on $choiceInput element
          *
+         * @return {Promise.<Backbone.View>}
          * @abstract
          */
-        initChoiceInput: function() {
-            throw new Error('method `initChoiceInput` should be implemented in a descendant');
-        },
-
-        /**
-         * Returns jQuery widget that was bound to $choiceInput element
-         *
-         * @return {jQuery.Widget}
-         * @abstract
-         */
-        getChoiceInputWidget: function() {
-            throw new Error('method `getChoiceInputWidget` should be implemented in a descendant');
+        initChoiceInputView: function() {
+            throw new Error('method `initChoiceInputView` should be implemented in a descendant');
         },
 
         /**

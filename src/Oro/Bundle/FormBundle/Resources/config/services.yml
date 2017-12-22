@@ -25,6 +25,8 @@ services:
 
     oro_form.provider.html_tag_provider:
         class: %oro_form.provider.html_tag_provider.class%
+        arguments:
+            - []
 
     oro_form.count_query_optimization_listener:
         class: Oro\Bundle\FormBundle\EventListener\CountQueryOptimizationListener

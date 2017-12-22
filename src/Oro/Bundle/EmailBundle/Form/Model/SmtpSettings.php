@@ -61,7 +61,7 @@ class SmtpSettings
      */
     public function __toString()
     {
-        return $this->getHost();
+        return (string)$this->getHost();
     }
 
     /**

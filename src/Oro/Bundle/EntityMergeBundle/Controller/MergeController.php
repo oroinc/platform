@@ -35,7 +35,7 @@ class MergeController extends Controller
     public function mergeMassActionAction($gridName, $actionName)
     {
         /** @var MassActionDispatcher $massActionDispatcher */
-        $massActionDispatcher = $this->get('oro_datagrid.mass_action.dispatcher');
+        $massActionDispatcher = $this->get('oro_entity_merge.mass_action.dispatcher');
 
         $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $this->getRequest());
 

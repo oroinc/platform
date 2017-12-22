@@ -1,0 +1,15 @@
+services:
+    oro_behat_statistic.criteria_array_collection:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\CriteriaArrayCollection
+        arguments:
+            - '%oro_behat_statistic.criteria%'
+
+    oro_behat_statistic.avg_strategy.simple:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\AvgStrategy\SimpleAvgStrategy
+        tags:
+            - { name: 'avg_strategy', strategy: 'AVG' }
+
+    oro_behat_statistic.avg_strategy.avg_plus_std:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\AvgStrategy\MysqlAvgPlusStdStrategy
+        tags:
+            - { name: 'avg_strategy', strategy: 'AVG+STD', platform: 'mysql' }

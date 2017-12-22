@@ -16,4 +16,9 @@ interface HealthCheckerInterface extends EventSubscriberInterface
      * @return string[]
      */
     public function getErrors();
+
+    /**
+     * @return string
+     */
+    public function getName();
 }

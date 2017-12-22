@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ReportBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -11,6 +13,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ReportChartSchemaType extends AbstractType
 {
+    const VIEW_MODULE_NAME = 'ororeport/js/app/views/report-chart-data-schema-view';
+
     /**
      * @var Manager
      */
@@ -51,10 +55,18 @@ class ReportChartSchemaType extends AbstractType
 
             $builder->add(
                 $schemaOptions['name'],
-                'text',
+                $schemaOptions['default_type'] !== 'boolean' ? 'text' : 'checkbox',
                 $fieldOptions
             );
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['attr']['data-page-component-view'] = self::VIEW_MODULE_NAME;
     }
 
     /**

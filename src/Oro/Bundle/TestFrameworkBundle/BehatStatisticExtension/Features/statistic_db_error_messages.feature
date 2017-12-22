@@ -48,9 +48,10 @@ Feature: Statistic db error messages
         connection:
           driver: pdo_sqlite
           path: test.db
-        branch_name_env: CHANGE_BRANCH
-        target_branch_env: CHANGE_TARGET
-        build_id_env: BUILD_ID
+        criteria:
+          branch_name: CHANGE_BRANCH_TEST
+          target_branch: CHANGE_TARGET_TEST
+          build_id: BUILD_ID_TEST
       """
     And "test.db" sqlite database exists
     When I run "behat -s ping_pong -f statistic -o std -f pretty -o std"

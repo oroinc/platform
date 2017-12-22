@@ -5,7 +5,7 @@ services:
     oro_behat_statistic.specification.suite_configuration_divider:
         class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\SuiteConfigurationDivider
         arguments:
-            - '@oro_behat_statistic.feature_repository'
+            - '@oro_behat_statistic.feature_avg_time_provider.registry'
             - '@oro_behat_statistic.specification.feature_path_locator'
 
     oro_behat_statistic.suite.suite_configuration_registry:
@@ -29,15 +29,10 @@ services:
         arguments: ['%oro_behat_statistic.connection%']
 
     oro_behat_statistic.feature_repository:
-        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\Repository\FeatureStatisticRepository
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\StatisticRepository
         arguments:
             - '@oro_behat_statistic.database.connection'
         calls:
             - [setClassName, ['Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatistic']]
-            - [setBuildCountLimit, ['%oro_behat_statistic.count_build_limit%']]
-            -
-                - setCriteria
-                -
-                    -
-                        git_branch: '%oro_behat_statistic.branch_name%'
-                        git_target: '%oro_behat_statistic.target_branch%'
+        tags:
+            - { name: 'avg_strategy_aware' }

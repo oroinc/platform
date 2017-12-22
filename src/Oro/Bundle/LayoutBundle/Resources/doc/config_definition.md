@@ -1,21 +1,22 @@
-# Config definition
+# Config Definition
 
-Table of content
-----------------
+## Table of Contents
+
 
 * [Assets](#assets)
 * [Images](#images)
-* [RequireJS definition](#requirejs-definition)
+* [RequireJS Definition](#requirejs-definition)
 * [Page Templates](#page-templates)
 
 ## Overview
 
-If you want to use different configuration for your **theme**, such as **assets**, **images**, **requirejs** or **page_templates**, you need to put it to `layout/{theme_name}/config` folder.
+If you want to use a different configuration for your **theme**, such as **assets**, **images**, **requirejs** or **page_templates**, you need to put it to the `layout/{theme_name}/config` folder.
 
 ## Assets
 
 ### Configuration
-Assets configuration file should be placed in `layout/{theme_name}/config` folder and named `assets.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/config/assets.yml`
+
+Assets configuration file should be placed in the `layout/{theme_name}/config` folder and named `assets.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/config/assets.yml`
 
 **Example:**
 
@@ -42,7 +43,7 @@ layout:
     ...
 ```
 
-**Example how to create 2 or more outputs:**
+**Example of how to create 2 or more outputs:**
 
 ```yaml
 #DemoBundle/Resources/views/layouts/first_theme/config/assets.yml
@@ -82,7 +83,8 @@ layout:
 ## Images
 
 ### Configuration
-Images configuration file should be placed in `layout/{theme_name}/config` folder and named `images.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/config/images.yml`
+
+Images configuration file should be placed in the `layout/{theme_name}/config` folder and named `images.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/config/images.yml`
 
 **Example:**
 
@@ -103,16 +105,19 @@ types:
         max_number: ~
 ```
 
-## RequireJS definition
+## RequireJS Definition
 
 ### Configuration
-The configuration file should be placed in `layout/{theme_name}/config` folder and named `requirejs.yml`, for example `DemoBundle/Resources/views/layouts/base/config/requirejs.yml`
 
-#### RequireJS configuration reference
-LayoutBundle is depends on [RequireJSBundle](../../../RequireJSBundle/README.md),
-that's why you can use configuration reference described in [Require.js config generation](../../../RequireJSBundle/README.md#requirejs-config-generation).
+The configuration file should be placed in the `layout/{theme_name}/config` folder and named `requirejs.yml`, for example `DemoBundle/Resources/views/layouts/base/config/requirejs.yml`
 
-#### Additional configuration reference
+#### RequireJS Configuration Reference
+
+LayoutBundle depends on [RequireJSBundle](../../../RequireJSBundle/README.md),
+that is why you can use the configuration reference described in [Require.js config generation](../../../RequireJSBundle/README.md#requirejs-config-generation).
+
+#### Additional Configuration Reference
+
 | Option | Description | Required |
 |------- |-------------|----------|
 | `build_path` | Relative path from theme scripts folder (`web/js/layout/{theme_name}/`) | no |
@@ -138,16 +143,17 @@ config:
         'oroui/js/jquery-extend': 'bundles/oroui/js/jquery-extend.js'
 ```
 
-When you execute a command in console:
+When you execute the following command in the console:
 ```
 php app/console oro:requirejs:build
 ```
-Your result is `web/js/layout/base/scripts.min.js`
+The result should be `web/js/layout/base/scripts.min.js`
 
-### RequireJS config provider
+### RequireJS Config Provider
+
 [RequireJSBundle](../../../RequireJSBundle/README.md) has its own config provider `oro_requirejs.provider.requirejs_config`
-and **used in theme by default** (`web/js/oro.min.js` minimized scripts by default).
-If you want use in theme your own minimized scripts you need to define block type `requires` with `provider_alias: { '@value': 'oro_layout_requirejs_config_provider' }`
+and **is used in the theme by default** (`web/js/oro.min.js` minimized scripts by default).
+If you want use your own minimized scripts in the theme, define the `requires` block type  with the `provider_alias: { '@value': 'oro_layout_requirejs_config_provider' }`
 
 **Example:**
 
@@ -164,20 +170,23 @@ requirejs_scripts:
 `oro_layout_requirejs_config_provider` is alias of `oro_layout.provider.requirejs_config`
 
 ## Page Templates
+
 A **page_template** is a collection of files that expand the visual presentation for one or more route names.
 
 ### Configuration
-Page templates configuration file should be placed in `layout/{theme_name}/config` folder and named `page_templates.yml`, 
+
+The page templates configuration file should be placed in the `layout/{theme_name}/config` folder and named `page_templates.yml`, 
 for example `DemoBundle/Resources/views/layouts/first_theme/config/page_templates.yml`.
-All page template **layout updates** stored in `layout/{theme_name}/{route_name}/page_template/{page_template_KEY}/` folder, 
+All page template **layout updates** should be stored in the `layout/{theme_name}/{route_name}/page_template/{page_template_KEY}/` folder, 
 for example `DemoBundle/Resources/views/layouts/first_theme/demo_first_route_name/page_template/custom/layout.yml`.
 
-#### Additional configuration reference
+#### Additional Configuration Reference
+
 | Option | Description | Required |
 |------- |-------------|----------|
 | `label` | Label will be displayed in the page template management UI. | yes |
 | `route_name` | Route name identifier, used in the path where **layout updates** stored. | yes |
-| `key` | Key used in the path where **layout updates** stored. | yes |
+| `key` | Key used in the path where **layout updates** are stored. | yes |
 | `description` | Description will be displayed in the page template management UI. | no |
 | `screenshot` | Screenshot for preview. This will be displayed in the page template management UI. | no |
 | `enabled` | Enable/Disable page template | no |
@@ -207,9 +216,7 @@ titles:
     demo_second_route_name: Second route name title
 ```
 
-_NOTICE:_ Pay attention that page templates inherit parent themes. 
-You can simple override existing page template, just add **layout update** file to page template path in your child theme, 
-for example if `first_theme` is parent theme of `second_theme` you need to put page template to 
+_NOTICE:_ Be aware that page templates inherit parent themes. To override the existing page template, add the **layout update** file to the page template path in your child theme. For example, if `first_theme` is the parent theme of `second_theme`, put the page template into the
 `DemoBundle/Resources/views/layouts/second_theme/demo_first_route_name/page_template/custom/layout.yml`.
 
-Also you can disable some page templates adding `enabled: false`.
+To disable some page templates, add `enabled: false`.

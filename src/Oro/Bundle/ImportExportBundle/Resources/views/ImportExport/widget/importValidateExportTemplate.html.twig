@@ -1,0 +1,254 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% set importProcessorAliasesToConfirmMessage = [] %}
+
+<div class="widget-content import-widget-content">
+    {% if configsWithForm|length > 1 %}
+
+        <ul class="nav nav-tabs">
+            {% for configWithForm in configsWithForm %}
+                {% set config = configWithForm.configuration %}
+                {% set shortEntityName = config.entityClass|basename %}
+
+                {% if config.importEntityLabel is defined and config.importEntityLabel is not empty %}
+                    {% set entityLabel = config.importEntityLabel %}
+                {% else %}
+                    {% set entityLabel = shortEntityName %}
+                {% endif %}
+
+                {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
+
+                <li {% if isActiveEntity %} class="active" {% endif %}>
+                    <a data-toggle="tab" href="#importExport{{ shortEntityName }}">{{ entityLabel }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+
+    {% endif %}
+
+    {% if configsWithForm|length > 1 %}
+    <div class="tab-content">
+    {% endif %}
+
+        {% for configWithForm in configsWithForm %}
+            {% set config = configWithForm.configuration %}
+            {% set form = configWithForm.form.createView() %}
+            {% set shortEntityName = config.entityClass|basename %}
+            {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
+            {% set strategyTooltip = config.importStrategyTooltip ? config.importStrategyTooltip : 'oro.importexport.import.strategy.tooltip' %}
+            {% set importProcessorAliasesToConfirmMessage = importProcessorAliasesToConfirmMessage|merge(config.importProcessorsToConfirmationMessage) %}
+
+            <div id="importExport{{ shortEntityName }}" class="tab-pane fade in {% if isActiveEntity %} active {% endif %}">
+                <div class="alert alert-info import-notice">
+                    <strong>{{ 'oro.importexport.import.importance'|trans }}</strong>:
+                    {{ 'oro.importexport.import.columns_notice'|trans }}
+                    {% if config.importAdditionalNotices is defined %}
+                        {% for importAdditionalNotice in config.importAdditionalNotices %}
+                            {{ importAdditionalNotice|nl2br }}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="form-container">
+                    <form method="post"
+                          data-nohash="true"
+                          id="{{ form.vars.id }}"
+                          name="{{ form.vars.name }}"
+                          action="{{ path('oro_importexport_import_validate_export_template_form', {
+                              entity: config.entityClass,
+                              importJob: config.importJobName,
+                              importValidateJob: config.importValidationJobName,
+                              alias: alias
+                          }) }}"
+                          class="form-horizontal" {{ form_enctype(form) }}
+                    >
+                        {% for key, option in options %}
+                            <input type="hidden" name="options[{{ key }}]" value="{{ option }}" />
+                        {% endfor %}
+
+                        <input type="hidden" name="isValidateJob" value="false" />
+
+                        <fieldset class="form">
+                            <div class="import-file">
+                                {{ form_row(form.file, {'label': 'oro.importexport.import.file'}) }}
+                            </div>
+                            <div {% if form.processorAlias.vars.choices|length <= 1 %}style="display: none;"{% endif %}>
+                                {{ form_row(form.processorAlias, {
+                                    'label': 'oro.importexport.import.strategy',
+                                    'tooltip': strategyTooltip
+                                }) }}
+                            </div>
+                        {{ form_rest(form) }}
+
+                        {% set exportTemplateProcessors = config.exportTemplateProcessorAlias %}
+                        {% set hasExportTemplateProcessor = config.exportTemplateProcessorAlias is not empty %}
+                        {% set isMultipleProcessorsRequired = exportTemplateProcessors is iterable %}
+                            <div class="control-group control-group-file multicurrency-selection-control-group">
+                                <div class="control-label wrap"></div>
+                                <div class="controls">
+                                    {% if hasExportTemplateProcessor %}
+                                        {% if isMultipleProcessorsRequired and exportTemplateProcessors|length > 1 %}
+                                            {% set exportTemplateButtons = [] %}
+
+                                            {% for alias, label in exportTemplateProcessors %}
+                                                {% set exportTemplateButtons = exportTemplateButtons|merge([{
+                                                        'path':'#',
+                                                        'aCss':'icons-holder-text no-hash export-tmpl-btn',
+                                                        'title': label|trans,
+                                                        'iCss':'fa-file-o hide-text',
+                                                        'label': label|trans,
+                                                        'data': {
+                                                            'page-component-module': 'oroui/js/app/components/view-component',
+                                                            'page-component-options': {
+                                                                'view': 'oroimportexport/js/app/views/export-template-button-view',
+                                                                'exportTemplateProcessor': alias,
+                                                                'exportTemplateJob': config.exportTemplateJob|default(null),
+                                                                'routeOptions': options|default({})
+                                                            }|json_encode
+                                                        }
+                                                    }])
+                                                %}
+                                            {% endfor %}
+
+                                            {{ UI.dropdownButton({
+                                                'label': 'oro.importexport.export_template.label'|trans,
+                                                'elements': exportTemplateButtons
+                                            }) }}
+                                        {% else %}
+                                            {{ UI.button({
+                                                'path':'#',
+                                                'aCss':'icons-holder-text no-hash export-tmpl-btn',
+                                                'title': 'oro.importexport.export_template.label'|trans,
+                                                'iCss':'fa-file-o hide-text',
+                                                'label': 'oro.importexport.export_template.label'|trans,
+                                                'data': {
+                                                    'page-component-module': 'oroui/js/app/components/view-component',
+                                                    'page-component-options': {
+                                                        'view': 'oroimportexport/js/app/views/export-template-button-view',
+                                                        'exportTemplateProcessor': config.exportTemplateProcessorAlias,
+                                                        'exportTemplateJob': config.exportTemplateJob|default(null),
+                                                        'routeOptions': options|default({})
+                                                    }|json_encode
+                                                }
+                                            }) }}
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                    {{ oro_form_js_validation(form) }}
+                </div>
+            </div>
+        {% endfor %}
+
+    {% if configsWithForm|length > 1 %}
+    </div>
+    {% endif %}
+
+    <div class="widget-actions">
+        <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+        <button class="btn btn-primary" type="button" id="validate_import_button">{{ 'oro.importexport.import.validation_label'|trans }}</button>
+        <button class="btn btn-success" type="button" id="import_button">{{ 'oro.importexport.import.label'|trans }}</button>
+    </div>
+
+    <script type="text/javascript">
+        require(['underscore', 'orotranslation/js/translator', 'oroui/js/widget-manager', 'oroui/js/messenger', 'oroui/js/standart-confirmation'],
+            function(_, __, WidgetManager, Messenger, DeleteConfirmation) {
+                var importProcessorsToConfirmationMessages = {{ importProcessorAliasesToConfirmMessage|json_encode|raw }};
+
+                var resetWidgetFormToActiveTabForm = function(widget) {
+                    var $tabContent = getCurrentlyActiveTabContent();
+
+                    widget.form = $tabContent.find('form');
+                };
+
+                var getCurrentlyActiveTabContent = function(){
+                    return $('.tab-pane.active');
+                };
+
+                var getCurrentlyChosenProcessorAlias = function() {
+                    var form = getCurrentlyActiveTabContent().find('form');
+
+                    return form.find("select[name='oro_importexport_import[processorAlias]']").val();
+                };
+
+                // this needs to be done because select2 does not work well with hidden selects in mobile version
+                var refreshActiveInputWidgets = function(){
+                    getCurrentlyActiveTabContent().find('select').each(function(){
+                        if (this.isRefreshed) {
+                            return;
+                        }
+
+                        $(this).inputWidget('refresh');
+                        this.isRefreshed = true; // so that each select is not refreshed every time
+                    });
+                };
+
+                refreshActiveInputWidgets();
+
+                $('#import_button').click(function(){
+                    var $form = getCurrentlyActiveTabContent().find('form');
+
+                    $form.find('input[name=isValidateJob]').val(false);
+
+                    var currentlyChosenProcessorAlias = getCurrentlyChosenProcessorAlias();
+
+                    if (importProcessorsToConfirmationMessages[currentlyChosenProcessorAlias] !== undefined) {
+                        var confirm = new DeleteConfirmation({
+                            content: importProcessorsToConfirmationMessages[currentlyChosenProcessorAlias]
+                        });
+
+                        confirm.on('ok', function () {
+                            $form.submit();
+                        });
+
+                        confirm.open();
+                    } else {
+                        $form.submit();
+                    }
+                });
+
+                $('#validate_import_button').click(function(){
+                    var $form = getCurrentlyActiveTabContent().find('form');
+                    $form.find('input[name=isValidateJob]').val(true);
+
+                    $form.submit();
+                });
+
+                WidgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+                    resetWidgetFormToActiveTabForm(widget);
+
+                    $('.nav-tabs a').on('shown .bs.tab', function() {
+                        resetWidgetFormToActiveTabForm(widget);
+                        refreshActiveInputWidgets();
+                    });
+
+                    widget._onContentLoad = function (content) {
+                        if (_.has(content, 'success')) {
+                            if(content.success) {
+                                var message = _.has(content, 'message') ?
+                                    content.message :
+                                    __('oro.importexport.import.success.message');
+                                Messenger.notificationFlashMessage('success', message);
+                            } else {
+                                Messenger.notificationFlashMessage('error', __('oro.importexport.import.form_fail.message'));
+                            }
+                            this.remove();
+                        } else {
+                            delete this.loading;
+                            this.disposePageComponents();
+                            this.setContent(content, true);
+                            this._triggerContentLoadEvents();
+                        }
+                    };
+
+                    widget._onContentLoadFail = function() {
+                        Messenger.notificationFlashMessage('error', __('oro.importexport.import.fail.message'));
+                        this.remove();
+                    }
+                });
+
+            });
+    </script>
+</div>

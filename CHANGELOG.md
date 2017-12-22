@@ -1,21 +1,65 @@
 ## 2.6.0 (Unreleased)
 
+### Added
+#### EntityBundle
+* Added event `oro_entity.structure.options` (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/events.md#entity-structure-options-event))
+* Added provider `Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider` for getting data of entities structure (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/entity_structure_data_provider.md))
+* Added JS `EntityModel`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/models/entity-model.js) (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-model.md))
+* Added JS `EntityStructureDataProvider`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js) (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md))
+* Added `FieldChoiceView`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/views/field-choice-view.js) Backbone view, as replacement for jQuery widget `oroentity.fieldChoice`.
+#### QueryDesignerBundle
+* Added `FunctionChoiceView`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/QueryDesignerBundle/Resources/public/js/app/views/function-choice-view.js) Backbone view, as replacement for jQuery widget `oroquerydesigner.functionChoice`.
+#### SegmentBundle
+* Added `SegmentChoiceView`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/SegmentBundle/Resources/public/js/app/views/segment-choice-view.js) Backbone view, as replacement for jQuery widget `orosegment.segmentChoice`.
+#### UIBundle
+* Added JS `Registry`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/UIBundle/Resources/public/js/app/services/registry/registry.js) (see [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/client-side/registry.md))
+
+### Changed
+
+#### SegmentBundle
+* Refactored `SegmentComponent` js-component to use `EntityStructureDataProvider`.
+#### SidebarBundle
+* In the `Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry` class, the return type in the `getWidgetDefinitions` and `getWidgetDefinitionsByPlacement` methods were changed from `ArrayCollection` to `array`.
+#### UIBundle
+* The `loadModules` method of the `'oroui/js/tools'` js-module now returns a promise object.
+* The default value for the `keepElement` property of a `Chaplin.View` has changed from `false` to `null` when no element is provided, and from `false` to `true` when the element is provided in the options.
+#### WorkflowBundle
+* Refactored the `WorkflowEditorComponent` and `WorkflowViewerComponent` js-components to use `EntityStructureDataProvider`.
+
+### Deprecated
+#### EntityBundle
+* JS util `EntityFieldsUtil` is deprecated in favor of `EntityStructureDataProvider`.
+
 ### Removed
 #### AttachmentBundle
-* The parameter `oro_attachment.listener.file_listener.class` was removed form the service container
+* The parameter `oro_attachment.listener.file_listener.class` was removed form the service container.
 #### CommentBundle
-* The parameter `oro_comment.comment_lifecycle_listener.class` was removed form the service container
+* The parameter `oro_comment.comment_lifecycle_listener.class` was removed form the service container.
+#### EntityBundle
+* A jQuery widget `oroentity.fieldChoice` is replaced with the `FieldChoiceView` Backbone view.
+* A jQuery widget `oroentity.fieldsLoader` is removed. Please use `EntityStructureDataProvider` instead.
 #### ImapBundle
 * The parameter `oro_imap.listener.user_email_origin.class` was removed form the service container
+#### QueryDesignerBundle
+* A jQuery widget `oroquerydesigner.functionChoice` is replaced with the `FunctionChoiceView` Backbone view.
 #### ReminderBundle
-* The parameter `oro_reminder.event_listener.reminder_listener.class` was removed form the service container
+* The parameter `oro_reminder.event_listener.reminder_listener.class` was removed form the service container.
+#### SegmentBundle
+* A jQuery widget `orosegment.segmentChoice` is replaced with the `SegmentChoiceView` Backbone view.
+#### SidebarBundle
+* The parameter `oro_sidebar.widget_definition.registry.class` was removed form the service container.
+* The service `oro_sidebar.request.handler` was removed.
 #### SSOBundle
-* The parameter `oro_sso.event_listener.user_email_change_listener.class` was removed form the service container
-#### WorkflowBundle
-* The parameter `oro_workflow.listener.process_data_serialize.class` was removed form the service container
-* The parameter `oro_workflow.listener.workflow_data_serialize.class` was removed form the service container
+* The parameter `oro_sso.event_listener.user_email_change_listener.class` was removed form the service container.
+#### UIBundle
+* Removed the `loadModule` methods from `'oroui/js/tools'` js-module.  Please use `loadModules` instead.
 
-## 2.5.0 (Unreleased)
+#### WorkflowBundle
+* The parameter `oro_workflow.listener.process_data_serialize.class` was removed form the service container.
+* The parameter `oro_workflow.listener.workflow_data_serialize.class` was removed form the service container.
+
+## 2.5.0 (2017-11-30)
+[Show detailed list of changes](incompatibilities-2-5.md)
 
 ### Added
 #### ActivityListBundle

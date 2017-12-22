@@ -1,12 +1,14 @@
 define(function(require) {
     'use strict';
 
+    // @export orosegment/js/app/views/segment-condition-view
+
     var SegmentConditionView;
+    var $ = require('jquery');
     var _ = require('underscore');
     var SegmentFilter = require('orosegment/js/filter/segment-filter');
     var AbstractConditionView = require('oroquerydesigner/js/app/views/abstract-condition-view');
-
-    require('orosegment/js/segment-choice');
+    var SegmentChoiceView = require('orosegment/js/app/views/segment-choice-view');
 
     SegmentConditionView = AbstractConditionView.extend({
         getDefaultOptions: function() {
@@ -16,21 +18,22 @@ define(function(require) {
             });
         },
 
-        initChoiceInput: function() {
-            this.$choiceInput.segmentChoice(this.options.segmentChoice);
+        initChoiceInputView: function() {
+            var choiceInput = new SegmentChoiceView(_.extend({
+                autoRender: true,
+                el: this.$choiceInput,
+                entity: this.options.rootEntity
+            }, this.options.segmentChoice));
+            return $.when(choiceInput);
         },
 
-        getChoiceInputWidget: function() {
-            return this.$choiceInput.segmentChoice('instance');
-        },
-
-        render: function() {
-            SegmentConditionView.__super__.render.call(this);
+        onChoiceInputReady: function(choiceInputView) {
+            SegmentConditionView.__super__.onChoiceInputReady.call(this, choiceInputView);
             if (this.filter) {
                 var filterValue = this._getFilterValue();
                 var label = this.filter.getSelectedLabel();
                 if (filterValue && label) {
-                    this.getChoiceInputWidget().setSelectedData({
+                    choiceInputView.setData({
                         id: 'segment_' + filterValue.value,
                         text: label
                     });
@@ -42,7 +45,7 @@ define(function(require) {
             var segmentId = fieldId.split('_')[1];
             var filterId = this._getSegmentFilterId();
 
-            var data = this.$choiceInput.inputWidget('data');
+            var data = this.subview('choice-input').getData();
             if (_.has(data, 'id')) {
                 data.value = segmentId;
                 // pre-set data
@@ -87,8 +90,8 @@ define(function(require) {
             return value;
         },
 
-        getChoiceInputValue: function() {
-            var entity = this.$choiceInput.data('entity');
+        getColumnName: function() {
+            var entity = this.subview('choice-input').entity;
             return this.filter ? _.result(this.filter.entity_ids, entity) : null;
         }
     });

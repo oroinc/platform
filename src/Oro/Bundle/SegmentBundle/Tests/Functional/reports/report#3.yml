@@ -18,7 +18,7 @@ response:
         -
           c1: admin
           id: 1
-          view_link: %oro_default_prefix%user/view/1
+          view_link: '%oro_default_prefix%user/view/1'
 export: []
 export_filter:
         oro_segment_grid_$id[_filter][c1][value]: 321admin123

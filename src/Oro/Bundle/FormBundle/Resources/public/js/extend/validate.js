@@ -368,8 +368,8 @@ define(function(require) {
      * @param {string|Array.<string>} module name of AMD module or list of modules
      */
     $.validator.loadMethod = function(module) {
-        tools.loadModules($.makeArray(module), function(validators) {
-            _.each(validators, function(args) {
+        tools.loadModules($.makeArray(module), function() {
+            _.each(arguments, function(args) {
                 $.validator.addMethod.apply($.validator, args);
             });
         });
@@ -385,7 +385,11 @@ define(function(require) {
                 $placement.find('.' + this.errorClass);
                 label.appendTo($placement);
             } else {
-                $placement.next('.' + this.errorClass).remove();
+                if (this.settings) {
+                    $placement.next('.' + this.settings.errorClass).remove();
+                } else {
+                    $placement.next('.' + this.errorClass).remove();
+                }
                 label.insertAfter($placement);
             }
         },

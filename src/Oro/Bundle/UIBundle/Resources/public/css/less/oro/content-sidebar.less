@@ -1,14 +1,16 @@
 @sidebarHeaderHeight: 31px;
-@sidebarHorizontalPadding: 10px;
-@sidebarWidth: 313px;
+@sidebarHorizontalPadding: 12px;
+@sidebarWidth: 320px;
 @sidebarMinimizedWidth: 33px;
-
 @sidebarBorderColor: #f2f2f2;
+@sidebarMinHeight: 90vh;
+
+@sidebarContentMinWidth: 288px;
 
 .content-with-sidebar {
     &--sidebar {
         position: absolute;
-        border-top: 1px solid @sidebarBorderColor;
+        border: 1px solid @sidebarBorderColor;
         width: @sidebarWidth;
         overflow: auto;
         background: #fff;
@@ -27,8 +29,8 @@
     }
 
     &--header {
-        height: @sidebarHeaderHeight;
         border-bottom: 1px solid @sidebarBorderColor;
+        height: @sidebarHeaderHeight;
         padding: 5px @sidebarHorizontalPadding 4px;
         margin-bottom: @sidebarHorizontalPadding;
     }
@@ -68,8 +70,10 @@
     }
 
     &--content {
-        border-left: 1px solid @sidebarBorderColor;
         margin-left: @sidebarWidth;
+        min-width: @sidebarContentMinWidth;
+
+        .forScreen(992px, width, calc(100% ~"-" @sidebarMinimizedWidth));
 
         &.content-sidebar-minimized {
             margin-left: @sidebarMinimizedWidth;
@@ -79,31 +83,41 @@
             background-color: #f1f1f1;
 
             .content {
-                padding: 15px 15px 0;
+                padding: @contentPadding @contentPadding 0;
             }
         }
 
         .responsive-section {
-            margin: 0 -20px;
-            padding-right: 20px;
+            margin: 0 -@contentPadding;
+            padding-right: @contentPadding;
 
             .form-horizontal {
                 padding: @contentPadding 0;
             }
         }
     }
+
+    &--sidebar {
+        .sidebar-items {
+            padding: 0 @sidebarHorizontalPadding;
+        }
+    }
+
 }
 
 .mobile-version .content-with-sidebar {
     &--container {
         margin-top: -10px;
+        .safe-area-padding(0);
 
         .scrollspy.container-fluid {
             margin-top: 0;
         }
     }
     &--sidebar {
-        max-width: 320px;
+        max-width: @sidebarWidth;
+        min-height: @sidebarMinHeight;
+        overflow: visible;
 
         &.content-sidebar-maximized {
             width: 100%;

@@ -11,6 +11,8 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Cli\SuiteConfigurationFilterController
         arguments:
             - '@oro_behat_statistic.suite.suite_configuration_registry'
+            - '%suite.configurations%'
+            - '%oro_behat_statistic.suite_sets%'
         tags:
 #            priority should be under 700 to make it load after Behat\Behat\Gherkin\Cli\FilterController
             - { name: cli.controller, priority: 650 }
@@ -41,7 +43,7 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Cli\AvailableSuiteSetsController
         arguments:
             - '@oro_behat_statistic.suite.suite_configuration_registry'
-            - '@oro_behat_statistic.feature_repository'
+            - '@oro_behat_statistic.feature_avg_time_provider.registry'
             - '@oro_behat_statistic.specification.feature_path_locator'
         tags:
             - { name: cli.controller, priority: 550 }

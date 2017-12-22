@@ -1,8 +1,7 @@
-Fields Configuration
-====================
+## Fields Configuration
 
-Table of Contents
------------------
+# Table of Contents
+
  - [Header](#header)
  - [Order](#order)
  - [Identity](#identity)
@@ -10,10 +9,9 @@ Table of Contents
  - [Full](#full)
 
 
-Header
-------
+# Header
 
-This option used to configure custom column header, field label is used by default.
+This option is used to configure a custom column header. A field label is used by default.
 
 ```php
     use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -33,11 +31,9 @@ This option used to configure custom column header, field label is used by defau
 
 ```
 
+# Order
 
-Order
------
-
-This option used to configure custom column order.
+This option is used to configure a custom column order.
 
 ```php
     use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -58,11 +54,9 @@ This option used to configure custom column order.
 ```
 
 
-Identity
---------
+# Identity
 
-Fields with this option are used to identify (search) entity. It is possible to use multiple identity fields for one
-entity.
+The fields with this option are used to identify (search) the entity. It is possible to use multiple identity fields for one entity.
 
 ```php
     use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -83,10 +77,9 @@ entity.
 ```
 
 
-Excluded
---------
+# Excluded
 
-Fields with this option are not exported.
+The fields with this option cannot be exported.
 
 ```php
     use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -107,11 +100,10 @@ Fields with this option are not exported.
 ```
 
 
-Full
-----
+# Full
 
-All fields of the related entity are exported. Fields with [Excluded](#excluded) option are skipped.
-If **full** is set to *false* (default value), only fields with identity will be exported. 
+All the fields of the related entity are exported. The fields with the [Excluded](#excluded) option are skipped.
+If **full** is set to *false* (the default value), only the fields with an identity will be exported. 
 
 ```php
     use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;

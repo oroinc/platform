@@ -80,7 +80,6 @@ services:
 
     oro_layout.theme_extension.resource_provider.theme:
         class: Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider
-        public: false
         arguments:
             - '@oro_layout.loader'
             - '@oro_layout.cache.block_view_cache'
@@ -144,25 +143,11 @@ services:
     oro_layout.request.listener.theme:
         class: %oro_layout.request.listener.theme.class%
         arguments:
-            - %oro_layout.default_active_theme%
+            - '%oro_layout.default_active_theme%'
         calls:
-            - [setDebug, [%oro_layout.debug%]]
+            - [setDebug, ['%oro_layout.debug%']]
         tags:
             - { name: kernel.event_subscriber }
-
-    oro_layout.config.dumper:
-        class: Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper
-        public: false
-        lazy: true
-        arguments: [ %kernel.cache_dir%, %kernel.debug%, 'oro_layout_resource' ]
-
-    oro_layout.event_listener.container_listener:
-        class: Oro\Bundle\LayoutBundle\EventListener\ContainerListener
-        arguments:
-            - '@oro_layout.theme_extension.resource_provider.theme'
-            - '@oro_layout.config.dumper'
-        tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
     oro_layout.layout_block_view.cache:
         public: false

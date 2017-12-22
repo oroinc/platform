@@ -35,7 +35,7 @@ class FakeRestResponse implements RestResponseInterface
      */
     public function __toString()
     {
-        return $this->getMessage();
+        return (string)$this->getMessage();
     }
 
     /**

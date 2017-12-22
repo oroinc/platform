@@ -12,7 +12,7 @@ Table of Contents
 configuration. 
   Those parties are:
   
-  **Buttons** - User interface component under witch you can deliver your custom actions for user interaction.
+  **Buttons** - User interface component under which you can deliver your custom actions for user interaction.
   
   **Operations** - configured user interaction elements (buttons, links or even further: forms, pages) with customizable
 execution logic;

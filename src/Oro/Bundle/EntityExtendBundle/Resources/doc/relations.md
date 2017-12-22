@@ -25,6 +25,7 @@ A new relationship may be created between two entities when at least the entity 
 | **Extendable entity**     | Bidirectional and unidirectional many-to-many, <br>bidirectional and unidirectional many-to-one, <br>bidirectional one-to-many| Many-to-many and many-to-one <br>relationships, unidirectional only |
 | **Non-extendable entity** | None              | None                                  |
 
+**Note**: All custom/extend relationships of type `One-To-Many` and `Many-To-One` will have [cascade: detach](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/working-with-associations.html#transitive-persistence-cascade-operations) enabled by default.
 
 Many-To-One, Unidirectional
 ---------------------------

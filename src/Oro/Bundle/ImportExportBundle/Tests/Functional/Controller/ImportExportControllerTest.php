@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Controller;
 
 use Symfony\Component\Filesystem\Filesystem;
@@ -6,12 +7,12 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
-use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 
 class ImportExportControllerTest extends WebTestCase
 {
@@ -30,7 +31,7 @@ class ImportExportControllerTest extends WebTestCase
             $this->getUrl('oro_importexport_export_instant', ['processorAlias' => 'oro_account'])
         );
 
-        $this->assertJsonResponseSuccess();
+        $this->assertJsonResponseSuccessOnExport();
 
         $organization = $this->getTokenAccessor()->getOrganization();
         $organizationId = $organization ? $organization->getId() : null;
@@ -60,7 +61,7 @@ class ImportExportControllerTest extends WebTestCase
             ])
         );
 
-        $this->assertJsonResponseSuccess();
+        $this->assertJsonResponseSuccessOnExport();
 
         $organization = $this->getTokenAccessor()->getOrganization();
         $organizationId = $organization ? $organization->getId() : null;
@@ -268,6 +269,35 @@ class ImportExportControllerTest extends WebTestCase
         unlink($file . '_formatted');
     }
 
+    public function testImportValidateExportTemplateFormNoAlias()
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_importexport_import_validate_export_template_form')
+        );
+
+        static::assertResponseStatusCodeEquals($this->client->getResponse(), 400);
+    }
+
+    public function testImportValidateExportTemplateFormGetRequest()
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_importexport_import_validate_export_template_form'),
+            [
+                'alias' => 'alias',
+                'entity' => 'entity',
+            ]
+        );
+
+        $response = $this->client->getResponse();
+
+        static::assertResponseStatusCodeEquals($response, 200);
+        static::assertContains('Cancel', $response->getContent());
+        static::assertContains('Validate', $response->getContent());
+        static::assertContains('Import file', $response->getContent());
+    }
+
     /**
      * @return TokenAccessorInterface
      */
@@ -284,12 +314,22 @@ class ImportExportControllerTest extends WebTestCase
         return $this->getContainer()->get('security.token_storage')->getToken()->getUser();
     }
 
-    private function assertJsonResponseSuccess()
+    private function assertJsonResponseSuccessOnExport()
     {
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($result);
         $this->assertCount(1, $result);
         $this->assertTrue($result['success']);
+    }
+
+    private function assertJsonResponseSuccess()
+    {
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertNotEmpty($result);
+        $this->assertCount(2, $result);
+        $this->assertTrue($result['success']);
+        $this->assertContains('message', $result);
     }
 }

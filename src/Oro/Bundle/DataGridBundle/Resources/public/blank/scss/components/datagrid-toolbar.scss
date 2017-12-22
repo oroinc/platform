@@ -61,6 +61,8 @@
 
     .page-size {
         flex-grow: 0;
+        display: flex;
+        align-items: center;
 
         .select2-container {
             min-width: 64px;

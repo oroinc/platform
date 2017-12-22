@@ -48,7 +48,8 @@ class ReportChartSchemaTypeTest extends FormIntegrationTestCase
                     'fieldName' => [
                         'label'    => 'label',
                         'name'     => 'name',
-                        'required' => true
+                        'required' => true,
+                        'default_type' => 'string',
                     ]
                 ]
             ]
@@ -60,7 +61,12 @@ class ReportChartSchemaTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        $fieldChoiceType = new FieldChoiceType();
+        $translator = $this
+            ->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $fieldChoiceType = new FieldChoiceType($translator);
 
         return [
             new PreloadedExtension(

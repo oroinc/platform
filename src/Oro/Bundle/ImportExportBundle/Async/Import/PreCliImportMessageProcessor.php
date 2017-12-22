@@ -2,6 +2,7 @@
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
 use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
@@ -31,7 +32,7 @@ class PreCliImportMessageProcessor extends PreImportMessageProcessorAbstract
             'options' => []
         ], $body);
 
-        $body['options']['batch_size'] = $this->batchSize;
+        $body['options'][Context::OPTION_BATCH_SIZE] = $this->batchSize;
 
         return $body;
     }

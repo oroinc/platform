@@ -255,6 +255,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
             this.options.minimizeTo = $('#dialog-extend-fixed-container');
             if (!this.options.minimizeTo.length) {
                 this.options.minimizeTo = $('<div id="dialog-extend-fixed-container"></div>');
+                this.options.minimizeTo.addClass('ui-dialog-minimize-container');
                 this.options.minimizeTo
                     .css({
                         position: "fixed",

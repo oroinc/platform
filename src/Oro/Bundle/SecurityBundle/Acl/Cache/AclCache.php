@@ -16,6 +16,8 @@ class AclCache extends DoctrineAclCache
 {
     const ENTRY_CLASS = 'Symfony\Component\Security\Acl\Domain\Entry';
 
+    const CACHE_CLEAR_EVENT = 'oro_security.acl_cache.clear';
+
     /**
      * @var CacheProvider
      */
@@ -47,6 +49,14 @@ class AclCache extends DoctrineAclCache
     }
 
     /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
      * Set Underlying cache
      *
      * @param UnderlyingAclCache $underlyingCache
@@ -64,6 +74,10 @@ class AclCache extends DoctrineAclCache
         $this->cache->deleteAll();
         // we should clear underlying cache to avoid generation of wrong ACLs
         $this->underlyingCache->clearCache();
+
+        if ($this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(self::CACHE_CLEAR_EVENT);
+        }
     }
 
     /**

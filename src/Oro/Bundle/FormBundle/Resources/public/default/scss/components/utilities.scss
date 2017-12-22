@@ -11,11 +11,3 @@ label.required em {
 
     @include clearfix();
 }
-
-// Reset styles for select2 from platform styles
-.form-horizontal {
-    .oro-select2 {
-        width: auto;
-        max-width: inherit;
-    }
-}

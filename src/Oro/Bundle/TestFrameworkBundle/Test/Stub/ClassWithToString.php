@@ -20,6 +20,6 @@ class ClassWithToString
      */
     public function __toString()
     {
-        return $this->representation;
+        return (string)$this->representation;
     }
 }

@@ -1,9 +1,8 @@
-Events
-======
+## Events
 
-Table of Contents
------------------
- - [Where to find](#where-to-find)
+# Table of Contents
+
+ - [Where to Find](#where-to-find)
  - [AFTER_ENTITY_PAGE_LOADED](#after-entity-page-loaded)
  - [BEFORE_NORMALIZE_ENTITY](#before-normalize-entity)
  - [AFTER_NORMALIZE_ENTITY](#after-normalize-entity)
@@ -17,66 +16,63 @@ Table of Contents
  - [AFTER_IMPORT_FORMAT_CONVERSION](#after-import-format-conversion)
  - [AFTER_JOB_EXECUTION](#after-job-execution)
 
-Where to find
---------
-All events are available in Oro\Bundle\ImportExportBundle\Event\Events class.
+# Where to Find
 
-AFTER_ENTITY_PAGE_LOADED
-------------------------
-This event occurs after the entity page is loaded in iterator.
-Can be used to modify rows.
+All events are available in the Oro\Bundle\ImportExportBundle\Event\Events class.
 
-BEFORE_NORMALIZE_ENTITY
------------------------
-This event occurs before entity is normalized.
-Can be used to change entity data or prefill normalized data before normalization.
+# AFTER_ENTITY_PAGE_LOADED
 
-AFTER_NORMALIZE_ENTITY
-----------------------
-This event occurs after entity is normalized.
-Can be used to change normalized data.
+This event occurs after the entity page is loaded in the iterator. It is used to modify rows.
 
-BEFORE_DENORMALIZE_ENTITY
--------------------------
-This event occurs before entity is denormalized.
-Can be used to prefill denormalized data.
+# BEFORE_NORMALIZE_ENTITY
 
-AFTER_DENORMALIZE_ENTITY
-------------------------
-This event occurs after entity is denormalized.
-Can be used to change denormalized data.
+This event occurs before the entity is normalized. It is used to change the entity data or prefill the normalized data before normalization.
 
-AFTER_LOAD_ENTITY_RULES_AND_BACKEND_HEADERS
--------------------------------------------
-This event occurs after rules and backend headers are loaded.
-Can be used to modify, add new headers and modify rules.
+# AFTER_NORMALIZE_ENTITY
 
-AFTER_LOAD_TEMPLATE_FIXTURES
-----------------------------
-This event occurs after template fixtures are loaded.
-Can be used to modify fixtures.
+This event occurs after the entity is normalized. It is used to change the normalized data.
 
-BEFORE_EXPORT_FORMAT_CONVERSION
--------------------------------
-This event occurs before data is converted into export format.
-Can be used to modify record before conversion begins.
+# BEFORE_DENORMALIZE_ENTITY
 
-AFTER_EXPORT_FORMAT_CONVERSION
-------------------------------
-This event occurs after data is converted into export format.
-Can be used to modify result after conversion ends.
+This event occurs before the entity is denormalized.
+It is used to prefill the denormalized data.
 
-BEFORE_IMPORT_FORMAT_CONVERSION
--------------------------------
-This event occurs before data is converted into import format.
-Can be used to modify record before conversion begins.
+# AFTER_DENORMALIZE_ENTITY
 
-AFTER_IMPORT_FORMAT_CONVERSION
-------------------------------
-This event occurs after data is converted into export format.
-Can be used to modify result after conversion ends.
+This event occurs after the entity is denormalized.
+It is used to change the denormalized data.
 
-AFTER_JOB_EXECUTION
--------------------
-This event occurs after processing some job.
-Can be used to do some staff after job. For example, clean cache.
+# AFTER_LOAD_ENTITY_RULES_AND_BACKEND_HEADERS
+
+This event occurs after the rules and backend headers are loaded.
+It is used to modify the rules and headers, and add new ones.
+
+# AFTER_LOAD_TEMPLATE_FIXTURES
+
+This event occurs after the template fixtures are loaded.
+It is used to modify the fixtures.
+
+# BEFORE_EXPORT_FORMAT_CONVERSION
+
+This event occurs before the data is converted into the export format.
+It is used to modify the record before the conversion begins.
+
+# AFTER_EXPORT_FORMAT_CONVERSION
+
+This event occurs after the data is converted into the export format.
+It is used to modify the result after the conversion ends.
+
+# BEFORE_IMPORT_FORMAT_CONVERSION
+
+This event occurs before the data is converted into the import format.
+It is used to modify the record before the conversion begins.
+
+# AFTER_IMPORT_FORMAT_CONVERSION
+
+This event occurs after the data is converted into the export format.
+It is used to modify the result after the conversion ends.
+
+# AFTER_JOB_EXECUTION
+
+This event occurs after a job is processed.
+It is used to perform some actions after the job is processed. For example, clean cache.

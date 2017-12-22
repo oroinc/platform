@@ -182,6 +182,8 @@ define(function(require) {
         var close = prototype.close;
         var prepareOpts = prototype.prepareOpts;
         var init = prototype.init;
+        var destroy = prototype.destroy;
+
         prototype.prepareOpts = function(options) {
             if (options.collapsibleResults) {
                 options.populateResults = populateCollapsibleResults;
@@ -228,6 +230,15 @@ define(function(require) {
             this.dropdown.prepend(this.breadcrumbs);
         };
 
+        prototype.destroy = function() {
+            if (this.propertyObserver) {
+                this.propertyObserver.disconnect();
+                delete this.propertyObserver;
+                this.propertyObserver = null;
+            }
+            destroy.call(this);
+        };
+
         prototype.updateBreadcrumbs = function() {
             var breadcrumbs = this.breadcrumbs;
             var opts = this.opts;
@@ -235,8 +246,8 @@ define(function(require) {
             if ($.isFunction(opts.formatBreadcrumbItem) && $.isFunction(opts.breadcrumbs)) {
                 var items = opts.breadcrumbs(this.pagePath);
                 $.each(items, function(i, item) {
-                    var $item = opts.formatBreadcrumbItem(item, {index: i, length: items.length});
-                    $item = $('<li class="select2-breadcrumb-item">' + $item + '</li>');
+                    var itemHTML = opts.formatBreadcrumbItem(item, {index: i, length: items.length});
+                    var $item = $('<li class="select2-breadcrumb-item">' + itemHTML + '</li>');
                     $item.data('select2-data', {pagePath: item.pagePath});
                     breadcrumbs.append($item);
                 });
