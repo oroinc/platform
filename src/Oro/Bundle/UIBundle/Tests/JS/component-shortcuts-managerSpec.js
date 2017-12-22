@@ -111,5 +111,15 @@ define(['underscore'], function(_) {
                 pageComponentOptions: testPageComponentOptions
             });
         });
+
+        it('Get component resolved shortcut data key/attr', function() {
+            componentShortcutsManager.add('test-shortcut-module', testWidgetConfiguration);
+
+            expect(componentShortcutsManager.getAll()['test-shortcut-module'].dataKey)
+                .toEqual('pageComponentTestShortcutModule');
+
+            expect(componentShortcutsManager.getAll()['test-shortcut-module'].dataAttr)
+                .toEqual('data-page-component-test-shortcut-module');
+        });
     });
 });
