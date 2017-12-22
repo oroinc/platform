@@ -12,7 +12,8 @@ define(function(require) {
 
     MultipleEntityComponent = BaseComponent.extend({
         optionNames: BaseComponent.prototype.optionNames.concat([
-            'wid', 'gridName', 'fieldTitles', 'entityName', 'fieldName', 'extraData'
+            'wid', 'addedVal', 'removedVal', 'gridName', 'columnName', 'fieldTitles', 'extraData', 'link', 'entityName',
+            'fieldName'
         ]),
 
         initialize: function() {
@@ -29,8 +30,8 @@ define(function(require) {
             WidgetManager.getWidgetInstance(this.wid, function(widget) {
                 widget.getAction('select', 'adopted', function(selectBtn) {
                     selectBtn.click(function() {
-                        var addedVal = $('#appendRelation').val();
-                        var removedVal = $('#removeRelation').val();
+                        var addedVal = $(self.addedVal).val();
+                        var removedVal = $(self.removedVal).val();
                         var appendedIds = addedVal.length ? addedVal.split(',') : [];
                         var removedIds = removedVal.length ? removedVal.split(',') : [];
                         widget.trigger('completeSelection', appendedIds, self.addedModels, removedIds);
@@ -44,7 +45,7 @@ define(function(require) {
                 $gridContainer: $('[data-wid="' + this.wid + '"]'),
                 gridName: this.gridName,
                 dataField: 'id',
-                columnName: 'assigned',
+                columnName: this.columnName,
                 processCallback: this.onModelSelect.bind(this)
             });
         },
@@ -52,43 +53,52 @@ define(function(require) {
         onModelSelect: function(value, model, listener) {
             var id = model.get('id');
             if (model.get(listener.columnName)) {
-                var label = '';
-                var extraData = [];
-
-                if (!_.isUndefined(this.fieldTitles)) {
-                    for (var i = 0; i < this.fieldTitles.length; i++) {
-                        var field = model.get(this.fieldTitles[i]);
-                        if (field) {
-                            label += field + ' ';
-                        }
-                    }
-                }
-
-                if (!_.isUndefined(this.extraData)) {
-                    for (var j = 0; j < this.extraData.length; j++) {
-                        extraData.push({
-                            'label': this.extraData[j].label,
-                            'value': model.get(this.extraData[j].value)
-                        });
-                    }
-                }
-
                 this.addedModels[id] = new MultipleEntityModel({
                     'id': model.get('id'),
                     'link': routing.generate(
-                        'oro_entity_detailed',
+                        this.link,
                         {
                             id: model.get('id'),
                             entityName: this.entityName,
                             fieldName: this.field_name
                         }
                     ),
-                    'label': label,
-                    'extraData': extraData
+                    'label': this._getLabel(model),
+                    'extraData': this._getExtraData(model)
                 });
             } else if (this.addedModels.hasOwnProperty(id)) {
                 delete this.addedModels[id];
             }
+        },
+
+        _getLabel: function(model) {
+            var label = '';
+
+            if (!_.isUndefined(this.fieldTitles)) {
+                for (var i = 0; i < this.fieldTitles.length; i++) {
+                    var field = model.get(this.fieldTitles[i]);
+                    if (field) {
+                        label += field + ' ';
+                    }
+                }
+            }
+
+            return label;
+        },
+
+        _getExtraData: function(model) {
+            var extraData = [];
+
+            if (!_.isUndefined(this.extraData)) {
+                for (var j = 0; j < this.extraData.length; j++) {
+                    extraData.push({
+                        'label': this.extraData[j].label,
+                        'value': model.get(this.extraData[j].value)
+                    });
+                }
+            }
+
+            return extraData;
         },
 
         dispose: function() {
