@@ -294,7 +294,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                 scrollspy.adjust();
 
                 var fixDialog = 2;
-                var footersHeight = $('.sf-toolbar').height() + $('#footer').height();
+                var footersHeight = ($('.sf-toolbar').height() || 0) + $('#footer').height();
 
                 $('#dialog-extend-fixed-container').css({
                     position: 'fixed',
