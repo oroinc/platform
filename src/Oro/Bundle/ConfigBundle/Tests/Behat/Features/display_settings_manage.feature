@@ -1,7 +1,6 @@
 @regression
 @ticket-BAP-14053
 @automatically-ticket-tagged
-@fixture-OroConfigBundle:cases.yml
 @fixture-OroConfigBundle:custom_report.yml
 @fixture-OroConfigBundle:activities.yml
 Feature: Display settings manage
@@ -33,12 +32,12 @@ Feature: Display settings manage
     And I fill "System Config Form" with:
       | Enable WYSIWYG editor | false |
     And save form
-    When I go to Activities/Cases
-    And press "Create Case"
+    When I go to Activities/Calendar Events
+    And press "Create Calendar event"
     Then I should not see an "WYSIWYG editor" element
 
   Scenario: Change records in grid per page amount
-    When I go to Activities/Cases
+    Given I go to Activities/ Calendar Events
     Then per page amount should be 25
     And records in current page grid should be 25
     When I go to System/Configuration
@@ -46,23 +45,23 @@ Feature: Display settings manage
     And I fill "System Config Form" with:
       | Items per Page by Default | 10 |
     And I save form
-    And I go to Activities/Cases
+    And I go to Activities/ Calendar Events
     Then per page amount should be 10
     And records in current page grid should be 10
 
   Scenario: Make grid header sticky
-    When I go to Activities/Cases
+    Given I go to Activities/ Calendar Events
     Then I see that grid has scrollable header
     When I go to System/Configuration
     And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
       | Lock headers in grids | off |
     And I save form
-    And I go to Activities/Cases
+    And I go to Activities/ Calendar Events
     Then I see that grid header is sticky
 
   Scenario: Disable navigation through grid entity from a view page
-    When I go to Activities/Cases
+    Given I go to Activities/ Calendar Events
     And I click view 1 in grid
     Then I should see an "Entity pagination" element
     When I go to System/Configuration
@@ -70,17 +69,17 @@ Feature: Display settings manage
     And I fill "System Config Form" with:
       | Record Pagination | off |
     And I save form
-    And I go to Activities/Cases
+    And I go to Activities/ Calendar Events
     And click view 1 in grid
     Then I should not see an "Entity pagination" element
 
   Scenario: Change record pagination limit
-    When I go to System/Configuration
+    Given I go to System/Configuration
     And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
       | Record Pagination | on |
     And I save form
-    And I go to Activities/Cases
+    And I go to Activities/ Calendar Events
     And I click view 1 in grid
     Then I should see an "Entity pagination" element
     When I go to System/Configuration
@@ -88,12 +87,12 @@ Feature: Display settings manage
     And I fill "System Config Form" with:
       | Record Pagination limit | 20 |
     And I save form
-    And I go to Activities/Cases
+    And I go to Activities/ Calendar Events
     And I click view 1 in grid
     Then I should not see an "Entity pagination" element
 
   Scenario: Change activity list configuration
-    When I go to Customers/Contacts
+    Given I go to System/ User Management/ Users
     And I click View Charlie in grid
     Then there is 10 records in activity list
     And Activity List must be sorted descending by updated date
@@ -103,9 +102,9 @@ Feature: Display settings manage
       | Sort direction            | Ascending |
       | Items Per Page By Default | 25        |
     And I save form
-    And I go to Customers/Contacts
+    And I go to System/ User Management/ Users
     And click View Charlie in grid
-    Then there is 13 records in activity list
+    Then there is 25 records in activity list
     And Activity List must be sorted ascending by updated date
     When I go to System/Configuration
     And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
@@ -114,7 +113,7 @@ Feature: Display settings manage
       | Sort direction            | Descending   |
       | Items Per Page By Default | 10           |
     And I save form
-    And I go to Customers/Contacts
+    And I go to System/ User Management/ Users
     And click View Charlie in grid
     Then I see following records in activity list with provided order:
       | -1 days |
@@ -147,7 +146,7 @@ Feature: Display settings manage
     And right sidebar is visible
 
   Scenario: Change calendar color settings
-    When I fill "System Config Form" with:
+    Given I fill "System Config Form" with:
       | Event colors    | Apple green, Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black, Lime |
       | Calendar colors | Alizarin Crimson, Beige, Black, Lime, Melrose, Mercury, Apple green, Cornflower Blue, Mauve, Aqua, Aquamarine, Azure |
     And save form
@@ -156,12 +155,12 @@ Feature: Display settings manage
     Then I should see following available "Event Form" colors:
       | Apple green, Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black |
     When I click My Calendar in user menu
-    And click "My Tasks Choose Color Menu"
+    And click "My Calendar Choose Color Menu"
     Then I should see following available "Calendar" colors:
       | Alizarin Crimson, Beige, Black, Lime, Melrose, Mercury, Apple green, Cornflower Blue, Mauve, Aqua, Aquamarine, Azure |
 
   Scenario: Change taxonomy color settings
-    When I go to System/Configuration
+    Given I go to System/Configuration
     And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And fill "System Config Form" with:
       | Taxonomy Colors | Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black, Lime |
@@ -172,7 +171,7 @@ Feature: Display settings manage
       | Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black, Lime |
 
   Scenario: Change reports settings
-    When I go to Reports & Segments/Calendar Events/Test Report
+    Given I go to Reports & Segments/Calendar Events/Test Report
     Then I should not see "Show SQL Query"
     When I go to System/Configuration
     And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar

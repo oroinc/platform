@@ -19,7 +19,7 @@ define(function(require) {
          * @param {Object} shortcut
          */
         add: function(key, shortcut) {
-            var capitalizeKey = '';
+            var capitalizeKey;
 
             if (this.reservedKeys.indexOf(key) !== -1) {
                 throw new Error('Component shortcut `' + key + '` is reserved!');
@@ -29,9 +29,9 @@ define(function(require) {
                 throw new Error('Component shortcut `' + key + '` already exists!');
             }
 
-            _.each(key.split('-'), function(item) {
-                capitalizeKey += _.capitalize(item);
-            });
+            capitalizeKey = _.map(key.split('-'), function(item) {
+                return _.capitalize(item);
+            }).join('');
 
             shortcut.dataKey = 'pageComponent' + capitalizeKey;
             shortcut.dataAttr = 'data-page-component-' + key;

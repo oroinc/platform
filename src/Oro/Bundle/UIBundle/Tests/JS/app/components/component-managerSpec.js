@@ -8,6 +8,7 @@ define(function(require) {
     var exposure = requirejsExposure.disclose('oroui/js/app/components/component-manager');
     var componentsLoadModule = require('../../Fixture/app/components/component-manager/components-loader-mock');
     require('oroui/js/app/modules/component-shortcuts-module');
+    require('orofrontend/js/app/modules/component-shortcuts-module');
 
     function dataAttr(obj) {
         return JSON.stringify(obj).replace(/"/g, '&quot;');
@@ -45,6 +46,27 @@ define(function(require) {
                 pageComponentModule: 'oroui/js/app/components/view-component',
                 pageComponentOptions: {
                     view: 'test-view'
+                }
+            });
+        });
+
+        it('Initialize shortcut widget', function() {
+            window.setFixtures([
+                '<div id="container" data-layout="separate">',
+                '<div data-page-component-print-page=""></div>',
+                '</div>'
+            ].join(''));
+
+            var manager = new ComponentManager($('#container'));
+            var elements = manager._collectElements();
+            var $element = $(elements[0]);
+
+            expect(elements.length).toEqual(1);
+            expect($element.data()).toEqual({
+                pageComponentModule: 'oroui/js/app/components/jquery-widget-component',
+                pageComponentOptions: {
+                    printPage: '',
+                    widgetModule: 'orofrontend/blank/js/widgets/print-page-widget'
                 }
             });
         });
