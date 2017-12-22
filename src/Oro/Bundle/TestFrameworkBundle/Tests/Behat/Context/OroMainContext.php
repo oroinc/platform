@@ -157,7 +157,7 @@ class OroMainContext extends MinkContext implements
         try {
             $url = $session->getCurrentUrl();
         } catch (\Exception $e) {
-            // there is some age cases when url is not reacheble
+            // there is some age cases when url is not reachable
             return;
         }
 
@@ -193,7 +193,7 @@ class OroMainContext extends MinkContext implements
         try {
             $url = $session->getCurrentUrl();
         } catch (\Exception $e) {
-            // there is some age cases when url is not reacheble
+            // there is some age cases when url is not reachable
             return;
         }
 
