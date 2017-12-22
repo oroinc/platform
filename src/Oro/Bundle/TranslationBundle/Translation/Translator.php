@@ -271,6 +271,8 @@ class Translator extends BaseTranslator
 
         rmdir($tmpDir);
 
+        $this->setFallbackLocales($provider->getAllFallbackLocales($currentStrategy));
+
         // cleanup local cache
         $this->catalogues = [];
     }

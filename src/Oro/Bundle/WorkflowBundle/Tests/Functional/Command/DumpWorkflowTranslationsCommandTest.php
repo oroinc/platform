@@ -30,8 +30,6 @@ class DumpWorkflowTranslationsCommandTest extends WebTestCase
 
     public function testExecute()
     {
-        $this->markTestSkipped('BAP-16240');
-
         $result = $this->runCommand(
             DumpWorkflowTranslationsCommand::NAME,
             [
