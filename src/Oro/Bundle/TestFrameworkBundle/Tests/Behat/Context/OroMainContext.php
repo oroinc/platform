@@ -154,7 +154,12 @@ class OroMainContext extends MinkContext implements
 
         /** @var OroSelenium2Driver $driver */
         $driver = $session->getDriver();
-        $url = $session->getCurrentUrl();
+        try {
+            $url = $session->getCurrentUrl();
+        } catch (\Exception $e) {
+            // there is some age cases when url is not reacheble
+            return;
+        }
 
         if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
             return;
@@ -185,7 +190,12 @@ class OroMainContext extends MinkContext implements
 
         /** @var OroSelenium2Driver $driver */
         $driver = $session->getDriver();
-        $url = $session->getCurrentUrl();
+        try {
+            $url = $session->getCurrentUrl();
+        } catch (\Exception $e) {
+            // there is some age cases when url is not reacheble
+            return;
+        }
 
         if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
             return;
