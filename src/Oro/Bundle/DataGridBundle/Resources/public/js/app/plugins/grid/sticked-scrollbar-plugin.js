@@ -188,8 +188,8 @@ define(function(require) {
             $scrollbar.css({
                 'position': 'fixed',
                 'top': 'auto',
-                'right': documentWidth - containerWidth - containerLeftOffset + 'px',
-                'left': 'auto',
+                'right': 'auto',
+                'left': containerLeftOffset + 'px',
                 'bottom': 0,
                 'z-index': 999,
                 'width': containerWidth + 'px'
