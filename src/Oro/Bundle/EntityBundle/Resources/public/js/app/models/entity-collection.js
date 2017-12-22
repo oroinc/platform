@@ -68,7 +68,7 @@ define(function(require) {
          * Converts model in to an object that is used for API requests
          *
          * @param {Object?} options
-         * @return {Object<string, {data: Array<EntityModel.identifier>}>}
+         * @return {Object.<string, {data: Array.<EntityModel.identifier>}>}
          */
         toJSON: function(options) {
             var identifiers = this.map(function(model) {

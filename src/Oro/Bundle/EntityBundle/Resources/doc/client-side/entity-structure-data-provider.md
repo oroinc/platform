@@ -42,6 +42,16 @@ Signature for `createDataProvider` method is following
      *      ['relationType'] - will include all entries that has 'relationType' key (means relational fields)
      *      [{type: 'date'}] - will include all entries that has property "type" equals to "date"
      * @param {fieldsFilterer} [options.fieldsFilterer]
+     * @param {Object.<string, Object.<string, boolean>>} [options.fieldsFilterWhitelist]
+     *  whitelist of fields that has NOT to be filtered out
+     *  examples:
+     *      {'Oro\\Bundle\\UserBundle\\Entity\\User': {groups: true}} - groups field of User entity
+     *          has to be included to results, despite it might not pass the filters
+     * @param {Object.<string, Object.<string, boolean>>} [options.fieldsFilterBlacklist]
+     *  blacklist of fields that HAS to be filtered out
+     *  examples:
+     *      {'Oro\\Bundle\\UserBundle\\Entity\\User': {groups: true}} - groups field of User entity
+     *          has to be excluded from results, despite it might pass the filters
      * @param {RegistryApplicant} applicant
      * @return {Promise.<EntityStructureDataProvider>}
      */
@@ -52,6 +62,7 @@ Where is the first argument is options for the provider:
 - `optionsFilter`, `exclude` and `include` rules allow to define constraints for entities and fields that provider returns
 - `fieldsFilterer` custom filter function
 - `filterPreset` name of preconfigured filter
+- `fieldsFilterWhitelist` and `fieldsFilterBlacklist` allows to define filter strategy for specific fields
 
 And the second the applicant, instance that has requested the provider. 
 It allows to define life cycles of shared `EntityStructuresCollection` instance in registry (see [registry](../../../../UIBundle/Resources/doc/reference/client-side/registry.md) for details).

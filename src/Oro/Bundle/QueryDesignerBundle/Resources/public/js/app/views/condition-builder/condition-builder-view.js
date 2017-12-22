@@ -53,7 +53,7 @@ define(function(require) {
         currentDraggingElementHeight: 0,
 
         /**
-         * @type {Object<string, View>}
+         * @type {Object.<string, View>}
          */
         criteriaModules: undefined,
 
@@ -63,7 +63,7 @@ define(function(require) {
         value: null,
 
         /**
-         * @type {Object<string, ConditionView>}
+         * @type {Object.<string, ConditionView>}
          */
         conditions: undefined,
 

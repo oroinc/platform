@@ -375,14 +375,21 @@ define(function(require) {
 
             beforeEach(function(done) {
                 EntityStructureDataProvider.defineFilterPreset('first-custom-fields-set', {
-                    optionsFilter: {configurable: true},
                     include: [{relationType: 'manyToMany'}],
-                    exclude: []
+                    fieldsFilterBlacklist: {
+                        'Oro\\Bundle\\UserBundle\\Entity\\Group': {
+                            'Oro\\Bundle\\UserBundle\\Entity\\User::groups': true
+                        }
+                    }
                 });
                 EntityStructureDataProvider.defineFilterPreset('second-custom-fields-set', {
                     optionsFilter: {virtual: true},
-                    include: [],
-                    exclude: [{relationType: 'manyToMany'}]
+                    exclude: [{relationType: 'manyToMany'}],
+                    fieldsFilterWhitelist: {
+                        'Oro\\Bundle\\UserBundle\\Entity\\Group': {
+                            'roles': true
+                        }
+                    }
                 });
                 EntityStructureDataProvider.createDataProvider({
                     rootEntity: 'Oro\\Bundle\\UserBundle\\Entity\\Group',
@@ -409,8 +416,68 @@ define(function(require) {
                 dataProvider.setFilterPreset('second-custom-fields-set');
                 var chain = dataProvider.pathToEntityChain();
                 expect(chain[0].entity.fields).toEqual([
-                    jasmine.objectContaining({name: 'name', label: 'Name'})
+                    jasmine.objectContaining({name: 'name', label: 'Name'}),
+                    jasmine.objectContaining({name: 'roles', label: 'Roles'})
                 ]);
+            });
+        });
+
+        describe('whitelist of field filter', function() {
+            var fields;
+
+            beforeEach(function(done) {
+                EntityStructureDataProvider.createDataProvider({
+                    rootEntity: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+                    exclude: [{relationType: 'manyToMany'}],
+                    fieldsFilterWhitelist: {
+                        'Oro\\Bundle\\UserBundle\\Entity\\User': {
+                            'groups': true
+                        }
+                    }
+                }, applicant1).then(function(provider) {
+                    var chain = provider.pathToEntityChain();
+                    fields = chain[0].entity.fields;
+                    done();
+                });
+            });
+
+            it('result contains field from whitelist', function() {
+                expect(fields).toContain(
+                    jasmine.objectContaining({name: 'groups', relationType: 'manyToMany'}));
+            });
+
+            it('result does not contain filtered out field that is not in whitelist', function() {
+                expect(fields).not.toContain(
+                    jasmine.objectContaining({name: 'roles', relationType: 'manyToMany'}));
+            });
+        });
+
+        describe('blacklist of field filter', function() {
+            var fields;
+
+            beforeEach(function(done) {
+                EntityStructureDataProvider.createDataProvider({
+                    rootEntity: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+                    fieldsFilterBlacklist: {
+                        'Oro\\Bundle\\UserBundle\\Entity\\User': {
+                            'roles': true
+                        }
+                    }
+                }, applicant1).then(function(provider) {
+                    var chain = provider.pathToEntityChain();
+                    fields = chain[0].entity.fields;
+                    done();
+                });
+            });
+
+            it('result does not contain field from blacklist', function() {
+                expect(fields).not.toContain(
+                    jasmine.objectContaining({name: 'roles', relationType: 'manyToMany'}));
+            });
+
+            it('result contains field that is not in blacklist', function() {
+                expect(fields).toContain(
+                    jasmine.objectContaining({name: 'groups', relationType: 'manyToMany'}));
             });
         });
 

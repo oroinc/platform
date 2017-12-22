@@ -22,12 +22,14 @@ define(function(require) {
 
     /**
      * @typedef {Object} FilterConfig
-     * @property {Object.<string, boolean>} [config.optionsFilter] acceptable entity's and fields' options
+     * @property {Object.<string, boolean>} [optionsFilter] acceptable entity's and fields' options
      *  example:
      *      {auditable: true, configurable: true, unidirectional: false}
-     * @property {[Object|string]} [config.exclude]
-     * @property {[Object|string]} [config.include]
-     * @property {fieldsFilterer} [config.fieldsFilterer]
+     * @property {[Object|string]} [exclude]
+     * @property {[Object|string]} [include]
+     * @property {fieldsFilterer} [fieldsFilterer]
+     * @property {Object.<string, Object.<string, boolean>>} [fieldsFilterWhitelist]
+     * @property {Object.<string, Object.<string, boolean>>} [fieldsFilterBlacklist]
      */
 
     /**
@@ -118,6 +120,34 @@ define(function(require) {
         rootEntityClassName: void 0,
 
         /**
+         * Whitelist of fields that has NOT to be filtered out
+         *  first key is entity class name
+         *  second key is field name
+         *  the value is boolean flag, means the field has to be included to results
+         *
+         *  examples:
+         *      {'Oro\\Bundle\\UserBundle\\Entity\\User': {groups: true}} - groups field of User entity
+         *          has to be included to results, despite it might not pass the filters
+         *
+         * @type {Object.<string, Object.<string, boolean>>}
+         */
+        fieldsFilterWhitelist: null,
+
+        /**
+         * Blacklist of fields that HAS to be filtered out
+         *  first key is entity class name
+         *  second key is field name
+         *  the value is boolean flag, means the field has to be excluded from results
+         *
+         *  examples:
+         *      {'Oro\\Bundle\\UserBundle\\Entity\\User': {groups: true}} - groups field of User entity
+         *          has to be excluded from results, despite it might pass the filters
+         *
+         * @type {Object.<string, Object.<string, boolean>>}
+         */
+        fieldsFilterBlacklist: null,
+
+        /**
          * Array of rule objects or strings that will be used for entries filtering
          *  examples:
          *      ['relationType'] - will exclude all entries that has 'relationType' key (means relational fields)
@@ -136,13 +166,13 @@ define(function(require) {
          * List of acceptable options of entities and fields, is used for filtering
          *  example:
          *      {auditable: true, configurable: true, unidirectional: false}
-         * @type {Object.<string, true>}
+         * @type {Object.<string, boolean>}
          */
         optionsFilter: null,
 
         /**
          * Same as optionsFilter, but filtered from options that require special filterer method
-         * @type {Object.<string, true>}
+         * @type {Object.<string, boolean>}
          */
         regularOptionsFilter: null,
 
@@ -174,9 +204,11 @@ define(function(require) {
          * @param {[Object|string]} [options.exclude]
          * @param {[Object|string]} [options.include]
          * @param {fieldsFilterer} [options.fieldsFilterer]
+         * @param {Object.<string, Object.<string, boolean>>} [options.fieldsFilterWhitelist]
+         * @param {Object.<string, Object.<string, boolean>>} [options.fieldsFilterBlacklist]
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, 'collection', 'fieldsFilterer', 'errorHandler'));
+            _.extend(this, _.pick(options, 'collection', 'errorHandler'));
             if (!(this.collection instanceof EntityStructuresCollection)) {
                 throw new TypeError('The option `collection` has to be an instance of `EntityStructuresCollection`');
             }
@@ -186,7 +218,8 @@ define(function(require) {
             if (options.filterPreset) {
                 this.setFilterPreset(options.filterPreset);
             }
-            this._configureFilter(_.pick(options, 'optionsFilter', 'exclude', 'include', 'fieldsFilterer'));
+            this._configureFilter(_.pick(options, 'optionsFilter', 'exclude', 'include', 'fieldsFilterer',
+                'fieldsFilterWhitelist', 'fieldsFilterBlacklist'));
 
             if (options.rootEntity) {
                 this.rootEntityClassName = options.rootEntity;
@@ -236,9 +269,7 @@ define(function(require) {
             if (filterConfig.include) {
                 this.setIncludeRules(filterConfig.include);
             }
-            if (filterConfig.fieldsFilterer) {
-                this.fieldsFilterer = filterConfig.fieldsFilterer;
-            }
+            _.extend(this, _.pick(filterConfig, 'fieldsFilterer', 'fieldsFilterWhitelist', 'fieldsFilterBlacklist'));
         },
 
         /**
@@ -323,10 +354,9 @@ define(function(require) {
         },
 
         /**
-         * Filters fields of entity by
-         *  - `optionsFilter`
-         *  - using `fieldsFilterer` callback function
-         *  - `include`, `exclude` rules
+         * Filters fields of entity
+         *  first check if the field in white or black list
+         *  then matches field to filterers
          *
          * @param {Array.<Object>} fields
          * @param {string} entityClassName
@@ -335,15 +365,54 @@ define(function(require) {
         filterEntityFields: function(fields, entityClassName) {
             if (!_.isEmpty(this.fieldFilterers)) {
                 fields = _.filter(fields, function(field) {
-                    return _.every(this.fieldFilterers, function(filterer) {
-                        return filterer.call(this, field, entityClassName);
-                    }, this);
+                    return this._isWhitelistedField(entityClassName, field) ||
+                        !this._isBlacklistedField(entityClassName, field) &&
+                        this._matchFieldFilterers(entityClassName, field);
+
                 }, this);
             }
 
             fields = this.fieldsFilterer(entityClassName, fields);
 
             return fields;
+        },
+
+        /**
+         * Check if the field matches all filterers functions
+         *
+         * @param {string} entityClassName
+         * @param {Object} field
+         * @return {boolean}
+         * @protected
+         */
+        _matchFieldFilterers: function(entityClassName, field) {
+            return _.every(this.fieldFilterers, function(filterer) {
+                return filterer.call(this, field, entityClassName);
+            }, this);
+        },
+
+        /**
+         * Check if field is in the white list
+         *
+         * @param {string} entityClassName
+         * @param {Object} field
+         * @return {boolean}
+         * @protected
+         */
+        _isWhitelistedField: function(entityClassName, field) {
+            return _.result(_.result(this.fieldsFilterWhitelist, entityClassName), field.name, false);
+        },
+
+        /**
+         * Check if field is in the black list
+         *
+         * @param {string} entityClassName
+         * @param {Object} field
+         * @return {boolean}
+         * @protected
+         */
+        _isBlacklistedField: function(entityClassName, field) {
+            return _.result(_.result(this.fieldsFilterBlacklist, entityClassName), field.name, false);
         },
 
         /**
@@ -701,6 +770,16 @@ define(function(require) {
          *      ['relationType'] - will include all entries that has 'relationType' key (means relational fields)
          *      [{type: 'date'}] - will include all entries that has property "type" equals to "date"
          * @param {fieldsFilterer} [options.fieldsFilterer]
+         * @param {Object.<string, Object.<string, boolean>>} [options.fieldsFilterWhitelist]
+         *  whitelist of fields that has NOT to be filtered out
+         *  examples:
+         *      {'Oro\\Bundle\\UserBundle\\Entity\\User': {groups: true}} - groups field of User entity
+         *          has to be included to results, despite it might not pass the filters
+         * @param {Object.<string, Object.<string, boolean>>} [options.fieldsFilterBlacklist]
+         *  blacklist of fields that HAS to be filtered out
+         *  examples:
+         *      {'Oro\\Bundle\\UserBundle\\Entity\\User': {groups: true}} - groups field of User entity
+         *          has to be excluded from results, despite it might pass the filters
          * @param {RegistryApplicant} applicant
          * @return {Promise.<EntityStructureDataProvider>}
          */
@@ -741,13 +820,20 @@ define(function(require) {
          *  it helps to reuse filter configurations
          *
          * @param {string} name
-         * @param {FilterConfig} config
+         * @param {FilterConfig} filterConfig
          */
-        defineFilterPreset: function(name, config) {
+        defineFilterPreset: function(name, filterConfig) {
             if (name in EntityStructureDataProvider.filterPresets) {
                 throw new Error('Filter preset with `' + name + '` name already defined');
             }
-            EntityStructureDataProvider.filterPresets[name] = config;
+            EntityStructureDataProvider.filterPresets[name] = _.defaults(filterConfig, {
+                optionsFilter: {},
+                exclude: [],
+                include: [],
+                fieldsFilterer: EntityStructureDataProvider.prototype.fieldsFilterer,
+                fieldsFilterWhitelist: {},
+                fieldsFilterBlacklist: {}
+            });
         }
     });
 
