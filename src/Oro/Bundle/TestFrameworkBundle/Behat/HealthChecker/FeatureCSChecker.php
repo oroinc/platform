@@ -65,6 +65,14 @@ class FeatureCSChecker implements HealthCheckerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'cs';
+    }
+
+    /**
      * @param BeforeFeatureTested $event
      */
     public function checkFeatureDescription(BeforeFeatureTested $event)

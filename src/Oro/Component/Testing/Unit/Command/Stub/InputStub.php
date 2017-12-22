@@ -125,6 +125,7 @@ class InputStub implements InputInterface
      */
     public function hasOption($name)
     {
+        return array_key_exists($name, $this->options);
     }
 
     /**
