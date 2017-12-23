@@ -1,14 +1,9 @@
-Oro\Bundle\ContactBundle\Entity\Contact:
-  contactCharlie:
-    firstName: Charlie
-    lastName: Sheen
-    email: charlie@sheen.com
-    owner: '@admin'
-    organization: '@organization'
+include:
+  - '@OroUserBundle:user.yml'
 
 OroEntityProxy\OroEmailBundle\EmailAddressProxy:
   charlieAddress:
-    owner: '@contactCharlie'
+    owner: '@charlie'
     email: charlie@sheen.com
     hasOwner: true
 
@@ -43,11 +38,3 @@ Oro\Bundle\EmailBundle\Entity\Email:
     internalDate: '<dateTimeBetween("-200 days", "-1 day")>'
     messageId: fsdfasdf
     emailUsers: ['@adminEmailUser1']
-
-Oro\Bundle\TaskBundle\Entity\Task:
-  task:
-    subject: 'First test task'
-    addActivityTarget: ['@contactCharlie']
-    createdAt: '<dateTime("now")>'
-    updatedAt: '<dateTime($createdAt)>'
-    dueDate: '<dateTime($createdAt)>'

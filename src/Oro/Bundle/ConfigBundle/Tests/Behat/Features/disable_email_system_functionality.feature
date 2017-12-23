@@ -15,7 +15,7 @@ Feature: Disable Email system functionality
       | oro:cron:email-body-sync |
       | oro:cron:imap-sync       |
     And I should see My emails in user menu
-    When I go to Customers/Contacts
+    When I go to System/ User Management/ Users
     And click View Charlie in grid
     And follow "More actions"
     Then I should see "Send Email"
@@ -37,3 +37,9 @@ Feature: Disable Email system functionality
     When I go to System/Scheduled Tasks
     Then I should not see "oro:cron:email-body-sync"
     And should not see "oro:cron:imap-sync"
+
+  Scenario: No Email Action on user view page
+    Given I go to System/ User Management/ Users
+    And click View Charlie in grid
+    And follow "More actions"
+    Then I should not see "Send Email"
