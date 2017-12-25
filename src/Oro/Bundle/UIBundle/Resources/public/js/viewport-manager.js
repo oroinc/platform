@@ -9,34 +9,32 @@ define([
     var viewportManager;
     var isMobile = _.isMobile();
 
-    var defaults = $.extend(true, {
-        screenMap: [
-            {
-                name: 'desktop',
-                max: Infinity
-            },
-            {
-                name: 'tablet',
-                max: 1099
-            },
-            {
-                name: 'tablet-small',
-                max: 992
-            },
-            {
-                name: 'mobile-landscape',
-                max: 640
-            },
-            {
-                name: 'mobile',
-                max: 414
-            }
-        ]
-    }, module.config());
+    var screenMap = [
+        {
+            name: 'desktop',
+            max: Infinity
+        },
+        {
+            name: 'tablet',
+            max: 1099
+        },
+        {
+            name: 'tablet-small',
+            max: 992
+        },
+        {
+            name: 'mobile-landscape',
+            max: 640
+        },
+        {
+            name: 'mobile',
+            max: 414
+        }
+    ];
 
     viewportManager = {
         options: {
-            screenMap: defaults.screenMap
+            screenMap: screenMap
         },
 
         screenByTypes: {},
@@ -44,6 +42,21 @@ define([
         viewport: null,
 
         initialize: function() {
+            if (!_.isUndefined(module.config().screenMap) && _.isArray(module.config().screenMap)) {
+                this.options.screenMap = _.filter(
+                    _.uniq(
+                        _.flatten([module.config().screenMap, this.options.screenMap]),
+                        false,
+                        function(item) {
+                            return item.name;
+                        }
+                    ),
+                    function(item) {
+                        return !item.skip;
+                    }
+                );
+            }
+
             var screenMap = this.options.screenMap = _.sortBy(this.options.screenMap, 'max');
 
             _.each(screenMap, function(screen, i) {
