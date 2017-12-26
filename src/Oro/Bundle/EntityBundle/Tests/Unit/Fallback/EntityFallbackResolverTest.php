@@ -6,54 +6,58 @@ use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
-use Oro\Bundle\EntityBundle\Exception\Fallback\FallbackFieldConfigurationMissingException;
-use Oro\Bundle\EntityBundle\Exception\Fallback\FallbackProviderNotFoundException;
-use Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackKeyException;
 use Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackTypeException;
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 use Oro\Bundle\EntityBundle\Fallback\Provider\EntityFallbackProviderInterface;
 use Oro\Bundle\EntityBundle\Fallback\Provider\SystemConfigFallbackProvider;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fallback\Stub\FallbackContainingEntity;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_FALLBACK = 'testFallback';
 
     /** @var ConfigBag|\PHPUnit_Framework_MockObject_MockObject */
     protected $configBag;
+
     /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityConfigProvider;
+
     /** @var SystemConfigurationFormProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $formProvider;
+
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
+
     /** @var ConfigInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $configInterface;
+
+    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrineHelper;
+
     /** @var EntityFallbackResolver */
     protected $resolver;
 
     public function setUp()
     {
-        $this->entityConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->formProvider = $this->getMockBuilder(SystemConfigurationFormProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configBag = $this->getMockBuilder(ConfigBag::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->formProvider = $this->createMock(SystemConfigurationFormProvider::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->configBag = $this->createMock(ConfigBag::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->configInterface = $this->createMock(ConfigInterface::class);
+
         $this->resolver = new EntityFallbackResolver(
             $this->entityConfigProvider,
             $this->formProvider,
             $this->configManager,
-            $this->configBag
+            $this->configBag,
+            $this->doctrineHelper
         );
     }
 
@@ -63,14 +67,13 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
         $this->configInterface->expects($this->once())
             ->method('getValues')
             ->willReturn($this->getEntityConfiguration());
+
         $formDescription = ['data_type' => 'testDataType'];
         $this->configBag->expects($this->once())
             ->method('getFieldsRoot')
             ->willReturn($formDescription);
 
-
-        $type = $this->resolver->getType(new \stdClass(), 'testProperty');
-        $this->assertEquals($formDescription['data_type'], $type);
+        $this->assertEquals($formDescription['data_type'], $this->resolver->getType(new \stdClass(), 'testProperty'));
     }
 
     public function testGetTypeFromEntityFieldConfig()
@@ -83,10 +86,17 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
         $this->configBag->expects($this->once())
             ->method('getFieldsRoot')
             ->willReturn([]);
-        $type = $this->resolver->getType(new \stdClass(), 'testProperty');
-        $this->assertEquals($entityConfig[EntityFieldFallbackValue::FALLBACK_TYPE], $type);
+
+        $this->assertEquals(
+            $entityConfig[EntityFieldFallbackValue::FALLBACK_TYPE],
+            $this->resolver->getType(new \stdClass(), 'testProperty')
+        );
     }
 
+    /**
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackTypeException
+     * @expectedExceptionMessage Invalid fallback data type 'invalidType' provided.
+     */
     public function testGetTypeThrowsExceptionOnInvalidType()
     {
         $this->setDefaultConfigInterfaceMock();
@@ -99,7 +109,6 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldsRoot')
             ->willReturn([]);
 
-        $this->expectException(InvalidFallbackTypeException::class);
         $this->resolver->getType(new \stdClass(), 'testProperty');
     }
 
@@ -146,11 +155,13 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testIsFallbackSupported()
     {
-        $provider = $this->getMockBuilder(SystemConfigFallbackProvider::class)->disableOriginalConstructor()->getMock();
-        $this->resolver->addFallbackProvider($provider, 'systemConfig');
+        /** @var SystemConfigFallbackProvider|\PHPUnit_Framework_MockObject_MockObject $provider */
+        $provider = $this->createMock(SystemConfigFallbackProvider::class);
         $provider->expects($this->once())
             ->method('isFallbackSupported')
             ->willReturn(true);
+
+        $this->resolver->addFallbackProvider($provider, 'systemConfig');
 
         $this->assertTrue($this->resolver->isFallbackSupported(new \stdClass(), 'testProperty', 'systemConfig'));
     }
@@ -181,6 +192,12 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($entityConfig[EntityFieldFallbackValue::FALLBACK_LIST], $result);
     }
 
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\Fallback\FallbackFieldConfigurationMissingException
+     * @expectedExceptionMessage You must define the fallback configuration 'nonExistentConfig' for class 'stdClass', field 'testProperty'
+     */
+    // @codingStandardsIgnoreEnd
     public function testGetFallbackConfigThrowsExceptionIfNoConfigWithName()
     {
         $this->setDefaultConfigInterfaceMock();
@@ -188,26 +205,27 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
         $this->configInterface->expects($this->any())
             ->method('getValues')
             ->willReturn($entityConfig);
-        $this->expectException(FallbackFieldConfigurationMissingException::class);
-        $this->resolver->getFallbackConfig(
-            new \stdClass(),
-            'testProperty',
-            'nonExistentConfig'
-        );
+
+        $this->resolver->getFallbackConfig(new \stdClass(), 'testProperty', 'nonExistentConfig');
     }
 
+    /**
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\Fallback\FallbackProviderNotFoundException
+     * @expectedExceptionMessage Fallback provider for fallback with identification key "nonExistent" not found.
+     */
     public function testGetFallbackProviderThrowsException()
     {
-        $this->expectException(FallbackProviderNotFoundException::class);
         $this->resolver->getFallbackProvider('nonExistent');
     }
 
     public function testGetFallbackProviderReturnsProvider()
     {
-        $provider = $this->getMockBuilder(SystemConfigFallbackProvider::class)->disableOriginalConstructor()->getMock();
+        /** @var SystemConfigFallbackProvider $provider */
+        $provider = $this->createMock(SystemConfigFallbackProvider::class);
+
         $this->resolver->addFallbackProvider($provider, 'systemConfig');
-        $result = $this->resolver->getFallbackProvider('systemConfig');
-        $this->assertSame($provider, $result);
+
+        $this->assertSame($provider, $this->resolver->getFallbackProvider('systemConfig'));
     }
 
     public function testGetFallbackValueReturnsNonFallbackValue()
@@ -276,8 +294,7 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
         $testProvider->expects($this->once())->method('getFallbackHolderEntity')
             ->willReturn($entity2);
 
-        $value = $this->resolver->getFallbackValue($entity, 'testProperty');
-        $this->assertEquals($expectedValue, $value);
+        $this->assertEquals($expectedValue, $this->resolver->getFallbackValue($entity, 'testProperty'));
     }
 
     public function testGetFallbackValueReturnsOwnValue()
@@ -324,9 +341,12 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['test'], $this->resolver->getFallbackValue($entity, 'testProperty'));
     }
 
+    /**
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackKeyException
+     * @expectedExceptionMessage Invalid fallback key "nonExistentProvider" provided
+     */
     public function testGetFallbackValueThrowsInvalidKeyException()
     {
-        $this->expectException(InvalidFallbackKeyException::class);
         $fallbackValue = new EntityFieldFallbackValue();
         $fallbackValue->setFallback('nonExistentProvider');
         $entity = new FallbackContainingEntity($fallbackValue);
@@ -364,8 +384,7 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
             ->willReturn('directValue');
         $this->resolver->addFallbackProvider($testProvider, self::TEST_FALLBACK);
 
-        $result = $this->resolver->getFallbackValue($entity, 'testProperty');
-        $this->assertEquals('directValue', $result);
+        $this->assertEquals('directValue', $this->resolver->getFallbackValue($entity, 'testProperty'));
     }
 
     public function testGetFallbackValueReturnsFallbackValue()
@@ -429,6 +448,9 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @return array
+     */
     public function getRequiredFallbackFieldByTypeProvider()
     {
         return [
@@ -441,6 +463,9 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @param string $type
+     */
     protected function setUpTypeResolution($type = 'boolean')
     {
         $this->configInterface->expects($this->any())
@@ -451,6 +476,9 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
             ->willReturn(['data_type' => $type]);
     }
 
+    /**
+     * @return array
+     */
     protected function getEntityConfiguration()
     {
         return [
