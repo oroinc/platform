@@ -21,6 +21,7 @@ define(function(require) {
             window.setFixtures(html);
 
             expressionEditorView = new ExpressionEditorView(_.defaults({}, {
+                autoRender: true,
                 el: '#expression-editor'
             }, options));
 
