@@ -121,6 +121,7 @@ class TranslatorTest extends WebTestCase
     {
         // build initial cache
         $this->translator->rebuildCache();
+        $this->assertEquals(['lang1', 'lang2', 'lang3', 'lang4'], $this->translator->getFallbackLocales());
 
         $key = uniqid('TRANSLATION_KEY_', true);
         $val1 = uniqid('TEST_VALUE1_', true);
