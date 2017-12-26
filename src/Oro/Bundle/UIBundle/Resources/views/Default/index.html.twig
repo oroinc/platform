@@ -5,11 +5,7 @@
         {% block head %}
             <title>{% trans %}Loading...{% endtrans %}</title>
             <script id="page-title" type="text/html">{{ oro_title_render() }}</script>
-            {% if isMobileVersion() %}
-            <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-            {% else %}
-            <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no"/>
-            {% endif %}
+            <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no{% if isMobileVersion() %}, viewport-fit=cover{% endif %}"/>
             <meta http-equiv="cache-control" content="max-age=0" />
             <meta http-equiv="cache-control" content="no-cache" />
             <meta http-equiv="expires" content="0" />
