@@ -295,6 +295,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
         $activityList = $this->createElement('Activity List');
         $collapsedItem = $activityList->getCollapsedItem();
         $collapsedItem->deleteAllContexts();
+        $this->waitForAjax();
     }
 
     /**
