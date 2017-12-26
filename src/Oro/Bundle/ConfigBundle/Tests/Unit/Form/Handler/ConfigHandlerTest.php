@@ -3,22 +3,25 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Handler;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Form\Handler\ConfigHandler;
+use Symfony\Component\Form\Test\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class ConfigHandlerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $configManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var FormInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $form;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var Request|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $request;
 
@@ -29,14 +32,17 @@ class ConfigHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
-        $this->form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $this->request = $request = $this->createMock('Symfony\Component\HttpFoundation\Request');
+        $this->form = $this->createMock(FormInterface::class);
+        $this->request = $this->createMock(Request::class);
 
         $this->handler = new ConfigHandler($this->configManager);
+    }
+
+    public function testGetConfigManager()
+    {
+        $this->assertSame($this->configManager, $this->handler->getConfigManager());
     }
 
     public function testProcessWithoutAdditionalHandler()
