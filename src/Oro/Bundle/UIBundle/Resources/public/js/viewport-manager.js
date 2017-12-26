@@ -2,8 +2,9 @@ define([
     'module',
     'oroui/js/mediator',
     'jquery',
-    'underscore'
-], function(module, mediator, $, _) {
+    'underscore',
+    'oroui/js/error'
+], function(module, mediator, $, _, error) {
     'use strict';
 
     var viewportManager;
@@ -41,22 +42,9 @@ define([
         viewport: null,
 
         initialize: function() {
-            if (!_.isUndefined(module.config().screenMap) && _.isArray(module.config().screenMap)) {
-                this.options.screenMap = _.filter(
-                    _.uniq(
-                        _.flatten([module.config().screenMap, this.options.screenMap]),
-                        false,
-                        function(item) {
-                            return item.name;
-                        }
-                    ),
-                    function(item) {
-                        return !item.skip;
-                    }
-                );
-            }
+            this._prepareScreenMaps();
 
-            var screenMap = this.options.screenMap = _.sortBy(this.options.screenMap, 'max');
+            var screenMap = this.options.screenMap;
 
             _.each(screenMap, function(screen, i) {
                 var smallerScreen = screenMap[i - 1] || null;
@@ -94,6 +82,56 @@ define([
             }, this);
 
             return isApplicable;
+        },
+
+        _prepareScreenMaps: function() {
+            var moduleScreenMap = this._getModuleScreenMaps();
+
+            if (this._isValidScreenMap(moduleScreenMap)) {
+                this.options.screenMap = _.filter(
+                    _.uniq(
+                        _.flatten([moduleScreenMap, this.options.screenMap]),
+                        false,
+                        function(item) {
+                            return item.name;
+                        }
+                    ),
+                    function(item) {
+                        return !item.skip;
+                    }
+                );
+            }
+
+            this.options.screenMap = _.sortBy(this.options.screenMap, 'max');
+        },
+
+        _getModuleScreenMaps: function() {
+            var arr = [];
+
+            if (!_.isUndefined(module.config().screenMap)) {
+                arr = module.config().screenMap;
+            }
+
+            return arr;
+        },
+
+        _getScreenByTypes: function(screenType) {
+            var defaultVal = null;
+
+            if (_.isNull(screenType)) {
+                return defaultVal;
+            }
+
+            if (_.has(this.screenByTypes, screenType)) {
+                return this.screenByTypes[screenType];
+            } else {
+                error.showErrorInConsole('The screen type "' + screenType + '" not defined ');
+                return defaultVal;
+            }
+        },
+
+        _isValidScreenMap: function(array) {
+            return _.isArray(array) && array.length;
         },
 
         _onResize: function() {
@@ -140,15 +178,15 @@ define([
         },
 
         _minScreenTypeChecker: function(minScreenType) {
-            var viewport = this.screenByTypes[this.viewport.type];
-            var minViewport = this.screenByTypes[minScreenType];
-            return minScreenType === 'any' || viewport.max >= minViewport.max;
+            var viewport = this._getScreenByTypes(this.viewport.type);
+            var minViewport = this._getScreenByTypes(minScreenType);
+            return minScreenType === 'any' || (_.isObject(viewport) ? viewport.max >= minViewport.max : false);
         },
 
         _maxScreenTypeChecker: function(maxScreenType) {
-            var viewport = this.screenByTypes[this.viewport.type];
-            var maxViewport = this.screenByTypes[maxScreenType];
-            return maxScreenType === 'any' || viewport.max <= maxViewport.max;
+            var viewport = this._getScreenByTypes(this.viewport.type);
+            var maxViewport = this._getScreenByTypes(maxScreenType);
+            return maxScreenType === 'any' || (_.isObject(viewport) ? viewport.max <= maxViewport.max : false);
         },
 
         _widthChecker: function(width) {
