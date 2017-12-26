@@ -7,7 +7,6 @@ define([
     'use strict';
 
     var viewportManager;
-    var isMobile = _.isMobile();
 
     var screenMap = [
         {
@@ -68,7 +67,7 @@ define([
             this.viewport = {
                 width: 0,
                 type: null,
-                isMobile: isMobile,
+                isMobile: _.isMobile(),
                 isApplicable: _.bind(this.isApplicable, this)
             };
 
