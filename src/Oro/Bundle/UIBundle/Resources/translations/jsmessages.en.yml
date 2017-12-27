@@ -63,7 +63,9 @@ oro:
         leave_page_with_unsaved_data_confirm: 'You have unsaved changes, are you sure you want to leave this page?'
         leave_page_save_data_or_discard_title: "Navigation confirmation"
         leave_page_save_data_or_discard: "You have unsaved changes. Do you want to save them before leaving the page?"
-        error: "There was an error performing the requested operation. Please try again or contact us for assistance."
+        error:
+            unexpected: "Unexpected content format"
+            performing: "There was an error performing the requested operation. Please try again or contact us for assistance."
         request_too_large_error: >
             The information you are submitting does not fit the doorway on the server side.
             This may happen due to the extremely high-resolution images in your data.
