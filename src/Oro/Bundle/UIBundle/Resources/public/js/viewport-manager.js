@@ -72,7 +72,7 @@ define([
                     isApplicable = checker.call(this, testViewport[check]);
                 }
             }, this);
-
+            console.log(testViewport, isApplicable)
             return isApplicable;
         },
 
@@ -183,19 +183,23 @@ define([
         _minScreenTypeChecker: function(minScreenType) {
             var viewport = this._getScreenByTypes(this.viewport.type);
             var minViewport = this._getScreenByTypes(minScreenType);
-            if (_.isNull(viewport) || _.isNull(minViewport)) {
-                return false;
-            }
-            return minScreenType === 'any' || viewport.max >= minViewport.max;
+
+            return minScreenType === 'any' || (
+                _.isObject(viewport) && _.isObject(minViewport) ?
+                viewport.max >= minViewport.max :
+                false
+            );
         },
 
         _maxScreenTypeChecker: function(maxScreenType) {
             var viewport = this._getScreenByTypes(this.viewport.type);
             var maxViewport = this._getScreenByTypes(maxScreenType);
-            if (_.isNull(viewport) || _.isNull(maxViewport)) {
-                return false;
-            }
-            return maxScreenType === 'any' || viewport.max <= maxViewport.max;
+
+            return maxScreenType === 'any' || (
+                _.isObject(viewport) && _.isObject(maxViewport) ?
+                viewport.max <= maxViewport.max :
+                false
+            );
         },
 
         _widthChecker: function(width) {
