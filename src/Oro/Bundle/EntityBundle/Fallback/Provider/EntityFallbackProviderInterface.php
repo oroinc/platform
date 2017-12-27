@@ -22,4 +22,9 @@ interface EntityFallbackProviderInterface
      * @return string
      */
     public function getFallbackLabel();
+
+    /**
+     * @return string|null
+     */
+    public function getFallbackEntityClass();
 }

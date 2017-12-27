@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Fallback;
 
+use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -16,7 +18,11 @@ use Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackTypeException;
 use Oro\Bundle\EntityBundle\Fallback\Provider\EntityFallbackProviderInterface;
 use Oro\Bundle\EntityBundle\Fallback\Provider\SystemConfigFallbackProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class EntityFallbackResolver
 {
     const TYPE_BOOLEAN = 'boolean';
@@ -67,24 +73,32 @@ class EntityFallbackResolver
     protected $accessor;
 
     /**
+     * @var DoctrineHelper
+     */
+    private $doctrineHelper;
+
+    /**
      * EntityFallbackResolver constructor.
      *
      * @param ConfigProvider $entityConfigProvider
      * @param SystemConfigurationFormProvider $formProvider
      * @param ConfigManager $configManager
      * @param ConfigBag $configBag
+     * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
         SystemConfigurationFormProvider $formProvider,
         ConfigManager $configManager,
-        ConfigBag $configBag
+        ConfigBag $configBag,
+        DoctrineHelper $doctrineHelper
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
         $this->sysConfigFormProvider = $formProvider;
         $this->accessor = PropertyAccess::createPropertyAccessor();
         $this->configManager = $configManager;
         $this->configBag = $configBag;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -226,14 +240,50 @@ class EntityFallbackResolver
     /**
      * @param object $object
      * @param string $objectFieldName
+     * @param string $value
+     * @return bool
+     */
+    public function hasAtLeastOneFallbackScalarValue($object, $objectFieldName, $value)
+    {
+        $className = get_class($object);
+
+        $repo = $this->doctrineHelper->getEntityRepositoryForClass($className);
+        if ($this->isRepositoryContainsEntityWithValue($repo, $objectFieldName, $value)) {
+            return true;
+        }
+
+        $fallbackList = $this->getFallbackConfig($className, $objectFieldName, EntityFieldFallbackValue::FALLBACK_LIST);
+        foreach ($fallbackList as $fallbackId => $config) {
+            $provider = $this->getFallbackProvider($fallbackId);
+            if ($provider instanceof SystemConfigFallbackProvider) {
+                // here must be non-strict comparison, because, for instance,
+                // bool values is represented as '1' or 'true' in different cases
+                return $provider->getFallbackHolderEntity($object, $objectFieldName) == $value;
+            }
+            $fallbackClass = $provider->getFallbackEntityClass();
+            if ($fallbackClass) {
+                $repo = $this->doctrineHelper->getEntityRepositoryForClass($fallbackClass);
+                if ($this->isRepositoryContainsEntityWithValue($repo, $objectFieldName, $value)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param object|string $object
+     * @param string $objectFieldName
      * @param string|null $configName
      * @return array|string
      * @throws FallbackFieldConfigurationMissingException
      */
     public function getFallbackConfig($object, $objectFieldName, $configName = null)
     {
+        $className = is_string($object) ? $object : get_class($object);
+
         $config = $this->entityConfigProvider
-            ->getConfig(get_class($object), $objectFieldName)
+            ->getConfig($className, $objectFieldName)
             ->getValues();
 
         if (!$configName) {
@@ -245,7 +295,7 @@ class EntityFallbackResolver
                 sprintf(
                     "You must define the fallback configuration '%s' for class '%s', field '%s'",
                     $configName,
-                    get_class($object),
+                    $className,
                     $objectFieldName
                 )
             );
@@ -413,5 +463,23 @@ class EntityFallbackResolver
         }
 
         return $systemConfig[SystemConfigFallbackProvider::CONFIG_NAME_KEY];
+    }
+
+    /**
+     * @param EntityRepository $repo
+     * @param string $objectFieldName
+     * @param string $value
+     * @return bool
+     */
+    protected function isRepositoryContainsEntityWithValue(EntityRepository $repo, $objectFieldName, $value)
+    {
+        $qb = $repo->createQueryBuilder('e');
+        $qb->select('1')
+            ->innerJoin(sprintf('e.%s', $objectFieldName), 'fallbackValue')
+            ->where($qb->expr()->eq('fallbackValue.scalarValue', ':value'))
+            ->setParameter('value', $value, Type::STRING)
+            ->setMaxResults(1);
+
+        return (bool)$qb->getQuery()->getResult();
     }
 }
