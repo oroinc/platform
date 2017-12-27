@@ -447,7 +447,7 @@ abstract class AbstractImportExportTest extends WebTestCase
     {
         $resultData = str_getcsv($content, "\n");
         $header = str_getcsv(array_shift($resultData));
-        array_walk($resultData, function(&$row) use ($header, $resultData) {
+        array_walk($resultData, function (&$row) use ($header, $resultData) {
             $row = array_combine($header, str_getcsv($row));
             $resultData[] = $row;
         });
