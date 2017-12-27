@@ -2,10 +2,15 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
+use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
+use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\EmailAddress;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
@@ -109,45 +114,22 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
         $organization->setName('Org');
         $user = new User();
         $user->setUsername('test');
+        $user->setOrganization($organization);
         $emailUser = new EmailUser();
         $emailUser->setOrganization($organization);
         $emailUser->setOwner($user);
         $owners = [$emailUser];
 
-        $emailMock = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
-            ->setMethods(
-                [
-                    'getFromEmailAddress',
-                    'hasOwner',
-                    'getOwner',
-                    'getOrganization',
-                    'getActivityTargets'
-                ]
-            )
-            ->disableOriginalConstructor()
-            ->getMock();
-        $emailMock->expects($this->once())
-            ->method('getFromEmailAddress')
-            ->willReturn($emailMock);
-        $emailMock->expects($this->once())
-            ->method('getOwner')
-            ->willReturn($emailMock);
-        $emailMock->expects($this->exactly(2))
-            ->method('getOrganization')
-            ->willReturn($organization);
-        $emailMock->expects($this->exactly(1))
-            ->method('getActivityTargets')
-            ->willReturn([]);
+        $fromEmailAddress = new EmailAddress();
+        $fromEmailAddress->setOwner($user);
+        $email = new Email();
+        $email->setFromEmailAddress($fromEmailAddress);
+        $email->addEmailUser($emailUser);
 
-        $activityListMock = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\ActivityList')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var ActivityList $activityListMock */
+        $activityListMock = $this->createMock(ActivityList::class);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $repository = $this->createMock(ObjectRepository::class);
         $this->doctrineRegistryLink
             ->expects($this->once())
             ->method('getService')
@@ -159,11 +141,62 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
             ->method('findBy')
             ->willReturn($owners);
 
-        $activityOwnerArray = $this->emailActivityListProvider->getActivityOwners($emailMock, $activityListMock);
+        $activityOwnerArray = $this->emailActivityListProvider->getActivityOwners($email, $activityListMock);
 
         $this->assertCount(1, $activityOwnerArray);
-        $owner = $activityOwnerArray[0];
+        $owner = reset($activityOwnerArray);
         $this->assertEquals($organization->getName(), $owner->getOrganization()->getName());
+        $this->assertEquals($user->getUsername(), $owner->getUser()->getUsername());
+    }
+
+    public function testGetActivityOwnersSeveralOrganizations()
+    {
+        $organization1 = new Organization();
+        $organization1->setName('Org1');
+
+        $organization2 = new Organization();
+        $organization2->setName('Org2');
+
+        $user = new User();
+        $user->setUsername('test');
+        $user->setOrganization($organization1);
+        $emailUser = new EmailUser();
+        $emailUser->setOrganization($organization2);
+        $emailUser->setOwner($user);
+
+        $fromEmailAddress = new EmailAddress();
+        $fromEmailAddress->setOwner($user);
+        $email = new Email();
+        $email->setFromEmailAddress($fromEmailAddress);
+        $email->addEmailUser($emailUser);
+
+        /** @var ActivityList $activityListMock */
+        $activityListMock = $this->createMock(ActivityList::class);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $repository = $this->createMock(ObjectRepository::class);
+        $this->doctrineRegistryLink
+            ->expects($this->once())
+            ->method('getService')
+            ->willReturn($em);
+        $em->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($repository);
+        $repository->expects($this->once())
+            ->method('findBy')
+            ->with([
+                'email' => $email,
+                'organization' => [
+                    $organization1,
+                    $organization2
+                ]
+            ])
+            ->willReturn([$emailUser]);
+
+        $activityOwnerArray = $this->emailActivityListProvider->getActivityOwners($email, $activityListMock);
+
+        $this->assertCount(1, $activityOwnerArray);
+        $owner = reset($activityOwnerArray);
+        $this->assertEquals($organization2->getName(), $owner->getOrganization()->getName());
         $this->assertEquals($user->getUsername(), $owner->getUser()->getUsername());
     }
 

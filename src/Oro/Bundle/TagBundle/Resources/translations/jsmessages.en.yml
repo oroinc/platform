@@ -14,7 +14,6 @@ oro:
             entity_plural_label: Taxonomies
             id.label:            Id
             name.label:          Name
-            owner.label:         Owner
             tagging.label:       Tagging
             tags.label:          Tags
             updated_by.label:    Updated By

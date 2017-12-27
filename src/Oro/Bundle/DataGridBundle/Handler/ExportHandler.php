@@ -91,9 +91,15 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
             }
         }
 
-        $executor->execute($this);
-        $this->fileManager->writeFileToStorage($filePath, $fileName);
-        @unlink($filePath);
+        try {
+            $executor->execute($this);
+            $this->fileManager->writeFileToStorage($filePath, $fileName);
+        } catch (\Exception $exception) {
+            $context->addFailureException($exception);
+        } finally {
+            @unlink($filePath);
+        }
+
         $readsCount = $context->getReadCount() ?: 0;
         $errorsCount = count($context->getFailureExceptions());
         $errors = array_slice(array_merge($context->getErrors(), $context->getFailureExceptions()), 0, 100);

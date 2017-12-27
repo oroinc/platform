@@ -63,7 +63,7 @@
     clear: both;
     position: relative;
     margin:0;
-    padding:0;
+    .safe-area-padding(0);
     border:none;
     border-bottom: 1px solid @baseGradientColorBorder;
     #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
@@ -355,7 +355,8 @@
         text-shadow:none;
         [class^="fa-"] {
           vertical-align:top;
-          font-size:14px
+          font-size:14px;
+          margin: 0 4px;
         }
       }
       .dropdown-menu {

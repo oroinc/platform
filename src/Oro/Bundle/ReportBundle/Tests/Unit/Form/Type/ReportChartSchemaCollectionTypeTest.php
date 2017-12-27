@@ -67,8 +67,13 @@ class ReportChartSchemaCollectionTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $translator = $this
+            ->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $schemaCollectionType = new ReportChartSchemaType($manager);
-        $fieldChoiceType      = new FieldChoiceType();
+        $fieldChoiceType      = new FieldChoiceType($translator);
 
         return [
             new PreloadedExtension(

@@ -36,14 +36,12 @@ class ReportCacheCleanerListener
         $this->prefixCacheKey = $prefixCacheKey;
     }
 
-    public function postUpdate(LifecycleEventArgs $args)
+    /**
+     * @param Report             $entity
+     * @param LifecycleEventArgs $args
+     */
+    public function postUpdate(Report $entity, LifecycleEventArgs $args)
     {
-        $entity = $args->getEntity();
-
-        if (!$entity instanceof Report) {
-            return;
-        }
-
         $this->clearCache($entity);
     }
 

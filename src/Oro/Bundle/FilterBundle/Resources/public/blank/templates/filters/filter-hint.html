@@ -1,0 +1,13 @@
+<span class="filter-criteria-hint-item">
+    <span class="filter-criteria-hint-label">
+        <%- label %>:
+    </span>
+    <span class="filter-criteria-hint"></span>
+    <% if (allowClear) { %>
+        <button class="reset-filter"
+            title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
+        >
+            <i class="fa-close hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i>
+        </button>
+    <% } %>
+</span>

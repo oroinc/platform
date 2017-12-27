@@ -154,8 +154,8 @@ oro:
             new_password.label:             New password
             enter_new_password.label:       New password
             enter_new_password_again.label: Repeat password
-            reset.label:                    Reset
             reset:
+                label: Reset
                 ttl_already_requested.message: The password for this user has already been requested within the last 24 hours
                 popup.message: User {{ user }} will receive reset password by email.
                 popup.question: Are you sure you want to proceed?
@@ -170,7 +170,6 @@ oro:
                 failure.message: Password reset request to %email% has failed.
                 mass_action.success: Password reset completed successfully. %count% emails sent.
                 mass_action.failure: Mass reset action has failed.
-
         password_re.label:           Re-enter password
         password_requested_at:
             label:                   Password requested at
@@ -204,30 +203,6 @@ oro:
                 active: Active Users
                 cannot_login: Cannot login
                 disabled: Disabled Users
-        password:
-            change_dialog.title: Change password
-            reset_dialog.title: Reset password
-            reset_password.label: Reset password
-            change_password.label: Change password
-            new_password.label: New password
-            enter_new_password.label: New password
-            enter_new_password_again.label: Repeat password
-            reset.label: Reset
-            reset:
-                ttl_already_requested.message: The password for this user has already been requested within the last 24 hours
-                popup.message: User {{ user }} will receive reset password by email.
-                popup.question: Are you sure you want to proceed?
-            reset_password:
-                flash:
-                    success: Reset password email has been sent to user
-            force_reset:
-                popup.message: User {{ user }} will receive reset password by email and will be disabled from login.
-                popup.question: Are you sure you want to proceed?
-                popup.button: Reset
-                success.message: Password reset request has been sent to %email%.
-                failure.message: Password reset request to %email% has failed.
-                mass_action.success: Password reset completed successfully. %count% emails sent.
-                mass_action.failure: Mass reset action has failed.
 
     #
     # Oro/Bundle/UserBundle/Entity/Email

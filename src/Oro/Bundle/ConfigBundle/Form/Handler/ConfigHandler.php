@@ -35,6 +35,14 @@ class ConfigHandler
     }
 
     /**
+     * @return ConfigManager
+     */
+    public function getConfigManager()
+    {
+        return $this->manager;
+    }
+
+    /**
      * Process form
      *
      * @param FormInterface $form

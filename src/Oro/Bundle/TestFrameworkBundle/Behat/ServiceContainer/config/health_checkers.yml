@@ -5,6 +5,12 @@ services:
       - '@oro_test.context.fixture_loader'
       - '@oro_behat_extension.fixtures.yml_parser'
       - '@oro_behat_extension.isolation.doctrine_isolator'
+      - '@symfony2_extension.kernel'
+    tags:
+      - { name: 'behat_health_checker' }
+
+  oro_behat_extension.health_checker.feature_cs_ckecker:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\FeatureCSChecker
     tags:
       - { name: 'behat_health_checker' }
 

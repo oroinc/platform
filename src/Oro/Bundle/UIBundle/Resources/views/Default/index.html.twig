@@ -5,7 +5,7 @@
         {% block head %}
             <title>{% trans %}Loading...{% endtrans %}</title>
             <script id="page-title" type="text/html">{{ oro_title_render() }}</script>
-            <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no"/>
+            <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no{% if isMobileVersion() %}, viewport-fit=cover{% endif %}"/>
             <meta http-equiv="cache-control" content="max-age=0" />
             <meta http-equiv="cache-control" content="no-cache" />
             <meta http-equiv="expires" content="0" />
@@ -183,7 +183,7 @@
                 {% endblock right_panel %}
             {% endif %}
             {% block footer %}
-                <div id="dialog-extend-fixed-container"></div>
+                <div id="dialog-extend-fixed-container" class="ui-dialog-minimize-container"></div>
                 <footer id="footer" class="footer">
                     {% placeholder footer_inner %}
                 </footer>

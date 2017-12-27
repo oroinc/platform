@@ -1,10 +1,16 @@
 layout:
     actions:
-        - '@setBlockTheme':
-            themes: 'logo.html.twig'
-
         - '@add':
             id: logo
             parentId: middle_bar_logo
-            blockType: block
+            blockType: logo
 
+        - '@add':
+            id: logo_print
+            blockType: logo
+            parentId: page_container
+            siblingId: page_header
+            options:
+                attr:
+                    class: 'logo--print-only'
+                renderLink: false

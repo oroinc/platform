@@ -154,7 +154,12 @@ class OroMainContext extends MinkContext implements
 
         /** @var OroSelenium2Driver $driver */
         $driver = $session->getDriver();
-        $url = $session->getCurrentUrl();
+        try {
+            $url = $session->getCurrentUrl();
+        } catch (\Exception $e) {
+            // there is some age cases when url is not reachable
+            return;
+        }
 
         if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
             return;
@@ -185,7 +190,12 @@ class OroMainContext extends MinkContext implements
 
         /** @var OroSelenium2Driver $driver */
         $driver = $session->getDriver();
-        $url = $session->getCurrentUrl();
+        try {
+            $url = $session->getCurrentUrl();
+        } catch (\Exception $e) {
+            // there is some age cases when url is not reachable
+            return;
+        }
 
         if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
             return;
@@ -1772,5 +1782,17 @@ class OroMainContext extends MinkContext implements
 
         self::assertEquals($status, $element->getText());
         self::assertEquals($color, $element->getColor());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertPageAddress($page)
+    {
+        $this->spin(function () use ($page) {
+            parent::assertPageAddress($page);
+        }, 10);
+
+        parent::assertPageAddress($page);
     }
 }

@@ -178,10 +178,6 @@ define(function(require) {
                 self.on('ok', cb);
             }
 
-            this.once('cancel', _.bind(function() {
-                this.$el.trigger('hidden');
-            }, this));
-
             if (tools.isMobile()) {
                 this._fixHeightForMobile();
                 $(window).on('resize' + this._eventNamespace(), _.bind(this._fixHeightForMobile, this));

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
+use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 
@@ -18,6 +19,11 @@ abstract class CsvFileStreamWriter extends FileStreamWriter
     protected $enclosure = '"';
 
     /**
+     * @var string
+     */
+    protected $escape;
+
+    /**
      * @var bool
      */
     protected $firstLineIsHeader = true;
@@ -26,6 +32,20 @@ abstract class CsvFileStreamWriter extends FileStreamWriter
      * @var resource
      */
     protected $fileHandle;
+
+    public function __construct()
+    {
+        /**
+         * According to RFC4180 for CSV (https://tools.ietf.org/html/rfc4180)
+         * there's no special meaning for backslash character. As data for import/export is usually meant
+         * to be treated "as is" it was decided to set escape symbol as 0x0 character.
+         * This solves a problem when csv field contains single backslash character.
+         *
+         * If one wants to use other escape symbol then he or she needs to pass it via "escape" option
+         * and provide needed changes for correct csv reading/writing.
+         */
+        $this->escape = chr(0);
+    }
 
     /**
      * {@inheritdoc}
@@ -65,7 +85,7 @@ abstract class CsvFileStreamWriter extends FileStreamWriter
      */
     protected function writeLine(array $fields)
     {
-        $result = fputcsv($this->getFile(), $fields, $this->delimiter, $this->enclosure);
+        $result = fputcsv($this->getFile(), $fields, $this->delimiter, $this->enclosure, $this->escape);
         if ($result === false) {
             throw new RuntimeException('An error occurred while writing to the csv.');
         }
@@ -119,20 +139,24 @@ abstract class CsvFileStreamWriter extends FileStreamWriter
      */
     public function setImportExportContext(ContextInterface $context)
     {
-        if ($context->hasOption('delimiter')) {
-            $this->delimiter = $context->getOption('delimiter');
+        if ($context->hasOption(Context::OPTION_DELIMITER)) {
+            $this->delimiter = $context->getOption(Context::OPTION_DELIMITER);
         }
 
-        if ($context->hasOption('enclosure')) {
-            $this->enclosure = $context->getOption('enclosure');
+        if ($context->hasOption(Context::OPTION_ENCLOSURE)) {
+            $this->enclosure = $context->getOption(Context::OPTION_ENCLOSURE);
         }
 
-        if ($context->hasOption('firstLineIsHeader')) {
-            $this->firstLineIsHeader = (bool)$context->getOption('firstLineIsHeader');
+        if ($context->hasOption(Context::OPTION_ESCAPE)) {
+            $this->escape = $context->getOption(Context::OPTION_ESCAPE);
         }
 
-        if ($context->hasOption('header')) {
-            $this->header = $context->getOption('header');
+        if ($context->hasOption(Context::OPTION_FIRST_LINE_IS_HEADER)) {
+            $this->firstLineIsHeader = (bool)$context->getOption(Context::OPTION_FIRST_LINE_IS_HEADER);
+        }
+
+        if ($context->hasOption(Context::OPTION_HEADER)) {
+            $this->header = $context->getOption(Context::OPTION_HEADER);
         }
     }
 }

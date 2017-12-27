@@ -16,7 +16,7 @@ use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 use Oro\Bundle\HelpBundle\Annotation\Help;
 
 /**
- * @Help(link="https://www.orocommerce.com/documentation/current/install-upgrade")
+ * @Help(link="https://www.oroinc.com/doc/orocommerce/current/install-upgrade")
  */
 class PackageController extends Controller
 {

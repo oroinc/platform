@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\FirstEntity;
 use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\FirstEntityRepository;
@@ -68,7 +69,7 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame([], $repositoryFactory->getArgument(1));
         $this->assertEquals(
-            [['setRepositoryFactory', [$repositoryFactory]]],
+            [['setRepositoryFactory', [new Reference('oro_entity.repository.factory')]]],
             $doctrineConfiguration->getMethodCalls()
         );
     }
@@ -122,7 +123,7 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
             $repositoryFactory->getArgument(1)
         );
         $this->assertEquals(
-            [['setRepositoryFactory', [$repositoryFactory]]],
+            [['setRepositoryFactory', [new Reference('oro_entity.repository.factory')]]],
             $doctrineConfiguration->getMethodCalls()
         );
 

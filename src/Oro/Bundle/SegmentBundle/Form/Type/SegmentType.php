@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
 
@@ -42,6 +42,9 @@ class SegmentType extends AbstractQueryDesignerType
     public function getDefaultOptions()
     {
         return [
+            'column_column_field_choice_options' => [
+                'exclude_fields' => ['relation_type'],
+            ],
             'column_column_choice_type' => 'hidden',
             'filter_column_choice_type' => 'oro_entity_field_select'
         ];
@@ -50,13 +53,16 @@ class SegmentType extends AbstractQueryDesignerType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
+        parent::configureOptions($resolver);
+
         $options = array_merge(
             $this->getDefaultOptions(),
             [
                 'data_class'         => 'Oro\Bundle\SegmentBundle\Entity\Segment',
                 'intention'          => 'segment',
+                'query_type'         => 'segment',
             ]
         );
 

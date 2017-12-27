@@ -6,3 +6,6 @@ config:
         'oroimportexport/js/app/views/export-configurable-widget-view': 'bundles/oroimportexport/js/app/views/export-configurable-widget-view.js'
         'oroimportexport/js/app/views/export-configurable-template-widget-view': 'bundles/oroimportexport/js/app/views/export-configurable-template-widget-view.js'
         'oroimportexport/js/widget/import-dialog-widget': 'bundles/oroimportexport/js/widget/import-dialog-widget.js'
+        'oroimportexport/js/app/views/import-button-view': 'bundles/oroimportexport/js/app/views/import-button-view.js'
+        'oroimportexport/js/app/views/export-template-button-view': 'bundles/oroimportexport/js/app/views/export-template-button-view.js'
+        'oroimportexport/js/app/views/export-button-view': 'bundles/oroimportexport/js/app/views/export-button-view.js'

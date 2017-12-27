@@ -5,6 +5,7 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Entity\Repository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository;
 
 class RecipientListRepositoryTest extends \PHPUnit_Framework_TestCase
@@ -17,7 +18,7 @@ class RecipientListRepositoryTest extends \PHPUnit_Framework_TestCase
     protected $repository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|\Doctrine\ORM\EntityManager
      */
     protected $entityManager;
 
@@ -25,7 +26,7 @@ class RecipientListRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
-            ->setMethods(array('createQueryBuilder'))
+            ->setMethods(['createQueryBuilder'])
             ->getMock();
 
         $this->repository = new RecipientListRepository($this->entityManager, new ClassMetadata(self::ENTITY_NAME));
@@ -49,10 +50,11 @@ class RecipientListRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue(1));
 
-        $users = new ArrayCollection(array($userMock));
-        $groups = new ArrayCollection(array($groupMock));
+        $users = new ArrayCollection([$userMock]);
+        $groups = new ArrayCollection([$groupMock]);
 
-        $recipientList = $this->createMock('Oro\Bundle\NotificationBundle\Entity\RecipientList');
+        /** @var RecipientList|\PHPUnit_Framework_MockObject_MockObject $recipientList */
+        $recipientList = $this->createMock(RecipientList::class);
         $recipientList->expects($this->once())
             ->method('getUsers')
             ->will($this->returnValue($users));
@@ -60,37 +62,22 @@ class RecipientListRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('getGroups')
             ->will($this->returnValue($groups));
 
-        $recipientList->expects($this->once())
-            ->method('getOwner')
-            ->will($this->returnValue(true));
-
         $recipientList->expects($this->exactly(2))
             ->method('getEmail')
             ->will($this->returnValue('a@a.com'));
 
-        $emailCollection = new ArrayCollection(['a@b.com']);
-        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
-        $user->expects($this->once())
-            ->method('getNotificationEmails')
-            ->will($this->returnValue($emailCollection));
-
-        $entity = $this->createMock('Oro\Bundle\TagBundle\Entity\Tag');
-        $entity->expects($this->once())
-            ->method('getOwner')
-            ->will($this->returnValue($user));
-
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
-            ->setMethods(array('getResult'))
+            ->setMethods(['getResult'])
             ->getMockForAbstractClass();
         $query->expects($this->once())->method('getResult')
-            ->will($this->returnValue(array(array('email' => 'b@b.com'))));
+            ->will($this->returnValue([['email' => 'b@b.com']]));
 
         $entityAlias = 'u';
 
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
-            ->setMethods(array('select', 'from', 'getQuery', 'leftJoin', 'where', 'setParameter'))
+            ->setMethods(['select', 'from', 'getQuery', 'leftJoin', 'where', 'setParameter'])
             ->getMock();
         $queryBuilder->expects($this->once())->method('select')
             ->will($this->returnSelf());
@@ -109,7 +96,7 @@ class RecipientListRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('createQueryBuilder')
             ->will($this->returnValue($queryBuilder));
 
-        $emails = $this->repository->getRecipientEmails($recipientList, $entity, 'owner');
-        $this->assertCount(3, $emails);
+        $emails = $this->repository->getRecipientEmails($recipientList);
+        $this->assertCount(2, $emails);
     }
 }

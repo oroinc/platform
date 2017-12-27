@@ -44,7 +44,7 @@ final class CompiledPropertyPath implements \IteratorAggregate, PropertyPathInte
      */
     public function __toString()
     {
-        return $this->path;
+        return (string)$this->path;
     }
 
     /**

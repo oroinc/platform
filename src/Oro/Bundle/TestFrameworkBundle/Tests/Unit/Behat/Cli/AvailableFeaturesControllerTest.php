@@ -18,7 +18,7 @@ class AvailableFeaturesControllerTest extends \PHPUnit_Framework_TestCase
     {
         $suiteRegistry = new SuiteRegistry();
         $specificationFinder = new SpecificationFinder();
-        $controller = new AvailableFeaturesController($suiteRegistry, $specificationFinder, []);
+        $controller = new AvailableFeaturesController($suiteRegistry, $specificationFinder);
         $command = new Command('test');
 
         $controller->configure($command);
@@ -29,6 +29,7 @@ class AvailableFeaturesControllerTest extends \PHPUnit_Framework_TestCase
 
     public function testExecute()
     {
+        /** @var SuiteGenerator|\PHPUnit_Framework_MockObject_MockObject $generator */
         $generator = $this->getMockBuilder(SuiteGenerator::class)->getMock();
         $generator->method('supportsTypeAndSettings')->willReturn(true);
         $generator->method('generateSuite')->willReturn(new GenericSuite('AcmeSuite', []));

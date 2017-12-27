@@ -70,7 +70,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->menuConfiguration->expects(self::once())
             ->method('getTree')
             ->willReturn($options['tree']);
-        $this->menuConfiguration->expects(self::once())
+        $this->menuConfiguration->expects(self::any())
             ->method('getItems')
             ->willReturn(isset($options['items']) ? $options['items'] : []);
 
@@ -287,10 +287,45 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->menuConfiguration->expects(self::once())
             ->method('getTree')
             ->willReturn($options['tree']);
-        $this->menuConfiguration->expects(self::once())
+        $this->menuConfiguration->expects(self::any())
             ->method('getItems')
             ->willReturn($options['items']);
         $menu = new MenuItem('navbar', $this->factory);
         $this->configurationBuilder->build($menu, [], 'navbar');
+    }
+
+    public function testBuildExtraIsAllowed()
+    {
+        $options = [
+            'items' => [
+                'user_registration_register' => [
+                    'route' => 'oro_menu_submenu',
+                    'extras' => []
+                ]
+            ],
+            'tree' => [
+                'navbar' => [
+                    'type' => 'navbar',
+                    'extras' => [],
+                    'children' => [
+                        'user_user_show' => [
+                            'position' => '10'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $this->menuConfiguration->expects(self::once())
+            ->method('getTree')
+            ->willReturn($options['tree']);
+        $this->menuConfiguration->expects(self::any())
+            ->method('getItems')
+            ->willReturn($options['items']);
+
+        $menu = new MenuItem('navbar', $this->factory);
+        $menu->setExtra('isAllowed', true);
+        $this->configurationBuilder->build($menu, [], 'navbar');
+
+        $this->assertFalse($menu->getExtra('isAllowed'));
     }
 }

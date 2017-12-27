@@ -115,6 +115,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $mailer->send($message, $failedRecipients));
     }
 
+
     /**
      * @expectedException \Exception
      */
@@ -189,17 +190,14 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
      */
     public function testRegisterPlugin()
     {
-        $transport = $this->createMock('\Swift_Transport');
-
-        $this->baseMailer->expects($this->once())
-            ->method('getTransport')
-            ->will($this->returnValue($transport));
-
         $mailer = new DirectMailer($this->baseMailer, $this->container);
         $plugin = $this->createMock('\Swift_Events_EventListener');
         $mailer->registerPlugin($plugin);
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function getMailerMock()
     {
         return $this->getMockBuilder('\Swift_Mailer')

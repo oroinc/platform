@@ -1,5 +1,5 @@
-Configuration Reference
-=======================
+# Configuration Reference
+
   * [Overview](#overview)
   * [Configuration File](#configuration-file)
   * [Configuration Loading](#configuration-loading)
@@ -21,30 +21,27 @@ Configuration Reference
     * [Example](#example-4)
   * [Form Options Configuration](#form-options-configuration)
     * [Example](#example-5)
-  * [Pre Conditions and Conditions Configuration](#pre-conditions-and-conditions-configuration)
+  * [Preconditions and Conditions Configuration](#pre-conditions-and-conditions-configuration)
     * [Example](#example-6)
-  * [Pre Actions, Form Init Actions and Actions Configuration](#pre-actions-form-init-actions-and-actions-configuration)
+  * [Preactions, Form Init Actions and Actions Configuration](#pre-actions-form-init-actions-and-actions-configuration)
     * [Example](#example-7)
 
-Overview
-========
+## Overview
 
-Configuration of Operation declares all aspects related to specific operation:
+Configuration of Operation declares all aspects related to a specific operation:
 
 * basic properties of operation like name, label, order, acl resource, etc
-* entities or routes or datagrids that is related to operation
+* entities or routes, or datagrids that are related to the operation
 * conditions and actions
-* attributes involved in operation
+* attributes involved in the operation
 * frontend configuration
 * operation dialog parameters
 
-Structure of configuration is declared in class Oro\Bundle\ActionBundle\Configuration\OperationListConfiguration.
+Structure of configuration is declared in the Oro\Bundle\ActionBundle\Configuration\OperationListConfiguration class.
 
-Configuration File
-==================
+## Configuration File
 
-Configuration must be placed in a file named Resources/config/oro/actions.yml. For example
-Acme/Bundle/DemoBundle/Resources/config/oro/actions.yml.
+Configuration must be placed in a file named Resources/config/oro/actions.yml. For example,Acme/Bundle/DemoBundle/Resources/config/oro/actions.yml.
 
 **Example - actions.yml**
 ```
@@ -56,121 +53,139 @@ operations:
         ...
 ```
 
-Configuration Loading
-=====================
+## Configuration Loading
 
-All operations configuration load automatically on Symfony container building process. Configuration collect from all
-bundles, validate and merge. Merged configuration stored in app cache.
+All operations configurations are loaded automatically on Symfony container building process. Configuration collect from all
+bundles, validate and merge. Merged configuration is stored in app cache.
 
-To validate configuration manually execute a command:
+Eexecute a command to validate configuration manually:
 
 ```
 php app/console oro:action:configuration:validate
 ```
 
-Configuration Merging
-=====================
+## Configuration Merging
 
-All configurations merge in the boot bundles order. There are two steps of merging process: overriding and extending.
+All configurations are merged in the boot bundles order. There are two steps of the merging process: overriding and extending.
 
 **Overriding**
 
-On this step application collects all configurations of all operations with the same name and merge their to one
+At this step, the application collects all configurations of all operations with the same name and merge them to one
 configuration.
-Merging uses simple rules:
- * if node value is scalar - value will be replaced
- * if node value is array - this array will be complemented by values from the second configuration
+The merging process uses simple rules:
+ * if the node value is scalar - the value is replaced
+ * if the node value is array - this array is complemented by values from the second configuration
 
-After first step application knows about all operations and have only one configuration for each operation.
+After the first step, the application knows about all operations and has only one configuration for each operation.
 
 **Extending**
-On this step application collects configurations for all operations which contain `extends`. Then main operation
-configuration, which specified in `extends`, copied and merged with configuration of original operation. Merging use same
-way, which use `overriding` step (rules).
 
-Configuration Replacing
-=======================
+An this step, the application collects configurations for all operations which contain `extends`. Then, the main operation configuration, specified in `extends`, is copied and merged with the configuration of the original operation. Merging is processed in the same way using the `overriding` step (rules).
 
-In merge process we can replace any node on any level of our configuration. If node `replace` is exist and it contains
-some nodes which located on the same level of node `replace` - value of these nodes will be replaced by values from
-_last_ configuration from queue.
+## Configuration Replacing
 
-Defining an Operation
-=====================
+In the merging process, we can replace any node on any level of our configuration. If the `replace` node exists, and it contains
+some nodes on the same level, the value of these nodes are replaced by the values from the _last_ configuration from a queue.
 
-Root element of configuration is "operations". Under this element operations can be defined.
+## Defining an Operation
 
-Single operation configuration has next properties:
+Root element of configuration is "operations". The operations are defined under this element.
+
+Single operation configuration has the following properties:
 
 * **name**
     *string*
     Operation should have a unique name in scope of all application.
+    
 * **extends**
     *string*
-    Operation name, which configuration will be used as basis for current operation.
+    Operation name which is used by configuration as a basis for the current operation.
+    
 * **label**
     *string*
-    This value will be shown in the UI.
+    This value is shown in the UI.
+    
 * **substitute_operation**
     *string*
-    Name of operation that can be replaced (e.g. [substituted](#substitution-of-operation)) by current one.
+    Name of the operation that can be replaced (e.g. [substituted](#substitution-of-operation)) by the current one.
+    
 * **enabled**
     *boolean*
-    Flag that define whether this operation is enabled. Disabled operations will not be used in application.
+    Flag that defines whether this operation is enabled. Disabled operations are used in applications.
+    
 * **page_reload**
     *boolean*
-    By default *true*. Flag that define whether this operation should reload page after execution. It applies when redirect url or datagrid not specified inside *actions* block.
+    By default, it is set to *true*. A flag that defines whether this operation should reload the page after execution. It applies when redirect url or datagrid is not specified inside the *actions* block.
+    
 * **entities**
     *array*
-    Array of entity class names. Operation button will be shown on view/edit pages of this entities.
+    Array of entity class names. Operation button is shown on the view/edit pages of the entities.
+    
 * **for_all_entities**
     *boolean*
-    Boolean flag that determines that current operation matched against all entities if any present.
+    Boolean flag that determines whether the current operation matches the selected entities if any.
+    
 * **exclude_entities**
     *array*
-    List of entities that should be excluded from matching against current operation
+    List of entities that should be excluded from matching against current operation.
+    
 * **routes**
     *array*
-    Operation button will be shown on pages which route is in list.
+    Operation button is shown on the pages where the route is mentioned.
+    
 * **groups**
     *array*
-    Define an array of group names to use with current operation. Behave like tagging of operations. Easiest way to pick needed group of operations for custom approaches.
+    Defines an array of group names to use with the current operation and behaves the same way as operations tagging. It is the easiest way to select the required group of operations for custom approaches.
+    
 * **datagrids**
     *array*
-    Operation icon will be shown as an datagrid-action in listed datagrids.
+    Operation icon is shown as a datagrid-action in the listed datagrids.
+    
 * **for_all_datagrids**
     *boolean*
-    Flag that determines that current operation should be matched for all datagrids if any present.
+    Flag that determines whether the current operation matches all the selected datagrids if any.
+    
 * **exclude_datagrids**
     *array*
-    Define a list of datagrid names witch should be excluded from matching with current operation.
+    Defines a list of datagrid names which should be excluded from matching against the current operation.
+    
 * **order**
     *integer*
     Parameter that specifies the display order of operations buttons.
+    
 * **acl_resource**
     *string*
-    Operation button will be shown only if user have expected permissions.
+    Operation button is shown only if a user has the expected permissions.
+    
 * **frontend_options**
-    Contains configuration for Frontend Options
+    Contains configuration for Frontend Options.
+    
 * **preactions**
-    Contains configuration for actions which will be performed before preconditions
+    Contains configuration for actions which are performed before preconditions.
+    
 * **preconditions**
-    Contains configuration for Pre Conditions
+    Contains configuration for Preconditions.
+    
 * **attributes**
-    Contains configuration for Attributes
+    Contains configuration for Attributes.
+    
 * **datagrid_options**
-    Contains configuration for Datagrid Options
+    Contains configuration for Datagrid Options.
+    
 * **form_options**
-    Contains configuration for Transitions
+    Contains configuration for Transitions.
+    
 * **form_init**
-    Contains configuration for Form Init Actions
+    Contains configuration for Form Init Actions.
+    
 * **conditions**
-    Contains configuration for Conditions
+    Contains configuration for Conditions.
+    
 * **actions**
-    Contains configuration for Actions
+    Contains configuration for Actions.
 
-Example
--------
+### Example
+
 ```
 operations:                                             # root elements
     demo_operation:                                     # name of operation
@@ -185,12 +200,12 @@ operations:                                             # root elements
         datagrids                                       # in listed datagrids operation icon will be shown
             - acme-demo-grid                            # datagrid name
         order: 10                                       # display order of operation button
-        acl_resource: acme_demo_action_view             # ACL resource name that will be checked on pre conditions step
+        acl_resource: acme_demo_action_view             # ACL resource name that will be checked on preconditions step
         frontend_options:                               # configuration for Frontend Options
                                                         # ...
-        preactions:                                     # configuration for Pre Actions
+        preactions:                                     # configuration for Preactions
                                                         # ...
-        preconditions:                                  # configuration for Pre Conditions
+        preconditions:                                  # configuration for Preconditions
                                                         # ...
         attributes:                                     # configuration for Attributes
                                                         # ...
@@ -206,73 +221,74 @@ operations:                                             # root elements
                                                         # ...
 ```
 
-Matching and Filter Mechanism
-=============================
-There are config fields responsible for matching and filtering operations that corresponds to actual context call (e.g.
+## Matching and Filter Mechanism
+
+There are config fields responsible for matching and filtering operations that correspond to actual context call (e.g.
 request, place in template, etc.)
-Filtering
----------
-Filters are presents in single property `groups` for now
 
-Matching
---------
+### Filtering
+
+Filters are currently included in single property `groups`.
+
+### Matching
+
 Matching properties are:
-- `for_all_entities` and `for_all_datagrids` as wildcards boolean indicators.
-- And elements comparisons: `entities`, `routes`, `datagrids`
-- also here is present `exclude_entities` and `exclude_datagrids` - as exclusion matchers useful with wildcard 
-`for_all_entities` and `for_all_datagrids` defined to `true`.
 
-How it works? **Filters** discards all non matched operations and applied first before matchers.
-Then, **matchers**, in turn, collect all operations, among filtered, where any of comparison met though `OR` statement.
-E.g.
- if `datagrid` `OR` `route` will be met in context and present in operation config then that operation will be added to 
-result list.
+- `for_all_entities` and `for_all_datagrids` as wildcards boolean indicators
+- the `entities`, `routes`, `datagrids` elements comparisons
+- `exclude_entities` and `exclude_datagrids` as exclusion matchers useful for the `for_all_entities` and `for_all_datagrids` wildcards set to `true`.
 
-Substitution of Operation
-=========================
+How does it work? 
 
-When parameter `substitute_operation` is defined and it corresponds to other operation name that should be displayed
-(e.g. matched by context) substitution happens. In other words, operation that define substitution will be positioned in
-UI instead of operation that defined in parameter.
-For replacement operation (e.g. operation that have `substitute_operation` parameter) the same
-[matching and filter mechanisms](#matching-and-filter-mechanism) are applied as for normal operation
-with one important difference: **if no matching or filtering criteria are specified than that operation will be matched
-automatically - always**.
-But after all - operations that did not make any replacement (in context) will be cleared from final result list.
+**Filters** discard all non matched operations being applied first before matchers. Then, **matchers**, in turn, collect all operations, among filtered, where comparisons meet though the `OR` statement.
 
-Button Options Configuration
-============================
+For example, if `datagrid` `OR` `route` are present in operation configuration, and they meet in a context, then the operation is added to the result list.
 
-Button Options allow to change operation button style, override button template and add some data attributes.
+## Substitution of Operation
 
-Button Options configuration has next options:
+The substitution happens when the `substitute_operation` parameter is defined, and it corresponds to another operation name that should be displayed (e.g. matched by context). In other words, the operation that defines substitution is located in the UI instead of the operation that is defined in parameter.
+
+ The same [matching and filter mechanisms](#matching-and-filter-mechanism) are applied for replacement operation (e.g. the operation that has the `substitute_operation` parameter) as for the regular one with one important difference: **if no matching or filtering criteria are specified than that operation will be matched automatically - always**.
+Though, the operations that did not make any replacement (in context) are removed from the final result list.
+
+## Button Options Configuration
+
+Button Options enable to change an operation button style, override a button template and add some data attributes.
+
+Button Options configuration has the following options:
 
 * **icon**
     *string*
-    CSS class of icon of operation button
+    CSS class the operation button icon.
+    
 * **class**
     *string*
-    CSS class applied to operation button
+    CSS class applied to the operation button.
+    
 * **group**
     *string*
-    Name of operation button menu. Operation button will be part of dropdown buttons menu with label (specified group).
-    All operations with same group will be shown in one dropdown button html menu.
+    Name of operation button menu. The operation button is a part of a dropdown buttons menu with a label (specified group).
+    All operations within the same group are shown in a dropdown button html menu.
+    
 * **template**
     *string*
-    This option provide possibility to override button template.
-    Should be extended from `OroActionBundle:Operation:button.html.twig`
+    This option provides possibility to override the button template.
+    Should be extended from `OroActionBundle:Operation:button.html.twig`.
+    
 * **data**
     *array*
-    This option provide possibility to add data-attributes to the button tag or dynamic attributes for datagrid action.
+    This option provides possibility to add data-attributes to the button tag or dynamic attributes for datagrid action.
+    
 * **page_component_module**
     *string*
-    Name of js-component module for the operation-button  (attribute *data-page-component-module*).
+    Name of js-component module for the operation-button (attribute *data-page-component-module*).
+    
 * **page_component_options**
     *array*
     List of options of js-component module for the operation-button (attribute *data-page-component-options*).
 
-Example
--------
+### Example
+
 ```
 operations:
     demo_operation:
@@ -291,38 +307,41 @@ operations:
                 component_additional: '[name$="[additional]"]'
 ```
 
-Frontend Options Configuration
-==============================
+## Frontend Options Configuration
 
-Frontend Options allow to override operation dialog or page template, title and set widget options.
+Frontend Options enable to override an operation dialog, page template, or title as well as to set widget options.
 
-Frontend Options configuration has next options:
+Frontend Options configuration has the following options:
 
 * **template**
     *string*
     You can set custom operation dialog template.
-    Should be extended from `OroActionBundle:Operation:form.html.twig`
+    Should be extended from `OroActionBundle:Operation:form.html.twig`.
+    
 * **title**
     *string*
     Custom title of operation dialog window.
+    
 * **title_parameters**
     *array*
-    Parameter for replace placeholders from title. Operation data can be used.
+    Parameter for replacing placeholders from the title. The operation data can be used.
+    
 * **options**
     *array*
-    Parameters related to widget component. Can be specified next options: *allowMaximize*, *allowMinimize*, *dblclick*,
+    Parameters related to widget component with the following options: *allowMaximize*, *allowMinimize*, *dblclick*,
     *maximizedHeightDecreaseBy*, *width*, etc.
+    
 * **confirmation**
     *string*
-    You can show confirmation message before start operation`s execution. Translate constant should be available
-    for JS - placed in jsmessages.*.yml
+    You can show a confirmation message before starting the operation execution. Translate constant should be available
+    for JS - placed in `jsmessages.*.yml`.
+    
 * **show_dialog**
     *boolean*
-    By default this value is `true`. It mean that on operation execution, if form parameters are set, will be shown
-    modal dialog with form. Otherwise will be shown separate page (like entity update page) with form.
+    By default, this value is `true`. It means that during the operation execution a modal dialog with a form is displayed if the form parameters are set. Otherwise a separate page (like entity update page) with a form is displayed instead.
 
-Example
--------
+### Example
+
 ```
 operations:
     demo_operation:
@@ -342,20 +361,19 @@ operations:
             show_dialog: true
 ```
 
-Attributes Configuration
-========================
+## Attributes Configuration
 
-Operation define configuration of attributes. Operation can manipulate it's own data that is mapped by
-Attributes. Each attribute must to have a type and may have options.
+The operation defines configuration of attributes. The operation can manipulate its own data that is mapped by Attributes. Each attribute should have a type and may have options.
 
-Single attribute can be described with next configuration:
+Single attribute can be described with the following configuration:
 
 * **unique name**
-    Attributes should have unique name in scope of Operation that they belong to. Form configuration references
+    Attributes should have a unique name in scope of Operation that they belong to. Form configuration references
     attributes by this value.
+    
 * **type**
     *string*
-    Type of attribute. Next types are supported:
+    Type of attribute. The following types are supported:
     * **boolean**
     * **bool**
         *alias for boolean*
@@ -365,31 +383,34 @@ Single attribute can be described with next configuration:
     * **float**
     * **string**
     * **array**
-        Elements of array should be scalars or objects that supports serialize/deserialize
+        Elements of array should be scalars or objects that support serialization/deserialization.
     * **object**
-        Object should support serialize/deserialize, option "class" is required for this type
+        Object should support serialization/deserialization, the "class" option is required for this type.
     * **entity**
-        Doctrine entity, option "class" is required and it must be a Doctrine manageable class
+        Doctrine entity, the "class" option is required, and it must be a Doctrine manageable class.
+        
 * **label**
     *string*
-    Label can be shown in the UI
+    Label can be shown in the UI.
+    
 * **property_path**
     *string*
     Used to work with attribute value by reference and specifies path to data storage. If property path is specified
-    then all other attribute properties except name are optional - they can be automatically guessed based on last
-    element (field) of property path.
+    then all other attribute properties except name are optional. They can be automatically determined based on the last
+    element (field) of the property path.
+    
 * **options**
-    Options of an attribute. Currently next options are supported
+    Options of an attribute. Currently the following options are supported:
     * **class**
         *string*
-        Fully qualified class name. Allowed only when type either entity or object.
+        Fully qualified class name. Enabled only when typing either entity or object.
 
 **Notice**
-Attribute configuration does not contain any information about how to render attribute on step forms, it's
-responsibility of "Form Options".
+Attribute configuration does not contain any information about how to render the attribute on step forms, it's
+the responsibility of "Form Options".
 
-Example
--------
+### Example
+
 
 ```
 operations:
@@ -408,32 +429,33 @@ operations:
                 property_path: user.group.name
 ```
 
-Datagrid Options Configuration
-==============================
+## Datagrid Options Configuration
 
- Datagrid options allow to define options of datagrid mass operation. It provide two way to set mass operation
-configuration: using service which return array of mas operation configurations or set inline configuration of mass
+ Datagrid options enable to define options of datagrid mass operation. They provide two ways to set mass operation
+configuration: using service which returns array of mas operation configuration or set the inline configuration of mass
 operation.
 
- Single datagrid options can be described with next configuration:
+ Single datagrid options can be described with the following configuration:
 
 * **mass_action_provider**
     *string*
-    Service name. This service must be marked with "oro_action.datagrid.mass_action_provider" tag. Also it must
-    implements Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface. Method "getActions" of this
+    Service name. This service must be marked with the `oro_action.datagrid.mass_action_provider` tag. Also it must
+    implement Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface. The "getActions" method of this
     provider must return array of mass action configurations.
+    
 * **mass_action**
     *array*
-    Mass action configuration. See datagrid documentation.
+    Mass action configuration. See the datagrid documentation.
+    
 * **data**
     *array*
-    This option provide possibility to add static attributes to datagrid action. See datagrid documentation.
+    This option provides possibility to add static attributes to datagrid action. See the datagrid documentation.
 
 **Notice**
-It must be used only one parameter "mass_action_provider" or "mass_action".
+Be noted that only one parameter, either "mass_action_provider" or "mass_action", can be used.
 
-Example
--------
+### Example
+
 
 ```
 operations:
@@ -458,24 +480,22 @@ operations:
                 importJob: 'acme_import_from_csv'
 ```
 
-Form Options Configuration
-==========================
+## Form Options Configuration
 
-These options will be passed to form type of operation, they can contain options for form types of attributes that will be
-shown when user clicks operation button.
+These options are passed to form type of operation. They contain options for form types of attributes that are displayed once a user clicks the operation button.
 
-Single form configuration can be described with next configuration:
+Single form configuration is described with the following configuration:
 
 * **attribute_fields**
     *array*
-    List of attributes with their options. All attributes specified in this configuration must be contains in attribute
-    configuration.
+    List of attributes with their options. All attributes specified in this configuration must be included in the attribute configuration.
+    
 * **attribute_default_values**
     *array*
-    List of default values for attributes. This values are shown in operation form on form load.
+    List of default values for attributes. These values are shown in the operation form once it is loaded. 
 
-Example
--------
+### Example
+
 
 ```
 operations:
@@ -493,34 +513,33 @@ operations:
                 demo_attr: $demo
 ```
 
-Pre Conditions and Conditions Configuration
-===========================================
+## Preconditions and Conditions Configuration
 
 * **preconditions**
-    Configuration of Pre Conditions that must satisfy to allow showing operation button.
+    Configuration of preconditions that must be satisfied to enable the operation button displaying.
+    
 * **conditions**
-    Configuration of Conditions that must satisfy to allow operation.
+    Configuration of Conditions that must be satisfied to enable the operation.
 
 It declares a tree structure of conditions that are applied on the Action Data to check if the Operation could be
-performed. Single condition configuration contains alias - a unique name of condition - and options.
+performed. Single condition configuration contains alias, a unique name of a condition, and options.
 
-Optionally each condition can have a constraint message. All messages of not passed conditions will be shown to user
-when operation could not be performed.
+Optionally, each condition can have a constraint message. All messages of not passed conditions are shown to a user
+if the operation fails to be performed.
 
-There are two types of conditions - preconditions and actually operation conditions. Preconditions are using to check
-whether operation should be allowed to show, and actual conditions used to check whether operation can be done.
+There are two types of conditions: preconditions and actually operation conditions. Preconditions are used to check
+whether the operation is enabled to be displayed, and actual conditions are used to check whether the operation can be done.
 
-Alias of condition starts from "@" symbol and must refer to registered condition. For example "@or" refers to logical
+Alias of condition starts from the `@` symbol and must refer to the registered condition. For example, `@or` refers to the logical
 OR condition.
 
-Options can refer to values of main entity in Action Data using "$" prefix. For example "$some_value" refers to value
-of "callsome_value" attribute of entity that is processed in condition.
+Options can refer to values of the main entity in Action Data using the `$` prefix. For example, `$some_value` refers to the value
+of "callsome_value" attribute of the entity that is processed in condition.
 
-Also it is possible to refer to any property of Action Data using "$." prefix. For example to refer date attribute
-with date can be used string "$.created".
+Also, it is possible to refer to any property of Action Data using the `$.` prefix. For example, the `$.created` string is used to refer to the date attribute.
 
-Example
--------
+### Example
+
 
 ```
 operations:
@@ -532,25 +551,26 @@ operations:
             @not_empty: [$group]
 ```
 
-Pre Actions, Form Init Actions and Actions Configuration
-========================================================
+## Preactions, Form Init Actions and Actions Configuration
 
 * **preactions**
-    Configuration of Pre Actions that may be performed before pre conditions, conditions, form init actions and actions.
-    It can be used to prepare some data in Action Data that will be used in pre conditions validation.
+    Configuration of preactions that may be performed before preconditions, conditions, form init actions, and actions.
+    It can be used to prepare some data in Action Data that will be used in preconditions validation.
+    
 * **form_init**
-    Configuration of Form Init Actions that may be performed on Action Data before conditions and actions.
-    One of possible init operations usage scenario is to fill attributes with default values, which will be used in
-    operation form if it exist.
+    Configuration of Form Init Actions that may be performed in Action Data before conditions and actions.
+    One of the possible init operations usage scenario is to fill attributes with default values which will be used in
+    operation form if any.
+    
 * **actions**
-    Configuration of Actions that must be performed after all previous steps are performed. This is main operation step
-    that must contain operation logic. It will be performed only after conditions will be qualified.
+    Configuration of actions that must be performed after all previous steps are completed. This is the main operation step
+    that must contain operation logic. It will be performed only after conditions are qualified.
 
-Similarly to Conditions - alias of Action starts from "@" symbol and must refer to registered Actions. For example
-"@assign_value" refers to Action which set specified value to attribute in Action Data.
+Similarly to conditions, the alias of action starts from the `@` symbol and must refer to registered actions. For example, the
+`@assign_value` refers to the action which set specified value to attribute in Action Data.
 
-Example
--------
+### Example
+
 
 ```
 operations:

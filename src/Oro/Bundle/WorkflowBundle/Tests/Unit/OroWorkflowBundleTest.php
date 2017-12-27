@@ -8,6 +8,7 @@ use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler;
 use Oro\Bundle\WorkflowBundle\OroWorkflowBundle;
 use Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 
 class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,7 +26,11 @@ class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
         $expectations = [
             $this->isInstanceOf(Compiler\AddAttributeNormalizerCompilerPass::class),
             $this->isInstanceOf(Compiler\AddWorkflowValidationLoaderCompilerPass::class),
-            $this->isInstanceOf(Compiler\WorkflowChangesEventsCompilerPass::class),
+            new RegisterListenersPass(
+                'oro_workflow.changes.event.dispatcher',
+                'oro_workflow.changes.listener',
+                'oro_workflow.changes.subscriber'
+            ),
             $this->isInstanceOf(Compiler\EventTriggerExtensionCompilerPass::class),
             $this->isInstanceOf(Compiler\WorkflowConfigurationHandlerCompilerPass::class),
             $this->isInstanceOf(Compiler\WorkflowDefinitionBuilderExtensionCompilerPass::class),

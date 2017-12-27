@@ -42,6 +42,17 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
+     * @When /^I remove "(?P<value>([\w\s]+))" from (?P<tableContent>([\w\s]+))$/
+     */
+    public function removeRow($value, $tableContent)
+    {
+        /** @var Table $table */
+        $table = $this->findElementContains('Table', $tableContent);
+        $row = $table->getRowByContent($value);
+        $row->find('css', 'button.removeRow')->click();
+    }
+
+    /**
      * @When /^I drag (?P<rowNum>([\d]+)) row to the top in "(?P<tableContent>([\w\s]+))" table$/
      */
     public function dragRowToTop($rowNum, $tableContent)

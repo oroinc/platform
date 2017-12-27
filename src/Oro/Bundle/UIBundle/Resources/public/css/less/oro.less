@@ -1660,6 +1660,11 @@ footer {
     width: 100%;
     top: 1px;
     left: 1px;
+
+    .ui-dialog-minimize-container & {
+      position: relative;
+    }
+
     .ui-dialog-titlebar-close{
       position: absolute;
       right: 10px;
@@ -1686,6 +1691,11 @@ footer {
   }
   .ui-dialog-titlebar-buttonpane {
     right: 7px !important;
+    /* iOS 11 */
+    right: calc(constant(safe-area-inset-right) + 7px) !important;
+    /* iOS 11.2+ */
+    right: calc(env(safe-area-inset-right) + 7px) !important;
+
     top: 5px !important;
     margin: 0 !important;
     border:1px solid #272e36;
@@ -2118,7 +2128,7 @@ ul.inline-extra {
   text-decoration: none !important;
 }
 .navbar-extra-right {
-  padding-right: 23px;
+  padding-right: @contentPadding;
   .title-buttons-container {
     .btn-group{
       margin-left: 8px;
@@ -2183,7 +2193,7 @@ textarea {
 .scrollspy-title {
   border:1px solid #e5e5e5;
   border-width:1px 0;
-  margin:0 -20px 0px -20px;
+  margin:0 -12px 0px -12px;
   background:#fafafa;
   /*#gradient > .vertical(#fafafa, #f7f7f7);*/
   padding:4px 20px;
@@ -2719,7 +2729,7 @@ label.radio.error {
   float: left;
   background: none;
   margin: 0;
-  padding: 6px 15px 6px 20px;
+  padding: 6px 15px 6px @contentPadding;
 }
 .breadcrumb > li.active,
 .breadcrumb > li {

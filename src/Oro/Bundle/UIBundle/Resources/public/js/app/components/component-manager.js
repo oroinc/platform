@@ -1,13 +1,15 @@
-define(function(require) {
+define([
+    'require',
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/tools',
+    'oroui/js/app/components/base/component',
+    'oroui/js/component-shortcuts-manager',
+    'chaplin' // it is a circular dependency, so there's no local variable assigned
+], function(require, $, _, __, tools, BaseComponent, ComponentShortcutsManager) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Chaplin = require('chaplin');
-    var __ = require('orotranslation/js/translator');
-    var tools = require('oroui/js/tools');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var ComponentShortcutsManager = require('oroui/js/component-shortcuts-manager');
     var console = window.console;
 
     function ComponentManager($el) {
@@ -102,17 +104,26 @@ define(function(require) {
             var elements = [];
             var self = this;
 
-            _.each(ComponentShortcutsManager.getAll(), function(shortcut, shortcutName) {
-                var dataKey = 'page-component-' + shortcutName;
-                var dataAttr = 'data-' + dataKey;
+            var shortcuts = ComponentShortcutsManager.getAll();
+            var selector = _.map(shortcuts, function(shortcut) {
+                return '[' + shortcut.dataAttr + ']';
+            });
 
-                this.$el.find('[' + dataAttr + ']').each(function() {
-                    var $elem = $(this);
-                    if (self._isInOwnLayout($elem)) {
+            this.$el.find(selector.join(',')).each(function() {
+                var $elem = $(this);
+                if (self._isInOwnLayout($elem)) {
+                    return;
+                }
+
+                var elemData = $elem.data();
+                _.each(shortcuts, function(shortcut) {
+                    var dataKey = shortcut.dataKey;
+                    var dataAttr = shortcut.dataAttr;
+                    if (elemData[dataKey] === undefined) {
                         return;
                     }
 
-                    var data = ComponentShortcutsManager.getComponentData(shortcut, $elem.data(dataKey));
+                    var data = ComponentShortcutsManager.getComponentData(shortcut, elemData[dataKey]);
                     data.pageComponentOptions = $.extend(
                         true,
                         data.pageComponentOptions,
@@ -124,7 +135,7 @@ define(function(require) {
 
                     elements.push($elem);
                 });
-            }, this);
+            });
 
             return elements;
         },
@@ -221,7 +232,7 @@ define(function(require) {
         _loadAndInitializeComponent: function(data) {
             var initDeferred = $.Deferred();
 
-            tools.loadModule(data.module)
+            tools.loadModules(data.module)
                 .then(this._onComponentLoaded.bind(this, initDeferred, data.options))
                 .catch(this._onRequireJsError.bind(this, initDeferred));
 
@@ -429,7 +440,8 @@ define(function(require) {
                 }
             } else if (error) {
                 // if there is unhandled error -- show user message
-                Chaplin.mediator.execute('showMessage', 'error', __('oro.ui.components.initialization_error'));
+                require('chaplin').mediator
+                    .execute('showMessage', 'error', __('oro.ui.components.initialization_error'));
             }
         },
 

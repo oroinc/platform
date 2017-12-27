@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImapBundle\EventListener;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
@@ -58,12 +58,12 @@ class UserEmailOriginListener
     /**
      * Create ImapEmailFolder instances for each newly created EmailFolder related to UserEmailOrigin
      *
-     * @param LifecycleEventArgs $event
+     * @param UserEmailOrigin    $origin
+     * @param LifecycleEventArgs $args
      */
-    public function prePersist(LifecycleEventArgs $event)
+    public function prePersist(UserEmailOrigin $origin, LifecycleEventArgs $args)
     {
-        $origin = $event->getObject();
-        if ($origin instanceof UserEmailOrigin && !$origin->getFolders()->isEmpty()) {
+        if (!$origin->getFolders()->isEmpty()) {
             $manager = $this->createManager($origin);
             $folders = $origin->getRootFolders();
 

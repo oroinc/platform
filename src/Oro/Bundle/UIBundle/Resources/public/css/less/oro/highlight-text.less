@@ -4,7 +4,7 @@
       text-decoration: underline;
       background-color: @highlightTextColor;
       font-family: inherit;
-      font-weight: 700;
+      font-weight: bold;
       font-size: inherit;
       line-height: inherit;
 
@@ -13,17 +13,10 @@
     }
   }
 
-  &-element {
-    label& {
-      display: inline-block !important; //Need for rewrite deeper nested class
-      margin: 0;
-    }
-  }
-
   &-element[class^="fa-"],
   &-element[class*=" fa-"] {
     background-color: @highlightTextColor;
-    padding: 1px 2px
+    padding: 1px 2px;
   }
 
   &-not-found {

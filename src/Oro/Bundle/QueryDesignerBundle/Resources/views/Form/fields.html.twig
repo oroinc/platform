@@ -1,32 +1,7 @@
 {% block oro_field_choice_row %}
     {{ block('form_row') }}
-    {% set fieldConditionOptions = {
-        _sourceElement: '#' ~ id,
-        widgetModule: 'oroentity/js/field-choice',
-        widgetName: 'fieldChoice',
-        select2: {
-            placeholder: placeholder|trans
-        },
-        fieldsLoaderSelector: entity_choice_selector
-    } %}
-    <div data-page-component-module="oroui/js/app/components/jquery-widget-component"
-         data-page-component-options="{{ fieldConditionOptions|json_encode }}">
-    </div>
 {% endblock %}
 
 {% block oro_date_field_choice_row %}
     {{ block('form_row') }}
-    {% set fieldConditionOptions = {
-        _sourceElement: '#' ~ id,
-        widgetModule: 'oroentity/js/field-choice',
-        widgetName: 'fieldChoice',
-        select2: {
-            placeholder: placeholder|trans
-        },
-        include: [{type: 'datetime'}],
-        fieldsLoaderSelector: entity_choice_selector
-    } %}
-    <div data-page-component-module="oroui/js/app/components/jquery-widget-component"
-         data-page-component-options="{{ fieldConditionOptions|json_encode }}">
-    </div>
 {% endblock %}

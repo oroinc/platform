@@ -7,16 +7,9 @@
 
 {% block navButtons %}
     {% if is_granted('oro_attribute_create') and is_granted('oro_attribute_update') %}
-        {% include 'OroImportExportBundle:ImportExport:buttons.html.twig' with {
-            entity_class: fieldClassName,
-            importJob: 'attribute_import_from_csv',
-            importProcessor: 'oro_entity_config_entity_field.add_or_replace',
-            importTitle: 'oro.importexport.import.entity'|trans({'%entityName%': 'oro.entity_config.attribute.entity_plural_label'|trans}),
-            exportTemplateJob: 'entity_export_template_to_csv',
-            exportTemplateProcessor: 'oro_entity_config_attribute.export_template',
-            refreshPageOnSuccess: true,
-            options: {'entity_id': entity.id, 'check_attributes' : true},
-            importLabel: 'oro.importexport.import.label'|trans,
+        {% include 'OroImportExportBundle:ImportExport:buttons_from_configuration.html.twig' with {
+            'alias': 'oro_field_config_model_attribute',
+            'options': {'entity_id': entity.id, 'check_attributes' : true}
         } %}
     {% endif %}
 

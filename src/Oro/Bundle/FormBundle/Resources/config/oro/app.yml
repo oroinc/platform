@@ -60,3 +60,75 @@ assetic:
             inputs:
                 - %kernel.root_dir%/../vendor/tinymce/tinymce/skins/lightgray/fonts/tinymce.ttf
             output: bundles/tinymce/skins/lightgray/fonts/tinymce.ttf
+
+oro_form:
+    wysiwyg:
+        html_allowed_elements:
+            table:
+                attributes:
+                    - cellspacing
+                    - cellpadding
+                    - border
+                    - align
+                    - width
+            thead:
+                attributes:
+                    - align
+                    - valign
+            tbody:
+                attributes:
+                    - align
+                    - valign
+            tr:
+                attributes:
+                    - align
+                    - valign
+            td:
+                attributes:
+                    - align
+                    - valign
+                    - rowspan
+                    - colspan
+                    - bgcolor
+                    - nowrap
+                    - width
+                    - height
+            a:
+                attributes:
+                    - !href
+                    - target
+                    - title
+            dl: ~
+            dt: ~
+            div:
+                attributes:
+                    - id
+            ul: ~
+            ol: ~
+            li: ~
+            em: ~
+            strong: ~
+            b: ~
+            p: ~
+            font:
+                attributes:
+                    - color
+            i: ~
+            br:
+                hasClosingTag: false
+            span:
+                attributes:
+                    - id
+            img:
+                attributes:
+                    - src
+                    - width
+                    - height
+                    - alt
+                hasClosingTag: false
+            h1: ~
+            h2: ~
+            h3: ~
+            h4: ~
+            h5: ~
+            h6: ~

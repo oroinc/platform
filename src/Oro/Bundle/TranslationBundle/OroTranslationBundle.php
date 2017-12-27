@@ -10,6 +10,7 @@ use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationContext
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationPackagesProviderPass;
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationStrategyPass;
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslatorDependencyPass;
+use Oro\Bundle\UIBundle\DependencyInjection\Compiler\DynamicAssetVersionPass;
 
 class OroTranslationBundle extends Bundle
 {
@@ -23,5 +24,6 @@ class OroTranslationBundle extends Bundle
         $container->addCompilerPass(new TranslationContextResolverPass());
         $container->addCompilerPass(new TranslationStrategyPass());
         $container->addCompilerPass(new TranslationPackagesProviderPass());
+        $container->addCompilerPass(new DynamicAssetVersionPass('translations'));
     }
 }

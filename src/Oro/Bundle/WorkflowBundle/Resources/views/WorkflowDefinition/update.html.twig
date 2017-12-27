@@ -19,9 +19,7 @@
                     exclusive_record_groups: entity.exclusiveRecordGroups,
                     applications: entity.applications
                 },
-                entityFields: entityFields,
                 availableDestinations: availableDestinations,
-                system_entities: system_entities,
                 chartOptions: {},
                 connectionOptions: {
                     detachable: true
@@ -412,6 +410,7 @@
     <script type="text/template" id="attribute-form-option-edit-template">
         <form action="#">
             <div class="form-horizontal" style="width: 436px;">
+                <input type="hidden" name="itemId" value="">
                 <div class="control-group">
                     {{ _self.render_label("oro.workflow.form.entity_field.label"|trans, true, "oro.workflow.workflowdefinition.attribute.property_path.tooltip") }}
                     <div class="controls">

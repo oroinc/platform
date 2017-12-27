@@ -259,6 +259,7 @@ define(function(require) {
             select2element.inputWidget('data',  values);
 
             this._criteriaRenderd = true;
+            this._alignCriteria();
         },
 
         /**
@@ -307,7 +308,7 @@ define(function(require) {
             }
 
             if (this.templateTheme === '') {
-                config.width = 'auto';
+                config.width = 'resolve';
             }
 
             return config;
@@ -462,6 +463,7 @@ define(function(require) {
             // update left and right margins of value field frame
             var leftWidth = this.$('.choice-filter .dropdown-toggle').outerWidth();
             var rightWidth = this.$('.filter-update').outerWidth();
+
             valueFrame.css('margin-left', leftWidth);
             valueFrame.css('padding-right', rightWidth);
         },

@@ -39,15 +39,18 @@ define(function(require) {
         lastSearch: null,
 
         /**
-         * @property {Object}
+         * @property {integer}
          */
-        waitingSearch: {},
+        debounceWait: 500,
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
             AutocompleteComponent.__super__.initialize.apply(this, arguments);
+
+            //add debounce to search method
+            this._searchForResults = _.debounce(this._searchForResults.bind(this), this.debounceWait);
 
             var thisOptions = {
                 selection_template: _.bind(this.renderSelection, this),
@@ -94,38 +97,37 @@ define(function(require) {
          * @param {Function} callback
          */
         source: function(query, callback) {
-            var self = this;
-
-            if (this.source.timeoutId) {
-                clearTimeout(this.source.timeoutId);
-            }
+            var $el = this.$el;
 
             if (this.lastSearch === query) {
-                this.$el.typeahead('show');
+                $el.typeahead('show');
                 return;
             }
 
-            if (this.waitingSearch[query]) {
-                return;
+            $el.typeahead('hide');
+            this._searchForResults(query, callback);
+        },
+
+        _searchForResults: function(query, callback) {
+            var self = this;
+
+            if (this.jqXHR) {
+                this.jqXHR.abort(); // abort ajax call with out-dated results
             }
 
-            this.$el.typeahead('hide');
-
-            this.source.timeoutId = setTimeout(function() {
-                self.source.timeoutId = null;
-                self.waitingSearch[query] = true;
-
-                $.ajax({
-                    url: self.url,
-                    data: {query: query},
-                    success: function(response) {
-                        self.sourceCallback(query, callback, response);
-                    },
-                    error: function() {
-                        self.sourceCallback(query, callback, {});
-                    }
-                });
-            }, this.options.timeout);
+            this.jqXHR = $.ajax({
+                url: self.url,
+                data: {query: query},
+                success: function(response) {
+                    self.sourceCallback(query, callback, response);
+                },
+                error: function() {
+                    self.sourceCallback(query, callback, {});
+                },
+                complete: function() {
+                    delete self.jqXHR; // clear
+                }
+            });
         },
 
         sourceCallback: function(query, callback, response) {
@@ -133,7 +135,6 @@ define(function(require) {
             callback(this.$el.is(':focus') ? results : []);
 
             this.lastSearch = query;
-            delete this.waitingSearch[query];
         },
 
         /**

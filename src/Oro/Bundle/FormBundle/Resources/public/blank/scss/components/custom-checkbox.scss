@@ -1,4 +1,4 @@
-// @theme: blank
+// @theme: blank;
 
 .custom-checkbox {
     position: relative;
@@ -42,7 +42,6 @@
 
     &__icon {
         display: inline-block;
-        box-sizing: border-box;
 
         height: $checkbox-icon-size;
         width: $checkbox-icon-size;

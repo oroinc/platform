@@ -4,12 +4,12 @@
   height: 100%;
   min-height: 280px;
   #page{
-    position: relative;
-    top: 50%;
-    overflow: visible;
-    #top-page{
-      position: relative;
-      margin: -140px 0 0;
+    #top-page {
+      display: table;
+      > .container{
+        display: table-cell;
+        vertical-align: middle;
+      }
     }
   }
 }

@@ -2,11 +2,11 @@
     filters: params.metadata.filters|default([]),
     hierarchy: params.metadata.hierarchy|default({}),
     fieldChoice: {
+        filterPreset: 'dataaudit',
         select2: {
             placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans,
             formatSelectionTemplateSelector: params.column_chain_template_selector|default(null),
         },
-        fieldsLoaderSelector: '#' ~ params.entity_choice_id ~ 'oro_api_get_audit_fields',
     },
 }|merge_recursive(params.dataAuditConditionOptions|default({})) %}
 

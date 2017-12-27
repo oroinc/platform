@@ -3,6 +3,15 @@ OroPlatformBundle
 
 The Oro Platform version holder, maintenance mode support, lazy services functionality and provide easy way to add application configuration settings from any bundle.
 
+
+## Table of Contents ##
+ - [Maintenance mode](#maintenance-mode)
+ - [Lazy services](#lazy-services)
+ - [Add application configuration settings from any bundle](#add-application-configuration-settings-from-any-bundle)
+ - [Optional Doctrine listeners](#optional-doctrine-listeners)
+ - [Lazy Doctrine listeners](#lazy-doctrine-listeners)
+
+
 ## Maintenance mode ##
 To use maintenance mode functionality bundle provides `oro_platform.maintenance` service.
 
@@ -90,20 +99,46 @@ doctrine:
 Please note that setting added through _app.yml_ can be overwrote in _app/config.yml_. So, you can consider settings in _app.yml_ as default ones.
 
 
-## Optional Doctrine listeners ##
+## Optional listeners ##
 
-Doctrine listeners can be a very slow processes. And during console command execution, you can disable this listeners.
+Doctrine and some Kernel listeners can be a very slow processes. And during console command execution, you can disable this listeners.
 
-Each console command have additional option `disabled_listeners`. Using this option, you can disable some of doctrine listeners.
+Each console command have additional option `disabled_listeners`. Using this option, you can disable some of listeners.
 
-As value, this option takes `all` string or array of optional doctrine listener services. In the first case, will be disabled all optional listeners. In the second case, will be disabled only the specified listeners. For example:
+As value, this option takes `all` string or array of optional listener services. In the first case, will be disabled all optional listeners. In the second case, will be disabled only the specified listeners. For example:
 
 ```
  app/console some.command --disabled_listeners=first_listener --disabled_listeners=second_listener
 ```
 
-In this case, command will be run with disabled doctrine listeners: first_listener and second_listener.
+In this case, command will be run with disabled listeners: first_listener and second_listener.
 
 See the list of optional listeners you can by run command `oro:platform:optional-listeners`.
 
-To mark your doctrine listener as optional, your listener must implement `Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface` interface and set skips in your code if $enabled = false.
+To mark your listener as optional, your listener must implement `Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface` interface and set skips in your code if $enabled = false.
+
+## Lazy Doctrine listeners ##
+
+Doctrine [Event Listeners](https://symfony.com/doc/current/doctrine/event_listeners_subscribers.html)
+and [Entity Listeners](https://symfony.com/doc/current/bundles/DoctrineBundle/entity-listeners.html)
+can have dependencies to other services with a lot of dependencies. This can lead a significant impact on
+performance of each request, because all of these services need to be fetched from the service container
+(and thus be instantiated) every time when any operation with Entity Manager is performed.
+
+To solve this issue the Symfony provides an ability to mark the listeners as lazily loaded. For details see
+[Lazy loading for Event Listeners](https://symfony.com/doc/current/doctrine/event_listeners_subscribers.html#lazy-loading-for-event-listeners).
+But it is easy to forget about this, especially in a big project with a lot of listeners. This is the reason why in
+the Oro Platform all the listeners are marked as lazily loaded. But if needed, you can remove the lazy loading
+for your listeners by adding `lazy: false` to `doctrine.event_listener` or `doctrine.orm.entity_listener` tags. E.g.:
+
+```yaml
+services:
+    acme.event_listener:
+        class: AppBundle\EventListener\DoctrineEventListener
+        tags:
+            - { name: doctrine.event_listener, event: postPersist, lazy: false }
+    acme.entity_listener:
+        class: AppBundle\EventListener\DoctrineEntityListener
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: AppBundle\Entity\MyEntity, event: postPersist, lazy: false }
+```

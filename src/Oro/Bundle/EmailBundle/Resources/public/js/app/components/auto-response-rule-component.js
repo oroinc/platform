@@ -1,10 +1,9 @@
-define([
-    'jquery',
-    'underscore',
-    'oroui/js/app/components/base/component',
-    'oroentity/js/fields-loader'
-], function($, _, BaseComponent) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BaseComponent = require('oroui/js/app/components/base/component');
 
     var AutoResponseRuleComponent = BaseComponent.extend({
         relatedSiblingComponents: {
@@ -12,45 +11,35 @@ define([
         },
 
         initialize: function(options) {
-            this.$storage = $('[data-ftid=oro_email_autoresponserule_definition]');
+            if (!this.conditionBuilderComponent) {
+                throw new Error('Sibling component `conditionBuilderComponent` is required.');
+            }
+            this.$definitionInput = $('[data-ftid=oro_email_autoresponserule_definition]');
 
-            this._initLoader(options);
+            this.conditionBuilderComponent.view.setValue(_.result(this.getValue(), 'filters'));
 
-            this.conditionBuilderComponent.view.setValue(this.load('filters'));
-            this.listenTo(this.conditionBuilderComponent.view, 'change', function(value) {
-                this.save(value, 'filters');
-            });
+            this.listenTo(this.conditionBuilderComponent.view, 'change', this.setFiltersValue);
 
             AutoResponseRuleComponent.__super__.initialize.apply(this, arguments);
         },
 
-        _initLoader: function(options) {
-            var $entityChoice = $('[data-ftid=oro_email_autoresponserule_entity]');
-            $entityChoice.fieldsLoader();
-            $entityChoice.fieldsLoader('setFieldsData', options.data);
+        getValue: function() {
+            var value = this.$definitionInput.val();
+            return value.length ? JSON.parse(value) : {};
         },
 
-        load: function(key) {
-            var data = {};
-            var json = this.$storage.val();
-            if (json) {
-                try {
-                    data = JSON.parse(json);
-                } catch (e) {
-                    return undefined;
-                }
-            }
-            return key ? data[key] : data;
+        setFiltersValue: function(filtersValue) {
+            var value = this.getValue();
+            value.filters = filtersValue;
+            this.$definitionInput.val(JSON.stringify(value));
         },
 
-        save: function(value, key) {
-            var data = this.load();
-            if (key) {
-                data[key] = value;
-            } else {
-                data = key;
+        dispose: function() {
+            if (this.disposed) {
+                return;
             }
-            this.$storage.val(JSON.stringify(data));
+            delete this.$definitionInput;
+            AutoResponseRuleComponent.__super__.dispose.call(this);
         }
     });
 

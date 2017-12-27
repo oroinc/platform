@@ -3,6 +3,8 @@
 .page-footer-container {
     display: flex;
 
+    @include safe-area-offset(padding, $page-footer-container-inner-offset);
+
     &__base {
         width: $page-footer-container-base-width;
 

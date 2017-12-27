@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
+use PHPUnit\Framework\TestCase;
+
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use NumberFormatter as IntlNumberFormatter;
 use Symfony\Component\Intl\Util\IntlTestHelper;
@@ -9,7 +11,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class NumberFormatterTest extends \PHPUnit_Framework_TestCase
+class NumberFormatterTest extends TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject

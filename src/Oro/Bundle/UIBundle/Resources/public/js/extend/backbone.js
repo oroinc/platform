@@ -122,6 +122,13 @@ define(function(require) {
         this.disposed = true;
         return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
     };
+    Backbone.View.prototype._ensureElement = _.wrap(Backbone.View.prototype._ensureElement, function(_ensureElement) {
+        // if the element was passed with options -- preserve it in the DOM, if `keepElement` is not set to `false`
+        if (this.el && this.keepElement !== false) {
+            this.keepElement = true;
+        }
+        return _ensureElement.call(this);
+    });
     Backbone.View.prototype.setElement = _.wrap(Backbone.View.prototype.setElement, function(setElement, element) {
         if (this.$el) {
             this.disposePageComponents();

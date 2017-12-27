@@ -1,43 +1,31 @@
-Operations
-==========
+# Operations
 
   * [What are Operations?](#what-are-operations)
-  * [How it works?](#how-it-works)
+  * [How does it work?](#how-it-works)
   * [Operation Configuration](#operation-configuration)
   * [Configuration Validation](#configuration-validation)
   * [Default Operations](#default-operations)
     * [Questions and Answers](#questions-and-answers)
   * [Operation Diagram](#operation-diagram)
 
-What are Operations?
---------------------
+## What are Operations?
 
-*Operations* provide possibility to assign any interaction with user by specifying them to:
- - Entity classes;
- - Routes;
- - Datagrids.
+*Operations* provide possibility to assign any interaction with a user by specifying:
+ - Entity classes
+ - Routes
+ - Datagrids
 
-Every active *operation* will show button (link) on the corresponded page(s). Button will be displayed only if all
-described Preconditions are met. The *operation* will be performed by clicking on the button if all described
-Preconditions and Conditions are met. Also, after clicking on a button, a modal dialog will be shown with some fields
-only if the operation has a config for form dialog.
+Every active *operation* shows a button or a link on the corresponding page. The button is displayed only if all the described preconditions are met. The *operation* is performed by clicking the button if all the described preconditions and conditions are met. Also, if the operation has a form dialog configuration, then a a modal dialog with fields appears when clicking the button. 
 
-How it works?
--------------
+## How does it work?
 
-Each *operation* relates to the some entity types (i.e. consists full class name) or\and routes of pages
-where operations should be displayed or\and datagrids. Before page loading, ActionBundle chooses *operations* that have 
-corresponded page entity|route. Then these *operations* are checking for their Pre conditions. If all Pre conditions 
-are met - Operation's button is displaying.
-After a user clicks on the button - all performed operations (and underlined actions) will be executed 
-if preconditions of *operation* and conditions of *actions* are met.
+Each *operation* relates to an entity type (consists of a full class name) or\and a route of the page where the operations should be displayed or\and a datagrid. Before the page loading, ActionBundle chooses *operations* that have a corresponding page entity|route. Then these *operations* are checked against the preconditions. If all the preconditions are met - the operation's button is displayed.
+Upon clicking the button - all the performed operations (and underlined actions) are executed provided that all the preconditions of *operation* and conditions of *actions* are met.
 
-Operation Configuration
------------------------
+## Operation Configuration
 
-All operations can be described in configuration file ``actions.yml`` under corresponded bundle in `config/oro` 
-resource directory.
-Look at the example of simple operation configuration that performs some execution logic with entity MyEntity.
+All operations can be described in the ``actions.yml`` configuration file under the corresponding bundle in the `config/oro` resource directory.
+Below, there is an example of a simple operation configuration that performs an execution logic with the MyEntity entity.
 
 ```
 operations:
@@ -142,58 +130,48 @@ operations:
             - @assign_value: [$expired, true]                       # action definition
 ```
 
- This configuration describes operation that relates to the ``MyEntity`` entity. On the View page 
-(acme_demo_myentity_view) of this entity (in case of field 'updatedAt' > new DateTime('now')) will be displayed button
-with label "adme.demo.myentity.operations.myentity_operation". After click on this button - if property `expired` of the
-entity = false - will run actions "assign_value" that set field 'expired' to `true`.
- If `form_options` are specified after click on button will be shown form dialog with attributes fields. And actions
-will run only on form submit.
+ This configuration describes the operation that relates to the ``MyEntity`` entity. The button with the "adme.demo.myentity.operations.myentity_operation" label is displayed on the view page (acme_demo_myentity_view) of this entity (in case the 'updatedAt' field > new DateTime('now')). If the `expired` property of the entity = false, then clicking the button triggers the "assign_value" action that sets the 'expired' field to `true`.
+ If `form_options` are specified, then the form dialog with attributes fields is displayed when clicking the button. The actions run only on the submit form.
 
-Configuration Validation
-------------------------
+# Configuration Validation
 
-To validate all operations configuration execute a command:
+Execute a command to validate all operations configuration:
 
 ```
 php app/console oro:action:configuration:validate
 ```
 
-**Note:** All configurations apply automatically after their changes on dev environment.
+**Note:** All configurations apply automatically after their changes made in developer environment.
 
 
-Default Operations
-------------------
+## Default Operations
 
-**Oro Action Bundle** defines several system wide default operations for common purpose. Those are basic CRUD-called
-operations for entities:
+**Oro Action Bundle** defines several system wide default operations for a common purpose. Those are basic CRUD-called operations for entities:
  
- - `UPDATE` - operation to edit entity, using route from `routeUpdate` option of entity configuration.
- - `DELETE` - operation for entity deletion, using route from `routeDelete` option of entity configuration
+ - `UPDATE` - operation for an entity editing that uses a route from the `routeUpdate` option of the entity configuration.
+ - `DELETE` - operation for an entity deletion that uses a route from the `routeDelete` option of the entity configuration.
 
-  If Default Operations are suppose to be used in not default application - e.g. `commerce` - routes will be retrieved
-from `routeCommerceUpdate` and `routeCommerceDelete` options.
+  If the default operations are used in the nondefault applications, as in `commerce`, for example, the routes are retrieved from the `routeCommerceUpdate` and `routeCommerceDelete` options.
 
-  Configs for default operations placed in `Resources/config/oro/action.yml` file under **Oro Action Bundle** directory.
+  Configurations for the default operations are allocated in the `Resources/config/oro/action.yml` file under the **Oro Action Bundle** directory.
 
 ### Questions and Answers
 
-#### How I can disable CRUD default operation for my Bundle?
+#### How can I disable a CRUD default operation for my Bundle?
 
-  Suppose you need to disable default `DELETE` operation for your new entity `MyEntity`.
-Here the case which describe the way. You can do this in `actions.yml` under your bundle config resources directory:
+  Supposing you need to disable the default `DELETE` operation for your new `MyEntity` entity.
+Here is the case which describes the solution. You can do this in `actions.yml` under your bundle configuration resources directory:
 
 ```
 operations:
     DELETE:
         exclude_entities: ['MyEntity']
 ```
-  This will merge addition special condition to default operation during config compilation. 
-So that default operation `DELETE` will not be matched for your entity and will not be displayed as well.
+  The operation merges special additional condition to the default operation during the configuration compilation, so that the default `DELETE` operation doesn't match your entity and is not displayed as well.
 
 #### Can I disable default operation for my datagrid?
 
-  Yes. There are two ways to do that. **The first**: you can disable operation by updating datagrid configuration in its
-section `action_configuration` you should define a key that corresponds to operation name with value `false`.
+  Yes. There are two ways to do that. **The first way**: you can disable the operation by updating your datagrid configuration in its `action_configuration` section. Define a key that corresponds to the operation name with the `false` value.
 
 `datagrids.yml`:
 
@@ -205,16 +183,11 @@ datagrids:
             some_default_common_operation: false
 ```
 
-`some_default_common_operation` will not be displayed at `your_datagrid_name` grid anymore. 
-However, action_configuration can accept callable as value, so that sometimes the options is occupied by service callback.
-If is that, we can use another approach.
+`some_default_common_operation` is not displayed at `your_datagrid_name` grid anymore. 
+However, action_configuration can accept callable as value, so sometimes the options are occupied by service callback.
+If it is so, we can use another approach.
 
- The **second way** to disable operation for custom datagrid is to use `exclude_datagrids` option in operation definition.
-So you can specialize name of datagrid that should be excluded from matching by *operation*. 
-If your operation is defined by other bundle you can use *merge* behavior of operation configuration and just add an
-additional property value under your bundle config. For example, your operation that should not be displayed for 
-datagrid `product_view` is default operation `DELETE` from `OroActionBundle`. You can exclude your grid from matching with
-next addition to `<YourBundle>/Resources/config/oro/action.yml`
+ The **second way** is to disable the operation for custom datagrid using the `exclude_datagrids` option in operation definition.So you can specify the name of the datagrid that should be excluded from the *operation* matching. If your operation is defined by another bundle, you can use the *merge* behavior of operation configuration and just add anadditional property value under your bundle configuration. For example, the operation that should not be displayed for the `product_view` datagrid is the default `DELETE` operation from `OroActionBundle`. You can exclude your grid from matching with the next addition to `<YourBundle>/Resources/config/oro/action.yml`
 
 ```
 operations:
@@ -222,13 +195,11 @@ operations:
         exclude_datagrids:
             - product_view
 ```
-This is it.
-You can always use more different ways to define, reuse or customize operation definition. With basic merge there also
-`replace`, `extend` and `substitute_operation` options to help with different cases.
+You can always use other ways to define, reuse, or customize the operation definition. Along with basic merge there also the `replace`, `extend`, and `substitute_operation` options that become helpful in different cases.
 
-#### How I can modify CRUD default operation for my Bundle?
-  If you need to customize somehow a default (or any other) operation. Suppose to change basically its `label`, you can
-do thing like that:
+#### How can I modify CRUD default operation for my Bundle?
+
+  If you need to customize a default or any other operation, you should change its `label` as follows:
  
 ```
 operations:
@@ -239,17 +210,12 @@ operations:
         entities: ['MyEntity']                  # replacement will occur only if this operation will be matched by entity
         for_all_entities: false                 # overriding extended property for `entities` field matching only
 ```
-  Here is custom modification through substitution mechanism. When operation mentioned in `substitute_operation` field 
-will be replaced by current one.
-  Additionally there present limitation in field `entities` that will pick this custom action for substitution of
-default one only when context will be matched by that entity.
-For those who need to make full replacement of operation instead of extended copy of it - `extends` field can be omitted
-and own, totally custom, body defined.
+  Here is a custom modification made through a substitution mechanism when the operation mentioned in the `substitute_operation` field is replaced by the current one.
+  Additionally, you can limit the application of the modification only to the entities mentioned in the `entities` field. If you need to make full replacement of the operation instead of copying the extended version of it, the `extends` field can be omitted, and the custom body should be defined.
 
-  See [substitution](./configuration-reference.md#substitution-of-operation) section in
-config documentation](./configuration-reference.md) for more details.
+  See the [substitution](./configuration-reference.md#substitution-of-operation) section in the configuration documentation (./configuration-reference.md) for more details.
 
 
-Operation Diagram
------------------
-Following diagram shows operation processes logic in graphical representation: ![Operation Diagram](images/operation.png)
+## Operation Diagram
+
+The following diagram shows operation processes logic in graphical representation: ![Operation Diagram](images/operation.png)

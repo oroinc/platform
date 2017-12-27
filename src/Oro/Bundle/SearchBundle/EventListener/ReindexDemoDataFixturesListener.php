@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SearchBundle\EventListener;
 
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
+use Oro\Bundle\PlatformBundle\EventListener\AbstractDemoDataFixturesListener;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface as SearchIndexerInterface;
 
@@ -10,51 +11,49 @@ use Oro\Bundle\SearchBundle\Engine\IndexerInterface as SearchIndexerInterface;
  * Disables search index listener during loading of demo data
  * and triggers full reindexation of search index after demo data are loaded.
  */
-class ReindexDemoDataFixturesListener
+class ReindexDemoDataFixturesListener extends AbstractDemoDataFixturesListener
 {
-    /**
-     * This listener is disabled to prevent a lot of reindex messages
-     */
-    const INDEX_LISTENER = 'oro_search.index_listener';
-
-    /** @var OptionalListenerManager */
-    private $listenerManager;
-
     /** @var SearchIndexerInterface */
-    private $searchIndexer;
+    protected $searchIndexer;
 
     /**
      * @param OptionalListenerManager $listenerManager
      * @param SearchIndexerInterface  $searchIndexer
      */
-    public function __construct(
-        OptionalListenerManager $listenerManager,
-        SearchIndexerInterface $searchIndexer
-    ) {
-        $this->listenerManager = $listenerManager;
+    public function __construct(OptionalListenerManager $listenerManager, SearchIndexerInterface $searchIndexer)
+    {
+        parent::__construct($listenerManager);
+
         $this->searchIndexer = $searchIndexer;
     }
 
     /**
-     * @param MigrationDataFixturesEvent $event
+     * {@inheritDoc}
      */
     public function onPreLoad(MigrationDataFixturesEvent $event)
     {
-        if ($event->isDemoFixtures()) {
-            $this->listenerManager->disableListener(self::INDEX_LISTENER);
-        }
+        $this->beforeDisableListeners($event);
+        $this->listenerManager->disableListeners($this->listeners);
+        $this->afterDisableListeners($event);
     }
 
     /**
-     * @param MigrationDataFixturesEvent $event
+     * {@inheritDoc}
      */
     public function onPostLoad(MigrationDataFixturesEvent $event)
     {
-        if ($event->isDemoFixtures()) {
-            $this->listenerManager->enableListener(self::INDEX_LISTENER);
+        $this->beforeEnableListeners($event);
+        $this->listenerManager->enableListeners($this->listeners);
+        $this->afterEnableListeners($event);
+    }
 
-            $event->log('running full reindexation of search index');
-            $this->searchIndexer->reindex();
-        }
+    /**
+     * {@inheritDoc}
+     */
+    protected function afterEnableListeners(MigrationDataFixturesEvent $event)
+    {
+        $event->log('running full reindexation of search index');
+
+        $this->searchIndexer->reindex();
     }
 }
