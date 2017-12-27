@@ -42,15 +42,7 @@ define([
         viewport: null,
 
         initialize: function() {
-            this._prepareScreenMaps();
-
-            var screenMap = this.options.screenMap;
-
-            _.each(screenMap, function(screen, i) {
-                var smallerScreen = screenMap[i - 1] || null;
-                screen.min = smallerScreen ? smallerScreen.max + 1 : 0;
-                this.screenByTypes[screen.name] = screen;
-            }, this);
+            this.screenByTypes = this._prepareScreenMaps();
 
             this.viewport = {
                 width: 0,
@@ -86,23 +78,33 @@ define([
 
         _prepareScreenMaps: function() {
             var moduleScreenMap = this._getModuleScreenMaps();
+            var screenMap = this.options.screenMap;
 
             if (this._isValidScreenMap(moduleScreenMap)) {
-                this.options.screenMap = _.filter(
-                    _.uniq(
-                        _.flatten([moduleScreenMap, this.options.screenMap]),
-                        false,
-                        function(item) {
-                            return item.name;
-                        }
-                    ),
-                    function(item) {
-                        return !item.skip;
+                screenMap = _.filter(
+                    _.extend(
+                        {},
+                        _.indexBy(this.options.screenMap, 'name'),
+                        _.indexBy(moduleScreenMap, 'name')
+                    ), function(value) {
+                        return !value.skip;
                     }
                 );
             }
 
-            this.options.screenMap = _.sortBy(this.options.screenMap, 'max');
+            screenMap = _.chain(screenMap)
+                .sortBy('max')
+                .map(function(value, index, screenMap) {
+                    var smallerScreen = screenMap[index - 1] || null;
+                    value.min = smallerScreen ? smallerScreen.max + 1 : 0;
+                    return value;
+                })
+                .indexBy('name')
+                .value();
+
+            this.options.screenMap = _.values(screenMap);
+
+            return screenMap;
         },
 
         _getModuleScreenMaps: function() {
@@ -152,6 +154,7 @@ define([
             var screen;
             for (var i = 0, stop = screenMap.length; i < stop; i++) {
                 screen = screenMap[i];
+                // console.log(screen)
                 inRange = this._isInRange({
                     max: screen.max,
                     min: screen.min,
@@ -180,13 +183,19 @@ define([
         _minScreenTypeChecker: function(minScreenType) {
             var viewport = this._getScreenByTypes(this.viewport.type);
             var minViewport = this._getScreenByTypes(minScreenType);
-            return minScreenType === 'any' || (_.isObject(viewport) ? viewport.max >= minViewport.max : false);
+            if (_.isNull(viewport) || _.isNull(minViewport)) {
+                return false;
+            }
+            return minScreenType === 'any' || viewport.max >= minViewport.max;
         },
 
         _maxScreenTypeChecker: function(maxScreenType) {
             var viewport = this._getScreenByTypes(this.viewport.type);
             var maxViewport = this._getScreenByTypes(maxScreenType);
-            return maxScreenType === 'any' || (_.isObject(viewport) ? viewport.max <= maxViewport.max : false);
+            if (_.isNull(viewport) || _.isNull(maxViewport)) {
+                return false;
+            }
+            return maxScreenType === 'any' || viewport.max <= maxViewport.max;
         },
 
         _widthChecker: function(width) {
