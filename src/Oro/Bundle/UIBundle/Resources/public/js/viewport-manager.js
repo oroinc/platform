@@ -72,7 +72,7 @@ define([
                     isApplicable = checker.call(this, testViewport[check]);
                 }
             }, this);
-            console.log(testViewport, isApplicable)
+
             return isApplicable;
         },
 
