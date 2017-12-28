@@ -203,20 +203,6 @@ class ResponseHistoryListener
     }
 
     /**
-     * Make sure url length is not bigger than url field's size
-     *
-     * @param EntityManager $em
-     * @param string $url
-     * @return string
-     *
-     * @deprecated logic replaced to Oro\Bundle\NavigationBundle\Entity\Listener\PrepareUrlListener
-     */
-    protected function prepareUrl(EntityManager $em, $url)
-    {
-        return $url;
-    }
-
-    /**
      * @param string $entityFQCN
      */
     public function setHistoryItemEntityFQCN($entityFQCN)
