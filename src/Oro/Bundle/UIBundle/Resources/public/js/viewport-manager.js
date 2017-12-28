@@ -154,7 +154,7 @@ define([
             var screen;
             for (var i = 0, stop = screenMap.length; i < stop; i++) {
                 screen = screenMap[i];
-                // console.log(screen)
+
                 inRange = this._isInRange({
                     max: screen.max,
                     min: screen.min,
