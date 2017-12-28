@@ -114,7 +114,7 @@ class PostExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('critical')
             ->with(
                 sprintf('Error occurred during export merge: %s', $exceptionMessage),
-                ['message' => $messageBody, 'exception' => $exception]
+                ['exception' => $exception]
             );
 
         $this->importExportResultSummarizer
