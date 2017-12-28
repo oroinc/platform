@@ -358,6 +358,23 @@ class QueryBuilderUtil
     }
 
     /**
+     * Query safe replacement for sprintf
+     *
+     * @param string $format
+     * @param array ...$args
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public static function sprintf($format, ...$args): string
+    {
+        foreach ($args as $arg) {
+            self::checkIdentifier($arg);
+        }
+
+        return sprintf($format, ...$args);
+    }
+
+    /**
      * Check that passed identifier is safe for usage in dynamic DQL
      *
      * @param string $str
@@ -368,6 +385,19 @@ class QueryBuilderUtil
         if (preg_match('/[\W]+/', $str)) {
             throw new \InvalidArgumentException(sprintf('Unsafe value passed %s', $str));
         }
+    }
+
+    /**
+     * Construct safe identifier field name based table alias and field name.
+     *
+     * @param string $alias
+     * @param string $field
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public static function getField($alias, $field): string
+    {
+        return self::sprintf('%s.%s', $alias, $field);
     }
 
     /**
