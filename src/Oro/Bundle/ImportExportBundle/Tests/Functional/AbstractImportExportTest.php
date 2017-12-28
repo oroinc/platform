@@ -57,12 +57,12 @@ abstract class AbstractImportExportTest extends WebTestCase
     /**
      * @param ImportExportConfigurationInterface $configuration
      * @param string                             $expectedCsvFilePath
-     * @param array                              $columnToIgnoreInExportFile
+     * @param array                              $skippedColumns
      */
     protected function assertExportWorks(
         ImportExportConfigurationInterface $configuration,
         string $expectedCsvFilePath,
-        array $columnToIgnoreInExportFile = []
+        array $skippedColumns = []
     ) {
         $this->assertPreExportActionExecuted($configuration);
 
@@ -91,7 +91,7 @@ abstract class AbstractImportExportTest extends WebTestCase
         $exportFileContent = $this->getImportExportFileContent($exportedFilename);
         $this->deleteImportExportFile($exportedFilename);
 
-        if (empty($columnToIgnoreInExportFile)) {
+        if (empty($skippedColumns)) {
             static::assertContains(
                 $this->getFileContent($expectedCsvFilePath),
                 $exportFileContent
@@ -101,7 +101,7 @@ abstract class AbstractImportExportTest extends WebTestCase
             $exportedData = $this->getParsedDataFromCSVContent($exportFileContent);
             $this->removedIgnoredColumnsFromData(
                 $exportedData,
-                $columnToIgnoreInExportFile
+                $skippedColumns
             );
 
             static::assertEquals(
