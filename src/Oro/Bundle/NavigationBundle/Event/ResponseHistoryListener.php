@@ -98,7 +98,7 @@ class ResponseHistoryListener
         }
 
         $postArray = [
-            'url'          => $this->prepareUrl($em, $request->getRequestUri()),
+            'url'          => $request->getRequestUri(),
             'user'         => $user,
             'organization' => $organization
         ];
@@ -208,14 +208,12 @@ class ResponseHistoryListener
      * @param EntityManager $em
      * @param string $url
      * @return string
+     *
+     * @deprecated logic replaced to Oro\Bundle\NavigationBundle\Entity\Listener\PrepareUrlListener
      */
     protected function prepareUrl(EntityManager $em, $url)
     {
-        $metaData = $em->getClassMetadata($this->historyItemFQCN);
-        $urlMeta = $metaData->getFieldMapping('url');
-        $length = $urlMeta['length'];
-
-        return substr($url, 0, $length);
+        return $url;
     }
 
     /**
