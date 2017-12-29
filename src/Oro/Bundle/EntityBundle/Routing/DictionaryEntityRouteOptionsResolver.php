@@ -2,35 +2,30 @@
 
 namespace Oro\Bundle\EntityBundle\Routing;
 
+use Psr\Log\LoggerInterface;
+
 use Symfony\Component\Routing\Route;
 
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
-
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
-use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-
-class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterface, LoggerAwareInterface
+class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterface
 {
-    use LoggerAwareTrait;
-
     const ROUTE_GROUP = 'dictionary_entity';
     const ENTITY_ATTRIBUTE = 'dictionary';
     const ENTITY_PLACEHOLDER = '{dictionary}';
 
     /** @var ChainDictionaryValueListProvider */
-    protected $dictionaryProvider;
+    private $dictionaryProvider;
 
     /** @var EntityAliasResolver */
-    protected $entityAliasResolver;
+    private $entityAliasResolver;
 
-    /** @var EntityClassNameHelper */
-    protected $entityClassNameHelper;
+    /** @var LoggerInterface */
+    private $logger;
 
     /** @var array */
     private $supportedEntities;
@@ -38,16 +33,16 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
     /**
      * @param ChainDictionaryValueListProvider $dictionaryProvider
      * @param EntityAliasResolver              $entityAliasResolver
-     * @param EntityClassNameHelper            $entityClassNameHelper
+     * @param LoggerInterface                  $logger
      */
     public function __construct(
         ChainDictionaryValueListProvider $dictionaryProvider,
         EntityAliasResolver $entityAliasResolver,
-        EntityClassNameHelper $entityClassNameHelper
+        LoggerInterface $logger
     ) {
-        $this->dictionaryProvider    = $dictionaryProvider;
-        $this->entityAliasResolver   = $entityAliasResolver;
-        $this->entityClassNameHelper = $entityClassNameHelper;
+        $this->dictionaryProvider = $dictionaryProvider;
+        $this->entityAliasResolver = $entityAliasResolver;
+        $this->logger = $logger;
     }
 
     /**
@@ -71,9 +66,9 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
     }
 
     /**
-     * @return array [[entity plural alias, url safe class name], ...]
+     * @return string[] The list of entity plural aliases
      */
-    protected function getSupportedEntities()
+    private function getSupportedEntities()
     {
         if (null === $this->supportedEntities) {
             $entities = $this->dictionaryProvider->getSupportedEntityClasses();
@@ -81,14 +76,12 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
             $this->supportedEntities = [];
             foreach ($entities as $className) {
                 try {
-                    $this->supportedEntities[] = [
-                        $this->entityAliasResolver->getPluralAlias($className),
-                        $this->entityClassNameHelper->getUrlSafeClassName($className)
-                    ];
+                    $this->supportedEntities[] = $this->entityAliasResolver->getPluralAlias($className);
                 } catch (EntityAliasNotFoundException $e) {
-                    if ($this->logger) {
-                        $this->logger->error($e->getMessage(), ['exception' => $e]);
-                    }
+                    $this->logger->error(
+                        'Cannot get an alias for the entity "{entity}"',
+                        ['exception' => $e, 'entity' => $className]
+                    );
                 }
             }
         }
@@ -99,15 +92,13 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
     /**
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
-     * @param array                   $entities [[entity plural alias, url safe class name], ...]
+     * @param string[]                $entities The list of entity plural aliases
      */
-    protected function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $entities)
+    private function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $entities)
     {
         $routeName = $routes->getName($route);
 
-        foreach ($entities as $entity) {
-            list($pluralAlias, $urlSafeClassName) = $entity;
-
+        foreach ($entities as $pluralAlias) {
             $existingRoute = $routes->getByPath(
                 str_replace(self::ENTITY_PLACEHOLDER, $pluralAlias, $route->getPath()),
                 $route->getMethods()
@@ -116,19 +107,6 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
                 // move existing route before the current route
                 $existingRouteName = $routes->getName($existingRoute);
                 $routes->insert($existingRouteName, $existingRoute, $routeName, true);
-                // additional route for entities which has api, but it not recognize urls like
-                // /api/rest/latest/Oro_Bundle_AddressBundle_Entity_Country
-                // TODO: This should be removed in scope of https://magecore.atlassian.net/browse/BAP-8650
-                $dictionaryRoute = $routes->cloneRoute($existingRoute);
-                $dictionaryRoute->setPath(
-                    str_replace(self::ENTITY_PLACEHOLDER, $urlSafeClassName, $route->getPath())
-                );
-                $routes->insert(
-                    $routes->generateRouteName($existingRouteName),
-                    $dictionaryRoute,
-                    $existingRouteName,
-                    true
-                );
             } else {
                 // add an additional strict route based on the base route and current entity
                 $strictRoute = $routes->cloneRoute($route);
@@ -147,7 +125,7 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
      *
      * @return bool
      */
-    protected function hasAttribute(Route $route, $placeholder)
+    private function hasAttribute(Route $route, $placeholder)
     {
         return false !== strpos($route->getPath(), $placeholder);
     }

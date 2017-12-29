@@ -137,7 +137,7 @@ class ApiEntityManager
     /**
      * Get entity metadata
      *
-     * @return ClassMetadata|ClassMetadataInfo
+     * @return ClassMetadata|ClassMetadataInfo|null
      */
     public function getMetadata()
     {

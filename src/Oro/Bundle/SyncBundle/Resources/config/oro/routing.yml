@@ -1,0 +1,5 @@
+oro_sync_ticket:
+    path: /socket_ticket
+    methods: [POST]
+    defaults:
+        _controller: OroSyncBundle:Ticket:post
