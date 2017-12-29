@@ -23,6 +23,7 @@ define(function(require) {
         options: {
             type: 'widget',
             actionsEl: '.widget-actions',
+            moveAdoptedActions: true,
             url: false,
             elementFirst: true,
             title: '',
@@ -301,7 +302,9 @@ define(function(require) {
                     }
                     self.actions.adopted[actionId] = $action;
                 });
-                adoptedActionsContainer.remove();
+                if (this.options.moveAdoptedActions) {
+                    adoptedActionsContainer.remove();
+                }
             }
         },
 
@@ -541,20 +544,22 @@ define(function(require) {
          * @private
          */
         _renderActions: function() {
-            var self = this;
             this._clearActionsContainer();
             var container = this.getActionsElement();
 
             if (container) {
                 _.each(this.actions, function(actions, section) {
-                    var sectionContainer = self._createWidgetActionsSection(section);
+                    var sectionContainer = this._createWidgetActionsSection(section);
+                    var move = section === 'adopted' ? this.options.moveAdoptedActions : true;
                     _.each(actions, function(action, key) {
-                        self._initActionEvents(action);
-                        self._appendActionElement(sectionContainer, action);
-                        self.trigger('widget:add:action:' + section + ':' + key, $(action));
-                    });
+                        this._initActionEvents(action);
+                        if (move) {
+                            this._appendActionElement(sectionContainer, action);
+                        }
+                        this.trigger('widget:add:action:' + section + ':' + key, $(action));
+                    }, this);
                     container.append(sectionContainer);
-                });
+                }, this);
             }
         },
 
