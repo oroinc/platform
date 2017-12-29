@@ -24,6 +24,7 @@ oro_entity_dictionary_api:
         version:  latest
     options:
         group: dictionary_entity
+        priority: -10
 
 oro_entity_data_api:
     resource: "@OroEntityBundle/Controller/Api/Rest/EntityDataController.php"
