@@ -55,7 +55,12 @@ class DictionaryController extends RestGetController
     public function cgetAction($dictionary)
     {
         $manager = $this->getManager();
-        $manager->setClass($manager->resolveEntityClass($dictionary, true));
+        $entityClass = $manager->resolveEntityClass($dictionary, true);
+        if (!$entityClass) {
+            return $this->buildNotFoundResponse();
+        }
+
+        $manager->setClass($entityClass);
 
         $page  = (int)$this->getRequest()->get('page', 1);
         $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);

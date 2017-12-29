@@ -36,12 +36,18 @@ define([
      * @param {boolean=} options.skipSubprotocolCheck, default is false
      * @param {boolean=} options.skipSubprotocolAnnounce, default is false
      * @param {boolean=} options.debug, default is false
+     * @param {string} options.syncTicketUrl
      *
      * @export  orosync/js/sync/wamp
      * @class   orosync.sync.Wamp
      */
     function Wamp(options) {
         this.options = _.extend({}, defaultOptions, options);
+        this.maxRetries = this.options.maxRetries;
+
+        // set 0 for autobahn maxRetries count as the reconnects was done with onHangup method of Wamp object
+        this.options.maxRetries = 0;
+
         if (!this.options.host) {
             throw new Error('host option is required');
         }
@@ -59,22 +65,38 @@ define([
     }
 
     Wamp.prototype = {
+        // number of retry reconnects
+        retryCount: 0,
+
+        // quantity of attempts before stop reconnection
+        maxRetries: 0,
+
         /**
          * Initiate connection process
          */
         connect: function() {
             if (!this.session) {
-                var protocol = this.options.secure ? 'wss' : 'ws';
-                var wsuri = [
-                    protocol,
-                    '://',
-                    this.options.host,
-                    ':',
-                    this.options.port,
-                    '/',
-                    this.options.path.replace(/\/+$/, '')
-                ].join('');
-                ab.connect(wsuri, _.bind(this.onConnect, this), _.bind(this.onHangup, this), this.options);
+                $.ajax(this.options.syncTicketUrl, {
+                    method: 'POST',
+                    success: (function(response) {
+                        var protocol = this.options.secure ? 'wss' : 'ws';
+                        var wsuri = [
+                            protocol,
+                            '://',
+                            this.options.host,
+                            ':',
+                            this.options.port,
+                            '/',
+                            this.options.path.replace(/\/+$/, '')
+                        ].join('');
+                        wsuri = wsuri + '?ticket=' + encodeURIComponent(response.ticket);
+                        ab.connect(wsuri, _.bind(this.onConnect, this), _.bind(this.onHangup, this), this.options);
+                    }).bind(this),
+                    error: (function() {
+                        this.onHangup(ab.CONNECTION_UNSUPPORTED);
+                    }).bind(this),
+                    dataType: 'json'
+                });
             }
         },
 
@@ -139,8 +161,27 @@ define([
          * @param {number} details.retries number of scheduled attempt
          */
         onHangup: function(code, msg, details) {
-            if (code !== 0) {
-                this.trigger('connection_lost', _.extend({code: code}, details || {}));
+            this.retryCount += 1;
+            // change the callback retries parameter to real attempt
+            details = _.extend(
+                details || {},
+                {retries: this.retryCount, maxretries: this.maxRetries, delay: this.options.retryDelay}
+            );
+
+            if (code === ab.CONNECTION_RETRIES_EXCEEDED) {
+                if (this.retryCount <= this.maxRetries) {
+                    var that = this;
+                    window.setTimeout(function() {
+                        that.connect();
+                    }, this.options.retryDelay);
+                } else {
+                    // set the retries to null in case if was reached maximum number of retries
+                    details.retries = null;
+                }
+            }
+
+            if (code !== ab.CONNECTION_CLOSED) {
+                this.trigger('connection_lost', _.extend({code: code}, details));
             }
             this.session = null;
         },

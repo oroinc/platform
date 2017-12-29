@@ -63,7 +63,7 @@ class TopicSender
                 $this->publisher->send(self::UPDATE_TOPIC, json_encode($tags));
             } catch (\Exception $e) {
                 $this->logger->error(
-                    'Failed to publish a message to {topic}.',
+                    'Failed to publish a message to {topic}',
                     ['topic' => self::UPDATE_TOPIC, 'exception' => $e, 'tags' => $tags]
                 );
             }

@@ -34,16 +34,19 @@ class EntityMetadataProvider implements MetadataProviderInterface
         $metadata = [];
 
         if ($object instanceof EntityManagerAwareInterface) {
-            $entityFQCN         = $object->getManager()->getMetadata()->name;
-            $metadata['entity'] = [];
+            $classMetadata = $object->getManager()->getMetadata();
+            if (null !== $classMetadata) {
+                $entityFQCN = $classMetadata->name;
+                $metadata['entity'] = [];
 
-            $metadata['entity']['phpType'] = $entityFQCN;
-            if ($this->cm->hasConfig($entityFQCN)) {
-                $config = $this->cm->getConfig(new EntityConfigId('entity', $entityFQCN));
+                $metadata['entity']['phpType'] = $entityFQCN;
+                if ($this->cm->hasConfig($entityFQCN)) {
+                    $config = $this->cm->getConfig(new EntityConfigId('entity', $entityFQCN));
 
-                $metadata['entity']['label']       = $this->translator->trans($config->get('label'));
-                $metadata['entity']['pluralLabel'] = $this->translator->trans($config->get('plural_label'));
-                $metadata['entity']['description'] = $this->translator->trans($config->get('description'));
+                    $metadata['entity']['label']       = $this->translator->trans($config->get('label'));
+                    $metadata['entity']['pluralLabel'] = $this->translator->trans($config->get('plural_label'));
+                    $metadata['entity']['description'] = $this->translator->trans($config->get('description'));
+                }
             }
         }
 
