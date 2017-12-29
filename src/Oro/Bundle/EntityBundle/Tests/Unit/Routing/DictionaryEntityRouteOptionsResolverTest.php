@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Routing;
 
+use Psr\Log\LoggerInterface;
+
 use Symfony\Component\Routing\Route;
 
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\SortableRouteCollection;
-
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\EntityBundle\Routing\DictionaryEntityRouteOptionsResolver;
 
 class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCase
@@ -18,7 +21,7 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
     protected $entityAliasResolver;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityClassNameHelper;
+    protected $logger;
 
     /** @var SortableRouteCollection */
     protected $routeCollection;
@@ -31,21 +34,14 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
 
     protected function setUp()
     {
-        $this->dictionaryProvider    = $this
-            ->getMockBuilder('Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityAliasResolver   = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityClassNameHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->dictionaryProvider = $this->createMock(ChainDictionaryValueListProvider::class);
+        $this->entityAliasResolver = $this->createMock(EntityAliasResolver::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->routeOptionsResolver = new DictionaryEntityRouteOptionsResolver(
             $this->dictionaryProvider,
             $this->entityAliasResolver,
-            $this->entityClassNameHelper
+            $this->logger
         );
 
         $this->routeCollection         = new SortableRouteCollection();
@@ -105,13 +101,6 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
                     ['Test\Group', 'groups'],
                 ]
             );
-        $this->entityClassNameHelper->expects($this->any())
-            ->method('getUrlSafeClassName')
-            ->willReturnCallback(
-                function ($className) {
-                    return str_replace('\\', '_', $className);
-                }
-            );
 
         $this->routeOptionsResolver->resolve($route, $this->routeCollectionAccessor);
 
@@ -125,12 +114,10 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
             [
                 'first_route',
                 'some_route',
-                'override_after_auto_7', // statuses
                 'override_after', // statuses
-                'tested_route_auto_8', // priorities
-                'override_before_auto_9', // sources
+                'tested_route_auto_7', // priorities
                 'override_before', // sources
-                'tested_route_auto_10', // groups
+                'tested_route_auto_8', // groups
                 'tested_route',
                 'last_route'
             ],
@@ -143,11 +130,11 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
         );
         $this->assertEquals(
             'priorities',
-            $this->routeCollection->get('tested_route_auto_8')->getDefault('dictionary')
+            $this->routeCollection->get('tested_route_auto_7')->getDefault('dictionary')
         );
         $this->assertEquals(
             'groups',
-            $this->routeCollection->get('tested_route_auto_10')->getDefault('dictionary')
+            $this->routeCollection->get('tested_route_auto_8')->getDefault('dictionary')
         );
     }
 }

@@ -8,6 +8,7 @@ use Doctrine\ORM\Query;
 
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Helper\DictionaryHelper;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -21,14 +22,10 @@ class DictionaryApiEntityManager extends ApiEntityManager
     /** @var DictionaryHelper */
     protected $dictionaryHelper;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $entityConfigManager;
 
-    /**
-     * @var PropertyAccessor
-     */
+    /** @var PropertyAccessor */
     protected $propertyAccessor;
 
     /**
@@ -50,6 +47,23 @@ class DictionaryApiEntityManager extends ApiEntityManager
         $this->dictionaryHelper = $dictionaryHelper;
         $this->entityConfigManager = $entityConfigManager;
         $this->propertyAccessor = $propertyAccessor;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resolveEntityClass($entityName, $isPluralAlias = false)
+    {
+        try {
+            $entityClass = $this->entityClassNameHelper->resolveEntityClass($entityName, $isPluralAlias);
+        } catch (EntityAliasNotFoundException $e) {
+            $entityClass = null;
+        }
+        if ($entityClass && !in_array($entityClass, $this->dictionaryProvider->getSupportedEntityClasses(), true)) {
+            $entityClass = null;
+        }
+
+        return $entityClass;
     }
 
     /**
