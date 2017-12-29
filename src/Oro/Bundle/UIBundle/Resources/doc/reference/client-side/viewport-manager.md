@@ -54,6 +54,25 @@ require({
     }
 });
 ```
+To delete inherited screen type need set `skip: true` for a specific screen name
+```javascript
+require({
+    config: {
+        'oroui/js/viewport-manager': {
+            screenMap: [
+                {
+                    name: 'tablet',
+                    skip: true
+                },
+                {
+                    name: 'desktop',
+                    max: 1260
+                }
+            ]
+        }
+    }
+});
+```
 
 
 ## Screen Types
