@@ -368,7 +368,7 @@ class QueryBuilderUtil
     public static function sprintf($format, ...$args): string
     {
         foreach ($args as $arg) {
-            self::checkIdentifier($arg);
+            self::checkField($arg);
         }
 
         return sprintf($format, ...$args);
@@ -384,6 +384,36 @@ class QueryBuilderUtil
     {
         if (preg_match('/[\W]+/', $str)) {
             throw new \InvalidArgumentException(sprintf('Unsafe value passed %s', $str));
+        }
+    }
+
+    /**
+     * Check that passed field is safe for usage in dynamic DQL. Field may be in format (?alias.)field
+     *
+     * @param string $str
+     * @throws \InvalidArgumentException
+     */
+    public static function checkField($str)
+    {
+        if (strpos($str, '.') !== false) {
+            list($alias, $field) = explode('.', $str, 2);
+            self::checkIdentifier($alias);
+            self::checkIdentifier($field);
+        } else {
+            self::checkIdentifier($str);
+        }
+    }
+
+    /**
+     * Check that passed parameter is safe for usage in dynamic DQL
+     *
+     * @param string $str
+     * @throws \InvalidArgumentException
+     */
+    public static function checkParameter($str)
+    {
+        if (strpos($str, ':') === 0) {
+            self::checkIdentifier(substr($str, 1));
         }
     }
 
