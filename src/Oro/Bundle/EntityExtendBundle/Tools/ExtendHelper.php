@@ -269,6 +269,8 @@ class ExtendHelper
     /**
      * Convert enum code/value
      *
+     * @throws \RuntimeException
+     *
      * @param string $name
      * @return string
      */
@@ -277,7 +279,14 @@ class ExtendHelper
         if ($name && function_exists('iconv')) {
             $originalName = $name;
             $name = @iconv('utf-8', 'ascii//TRANSLIT', $name);
-            if (!$name || strpos($name, '?') !== false) {
+            if (false === $name) {
+                throw new \RuntimeException(sprintf(
+                    "Can't convert the string '%s' with the 'iconv' function. " .
+                    "Please check that the 'iconv' extension is configured correctly.",
+                    $originalName
+                ));
+            }
+            if (strpos($name, '?') !== false) {
                 $name = hash('crc32', $originalName);
             }
         }
