@@ -27,9 +27,11 @@ define(function(require) {
      *      {auditable: true, configurable: true, unidirectional: false}
      * @property {[Object|string]} [exclude]
      * @property {[Object|string]} [include]
-     * @property {fieldsFilterer} [fieldsFilterer]
+     * @property {fieldsFilterer|null} [fieldsFilterer]
+     * @property {boolean} [isRestrictiveWhitelist]
      * @property {Object.<string, Object.<string, boolean>>} [fieldsFilterWhitelist]
      * @property {Object.<string, Object.<string, boolean>>} [fieldsFilterBlacklist]
+     * @property {Object.<string, Object.<string, Object>>} [fieldsDataUpdate]
      */
 
     /**
@@ -120,6 +122,13 @@ define(function(require) {
         rootEntityClassName: void 0,
 
         /**
+         * Flag says if only fields from whitelist has to be represented in results
+         *
+         * @type {boolean}
+         */
+        isRestrictiveWhitelist: false,
+
+        /**
          * Whitelist of fields that has NOT to be filtered out
          *  first key is entity class name
          *  second key is field name
@@ -146,6 +155,19 @@ define(function(require) {
          * @type {Object.<string, Object.<string, boolean>>}
          */
         fieldsFilterBlacklist: null,
+
+        /**
+         * DataUpdate that has to be applied to fields of filtered results
+         *
+         *  examples:
+         *      {'Oro\\Bundle\\UserBundle\\Entity\\User': {
+         *          groups: {type: 'enum'},  // groups field of User entity will be represented as enum
+         *          viewHistory: {type: 'collection', label: 'View history'} // new field will be added
+         *      }}
+         *
+         * @type {Object.<string, Object.<string, Object>>}
+         */
+        fieldsDataUpdate: null,
 
         /**
          * Array of rule objects or strings that will be used for entries filtering
@@ -186,11 +208,9 @@ define(function(require) {
         /**
          * Allow to define advances filter function for entity fields
          *
-         * @type {fieldsFilterer}
+         * @type {fieldsFilterer|null}
          */
-        fieldsFilterer: function(entityName, entityFields) {
-            return entityFields;
-        },
+        fieldsFilterer: null,
 
         /**
          * @inheritDoc
@@ -204,8 +224,10 @@ define(function(require) {
          * @param {[Object|string]} [options.exclude]
          * @param {[Object|string]} [options.include]
          * @param {fieldsFilterer} [options.fieldsFilterer]
+         * @param {boolean} [options.isRestrictiveWhitelist]
          * @param {Object.<string, Object.<string, boolean>>} [options.fieldsFilterWhitelist]
          * @param {Object.<string, Object.<string, boolean>>} [options.fieldsFilterBlacklist]
+         * @param {Object.<string, Object.<string, Object>>} [options.fieldsDataUpdate]
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, 'collection', 'errorHandler'));
@@ -218,8 +240,7 @@ define(function(require) {
             if (options.filterPreset) {
                 this.setFilterPreset(options.filterPreset);
             }
-            this._configureFilter(_.pick(options, 'optionsFilter', 'exclude', 'include', 'fieldsFilterer',
-                'fieldsFilterWhitelist', 'fieldsFilterBlacklist'));
+            this._configureFilter(_.pick(options, _.keys(EntityStructureDataProvider._filterConfigDefaults)));
 
             if (options.rootEntity) {
                 this.rootEntityClassName = options.rootEntity;
@@ -269,7 +290,7 @@ define(function(require) {
             if (filterConfig.include) {
                 this.setIncludeRules(filterConfig.include);
             }
-            _.extend(this, _.pick(filterConfig, 'fieldsFilterer', 'fieldsFilterWhitelist', 'fieldsFilterBlacklist'));
+            _.extend(this, _.omit(filterConfig, 'optionsFilter', 'exclude', 'include'));
         },
 
         /**
@@ -278,10 +299,11 @@ define(function(require) {
          * @param {string} presetName
          */
         setFilterPreset: function(presetName) {
-            if (!(presetName in EntityStructureDataProvider.filterPresets)) {
+            if (!(presetName in EntityStructureDataProvider._filterPresets)) {
                 throw new TypeError('Filter preset `' + presetName + '` is not defined');
             }
-            this._configureFilter(EntityStructureDataProvider.filterPresets[presetName]);
+            var filterConfig = EntityStructureDataProvider._filterPresets[presetName];
+            this._configureFilter(_.defaults(filterConfig, EntityStructureDataProvider._filterConfigDefaults));
         },
 
         /**
@@ -358,23 +380,26 @@ define(function(require) {
          *  first check if the field in white or black list
          *  then matches field to filterers
          *
-         * @param {Array.<Object>} fields
-         * @param {string} entityClassName
-         * @return {Array.<Object>}
+         * @param {Object} entityData
+         * @param {string} entityData.className
+         * @param {Array.<Object>} entityData.fields
+         * @protected
          */
-        filterEntityFields: function(fields, entityClassName) {
+        _filterEntityFields: function(entityData) {
+            var entityClassName = entityData.className;
             if (!_.isEmpty(this.fieldFilterers)) {
-                fields = _.filter(fields, function(field) {
+                entityData.fields = _.filter(entityData.fields, function(field) {
                     return this._isWhitelistedField(entityClassName, field) ||
+                        !this.isRestrictiveWhitelist &&
                         !this._isBlacklistedField(entityClassName, field) &&
                         this._matchFieldFilterers(entityClassName, field);
 
                 }, this);
             }
 
-            fields = this.fieldsFilterer(entityClassName, fields);
-
-            return fields;
+            if (this.fieldsFilterer) {
+                entityData.fields = this.fieldsFilterer(entityClassName, entityData.fields);
+            }
         },
 
         /**
@@ -423,28 +448,64 @@ define(function(require) {
          * @protected
          */
         _extractEntityData: function(entityModel) {
-            var attrs = entityModel.getAttributes();
-            attrs.fields = attrs.fields.map(function(fieldData) {
-                fieldData = _.clone(fieldData);
-                fieldData.entity = attrs;
-                if (fieldData.relationType && fieldData.type === 'enum') {
-                    // @todo, should be fixed in API
-                    // `enum` field has to be with empty relationType, same as `tag` and `dictionary` types
-                    fieldData.relationType = '';
-                }
-                if (fieldData.options) {
-                    fieldData.options = _.clone(fieldData.options);
-                }
-                return fieldData;
-            });
-            attrs.fields = this.filterEntityFields(attrs.fields, entityModel.get('className'));
-            if (attrs.options) {
-                attrs.options = _.clone(attrs.options);
+            var entityData = entityModel.getAttributes();
+            entityData.fields = entityData.fields.map(this._extractFieldData.bind(this, entityData));
+            this._filterEntityFields(entityData);
+            this._applyEntityFieldsUpdates(entityData);
+            if (entityData.options) {
+                entityData.options = _.clone(entityData.options);
             }
-            if (attrs.routes) {
-                attrs.routes = _.clone(attrs.routes);
+            if (entityData.routes) {
+                entityData.routes = _.clone(entityData.routes);
             }
-            return attrs;
+            return entityData;
+        },
+
+        /**
+         * Extracts field data from original
+         *
+         * @param {Object} entityData
+         * @param {Object} fieldData
+         * @return {Object}
+         * @protected
+         */
+        _extractFieldData: function(entityData, fieldData) {
+            fieldData = _.clone(fieldData);
+            fieldData.entity = entityData;
+            if (fieldData.relationType && fieldData.type === 'enum') {
+                // @todo, should be fixed in API
+                // `enum` field has to be with empty relationType, same as `tag` and `dictionary` types
+                fieldData.relationType = '';
+            }
+            if (fieldData.options) {
+                fieldData.options = _.clone(fieldData.options);
+            }
+            return fieldData;
+        },
+
+        /**
+         * Applies field data updates
+         *
+         * @param {Object} entityData
+         * @param {string} entityData.className
+         * @param {Array.<Object>} entityData.fields
+         * @protected
+         */
+        _applyEntityFieldsUpdates: function(entityData) {
+            var fields = entityData.fields;
+            var fieldsDataUpdate = _.result(this.fieldsDataUpdate, entityData.className);
+            if (!fieldsDataUpdate) {
+                return;
+            }
+            _.each(fieldsDataUpdate, function(fieldUpdate, fieldName) {
+                fieldUpdate = _.defaults({name: fieldName}, _.omit(fieldUpdate, 'entity', 'relatedEntity'));
+                var field = _.findWhere(fields, {name: fieldName});
+                if (field) {
+                    _.extend(field, fieldUpdate);
+                } else {
+                    fields.push(this._extractFieldData(entityData, fieldUpdate));
+                }
+            }, this);
         },
 
         /**
@@ -749,8 +810,10 @@ define(function(require) {
     }, /** @lends EntityStructureDataProvider */{
         /**
          * @type {Object.<string, FilterConfig>}
+         * @protected
+         * @static
          */
-        filterPresets: {},
+        _filterPresets: {},
 
         /**
          * Creates instance of data provider and returns it with the promise object
@@ -770,6 +833,8 @@ define(function(require) {
          *      ['relationType'] - will include all entries that has 'relationType' key (means relational fields)
          *      [{type: 'date'}] - will include all entries that has property "type" equals to "date"
          * @param {fieldsFilterer} [options.fieldsFilterer]
+         * @param {boolean} [options.isRestrictiveWhitelist] - says if only fields from whitelist
+         *  has to be represented in results
          * @param {Object.<string, Object.<string, boolean>>} [options.fieldsFilterWhitelist]
          *  whitelist of fields that has NOT to be filtered out
          *  examples:
@@ -780,8 +845,16 @@ define(function(require) {
          *  examples:
          *      {'Oro\\Bundle\\UserBundle\\Entity\\User': {groups: true}} - groups field of User entity
          *          has to be excluded from results, despite it might pass the filters
+         * @param {Object.<string, Object.<string, Object>>} [options.fieldsDataUpdate]
+         *  DataUpdate that has to be applied to fields of filtered results
+         *  examples:
+         *      {'Oro\\Bundle\\UserBundle\\Entity\\User': {
+         *          groups: {type: 'enum'},  // groups field of User entity will be represented as enum
+         *          viewHistory: {type: 'collection', label: 'View history'} // new field will be added
+         *      }}
          * @param {RegistryApplicant} applicant
          * @return {Promise.<EntityStructureDataProvider>}
+         * @static
          */
         createDataProvider: function(options, applicant) {
             var collection = registry.fetch(EntityStructuresCollection.prototype.globalId, applicant);
@@ -821,19 +894,29 @@ define(function(require) {
          *
          * @param {string} name
          * @param {FilterConfig} filterConfig
+         * @static
          */
         defineFilterPreset: function(name, filterConfig) {
-            if (name in EntityStructureDataProvider.filterPresets) {
+            if (name in EntityStructureDataProvider._filterPresets) {
                 throw new Error('Filter preset with `' + name + '` name already defined');
             }
-            EntityStructureDataProvider.filterPresets[name] = _.defaults(filterConfig, {
-                optionsFilter: {},
-                exclude: [],
-                include: [],
-                fieldsFilterer: EntityStructureDataProvider.prototype.fieldsFilterer,
-                fieldsFilterWhitelist: {},
-                fieldsFilterBlacklist: {}
-            });
+            EntityStructureDataProvider._filterPresets[name] = filterConfig;
+        },
+
+        /**
+         * @type {FilterConfig}
+         * @static
+         * @protected
+         */
+        _filterConfigDefaults: {
+            optionsFilter: {},
+            exclude: [],
+            include: [],
+            fieldsFilterer: null,
+            isRestrictiveWhitelist: false,
+            fieldsFilterWhitelist: {},
+            fieldsFilterBlacklist: {},
+            fieldsDataUpdate: {}
         }
     });
 

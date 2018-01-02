@@ -401,8 +401,8 @@ define(function(require) {
             });
 
             afterEach(function() {
-                delete EntityStructureDataProvider.filterPresets['first-custom-fields-set'];
-                delete EntityStructureDataProvider.filterPresets['second-custom-fields-set'];
+                delete EntityStructureDataProvider._filterPresets['first-custom-fields-set'];
+                delete EntityStructureDataProvider._filterPresets['second-custom-fields-set'];
             });
 
             it('uses initial filter configuration preset', function() {
@@ -449,6 +449,34 @@ define(function(require) {
             it('result does not contain filtered out field that is not in whitelist', function() {
                 expect(fields).not.toContain(
                     jasmine.objectContaining({name: 'roles', relationType: 'manyToMany'}));
+            });
+        });
+
+        describe('restrictive whitelist of field filter', function() {
+            var fields;
+
+            beforeEach(function(done) {
+                EntityStructureDataProvider.createDataProvider({
+                    rootEntity: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+                    isRestrictiveWhitelist: true,
+                    fieldsFilterWhitelist: {
+                        'Oro\\Bundle\\UserBundle\\Entity\\User': {
+                            'groups': true,
+                            'firstName': true
+                        }
+                    }
+                }, applicant1).then(function(provider) {
+                    var chain = provider.pathToEntityChain();
+                    fields = chain[0].entity.fields;
+                    done();
+                });
+            });
+
+            it('result contains only field from whitelist', function() {
+                expect(fields).toEqual([
+                    jasmine.objectContaining({name: 'firstName', type: 'string'}),
+                    jasmine.objectContaining({name: 'groups', relationType: 'manyToMany'})
+                ]);
             });
         });
 
@@ -522,6 +550,33 @@ define(function(require) {
                 expect(function() {
                     dataProvider.getPathByPropertyPath(propertyPath);
                 }).toThrow(jasmine.any(Error));
+            });
+        });
+
+        describe('fields data update', function() {
+            var fields;
+
+            beforeEach(function(done) {
+                EntityStructureDataProvider.createDataProvider({
+                    rootEntity: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+                    fieldsDataUpdate: {
+                        'Oro\\Bundle\\UserBundle\\Entity\\User': {
+                            groups: {type: 'enum'},
+                            viewHistory: {type: 'collection', label: 'View history'}
+                        }
+                    }
+                }, applicant1).then(function(provider) {
+                    var chain = provider.pathToEntityChain();
+                    fields = chain[0].entity.fields;
+                    done();
+                });
+            });
+
+            it('is applied to results', function() {
+                expect(fields).toContain(
+                    jasmine.objectContaining({name: 'groups', type: 'enum'}));
+                expect(fields).toContain(
+                    jasmine.objectContaining({name: 'viewHistory', type: 'collection', label: 'View history'}));
             });
         });
     });

@@ -9,25 +9,36 @@ define(function(require) {
 
     ExpressionEditorComponent = BaseComponent.extend({
         /**
-         * @constructor
          * @param {Object} options
+         * @param {Object} options.dataProviderConfig
          */
         initialize: function(options) {
             this._deferredInit();
-            var providerOptions = _.pick(options, 'filterPreset', 'exclude', 'include');
+            EntityStructureDataProvider
+                .createDataProvider(options.dataProviderConfig, this)
+                .then(function(provider) {
+                    this._resolveDeferredInit();
+                    if (!this.disposed) {
+                        this.initExpressionEditorView(options, provider);
+                    }
+                }.bind(this));
+            ExpressionEditorComponent.__super__.initialize.call(this, options);
+        },
+
+        /**
+         * Initializes ExpressionEditorView
+         *
+         * @param {Object} options
+         * @param {EntityStructureDataProvider} provider
+         */
+        initExpressionEditorView: function(options, provider) {
             var viewOptions = _.extend({
                 el: options._sourceElement,
-                autoRender: true
-            }, _.omit(options, '_sourceElement', '_subPromises'));
-            EntityStructureDataProvider.createDataProvider(providerOptions, this).then(function(viewOptions, provider) {
-                this._resolveDeferredInit();
-                if (this.disposed) {
-                    return;
-                }
-                viewOptions.entityDataProvider = provider;
-                this.view = new ExpressionEditorView(viewOptions);
-            }.bind(this, viewOptions));
-            ExpressionEditorComponent.__super__.initialize.call(this, options);
+                autoRender: true,
+                entityDataProvider: provider
+            }, _.omit(options, '_sourceElement', '_subPromises', 'dataProviderConfig'));
+
+            this.view = new ExpressionEditorView(viewOptions);
         }
     });
 

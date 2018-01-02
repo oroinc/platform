@@ -42,6 +42,8 @@ Signature for `createDataProvider` method is following
      *      ['relationType'] - will include all entries that has 'relationType' key (means relational fields)
      *      [{type: 'date'}] - will include all entries that has property "type" equals to "date"
      * @param {fieldsFilterer} [options.fieldsFilterer]
+     * @param {boolean} [options.isRestrictiveWhitelist] - says if only fields from whitelist
+     *  has to be represented in results
      * @param {Object.<string, Object.<string, boolean>>} [options.fieldsFilterWhitelist]
      *  whitelist of fields that has NOT to be filtered out
      *  examples:
@@ -52,6 +54,13 @@ Signature for `createDataProvider` method is following
      *  examples:
      *      {'Oro\\Bundle\\UserBundle\\Entity\\User': {groups: true}} - groups field of User entity
      *          has to be excluded from results, despite it might pass the filters
+     * @param {Object.<string, Object.<string, Object>>} [options.fieldsDataUpdate]
+     *  data update that has to be applied to fields of filtered results
+     *  examples:
+     *      {'Oro\\Bundle\\UserBundle\\Entity\\User': {
+     *          groups: {type: 'enum'},  // groups field of User entity will be represented as enum
+     *          viewHistory: {type: 'collection', label: 'View history'} // new field will be added
+     *      }}
      * @param {RegistryApplicant} applicant
      * @return {Promise.<EntityStructureDataProvider>}
      */
@@ -62,7 +71,9 @@ Where is the first argument is options for the provider:
 - `optionsFilter`, `exclude` and `include` rules allow to define constraints for entities and fields that provider returns
 - `fieldsFilterer` custom filter function
 - `filterPreset` name of preconfigured filter
+- `isRestrictiveWhitelist` defines mode of whitelist, by default it is not restrictive 
 - `fieldsFilterWhitelist` and `fieldsFilterBlacklist` allows to define filter strategy for specific fields
+- `fieldsDataUpdate` allows to define updates for filtered data
 
 And the second the applicant, instance that has requested the provider. 
 It allows to define life cycles of shared `EntityStructuresCollection` instance in registry (see [registry](../../../../UIBundle/Resources/doc/reference/client-side/registry.md) for details).
