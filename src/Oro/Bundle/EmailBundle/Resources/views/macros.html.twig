@@ -152,7 +152,7 @@
         model: {
             attributes: render(path('oro_api_get_emailtemplate_variables')),
             entityName: entityName,
-            entityLabel: oro_entity_config_value(entityName, 'label')|trans,
+            entityLabel: entityName ? oro_entity_config_value(entityName, 'label')|trans : '',
         }
     } %}
     <div data-page-component-module="oroemail/js/app/components/email-variable-component"

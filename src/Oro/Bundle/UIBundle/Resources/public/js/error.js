@@ -11,7 +11,7 @@ define([
     var defaults = _.defaults(module.config(), {
         headerServerError: _.__('Server error'),
         headerUserError: _.__('User input error'),
-        message: _.__('oro.ui.error'),
+        message: _.__('oro.ui.error.performing'),
         loginRoute: 'oro_user_security_login'
     });
 

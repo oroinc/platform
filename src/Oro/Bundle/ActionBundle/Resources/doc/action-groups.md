@@ -1,5 +1,4 @@
-Action Groups
-=============
+# Action Groups
 
  * [What are the Action Groups?](#what-are-the-action-groups)
  * [ActionGroup Configuration](#actiongroup-configuration)
@@ -10,19 +9,15 @@ Action Groups
  * [Action Group Diagram](#action-group-diagram)
 
 
-What are the Action Groups?
----------------------------
-Action Group is a named block of execution logic bunched together under its own `actions` configuration node.
-*Action groups* can be called with `@run_action_group` action in any application configuration nodes which supports
-Action Component.
-*Action group* declaration also has important configuration section - `parameters` that describes all expected 
-data from the caller (with type, requirement, default value, and validation message).
-Parameters will be accessible in actions as the root node of contextual data (e.g `$.parameterName`).
-Also, along with `parameters` and `actions`, there can be optionally declared special `acl_resource` criteria and
-custom `conditions` node, where you can define special instructions to check against, before bunch execution process.
+### What are the Action Groups?
 
-ActionGroup Configuration
--------------------------
+Action Group is a named block of execution logic grouped together under its own `actions` configuration node.
+*Action groups* can be called along with the `@run_action_group` action in any application configuration node that Action Component supports.
+The *Action group* declaration also has an important configuration section - `parameters` that describes all the data expected to obtain from the caller (with a type, requirement, default value, and validation message).
+Parameters are accessible in actions as the root node of contextual data (e.g `$.parameterName`).
+Also, along with `parameters` and `actions`, there can be optionally declared special `acl_resource` criteria and a custom `conditions` node where you can define special instructions to check against, before the bunch execution process.
+
+## ActionGroup Configuration
 
 File `<bundleResourceRoot>/config/oro/action.yml`
 
@@ -51,7 +46,7 @@ action_groups:                                  # root node for action groups
                     param2: $.typeOfWho
 ```
 
-Now we can run this action_group with something like:
+Now, we can run this action_group as follows:
 
 ```
     @run_action_group:
@@ -59,47 +54,34 @@ Now we can run this action_group with something like:
         parameters_mapping:
             who: $.myInstanceWithVariousType
 ```
-Here we skip `what` parameter, as it has default value `default` and it is good for us.
-To see syntax of `@run_action_group` see [the actions section](./actions.md#run-action-group-run_action_group)
+Here, we skip the `what` parameter, as it has the `default` value. 
+To see the `@run_action_group`syntax, please refer to [the actions section](./actions.md#run-action-group-run_action_group)
 
 
-Data isolation
---------------
+## Data isolation
 
-Note that **Action group** runs (executes) with clean context data. E.g. caller context will be mapped with `parameters_mapping` 
-(under `@run_action_group`) to a new context and **action group** will be executed with it.
-There will be no data except for those that supported by **action group** parameters declaration.
-That is why **action groups** can be called from different places and with various cases.
+Note that **Action group** runs with empty context data. For example, if a caller context is mapped with `parameters_mapping` (under `@run_action_group`) to a new context, **action group** is executed along with it. In this case, there will be only the data supported by the **action group** parameters declaration.
+That is why **action groups** can be called from different places and under various circumstances.
 
-Call from PHP
--------------
+## Call from PHP
 
-All named action groups internally gathered under registry service `oro_action.action_group_registry`, which is the
-instance of [`\Oro\Bundle\ActionBundle\Model\ActionGroupRegistry`](../../Model/ActionGroupRegistry.php) class. 
-It has simple api to `get` **action group** ([`\Oro\Bundle\ActionBundle\Model\ActionGroup`](../../Model/ActionGroup.php)) 
-configured instance and perform its execution by invocation of `\Oro\Bundle\ActionBundle\Model\ActionGroup::execute` method with proper params.
+All named action groups are internally gathered under the `oro_action.action_group_registry` registry service which is the instance of the [`\Oro\Bundle\ActionBundle\Model\ActionGroupRegistry`](../../Model/ActionGroupRegistry.php) class. 
+It has simple api to `get` the **action group** ([`\Oro\Bundle\ActionBundle\Model\ActionGroup`](../../Model/ActionGroup.php)) configured instance and perform its execution by applying the `\Oro\Bundle\ActionBundle\Model\ActionGroup::execute` method with proper parameters.
 
-
-Recommendations
----------------
+## Recommendations
 
 **User Interface** 
-In the example above we've used in `actions` block action called `@flash_message`. That action was mentioned only for 
-example purpose.
-Usually, you should not perform any user interface related actions in **action group** `actions` set. Because they can 
-be called or used in the scope of actions that have no available user interface environment in runtime. 
 
-Using result of action group
-----------------------------
-As for a most actions that implements [`ActionInterface`](/src/Oro/Component/Action/Action/ActionInterface.php) all 
-result is stored under its execution context object. Usually it is one of 
-[`AbstractStorage`](/src/Oro/Component/Action/Model/AbstractStorage.php) child instances.
-So all results of action group as of action can be accessed from context data passed to its method `execute(...)` method.
+In the abovementioned `actions` block, we have used the action called `@flash_message`. That action was mentioned only for example purpose.
+Usually, you should not perform any user interface related actions in the **action group** `actions` set, as they are called or used only in the scope of the actions with no user interface environment available in runtime. 
 
-Here we bring two useful `@run_action_group` configuration options: `results` (to map (transfer) data from action group 
-context to caller context separately ) and `result` to put all context of executed action group under desired node of caller context.
+## Using results of action group
+
+[`ActionInterface`](/src/Oro/Component/Action/Action/ActionInterface.php) implements most actions and stores the results of these actions under their execution context object. Usually it is one of the [`AbstractStorage`](/src/Oro/Component/Action/Model/AbstractStorage.php) child instances. So all the results of the action group are accessed from the context data passed to its `execute(...)` method.
+
+Here, there are two `@run_action_group` configuration options: `results` (transfers data from the action group context to the caller context separately) and `result` (allocates all context of the executed action group under a desired node of the caller context).
 [More information about `@run_action_group` options](./actions.md#run-action-group-run_action_group).
 
-Action Group Diagram
---------------------
-Following diagram shows action group processes logic in graphical representation: ![Action Group Diagram](images/action_group.png)
+## Action Group Diagram
+
+The following diagram shows the logic of the action group process in graphical representation: ![Action Group Diagram](images/action_group.png)

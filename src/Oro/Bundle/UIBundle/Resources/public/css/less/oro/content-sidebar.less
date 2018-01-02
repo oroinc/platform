@@ -48,7 +48,7 @@
 
         i {
             font-size: 8px;
-            margin: 6px 0 0 0;
+            padding: 6px 0 0 0;
             display: block;
         }
     }
@@ -72,6 +72,8 @@
     &--content {
         margin-left: @sidebarWidth;
         min-width: @sidebarContentMinWidth;
+
+        .forScreen(992px, width, calc(100% ~"-" @sidebarMinimizedWidth));
 
         &.content-sidebar-minimized {
             margin-left: @sidebarMinimizedWidth;

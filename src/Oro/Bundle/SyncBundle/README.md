@@ -114,3 +114,4 @@ This means the websocket server is now up and running!
 
 * [Content Outdating Notifications](./Resources/doc/content_outdating.md)
 * [Mediator Handlers](./Resources/doc/mediator-handlers.md)
+* [Authentication](./Resources/doc/authentication.md)
