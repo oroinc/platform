@@ -451,4 +451,20 @@ class QueryBuilderUtil
 
         return null;
     }
+
+    /**
+     * @param string $sortOrder
+     * @return string
+     */
+    public static function getSortOrder($sortOrder)
+    {
+        if (\strtolower($sortOrder) === 'asc') {
+            return 'ASC';
+        }
+        if (\strtolower($sortOrder) === 'desc') {
+            return 'DESC';
+        }
+
+        throw new \InvalidArgumentException(sprintf('Unsafe value passed %s', $sortOrder));
+    }
 }
