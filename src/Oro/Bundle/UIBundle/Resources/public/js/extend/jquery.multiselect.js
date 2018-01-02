@@ -9,8 +9,39 @@ define([
 
     $.widget('orofilter.multiselect', $.ech.multiselect, {
         options: _.extend({}, $.ech.multiselect.prototype.options, {
+            outerTrigger: $([]),
             refreshNotOpened: true
         }),
+
+        _create: function() {
+            this.outerTrigger = this.options.outerTrigger;
+            this._superApply(arguments);
+        },
+
+        _bindEvents: function() {
+            var self = this;
+
+            this._bindButtonEvents();
+            this._bindMenuEvents();
+            this._bindHeaderEvents();
+
+            // close each widget when clicking on any other element/anywhere else on the page
+            $(document).bind('mousedown.' + self._namespaceID, function(event) {
+                var target = event.target;
+
+                if(self._isOpen && self._isExcluded(target)) {
+                    self.close();
+                }
+            });
+
+            // deal with form resets.  the problem here is that buttons aren't
+            // restored to their defaultValue prop on form reset, and the reset
+            // handler fires before the form is actually reset.  delaying it a bit
+            // gives the form inputs time to clear.
+            $(this.element[0].form).bind('reset.' + this._namespaceID, function() {
+                setTimeout($.proxy(self.refresh, self), 10);
+            });
+        },
 
         /**
          * Bind update position method after menu is opened
@@ -77,6 +108,15 @@ define([
                 .addClass('hidden-item');
             this._super();
             this.menu.find('.hidden-item').removeClass('hidden-item');
+        },
+
+        _isExcluded: function(target) {
+            return target !== this.button.get(0) &&
+                   target !== this.menu.get(0) &&
+                   target !== this.outerTrigger.get(0) &&
+                   !$.contains(this.menu.get(0), target) &&
+                   !$.contains(this.button.get(0), target) &&
+                   !$.contains(this.outerTrigger, target);
         }
     });
 
