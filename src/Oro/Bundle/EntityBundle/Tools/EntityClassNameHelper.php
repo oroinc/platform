@@ -22,7 +22,7 @@ class EntityClassNameHelper
      * Resolves the entity class name
      *
      * @param string $entityName    The class name, url-safe class name, alias or plural alias of the entity
-     * @param bool   $isPluralAlias Determines whether the entity name may be a singular of plural alias
+     * @param bool   $isPluralAlias Determines whether the entity name may be a singular or plural alias
      *
      * @return string The FQCN of an entity
      */
