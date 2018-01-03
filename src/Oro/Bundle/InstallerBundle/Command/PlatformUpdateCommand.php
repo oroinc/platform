@@ -55,7 +55,14 @@ class PlatformUpdateCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $commandExecutor = $this->getCommandExecutor($input, $output);
+
         $this->checkSuggestedMemory($output);
+
+        $exitCode = $this->checkRequirements($commandExecutor);
+        if ($exitCode > 0) {
+            return $exitCode;
+        }
 
         $force = $input->getOption('force');
 
@@ -66,8 +73,6 @@ class PlatformUpdateCommand extends AbstractCommand
             if ($input->hasOption('symlink') && $input->getOption('symlink')) {
                 $assetsOptions['--symlink'] = true;
             }
-
-            $commandExecutor = $this->getCommandExecutor($input, $output);
 
             try {
                 $commandExecutor
@@ -127,6 +132,21 @@ class PlatformUpdateCommand extends AbstractCommand
 
             return 0;
         }
+    }
+
+    /**
+     * @param CommandExecutor $commandExecutor
+     *
+     * @return int
+     */
+    protected function checkRequirements(CommandExecutor $commandExecutor)
+    {
+        $commandExecutor->runCommand(
+            'oro:check-requirements',
+            ['--ignore-errors' => true, '--verbose' => 1]
+        );
+
+        return $commandExecutor->getLastCommandExitCode();
     }
 
     /**

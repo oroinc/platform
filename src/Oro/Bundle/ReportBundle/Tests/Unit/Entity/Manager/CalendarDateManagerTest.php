@@ -53,11 +53,9 @@ class CalendarDateManagerTest extends \PHPUnit_Framework_TestCase
     public function testHandleCalendarDatesWithAppending()
     {
         $timezone = new \DateTimeZone('UTC');
-        $startDate = new \DateTime('first day of january', $timezone);
-        $startDate->modify('+15 days');
+        $startDate = new \DateTime('tomorrow midnight - 10 days', $timezone);
         $calendarDate = new CalendarDate();
         $calendarDate->setDate($startDate);
-        $endDate = new \DateTime('tomorrow midnight', $timezone);
         $repository = $this->getMockBuilder(CalendarDateRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -82,7 +80,7 @@ class CalendarDateManagerTest extends \PHPUnit_Framework_TestCase
             ->with(CalendarDate::class)
             ->willReturn($entityManager);
         $entityManager
-            ->expects($this->exactly((int)$endDate->diff($startDate)->format('%a')))
+            ->expects($this->exactly(10))
             ->method('persist')
             ->with($this->isInstanceOf(CalendarDate::class));
         $entityManager->expects($this->once())->method('flush');
