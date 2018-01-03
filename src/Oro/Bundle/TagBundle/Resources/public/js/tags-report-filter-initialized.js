@@ -14,7 +14,7 @@ define(function(require) {
      */
     return function(filterOptions, context) {
         var className = _.last(context).field.relatedEntityName;
-        var entityClass = _.last(context).field.entity.className;
+        var entityClass = _.last(context).field.parentEntity.className;
         filterOptions.filterParams = {'class': className, 'entityClass': entityClass};
         return $.when(filterOptions);
     };

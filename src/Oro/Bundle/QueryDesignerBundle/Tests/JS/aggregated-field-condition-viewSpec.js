@@ -4,7 +4,6 @@ define(function(require) {
     var $ = require('jquery');
     var Backbone = require('backbone');
     var requirejsExposure = require('requirejs-exposure');
-    var markup = require('text!./Fixture/aggregated-field-condition/markup.html');
     var data = JSON.parse(require('text!./Fixture/aggregated-field-condition/entities.json'));
     var filters = JSON.parse(require('text!./Fixture/aggregated-field-condition/filters.json'));
     var columnsData = JSON.parse(require('text!./Fixture/aggregated-field-condition/columnsData.json'));
@@ -24,7 +23,6 @@ define(function(require) {
             beforeEach(function(done) {
                 FieldChoiceMock.setData(data);
                 exposure.substitute('FieldChoiceView').by(FieldChoiceMock);
-                window.setFixtures(markup);
                 columnsCollection = new Backbone.Collection(columnsData);
                 aggregatedFieldConditionView = new AggregatedFieldConditionView({
                     autoRender: true,
@@ -80,7 +78,6 @@ define(function(require) {
             beforeEach(function(done) {
                 FieldChoiceMock.setData(data);
                 exposure.substitute('FieldChoiceView').by(FieldChoiceMock);
-                window.setFixtures(markup);
                 columnsCollection = new Backbone.Collection(columnsData);
                 aggregatedFieldConditionView = new AggregatedFieldConditionView({
                     autoRender: true,

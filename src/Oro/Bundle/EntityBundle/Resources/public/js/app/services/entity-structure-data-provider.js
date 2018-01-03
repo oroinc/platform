@@ -471,11 +471,20 @@ define(function(require) {
          */
         _extractFieldData: function(entityData, fieldData) {
             fieldData = _.clone(fieldData);
-            fieldData.entity = entityData;
+            fieldData.parentEntity = entityData;
             if (fieldData.relationType && fieldData.type === 'enum') {
                 // @todo, should be fixed in API
                 // `enum` field has to be with empty relationType, same as `tag` and `dictionary` types
                 fieldData.relationType = '';
+            }
+            if (fieldData.relatedEntityName) {
+                Object.defineProperty(fieldData, 'relatedEntity', {
+                    get: function() {
+                        return this._extractEntityData(
+                            this.collection.getEntityModelByClassName(fieldData.relatedEntityName));
+                    }.bind(this),
+                    enumerable: true
+                });
             }
             if (fieldData.options) {
                 fieldData.options = _.clone(fieldData.options);
@@ -738,7 +747,7 @@ define(function(require) {
          * @param {fieldId} fieldId
          * @return {propertyPath}
          */
-        getPropertyPathByPath: function(fieldId) {
+        getRelativePropertyPathByPath: function(fieldId) {
             var fields = [];
             _.each(fieldId.split('+'), function(part, i) {
                 var field;
@@ -767,7 +776,7 @@ define(function(require) {
          * @return {fieldId}
          * @throws {EntityError} -- in case invalid property path
          */
-        getPathByPropertyPath: function(propertyPath) {
+        getPathByRelativePropertyPath: function(propertyPath) {
             var parts;
             var properties = propertyPath.split('.');
             var entityModel = this.rootEntity;
@@ -796,16 +805,138 @@ define(function(require) {
          * @param {propertyPath} propertyPath
          * @return {fieldId}
          */
-        getPathByPropertyPathSafely: function(propertyPath) {
+        getPathByRelativePropertyPathSafely: function(propertyPath) {
             var fieldId;
 
             try {
-                fieldId = this.getPathByPropertyPath(propertyPath);
+                fieldId = this.getPathByRelativePropertyPath(propertyPath);
             } catch (error) {
                 this.errorHandler.handle(error);
             }
 
             return fieldId || '';
+        },
+
+        /**
+         * Creates EntityTree object that allows to navigate over entities and their relations
+         *
+         * @return {Object}
+         * @protected
+         */
+        _getEntityTree: function() {
+            var entityTree = {};
+            var properties = {};
+
+            this.collection.each(function(entityModel) {
+                var entityName = entityModel.get('alias') || entityModel.get('className');
+                properties[entityName] = {
+                    get: this._getEntityTreeNode.bind(this, entityModel),
+                    enumerable: true
+                };
+            }, this);
+
+            Object.defineProperties(entityTree, properties);
+
+            return entityTree;
+        },
+
+        /**
+         * Creates EntityTreeNode for the EntityModel and its field, if the fieldName is specified
+         *
+         * @param {EntityModel} entityModel
+         * @param {string} [fieldName]
+         * @return {Object}
+         * @protected
+         */
+        _getEntityTreeNode: function(entityModel, fieldName) {
+            var node = {};
+            var properties = this._getEntityTreeNodeProperties(entityModel, fieldName);
+
+            properties.__isField = {value: '__field' in properties};
+            properties.__isEntity = {value: '__entity' in properties};
+
+            Object.defineProperties(node, properties);
+
+            return node;
+        },
+
+        /**
+         * Prepares properties definition object for EntityTreeNode by the EntityModel and its field (if specified)
+         *
+         * @param {EntityModel} entityModel
+         * @param {string} [fieldName]
+         * @return {Object}
+         * @protected
+         */
+        _getEntityTreeNodeProperties: function(entityModel, fieldName) {
+            var properties = {};
+            var entityData = this._extractEntityData(entityModel);
+
+            if (fieldName) {
+                var fieldData = _.find(entityData.fields, {name: fieldName});
+                if (fieldData.relatedEntityName) {
+                    var relatedEntityModel = this.collection.getEntityModelByClassName(fieldData.relatedEntityName);
+                    if (relatedEntityModel) {
+                        _.extend(properties, this._getEntityTreeNodeProperties(relatedEntityModel));
+                    }
+                }
+                _.extend(properties, {
+                    __field: {
+                        get: function() {
+                            var entityData = this._extractEntityData(entityModel);
+                            return _.find(entityData.fields, {name: fieldName});
+                        }.bind(this)
+                    }
+                });
+            } else {
+                _.each(entityData.fields, function(fieldData) {
+                    properties[fieldData.name] = {
+                        get: this._getEntityTreeNode.bind(this, entityModel, fieldData.name),
+                        enumerable: true
+                    };
+                }, this);
+                _.extend(properties, {
+                    __entity: {
+                        get: this._extractEntityData.bind(this, entityModel)
+                    }
+                });
+            }
+
+            return properties;
+        },
+
+        /**
+         * Parses string of property path and returns EntityTreeNode for it
+         *  examples:
+         *   - 'user' node represents user entity
+         *   - 'Oro\Bundle\UserBundle\Entity\User' node of same entity
+         *   - 'user.owner' node represents user.owner field and businessunit entity (related entity)
+         *   - 'user.owner.id' node represents businessunit.id field
+         *
+         * @param {string} propertyPath
+         * @return {Object|undefined}
+         */
+        getEntityTreeNodeByPropertyPath: function(propertyPath) {
+            var fieldName;
+            var fieldData;
+            var path = propertyPath.split('.');
+            var entity = path.shift();
+            var entityModel = this.collection.getEntityModelByClassName(entity);
+            if (!entityModel) {
+                entityModel = this.collection.find({alias: entity});
+            }
+
+            while (entityModel && path.length) {
+                fieldName = path.shift();
+                if (path.length) {
+                    // if it is not last element of path -- it is relation to next entity
+                    fieldData = _.find(this._extractEntityData(entityModel).fields, {name: fieldName});
+                    entityModel =
+                        fieldData ? this.collection.getEntityModelByClassName(fieldData.relatedEntityName) : void 0;
+                }
+            }
+
+            return entityModel ? this._getEntityTreeNode(entityModel, fieldName) : void 0;
         }
     }, /** @lends EntityStructureDataProvider */{
         /**
@@ -917,6 +1048,26 @@ define(function(require) {
             fieldsFilterWhitelist: {},
             fieldsFilterBlacklist: {},
             fieldsDataUpdate: {}
+        }
+    });
+
+    Object.defineProperties(EntityStructureDataProvider.prototype, {
+        /**
+         * Returns EntityTree object that allows to navigate over entities and their relations.
+         * Each node can represent entity or/and field.
+         *  - root nodes are only entities
+         *  - leaf nodes are only fields
+         *  - intermediate nodes are both fields and entities, since they represent relation fields
+         * Entity node has magic property __entity, returns information about the entity
+         * Field node has magic property __field, returns information about the field
+         * Both nodes have magic properties __isField and __isEntity
+         *
+         * @type {Object}
+         * @memberOf {EntityStructureDataProvider.prototype}
+         */
+        entityTree: {
+            get: EntityStructureDataProvider.prototype._getEntityTree,
+            enumerable: true
         }
     });
 

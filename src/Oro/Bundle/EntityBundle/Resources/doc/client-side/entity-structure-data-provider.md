@@ -104,4 +104,138 @@ Once preset is defined, its name can be used to configure the provider
 ```
 Direct definition of `fieldsFilterer`, `optionsFilter`, `exclude` and `include` options have higer priority over defined in used `filterPreset`. That allows customise filter configuration for certain provider.
 
+### Entity tree
+Data provider has magic property `entityTree` that returns linked objects. It allows to navigate over entities and their relations.
+```js
+    console.log(provider.entityTree); 
+    { // list with enumerable entities
+        user: (...),
+        organization: (...),
+        userrole: (...)
+        // ...
+    }
+    
+    console.log(provider.entityTree.user);
+    { // list with enumerable fields of user entity
+        id: (...),
+        firstName: (...),
+        roles: (...)
+        // ...
+    }
+    
+    console.log(provider.entityTree.user.roles); 
+    { // list with enumerable fields of userrole entity 
+        id: (...),
+        label: (...),
+        // ...
+    }
+    
+    console.log(provider.entityTree.user.roles.label);
+    {} // object of non-relation field has no enumerable properties
+```
+
+Each tree node can represent entity or/and field:
+ - root nodes are only entities
+ - leaf nodes are only fields
+ - intermediate nodes are both fields and entities, since they represent relation fields
+
+All nodes have magic properties `__isField` and `__isEntity`.
+```js
+    // root nodes are entity
+    console.log(provider.entityTree.user.__isEntity); // true;
+    console.log(provider.entityTree.user.__isField); // false;
+    
+    // relation-field nodes are both fields and entities
+    console.log(provider.entityTree.user.roles.__isEntity); // true;
+    console.log(provider.entityTree.user.roles.__isField); // true;
+    
+    // leaf nodes are field
+    console.log(provider.entityTree.user.roles.label.__isEntity); // false;
+    console.log(provider.entityTree.user.roles.label.__isField); // true;
+```
+Field nodes have magic property `__field`, that returns information about the field.
+```js
+    // relation field
+    console.log(provider.entityTree.user.roles.__field);
+    {
+        label: 'Roles',
+        name: 'roles',
+        relationType: 'manyToMany',
+        relatedEntityName: 'Oro\\Bundle\\UserBundle\\Entity\\Role',
+        parentEntity: {
+            label: 'User',
+            alias: 'user',
+            className: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+            fields: [ /* ... */ ]
+            // ...
+        },
+        relatedEntity: {
+            label: 'Role',
+            alias: 'userrole',
+            className: 'Oro\\Bundle\\UserBundle\\Entity\\Role',
+            fields: [ /* ... */ ]
+            // ...
+        }
+        // ...
+    }
+    
+    // non-relation field
+    console.log(provider.entityTree.user.roles.label.__field);
+    {
+        label: 'Label',
+        name: 'label',
+        type: 'string',
+        parentEntity: {
+            label: 'Role',
+            alias: 'userrole',
+            className: 'Oro\\Bundle\\UserBundle\\Entity\\Role',
+            fields: [ /* ... */ ]
+            // ...
+        }
+        // ...
+    }
+```
+Entity nodes have magic property `__entity`, that returns information about the entity.
+```js
+    console.log(provider.entityTree.user.__entity);
+    {
+        label: 'User',
+        alias: 'user',
+        className: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+        fields: [ /* ... */ ]
+        // ...
+    }
+    
+    console.log(provider.entityTree.user.roles.__entity);
+    {
+        label: 'Role',
+        alias: 'userrole',
+        className: 'Oro\\Bundle\\UserBundle\\Entity\\Role',
+        fields: [ /* ... */ ]
+        // ...
+    }
+```
+
+There's method `getEntityTreeNodeByPropertyPath` in `EntityStructureDataProvider` allows to get the node by property path string
+```js
+    var node = provider.getEntityTreeNodeByPropertyPath('user.roles.label');
+
+    console.log(node.__isField); // true
+    console.log(node.__isEntity); // false
+    console.log(node.__field);
+    {
+        label: 'Label',
+        name: 'label',
+        type: 'string',
+        parentEntity: {
+            label: 'Role',
+            alias: 'userrole',
+            className: 'Oro\\Bundle\\UserBundle\\Entity\\Role',
+            fields: [ /* ... */ ]
+            // ...
+        }
+        // ...
+    }
+```
+
 See other methods documentation in [entity-structure-data-provider.js](../../public/js/app/services/entity-structure-data-provider.js)
