@@ -76,7 +76,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->item = $this->createMock('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem');
 
-        $this->serializedTitle = json_encode(array('titleTemplate' => 'Test title template'));
+        $this->serializedTitle = json_encode(['titleTemplate' => 'Test title template']);
     }
 
     /**
@@ -95,12 +95,15 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onResponse($this->getEventMock($this->getRequest(), $response));
     }
 
+    /**
+     * @return array
+     */
     public function onResponseProvider()
     {
-        return array(
-            'with enabling/disabling listeners'    => array('Oro\Bundle\EntityBundle\Event\OroEventManager'),
-            'without enabling/disabling listeners' => array('Doctrine\Common\EventManager')
-        );
+        return [
+            'with enabling/disabling listeners'    => ['Oro\Bundle\EntityBundle\Event\OroEventManager'],
+            'without enabling/disabling listeners' => ['Doctrine\Common\EventManager']
+        ];
     }
 
     public function testTitle()
@@ -186,32 +189,6 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onResponse($event);
     }
 
-    public function testLongHistoryUrlCut()
-    {
-        $response   = $this->getResponse();
-        $repository = $this->getDefaultRepositoryMock(null);
-        $request = $this->getRequest();
-        $request->expects($this->once())->method('getRequestUri')->will($this->returnValue(str_repeat('a', 200)));
-        $em = $this->getEntityManager($repository);
-
-        $this->factory->expects($this->once())
-            ->method('createItem')
-            ->with(
-                'history',
-                $this->callback(
-                    function ($params) {
-                        $this->assertEquals(100, strlen($params['url']));
-
-                        return true;
-                    }
-                )
-            )
-            ->will($this->returnValue($this->item));
-
-        $listener = $this->getListener($this->factory, $this->tokenStorage, $em);
-        $listener->onResponse($this->getEventMock($request, $response));
-    }
-
     /**
      * Get the mock of the GetResponseEvent and FilterResponseEvent.
      *
@@ -261,11 +238,11 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->will(
                 $this->returnValueMap(
-                    array(
-                        array('_route', 'test_route'),
-                        array('_route_params', array()),
-                        array('id', 1),
-                    )
+                    [
+                        ['_route', 'test_route'],
+                        ['_route_params', []],
+                        ['id', 1],
+                    ]
                 )
             );
 
@@ -282,6 +259,9 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
         return new Response('message', 200);
     }
 
+    /**
+     * @return TitleService|\PHPUnit_Framework_MockObject_MockObject
+     */
     public function getTitleService()
     {
         $this->titleService = $this->createMock('Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface');
@@ -340,16 +320,6 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->with($this->equalTo('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem'))
             ->will($this->returnValue($repositoryMock));
-
-        $meta = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $meta->expects($this->once())->method('getFieldMapping')->with($this->equalTo('url'))
-            ->will($this->returnValue(array('length' => 100)));
-        $this->em->expects($this->any())
-            ->method('getClassMetadata')
-            ->with($this->equalTo('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem'))
-            ->will($this->returnValue($meta));
 
         $shouldBeDisabled = $eventManager instanceof OroEventManager;
         if ($shouldBeDisabled) {
