@@ -59,14 +59,42 @@ class TopicSender
                 },
                 $tags
             );
-            try {
-                $this->publisher->send(self::UPDATE_TOPIC, json_encode($tags));
-            } catch (\Exception $e) {
-                $this->logger->error(
-                    'Failed to publish a message to {topic}',
-                    ['topic' => self::UPDATE_TOPIC, 'exception' => $e, 'tags' => $tags]
-                );
-            }
+
+            $this->sendTags($tags);
+        }
+    }
+
+    /**
+     * Send payload into topic for all users (i.e. including current one).
+     *
+     * @param array $tags
+     */
+    public function sendToAll(array $tags)
+    {
+        if (!empty($tags)) {
+            $tags = array_map(
+                function ($tag) {
+                    return ['tagname' => $tag];
+                },
+                $tags
+            );
+
+            $this->sendTags($tags);
+        }
+    }
+
+    /**
+     * @param array $tags
+     */
+    private function sendTags(array $tags)
+    {
+        try {
+            $this->publisher->send(self::UPDATE_TOPIC, json_encode($tags));
+        } catch (\Exception $e) {
+            $this->logger->error(
+                'Failed to publish a message to {topic}.',
+                ['topic' => self::UPDATE_TOPIC, 'exception' => $e, 'tags' => $tags]
+            );
         }
     }
 

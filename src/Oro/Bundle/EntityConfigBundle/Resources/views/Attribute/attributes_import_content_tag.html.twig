@@ -1,0 +1,12 @@
+<script type="text/javascript">
+    require([
+        'orosync/js/content-manager',
+        'oroui/js/messenger',
+        'orotranslation/js/translator'
+    ],
+    function (contentManager, messenger, __) {
+        contentManager.tagContent({{ data|json_encode|raw }}, function () {
+            messenger.notificationMessage('warning', __('oro.attribute.attributes_import_has_finished'));
+        });
+    });
+</script>
