@@ -106,7 +106,8 @@ class CriteriaConnector
                 $sort = $allAliases[0] . '.' . $sort;
             }
 
-            $qb->addOrderBy($sort, $order);
+            QueryBuilderUtil::checkField($sort);
+            $qb->addOrderBy($sort, QueryBuilderUtil::getSortOrder($order));
         }
 
         // Overwrite limits only if they was set in criteria

@@ -19,6 +19,7 @@ use Oro\Bundle\SearchBundle\Entity\AbstractItem;
 use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -304,7 +305,7 @@ abstract class BaseDriver implements DBALPersisterInterface
      */
     public function getJoinAlias($fieldType, $index)
     {
-        return sprintf('%sField%s', $fieldType, $index);
+        return sprintf('%sField%d', $fieldType, $index);
     }
 
     /**
@@ -552,9 +553,12 @@ abstract class BaseDriver implements DBALPersisterInterface
 
         foreach ($selects as $select) {
             list($type, $name) = Criteria::explodeFieldTypeName($select);
+            QueryBuilderUtil::checkIdentifier($name);
 
             $joinField = $this->getJoinField($type);
             list($joinAlias, $uniqIndex) = $this->getJoinAttributes($name, $type, $qb->getAllAliases());
+            QueryBuilderUtil::checkIdentifier($joinAlias);
+            QueryBuilderUtil::checkIdentifier($uniqIndex);
 
             $param = sprintf('param%s', $uniqIndex);
             $withClause = sprintf('%s.field = :%s', $joinAlias, $param);
@@ -622,9 +626,10 @@ abstract class BaseDriver implements DBALPersisterInterface
         if ($orderBy) {
             $direction = reset($orderBy);
             list($fieldType, $fieldName) = Criteria::explodeFieldTypeName(key($orderBy));
+            QueryBuilderUtil::checkIdentifier($fieldType);
             $orderRelation = $fieldType . 'Fields';
             $qb->leftJoin('search.' . $orderRelation, 'orderTable', 'WITH', 'orderTable.field = :orderField')
-                ->orderBy('orderTable.value', $direction)
+                ->orderBy('orderTable.value', QueryBuilderUtil::getSortOrder($direction))
                 ->setParameter('orderField', $fieldName);
             $qb->addSelect('orderTable.value');
         }

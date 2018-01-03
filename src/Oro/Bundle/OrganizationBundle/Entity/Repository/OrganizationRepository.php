@@ -5,6 +5,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class OrganizationRepository extends EntityRepository
 {
@@ -66,11 +67,15 @@ class OrganizationRepository extends EntityRepository
      */
     public function getOrganizationsPartialData(array $fields, array $sortOrder = [], array $ids = [])
     {
+        array_walk($fields, [QueryBuilderUtil::class, 'checkIdentifier']);
         $organizationsQueryQB = $this->createQueryBuilder('org')
             ->select(sprintf('partial org.{%s}', implode(', ', $fields)));
         if (count($sortOrder) !== 0) {
             foreach ($sortOrder as $fieldName => $direction) {
-                $organizationsQueryQB->addOrderBy('org.' . $fieldName, $direction);
+                $organizationsQueryQB->addOrderBy(
+                    QueryBuilderUtil::getField('org', $fieldName),
+                    QueryBuilderUtil::getSortOrder($direction)
+                );
             }
         }
 
@@ -96,7 +101,10 @@ class OrganizationRepository extends EntityRepository
             ->where('org.enabled = true');
         if (!empty($sortOrder)) {
             foreach ($sortOrder as $fieldName => $direction) {
-                $organizationsQueryQB->addOrderBy('org.' . $fieldName, $direction);
+                $organizationsQueryQB->addOrderBy(
+                    QueryBuilderUtil::getField('org', $fieldName),
+                    QueryBuilderUtil::getSortOrder($direction)
+                );
             }
         }
         $organizationsQuery = $organizationsQueryQB->getQuery();
@@ -120,6 +128,8 @@ class OrganizationRepository extends EntityRepository
      */
     public function updateWithOrganization($tableName, $id, $relationName = 'organization', $onlyEmpty = false)
     {
+        QueryBuilderUtil::checkIdentifier($relationName);
+
         $qb = $this->getEntityManager()
             ->createQueryBuilder()
             ->update($tableName, 't')
