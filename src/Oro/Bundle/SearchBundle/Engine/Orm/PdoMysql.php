@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class PdoMysql extends BaseDriver
 {
@@ -242,10 +243,12 @@ class PdoMysql extends BaseDriver
         array $searchCondition,
         $setOrderBy = true
     ) {
+        QueryBuilderUtil::checkIdentifier($index);
         $joinAlias      = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $fieldName      = $searchCondition['fieldName'];
         $fieldParameter = 'field' . $index;
         $valueParameter = 'value' . $index;
+        QueryBuilderUtil::checkIdentifier($joinAlias);
 
         $result = "MATCH_AGAINST($joinAlias.value, :$valueParameter 'IN BOOLEAN MODE') > 0";
         if ($words) {
@@ -287,8 +290,10 @@ class PdoMysql extends BaseDriver
         $index,
         array $searchCondition
     ) {
+        QueryBuilderUtil::checkIdentifier($index);
         $joinAlias  = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $fieldName  = $searchCondition['fieldName'];
+        QueryBuilderUtil::checkIdentifier($joinAlias);
 
         $result = $qb->expr()->orX();
         foreach (array_values($words) as $key => $value) {

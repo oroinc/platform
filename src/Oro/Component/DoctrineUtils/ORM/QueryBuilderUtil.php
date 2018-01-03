@@ -131,6 +131,7 @@ class QueryBuilderUtil
         $qb->distinct(true);
         $rootAlias = self::getSingleRootAlias($qb);
         foreach ($joins as $key => $val) {
+            self::checkIdentifier($key);
             if (empty($val)) {
                 $qb->leftJoin($rootAlias . '.' . $key, $key);
             } elseif (is_array($val)) {
@@ -153,6 +154,7 @@ class QueryBuilderUtil
                 }
                 $qb->leftJoin($join, $key, $conditionType, $condition);
             } else {
+                self::checkIdentifier($val);
                 $qb->leftJoin($rootAlias . '.' . $val, $val);
             }
         }
@@ -165,14 +167,15 @@ class QueryBuilderUtil
      */
     public static function applyOptimizedIn(QueryBuilder $qb, $field, array $values)
     {
-        $expressions     = [];
+        self::checkField($field);
+        $expressions     = $qb->expr()->orX();
         $optimizedValues = self::optimizeIntegerValues($values);
 
         if ($optimizedValues[self::IN]) {
             $param = self::generateParameterName($field);
 
             $qb->setParameter($param, $optimizedValues[self::IN]);
-            $expressions[] = $qb->expr()->in($field, sprintf(':%s', $param));
+            $expressions->add($qb->expr()->in($field, sprintf(':%s', $param)));
         }
 
         foreach ($optimizedValues[self::IN_BETWEEN] as $range) {
@@ -183,15 +186,11 @@ class QueryBuilderUtil
             $qb->setParameter($minParam, $min);
             $qb->setParameter($maxParam, $max);
 
-            $expressions[] = $qb->expr()->between(
-                $field,
-                sprintf(':%s', $minParam),
-                sprintf(':%s', $maxParam)
-            );
+            $expressions->add($qb->expr()->between($field, sprintf(':%s', $minParam), sprintf(':%s', $maxParam)));
         }
 
-        if ($expressions) {
-            $qb->andWhere(call_user_func_array([$qb->expr(), 'orX'], $expressions));
+        if (count($expressions->getParts()) > 0) {
+            $qb->andWhere($expressions);
         }
     }
 
@@ -233,6 +232,7 @@ class QueryBuilderUtil
      */
     public static function generateParameterName($prefix)
     {
+        self::checkField($prefix);
         static $n = 0;
         $n++;
 
