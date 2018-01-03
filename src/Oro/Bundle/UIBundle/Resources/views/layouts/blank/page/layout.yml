@@ -20,7 +20,7 @@ layout:
                     blockType: meta
                     options:
                         name: viewport
-                        content: 'width=device-width, initial-scale=1, viewport-fit=cover'
+                        content: 'width=device-width, initial-scale=1'
                 theme_icon:
                     blockType: external_resource
                     options:

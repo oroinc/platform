@@ -4,21 +4,19 @@ namespace Oro\Bundle\FilterBundle\Filter;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\SkipEmptyPeriodsFilterType;
 
 class SkipEmptyPeriodsFilter extends ChoiceFilter
 {
     const NAME = 'skip_empty_periods';
 
-    /** @var array */
-    protected $config = [];
-
     /**
      * {@inheritdoc}
      */
-    protected function getFormType()
+    public function init($name, array $params)
     {
-        return SkipEmptyPeriodsFilterType::NAME;
+        $params[FilterUtility::FRONTEND_TYPE_KEY] = 'select';
+
+        parent::init($name, $params);
     }
 
     /**
@@ -27,38 +25,24 @@ class SkipEmptyPeriodsFilter extends ChoiceFilter
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         $data = $this->parseData($data);
-        $this->resolveConfiguration();
+        if (!$data) {
+            return false;
+        }
+
+        $value = true;
+        if (isset($data['value'])) {
+            $value = (bool)reset($data['value']);
+        }
+
+        $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
 
         /** @var OrmFilterDatasourceAdapter $ds */
-        $qb = $ds->getQueryBuilder();
-
-        if (boolval($data['value'])) {
-            $qb->andWhere(
-                sprintf('%s IS NOT NULL', $this->config['not_nullable_field'])
-            );
+        if ($value) {
+            $this->applyFilterToClause($ds, $ds->expr()->isNotNull($fieldName));
+        } elseif ($ds->getQueryBuilder()->getDQLPart('where')) {
+            $this->applyFilterToClause($ds, $ds->expr()->isNull($fieldName), FilterUtility::CONDITION_OR);
         }
 
         return true;
-    }
-
-    /**
-     * @param mixed $data
-     * @return mixed
-     */
-    protected function parseData($data)
-    {
-        if (is_array($data) && is_null($data['value'])) {
-            $data['value'] = true;
-        }
-
-        return $data;
-    }
-
-    /**
-     * Resolve options from configuration or constants.
-     */
-    private function resolveConfiguration()
-    {
-        $this->config['not_nullable_field'] = $this->get('not_nullable_field');
     }
 }

@@ -77,4 +77,12 @@ class SystemConfigFallbackProvider extends AbstractEntityFallbackProvider
     {
         return 'oro.entity.fallback.system_config.label';
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFallbackEntityClass()
+    {
+        return null;
+    }
 }

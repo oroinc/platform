@@ -89,7 +89,13 @@ class CommandRunnerMessageProcessor implements MessageProcessorInterface, TopicS
     {
         $jobName = sprintf('oro:cron:run_command:%s', $body['command']);
         if ($commandArguments) {
-            $jobName .= sprintf('-%s', implode('-', $commandArguments));
+            array_walk($commandArguments, function ($item, $key) use (&$jobName) {
+                if (is_array($item)) {
+                    $item = implode(',', $item);
+                }
+
+                $jobName .= sprintf('-%s=%s', $key, $item);
+            });
         }
 
         $result  = $this->jobRunner->runUnique(

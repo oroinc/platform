@@ -185,9 +185,7 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
-            - '@oro_filter.date_filter_utility'
-        calls:
-            - [setEntityManager, ['@doctrine.orm.entity_manager']]
+            - '@doctrine'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: date_grouping, datasource: orm }
 

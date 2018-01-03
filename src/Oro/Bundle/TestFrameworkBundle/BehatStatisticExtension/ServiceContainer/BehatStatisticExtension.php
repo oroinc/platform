@@ -176,7 +176,6 @@ final class BehatStatisticExtension implements TestworkExtension
     public function process(ContainerBuilder $container)
     {
         $this->addGeneratorsToConfigurationRegistry($container);
-        $this->addSuiteConfigurations($container);
 
         try {
             $this->pingConnection($container);
@@ -238,19 +237,6 @@ final class BehatStatisticExtension implements TestworkExtension
         foreach ($generatorIds as $generatorId) {
             $registry->addMethodCall('addSuiteGenerator', [new Reference($generatorId)]);
         }
-    }
-
-    /**
-     * Suite configurations should be added after generators
-     * @param ContainerBuilder $container
-     */
-    private function addSuiteConfigurations(ContainerBuilder $container)
-    {
-        $container
-            ->getDefinition('oro_behat_statistic.suite.suite_configuration_registry')
-            ->addMethodCall('setSuiteConfigurations', [$container->getParameter('suite.configurations')])
-            ->addMethodCall('setSets', [$container->getParameter('oro_behat_statistic.suite_sets')])
-        ;
     }
 
     /**

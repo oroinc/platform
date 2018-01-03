@@ -40,9 +40,12 @@ class CalendarDateRepositoryTest extends WebTestCase
 
     public function testGetDateWithNotExistingArgument()
     {
-        $lastDate = $this->getLastCalendarDate()->getDate()->modify('+1 day');
+        $lastDate = clone $this->getLastCalendarDate()->getDate();
+        $lastDate->modify('+1 day');
         $this->assertNull($this->getRepository()->getDate($lastDate));
-        $firstDate = $this->getFirstCalendarDate()->getDate()->modify('-1 day');
+
+        $firstDate = clone $this->getFirstCalendarDate()->getDate();
+        $firstDate->modify('-1 day');
         $this->assertNull($this->getRepository()->getDate($firstDate));
     }
 

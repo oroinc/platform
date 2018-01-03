@@ -6,8 +6,9 @@
 
  - [Overview](#overview)
  - [Usage](#usage)
- - [Cunsomer options](#cunsomer-options)
+ - [consumer options](#consumer-options)
  - [Supervisord](#supervisord)
+ - [Name prefix the for Message Queue](#name-prefix-for-the-message-queue)
  - [Internals](#internals)
    - [Structure](#structure)
    - [Flow](#flow)
@@ -126,7 +127,7 @@ was run:
 then:
 
 * The consumer processing a message
-* The cunsomer checks the used memory amount
+* The consumer checks the used memory amount
 * If it exceeds the option value (i.e. 705 MB or 780Mb or 1300 Mb) the consumer terminates (and Supervisord re-runs it)
 * Otherwise it continues message processing.
  
@@ -172,6 +173,24 @@ startsecs=0
 user=apache
 redirect_stderr=true
 ```
+
+### Name prefix for the Message Queue
+
+To use several independent Message Queues on single RabbitMQ instance, configure a name prefix for the Message Queue. For example:
+
+```yaml
+# app/config/config.yml
+
+oro_message_queue:
+    ...
+    client:
+        prefix: mq_oro_platform_test
+        router_destination: queue_name
+        default_destination: queue_name
+```
+
+In `router_destsination` and `default_destionation`, put the names of the queue specific to your environment.
+In the *prefix* option, provide a string that should be prepended to the queue name.
 
 ## Internals
 

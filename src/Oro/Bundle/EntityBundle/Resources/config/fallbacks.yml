@@ -6,6 +6,7 @@ services:
             - "@oro_config.provider.system_configuration.form_provider"
             - "@oro_config.manager"
             - "@oro_config.config_bag"
+            - '@oro_entity.doctrine_helper'
 
     oro_entity.fallback.provider.abstract_provider:
         class: Oro\Bundle\EntityBundle\Fallback\Provider\AbstractEntityFallbackProvider

@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\SwiftMailerHandlerPass;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\Reference;
 
 class SwiftMailerHandlerPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,7 +34,6 @@ class SwiftMailerHandlerPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        $decorator = new DefinitionDecorator('swiftmailer.plugin.no_recipient.abstract');
         $containerBuilder = new ContainerBuilder();
         $mailers = [
             'foo' => 'foo.mailer',
@@ -45,13 +44,13 @@ class SwiftMailerHandlerPassTest extends \PHPUnit_Framework_TestCase
         $fooDefinition = $this->createMock(Definition::class);
         $fooDefinition->expects($this->once())
             ->method('addMethodCall')
-            ->with('registerPlugin', [$decorator]);
+            ->with('registerPlugin', [new Reference('swiftmailer.mailer.foo.plugin.no_recipient')]);
         $containerBuilder->setDefinition('foo.mailer', $fooDefinition);
 
         $barDefinition = $this->createMock(Definition::class);
         $barDefinition->expects($this->once())
             ->method('addMethodCall')
-            ->with('registerPlugin', [$decorator]);
+            ->with('registerPlugin', [new Reference('swiftmailer.mailer.bar.plugin.no_recipient')]);
         $containerBuilder->setDefinition('bar.mailer', $barDefinition);
 
         $this->compilerPass->process($containerBuilder);

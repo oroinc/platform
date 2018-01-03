@@ -121,12 +121,19 @@ define(function(require) {
         },
 
         fillForm: function(emailData) {
+            var editorView = this.getBodyEditorView();
+
             if (!this.model.get('parentEmailId') || !this.domCache.subject.val()) {
                 this.domCache.subject.val(emailData.subject);
             }
 
             var body = this.initBody(emailData.body, false);
             this.domCache.body.val(body);
+
+            if (editorView.enabled && editorView.tinymceInstance) {
+                editorView.tinymceInstance.setContent(body);
+            }
+
             this.domCache.type.find('input[value=' + emailData.type + ']')
                 .prop('checked', true)
                 .trigger('change');

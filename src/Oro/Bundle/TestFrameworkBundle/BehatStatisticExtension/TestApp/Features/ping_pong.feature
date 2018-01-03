@@ -1,3 +1,4 @@
+@ping-pong
 Feature: Ping Pong
   For to be sure that behat works as expected
   As a developer

@@ -56,28 +56,78 @@ class ConfigurationBuilder implements BuilderInterface
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
         $tree = $this->menuConfiguration->getTree();
-        $items = $this->menuConfiguration->getItems();
 
-        if (!empty($tree) && !empty($items)) {
-            foreach ($tree as $menuTreeName => $menuTreeElement) {
-                if ($menuTreeName == $alias) {
-                    if (!empty($menuTreeElement['extras'])) {
-                        $menu->setExtras($menuTreeElement['extras']);
-                    }
+        if (array_key_exists($alias, $tree)) {
+            $treeData = $tree[$alias];
 
-                    $defaultArea = ConfigurationBuilder::DEFAULT_SCOPE_TYPE;
-                    $this->setExtraFromConfig($menu, $menuTreeElement, 'type');
-                    $this->setExtraFromConfig($menu, $menuTreeElement, 'scope_type', $defaultArea);
-                    $this->setExtraFromConfig($menu, $menuTreeElement, 'read_only', false);
-                    $this->setExtraFromConfig($menu, $menuTreeElement, 'max_nesting_level', 0);
-
-                    $this->createFromArray($menu, $menuTreeElement['children'], $items, $options);
-                }
+            if (!empty($treeData['extras'])) {
+                $menu->setExtras($treeData['extras']);
             }
+
+            $this->setExtraFromConfig($menu, $treeData, 'type');
+            $this->setExtraFromConfig($menu, $treeData, 'scope_type', ConfigurationBuilder::DEFAULT_SCOPE_TYPE);
+            $this->setExtraFromConfig($menu, $treeData, 'read_only', false);
+            $this->setExtraFromConfig($menu, $treeData, 'max_nesting_level', 0);
+
+            $existingNames[$alias] = true;
+            $this->appendChildData($menu, $treeData['children'], $options, $existingNames);
         }
 
         $event = new ConfigureMenuEvent($this->factory, $menu);
         $this->eventDispatcher->dispatch(ConfigureMenuEvent::getEventName($alias), $event);
+    }
+
+    /**
+     * @param ItemInterface $menu
+     * @param array $sliceData
+     * @param array $options
+     * @param array $existingNames
+     */
+    private function appendChildData(ItemInterface $menu, array $sliceData, array $options, array &$existingNames)
+    {
+        // If menu doesn't have children, it should be disabled
+        $isAllowed = false;
+
+        $items = $this->menuConfiguration->getItems();
+
+        foreach ($sliceData as $itemName => $itemData) {
+            // Throw exception if duplicated item name was found in menu tree
+            if (array_key_exists($itemName, $existingNames)) {
+                $rootName = $menu->getRoot()->getName();
+                $message = sprintf('Item key "%s" duplicated in tree menu "%s".', $itemName, $rootName);
+                throw new \InvalidArgumentException($message);
+            }
+
+            // Reserve item name in existing names list
+            $existingNames[$itemName] = true;
+
+            // Get additional options from navigation.yml config
+            $additionalOptions = array_key_exists($itemName, $items) ? $items[$itemName] : [];
+
+            // Override item name if it contains in additional options
+            if (empty($additionalOptions['name'])) {
+                $additionalOptions['name'] = $itemName;
+            }
+
+            $this->moveToExtras($additionalOptions, 'position', true);
+            $this->moveToExtras($additionalOptions, 'translateDomain');
+            $this->moveToExtras($additionalOptions, 'translateParameters');
+            $this->moveToExtras($additionalOptions, 'translate_disabled');
+            $this->moveToExtras($additionalOptions, 'acl_resource_id');
+
+            // Create new child menu item and append root menu options
+            $newMenuItem = $menu->addChild($additionalOptions['name'], array_merge($additionalOptions, $options));
+            if (!empty($itemData['children'])) {
+                $this->appendChildData($newMenuItem, $itemData['children'], $options, $existingNames);
+            }
+
+            // Enable menu item if one of child items exist and available
+            $isAllowed = $isAllowed || $newMenuItem->getExtra('isAllowed');
+        }
+
+        if ($menu->getExtra('isAllowed')) {
+            $menu->setExtra('isAllowed', $isAllowed);
+        }
     }
 
     /**
@@ -92,60 +142,6 @@ class ConfigurationBuilder implements BuilderInterface
             $menu->setExtra($optionName, $config[$optionName]);
         } elseif ($default !== null) {
             $menu->setExtra($optionName, $default);
-        }
-    }
-
-    /**
-     * @param ItemInterface $menu
-     * @param array         $data
-     * @param array         $itemList
-     * @param array         $options
-     * @param array         $itemCodes
-     */
-    private function createFromArray(
-        ItemInterface $menu,
-        array $data,
-        array &$itemList,
-        array $options = [],
-        array &$itemCodes = []
-    ) {
-        $isAllowed = false;
-        foreach ($data as $itemCode => $itemData) {
-            if (in_array($itemCode, $itemCodes, true)) {
-                throw new \InvalidArgumentException(sprintf(
-                    'Item key "%s" duplicated in tree menu "%s".',
-                    $itemCode,
-                    $menu->getRoot()->getName()
-                ));
-            }
-            $itemCodes[] = $itemCode;
-
-            $itemData = $this->resolver->resolve($itemData);
-            if (!empty($itemList[$itemCode])) {
-                $itemOptions = $itemList[$itemCode];
-
-                if (empty($itemOptions['name'])) {
-                    $itemOptions['name'] = $itemCode;
-                }
-
-                $this->moveToExtras($itemOptions, 'position', true);
-                $this->moveToExtras($itemOptions, 'translateDomain');
-                $this->moveToExtras($itemOptions, 'translateParameters');
-                $this->moveToExtras($itemOptions, 'translate_disabled');
-                $this->moveToExtras($itemOptions, 'acl_resource_id');
-
-                $newMenuItem = $menu->addChild($itemOptions['name'], array_merge($itemOptions, $options));
-
-                if (!empty($itemData['children'])) {
-                    $this->createFromArray($newMenuItem, $itemData['children'], $itemList, $options, $itemCodes);
-                }
-
-                $isAllowed = $isAllowed || $newMenuItem->getExtra('isAllowed');
-            }
-        }
-
-        if ($menu->getExtra('isAllowed')) {
-            $menu->setExtra('isAllowed', $isAllowed);
         }
     }
 

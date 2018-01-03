@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SyncBundle\Wamp;
 
+use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider;
 use Oro\Bundle\SyncBundle\Exception\WebSocket\Rfc6455Exception;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -38,6 +39,9 @@ class TopicPublisher implements LoggerAwareInterface
      */
     protected $ws = null;
 
+    /** @var TicketProvider */
+    private $ticketProvider;
+
     /**
      *
      * @param string $host Host to connect to. Default is localhost (127.0.0.1).
@@ -55,6 +59,16 @@ class TopicPublisher implements LoggerAwareInterface
         $this->path = $path;
 
         $this->setLogger(new NullLogger());
+    }
+
+    /**
+     * Sets the TicketProvider instance.
+     *
+     * @param TicketProvider $ticketProvider
+     */
+    public function setTicketProvider(TicketProvider $ticketProvider)
+    {
+        $this->ticketProvider = $ticketProvider;
     }
 
     /**
@@ -105,6 +119,12 @@ class TopicPublisher implements LoggerAwareInterface
     {
         if (null === $this->ws) {
             try {
+                // add the ticket parameter to the URL
+                $this->path = sprintf(
+                    '%s?ticket=%s',
+                    $this->path,
+                    urlencode($this->ticketProvider->generateTicket(true))
+                );
                 $this->ws = new WebSocket($this->host, $this->port, $this->path);
             } catch (Rfc6455Exception $e) {
                 $this->logger->warning(

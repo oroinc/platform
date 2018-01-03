@@ -84,7 +84,7 @@ define(function(require) {
                     onMaxConnections: function(info, e) {
                         mediator.execute(
                             'showErrorMessage',
-                            __('Maximum connections ({{ maxConnections }}) reached', info),
+                            __('oro.workflow.error.maxconnections', info),
                             e
                         );
                     }

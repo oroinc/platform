@@ -136,12 +136,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
             $report
         );
 
-        // Shifting select array to match convention for calendar date as first select item
-        $expectedSelect = $expectedConfig['source']['query']['select'];
-        array_unshift($expectedSelect, array_pop($expectedSelect));
-        $expectedConfig['source']['query']['select'] = $expectedSelect ;
-
-        $this->assertSame($this->config->toArray(), $expectedConfig);
+        $this->assertEquals($expectedConfig, $this->config->toArray());
     }
 
     /**
@@ -284,17 +279,28 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
                         'type' => 'date_grouping',
                         'data_name' => 'calendarDate.date',
                         'label' => 'oro.report.filter.grouping.label',
-                        'column_name' => 'dateGrouping',
+                        'column_name' => 'timePeriod',
                         'calendar_entity' => $this->calendarDateEntity,
                         'target_entity' => null,
                         'not_nullable_field' => 't1.id',
                         'joined_column' => null,
                         'joined_table' => 't1',
+                        'options' => [
+                            'field_options' => [
+                                'choices' => [
+                                    'day' => 'Day',
+                                    'month' => 'Month',
+                                    'quarter' => 'Quarter',
+                                    'year' => 'Year',
+                                ]
+                            ],
+                            'default_value' => 'Day'
+                        ]
                     ],
                     'datePeriodFilter' => [
                         'label' => 'oro.report.datagrid.column.time_period.label',
                         'type' => 'datetime',
-                        'data_name' => 'calendarDate.date',
+                        'data_name' => 't1.',
                     ],
                 ],
                 'default' => [
@@ -305,22 +311,18 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
             ],
             'sorters' => [
                 'columns' => [
-                    'cDate' => [
-                        'data_name' => 'calendarDate.date',
-                    ],
-                    'dateGrouping' => [
-                        'data_name' => 'calendarDate.date',
+                    'timePeriod' => [
+                        'data_name' => 'timePeriod',
+                        'apply_callback' => ['@oro_filter.date_grouping_filter', 'applyOrderBy']
                     ],
                 ],
                 'default' => [
-                    'dateGrouping' => 'DESC',
+                    'timePeriod' => 'DESC',
                 ],
             ],
             'source' => [
                 'query' => [
-                    'select' => [
-                        'calendarDate.date as cDate',
-                    ],
+                    'select' => [],
                     'join' => [
                         'left' => [
                             0 => [
@@ -341,9 +343,17 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
                     'columns' => [
                         'skip_empty_periods' => [
                             'type' => 'skip_empty_periods',
-                            'data_name' => 'calendarDate.date',
+                            'data_name' => 't1.id',
                             'label' => 'oro.report.filter.skip_empty_periods.label',
-                            'not_nullable_field' => 't1.id',
+                            'options' => [
+                                'field_options' => [
+                                    'choices' => [
+                                        'No',
+                                        'Yes'
+                                    ]
+                                ],
+                                'default_value' => 'Yes'
+                            ]
                         ],
                     ],
                     'default' => [
@@ -362,7 +372,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
                 'frontend_type' => 'date',
                 'renderable' => false,
             ],
-            'dateGrouping' => [
+            'timePeriod' => [
                 'label' => 'oro.report.datagrid.column.time_period.label',
             ],
         ];
@@ -373,7 +383,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
             'table' => $this->calendarDateEntity,
         ];
         $merged = array_merge_recursive($originalConfig, $additional);
-        $merged['source']['query']['groupBy'] = 'c2,calendarDate.date';
+        $merged['source']['query']['groupBy'] = 'c2';
         $merged['properties'] = [];
 
         return $merged;
