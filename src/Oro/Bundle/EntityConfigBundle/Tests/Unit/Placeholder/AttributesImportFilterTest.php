@@ -51,7 +51,11 @@ class AttributesImportFilterTest extends \PHPUnit_Framework_TestCase
         $this->configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->attributesImportFilter = new AttributesImportFilter($this->entityAliasResolver, $this->tagGenerator, $this->configManager);
+        $this->attributesImportFilter = new AttributesImportFilter(
+            $this->entityAliasResolver,
+            $this->tagGenerator,
+            $this->configManager
+        );
     }
 
     /**

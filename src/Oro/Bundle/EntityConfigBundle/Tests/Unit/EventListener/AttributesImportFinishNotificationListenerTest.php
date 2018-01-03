@@ -105,6 +105,5 @@ class AttributesImportFinishNotificationListenerTest extends \PHPUnit_Framework_
             ->with($tags);
 
         $this->attributesImportFinishNotificationListener->onAfterAttributesImport($event);
-
     }
 }
