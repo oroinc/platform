@@ -287,7 +287,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     protected function isFieldExcluded($entityName, $fieldName, $itemData = null)
     {
         $isExcluded = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded', false);
-        $isIdentity = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity', false);
+        $isIdentity = $this->isIdentityField($entityName, $fieldName, $itemData);
         $isSkipped  = $itemData !== null && !array_key_exists($fieldName, $itemData);
 
         return $isExcluded || $isSkipped && !$isIdentity;
@@ -626,5 +626,24 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         }
 
         return true;
+    }
+
+    /**
+     * @param string $entityName
+     * @param string $fieldName
+     * @param mixed  $itemData
+     *
+     * @return bool
+     */
+    private function isIdentityField($entityName, $fieldName, $itemData = null)
+    {
+        $isIdentity = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity', false);
+        if (false === $isIdentity) {
+            return $isIdentity;
+        }
+
+        $isInputDataContainsField = is_array($itemData) && array_key_exists($fieldName, $itemData);
+
+        return $this->fieldHelper->isRequiredIdentityField($entityName, $fieldName) || $isInputDataContainsField;
     }
 }
