@@ -29,7 +29,7 @@ define([
             $(document).bind('mousedown.' + self._namespaceID, function(event) {
                 var target = event.target;
 
-                if(self._isOpen && self._isExcluded(target)) {
+                if (self._isOpen && self._isExcluded(target)) {
                     self.close();
                 }
             });
