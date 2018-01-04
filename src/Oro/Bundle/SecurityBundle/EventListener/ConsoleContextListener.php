@@ -38,25 +38,7 @@ class ConsoleContextListener
      */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
-        $command = $event->getCommand();
         $input = $event->getInput();
-
-        $options = [
-            new InputOption(
-                self::OPTION_USER,
-                null,
-                InputOption::VALUE_REQUIRED,
-                'ID, username or email of the user that should be used as current user'
-            ),
-            new InputOption(
-                self::OPTION_ORGANIZATION,
-                null,
-                InputOption::VALUE_REQUIRED,
-                'ID or name of the organization that should be used as current organization'
-            )
-        ];
-
-        $this->addOptionsToCommand($command, $input, $options);
 
         $user = $input->getParameterOption('--' . self::OPTION_USER);
         $organization = $input->getParameterOption('--' . self::OPTION_ORGANIZATION);
@@ -75,6 +57,9 @@ class ConsoleContextListener
     }
 
     /**
+     * @deprecated since 2.4,
+     * should be called in Oro\Bundle\SecurityBundle\EventListener\ConsoleContextOptionsListener
+     *
      * @param Command             $command
      * @param InputInterface      $input
      * @param array|InputOption[] $options

@@ -33,10 +33,8 @@ class OptionalListenersListener
      */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
-        $command = $event->getCommand();
         $input = $event->getInput();
 
-        $this->addOptionsToCommand($command, $input);
         $listeners = $this->getListenersToDisable($input);
         if (!empty($listeners)) {
             $this->listenersManager->disableListeners($listeners);
@@ -44,6 +42,9 @@ class OptionalListenersListener
     }
 
     /**
+     * @deprecated since 2.4,
+     * should be called in Oro\Bundle\PlatformBundle\EventListener\Console\OptionalListenersOptionsListener
+     *
      * @param Command $command
      * @param InputInterface $input
      */
@@ -66,11 +67,6 @@ class OptionalListenersListener
          */
         $inputDefinition->addOption($disableOptionalListenerOption);
         $command->getDefinition()->addOption($disableOptionalListenerOption);
-        /**
-         * Added only for compatibility with Symfony below 2.8
-         */
-        $command->mergeApplicationDefinition();
-        $input->bind($command->getDefinition());
     }
 
     /**
