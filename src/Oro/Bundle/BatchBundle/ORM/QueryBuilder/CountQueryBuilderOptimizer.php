@@ -210,6 +210,18 @@ class CountQueryBuilderOptimizer
             );
         }
 
+        if (count($joinAliases) !== count($collectedAliases)) {
+            $relationJoinAliases = $this->addRequiredJoins(
+                $requiredJoinAliases,
+                $fromQueryPart,
+                $this->removeAliasesFromQueryJoinParts($joinQueryPart, $collectedAliases),
+                $groupByAliases,
+                false
+            );
+
+            $joinAliases = array_unique(array_merge($joinAliases, $relationJoinAliases));
+        }
+
         foreach ($rootAliases as $rootAlias) {
             if (!isset($joinQueryPart[$rootAlias])) {
                 continue;
