@@ -67,10 +67,7 @@ define(function(require) {
         _toggle: function(state) {
             var show = state === 'on';
 
-            this.$(this.sidebar).toggleClass('content-sidebar-maximized', show)
-                .toggleClass('content-sidebar-minimized', !show);
-            this.$(this.content).toggleClass('content-sidebar-maximized', show)
-                .toggleClass('content-sidebar-minimized', !show);
+            this.$(this.sidebar).toggleClass('content-sidebar-minimized', !show);
 
             mediator.execute('changeUrlParam', 'sidebar', show ? null : state);
         }

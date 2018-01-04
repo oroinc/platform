@@ -9,7 +9,6 @@
 
 .content-with-sidebar {
     &--sidebar {
-        position: absolute;
         border: 1px solid @sidebarBorderColor;
         width: @sidebarWidth;
         overflow: auto;
@@ -54,10 +53,10 @@
     }
 
     &--minimize {
-        display: none;
+        display: block;
 
-        .content-sidebar-maximized & {
-            display: block;
+        .content-sidebar-minimized & {
+            display: none;
         }
     }
 
@@ -69,15 +68,14 @@
         }
     }
 
+    &--container {
+        display: flex;
+    }
+
     &--content {
-        margin-left: @sidebarWidth;
-        min-width: @sidebarContentMinWidth;
+        flex-grow: 1;
 
         .forScreen(992px, width, calc(100% ~"-" @sidebarMinimizedWidth));
-
-        &.content-sidebar-minimized {
-            margin-left: @sidebarMinimizedWidth;
-        }
 
         .placeholder {
             background-color: #f1f1f1;
