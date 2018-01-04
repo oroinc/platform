@@ -13,6 +13,7 @@
         width: @sidebarWidth;
         overflow: auto;
         background: #fff;
+        flex-shrink: 0;
 
         &.content-sidebar-minimized {
             padding-left: 0;
@@ -73,9 +74,14 @@
     }
 
     &--content {
-        flex-grow: 1;
+        width: calc(100% ~"-" @sidebarWidth);
+        flex: 1 1 auto;
 
         .forScreen(992px, width, calc(100% ~"-" @sidebarMinimizedWidth));
+
+        &.content-sidebar-minimized {       
+            width: calc(100% ~"-" @sidebarMinimizedWidth);
+        }
 
         .placeholder {
             background-color: #f1f1f1;
