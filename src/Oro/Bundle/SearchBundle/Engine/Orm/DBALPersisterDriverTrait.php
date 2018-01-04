@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -185,12 +186,16 @@ trait DBALPersisterDriverTrait
      *
      * @param Connection $connection
      * @param array $multiInsertQueryData
+     * @return Statement[]
+     * @throws \Doctrine\DBAL\DBALException
      */
     private function runMultiInserts(Connection $connection, array $multiInsertQueryData)
     {
-        foreach ($multiInsertQueryData as $data) {
-            $connection->executeQuery($data['query'], $data['values'], $data['types']);
+        $result = [];
+        foreach ($multiInsertQueryData as $key => $data) {
+            $result[$key] = $connection->executeQuery($data['query'], $data['values'], $data['types']);
         }
+        return $result;
     }
 
     /**
