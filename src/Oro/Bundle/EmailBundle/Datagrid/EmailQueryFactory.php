@@ -6,6 +6,7 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
@@ -80,6 +81,7 @@ class EmailQueryFactory
          * see https://github.com/doctrine/doctrine2/issues/5801
          * as result we have to use NULLIF(0, 0) and NULLIF('', '') instead of NULL
          */
+        QueryBuilderUtil::checkIdentifier($emailAddressTableAlias);
         $providers = $this->emailOwnerProviderStorage->getProviders();
         if (empty($providers)) {
             $qb->addSelect('NULLIF(\'\', \'\') AS fromEmailAddressOwnerClass');
@@ -140,14 +142,13 @@ class EmailQueryFactory
      */
     public function applyAcl(QueryBuilder $qb)
     {
-        $exprs = [$qb->expr()->eq('eu.owner', ':owner')];
+        $uoCheck = $qb->expr()->andX($qb->expr()->eq('eu.owner', ':owner'));
 
         $organization = $this->getOrganization();
         if ($organization) {
-            $exprs[] = $qb->expr()->eq('eu.organization ', ':organization');
+            $uoCheck->add($qb->expr()->eq('eu.organization ', ':organization'));
             $qb->setParameter('organization', $organization->getId());
         }
-        $uoCheck = call_user_func_array([$qb->expr(), 'andX'], $exprs);
 
         $mailboxIds = $this->getAvailableMailboxIds();
         if (!empty($mailboxIds)) {
