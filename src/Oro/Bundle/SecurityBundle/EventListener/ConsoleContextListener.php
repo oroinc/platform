@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -54,34 +51,6 @@ class ConsoleContextListener
         if ($token && $token instanceof OrganizationContextTokenInterface) {
             $this->setOrganization($organization, $token);
         }
-    }
-
-    /**
-     * @deprecated since 2.4,
-     * should be called in Oro\Bundle\SecurityBundle\EventListener\ConsoleContextOptionsListener
-     *
-     * @param Command             $command
-     * @param InputInterface      $input
-     * @param array|InputOption[] $options
-     */
-    protected function addOptionsToCommand(Command $command, InputInterface $input, array $options)
-    {
-        $inputDefinition = $command->getApplication()->getDefinition();
-        $commandDefinition = $command->getDefinition();
-
-        foreach ($options as $option) {
-            /**
-             * Starting from Symfony 2.8 event 'ConsoleCommandEvent' fires after all definitions were merged.
-             */
-            $inputDefinition->addOption($option);
-            $commandDefinition->addOption($option);
-        }
-
-        /**
-         * Added only for compatibility with Symfony below 2.8
-         */
-        $command->mergeApplicationDefinition();
-        $input->bind($command->getDefinition());
     }
 
     /**

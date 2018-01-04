@@ -59,6 +59,10 @@
 #### WorkflowBundle
 * The parameter `oro_workflow.listener.process_data_serialize.class` was removed form the service container.
 * The parameter `oro_workflow.listener.workflow_data_serialize.class` was removed form the service container.
+#### SecurityBundle
+* Removed method `addOptionsToCommand` from class `ConsoleContextListener`<sup>[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/SecurityBundle/EventListener/ConsoleContextListener.php "Oro\Bundle\SecurityBundle\EventListener\ConsoleContextListener")</sup>.
+#### PlatformBundle
+* Removed method `addOptionsToCommand` from class `OptionalListenersListener`<sup>[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/PlatformBundle/EventListener/Console/OptionalListenersListener.php "Oro\Bundle\PlatformBundle\EventListener\Console\OptionalListenersListener")</sup>.
 
 ## 2.5.0 (2017-11-30)
 [Show detailed list of changes](incompatibilities-2-5.md)
