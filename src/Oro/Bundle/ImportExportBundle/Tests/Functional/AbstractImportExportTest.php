@@ -57,10 +57,12 @@ abstract class AbstractImportExportTest extends WebTestCase
     /**
      * @param ImportExportConfigurationInterface $configuration
      * @param string                             $expectedCsvFilePath
+     * @param array                              $skippedColumns
      */
     protected function assertExportWorks(
         ImportExportConfigurationInterface $configuration,
-        string $expectedCsvFilePath
+        string $expectedCsvFilePath,
+        array $skippedColumns = []
     ) {
         $this->assertPreExportActionExecuted($configuration);
 
@@ -86,12 +88,27 @@ abstract class AbstractImportExportTest extends WebTestCase
         $job = $this->findJob($jobId);
         $exportedFilename = $job->getData()['file'];
 
-        static::assertContains(
-            $this->getFileContent($expectedCsvFilePath),
-            $this->getImportExportFileContent($exportedFilename)
-        );
-
+        $exportFileContent = $this->getImportExportFileContent($exportedFilename);
         $this->deleteImportExportFile($exportedFilename);
+
+        if (empty($skippedColumns)) {
+            static::assertContains(
+                $this->getFileContent($expectedCsvFilePath),
+                $exportFileContent
+            );
+        } else {
+            $expectedData = $this->getParsedDataFromCSVFile($expectedCsvFilePath);
+            $exportedData = $this->getParsedDataFromCSVContent($exportFileContent);
+            $this->removedIgnoredColumnsFromData(
+                $exportedData,
+                $skippedColumns
+            );
+
+            static::assertEquals(
+                $expectedData,
+                $exportedData
+            );
+        }
     }
 
     /**
@@ -408,6 +425,55 @@ abstract class AbstractImportExportTest extends WebTestCase
         );
 
         return $this->client->getResponse()->getContent();
+    }
+
+    /**
+     * @param array $data
+     * @param array $ignoredColumns
+     */
+    protected function removedIgnoredColumnsFromData(array &$data, array $ignoredColumns)
+    {
+        array_walk($data, function (array $item, $key) use ($ignoredColumns, &$data) {
+            $data[$key] = array_diff_key($data[$key], array_flip($ignoredColumns));
+        });
+    }
+
+    /**
+     * @param string $content
+     *
+     * @return array
+     */
+    protected function getParsedDataFromCSVContent(string $content)
+    {
+        $resultData = str_getcsv($content, "\n");
+        $header = str_getcsv(array_shift($resultData));
+        array_walk($resultData, function (&$row) use ($header, $resultData) {
+            $row = array_combine($header, str_getcsv($row));
+            $resultData[] = $row;
+        });
+
+        return $resultData;
+    }
+
+    /**
+     * @param string $filename
+     *
+     * @return array
+     */
+    protected function getParsedDataFromCSVFile(string $filename)
+    {
+        $resultData = [];
+        $handler = fopen($filename, 'r');
+        $headers = fgetcsv($handler, 1000, ',');
+
+        while (($data = fgetcsv($handler, 1000, ',')) !== false) {
+            $row = array_combine($headers, array_values($data));
+            $resultData[] = $row;
+        }
+
+        fclose($handler);
+
+        return $resultData;
     }
 
     /**
