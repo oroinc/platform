@@ -14,7 +14,7 @@ class OroNavigationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_7';
+        return 'v1_8';
     }
 
     /**
@@ -64,6 +64,7 @@ class OroNavigationBundleInstaller implements Installation
         $table->addIndex(['route'], 'oro_navigation_history_route_idx');
         $table->addIndex(['entity_id'], 'oro_navigation_history_entity_id_idx');
         $table->addIndex(['organization_id'], 'IDX_B20613B932C8A3DE', []);
+        $table->addIndex(['user_id', 'organization_id'], 'oro_navigation_history_user_org_idx', []);
     }
 
     /**

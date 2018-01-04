@@ -94,9 +94,8 @@ class CommandRunnerProcessor implements MessageProcessorInterface, TopicSubscrib
                 $output = $this->commandRunner->run($commandName, $commandArguments);
                 $this->logger->info(
                     sprintf(
-                        'Ran command %s with arguments: %s. Got output %s',
+                        'Ran command %s. Got output %s',
                         $commandName,
-                        implode(' ', $commandArguments),
                         $output
                     ),
                     [
