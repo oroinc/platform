@@ -9,6 +9,7 @@ use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class ChoiceFieldHelper
 {
@@ -81,10 +82,16 @@ class ChoiceFieldHelper
             ->getRepository($entity)
             ->createQueryBuilder('e');
         //select only id and label fields
-        $queryBuilder->select("e.$keyField, e.$labelField");
+        $queryBuilder->select(
+            QueryBuilderUtil::getField('e', $keyField),
+            QueryBuilderUtil::getField('e', $labelField)
+        );
         if (!empty($orderBy)) {
             $field = array_keys($orderBy)[0];
-            $queryBuilder->orderBy('e.' . $field, $orderBy[$field]);
+            $queryBuilder->orderBy(
+                QueryBuilderUtil::getField('e', $field),
+                QueryBuilderUtil::getSortOrder($orderBy[$field])
+            );
         }
 
         $query = $this->aclHelper->apply($queryBuilder);

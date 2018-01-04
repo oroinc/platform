@@ -10,6 +10,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 class EmailRepository extends EntityRepository
@@ -169,7 +170,7 @@ class EmailRepository extends EntityRepository
         $qb = $this->_em->createQueryBuilder();
 
         return $qb
-            ->select(sprintf('owner.%s', $ownerIdentifierName))
+            ->select(QueryBuilderUtil::getField('owner', $ownerIdentifierName))
             ->from($ownerClassName, 'owner')
             ->where($qb->expr()->orX(
                 // has incoming email
@@ -179,7 +180,12 @@ class EmailRepository extends EntityRepository
                         ->select('e.id')
                         ->join('e.recipients', 'r')
                         ->join('r.emailAddress', 'ea')
-                        ->andWhere(sprintf('ea.%s = owner.%s', $ownerColumnName, $ownerIdentifierName))
+                        ->andWhere(
+                            $qb->expr()->eq(
+                                QueryBuilderUtil::getField('ea', $ownerColumnName),
+                                QueryBuilderUtil::getField('owner', $ownerIdentifierName)
+                            )
+                        )
                         ->andWhere('ea.hasOwner = :hasOwner')
                         ->getDQL()
                 ),
@@ -189,7 +195,12 @@ class EmailRepository extends EntityRepository
                         ->createQueryBuilder('e2')
                         ->select('e2.id')
                         ->join('e2.fromEmailAddress', 'ea2')
-                        ->andWhere(sprintf('ea2.%s = owner.%s', $ownerColumnName, $ownerIdentifierName))
+                        ->andWhere(
+                            $qb->expr()->eq(
+                                QueryBuilderUtil::getField('ea2', $ownerColumnName),
+                                QueryBuilderUtil::getField('owner', $ownerIdentifierName)
+                            )
+                        )
                         ->andWhere('ea2.hasOwner = :hasOwner')
                         ->getDQL()
                 )
@@ -232,14 +243,14 @@ class EmailRepository extends EntityRepository
                 ->createQueryBuilder('e')
                 ->join('e.recipients', 'r')
                 ->join('r.emailAddress', 'ea')
-                ->andWhere(sprintf('ea.%s = :contactId', $ownerColumnName))
+                ->andWhere(QueryBuilderUtil::sprintf('ea.%s = :contactId', $ownerColumnName))
                 ->andWhere('ea.hasOwner = :hasOwner')
                 ->setParameter('contactId', $entity->getId())
                 ->setParameter('hasOwner', true),
             $this
                 ->createQueryBuilder('e')
                 ->join('e.fromEmailAddress', 'ea')
-                ->andWhere(sprintf('ea.%s = :contactId', $ownerColumnName))
+                ->andWhere(QueryBuilderUtil::sprintf('ea.%s = :contactId', $ownerColumnName))
                 ->andWhere('ea.hasOwner = :hasOwner')
                 ->setParameter('contactId', $entity->getId())
                 ->setParameter('hasOwner', true),
