@@ -98,7 +98,7 @@ class ResponseHistoryListener
         }
 
         $postArray = [
-            'url'          => $this->prepareUrl($em, $request->getRequestUri()),
+            'url'          => $request->getRequestUri(),
             'user'         => $user,
             'organization' => $organization
         ];
@@ -200,22 +200,6 @@ class ResponseHistoryListener
         }
 
         return $result;
-    }
-
-    /**
-     * Make sure url length is not bigger than url field's size
-     *
-     * @param EntityManager $em
-     * @param string $url
-     * @return string
-     */
-    protected function prepareUrl(EntityManager $em, $url)
-    {
-        $metaData = $em->getClassMetadata($this->historyItemFQCN);
-        $urlMeta = $metaData->getFieldMapping('url');
-        $length = $urlMeta['length'];
-
-        return substr($url, 0, $length);
     }
 
     /**
