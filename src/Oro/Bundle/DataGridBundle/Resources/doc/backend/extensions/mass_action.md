@@ -66,8 +66,13 @@ operations:
                     confirm_title: oro.customer.mass_actions.disable_customers.confirm_title
                     confirm_content: oro.customer.mass_actions.disable_customers.confirm_content
                     confirm_ok: oro.customer.mass_actions.disable_customers.confirm_ok
-
+                allowedRequestTypes: [POST, DELETE]
+                requestType: [POST]
 ```
+
+**Note:**
+ - `allowedRequestTypes` intended to use for mass action request server side validation. If it's not specified, request compared to `GET` method.
+ - `requestType` intended to use for mass action to override default HTTP request type `GET` to one from allowed types. If it's not specified will be `GET` type.
 
 How to configure operations described in [Operations](../../../../../ActionBundle/Resources/doc/operations.md) article.
 

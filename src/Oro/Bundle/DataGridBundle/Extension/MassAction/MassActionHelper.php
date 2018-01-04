@@ -54,6 +54,18 @@ class MassActionHelper
     }
 
     /**
+     * @param MassActionInterface $massAction
+     * @param string $httpMethod
+     * @return bool
+     */
+    public function isRequestMethodAllowed(MassActionInterface $massAction, string $httpMethod): bool
+    {
+        $configuredMethods = $massAction->getOptions()->offsetGetOr(MassActionExtension::ALLOWED_REQUEST_TYPES, []);
+
+        return in_array($httpMethod, $configuredMethods, true);
+    }
+
+    /**
      * @param string $massActionName
      * @param DatagridInterface $dataGrid
      * @return MassActionInterface
