@@ -13,6 +13,7 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class MassActionHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -158,6 +159,25 @@ class MassActionHelperTest extends \PHPUnit_Framework_TestCase
         $this->setDatagridExtensions($dataGrid, [$extension]);
 
         $this->assertSame($massAction, $this->massActionHelper->getMassActionByName(self::MASS_ACTION_NAME, $dataGrid));
+    }
+
+    public function testIsRequestMethodAllowed()
+    {
+        /** @var MassActionInterface|\PHPUnit_Framework_MockObject_MockObject $massAction */
+        $massAction = $this->createMock(MassActionInterface::class);
+        $massAction
+            ->expects($this->any())
+            ->method('getOptions')
+            ->willReturn(
+                ActionConfiguration::create(
+                    [
+                        MassActionExtension::ALLOWED_REQUEST_TYPES => [Request::METHOD_GET, Request::METHOD_POST]
+                    ]
+                )
+            );
+
+        $this->assertTrue($this->massActionHelper->isRequestMethodAllowed($massAction, Request::METHOD_GET));
+        $this->assertFalse($this->massActionHelper->isRequestMethodAllowed($massAction, Request::METHOD_DELETE));
     }
 
     /**

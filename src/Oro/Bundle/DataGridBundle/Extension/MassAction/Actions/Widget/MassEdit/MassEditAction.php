@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget\MassEdit
 
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget\WindowMassAction;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
+use Symfony\Component\HttpFoundation\Request;
 
 class MassEditAction extends WindowMassAction
 {
@@ -20,5 +21,13 @@ class MassEditAction extends WindowMassAction
         }
 
         return parent::setOptions($options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAllowedRequestTypes()
+    {
+        return [Request::METHOD_POST];
     }
 }

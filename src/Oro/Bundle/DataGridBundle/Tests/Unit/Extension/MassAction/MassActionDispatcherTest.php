@@ -23,6 +23,9 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class MassActionDispatcherTest extends \PHPUnit_Framework_TestCase
 {
     const DATAGRID_NAME = 'datagridName';
@@ -131,6 +134,7 @@ class MassActionDispatcherTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param DatasourceInterface $datasource
+     * @param DatagridConfiguration|null $gridConfig
      * @return DatagridInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private function createDatagrid(DatasourceInterface $datasource = null, DatagridConfiguration $gridConfig = null)
@@ -256,7 +260,23 @@ class MassActionDispatcherTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('parse')
             ->with($request)
-            ->willReturn(['inset' => true, 'values' => [1], 'filters' => self::$filters]);
+            ->willReturn(
+                [
+                    'inset' => true,
+                    'values' => [1],
+                    'filters' => self::$filters,
+                    MassActionDispatcher::REQUEST_TYPE => Request::METHOD_GET
+                ]
+            );
+
+        $actionConfiguration = ActionConfiguration::create([]);
+        $massAction = $this->createMassAction($actionConfiguration);
+
+        $this->massActionHelper
+            ->expects($this->once())
+            ->method('isRequestMethodAllowed')
+            ->with($massAction, Request::METHOD_GET)
+            ->willReturn(true);
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Not supported datasource');
@@ -308,12 +328,29 @@ class MassActionDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testDispatchByRequest()
     {
+        self::$data[MassActionDispatcher::REQUEST_TYPE] = Request::METHOD_GET;
         $request = new Request(self::$data);
         $this->massActionParametersParser
             ->expects($this->once())
             ->method('parse')
             ->with($request)
-            ->willReturn(['inset' => true, 'values' => [1], 'filters' => self::$filters]);
+            ->willReturn(
+                [
+                    'inset' => true,
+                    'values' => [1],
+                    'filters' => self::$filters,
+                    MassActionDispatcher::REQUEST_TYPE => Request::METHOD_GET
+                ]
+            );
+
+        $actionConfiguration = ActionConfiguration::create([]);
+        $massAction = $this->createMassAction($actionConfiguration);
+
+        $this->massActionHelper
+            ->expects($this->once())
+            ->method('isRequestMethodAllowed')
+            ->with($massAction, Request::METHOD_GET)
+            ->willReturn(true);
 
         $handlerResponse = $this->setExpectationsForDispatch();
 
@@ -321,6 +358,51 @@ class MassActionDispatcherTest extends \PHPUnit_Framework_TestCase
             $handlerResponse,
             $this->massActionDispatcher->dispatchByRequest(self::DATAGRID_NAME, self::ACTION_NAME, $request)
         );
+    }
+
+    public function testDispatchByRequestWhenHTTPMethodNotAllowed()
+    {
+        self::$data[MassActionDispatcher::REQUEST_TYPE] = Request::METHOD_GET;
+        $request = new Request(self::$data);
+        $this->massActionParametersParser
+            ->expects($this->once())
+            ->method('parse')
+            ->with($request)
+            ->willReturn(['inset' => true, 'values' => [1], 'filters' => self::$filters]);
+
+        $actionConfiguration = ActionConfiguration::create([]);
+        $massAction = $this->createMassAction($actionConfiguration);
+
+        $this->massActionHelper
+            ->expects($this->once())
+            ->method('isRequestMethodAllowed')
+            ->with($massAction, Request::METHOD_GET)
+            ->willReturn(false);
+
+        $acceptedDatasource = $this->createMock(DatasourceInterface::class);
+        $gridConfig = $this->createMock(DatagridConfiguration::class);
+        $dataGrid = $this->createDatagrid($acceptedDatasource, $gridConfig);
+
+        $actionConfiguration = ActionConfiguration::create([]);
+        $massAction = $this->createMassAction($actionConfiguration);
+
+        $this->massActionHelper
+            ->expects($this->once())
+            ->method('getMassActionByName')
+            ->with(self::ACTION_NAME, $dataGrid)
+            ->willReturn($massAction);
+
+        $handler = $this->createMock(MassActionHandlerInterface::class);
+
+        $this->massActionHelper
+            ->expects($this->once())
+            ->method('getHandler')
+            ->with($massAction)
+            ->willReturn($handler);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('There is not allowed "GET" HTTP method received.');
+        $this->massActionDispatcher->dispatchByRequest(self::DATAGRID_NAME, self::ACTION_NAME, $request);
     }
 
     /**
