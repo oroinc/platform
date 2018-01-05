@@ -104,6 +104,9 @@ define(function(require) {
             if (options.configuration) {
                 this.configuration = $.extend(true, {}, this.configuration, options.configuration);
             }
+            if (options.requestType) {
+                this.requestType = options.requestType;
+            }
             if (options.order) {
                 this.order = options.order;
             }

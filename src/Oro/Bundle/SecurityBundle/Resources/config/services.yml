@@ -645,6 +645,13 @@ services:
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 250 }
 
+    oro_security.listener.console_context_options_listener:
+        class: Oro\Bundle\SecurityBundle\EventListener\ConsoleContextOptionsListener
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 255 }
+
     oro_security.form.extension.aclprotected_type:
         class: %oro_security.form.extension.aclprotected_type.class%
         arguments:

@@ -179,10 +179,13 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->getEvent();
         /** @var \PHPUnit_Framework_MockObject_MockObject $input */
         $input = $event->getInput();
-        $input->expects($this->at(1))
+        $input->expects($this->exactly(2))
             ->method('getParameterOption')
-            ->with('--' . ConsoleContextListener::OPTION_USER)
-            ->will($this->returnValue($username));
+            ->withConsecutive(
+                ['--' . ConsoleContextListener::OPTION_USER],
+                ['--' . ConsoleContextListener::OPTION_ORGANIZATION]
+            )
+            ->willReturnOnConsecutiveCalls($username, null);
 
         $this->userManager->expects($this->once())
             ->method('findUserByUsernameOrEmail')
@@ -315,31 +318,8 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         /** @var \PHPUnit_Framework_MockObject_MockObject|InputDefinition $definition */
         $definition = $this->getMockBuilder(InputDefinition::class)
             ->disableOriginalConstructor()
-            ->setMethods(['addOption', 'getParameterOption', 'getOptions'])
+            ->setMethods(['getParameterOption'])
             ->getMock();
-        $definition->expects($this->at(1))
-            ->method('addOption')
-            ->with($this->isInstanceOf(InputOption::class))
-            ->will(
-                $this->returnCallback(
-                    function (InputOption $option) {
-                        $this->assertEquals(ConsoleContextListener::OPTION_USER, $option->getName());
-                    }
-                )
-            );
-        $definition->expects($this->at(3))
-            ->method('addOption')
-            ->with($this->isInstanceOf('Symfony\Component\Console\Input\InputOption'))
-            ->will(
-                $this->returnCallback(
-                    function (InputOption $option) {
-                        $this->assertEquals(ConsoleContextListener::OPTION_ORGANIZATION, $option->getName());
-                    }
-                )
-            );
-        $definition->expects($this->any())
-            ->method('getOptions')
-            ->willReturn([]);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|Application $application */
         $application = $this->getMockBuilder(Application::class)

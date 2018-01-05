@@ -31,6 +31,7 @@ use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 use Symfony\Component\Stopwatch\Stopwatch;
 use WebDriver\Exception\NoAlertOpenError;
 use WebDriver\Exception\NoSuchElement;
+use WebDriver\Exception\UnknownError;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -411,6 +412,11 @@ class OroMainContext extends MinkContext implements
             try {
                 $session->accept_alert();
             } catch (NoAlertOpenError $exception) {
+                usleep(50000);
+            } catch (UnknownError $exception) {
+                /**
+                 * @see https://bugs.chromium.org/p/chromedriver/issues/detail?id=1500
+                 */
                 usleep(50000);
             }
         }
