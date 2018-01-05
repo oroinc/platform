@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     var ContentSidebarView;
-    var BaseView = require('oroui/js/app/views/base/view');
+    var ResizableAreaView = require('oroui/js/app/views/resizable-area-view');
     var layoutHelper = require('oroui/js/tools/layout-helper');
     var mediator = require('oroui/js/mediator');
     var tools = require('oroui/js/tools');
@@ -13,16 +13,18 @@ define(function(require) {
         fixSidebarHeight: true,
         sidebar: '[data-role="sidebar"]',
         scrollbar: '[data-role="sidebar"]',
-        content: '[data-role="content"]'
+        content: '[data-role="content"]',
+        uniqueStorageKey: 'contentSidebarResizableAreaUniq'
     }, config);
 
-    ContentSidebarView = BaseView.extend({
-        optionNames: BaseView.prototype.optionNames.concat([
+    ContentSidebarView = ResizableAreaView.extend({
+        optionNames: ResizableAreaView.prototype.optionNames.concat([
             'autoRender',
             'fixSidebarHeight',
             'sidebar',
             'scrollbar',
-            'content'
+            'content',
+            'uniqueStorageKey'
         ]),
 
         autoRender: config.autoRender,
@@ -35,9 +37,24 @@ define(function(require) {
 
         content: config.content,
 
+        uniqueStorageKey: config.uniqueStorageKey,
+
         events: {
             'click [data-role="sidebar-minimize"]': 'minimize',
             'click [data-role="sidebar-maximize"]': 'maximize'
+        },
+
+        /**
+         * {@inheritDoc}
+         */
+        initialize: function(options) {
+            var args = _.defaults(_.clone(options), {
+                $resizableEl: this.sidebar,
+                $extraEl: this.content,
+                uniqueStorageKey: this.uniqueStorageKey
+            });
+
+            ContentSidebarView.__super__.initialize.call(this, args);
         },
 
         /**
@@ -50,13 +67,17 @@ define(function(require) {
 
             var state = tools.unpackFromQueryString(location.search).sidebar || 'on';
             this._toggle(state);
+
+            ContentSidebarView.__super__.render.apply(this, arguments);
         },
 
         minimize: function() {
+            this.disableResizable(true);
             this._toggle('off');
         },
 
         maximize: function() {
+            this.enableResizable(true);
             this._toggle('on');
         },
 

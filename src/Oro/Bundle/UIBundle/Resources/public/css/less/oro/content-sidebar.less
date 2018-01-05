@@ -9,6 +9,7 @@
 
 .content-with-sidebar {
     &--sidebar {
+        position: relative;
         border: 1px solid @sidebarBorderColor;
         width: @sidebarWidth;
         overflow: auto;
@@ -18,6 +19,37 @@
         &.content-sidebar-minimized {
             padding-left: 0;
             width: @sidebarMinimizedWidth;
+        }
+
+        .resizable-area {
+            position: absolute;
+            top: 0;
+            right: 0;
+
+            width: 3px;
+            height: 100%;
+
+            background: #ddd;
+
+            touch-action: none;
+
+            cursor: ew-resize;
+
+            opacity: 0;
+
+            transition: opacity 150ms linear;
+        }
+
+        &:hover {
+            .resizable-area {
+                opacity: 1;
+            }
+        }
+
+        &.resizable-disable {
+            .resizable-area {
+                display: none;
+            }
         }
     }
 
