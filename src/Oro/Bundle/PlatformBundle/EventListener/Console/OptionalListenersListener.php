@@ -2,12 +2,8 @@
 
 namespace Oro\Bundle\PlatformBundle\EventListener\Console;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-
-use Oro\Bundle\PlatformBundle\Command\OptionalListenersCommand;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 
 class OptionalListenersListener
@@ -33,44 +29,12 @@ class OptionalListenersListener
      */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
-        $command = $event->getCommand();
         $input = $event->getInput();
 
-        $this->addOptionsToCommand($command, $input);
         $listeners = $this->getListenersToDisable($input);
         if (!empty($listeners)) {
             $this->listenersManager->disableListeners($listeners);
         }
-    }
-
-    /**
-     * @param Command $command
-     * @param InputInterface $input
-     */
-    protected function addOptionsToCommand(Command $command, InputInterface $input)
-    {
-        $inputDefinition = $command->getApplication()->getDefinition();
-        $disableOptionalListenerOption = new InputOption(
-            self::DISABLE_OPTIONAL_LISTENERS,
-            null,
-            InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY,
-            sprintf(
-                'Disable optional listeners, "%s" to disable all listeners, '
-                .'command "%s" shows all listeners',
-                self::ALL_OPTIONAL_LISTENERS_VALUE,
-                OptionalListenersCommand::NAME
-            )
-        );
-        /**
-         * Starting from Symfony 2.8 event 'ConsoleCommandEvent' fires after all definitions were merged.
-         */
-        $inputDefinition->addOption($disableOptionalListenerOption);
-        $command->getDefinition()->addOption($disableOptionalListenerOption);
-        /**
-         * Added only for compatibility with Symfony below 2.8
-         */
-        $command->mergeApplicationDefinition();
-        $input->bind($command->getDefinition());
     }
 
     /**
