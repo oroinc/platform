@@ -194,7 +194,7 @@ class EmailControllerTest extends WebTestCase
                 'values' => $this->getReference('emailUser_for_mass_mark_test')->getId()
             ]
         );
-        $this->client->request('GET', $url);
+        $this->client->request('POST', $url);
         $result = $this->client->getResponse();
         $data = json_decode($result->getContent(), true);
         $this->assertTrue($data['successful'] === true);
@@ -213,7 +213,7 @@ class EmailControllerTest extends WebTestCase
                 'values' => $this->getReference('emailUser_for_mass_mark_test')->getId()
             ]
         );
-        $this->client->request('GET', $url);
+        $this->client->request('POST', $url);
         $result = $this->client->getResponse();
         $data = json_decode($result->getContent(), true);
         $this->assertTrue($data['successful'] === true);

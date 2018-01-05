@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax;
 
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
+use Symfony\Component\HttpFoundation\Request;
 
 class AjaxMassAction extends AbstractMassAction
 {
@@ -32,5 +33,21 @@ class AjaxMassAction extends AbstractMassAction
         }
 
         return parent::setOptions($options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAllowedRequestTypes()
+    {
+        return [Request::METHOD_POST];
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    protected function getRequestType()
+    {
+        return Request::METHOD_POST;
     }
 }

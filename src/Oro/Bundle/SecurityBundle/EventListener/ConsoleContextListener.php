@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -38,25 +35,7 @@ class ConsoleContextListener
      */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
-        $command = $event->getCommand();
         $input = $event->getInput();
-
-        $options = [
-            new InputOption(
-                self::OPTION_USER,
-                null,
-                InputOption::VALUE_REQUIRED,
-                'ID, username or email of the user that should be used as current user'
-            ),
-            new InputOption(
-                self::OPTION_ORGANIZATION,
-                null,
-                InputOption::VALUE_REQUIRED,
-                'ID or name of the organization that should be used as current organization'
-            )
-        ];
-
-        $this->addOptionsToCommand($command, $input, $options);
 
         $user = $input->getParameterOption('--' . self::OPTION_USER);
         $organization = $input->getParameterOption('--' . self::OPTION_ORGANIZATION);
@@ -72,31 +51,6 @@ class ConsoleContextListener
         if ($token && $token instanceof OrganizationContextTokenInterface) {
             $this->setOrganization($organization, $token);
         }
-    }
-
-    /**
-     * @param Command             $command
-     * @param InputInterface      $input
-     * @param array|InputOption[] $options
-     */
-    protected function addOptionsToCommand(Command $command, InputInterface $input, array $options)
-    {
-        $inputDefinition = $command->getApplication()->getDefinition();
-        $commandDefinition = $command->getDefinition();
-
-        foreach ($options as $option) {
-            /**
-             * Starting from Symfony 2.8 event 'ConsoleCommandEvent' fires after all definitions were merged.
-             */
-            $inputDefinition->addOption($option);
-            $commandDefinition->addOption($option);
-        }
-
-        /**
-         * Added only for compatibility with Symfony below 2.8
-         */
-        $command->mergeApplicationDefinition();
-        $input->bind($command->getDefinition());
     }
 
     /**

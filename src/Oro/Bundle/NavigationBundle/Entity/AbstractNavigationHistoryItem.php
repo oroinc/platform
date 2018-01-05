@@ -4,14 +4,23 @@ namespace Oro\Bundle\NavigationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\NavigationBundle\Model\UrlAwareInterface;
+use Oro\Bundle\NavigationBundle\Model\UrlAwareTrait;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
+use Oro\Bundle\OrganizationBundle\Entity\Ownership\OrganizationAwareTrait;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
  * @ORM\MappedSuperclass
  */
-abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
+abstract class AbstractNavigationHistoryItem implements
+    NavigationItemInterface,
+    OrganizationAwareInterface,
+    UrlAwareInterface
 {
+    use OrganizationAwareTrait;
+    use UrlAwareTrait;
+
     const NAVIGATION_HISTORY_ITEM_TYPE          = 'history';
     const NAVIGATION_HISTORY_COLUMN_VISITED_AT  = 'visitedAt';
     const NAVIGATION_HISTORY_COLUMN_VISIT_COUNT = 'visitCount';
@@ -24,13 +33,6 @@ abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
-
-    /**
-     * @var string $url
-     *
-     * @ORM\Column(name="url", type="string", length=1023)
-     */
-    protected $url;
 
     /**
      * @var string $title
@@ -52,14 +54,6 @@ abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
      * @ORM\Column(name="visit_count", type="integer")
      */
     protected $visitCount = 0;
-
-    /**
-     * @var Organization
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $organization;
 
     /**
      * @var string $url
@@ -88,7 +82,6 @@ abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
     protected $user;
 
     /**
-     * Constructor
      * @param array $values
      */
     public function __construct(array $values = null)
@@ -109,35 +102,9 @@ abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
     }
 
     /**
-     * Set url
+     * @param string $title
      *
-     * @param  string $url
-     *
-     * @return NavigationHistoryItem
-     */
-    public function setUrl($url)
-    {
-        $this->url = $url;
-
-        return $this;
-    }
-
-    /**
-     * Get url
-     *
-     * @return string
-     */
-    public function getUrl()
-    {
-        return $this->url;
-    }
-
-    /**
-     * Set title
-     *
-     * @param  string $title
-     *
-     * @return NavigationHistoryItem
+     * @return AbstractNavigationHistoryItem
      */
     public function setTitle($title)
     {
@@ -147,8 +114,6 @@ abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
     }
 
     /**
-     * Get title
-     *
      * @return string
      */
     public function getTitle()
@@ -157,11 +122,9 @@ abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
     }
 
     /**
-     * Set visitedAt
+     * @param \DateTime $visitedAt
      *
-     * @param  \DateTime $visitedAt
-     *
-     * @return NavigationHistoryItem
+     * @return AbstractNavigationHistoryItem
      */
     public function setVisitedAt($visitedAt)
     {
@@ -171,8 +134,6 @@ abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
     }
 
     /**
-     * Get visitedAt
-     *
      * @return \DateTime
      */
     public function getVisitedAt()
@@ -181,11 +142,10 @@ abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
     }
 
     /**
-     * Set visitCount
      *
-     * @param  int $visitCount
+     * @param int $visitCount
      *
-     * @return NavigationHistoryItem
+     * @return AbstractNavigationHistoryItem
      */
     public function setVisitCount($visitCount)
     {
@@ -195,8 +155,6 @@ abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
     }
 
     /**
-     * Get visitCount
-     *
      * @return int
      */
     public function getVisitCount()
@@ -207,7 +165,7 @@ abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
     /**
      * @param int $entityId
      *
-     * @return NavigationHistoryItem
+     * @return AbstractNavigationHistoryItem
      */
     public function setEntityId($entityId)
     {
@@ -227,7 +185,7 @@ abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
     /**
      * @param string $route
      *
-     * @return NavigationHistoryItem
+     * @return AbstractNavigationHistoryItem
      */
     public function setRoute($route)
     {
@@ -247,7 +205,7 @@ abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
     /**
      * @param array $routeParameters
      *
-     * @return NavigationHistoryItem
+     * @return AbstractNavigationHistoryItem
      */
     public function setRouteParameters($routeParameters)
     {
@@ -265,10 +223,8 @@ abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
     }
 
     /**
-     * Set user
-     *
-     * @param  AbstractUser $user
-     * @return NavigationHistoryItem
+     * @param AbstractUser $user
+     * @return AbstractNavigationHistoryItem
      */
     public function setUser(AbstractUser $user = null)
     {
@@ -278,8 +234,6 @@ abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
     }
 
     /**
-     * Get user
-     *
      * @return AbstractUser
      */
     public function getUser()
@@ -334,29 +288,5 @@ abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
     {
         $this->visitedAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->visitCount++;
-    }
-
-    /**
-     * Set organization
-     *
-     * @param Organization $organization
-     *
-     * @return NavigationHistoryItem
-     */
-    public function setOrganization(Organization $organization = null)
-    {
-        $this->organization = $organization;
-
-        return $this;
-    }
-
-    /**
-     * Get organization
-     *
-     * @return Organization
-     */
-    public function getOrganization()
-    {
-        return $this->organization;
     }
 }
