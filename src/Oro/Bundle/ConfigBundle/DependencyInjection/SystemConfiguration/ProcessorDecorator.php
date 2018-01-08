@@ -245,6 +245,7 @@ class ProcessorDecorator
                 ->children()
                     ->scalarNode('data_type')->end()
                     ->scalarNode('type')->end()
+                    ->scalarNode('search_type')->end()
                     ->arrayNode('options')
                         ->prototype('variable')->end()
                     ->end()

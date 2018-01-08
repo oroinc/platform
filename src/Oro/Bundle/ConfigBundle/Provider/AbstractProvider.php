@@ -50,24 +50,35 @@ abstract class AbstractProvider implements ProviderInterface
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
+    /** @var  ChainSearchProvider */
+    protected $searchProvider;
+
     /**
      * @param ConfigBag $configBag
      * @param TranslatorInterface $translator
      * @param FormFactoryInterface $factory
      * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param ChainSearchProvider $searchProvider
      */
     public function __construct(
         ConfigBag $configBag,
         TranslatorInterface $translator,
         FormFactoryInterface $factory,
-        AuthorizationCheckerInterface $authorizationChecker
+        AuthorizationCheckerInterface $authorizationChecker,
+        ChainSearchProvider $searchProvider
     ) {
         $this->configBag = $configBag;
         $this->translator = $translator;
         $this->factory = $factory;
         $this->authorizationChecker = $authorizationChecker;
+        $this->searchProvider = $searchProvider;
     }
 
+    /**
+     * Use default checkbox label
+     *
+     * @return string
+     */
     abstract protected function getParentCheckboxLabel();
 
     /**
@@ -153,7 +164,7 @@ abstract class AbstractProvider implements ProviderInterface
      * @param int $correctMenuLevel
      *
      * @throws ItemNotFoundException
-     * @return []
+     * @return array
      */
     protected function getJsTreeData($treeName, $correctMenuLevel)
     {
@@ -239,11 +250,11 @@ abstract class AbstractProvider implements ProviderInterface
      * @param array $nodes
      * @param int $correctMenuLevel
      * @param int $level
-     * @param null|string $parentName
+     * @param string $parentName
      * @param array $groupedData
      * @return array
      */
-    protected function buildJsTree($nodes, $correctMenuLevel, $level = 0, $parentName = '#', $groupedData = [])
+    protected function buildJsTree($nodes, $correctMenuLevel, $level = 0, $parentName = '#', array $groupedData = [])
     {
         $nodes = $this->sortChildrenByPriority($nodes);
 
@@ -270,6 +281,7 @@ abstract class AbstractProvider implements ProviderInterface
     /**
      * @param string $name
      * @param string $parentName
+     * @param array $node
      * @return array
      */
     public function buildJsTreeItem($name, $parentName, array $node)
@@ -300,75 +312,34 @@ abstract class AbstractProvider implements ProviderInterface
     private function buildJsTreeItemWithSearchData($name, $parentName, array $node)
     {
         $jsTreeData = $this->buildJsTreeItem($name, $parentName, $node);
-        $jsTreeData['search_by'] = $this->prepareSearchData($name, $node);
+
+        if ($this->searchProvider->supports($name)) {
+            $children = array_key_exists('children', $node) ? $node['children'] : [];
+            $jsTreeData['search_by'] = $this->prepareSearchData($name, $children);
+        }
 
         return $jsTreeData;
     }
 
     /**
      * @param string $name
-     * @param string|array $node
+     * @param array $itemChildren
      * @return array
      */
-    private function prepareSearchData($name, $node)
+    private function prepareSearchData($name, array $itemChildren = [])
     {
-        $itemSearchData = [];
-        if (is_array($node) && isset($node['children'])) {
-            $itemSearchData[] = $this->prepareGroupSearchData($name);
-            foreach ($node['children'] as $childName => $nodeData) {
-                $itemSearchData[] = $this->prepareSearchData($childName, $nodeData);
-            }
-        } else {
-            $itemSearchData[] = $this->prepareFieldSearchData($node);
-        }
+        $itemSearchData = $this->searchProvider->getData($name);
 
-        if ($itemSearchData) {
-            $itemSearchData = array_merge(...$itemSearchData);
+        foreach ($itemChildren as $childName => $childData) {
+            if (is_array($childData)) {
+                $children = array_key_exists('children', $childData) ? $childData['children'] : [];
+                $itemSearchData = array_merge($itemSearchData, $this->prepareSearchData($childName, $children));
+            } else {
+                $itemSearchData = array_merge($itemSearchData, $this->prepareSearchData($childData));
+            }
         }
 
         return $itemSearchData;
-    }
-
-    /**
-     * @param string $node
-     * @return array
-     */
-    private function prepareGroupSearchData($node)
-    {
-        $group = $this->configBag->getGroupsNode($node);
-        if ($group === false) {
-            throw new ItemNotFoundException(sprintf('Group "%s" is not defined.', $node));
-        }
-
-        $searchData = [];
-        if (isset($group['title'])) {
-            $searchData[] = $this->translator->trans($group['title']);
-        }
-
-        return $searchData;
-    }
-
-    /**
-     * @param string $node
-     * @return array
-     */
-    private function prepareFieldSearchData($node)
-    {
-        $fieldsRoot = $this->configBag->getFieldsRoot($node);
-        if ($fieldsRoot === false) {
-            throw new ItemNotFoundException(sprintf('Field "%s" is not defined.', $node));
-        }
-
-        $searchData = [];
-        if (isset($fieldsRoot['options']['label'])) {
-            $searchData[] = $this->translator->trans($fieldsRoot['options']['label']);
-        }
-
-        if (isset($fieldsRoot['options']['tooltip'])) {
-            $searchData[] = $this->translator->trans($fieldsRoot['options']['tooltip']);
-        }
-
-        return $searchData;
     }
 
     /**
