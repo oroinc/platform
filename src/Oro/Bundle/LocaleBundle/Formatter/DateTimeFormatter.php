@@ -255,9 +255,9 @@ class DateTimeFormatter
     /**
      * Returns DateTime by $data and $timezone and false otherwise
      *
-     * @param \DateTime|string|int $date
+     * @param \DateTimeInterface|string|int $date
      *
-     * @return \DateTime|false
+     * @return \DateTimeInterface|false
      */
     public function getDateTime($date)
     {
@@ -265,7 +265,7 @@ class DateTimeFormatter
             return false;
         }
 
-        if ($date instanceof \DateTime) {
+        if ($date instanceof \DateTimeInterface) {
             return $date;
         }
 
