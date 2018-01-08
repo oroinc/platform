@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
@@ -19,41 +22,45 @@ use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class EmailEntityBuilder
 {
-    /**
-     * @var EmailEntityBatchProcessor
-     */
+    /** @var EmailEntityBatchProcessor */
     private $batch;
 
-    /**
-     * @var EmailAddressManager
-     */
+    /** @var EmailAddressManager */
     private $emailAddressManager;
 
-    /**
-     * @var EmailAddressHelper
-     */
+    /** @var EmailAddressHelper */
     private $emailAddressHelper;
 
     /** @var EmailBodyHelper */
     private $emailBodyHelper;
 
+    /** @var ManagerRegistry */
+    private $doctrine;
+
+    /** @var array [entity class => [field name => length, ...], ...] */
+    private $fieldLength = [];
+
     /**
-     * Constructor
-     *
      * @param EmailEntityBatchProcessor $batch
      * @param EmailAddressManager       $emailAddressManager
      * @param EmailAddressHelper        $emailAddressHelper
+     * @param ManagerRegistry           $doctrine
      */
     public function __construct(
         EmailEntityBatchProcessor $batch,
         EmailAddressManager $emailAddressManager,
-        EmailAddressHelper $emailAddressHelper
+        EmailAddressHelper $emailAddressHelper,
+        ManagerRegistry $doctrine
     ) {
-        $this->batch               = $batch;
+        $this->batch = $batch;
         $this->emailAddressManager = $emailAddressManager;
-        $this->emailAddressHelper  = $emailAddressHelper;
+        $this->emailAddressHelper = $emailAddressHelper;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -148,7 +155,7 @@ class EmailEntityBuilder
         $result = new Email();
         $result
             ->setSubject($subject)
-            ->setFromName($from)
+            ->setFromName($this->truncateFullEmailAddress($from, Email::class, 'fromName'))
             ->setFromEmailAddress($this->address($from))
             ->setSentAt($sentAt)
             ->setInternalDate($internalDate)
@@ -429,7 +436,7 @@ class EmailEntityBuilder
 
         return $result
             ->setType($type)
-            ->setName($email)
+            ->setName($this->truncateFullEmailAddress($email, EmailRecipient::class, 'name'))
             ->setEmailAddress($this->address($email));
     }
 
@@ -502,5 +509,40 @@ class EmailEntityBuilder
         }
 
         return $this->emailBodyHelper;
+    }
+
+    /**
+     * @param string $email
+     * @param string $entityClass
+     * @param string $fieldName
+     *
+     * @return string
+     */
+    private function truncateFullEmailAddress($email, $entityClass, $fieldName)
+    {
+        return $this->emailAddressHelper->truncateFullEmailAddress(
+            $email,
+            $this->getFieldLength($entityClass, $fieldName)
+        );
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $fieldName
+     *
+     * @return int
+     */
+    private function getFieldLength($entityClass, $fieldName)
+    {
+        if (!isset($this->fieldLength[$entityClass][$fieldName])) {
+            /** @var ClassMetadata $metadata */
+            $metadata = $this->doctrine
+                ->getManagerForClass($entityClass)
+                ->getClassMetadata($entityClass);
+            $mapping = $metadata->getFieldMapping($fieldName);
+            $this->fieldLength[$entityClass][$fieldName] = $mapping['length'];
+        }
+
+        return $this->fieldLength[$entityClass][$fieldName];
     }
 }

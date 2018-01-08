@@ -32,6 +32,7 @@ use Oro\Bundle\EmailBundle\Migrations\Schema\v1_27\OroEmailBundle as OroEmailBun
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_28\OroEmailBundle as OroEmailBundle128;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_29\OroEmailBundle as OroEmailBundle129;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_31\OroEmailBundle as OroEmailBundle131;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_32\IncreaseEmailNameLength as OroEmailBundle132;
 
 /**
  * Class OroEmailBundleInstaller
@@ -46,7 +47,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_31';
+        return 'v1_32';
     }
 
     /**
@@ -127,5 +128,8 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle128::oroEmailFolderChangeColumn($schema);
 
         OroEmailBundle131::oroAutoResponseRuleTable($schema);
+
+        OroEmailBundle132::changeEmailFromNameColumnLength($schema);
+        OroEmailBundle132::changeEmailRecipientNameColumnLength($schema);
     }
 }
