@@ -170,27 +170,31 @@
         'successMessage': movedMessage|default('oro.navigation.menuupdate.moved_success_message')
     } %}
 
-    {% embed "OroUIBundle::content_sidebar.html.twig" %}
-        {% block sidebar %}
-            {{ UI.renderJsTree(
-                {
-                    'label': 'oro.navigation.menu.menu_list_default.label'|trans,
-                    'treeOptions': treeOptions
-                },
-                {
-                    'move': {
-                        'view': 'oroui/js/app/views/jstree/move-action-view',
-                        'routeName': routePrefix ~ 'move',
-                        'routeParams': {menuName: menuName, context: context}
+    <div class="navigation-container">
+        {% embed "OroUIBundle::content_sidebar.html.twig" with {options: {
+            scrollbar: '[data-role="jstree-container"]'
+        }} %}
+            {% block sidebar %}
+                {{ UI.renderJsTree(
+                    {
+                        'label': 'oro.navigation.menu.menu_list_default.label'|trans,
+                        'treeOptions': treeOptions
+                    },
+                    {
+                        'move': {
+                            'view': 'oroui/js/app/views/jstree/move-action-view',
+                            'routeName': routePrefix ~ 'move',
+                            'routeParams': {menuName: menuName, context: context}
+                        }
                     }
-                }
-            ) }}
-        {% endblock sidebar %}
+                ) }}
+            {% endblock sidebar %}
 
-        {% block content %}
-            {% autoescape %}
-                {{ twoColumnContent|raw}}
-            {% endautoescape %}
-        {% endblock content %}
-    {% endembed %}
+            {% block content %}
+                {% autoescape %}
+                    {{ twoColumnContent|raw}}
+                {% endautoescape %}
+            {% endblock content %}
+        {% endembed %}
+    </div>
 {% endblock content_data %}
