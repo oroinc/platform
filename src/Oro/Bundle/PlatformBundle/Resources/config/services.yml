@@ -9,6 +9,7 @@ parameters:
 
     oro_platform.optional_listeners.manager.class: Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager
     oro_platform.event_listener.optional_listeners.class: Oro\Bundle\PlatformBundle\EventListener\Console\OptionalListenersListener
+    oro_platform.event_listener.optional_listeners_options.class: Oro\Bundle\PlatformBundle\EventListener\Console\OptionalListenersOptionsListener
     jms_serializer.twig_extension.class: Oro\Bundle\PlatformBundle\Twig\SerializerExtension
 
 services:
@@ -86,6 +87,16 @@ services:
             - "@oro_platform.optional_listeners.manager"
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
+
+    oro_platform.event_listener.optional_listeners_options:
+        class: %oro_platform.event_listener.optional_listeners_options.class%
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 255 }
+
+    oro_platform.event_listener.rebind_definition:
+        class: Oro\Bundle\PlatformBundle\EventListener\Console\RebindDefinitionListener
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 254 }
 
     oro_platform.event_listener.demo_data_fixtures_listener.abstract:
         class: 'Oro\Bundle\PlatformBundle\EventListener\AbstractDemoDataFixturesListener'
