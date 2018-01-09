@@ -38,6 +38,22 @@ Feature: Configuration Search in System, Personal and Organization configuration
     And I expand all on configuration sidebar
     Then I should see "Localization" in the "Configuration Sidebar Content" element
 
+  Scenario: Settings with search type text should be searchable
+    When I type "image/jpeg" in "Quick Search"
+    Then I should see "Upload Settings" in the "Configuration Sidebar Content" element
+    And I should not see "Localization" in the "Configuration Sidebar Content" element
+    When I click "Clear Sidebar Search"
+    And I expand all on configuration sidebar
+    Then I should see "Localization" in the "Configuration Sidebar Content" element
+
+  Scenario: Settings with search type choice should be searchable
+    When I type "Never" in "Quick Search"
+    Then I should see "Routing" in the "Configuration Sidebar Content" element
+    And I should not see "Localization" in the "Configuration Sidebar Content" element
+    When I click "Clear Sidebar Search"
+    And I expand all on configuration sidebar
+    Then I should see "Localization" in the "Configuration Sidebar Content" element
+
   Scenario: If the user types section name, all child settings should be displayed
     When I type "websites" in "Quick Search"
     Then I should see "Routing" in the "Configuration Sidebar Content" element
