@@ -78,6 +78,7 @@ services:
         calls:
             - ['setMessageProducer', ['@oro_message_queue.client.message_producer']]
             - [setLogger, ['@logger']]
+            - ['setCredentialsManager', ['@oro_email.credentials.issue_manager']]
         tags:
             - { name: oro_email.email_synchronizer }
 

@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_32\WrongCredentialsOriginTable;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_0\OroEmailBundle;
@@ -46,7 +47,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_31';
+        return 'v1_32';
     }
 
     /**
@@ -127,5 +128,7 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle128::oroEmailFolderChangeColumn($schema);
 
         OroEmailBundle131::oroAutoResponseRuleTable($schema);
+
+        WrongCredentialsOriginTable::createCredentialsOriginTable($schema);
     }
 }
