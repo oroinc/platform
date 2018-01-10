@@ -1,31 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var ResizableAreaView;
-    var BaseView = require('oroui/js/app/views/base/view');
+    var ResizableArea;
     var persistentStorage = require('oroui/js/persistent-storage');
+    var BasePlugin = require('oroui/js/app/plugins/base/plugin');
     var _ = require('underscore');
     var $ = require('jquery');
     require('jquery-ui');
 
-    ResizableAreaView = BaseView.extend({
-        /**
-         * @inheritDoc
-         * @property {Object}
-         */
-        optionNames: BaseView.prototype.optionNames.concat([
-            'uniqueStorageKey',
-            'resizableOptions',
-            '$resizableEl',
-            '$extraEl',
-            'useResizable'
-        ]),
-
+    ResizableArea = BasePlugin.extend({
         /**
          * @property {Options}
          */
-        options: {
-            useResizable: !_.isMobile()
+        defaults: {
+            useResizable: !_.isMobile(),
+            cashedStateToDOM: false
         },
 
         /**
@@ -34,7 +23,7 @@ define(function(require) {
         uniqueStorageKey: 'resizableAreaID',
 
         /**
-         * @property {String}
+         * @property {Object}
          */
         resizableOptions: {
             // 'n, e, s, w, ne, se, sw, nw, all' */
@@ -43,7 +32,11 @@ define(function(require) {
             maxWidth: 600,
             minWidth: 320,
             // Selector or Element or String
-            containment: 'parent'
+            containment: 'parent',
+            classes: {
+                'ui-resizable': 'resizable',
+                'ui-resizable-e': 'resizable-area'
+            }
         },
 
         /**
@@ -59,10 +52,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        initialize: function(options) {
-            this.options = _.extend(this.options, options);
-
-            ResizableAreaView.__super__.initialize.call(this, arguments);
+        initialize: function(main, options) {
+            this.options = _.extend(this.defaults, options);
 
             if (!this.options.useResizable) {
                 return;
@@ -76,15 +67,15 @@ define(function(require) {
                 this.uniqueStorageKey = this.options.uniqueStorageKey;
             }
 
-            if (this.$(this.options.$resizableEl).length) {
-                this.$resizableEl = this.$(this.options.$resizableEl);
+            if (this.main.$(this.options.$extraEl).length) {
+                this.$extraEl = this.main.$(this.options.$extraEl);
             }
 
-            if (this.$(this.options.$extraEl).length) {
-                this.$extraEl = this.$(this.options.$extraEl);
-            }
+            if (this.main.$(this.options.$resizableEl).length) {
+                this.$resizableEl = this.main.$(this.options.$resizableEl);
 
-            this._applyResizable();
+                this._applyResizable();
+            }
         },
 
         /**
@@ -97,7 +88,7 @@ define(function(require) {
 
             this._destroyResizable();
 
-            ResizableAreaView.__super__.initialize.apply(this, arguments);
+            ResizableArea.__super__.dispose.apply(this, arguments);
         },
 
         /**
@@ -114,10 +105,6 @@ define(function(require) {
                     _.extend(
                         this.resizableOptions,
                         {
-                            classes: {
-                                'ui-resizable': 'resizable',
-                                'ui-resizable-e': 'resizable-area'
-                            },
                             resize: _.bind(function(event, ui) {
                                 this._onResize(event, ui);
                             }, this),
@@ -135,7 +122,7 @@ define(function(require) {
          */
         _destroyResizable: function() {
             this.$resizableEl
-                .removeClass('resizable-disable')
+                .removeClass('resizable-enable')
                 .resizable('destroy');
         },
 
@@ -143,28 +130,36 @@ define(function(require) {
          * {Boolean} [removeSize]
          * Disable the resizable functionality
          */
-        disableResizable: function(removeSize) {
+        disable: function(removeSize) {
+            var restore = _.isUndefined(removeSize) ? true : removeSize;
+
             this.$resizableEl
-                .addClass('resizable-disable')
+                .removeClass('resizable-enable')
                 .resizable('disable');
 
-            if (_.isBoolean(removeSize)) {
+            if (_.isBoolean(restore)) {
                 this.removeCalculatedSize();
             }
+
+            ResizableArea.__super__.disable.call(this);
         },
 
         /**
          * {Boolean} [restoreSize]
          * Enable the resizable functionality
          */
-        enableResizable: function(restoreSize) {
+        enable: function(restoreSize) {
+            var restore = _.isUndefined(restoreSize) ? true : restoreSize;
+
             this.$resizableEl
-                .removeClass('resizable-disable')
+                .addClass('resizable-enable')
                 .resizable('enable');
 
-            if (_.isBoolean(restoreSize)) {
+            if (_.isBoolean(restore)) {
                 this.setPreviousSize();
             }
+
+            ResizableArea.__super__.enable.call(this);
         },
 
         /**
@@ -198,6 +193,21 @@ define(function(require) {
                     resizeSize: size
                 })
             );
+
+            if ($(this.options.cashedStateToDOM).length) {
+                var selectors = {};
+                selectors[this.options.$resizableEl] = size;
+                selectors[this.options.$extraEl] = this.calculateSize(size);
+                $(this.options.cashedStateToDOM).data('resizable-area-cache', {
+                    apply: _.bind(function() {
+                        _.each(selectors, function(key, item) {
+                            $(this).find(item).css({
+                                width: key
+                            });
+                        }, this);
+                    }, $(this.options.cashedStateToDOM))
+                });
+            }
         },
 
         setPreviousSize: function() {
@@ -220,9 +230,9 @@ define(function(require) {
         removeCalculatedSize: function() {
             this.$extraEl
                 .add(this.$resizableEl)
-                    .css({
-                        width: ''
-                    });
+                .css({
+                    width: ''
+                });
         },
 
         /**
@@ -234,5 +244,5 @@ define(function(require) {
         }
     });
 
-    return ResizableAreaView;
+    return ResizableArea;
 });

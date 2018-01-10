@@ -2,23 +2,27 @@ define(function(require) {
     'use strict';
 
     var ContentSidebarView;
-    var ResizableAreaView = require('oroui/js/app/views/resizable-area-view');
+    var _ = require('underscore');
+    var tools = require('oroui/js/tools');
+    var BaseView = require('oroui/js/app/views/base/view');
     var layoutHelper = require('oroui/js/tools/layout-helper');
     var mediator = require('oroui/js/mediator');
-    var tools = require('oroui/js/tools');
-    var _ = require('underscore');
+    var ResizableAreaPlugin = require('oroui/js/app/plugins/plugin-resizable-area');
+    var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var config = require('module').config();
+
     config = _.extend({
         autoRender: true,
         fixSidebarHeight: true,
         sidebar: '[data-role="sidebar"]',
         scrollbar: '[data-role="sidebar"]',
         content: '[data-role="content"]',
-        uniqueStorageKey: 'contentSidebarResizableAreaUniq'
+        uniqueStorageKey: 'contentSidebarResizableAreaUniq',
+        destroyResizable: false
     }, config);
 
-    ContentSidebarView = ResizableAreaView.extend({
-        optionNames: ResizableAreaView.prototype.optionNames.concat([
+    ContentSidebarView = BaseView.extend({
+        optionNames: BaseView.prototype.optionNames.concat([
             'autoRender',
             'fixSidebarHeight',
             'sidebar',
@@ -48,13 +52,17 @@ define(function(require) {
          * {@inheritDoc}
          */
         initialize: function(options) {
-            var args = _.defaults(_.clone(options), {
+            var args = {
                 $resizableEl: this.sidebar,
                 $extraEl: this.content,
-                uniqueStorageKey: this.uniqueStorageKey
-            });
+                uniqueStorageKey: this.uniqueStorageKey,
+                cashedStateToDOM: layoutHelper.elementContext
+            };
 
-            ContentSidebarView.__super__.initialize.call(this, args);
+            this.pluginManager = new PluginManager(this);
+            this.pluginManager.create(ResizableAreaPlugin, args);
+
+            ContentSidebarView.__super__.initialize.call(this, arguments);
         },
 
         /**
@@ -72,12 +80,10 @@ define(function(require) {
         },
 
         minimize: function() {
-            this.disableResizable(true);
             this._toggle('off');
         },
 
         maximize: function() {
-            this.enableResizable(true);
             this._toggle('on');
         },
 
@@ -91,7 +97,17 @@ define(function(require) {
             this.$(this.sidebar).toggleClass('content-sidebar-minimized', !show);
             this.$(this.content).toggleClass('content-sidebar-minimized', !show);
 
+            this.pluginManager[show ? 'enable' : 'disable'](ResizableAreaPlugin);
             mediator.execute('changeUrlParam', 'sidebar', show ? null : state);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function() {
+            this.pluginManager.dispose();
+
+            ContentSidebarView.__super__.dispose.call(this);
         }
     });
 

@@ -90,6 +90,10 @@ define(function(require) {
             var $container;
 
             $container = $(container);
+
+            if ($container.data('resizable-area-cache')) {
+                $container.data('resizable-area-cache').apply();
+            }
             this.styleForm($container);
 
             scrollspy.init($container);

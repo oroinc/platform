@@ -24,12 +24,12 @@
         .resizable-area {
             position: absolute;
             top: 0;
-            right: 0;
+            right: -10px;
 
-            width: 3px;
+            width: 10px;
             height: 100%;
 
-            background: #ddd;
+            border-left: 3px solid #ddd;
 
             touch-action: none;
 
@@ -38,6 +38,8 @@
             opacity: 0;
 
             transition: opacity 150ms linear;
+
+            visibility: hidden;
         }
 
         &:hover {
@@ -46,9 +48,9 @@
             }
         }
 
-        &.resizable-disable {
+        &.resizable-enable {
             .resizable-area {
-                display: none;
+                visibility: visible;
             }
         }
     }
