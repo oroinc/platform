@@ -15,6 +15,9 @@
 * Added `SegmentChoiceView`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/SegmentBundle/Resources/public/js/app/views/segment-choice-view.js) Backbone view, as replacement for jQuery widget `orosegment.segmentChoice`.
 #### UIBundle
 * Added JS `Registry`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/UIBundle/Resources/public/js/app/services/registry/registry.js) (see [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/client-side/registry.md))
+#### PlatformBundle
+* Added new DIC compiler pass `Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\ConsoleGlobalOptionsCompilerPass`
+* Added tag `oro_platform.console.global_options_provider` to be able to register console command global options provider for `GlobalOptionsProviderRegistry`<sup>[[?]](./src/Oro/Bundle/PlatformBundle/Provider/Console/GlobalOptionsProviderRegistry.php "Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderRegistry")</sup> and it will be used in `GlobalOptionsListener`<sup>[[?]](./src/Oro/Bundle/PlatformBundle/EventListener/Console/GlobalOptionsListener.php "Oro\Bundle\PlatformBundle\EventListener\Console\GlobalOptionsListener")</sup>. This providers must implement `GlobalOptionsProviderInterface`<sup>[[?]](./src/Oro/Bundle/PlatformBundle/Provider/Console/GlobalOptionsProviderInterface.php "Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderInterface")</sup>.
 
 ### Changed
 
