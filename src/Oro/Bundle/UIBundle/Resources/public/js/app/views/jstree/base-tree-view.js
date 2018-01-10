@@ -315,7 +315,7 @@ define(function(require) {
             }
 
             for (var i = 0, length = searchBy.length; i < length; i++) {
-                if (search(searchBy[i])) {
+                if (searchBy[i] && search(searchBy[i].toString())) {
                     this._foundNodes = true;
                     return true;
                 }

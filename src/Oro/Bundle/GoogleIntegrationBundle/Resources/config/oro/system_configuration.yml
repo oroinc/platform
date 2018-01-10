@@ -12,6 +12,7 @@ system_configuration:
         oro_google_integration.client_id:
             data_type: string
             type: text
+            search_type: text
             options:
                 label: oro.google_integration.system_configuration.fields.client_id.label
                 resettable: false
@@ -20,6 +21,7 @@ system_configuration:
         oro_google_integration.client_secret:
             data_type: string
             type: text
+            search_type: text
             options:
                 label: oro.google_integration.system_configuration.fields.client_secret.label
                 resettable: false
@@ -28,6 +30,7 @@ system_configuration:
         oro_google_integration.google_api_key:
             data_type: string
             type: text
+            search_type: text
             options:
                 label: oro.google_integration.system_configuration.fields.google_api_key.label
                 resettable: false
