@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\Shared\ValidateNormalizedResultExists;
+use Oro\Bundle\ApiBundle\Processor\Shared\ValidateResultExists;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
-class ValidateNormalizedResultExistsTest extends GetProcessorTestCase
+class ValidateResultExistsTest extends GetProcessorTestCase
 {
-    /** @var ValidateNormalizedResultExists */
+    /** @var ValidateResultExists */
     protected $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->processor = new ValidateNormalizedResultExists();
+        $this->processor = new ValidateResultExists();
     }
 
     public function testProcessWhenResultExists()

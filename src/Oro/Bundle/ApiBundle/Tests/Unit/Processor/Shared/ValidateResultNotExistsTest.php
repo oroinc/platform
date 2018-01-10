@@ -1,24 +1,25 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Delete;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\Delete\ValidateDeletionResult;
+use Oro\Bundle\ApiBundle\Processor\Shared\ValidateResultNotExists;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
-class ValidateDeletionResultTest extends DeleteProcessorTestCase
+class ValidateResultNotExistsTest extends GetProcessorTestCase
 {
-    /** @var ValidateDeletionResult */
+    /** @var ValidateResultNotExists */
     protected $processor;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->processor = new ValidateDeletionResult();
+        $this->processor = new ValidateResultNotExists();
     }
 
     /**
      * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The record was not deleted.
+     * @expectedExceptionMessage The result should not exist.
      */
     public function testProcessOnNotDeletedEntity()
     {

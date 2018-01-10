@@ -102,6 +102,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
+        $table->addIndex(['root_job_id', 'name', 'status', 'interrupted'], 'oro_message_queue_job_idx');
     }
 
     /**

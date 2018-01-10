@@ -1,19 +1,19 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 
 /**
- * Validates whether an access to the parent entity object is granted.
+ * Validates whether an access to the entity object is granted.
  * The permission type is provided in $permission argument of the class constructor.
  */
-class ParentEntityObjectSecurityCheck implements ProcessorInterface
+class EntityObjectSecurityCheck implements ProcessorInterface
 {
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
@@ -38,12 +38,20 @@ class ParentEntityObjectSecurityCheck implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var SubresourceContext $context */
+        /** @var SingleItemContext $context */
 
         $isGranted = true;
-        $parentEntity = $context->getParentEntity();
-        if ($parentEntity) {
-            $isGranted = $this->authorizationChecker->isGranted($this->permission, $parentEntity);
+        $entity = $context->getResult();
+        if ($entity) {
+            $config = $context->getConfig();
+            if ($config && $config->hasAclResource()) {
+                $aclResource = $config->getAclResource();
+                if ($aclResource) {
+                    $isGranted = $this->authorizationChecker->isGranted($aclResource, $entity);
+                }
+            } else {
+                $isGranted = $this->authorizationChecker->isGranted($this->permission, $entity);
+            }
         }
 
         if (!$isGranted) {

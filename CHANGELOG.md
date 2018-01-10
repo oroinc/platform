@@ -15,8 +15,33 @@
 * Added `SegmentChoiceView`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/SegmentBundle/Resources/public/js/app/views/segment-choice-view.js) Backbone view, as replacement for jQuery widget `orosegment.segmentChoice`.
 #### UIBundle
 * Added JS `Registry`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/UIBundle/Resources/public/js/app/services/registry/registry.js) (see [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/client-side/registry.md))
+#### PlatformBundle
+* Added new DIC compiler pass `Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\ConsoleGlobalOptionsCompilerPass`
+* Added tag `oro_platform.console.global_options_provider` to be able to register console command global options provider for `GlobalOptionsProviderRegistry`<sup>[[?]](./src/Oro/Bundle/PlatformBundle/Provider/Console/GlobalOptionsProviderRegistry.php "Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderRegistry")</sup> and it will be used in `GlobalOptionsListener`<sup>[[?]](./src/Oro/Bundle/PlatformBundle/EventListener/Console/GlobalOptionsListener.php "Oro\Bundle\PlatformBundle\EventListener\Console\GlobalOptionsListener")</sup>. This providers must implement `GlobalOptionsProviderInterface`<sup>[[?]](./src/Oro/Bundle/PlatformBundle/Provider/Console/GlobalOptionsProviderInterface.php "Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderInterface")</sup>.
 
 ### Changed
+
+#### ApiBundle
+* The `build_query` group was removed from `update` and `delete` actions. From now the updating/deleting entity is loaded by `Oro\Bundle\ApiBundle\Processor\Shared\LoadEntity` processor instead of `Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByOrmQuery` processor.
+* The priorities of some groups for `update` action were changed. All changes are in the following table:
+
+    | Group | Old Priority | New Priority |
+    | --- | --- | --- |
+    | load_data | -50 | -40 |
+    | transform_data | -60 | -50 |
+    | save_data | -70 | -60 |
+    | normalize_data | -80 | -70 |
+    | finalize | -90 | -80 |
+    | normalize_result | -100 | -90 |
+
+* The priorities of some groups for `delete` action were changed. All changes are in the following table:
+
+    | Group | Old Priority | New Priority |
+    | --- | --- | --- |
+    | load_data | -50 | -40 |
+    | delete_data | -60 | -50 |
+    | finalize | -70 | -60 |
+    | normalize_result | -80 | -70 |
 
 #### SegmentBundle
 * Refactored `SegmentComponent` js-component to use `EntityStructureDataProvider`.
