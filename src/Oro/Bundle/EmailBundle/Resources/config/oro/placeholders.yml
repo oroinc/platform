@@ -16,6 +16,9 @@ placeholders:
             items:
                 oro_email_action_send_email_button:
                     order: 20
+        scripts_after:
+            items:
+                oro_email_credentials_topic: ~
 
 
     items:
@@ -37,3 +40,5 @@ placeholders:
             applicable: "@oro_email.placeholder.send_email.filter->isApplicable($entity$)"
             template: OroEmailBundle:Email/action:sendEmailButton.html.twig
             acl: oro_email_email_create
+        oro_email_credentials_topic:
+            template: OroEmailBundle::credentialsTopicSubscribe.html.twig

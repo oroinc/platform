@@ -40,3 +40,9 @@ acls:
         class: OroEmailBundle:AutoResponseRule
         permission: VIEW
         group_name: ""
+
+    oro_email_credential_system_notifications:
+        type: action
+        label: oro.email.sync.acl.credential_system_notifications.label
+        description: oro.email.sync.acl.credential_system_notifications.description
+        group_name: ""

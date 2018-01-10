@@ -64,6 +64,10 @@ oro:
             empty: You don't have any emails yet
             new_email: You have a new email
             more_unread: More Unread
+        sync:
+            flash_message:
+                user_box_failed: The synchronization of your email box with username "{{ username }}" and host "{{ host }}" was failed. Please check the credentials at the email configuraton page.
+                system_box_failed: The synchronization of the system email box with username "{{ username }}" and host "{{ host }}" was failed. Please check the credentials at the email configuraton page.
 "Preview": "Preview"
 "Yes, Proceed": "Yes, Proceed"
 "Not Found": "Not Found"
