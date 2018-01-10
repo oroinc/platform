@@ -11,7 +11,10 @@ use Oro\Component\MessageQueue\Job\Job as BaseJob;
  * @ORM\Entity
  * @ORM\Table(
  *     name="oro_message_queue_job",
- *     indexes={@Index(name="owner_id_idx", columns={"owner_id"})}
+ *     indexes={
+ *          @Index(name="owner_id_idx", columns={"owner_id"}),
+ *          @Index(name="oro_message_queue_job_idx", columns={"root_job_id", "name", "status", "interrupted"})
+ *     }
  * )
  */
 class Job extends BaseJob
