@@ -91,8 +91,8 @@ define(function(require) {
 
             $container = $(container);
 
-            if ($container.data('resizable-area-cache')) {
-                $container.data('resizable-area-cache').apply();
+            if ($container.data('resizable-cache')) {
+                $container.data('resizable-cache').apply();
             }
             this.styleForm($container);
 

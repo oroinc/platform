@@ -52,15 +52,13 @@ define(function(require) {
          * {@inheritDoc}
          */
         initialize: function(options) {
-            var args = {
+            this.pluginManager = new PluginManager(this);
+            this.pluginManager.create(ResizableAreaPlugin, {
                 $resizableEl: this.sidebar,
                 $extraEl: this.content,
                 uniqueStorageKey: this.uniqueStorageKey,
-                cashedStateToDOM: layoutHelper.elementContext
-            };
-
-            this.pluginManager = new PluginManager(this);
-            this.pluginManager.create(ResizableAreaPlugin, args);
+                rootElement: layoutHelper.elementContext
+            });
 
             ContentSidebarView.__super__.initialize.call(this, arguments);
         },

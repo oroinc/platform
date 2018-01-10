@@ -14,7 +14,7 @@ define(function(require) {
          */
         defaults: {
             useResizable: !_.isMobile(),
-            cashedStateToDOM: false
+            rootElement: false
         },
 
         /**
@@ -194,18 +194,18 @@ define(function(require) {
                 })
             );
 
-            if ($(this.options.cashedStateToDOM).length) {
+            if ($(this.options.rootElement).length) {
                 var selectors = {};
                 selectors[this.options.$resizableEl] = size;
                 selectors[this.options.$extraEl] = this.calculateSize(size);
-                $(this.options.cashedStateToDOM).data('resizable-area-cache', {
+                $(this.options.rootElement).data('resizable-cache', {
                     apply: _.bind(function() {
                         _.each(selectors, function(key, item) {
                             $(this).find(item).css({
                                 width: key
                             });
                         }, this);
-                    }, $(this.options.cashedStateToDOM))
+                    }, $(this.options.rootElement))
                 });
             }
         },
@@ -225,6 +225,8 @@ define(function(require) {
 
         removePreviusState: function() {
             persistentStorage.removeItem(this.uniqueStorageKey);
+
+            $.removeData($(this.options.rootElement), 'resizable-cache');
         },
 
         removeCalculatedSize: function() {
