@@ -18,7 +18,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|CriteriaConnector */
     protected $criteriaConnector;
 
     /** @var BuildSingleItemQuery */
@@ -28,15 +28,21 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
     {
         parent::setUp();
 
-        $this->criteriaConnector = $this->getMockBuilder(CriteriaConnector::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->criteriaConnector = $this->createMock(CriteriaConnector::class);
 
         $this->processor = new BuildSingleItemQuery(
             $this->doctrineHelper,
             $this->criteriaConnector,
             new EntityIdHelper()
         );
+    }
+
+    public function testProcessWhenDataAlreadyExist()
+    {
+        $this->context->setResult(new \stdClass());
+        $this->processor->process($this->context);
+
+        $this->assertNull($this->context->getQuery());
     }
 
     public function testProcessWhenQueryIsAlreadyBuilt()
@@ -47,13 +53,6 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
 
         $this->assertSame($qb, $this->context->getQuery());
-    }
-
-    public function testProcessWhenCriteriaObjectDoesNotExist()
-    {
-        $this->processor->process($this->context);
-
-        $this->assertFalse($this->context->hasQuery());
     }
 
     public function testProcessForNotManageableEntity()
@@ -78,15 +77,10 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addField(new FieldMetadata('id'));
 
-        $resolver = $this->getMockBuilder(EntityClassResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $criteria = new Criteria($resolver);
-
         $this->criteriaConnector->expects($this->once())
             ->method('applyCriteria');
 
-        $this->context->setCriteria($criteria);
+        $this->context->setCriteria(new Criteria($this->createMock(EntityClassResolver::class)));
         $this->context->setClassName($entityClass);
         $this->context->setId($entityId);
         $this->context->setMetadata($metadata);
@@ -115,11 +109,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $metadata->addField(new FieldMetadata('id'));
         $metadata->addField(new FieldMetadata('title'));
 
-        $resolver = $this->getMockBuilder(EntityClassResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->context->setCriteria(new Criteria($resolver));
+        $this->context->setCriteria(new Criteria($this->createMock(EntityClassResolver::class)));
         $this->context->setClassName($entityClass);
         $this->context->setId($entityId);
         $this->context->setMetadata($metadata);
@@ -156,14 +146,10 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $config = new EntityDefinitionConfig();
         $config->setParentResourceClass($parentResourceClass);
 
-        $resolver = $this->getMockBuilder(EntityClassResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->criteriaConnector->expects($this->once())
             ->method('applyCriteria');
 
-        $this->context->setCriteria(new Criteria($resolver));
+        $this->context->setCriteria(new Criteria($this->createMock(EntityClassResolver::class)));
         $this->context->setClassName($entityClass);
         $this->context->setId($entityId);
         $this->context->setConfig($config);
@@ -196,16 +182,42 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $config = new EntityDefinitionConfig();
         $config->setParentResourceClass($parentResourceClass);
 
-        $resolver = $this->getMockBuilder(EntityClassResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->context->setCriteria(new Criteria($resolver));
+        $this->context->setCriteria(new Criteria($this->createMock(EntityClassResolver::class)));
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
         $this->assertNull($this->context->getQuery());
+    }
+
+    public function testProcessWhenCriteriaObjectDoesNotExist()
+    {
+        $entityClass = Entity\User::class;
+        $entityId = 123;
+        $metadata = new EntityMetadata();
+        $metadata->setClassName($entityClass);
+        $metadata->setIdentifierFieldNames(['id']);
+        $metadata->addField(new FieldMetadata('id'));
+
+        $this->criteriaConnector->expects($this->never())
+            ->method('applyCriteria');
+
+        $this->context->setClassName($entityClass);
+        $this->context->setId($entityId);
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+
+        $this->assertTrue($this->context->hasQuery());
+        /** @var QueryBuilder $query */
+        $query = $this->context->getQuery();
+        $this->assertEquals(
+            sprintf('SELECT e FROM %s e WHERE e.id = :id', $entityClass),
+            $query->getDQL()
+        );
+        /** @var Parameter $parameter */
+        $parameter = $query->getParameters()->first();
+        $this->assertEquals('id', $parameter->getName());
+        $this->assertEquals($entityId, $parameter->getValue());
     }
 }

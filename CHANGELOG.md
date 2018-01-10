@@ -18,6 +18,28 @@
 
 ### Changed
 
+#### ApiBundle
+* The `build_query` group was removed from `update` and `delete` actions. From now the updating/deleting entity is loaded by `Oro\Bundle\ApiBundle\Processor\Shared\LoadEntity` processor instead of `Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByOrmQuery` processor.
+* The priorities of some groups for `update` action were changed. All changes are in the following table:
+
+    | Group | Old Priority | New Priority |
+    | --- | --- | --- |
+    | load_data | -50 | -40 |
+    | transform_data | -60 | -50 |
+    | save_data | -70 | -60 |
+    | normalize_data | -80 | -70 |
+    | finalize | -90 | -80 |
+    | normalize_result | -100 | -90 |
+
+* The priorities of some groups for `delete` action were changed. All changes are in the following table:
+
+    | Group | Old Priority | New Priority |
+    | --- | --- | --- |
+    | load_data | -50 | -40 |
+    | delete_data | -60 | -50 |
+    | finalize | -70 | -60 |
+    | normalize_result | -80 | -70 |
+
 #### SegmentBundle
 * Refactored `SegmentComponent` js-component to use `EntityStructureDataProvider`.
 #### SidebarBundle

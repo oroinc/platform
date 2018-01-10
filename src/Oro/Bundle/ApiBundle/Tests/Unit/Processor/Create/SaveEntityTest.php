@@ -4,10 +4,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create;
 
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Create\SaveEntity;
 use Oro\Bundle\ApiBundle\Request\Constraint;
@@ -66,53 +66,15 @@ class SaveEntityTest extends FormProcessorTestCase
         $entity = new \stdClass();
         $entityId = 123;
 
-        $metadata = $this->createMock(ClassMetadata::class);
+        $metadata = $this->createMock(EntityMetadata::class);
         $em = $this->createMock(EntityManager::class);
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityManager')
             ->with($this->identicalTo($entity), false)
             ->willReturn($em);
-        $em->expects($this->once())
-            ->method('getClassMetadata')
-            ->with(get_class($entity))
-            ->willReturn($metadata);
         $metadata->expects($this->once())
-            ->method('getIdentifierValues')
-            ->with($this->identicalTo($entity))
-            ->willReturn(['id' => $entityId]);
-
-        $em->expects($this->once())
-            ->method('persist')
-            ->with($this->identicalTo($entity));
-        $em->expects($this->once())
-            ->method('flush')
-            ->with(null);
-
-        $this->context->setResult($entity);
-        $this->processor->process($this->context);
-
-        $this->assertEquals($entityId, $this->context->getId());
-    }
-
-    public function testProcessForManageableEntityWithCompositeId()
-    {
-        $entity = new \stdClass();
-        $entityId = ['id1' => 1, 'id2' => 2];
-
-        $metadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManager::class);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityManager')
-            ->with($this->identicalTo($entity), false)
-            ->willReturn($em);
-        $em->expects($this->once())
-            ->method('getClassMetadata')
-            ->with(get_class($entity))
-            ->willReturn($metadata);
-        $metadata->expects($this->once())
-            ->method('getIdentifierValues')
+            ->method('getIdentifierValue')
             ->with($this->identicalTo($entity))
             ->willReturn($entityId);
 
@@ -124,30 +86,28 @@ class SaveEntityTest extends FormProcessorTestCase
             ->with(null);
 
         $this->context->setResult($entity);
+        $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
         $this->assertEquals($entityId, $this->context->getId());
     }
 
-    public function testProcessForManageableEntityWhenIdWasNotGenerated()
+    public function testProcessForManageableEntityWithCompositeId()
     {
         $entity = new \stdClass();
+        $entityId = ['id1' => 1, 'id2' => 2];
 
-        $metadata = $this->createMock(ClassMetadata::class);
+        $metadata = $this->createMock(EntityMetadata::class);
         $em = $this->createMock(EntityManager::class);
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityManager')
             ->with($this->identicalTo($entity), false)
             ->willReturn($em);
-        $em->expects($this->once())
-            ->method('getClassMetadata')
-            ->with(get_class($entity))
-            ->willReturn($metadata);
         $metadata->expects($this->once())
-            ->method('getIdentifierValues')
+            ->method('getIdentifierValue')
             ->with($this->identicalTo($entity))
-            ->willReturn([]);
+            ->willReturn($entityId);
 
         $em->expects($this->once())
             ->method('persist')
@@ -157,6 +117,37 @@ class SaveEntityTest extends FormProcessorTestCase
             ->with(null);
 
         $this->context->setResult($entity);
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+
+        $this->assertEquals($entityId, $this->context->getId());
+    }
+
+    public function testProcessForManageableEntityWhenIdWasNotGenerated()
+    {
+        $entity = new \stdClass();
+
+        $metadata = $this->createMock(EntityMetadata::class);
+        $em = $this->createMock(EntityManager::class);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityManager')
+            ->with($this->identicalTo($entity), false)
+            ->willReturn($em);
+        $metadata->expects($this->once())
+            ->method('getIdentifierValue')
+            ->with($this->identicalTo($entity))
+            ->willReturn(null);
+
+        $em->expects($this->once())
+            ->method('persist')
+            ->with($this->identicalTo($entity));
+        $em->expects($this->once())
+            ->method('flush')
+            ->with(null);
+
+        $this->context->setResult($entity);
+        $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
         $this->assertNull($this->context->getId());
