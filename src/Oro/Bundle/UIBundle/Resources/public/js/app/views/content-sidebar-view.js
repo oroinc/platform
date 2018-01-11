@@ -17,7 +17,6 @@ define(function(require) {
         sidebar: '[data-role="sidebar"]',
         scrollbar: '[data-role="sidebar"]',
         content: '[data-role="content"]',
-        uniqueStorageKey: 'contentSidebarResizableAreaUniq',
         destroyResizable: false
     }, config);
 
@@ -27,8 +26,7 @@ define(function(require) {
             'fixSidebarHeight',
             'sidebar',
             'scrollbar',
-            'content',
-            'uniqueStorageKey'
+            'content'
         ]),
 
         autoRender: config.autoRender,
@@ -40,8 +38,6 @@ define(function(require) {
         scrollbar: config.scrollbar,
 
         content: config.content,
-
-        uniqueStorageKey: config.uniqueStorageKey,
 
         events: {
             'click [data-role="sidebar-minimize"]': 'minimize',
@@ -55,9 +51,7 @@ define(function(require) {
             this.pluginManager = new PluginManager(this);
             this.pluginManager.create(ResizableAreaPlugin, {
                 $resizableEl: this.sidebar,
-                $extraEl: this.content,
-                uniqueStorageKey: this.uniqueStorageKey,
-                rootElement: layoutHelper.elementContext
+                $extraEl: this.content
             });
 
             ContentSidebarView.__super__.initialize.call(this, arguments);

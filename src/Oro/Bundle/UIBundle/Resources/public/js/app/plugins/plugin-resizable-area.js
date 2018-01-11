@@ -1,6 +1,7 @@
 define(function(require) {
     'use strict';
 
+    var STORAGE_KEY = 'custom-style-elements-cache';
     var ResizableArea;
     var persistentStorage = require('oroui/js/persistent-storage');
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
@@ -13,14 +14,8 @@ define(function(require) {
          * @property {Options}
          */
         defaults: {
-            useResizable: !_.isMobile(),
-            rootElement: false
+            useResizable: !_.isMobile()
         },
-
-        /**
-         * @property {String}
-         */
-        uniqueStorageKey: 'resizableAreaID',
 
         /**
          * @property {Object}
@@ -42,12 +37,12 @@ define(function(require) {
         /**
          * @property {jQuery}
          */
-        $resizableEl: $([]),
+        $resizableEl: null,
 
         /**
          * @property {jQuery}
          */
-        $extraEl: $([]),
+        $extraEl: null,
 
         /**
          * @inheritDoc
@@ -60,11 +55,7 @@ define(function(require) {
             }
 
             if (_.isObject(this.options.resizableOptions)) {
-                this.resizableOptions = _.extend(this.resizableOptions, this.options.resizableOptions);
-            }
-
-            if (_.isString(this.options.uniqueStorageKey)) {
-                this.uniqueStorageKey = this.options.uniqueStorageKey;
+                this.resizableOptions =  _.defaults({}, this.options.resizableOptions, this.resizableOptions);
             }
 
             if (this.main.$(this.options.$extraEl).length) {
@@ -105,12 +96,8 @@ define(function(require) {
                     _.extend(
                         this.resizableOptions,
                         {
-                            resize: _.bind(function(event, ui) {
-                                this._onResize(event, ui);
-                            }, this),
-                            stop: _.bind(function(event, ui) {
-                                this._onResizeEnd(event, ui);
-                            }, this)
+                            resize: this._onResize.bind(this),
+                            stop: this._onResizeEnd.bind(this)
                         }
                     )
                 );
@@ -187,46 +174,25 @@ define(function(require) {
          * @private
          */
         _savePreviousSize: function(size) {
-            persistentStorage.setItem(
-                this.uniqueStorageKey,
-                JSON.stringify({
-                    resizeSize: size
-                })
-            );
+            var oldValue = persistentStorage.getItem(STORAGE_KEY);
+            var newValue = {};
 
-            if ($(this.options.rootElement).length) {
-                var selectors = {};
-                selectors[this.options.$resizableEl] = size;
-                selectors[this.options.$extraEl] = this.calculateSize(size);
-                $(this.options.rootElement).data('resizable-cache', {
-                    apply: _.bind(function() {
-                        _.each(selectors, function(key, item) {
-                            $(this).find(item).css({
-                                width: key
-                            });
-                        }, this);
-                    }, $(this.options.rootElement))
-                });
-            }
+            oldValue = oldValue ? JSON.parse(oldValue) : {};
+
+            newValue[this.options.$resizableEl] = {width: size};
+            newValue[this.options.$extraEl] = {width: this.calculateSize(size)};
+
+            persistentStorage.setItem(STORAGE_KEY,
+                JSON.stringify(_.extend({}, oldValue, newValue))
+            );
         },
 
         setPreviousSize: function() {
-            var state = JSON.parse(persistentStorage.getItem(this.uniqueStorageKey));
-
-            if (_.isObject(state)) {
-                this.$resizableEl.css({
-                    width: state.resizeSize
-                });
-                this.$extraEl.css({
-                    width: this.calculateSize(state.resizeSize)
-                });
-            }
+            ResizableArea.setPreviousSize(this.main.$el);
         },
 
         removePreviusState: function() {
-            persistentStorage.removeItem(this.uniqueStorageKey);
-
-            $.removeData($(this.options.rootElement), 'resizable-cache');
+            persistentStorage.removeItem(STORAGE_KEY);
         },
 
         removeCalculatedSize: function() {
@@ -245,6 +211,23 @@ define(function(require) {
             return _.isNumber(size) ? 'calc(100% - ' + size + 'px)' : '';
         }
     });
+
+    /**
+     * @static
+     */
+    ResizableArea.setPreviousSize = function($container) {
+        var state = JSON.parse(persistentStorage.getItem(STORAGE_KEY));
+
+        if (_.isObject(state)) {
+            _.each(state, function(value, key) {
+                var $el = $container.find(key);
+
+                if ($.contains($container[0], $el[0])) {
+                    $el.css(value);
+                }
+            }, this);
+        }
+    };
 
     return ResizableArea;
 });

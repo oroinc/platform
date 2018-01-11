@@ -91,9 +91,6 @@ define(function(require) {
 
             $container = $(container);
 
-            if ($container.data('resizable-cache')) {
-                $container.data('resizable-cache').apply();
-            }
             this.styleForm($container);
 
             scrollspy.init($container);
@@ -101,6 +98,8 @@ define(function(require) {
             $container.find('[data-toggle="tooltip"]').tooltip();
 
             this.initPopover($container);
+
+            mediator.trigger('resizable-area:setElementsStyles', $container);
         },
 
         initPopover: function(container, options) {
