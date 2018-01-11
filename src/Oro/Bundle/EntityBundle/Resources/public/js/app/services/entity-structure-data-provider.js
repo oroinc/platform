@@ -914,20 +914,32 @@ define(function(require) {
         getEntityTreeNodeByPropertyPath: function(propertyPath) {
             var fieldName;
             var fieldData;
-            var path = propertyPath.split('.');
-            var entity = path.shift();
-            var entityModel = this.collection.getEntityModelByClassName(entity);
+            var entityModel;
+            var entity;
+            var path;
+
+            if (!propertyPath) {
+                return;
+            }
+
+            path = propertyPath.split('.');
+            entity = path.shift();
+            entityModel = this.collection.getEntityModelByClassName(entity);
             if (!entityModel) {
                 entityModel = this.collection.find({alias: entity});
             }
 
             while (entityModel && path.length) {
                 fieldName = path.shift();
+                fieldData = _.find(this._extractEntityData(entityModel).fields, {name: fieldName});
+                if (!fieldData || path.length && !(fieldData.relatedEntityName && fieldData.relationType)) {
+                    // field with specified name doesn't exist in model
+                    // or relation to next level is not available
+                    return;
+                }
                 if (path.length) {
                     // if it is not last element of path -- it is relation to next entity
-                    fieldData = _.find(this._extractEntityData(entityModel).fields, {name: fieldName});
-                    entityModel =
-                        fieldData ? this.collection.getEntityModelByClassName(fieldData.relatedEntityName) : void 0;
+                    entityModel = this.collection.getEntityModelByClassName(fieldData.relatedEntityName);
                 }
             }
 

@@ -49,9 +49,7 @@ define(function(require) {
                 inclusion: ['in', 'not in'],
                 like: ['matches']
             },
-            entities: {
-                root_entities: {}
-            }
+            rootEntities: []
         },
 
         /**
@@ -578,7 +576,7 @@ define(function(require) {
                         }, this);
                     }
                 } else {
-                    _.each(this.options.entities.root_entities, function(alias) {
+                    _.each(this.options.rootEntities, function(alias) {
                         autocompleteData.items[alias] = {
                             item: alias,
                             hasChildren: true

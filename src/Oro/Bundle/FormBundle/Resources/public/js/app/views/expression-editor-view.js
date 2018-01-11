@@ -73,7 +73,7 @@ define(function(require) {
          */
         initialize: function(options) {
             var utilOptions = _.pick(options,
-                'itemLevelLimit', 'allowedOperations', 'operations', 'entities', 'entityDataProvider');
+                'itemLevelLimit', 'allowedOperations', 'operations', 'rootEntities', 'entityDataProvider');
             utilOptions.dataSourceNames = _.keys(options.dataSource);
             this.util = new ExpressionEditorUtil(utilOptions);
 
