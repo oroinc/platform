@@ -6,7 +6,7 @@
     "homepage": "https://github.com/laboro/UIBundle",
     "license": "MIT",
     "require": {
-        "php": ">=7.0",
+        "php": ">=7.1",
         "symfony/framework-bundle": "2.8.*",
         "kriswallsmith/assetic": "1.1.*@dev",
         "symfony/assetic-bundle": "2.1.*",

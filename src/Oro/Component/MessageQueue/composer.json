@@ -5,7 +5,7 @@
     "keywords": ["ORO", "Messaging", "Queue"],
     "license": "MIT",
     "require": {
-        "php": ">=7.0"
+        "php": ">=7.1"
     },
     "autoload": {
         "psr-4": { "Oro\\Component\\MessageQueue\\": "" }

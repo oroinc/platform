@@ -5,7 +5,7 @@
     "keywords": ["BAP", "Gaufrette"],
     "license": "MIT",
     "require": {
-        "php": ">=7.0",
+        "php": ">=7.1",
         "symfony/symfony": "2.8.*, !=2.8.10",
         "knplabs/knp-gaufrette-bundle": "0.3.*"
     },
