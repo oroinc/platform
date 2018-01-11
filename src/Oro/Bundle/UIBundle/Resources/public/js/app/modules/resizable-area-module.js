@@ -7,6 +7,6 @@ define([
     BaseController.loadBeforeAction([
         'oroui/js/app/plugins/plugin-resizable-area'
     ], function(resizableArea) {
-        mediator.on('layout:init', resizableArea.setPreviousState, resizableArea);
+        mediator.on('layoutInit', resizableArea.setPreviousState, resizableArea);
     });
 });

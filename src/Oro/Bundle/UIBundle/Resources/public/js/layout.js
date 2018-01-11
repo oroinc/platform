@@ -99,7 +99,7 @@ define(function(require) {
 
             this.initPopover($container);
 
-            mediator.trigger('layout:init', $container);
+            mediator.trigger('layoutInit', $container);
         },
 
         initPopover: function(container, options) {
