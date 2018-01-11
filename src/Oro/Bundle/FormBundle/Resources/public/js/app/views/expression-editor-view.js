@@ -72,7 +72,10 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            this.util = new ExpressionEditorUtil(options);
+            var utilOptions = _.pick(options,
+                'itemLevelLimit', 'allowedOperations', 'operations', 'entities', 'entityDataProvider');
+            utilOptions.dataSourceNames = _.keys(options.dataSource);
+            this.util = new ExpressionEditorUtil(utilOptions);
 
             this.autocompleteData = this.autocompleteData || {};
             this.dataSource = this.dataSource || {};
@@ -182,8 +185,7 @@ define(function(require) {
          */
         _typeaheadHighlighter: function(item) {
             var original = Typeahead.prototype.highlighter;
-            var hasChild = !!this.autocompleteData.items[item].child;
-            var suffix = hasChild ? '&hellip;' : '';
+            var suffix = this.autocompleteData.items[item].hasChildren ? '&hellip;' : '';
             return original.call(this.typeahead, item) + suffix;
         },
 

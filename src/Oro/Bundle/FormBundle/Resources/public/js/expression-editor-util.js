@@ -4,12 +4,9 @@ define(function(require) {
 
     var ExpressionEditorUtil;
     var _ = require('underscore');
+    var BaseClass = require('oroui/js/base-class');
 
-    ExpressionEditorUtil = function(options) {
-        this._initialize(options);
-    };
-
-    ExpressionEditorUtil.prototype = {
+    ExpressionEditorUtil = BaseClass.extend({
         /**
          * RegEx, used for expression analyze, autocomplete and validate
          */
@@ -39,9 +36,9 @@ define(function(require) {
         },
 
         /**
-         * Initialize options
+         * Default options
          */
-        options: {
+        defaultOptions: {
             itemLevelLimit: 3,
             allowedOperations: ['math', 'bool', 'equality', 'compare', 'inclusion', 'like'],
             operations: {
@@ -53,10 +50,8 @@ define(function(require) {
                 like: ['matches']
             },
             entities: {
-                root_entities: {},
-                fields_data: {}
-            },
-            dataSource: {}
+                root_entities: {}
+            }
         },
 
         /**
@@ -79,10 +74,16 @@ define(function(require) {
             'collection': '[]'
         },
 
-        /**
-         * Generated list of all autocomplete items
-         */
-        allItems: null,
+        fieldTypeMap: {
+            'text': 'string',
+            'money': 'float',
+            'decimal': 'float',
+            'manyToMany': 'relation',
+            'oneToMany': 'relation',
+            'manyToOne': 'relation',
+            'ref-many': 'relation',
+            'ref-one': 'relation'
+        },
 
         /**
          * Generated list of operations autocomplete items
@@ -90,34 +91,38 @@ define(function(require) {
         operationsItems: null,
 
         /**
-         * Generated list of entities autocomplete items
-         */
-        entitiesItems: null,
-
-        /**
          * Generated list of available data sources
          */
-        dataSource: null,
+        dataSourceNames: null,
+
+        /**
+         * Instance of EntityStructureDataProvider that contains data about entity fields
+         */
+        entityDataProvider: null,
 
         /**
          * Initialize util
          *
          * @param {Object} options
          */
-        _initialize: function(options) {
-            this.options = _.defaults(options || {}, this.options);
-            this.options.component = this;
-
-            this.dataSource = _.keys(this.options.dataSource);
-
-            this._prepareItems();
+        initialize: function(options) {
+            if (!options.entityDataProvider) {
+                throw new Error('Option "entityDataProvider" is required');
+            }
+            if ('itemLevelLimit' in options && (!_.isNumber(options.itemLevelLimit) || options.itemLevelLimit < 2)) {
+                throw new Error('Option "itemLevelLimit" can\'t be smaller than 2');
+            }
+            _.extend(this, _.pick(options, 'entityDataProvider', 'dataSourceNames'));
+            this.options = _.defaults(_.pick(options, _.keys(this.defaultOptions)), this.defaultOptions);
+            this._prepareOperationsItems();
+            ExpressionEditorUtil.__super__.initialize.call(this, options);
         },
 
         /**
          * Validate expression syntax
          *
-         * @param {String} expression
-         * @return {Boolean}
+         * @param {string} expression
+         * @return {boolean}
          */
         validate: function(expression) {
             expression = _.trim(expression);
@@ -135,8 +140,8 @@ define(function(require) {
         /**
          * Convert expression to native JS code
          *
-         * @param {String} expression
-         * @return {Boolean|String}
+         * @param {string} expression
+         * @return {boolean|string}
          * @private
          */
         _convertExpressionToNativeJS: function(expression) {
@@ -148,39 +153,51 @@ define(function(require) {
                 }
             }
 
-            var items = expression.split(this.regex.splitExpressionToItems);
+            var items = this._splitExpressionToItems(expression);
             _.each(items, this._convertItemToNativeJS, this);
 
-            return items.join('');
+            return items.indexOf(void 0) === -1 ? items.join('') : false;
+        },
+
+        /**
+         * Splits expression to array of strings taking in account that operations can contain space symbols
+         *
+         * @param {string} expression
+         * @return {Array.<string>}
+         * @private
+         */
+        _splitExpressionToItems: function(expression) {
+            var items = _.compact(expression.split(this.regex.splitExpressionToItems));
+            _.each(this.operationsItems, function(operation) {
+                var operationParts = operation.item.split(this.regex.splitExpressionToItems);
+                if (operationParts.length > 1) {
+                    for (var i = items.length - operationParts.length; i >= 0; i--) {
+                        var itemsPart = _.clone(items).splice(i, operationParts.length);
+                        if (itemsPart.join('') === operationParts.join('')) {
+                            items.splice(i, operationParts.length, operation.item);
+                        }
+                    }
+                }
+            }, this);
+            return items;
         },
 
         /**
          * Convert item, or group of items, to native JS code
          *
-         * @param {String} item
-         * @param {Integer} i
+         * @param {string} item
+         * @param {integer} i
          * @param {Array} items
          * @private
          */
         _convertItemToNativeJS: function(item, i, items) {
-            if (item.length === 0) {
+            if (_.trim(item).length === 0) {
                 return item;
             }
             var prevSeparator = i - 1;
             var prevItem = prevSeparator - 1;
             var nextSeparator = i + 1;
             var nextItem = nextSeparator + 1;
-
-            var groupedItem = item + this.strings.itemSeparator + items[nextItem];
-            if (items[nextItem] && this.allItems[groupedItem]) {
-                //items with whitespaces, for example: `not in`
-                item = groupedItem;
-                items[nextItem] = '';
-                items[nextSeparator] = '';
-
-                nextSeparator = nextItem + 1;
-                nextItem = nextSeparator + 1;
-            }
 
             var nativeJS = this._getNativeJS(item);
             if (nativeJS === item) {
@@ -207,8 +224,8 @@ define(function(require) {
         /**
          * Make all strings empty, convert all strings to use double quote
          *
-         * @param {String} expression
-         * @return {Boolean|String}
+         * @param {string} expression
+         * @return {boolean|string}
          * @private
          */
         _clearStrings: function(expression) {
@@ -222,24 +239,23 @@ define(function(require) {
         /**
          * Validate data source and replace data source [id]
          *
-         * @param {String} expression
-         * @return {Boolean|String}
+         * @param {string} expression
+         * @return {boolean|string}
          * @private
          */
         _clearDataSource: function(expression) {
-            var dataSources = this.dataSource;
-            if (!dataSources.length) {
+            if (!this.dataSourceNames.length) {
                 return expression;
             }
 
-            var items = expression.split(this.regex.splitExpressionToItems);
+            var items = this._splitExpressionToItems(expression);
             var item;
             //check all items
             for (var i = 0; i < items.length; i++) {
                 item = items[i];
                 //check all data sources in item
-                for (var j = 0; j < dataSources.length; j++) {
-                    item = item.split(new RegExp('(' + dataSources[j] + ')'));
+                for (var j = 0; j < this.dataSourceNames.length; j++) {
+                    item = item.split(new RegExp('(' + this.dataSourceNames[j] + ')'));
                     if (item.length < 2 || item[0] !== '') {
                         //data source not found in item or not in item beginning
                         continue;
@@ -261,8 +277,8 @@ define(function(require) {
         /**
          * Validate arrays and make them empty, remove nested arrays
          *
-         * @param {String} expression
-         * @return {String|Boolean}
+         * @param {string} expression
+         * @return {string|boolean}
          * @private
          */
         _clearArrays: function(expression) {
@@ -307,8 +323,8 @@ define(function(require) {
         /**
          * Remove duplicated/extra whitespaces
          *
-         * @param {String} expression
-         * @return {String|Boolean}
+         * @param {string} expression
+         * @return {string|boolean}
          * @private
          */
         _clearSeparators: function(expression) {
@@ -320,25 +336,42 @@ define(function(require) {
         /**
          * Try to find native JS code for expression item
          *
-         * @param {String} item
-         * @return {String}
+         * @param {string} item
+         * @return {string}
          * @private
          */
         _getNativeJS: function(item) {
-            var foundItem = this.allItems[item];
-            if (this.itemToNativeJS[item] !== undefined) {
-                return this.itemToNativeJS[item];
-            } else if (foundItem && this.itemToNativeJS[foundItem.type] !== undefined) {
-                return this.itemToNativeJS[foundItem.type];
+            var result;
+            if (item in this.itemToNativeJS) {
+                result = this.itemToNativeJS[item];
+            } else if (item in this.operationsItems) {
+                var operation = this.operationsItems[item];
+                if (operation.type in this.itemToNativeJS) {
+                    result = this.itemToNativeJS[operation.type];
+                } else {
+                    result = item;
+                }
             }
-            return item;
+            if (!result) {
+                var entityTreeNode = this.entityDataProvider.getEntityTreeNodeByPropertyPath(item);
+                if (entityTreeNode && entityTreeNode.__isField) {
+                    var fieldType = entityTreeNode.__field.type;
+                    if (fieldType in this.fieldTypeMap) {
+                        fieldType = this.fieldTypeMap[fieldType];
+                    }
+                    if (fieldType in this.itemToNativeJS) {
+                        result = this.itemToNativeJS[fieldType];
+                    }
+                }
+            }
+            return result || item;
         },
 
         /**
          * Validate native JS expression
          *
-         * @param {String} expression
-         * @return {Boolean}
+         * @param {string} expression
+         * @return {boolean}
          * @private
          */
         _validateNativeJS: function(expression) {
@@ -351,7 +384,7 @@ define(function(require) {
             try {
                 var f = new Function('return ' + expression);
                 var result = f();
-                return _.isBoolean(result) || !_.isUndefined(result);
+                return !_.isUndefined(result);
             } catch (e) {
                 return false;
             }
@@ -360,8 +393,8 @@ define(function(require) {
         /**
          * Build autocomplete data by expression and cursor position
          *
-         * @param {String} expression
-         * @param {Integer} position
+         * @param {string} expression
+         * @param {integer} position
          * @return {Object}
          */
         getAutocompleteData: function(expression, position) {
@@ -384,19 +417,21 @@ define(function(require) {
          * Insert into autocomplete data new item
          *
          * @param {Object} autocompleteData
-         * @param {String} item
+         * @param {string} item
          */
         updateAutocompleteItem: function(autocompleteData, item) {
             var positionModifier = 0;
-            var hasChild = !!autocompleteData.items[item].child;
-            var hasDataSource = this.dataSource.indexOf(item) !== -1;
+            if (autocompleteData.itemsType === 'entities') {
+                var hasChildren = autocompleteData.items[item].hasChildren;
+                if (this.dataSourceNames.indexOf(item) !== -1) {
+                    item += '[]';
+                    positionModifier = hasChildren ? -2 : -1;
+                }
 
-            if (hasDataSource) {
-                item += '[]';
-                positionModifier = hasChild ? -2 : -1;
+                item += hasChildren ? this.strings.childSeparator : this.strings.itemSeparator;
+            } else {
+                item += this.strings.itemSeparator;
             }
-
-            item += hasChild ? this.strings.childSeparator : this.strings.itemSeparator;
 
             autocompleteData.itemChild[autocompleteData.itemLastChildIndex] = item;
 
@@ -410,7 +445,7 @@ define(function(require) {
          * Set new data source value into autocomplete data
          *
          * @param {Object} autocompleteData
-         * @param {String} dataSourceValue
+         * @param {string} dataSourceValue
          */
         updateDataSourceValue: function(autocompleteData, dataSourceValue) {
             autocompleteData.itemChild[autocompleteData.itemCursorIndex] = autocompleteData
@@ -422,100 +457,20 @@ define(function(require) {
         },
 
         /**
-         * Generate list of all autocomplete items from initialize options
-         *
-         * @private
-         */
-        _prepareItems: function() {
-            this.allItems = {};
-            this.operationsItems = {};
-            this.entitiesItems = {};
-
-            this._prepareEntitiesItems();
-            this._prepareOperationsItems();
-        },
-
-        /**
-         * Add new autocomplete item
-         *
-         * @param {String} group
-         * @param {Object} items
-         * @param {String} item
-         * @param {Object} itemInfo
-         * @private
-         */
-        _addItem: function(group, items, item, itemInfo) {
-            if (itemInfo.child !== undefined && _.isEmpty(itemInfo.child)) {
-                //item is collection without child
-                return;
-            }
-
-            itemInfo.group = group;
-            if (itemInfo.parentItem) {
-                itemInfo.item = itemInfo.parentItem + this.strings.childSeparator + item;
-            } else {
-                itemInfo.item = item;
-            }
-
-            this.allItems[itemInfo.item] = itemInfo;
-            items[item] = itemInfo;
-        },
-
-        /**
          * Generate list of operations autocomplete items from initialize options
          *
          * @private
          */
         _prepareOperationsItems: function() {
+            this.operationsItems = {};
             _.each(this.options.allowedOperations, function(type) {
                 _.each(this.options.operations[type], function(item) {
-                    this._addItem('operations', this.operationsItems, item, {
-                        type: type
-                    });
+                    this.operationsItems[item] = {
+                        type: type,
+                        item: item
+                    };
                 }, this);
             }, this);
-        },
-
-        /**
-         * Generate list of entities autocomplete items from initialize options
-         *
-         * @private
-         */
-        _prepareEntitiesItems: function() {
-            _.each(this.options.entities.root_entities, function(item, entity) {
-                this._addItem('entities', this.entitiesItems, item, {
-                    child: this._getEntityChild(1, item, entity)
-                });
-            }, this);
-        },
-
-        /**
-         * Prepare entity child for autocomplete items
-         *
-         * @param {Integer} level
-         * @param {String} parentItem
-         * @param {String} entity
-         * @return {Object}
-         * @private
-         */
-        _getEntityChild: function(level, parentItem, entity) {
-            var child = {};
-
-            level++;
-            if (level > this.options.itemLevelLimit) {
-                return child;
-            }
-
-            _.each(this.options.entities.fields_data[entity], function(itemInfo, item) {
-                var childItem = parentItem + this.strings.childSeparator + item;
-                itemInfo.parentItem = parentItem;
-                if (itemInfo.type === 'relation') {
-                    itemInfo.child = this._getEntityChild(level, childItem, itemInfo.relation_alias);
-                }
-                this._addItem('entities', child, item, itemInfo);
-            }, this);
-
-            return child;
         },
 
         /**
@@ -537,14 +492,14 @@ define(function(require) {
                 itemLastChild: '',//last child of item
                 itemCursorIndex: 0,//index of an item child under cursor
                 itemCursorChild: '',//item child under cursor
-                group: '',//group of items for autocomplete
+                itemsType: '',// `entities` or `operations`
                 items: {},//list of items for autocomplete
                 dataSourceKey: '',//key of data source if item is data source
                 dataSourceValue: ''//value of data source if item is data source
             };
 
             this._setAutocompleteItem(autocompleteData);
-            this._setAutocompleteGroup(autocompleteData);
+            this._setAutocompleteItemsType(autocompleteData);
             this._setAutocompleteItems(autocompleteData);
             this._setAutocompleteDataSource(autocompleteData);
 
@@ -582,14 +537,13 @@ define(function(require) {
          * @param {Object} autocompleteData
          * @private
          */
-        _setAutocompleteGroup: function(autocompleteData) {
-            var prevItemStr = _.trim(autocompleteData.beforeItem).split(this.strings.itemSeparator).pop();
-            var prevItem = this.allItems[prevItemStr] || {};
+        _setAutocompleteItemsType: function(autocompleteData) {
+            var prevItem = _.trim(autocompleteData.beforeItem).split(this.strings.itemSeparator).pop();
 
-            if (!prevItemStr || prevItemStr === '(' || prevItem.group === 'operations') {
-                autocompleteData.group = 'entities';
+            if (!prevItem || prevItem === '(' || prevItem in this.operationsItems) {
+                autocompleteData.itemsType = 'entities';
             } else {
-                autocompleteData.group = 'operations';
+                autocompleteData.itemsType = 'operations';
             }
         },
 
@@ -600,19 +554,40 @@ define(function(require) {
          * @private
          */
         _setAutocompleteItems: function(autocompleteData) {
-            var items = this[autocompleteData.group + 'Items'];
-            var item;
-            for (var i = 0; i < autocompleteData.itemChild.length - 1; i++) {
-                item = autocompleteData.itemChild[i];
-                item = item.replace(this.regex.cutDataSourceId, '');
-                items = items[item] || {};
-                items = items.child || null;
-                if (!items) {
-                    break;
+            if (autocompleteData.itemsType === 'entities') {
+                autocompleteData.items = {};
+                if (autocompleteData.itemChild.length > 1) {
+                    var parts = autocompleteData.itemChild.map(function(item) {
+                        return item.replace(this.regex.cutDataSourceId, '');
+                    }.bind(this));
+                    var omitRelationFields = this.options.itemLevelLimit <= parts.length;
+                    parts.pop();
+                    var levelLimit = this.options.itemLevelLimit - parts.length;
+                    var treeNode = this.entityDataProvider
+                        .getEntityTreeNodeByPropertyPath(parts.join(this.strings.childSeparator));
+                    if (treeNode && treeNode.__isEntity) {
+                        _.each(treeNode, function(node) {
+                            var isEntity = node.__isEntity;
+                            if (isEntity && (omitRelationFields || !node.__hasScalarFieldsInSubtree(levelLimit))) {
+                                return;
+                            }
+                            var item = _.extend(_.pick(node.__field, 'label', 'type', 'name'), {
+                                hasChildren: isEntity
+                            });
+                            autocompleteData.items[item.name] = item;
+                        }, this);
+                    }
+                } else {
+                    _.each(this.options.entities.root_entities, function(alias) {
+                        autocompleteData.items[alias] = {
+                            item: alias,
+                            hasChildren: true
+                        };
+                    }, this);
                 }
+            } else {
+                autocompleteData.items = this.operationsItems;
             }
-
-            autocompleteData.items = items || {};
         },
 
         /**
@@ -635,7 +610,7 @@ define(function(require) {
             autocompleteData.dataSourceKey = dataSourceKey;
             autocompleteData.dataSourceValue = dataSourceValue;
         }
-    };
+    });
 
     return ExpressionEditorUtil;
 });

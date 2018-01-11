@@ -5,6 +5,7 @@ define(function(require) {
     var _ = require('underscore');
     var EntityError = require('oroentity/js/entity-error');
     var errorHandler = require('oroentity/js/app/services/entity-structure-error-handler');
+    var EntityTreeNode = require('oroentity/js/app/services/entity-tree-node');
     /** @type {Registry} */
     var registry = require('oroui/js/app/services/registry');
     var EntityStructuresCollection = require('oroentity/js/app/models/entitystructures-collection');
@@ -477,15 +478,16 @@ define(function(require) {
                 // `enum` field has to be with empty relationType, same as `tag` and `dictionary` types
                 fieldData.relationType = '';
             }
-            if (fieldData.relatedEntityName) {
-                Object.defineProperty(fieldData, 'relatedEntity', {
-                    get: function() {
-                        return this._extractEntityData(
-                            this.collection.getEntityModelByClassName(fieldData.relatedEntityName));
-                    }.bind(this),
-                    enumerable: true
-                });
-            }
+            Object.defineProperty(fieldData, 'relatedEntity', {
+                get: _.partial(function(provider) {
+                    var relatedEntityModel;
+                    if (this.relatedEntityName && this.relationType) {
+                        relatedEntityModel = provider.collection.getEntityModelByClassName(this.relatedEntityName);
+                    }
+                    return relatedEntityModel ? provider._extractEntityData(relatedEntityModel) : null;
+                }, this),
+                enumerable: true
+            });
             if (fieldData.options) {
                 fieldData.options = _.clone(fieldData.options);
             }
@@ -845,19 +847,12 @@ define(function(require) {
          *
          * @param {EntityModel} entityModel
          * @param {string} [fieldName]
-         * @return {Object}
+         * @return {EntityTreeNode}
          * @protected
          */
         _getEntityTreeNode: function(entityModel, fieldName) {
-            var node = {};
             var properties = this._getEntityTreeNodeProperties(entityModel, fieldName);
-
-            properties.__isField = {value: '__field' in properties};
-            properties.__isEntity = {value: '__entity' in properties};
-
-            Object.defineProperties(node, properties);
-
-            return node;
+            return new EntityTreeNode(properties);
         },
 
         /**
