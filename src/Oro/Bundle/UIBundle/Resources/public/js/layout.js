@@ -99,7 +99,7 @@ define(function(require) {
 
             this.initPopover($container);
 
-            mediator.trigger('resizable-area:setElementsStyles', $container);
+            mediator.trigger('resizable-area:set-previous-state', $container);
         },
 
         initPopover: function(container, options) {

@@ -143,7 +143,7 @@ define(function(require) {
                 .resizable('enable');
 
             if (_.isBoolean(restore)) {
-                this.setPreviousSize();
+                this.setPreviousState();
             }
 
             ResizableArea.__super__.enable.call(this);
@@ -187,8 +187,8 @@ define(function(require) {
             );
         },
 
-        setPreviousSize: function() {
-            ResizableArea.setPreviousSize(this.main.$el);
+        setPreviousState: function() {
+            ResizableArea.setPreviousState(this.main.$el);
         },
 
         removePreviusState: function() {
@@ -215,7 +215,7 @@ define(function(require) {
     /**
      * @static
      */
-    ResizableArea.setPreviousSize = function($container) {
+    ResizableArea.setPreviousState = function($container) {
         var state = JSON.parse(persistentStorage.getItem(STORAGE_KEY));
 
         if (_.isObject(state)) {
