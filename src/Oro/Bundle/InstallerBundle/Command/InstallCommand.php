@@ -535,12 +535,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                     ]
                 )
                 ->runCommand(
-                    'oro:translation:dump',
-                    [
-                        '--process-isolation' => true,
-                    ]
-                )
-                ->runCommand(
                     'oro:requirejs:build',
                     [
                         '--ignore-errors' => true,
@@ -562,6 +556,18 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $cacheClearOptions['--env'] = $input->getOption('env');
         }
         $commandExecutor->runCommand('cache:clear', $cacheClearOptions);
+
+        if (!$skipAssets) {
+            /**
+             * @todo Place this launch of command after the launch of 'assetic-dump' in BAP-16333
+             */
+            $commandExecutor->runCommand(
+                'oro:translation:dump',
+                [
+                    '--process-isolation' => true,
+                ]
+            );
+        }
 
         $output->writeln('');
 

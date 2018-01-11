@@ -1,18 +1,12 @@
 <?php
 
-namespace Oro\Bundle\PlatformBundle\EventListener\Console;
+namespace Oro\Bundle\PlatformBundle\Provider\Console;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputOption;
 
-abstract class AddGlobalOptionsListener
+abstract class AbstractGlobalOptionsProvider implements GlobalOptionsProviderInterface
 {
-    /**
-     * @param ConsoleCommandEvent $event
-     */
-    abstract public function onConsoleCommand(ConsoleCommandEvent $event);
-
     /**
      * @param Command $command
      * @param array|InputOption[] $options
