@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    var STORAGE_KEY = 'custom-style-elements-cache';
     var ResizableArea;
     var persistentStorage = require('oroui/js/persistent-storage');
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
@@ -174,7 +173,7 @@ define(function(require) {
          * @private
          */
         _savePreviousSize: function(size) {
-            var oldValue = persistentStorage.getItem(STORAGE_KEY);
+            var oldValue = persistentStorage.getItem(ResizableArea.STORAGE_KEY);
             var newValue = {};
 
             oldValue = oldValue ? JSON.parse(oldValue) : {};
@@ -182,7 +181,7 @@ define(function(require) {
             newValue[this.options.$resizableEl] = {width: size};
             newValue[this.options.$extraEl] = {width: this.calculateSize(size)};
 
-            persistentStorage.setItem(STORAGE_KEY,
+            persistentStorage.setItem(ResizableArea.STORAGE_KEY,
                 JSON.stringify(_.extend({}, oldValue, newValue))
             );
         },
@@ -192,7 +191,21 @@ define(function(require) {
         },
 
         removePreviusState: function() {
-            persistentStorage.removeItem(STORAGE_KEY);
+            var state = JSON.parse(persistentStorage.getItem(ResizableArea.STORAGE_KEY));
+
+            if (_.isObject(state)) {
+                if (_.has(state, this.options.$resizableEl)) {
+                    delete state[this.options.$resizableEl];
+                }
+
+                if (_.has(state, this.options.$extraEl)) {
+                    delete state[this.options.$extraEl];
+                }
+
+                if (_.isEmpty(state)) {
+                    persistentStorage.removeItem(ResizableArea.STORAGE_KEY);
+                }
+            }
         },
 
         removeCalculatedSize: function() {
@@ -215,8 +228,14 @@ define(function(require) {
     /**
      * @static
      */
+
+    ResizableArea.STORAGE_KEY = 'custom-style-elements-cache';
+
+    /**
+     * @static
+     */
     ResizableArea.setPreviousState = function($container) {
-        var state = JSON.parse(persistentStorage.getItem(STORAGE_KEY));
+        var state = JSON.parse(persistentStorage.getItem(ResizableArea.STORAGE_KEY));
 
         if (_.isObject(state)) {
             _.each(state, function(value, key) {
