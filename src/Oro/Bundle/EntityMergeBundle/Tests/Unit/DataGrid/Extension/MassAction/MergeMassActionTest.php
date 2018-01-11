@@ -36,6 +36,9 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getOptionsDataProvider
+     *
+     * @param array $actualOptions
+     * @param array $expectedOptions
      */
     public function testGetOptions(array $actualOptions, array $expectedOptions)
     {
@@ -43,14 +46,17 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedOptions, $this->target->getOptions()->toArray());
     }
 
+    /**
+     * @return array
+     */
     public function getOptionsDataProvider()
     {
-        return array(
-            'default_values'  => array(
-                'actual'   => array(
+        return [
+            'default_values'  => [
+                'actual'   => [
                     'entity_name' => 'SomeEntityClass'
-                ),
-                'expected' => array(
+                ],
+                'expected' => [
                     'entity_name'       => 'SomeEntityClass',
                     'frontend_handle'   => 'redirect',
                     'handler'           => 'oro_entity_merge.mass_action.data_handler',
@@ -59,12 +65,14 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                     'data_identifier'   => 'id',
                     'max_element_count' => self::MAX_ENTITIES_COUNT,
                     'label'             => null,
-                    'route_parameters'  => array(),
-                    'launcherOptions'   => array('iconClassName' => 'fa-random')
-                )
-            ),
-            'override_values' => array(
-                'actual'   => array(
+                    'route_parameters'  => [],
+                    'launcherOptions'   => ['iconClassName' => 'fa-random'],
+                    'allowedRequestTypes' => ['GET'],
+                    'requestType'       => 'GET'
+                ]
+            ],
+            'override_values' => [
+                'actual'   => [
                     'entity_name'       => 'SomeEntityClass',
                     'frontend_handle'   => 'custom_handler',
                     'handler'           => 'oro_entity_merge.mass_action.data_handler',
@@ -73,22 +81,24 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                     'icon'              => 'custom',
                     'max_element_count' => self::MAX_ENTITIES_COUNT,
                     'route'             => 'oro_entity_merge_massaction',
-                    'route_parameters'  => array()
-                ),
-                'expected' => array(
+                    'route_parameters'  => []
+                ],
+                'expected' => [
                     'entity_name'       => 'SomeEntityClass',
                     'frontend_handle'   => 'custom_handler',
                     'handler'           => 'oro_entity_merge.mass_action.data_handler',
                     'frontend_type'     => 'custom-merge-mass',
                     'data_identifier'   => 'code',
-                    'launcherOptions'   => array('iconClassName' => 'fa-custom'),
+                    'launcherOptions'   => ['iconClassName' => 'fa-custom'],
                     'max_element_count' => self::MAX_ENTITIES_COUNT,
                     'route'             => 'oro_entity_merge_massaction',
-                    'route_parameters'  => array(),
+                    'route_parameters'  => [],
                     'label'             => null,
-                )
-            )
-        );
+                    'allowedRequestTypes' => ['GET'],
+                    'requestType'       => 'GET'
+                ]
+            ]
+        ];
     }
 
     /**

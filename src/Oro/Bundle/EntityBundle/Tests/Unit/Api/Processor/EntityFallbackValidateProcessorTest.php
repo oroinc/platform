@@ -6,7 +6,6 @@ use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
-use Oro\Bundle\EntityBundle\Exception\Fallback\Api\InvalidIncludedFallbackItemException;
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 use Oro\Bundle\EntityBundle\Api\Processor\EntityFallbackValidateProcessor;
 
@@ -114,8 +113,12 @@ class EntityFallbackValidateProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('addError')
             ->willReturnCallback(
                 function ($error) {
-                    $exceptionText = (new InvalidIncludedFallbackItemException(0))->getMessage();
-                    $this->assertEquals($exceptionText, $error->getDetail());
+                    $this->assertEquals(
+                        'Invalid entity fallback value provided for the included value with id \'0\'.'
+                        . ' Please provide a correct id, and an attribute section with'
+                        . ' either a \'fallback\' identifier, an \'arrayValue\' or \'scalarValue\'',
+                        $error->getDetail()
+                    );
                 }
             );
 
@@ -183,8 +186,12 @@ class EntityFallbackValidateProcessorTest extends \PHPUnit_Framework_TestCase
                 ->method('addError')
                 ->willReturnCallback(
                     function ($error) {
-                        $exceptionText = (new InvalidIncludedFallbackItemException('1'))->getMessage();
-                        $this->assertEquals($exceptionText, $error->getDetail());
+                        $this->assertEquals(
+                            'Invalid entity fallback value provided for the included value with id \'1\'.'
+                            . ' Please provide a correct id, and an attribute section with'
+                            . ' either a \'fallback\' identifier, an \'arrayValue\' or \'scalarValue\'',
+                            $error->getDetail()
+                        );
                     }
                 );
         } else {

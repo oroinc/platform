@@ -35,15 +35,24 @@ class ActivityListItem extends Element
         return null;
     }
 
-    public function deleteAllContexts()
+    /**
+     * @param string $content
+     */
+    public function deleteContext($content)
     {
-        $contexts = array_reverse($this->getContexts());
-        // order of contexts is changed to avoid jumping element after previous one removed after animation
-        // since it sometimes leads to try clicking at wrong position
-        foreach ($contexts as $context) {
-            $context->find('css', 'i.fa-close')->click();
-            $this->getDriver()->waitForAjax();
+        $existingContext = null;
+        foreach ($this->getContexts() as $context) {
+            if (preg_match(sprintf('/%s/i', $content), $context->getText())) {
+                $existingContext = $context;
+                break;
+            }
         }
+
+        if (!$existingContext) {
+            throw new \InvalidArgumentException(sprintf('Context "%s" does not exist.', $content));
+        }
+
+        $existingContext->find('css', 'i.fa-close')->click();
     }
 
     public function hasContext($text)

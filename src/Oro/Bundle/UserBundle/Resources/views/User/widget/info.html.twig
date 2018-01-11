@@ -52,11 +52,11 @@
             {% endif %}
 
             {% if is_granted('oro_user_group_view') %}
-                {{ ui.renderHtmlProperty('oro.user.groups.label'|trans, entity.groups|join('<br />')) }}
+                {{ ui.renderHtmlProperty('oro.user.groups.label'|trans, entity.groups|join('\n')|escape|nl2br) }}
             {% endif %}
 
             {% if is_granted('oro_business_unit_view') %}
-                {{ ui.renderHtmlProperty('oro.user.business_units.label'|trans, entity.businessUnits|join('<br />')) }}
+                {{ ui.renderHtmlProperty('oro.user.business_units.label'|trans, entity.businessUnits|join('\n')|escape|nl2br) }}
             {% endif %}
 
             {{ entityConfig.renderDynamicFields(entity) }}

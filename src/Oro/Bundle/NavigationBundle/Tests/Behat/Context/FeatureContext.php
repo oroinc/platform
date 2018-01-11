@@ -140,7 +140,8 @@ class FeatureContext extends OroFeatureContext implements
      * Example: When follow Users link in pin holder
      * Example: When I follow Create User link in pin holder
      *
-     * @When /^(?:|I )follow (?P<link>[\w\s]+) link in pin holder$/
+     * @When /^(?:|I )follow (?P<link>[\w\s-]+) link in pin holder$/
+     * @When /^(?:|I )follow "(?P<link>[\w\s-]+)" link in pin holder$/
      */
     public function followUsersLinkInPinHolder($link)
     {

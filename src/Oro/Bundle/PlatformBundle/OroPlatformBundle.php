@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Oro\Component\DependencyInjection\Compiler\ServiceLinkCompilerPass;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 
+use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\ConsoleGlobalOptionsCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyDoctrineListenersPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyDoctrineOrmListenersPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyServicesCompilerPass;
@@ -59,5 +60,6 @@ class OroPlatformBundle extends Bundle
             );
         }
         $container->addCompilerPass(new UndoLazyEntityManagerPass());
+        $container->addCompilerPass(new ConsoleGlobalOptionsCompilerPass());
     }
 }
