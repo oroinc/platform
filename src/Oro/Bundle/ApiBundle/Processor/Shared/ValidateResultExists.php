@@ -1,23 +1,23 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Delete;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 
 /**
- * Validates that loaded entity was deleted.
+ * Makes sure that the result exists.
  */
-class ValidateDeletionResult implements ProcessorInterface
+class ValidateResultExists implements ProcessorInterface
 {
     /**
      * {@inheritdoc}
      */
     public function process(ContextInterface $context)
     {
-        if ($context->hasResult()) {
-            throw new RuntimeException('The record was not deleted.');
+        if (!$context->hasResult()) {
+            throw new RuntimeException('The result does not exist.');
         }
     }
 }

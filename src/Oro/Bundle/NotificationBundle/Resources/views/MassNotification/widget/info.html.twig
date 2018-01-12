@@ -8,8 +8,8 @@
             {{ ui.renderProperty('oro.notification.massnotification.email.label'|trans, entity.email) }}
             {{ ui.renderProperty('oro.notification.massnotification.processed_at.label'|trans, entity.processedAt|oro_format_datetime) }}
             {{ ui.renderProperty('oro.notification.massnotification.subject.label'|trans, entity.subject) }}
-            {{ ui.renderHtmlProperty('oro.notification.massnotification.status.label'|trans, statusLabel) }}
-            {{ ui.renderHtmlProperty('oro.notification.massnotification.body.label'|trans, entity.body) }}
+            {{ ui.renderProperty('oro.notification.massnotification.status.label'|trans, statusLabel) }}
+            {{ ui.renderHtmlProperty('oro.notification.massnotification.body.label'|trans, entity.body|oro_html_sanitize) }}
         </div>
     </div>
 </div>

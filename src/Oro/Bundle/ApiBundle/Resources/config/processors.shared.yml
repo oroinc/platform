@@ -408,6 +408,84 @@ services:
             - { name: oro.api.processor, action: delete, group: normalize_input, requestType: rest, priority: -110 }
 
     #
+    # security_check (primary resource)
+    #
+
+    oro_api.get.entity_type_security_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@security.authorization_checker'
+            - VIEW
+        tags:
+            - { name: oro.api.processor, action: get, group: security_check, priority: 10 }
+            - { name: oro.api.processor, action: get_list, group: security_check, priority: 10 }
+
+    oro_api.delete.entity_type_security_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@security.authorization_checker'
+            - DELETE
+        tags:
+            - { name: oro.api.processor, action: delete, group: security_check, priority: 10 }
+            - { name: oro.api.processor, action: delete_list, group: security_check, priority: 10 }
+
+    # VIEW permissions are required to create or update an entity because the newly created or updated entity
+    # should be returned in the response
+    # the "security_check" group is disabled for the "get" action is executed by
+    # the "oro_api.create.load_normalized_entity" and "oro_api.update.load_normalized_entity" processors
+    # so, if you add own security processor for the "get" action, add it for "create" and "update" actions as well
+    oro_api.entity_type_security_check.view:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@security.authorization_checker'
+            - VIEW
+            - true
+        tags:
+            - { name: oro.api.processor, action: create, group: security_check, priority: 5 }
+            - { name: oro.api.processor, action: update, group: security_check, priority: 5 }
+
+    #
+    # security_check (subresources)
+    #
+
+    oro_api.get_subresource.parent_entity_type_security_check:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@security.authorization_checker'
+            - VIEW
+        tags:
+            - { name: oro.api.processor, action: get_relationship, group: security_check, priority: 10 }
+            - { name: oro.api.processor, action: get_subresource, group: security_check, priority: 10 }
+
+    oro_api.subresource.parent_entity_type_security_check:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@security.authorization_checker'
+            - EDIT
+        tags:
+            - { name: oro.api.processor, action: add_relationship, group: security_check, priority: 10 }
+            - { name: oro.api.processor, action: update_relationship, group: security_check, priority: 10 }
+            - { name: oro.api.processor, action: delete_relationship, group: security_check, priority: 10 }
+
+    # VIEW permissions for the parent entity are required because the response may contains the updated relationship
+    oro_api.subresource.parent_entity_type_security_check.view:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@security.authorization_checker'
+            - VIEW
+            - true
+        tags:
+            - { name: oro.api.processor, action: add_relationship, group: security_check, priority: 5 }
+            - { name: oro.api.processor, action: update_relationship, group: security_check, priority: 5 }
+            - { name: oro.api.processor, action: delete_relationship, group: security_check, priority: 5 }
+
+    #
     # build_query
     #
 
@@ -419,9 +497,7 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: build_query, priority: 100 }
             - { name: oro.api.processor, action: get_list, group: build_query, priority: 100 }
-            - { name: oro.api.processor, action: delete, group: build_query, priority: 100 }
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: 100 }
-            - { name: oro.api.processor, action: update, group: build_query, priority: 100 }
             - { name: oro.api.processor, action: get_subresource, group: build_query, priority: 100 }
             - { name: oro.api.processor, action: get_relationship, group: build_query, priority: 100 }
 
@@ -460,8 +536,6 @@ services:
             - '@oro_api.entity_id_helper'
         tags:
             - { name: oro.api.processor, action: get, group: build_query, priority: -100 }
-            - { name: oro.api.processor, action: delete, group: build_query, priority: -100 }
-            - { name: oro.api.processor, action: update, group: build_query, priority: -100 }
 
     oro_api.subresource.add_parent_entity_id_to_query:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\AddParentEntityIdToQuery
@@ -484,12 +558,6 @@ services:
             - { name: oro.api.processor, action: get_subresource, group: load_data, collection: false, priority: -10 }
             - { name: oro.api.processor, action: get_relationship, group: load_data, collection: false, priority: -10 }
 
-    oro_api.load_entity_by_orm_query:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByOrmQuery
-        tags:
-            - { name: oro.api.processor, action: delete, group: load_data, priority: -10 }
-            - { name: oro.api.processor, action: update, group: load_data, priority: -10 }
-
     oro_api.load_entities_by_entity_serializer:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntitiesByEntitySerializer
         arguments:
@@ -498,6 +566,15 @@ services:
             - { name: oro.api.processor, action: get_list, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: load_data, collection: true, priority: -10 }
             - { name: oro.api.processor, action: get_relationship, group: load_data, collection: true, priority: -10 }
+
+    oro_api.load_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntity
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_loader'
+        tags:
+            - { name: oro.api.processor, action: delete, group: load_data, priority: -10 }
+            - { name: oro.api.processor, action: update, group: load_data, priority: -10 }
 
     oro_api.subresource.load_parent_entity:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadParentEntity
@@ -508,6 +585,12 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: add_relationship, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: update_relationship, group: load_data, priority: -10 }
+
+    oro_api.validate_loaded_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateLoadedEntity
+        tags:
+            - { name: oro.api.processor, action: update, group: load_data, priority: -30 }
+            - { name: oro.api.processor, action: delete, group: load_data, priority: -30 }
 
     oro_api.set_primary_entity:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetPrimaryEntity
@@ -521,6 +604,16 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: load_data, priority: -50 }
             - { name: oro.api.processor, action: add_relationship, group: load_data, priority: -50 }
             - { name: oro.api.processor, action: update_relationship, group: load_data, priority: -50 }
+
+    oro_api.subresource.parent_entity_object_security_check:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityObjectSecurityCheck
+        arguments:
+            - '@security.authorization_checker'
+            - EDIT
+        tags:
+            - { name: oro.api.processor, action: add_relationship, group: load_data, priority: -70 }
+            - { name: oro.api.processor, action: update_relationship, group: load_data, priority: -70 }
+            - { name: oro.api.processor, action: delete_relationship, group: load_data, priority: -70 }
 
     #
     # normalize_data
@@ -567,6 +660,16 @@ services:
             - { name: oro.api.processor, action: create, group: transform_data, priority: 250 }
             - { name: oro.api.processor, action: update, group: transform_data, priority: 250 }
 
+    oro_api.subresource.initialize_api_form_extension:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\InitializeApiFormExtension
+        arguments:
+            - '@form.registry'
+            - '@oro_api.form.guesser.metadata'
+        tags:
+            - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: 250 }
+            - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: 250 }
+            - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: 250 }
+
     oro_api.json_api.process_included_entities:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ProcessIncludedEntities
         arguments:
@@ -585,6 +688,14 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: -10 }
             - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -10 }
 
+    oro_api.submit_form:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SubmitForm
+        tags:
+            - { name: oro.api.processor, action: update, group: transform_data, priority: -50 }
+            - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: -50 }
+            - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -50 }
+            - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: -50 }
+
     oro_api.collect_form_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors
         arguments:
@@ -592,6 +703,15 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: transform_data, priority: -100 }
             - { name: oro.api.processor, action: update, group: transform_data, priority: -100 }
+
+    oro_api.subresource.collect_form_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\CollectFormErrors
+        arguments:
+            - '@oro_api.constraint_text_extractor'
+        tags:
+            - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: -100 }
+            - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -100 }
+            - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: -100 }
 
     oro_api.restore_default_form_extension:
         class: Oro\Bundle\ApiBundle\Processor\Shared\RestoreDefaultFormExtension
@@ -632,6 +752,16 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: save_data, priority: -10 }
             - { name: oro.api.processor, action: add_relationship, group: save_data, priority: -10 }
             - { name: oro.api.processor, action: update_relationship, group: save_data, priority: -10 }
+
+    #
+    # delete_data
+    #
+
+    oro_api.validate_result_not_exists:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateResultNotExists
+        tags:
+            - { name: oro.api.processor, action: delete, group: delete_data, priority: -200 }
+            - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -200 }
 
     #
     # normalize_data
@@ -834,7 +964,7 @@ services:
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -190 }
 
     oro_api.validate_normalized_result_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateNormalizedResultExists
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateResultExists
         tags:
             - { name: oro.api.processor, action: get, group: normalize_result, priority: -200 }
             - { name: oro.api.processor, action: get_list, group: normalize_result, priority: -200 }

@@ -219,16 +219,14 @@ oro_api:
                     priority: -20
                 security_check:
                     priority: -30
-                build_query:
-                    priority: -40
                 load_data:
-                    priority: -50
+                    priority: -40
                 delete_data:
-                    priority: -60
+                    priority: -50
                 finalize:
-                    priority: -70
+                    priority: -60
                 normalize_result:
-                    priority: -80
+                    priority: -70
         delete_list:
             processor_service_id: oro_api.delete_list.processor
             processing_groups:
@@ -284,20 +282,18 @@ oro_api:
                     priority: -20
                 security_check:
                     priority: -30
-                build_query:
-                    priority: -40
                 load_data:
-                    priority: -50
+                    priority: -40
                 transform_data:
-                    priority: -60
+                    priority: -50
                 save_data:
-                    priority: -70
+                    priority: -60
                 normalize_data:
-                    priority: -80
+                    priority: -70
                 finalize:
-                    priority: -90
+                    priority: -80
                 normalize_result:
-                    priority: -100
+                    priority: -90
         get_subresource:
             processor_service_id: oro_api.get_subresource.processor
             processing_groups:

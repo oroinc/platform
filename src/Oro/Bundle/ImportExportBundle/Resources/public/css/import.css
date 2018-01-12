@@ -10,6 +10,7 @@
 .import-widget-content .controls > div {
     margin-right: 16px;
 }
+
 .btn-group > .dropdown-menu a.import-validation-btn > .icon-download-alt {
     width: 17px;
 }
@@ -19,4 +20,10 @@
 
 .import-widget-content .tab-pane {
     margin-top: 10px;
+}
+
+@media (max-width: 767px) {
+    .import-widget-content .controls .selector {
+        margin-right: 0;
+    }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Delete;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -10,16 +10,14 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 /**
  * Checks whether an entity is loaded.
  */
-class ValidateLoadedResult implements ProcessorInterface
+class ValidateLoadedEntity implements ProcessorInterface
 {
     /**
      * {@inheritdoc}
      */
     public function process(ContextInterface $context)
     {
-        if (!$context->hasResult()) {
-            throw new NotFoundHttpException('Unsupported request.');
-        } elseif (null === $context->getResult()) {
+        if (!$context->hasResult() || null === $context->getResult()) {
             throw new NotFoundHttpException('An entity with the requested identifier does not exist.');
         }
     }

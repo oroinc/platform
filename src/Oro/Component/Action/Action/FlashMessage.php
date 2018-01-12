@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
@@ -28,6 +29,11 @@ class FlashMessage extends AbstractAction
      * @var TranslatorInterface
      */
     protected $translator;
+
+    /**
+     * @var HtmlTagHelper
+     */
+    protected $htmlTagHelper;
 
     /**
      * @var Request|null
@@ -52,12 +58,17 @@ class FlashMessage extends AbstractAction
     /**
      * @param ContextAccessor $contextAccessor
      * @param TranslatorInterface $translator
+     * @param HtmlTagHelper $htmlTagHelper
      */
-    public function __construct(ContextAccessor $contextAccessor, TranslatorInterface $translator)
-    {
+    public function __construct(
+        ContextAccessor $contextAccessor,
+        TranslatorInterface $translator,
+        HtmlTagHelper $htmlTagHelper
+    ) {
         parent::__construct($contextAccessor);
 
         $this->translator = $translator;
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**
@@ -86,7 +97,10 @@ class FlashMessage extends AbstractAction
 
             /** @var Session $session */
             $session = $this->request->getSession();
-            $session->getFlashBag()->add($type, $translatedMessage);
+            $session->getFlashBag()->add(
+                $type,
+                $this->htmlTagHelper->sanitize($translatedMessage)
+            );
         }
     }
 

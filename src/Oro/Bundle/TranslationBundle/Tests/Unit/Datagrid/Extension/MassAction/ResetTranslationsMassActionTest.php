@@ -33,6 +33,8 @@ class ResetTranslationsMassActionTest extends \PHPUnit_Framework_TestCase
             'frontend_handle' => 'ajax',
             'route_parameters' => [],
             'data_identifier' => 'id',
+            'allowedRequestTypes' => ['POST'],
+            'requestType' => 'POST'
         ], $options->toArray(), true);
     }
 

@@ -1615,6 +1615,7 @@ footer {
     padding: 12px 35px 12px 37px;
     border:1px solid @warningBorder;
     text-shadow: 0 1px 0 rgba(255,255,255,.5);
+    word-break: break-word;
     .border-radius(0);
     .close {
       font-size: 18px;
@@ -2314,6 +2315,10 @@ div.uploader span.filename {
   white-space: nowrap;
   cursor: default;
   width: 202px;
+
+  @media (max-width: 400px) {
+    width: 183px;
+  }
 }
 
 div.uploader input {

@@ -180,6 +180,7 @@ services:
         arguments:
             - '@oro_action.expression.context_accessor'
             - '@translator'
+            - '@oro_ui.html_tag_helper'
         calls:
             - [setRequest, ["@?request="]]
         tags:

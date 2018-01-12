@@ -8,7 +8,6 @@ parameters:
     oro_platform.event_listener.driver_lock.class:  Oro\Bundle\PlatformBundle\EventListener\Console\DriverLockCommandListener
 
     oro_platform.optional_listeners.manager.class: Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager
-    oro_platform.event_listener.optional_listeners.class: Oro\Bundle\PlatformBundle\EventListener\Console\OptionalListenersListener
     jms_serializer.twig_extension.class: Oro\Bundle\PlatformBundle\Twig\SerializerExtension
 
 services:
@@ -80,15 +79,25 @@ services:
            - []
            - '@service_container'
 
-    oro_platform.event_listener.optional_listeners:
-        class: %oro_platform.event_listener.optional_listeners.class%
-        arguments:
-            - "@oro_platform.optional_listeners.manager"
-        tags:
-            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
-
     oro_platform.event_listener.demo_data_fixtures_listener.abstract:
         class: 'Oro\Bundle\PlatformBundle\EventListener\AbstractDemoDataFixturesListener'
         abstract: true
         arguments:
             - '@oro_platform.optional_listeners.manager'
+
+    oro_platform.provider.console.global_options_provider_registry:
+        class: Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderRegistry
+
+    oro_platform.provider.console.optional_listeners_global_options_provider:
+        class: Oro\Bundle\PlatformBundle\Provider\Console\OptionalListenersGlobalOptionsProvider
+        arguments:
+            - '@oro_platform.optional_listeners.manager'
+        tags:
+            - { name: oro_platform.console.global_options_provider }
+
+    oro_platform.event_listener.console.global_options_listener:
+        class: Oro\Bundle\PlatformBundle\EventListener\Console\GlobalOptionsListener
+        arguments:
+            - '@oro_platform.provider.console.global_options_provider_registry'
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 250 }

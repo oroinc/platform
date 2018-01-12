@@ -9,6 +9,6 @@
 %>
 <span class="aware-icon-block aware-icon-block-text" <%= background %> ></span>
 <span class="aware-icon-block-text">
-    <%= highlight(text) %>
+    <%= highlight(_.escape(text)) %>
     (<% if (data.status) { %>{{ 'oro.integration.integration.enabled.active.label'|trans }}<% } else { %>{{ 'oro.integration.integration.enabled.inactive.label'|trans }}<% } %>)
 </span>

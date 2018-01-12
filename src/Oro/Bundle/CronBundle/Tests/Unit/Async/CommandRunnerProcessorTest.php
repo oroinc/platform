@@ -40,7 +40,7 @@ class CommandRunnerProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects(self::once())
             ->method('info')
             ->with(
-                'Ran command '.$testCommandName.' with arguments: . Got output '.$testCommandOutput,
+                'Ran command '.$testCommandName.'. Got output '.$testCommandOutput,
                 [
                     'command' => $testCommandName,
                     'arguments' => [],
@@ -87,8 +87,7 @@ class CommandRunnerProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects(self::once())
             ->method('info')
             ->with(
-                'Ran command '.$testCommandName.' with arguments: '.implode(' ', $testArguments).
-                '. Got output '.$testCommandOutput,
+                'Ran command '.$testCommandName.'. Got output '.$testCommandOutput,
                 [
                     'command' => $testCommandName,
                     'arguments' => $testArguments,

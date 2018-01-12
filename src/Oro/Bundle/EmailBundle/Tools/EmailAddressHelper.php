@@ -242,4 +242,79 @@ class EmailAddressHelper
 
         return (strpos($emailAddress, '<') !== false);
     }
+
+    /**
+     * Truncates the user name part of the given email address if its length is more than the specified max value.
+     *
+     * Examples of truncated addresses:
+     *    John Sm... <john@example.com>
+     *    "John Sm..." <john@example.com>
+     *
+     * IMPORTANT: the 'pure' email address is not truncated even if its length exceeds the specified max value,
+     * e.g. if max length is 10 and email address is 'John Smith <john@example.com>', the result
+     * will be '<john@example.com>'
+     *
+     * @param string $email
+     * @param int    $maxLength
+     *
+     * @return string
+     */
+    public function truncateFullEmailAddress($email, $maxLength)
+    {
+        if (mb_strlen($email) > $maxLength) {
+            $emailAddress = $this->extractPureEmailAddress($email);
+            if (false !== mb_strpos($email, '<' . $emailAddress . '>')) {
+                $emailAddress = '<' . $emailAddress . '>';
+            }
+            if (mb_strlen($emailAddress) <= $maxLength - 2) {
+                if ('"' === mb_substr($email, 0, 1)) {
+                    $maxNameLength = $maxLength - mb_strlen($emailAddress) - 3;
+                    if ($maxNameLength > 0) {
+                        $emailName = $this->truncate(
+                            $this->extractEmailAddressName($email),
+                            $maxNameLength
+                        );
+                        if (mb_strlen($emailName) > 0) {
+                            $emailName = '"' . $emailName . '"';
+                        }
+                    } else {
+                        $emailName = '';
+                    }
+                } else {
+                    $emailName = $this->truncate(
+                        $this->extractEmailAddressName($email),
+                        $maxLength - mb_strlen($emailAddress) - 1
+                    );
+                }
+                $email = $emailAddress;
+                if (mb_strlen($emailName) > 0) {
+                    $email = $emailName . ' ' . $email;
+                }
+            } else {
+                $email = $emailAddress;
+            }
+        }
+
+        return $email;
+    }
+
+    /**
+     * @param string $str
+     * @param int    $maxLength
+     *
+     * @return string
+     */
+    private function truncate($str, $maxLength)
+    {
+        if ($maxLength <= 3) {
+            return mb_substr($str, 0, $maxLength);
+        }
+
+        $length = mb_strlen($str);
+        if ($length <= $maxLength) {
+            return $str;
+        }
+
+        return mb_substr($str, 0, $maxLength - 3) . '...';
+    }
 }
