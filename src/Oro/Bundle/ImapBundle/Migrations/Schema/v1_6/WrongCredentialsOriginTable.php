@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_33;
+namespace Oro\Bundle\ImapBundle\Migrations\Schema\v1_6;
 
 use Doctrine\DBAL\Schema\Schema;
 
@@ -17,16 +17,8 @@ class WrongCredentialsOriginTable implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        static::createCredentialsOriginTable($schema);
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public static function createCredentialsOriginTable(Schema $schema)
-    {
-        if (!$schema->hasTable('oro_email_wrong_creds_origin')) {
-            $table = $schema->createTable('oro_email_wrong_creds_origin');
+        if (!$schema->hasTable('oro_imap_wrong_creds_origin')) {
+            $table = $schema->createTable('oro_imap_wrong_creds_origin');
             $table->addColumn('origin_id', 'integer', ['notnull' => true]);
             $table->addColumn('owner_id', 'integer', ['notnull' => false]);
             $table->setPrimaryKey(['origin_id']);

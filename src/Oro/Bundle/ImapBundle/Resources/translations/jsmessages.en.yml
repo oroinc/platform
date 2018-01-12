@@ -15,3 +15,7 @@ oro.imap:
                 request: Something has gone wrong.
                 closed_auth: Something has gone wrong. Please address your administrator to check the google API key settings.
                 blocked_popup: Something has gone wrong. Please make sure that pop-ups are enabled.
+    sync:
+        flash_message:
+            user_box_failed: The synchronization of your email box with username "{{ username }}" and host "{{ host }}" was failed. Please check the credentials at the email configuraton page.
+            system_box_failed: The synchronization of the system email box with username "{{ username }}" and host "{{ host }}" was failed. Please check the credentials at the email configuraton page.

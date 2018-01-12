@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Command\Cron;
+namespace Oro\Bundle\ImapBundle\Command\Cron;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,7 +16,7 @@ class SendCredentialNotificationsCommand extends ContainerAwareCommand implement
     /**
      * Command name
      */
-    const COMMAND_NAME = 'oro:cron:credential-notifications';
+    const COMMAND_NAME = 'oro:cron:imap-credential-notifications';
 
     /**
      * {@inheritdoc}
@@ -51,7 +51,7 @@ class SendCredentialNotificationsCommand extends ContainerAwareCommand implement
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->getContainer()->get('oro_email.credentials.issue_manager')->processInvalidOrigins();
+        $this->getContainer()->get('oro_imap.origin_credentials.issue_manager')->processInvalidOrigins();
 
         return 0;
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\EmailSyncCredentials;
+namespace Oro\Bundle\ImapBundle\OriginSyncCredentials;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
@@ -15,7 +15,7 @@ interface WrongCredentialsOriginsDriverInterface
      * @param integer $emailOriginId
      * @param integer $ownerId
      */
-    public function addOrigin($emailOriginId, $ownerId);
+    public function addOrigin($emailOriginId, $ownerId = null);
 
     /**
      * Returns array with wrong credential sync origins.
@@ -34,9 +34,9 @@ interface WrongCredentialsOriginsDriverInterface
     /**
      * Removes the origin information.
      *
-     * @param integer $emailOrigin
+     * @param integer $emailOriginId
      */
-    public function deleteOrigin($emailOrigin);
+    public function deleteOrigin($emailOriginId);
 
     /**
      * Clears the storage.

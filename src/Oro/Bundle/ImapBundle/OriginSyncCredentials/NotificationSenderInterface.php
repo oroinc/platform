@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\EmailSyncCredentials;
+namespace Oro\Bundle\ImapBundle\OriginSyncCredentials;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 

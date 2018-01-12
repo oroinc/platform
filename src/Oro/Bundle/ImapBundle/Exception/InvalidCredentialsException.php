@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Exception;
+namespace Oro\Bundle\ImapBundle\Exception;
 
 use Zend\Mail\Storage\Exception\RuntimeException;
 

@@ -1,6 +1,8 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Migrations\Data\ORM;
+namespace Oro\Bundle\ImapBundle\Migrations\Data\ORM;
+
+use Oro\Bundle\EmailBundle\Migrations\Data\ORM\AbstractEmailFixture;
 
 /**
  * Loads email templates from emails directory to the system.
@@ -14,6 +16,6 @@ class LoadEmailTemplates extends AbstractEmailFixture
     {
         return $this->container
             ->get('kernel')
-            ->locateResource('@OroEmailBundle/Migrations/Data/ORM/emails');
+            ->locateResource('@OroImapBundle/Migrations/Data/ORM/emails');
     }
 }

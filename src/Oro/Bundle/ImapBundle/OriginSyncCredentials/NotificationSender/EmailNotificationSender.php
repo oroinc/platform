@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\EmailSyncCredentials\NotificationSender;
+namespace Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Bundle\EmailBundle\EmailSyncCredentials\NotificationSenderInterface;
+use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSenderInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
