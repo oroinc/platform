@@ -351,14 +351,17 @@ define(function(require) {
                 }
             }
             if (!result) {
-                var entityTreeNode = this.entityDataProvider.getEntityTreeNodeByPropertyPath(item);
-                if (entityTreeNode && entityTreeNode.__isField) {
-                    var fieldType = entityTreeNode.__field.type;
-                    if (fieldType in this.fieldTypeMap) {
-                        fieldType = this.fieldTypeMap[fieldType];
-                    }
-                    if (fieldType in this.itemToNativeJS) {
-                        result = this.itemToNativeJS[fieldType];
+                var entity = _.first(item.split(this.strings.childSeparator));
+                if (this.options.rootEntities.indexOf(entity) !== -1) {
+                    var entityTreeNode = this.entityDataProvider.getEntityTreeNodeByPropertyPath(item);
+                    if (entityTreeNode && entityTreeNode.__isField) {
+                        var fieldType = entityTreeNode.__field.type;
+                        if (fieldType in this.fieldTypeMap) {
+                            fieldType = this.fieldTypeMap[fieldType];
+                        }
+                        if (fieldType in this.itemToNativeJS) {
+                            result = this.itemToNativeJS[fieldType];
+                        }
                     }
                 }
             }
@@ -558,6 +561,9 @@ define(function(require) {
                     var parts = autocompleteData.itemChild.map(function(item) {
                         return item.replace(this.regex.cutDataSourceId, '');
                     }.bind(this));
+                    if (this.options.rootEntities.indexOf(parts[0]) === -1) {
+                        return;
+                    }
                     var omitRelationFields = this.options.itemLevelLimit <= parts.length;
                     parts.pop();
                     var levelLimit = this.options.itemLevelLimit - parts.length;
