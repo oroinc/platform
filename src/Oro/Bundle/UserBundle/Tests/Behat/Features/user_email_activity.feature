@@ -69,9 +69,12 @@ Scenario: Forward email
 
 Scenario: Delete contexts
   When I collapse "Fwd: Re: Work for you" in activity list
-  And delete all contexts from collapsed email
-  Then shouldn't see "Fwd: Re: Work for you" email in activity list
-  And I go to System/User Management/Users
+  And delete "John Doe" context from collapsed email
+  Then I should see "The context has been removed" flash message
+  When I delete "Audrey Hepburn" context from collapsed email
+  Then I should see "The context has been removed" flash message
+  And shouldn't see "Fwd: Re: Work for you" email in activity list
+  When I go to System/User Management/Users
   And click view Brad in grid
   And shouldn't see "Fwd: Re: Work for you" email in activity list
 

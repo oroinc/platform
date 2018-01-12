@@ -153,7 +153,6 @@ This action has the following processor groups:
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource is granted. | |
-| build_query | Building a query that will be used to load an entity to be deleted. | |
 | load_data | Loading an entity that should be deleted and storing it in the `result` property of the context. | |
 | delete_data | Deleting the entity stored in the `result` property of the context. | |
 | finalize | Adding the required response headers. | |
@@ -222,7 +221,7 @@ This action has the following processor groups:
 | initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing input data for use by processors from the next groups. | |
-| security_check | Checking whether access to the requested resource is granted. | When you add a new processor to the **security_check** group of the [get](#get-action) action, add it to this group as well. This is necessary because the **VIEW** permission is checked here: the updated entity should be returned in response, and the **security_check** group of the [get](#get-action) action is disabled by the **oro_api.update.load_normalized_entity** processor. |
+| security_check | Checking whether access to the requested resource is granted. | When you add a new processor to the **security_check** group of the [get](#get-action) action, add it to this group as well. This is necessary because the **VIEW** permission is checked here: the created entity should be returned in response, and the **security_check** group of the [get](#get-action) action is disabled by the **oro_api.update.load_normalized_entity** processor. |
 | load_data | Creating a new entity object. | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
 | save_data | Validating and persisting an entity. | |

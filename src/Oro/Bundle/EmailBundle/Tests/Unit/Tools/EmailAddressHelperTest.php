@@ -146,4 +146,58 @@ class EmailAddressHelperTest extends \PHPUnit_Framework_TestCase
             ['john@example.com',                    'example.com'],
         ];
     }
+
+    /**
+     * @dataProvider truncateFullEmailAddressProvider
+     */
+    public function testTruncateFullEmailAddress($email, $maxLength, $expected)
+    {
+        $this->assertEquals($expected, $this->helper->truncateFullEmailAddress($email, $maxLength));
+    }
+
+    public static function truncateFullEmailAddressProvider()
+    {
+        return [
+            ['john@example.com', 255, 'john@example.com'],
+            ['john@example.com', 16, 'john@example.com'],
+            ['john@example.com', 10, 'john@example.com'],
+            ['<john@example.com>', 255, '<john@example.com>'],
+            ['<john@example.com>', 18, '<john@example.com>'],
+            ['<john@example.com>', 10, '<john@example.com>'],
+            ['John Smith <john@example.com>', 255, 'John Smith <john@example.com>'],
+            ['John Smith <john@example.com>', 29, 'John Smith <john@example.com>'],
+            ['John Smith <john@example.com>', 28, 'John S... <john@example.com>'],
+            ['John Smith <john@example.com>', 27, 'John ... <john@example.com>'],
+            ['John Smith <john@example.com>', 23, 'J... <john@example.com>'],
+            ['John Smith <john@example.com>', 22, 'Joh <john@example.com>'],
+            ['John Smith <john@example.com>', 21, 'Jo <john@example.com>'],
+            ['John Smith <john@example.com>', 20, 'J <john@example.com>'],
+            ['John Smith <john@example.com>', 19, '<john@example.com>'],
+            ['John Smith <john@example.com>', 18, '<john@example.com>'],
+            ['John Smith <john@example.com>', 10, '<john@example.com>'],
+            ['"John Smith" <john@example.com>', 255, '"John Smith" <john@example.com>'],
+            ['"John Smith" <john@example.com>', 31, '"John Smith" <john@example.com>'],
+            ['"John Smith" <john@example.com>', 30, '"John S..." <john@example.com>'],
+            ['"John Smith" <john@example.com>', 29, '"John ..." <john@example.com>'],
+            ['"John Smith" <john@example.com>', 25, '"J..." <john@example.com>'],
+            ['"John Smith" <john@example.com>', 24, '"Joh" <john@example.com>'],
+            ['"John Smith" <john@example.com>', 23, '"Jo" <john@example.com>'],
+            ['"John Smith" <john@example.com>', 22, '"J" <john@example.com>'],
+            ['"John Smith" <john@example.com>', 21, '<john@example.com>'],
+            ['"John Smith" <john@example.com>', 20, '<john@example.com>'],
+            ['"John Smith" <john@example.com>', 19, '<john@example.com>'],
+            ['"John Smith" <john@example.com>', 18, '<john@example.com>'],
+            ['"John Smith" <john@example.com>', 10, '<john@example.com>'],
+            ['John Smith <john@example.com> (Contact)', 255, 'John Smith <john@example.com> (Contact)'],
+            ['John Smith <john@example.com> (Contact)', 39, 'John Smith <john@example.com> (Contact)'],
+            ['John Smith <john@example.com> (Contact)', 38, 'John Smith <john@example.com>'],
+            ['John Smith <john@example.com> (Contact)', 29, 'John Smith <john@example.com>'],
+            ['John Smith <john@example.com> (Contact)', 28, 'John S... <john@example.com>'],
+            ['"John Smith" <john@example.com> (Contact)', 255, '"John Smith" <john@example.com> (Contact)'],
+            ['"John Smith" <john@example.com> (Contact)', 41, '"John Smith" <john@example.com> (Contact)'],
+            ['"John Smith" <john@example.com> (Contact)', 40, '"John Smith" <john@example.com>'],
+            ['"John Smith" <john@example.com> (Contact)', 31, '"John Smith" <john@example.com>'],
+            ['"John Smith" <john@example.com> (Contact)', 30, '"John S..." <john@example.com>'],
+        ];
+    }
 }
