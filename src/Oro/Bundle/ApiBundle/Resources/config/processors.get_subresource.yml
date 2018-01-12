@@ -29,15 +29,6 @@ services:
     # security_check
     #
 
-    oro_api.get_subresource.parent_entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@security.authorization_checker'
-            - VIEW
-        tags:
-            - { name: oro.api.processor, action: get_subresource, group: security_check, priority: 10 }
-
     #
     # build_query
     #

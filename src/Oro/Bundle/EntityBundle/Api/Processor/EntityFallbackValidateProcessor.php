@@ -2,31 +2,34 @@
 
 namespace Oro\Bundle\EntityBundle\Api\Processor;
 
+use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
-use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Util\ContextErrorUtilTrait;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
-use Oro\Bundle\EntityBundle\Exception\Fallback\Api\InvalidIncludedFallbackItemException;
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * @todo this processor should be replaced with a validator in BAP-15805
+ */
 class EntityFallbackValidateProcessor implements ProcessorInterface
 {
-    use ContextErrorUtilTrait;
-
     /**
      * @var EntityFallbackResolver
      */
-    protected $fallbackResolver;
+    private $fallbackResolver;
 
     /**
      * @var null|string
      */
-    protected $entityIncludedType;
+    private $entityIncludedType;
 
     /**
      * @param EntityFallbackResolver $fallbackResolver
@@ -48,24 +51,19 @@ class EntityFallbackValidateProcessor implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
+        /** @var Context|FormContext $context */
+
         $mainClass = $context->get(Context::CLASS_NAME);
         $requestData = $context->getRequestData();
         if (!array_key_exists(JsonApiDoc::INCLUDED, $requestData)) {
             return;
         }
 
-        try {
-            $includedData = $this->getCompatibleIncludedRelations($requestData, $this->entityIncludedType);
-        } catch (InvalidIncludedFallbackItemException $e) {
-            // convert validation exceptions into a context type error
-            $this->addError(
-                $this->buildPointer([JsonApiDoc::INCLUDED, $this->entityIncludedType]),
-                $e->getMessage(),
-                $context
-            );
-
+        $includedData = $this->getCompatibleIncludedRelations($requestData, $this->entityIncludedType, $context);
+        if (empty($includedData)) {
             return;
         }
+
         $relations = $this->getCompatibleRelations($requestData[JsonApiDoc::DATA][JsonApiDoc::RELATIONSHIPS]);
 
         // match included data with relationships section, and validate entity fallback values provided
@@ -76,7 +74,7 @@ class EntityFallbackValidateProcessor implements ProcessorInterface
                     if (false === $this->isFallbackRequestItemValid($relationName, $includedItem, $mainClass)) {
                         $this->addError(
                             $this->buildPointer([JsonApiDoc::INCLUDED, $this->entityIncludedType]),
-                            (new InvalidIncludedFallbackItemException($includedItem[JsonApiDoc::ID]))->getMessage(),
+                            $this->getInvalidIncludedFallbackItemMessage($includedItem[JsonApiDoc::ID]),
                             $context
                         );
                         break;
@@ -90,7 +88,7 @@ class EntityFallbackValidateProcessor implements ProcessorInterface
      * @param array $relations
      * @return array
      */
-    protected function getCompatibleRelations(array $relations)
+    private function getCompatibleRelations(array $relations)
     {
         return array_filter(
             $relations,
@@ -107,7 +105,7 @@ class EntityFallbackValidateProcessor implements ProcessorInterface
      * @param string $mainEntityClass
      * @return bool
      */
-    protected function isFallbackRequestItemValid($relationName, $fallbackRequestData, $mainEntityClass)
+    private function isFallbackRequestItemValid($relationName, $fallbackRequestData, $mainEntityClass)
     {
         $fallbackFiltered = array_filter(
             $fallbackRequestData[JsonApiDoc::ATTRIBUTES],
@@ -168,10 +166,10 @@ class EntityFallbackValidateProcessor implements ProcessorInterface
     /**
      * @param array $requestData
      * @param string $entityIncludedType
+     * @param Context $context
      * @return array
-     * @throws InvalidIncludedFallbackItemException
      */
-    protected function getCompatibleIncludedRelations(array $requestData, $entityIncludedType)
+    private function getCompatibleIncludedRelations(array $requestData, $entityIncludedType, Context $context)
     {
         $result = [];
 
@@ -183,12 +181,61 @@ class EntityFallbackValidateProcessor implements ProcessorInterface
             }
 
             if (!isset($includedItem[JsonApiDoc::ATTRIBUTES])) {
-                throw new InvalidIncludedFallbackItemException($includedItemIndex);
+                $this->addError(
+                    $this->buildPointer([JsonApiDoc::INCLUDED, $this->entityIncludedType]),
+                    $this->getInvalidIncludedFallbackItemMessage($includedItemIndex),
+                    $context
+                );
+                $result = [];
+                break;
             }
 
             $result[$includedItem[JsonApiDoc::ID]] = $includedItem;
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $itemId
+     *
+     * @return string
+     */
+    private function getInvalidIncludedFallbackItemMessage($itemId)
+    {
+        return sprintf(
+            "Invalid entity fallback value provided for the included value with id '%s'." .
+            " Please provide a correct id, and an attribute section with either a '%s' identifier, an '%s' or '%s'",
+            $itemId,
+            EntityFieldFallbackValue::FALLBACK_PARENT_FIELD,
+            EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD,
+            EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD
+        );
+    }
+
+    /**
+     * @param string $pointer
+     * @param string $message
+     * @param Context $context
+     */
+    private function addError($pointer, $message, Context $context)
+    {
+        $error = Error::createValidationError(Constraint::REQUEST_DATA, $message)
+            ->setSource(ErrorSource::createByPointer($pointer));
+
+        $context->addError($error);
+    }
+
+    /**
+     * @param array $properties
+     * @param string|null $parentPointer
+     * @return string
+     *
+     */
+    private function buildPointer(array $properties, $parentPointer = null)
+    {
+        array_unshift($properties, $parentPointer);
+
+        return implode('/', $properties);
     }
 }

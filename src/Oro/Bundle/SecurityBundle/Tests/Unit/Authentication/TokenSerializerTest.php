@@ -177,4 +177,72 @@ class TokenSerializerTest extends \PHPUnit_Framework_TestCase
             ['organizationId=1;userId=123;userClass=Oro\Bundle\UserBundle\Entity\User;roles1=ROLE_1'],
         ];
     }
+
+    public function testDeserializeSupportedTokenForDeletedUser()
+    {
+        $organization = new Organization();
+        $organization->setId(1);
+
+        $organizationRepo = $this->getMockBuilder(EntityRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $userRepo = $this->getMockBuilder(EntityRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrine->expects(self::exactly(2))
+            ->method('getRepository')
+            ->willReturnMap([
+                [Organization::class, null, $organizationRepo],
+                [User::class, null, $userRepo],
+            ]);
+        $organizationRepo->expects(self::once())
+            ->method('find')
+            ->with(1)
+            ->willReturn($organization);
+        $userRepo->expects(self::once())
+            ->method('find')
+            ->with(123)
+            ->willReturn(null);
+
+        /** @var ImpersonationToken $token */
+        $token = $this->tokenSerializer->deserialize(
+            'organizationId=1;userId=123;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_1,ROLE_2'
+        );
+
+        self::assertNull($token);
+    }
+
+    public function testDeserializeSupportedTokenForDeletedOrganization()
+    {
+        $user = new User();
+        $user->setId(123);
+
+        $organizationRepo = $this->getMockBuilder(EntityRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $userRepo = $this->getMockBuilder(EntityRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrine->expects(self::exactly(2))
+            ->method('getRepository')
+            ->willReturnMap([
+                [Organization::class, null, $organizationRepo],
+                [User::class, null, $userRepo],
+            ]);
+        $organizationRepo->expects(self::once())
+            ->method('find')
+            ->with(1)
+            ->willReturn(null);
+        $userRepo->expects(self::once())
+            ->method('find')
+            ->with(123)
+            ->willReturn($user);
+
+        /** @var ImpersonationToken $token */
+        $token = $this->tokenSerializer->deserialize(
+            'organizationId=1;userId=123;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_1,ROLE_2'
+        );
+
+        self::assertNull($token);
+    }
 }

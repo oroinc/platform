@@ -76,15 +76,8 @@ class RestJsonApiGetAndDeleteTest extends RestJsonApiTestCase
                         ['entity' => $entityType, 'filter[id]' => implode(',', $id)]
                     )
                 );
-                if ($response->getStatusCode() !== 204) {
-                    // process delete errors
-                    $data = self::jsonToArray($response->getContent());
-                    self::assertEquals(403, $response->getStatusCode());
-                    self::assertEquals($data['errors'][0]['title'], 'forbidden exception');
-                } elseif (!in_array('get', $excludedActions, true)) {
-                    // check if entity was really deleted
-                    $this->checkGetRequest($entityType, $id[0], 404);
-                }
+                // @todo: remove 400 and 403 status coded here
+                self::assertApiResponseStatusCodeEquals($response, [204, 400, 403], $entityType, 'delete_list');
             }
         }
     }
@@ -102,9 +95,7 @@ class RestJsonApiGetAndDeleteTest extends RestJsonApiTestCase
         );
         if ($response->getStatusCode() !== 204) {
             // process delete errors
-            $data = self::jsonToArray($response->getContent());
             self::assertEquals(403, $response->getStatusCode());
-            self::assertEquals($data['errors'][0]['title'], 'forbidden exception');
         } elseif (!in_array('get', $excludedActions, true)) {
             // check if entity was really deleted
             $this->checkGetRequest($entityType, $id, 404);

@@ -284,17 +284,17 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     }
 
     /**
-     * Delete all context from active (collapsed) item in activity list
-     * Example: And delete all contexts from collapsed email
+     * Example: And delete "John Doe" context from collapsed email
      *
-     * @When /^(?:|I )delete all contexts from collapsed ([\w\s]*)$/
+     * @When /^(?:|I )delete "(?P<content>[\w\s]+)" context from collapsed ([\w\s]*)$/
+     * @param string $content
      */
-    public function deleteAllContextsFromActionItem()
+    public function deleteContextFromActionItem($content)
     {
         /** @var ActivityList $activityList */
         $activityList = $this->createElement('Activity List');
         $collapsedItem = $activityList->getCollapsedItem();
-        $collapsedItem->deleteAllContexts();
+        $collapsedItem->deleteContext($content);
     }
 
     /**

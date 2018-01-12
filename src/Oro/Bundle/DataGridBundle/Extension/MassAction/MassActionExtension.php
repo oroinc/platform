@@ -2,19 +2,22 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class MassActionExtension extends AbstractExtension
 {
     const METADATA_ACTION_KEY = 'massActions';
     const ACTION_KEY          = 'mass_actions';
+    const ALLOWED_REQUEST_TYPES   = 'allowedRequestTypes';
+    const ALLOWED_REQUEST_METHODS = ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'];
 
     /** @var MassActionFactory */
     protected $actionFactory;
@@ -140,6 +143,21 @@ class MassActionExtension extends AbstractExtension
         $actionConfig['token'] = $this->tokenManager->getToken($actionName)->getValue();
 
         $action = $this->actionFactory->createAction($actionName, $actionConfig);
+        $configuredTypes = $action->getOptions()->offsetGetByPath(self::ALLOWED_REQUEST_TYPES);
+
+        if ($configuredTypes) {
+            $foundTypes = array_intersect(array_map('strtoupper', $configuredTypes), self::ALLOWED_REQUEST_METHODS);
+            if (count($foundTypes) !== count($configuredTypes)) {
+                throw new RuntimeException(
+                    sprintf(
+                        'Action parameter "%s" contains wrong HTTP method. Given "%s", allowed: "%s".',
+                        self::ALLOWED_REQUEST_TYPES,
+                        implode(', ', $configuredTypes),
+                        implode(', ', self::ALLOWED_REQUEST_METHODS)
+                    )
+                );
+            }
+        }
 
         $aclResource = $action->getAclResource();
         if ($aclResource && !$this->authorizationChecker->isGranted($aclResource)) {

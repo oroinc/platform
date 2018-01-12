@@ -695,17 +695,17 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
         $crawler = new Crawler($row->getHtml());
         /** @var Crawler[] $columns */
-        $columns = $crawler->filter('td')->siblings()->each(function (Crawler $td) {
+        $columns = $crawler->filter('td')->each(function (Crawler $td) {
             return $td;
         });
 
         foreach ($table->getRows() as list($header, $value)) {
             $columnNumber = $gridHeader->getColumnNumber($header);
-            $actualValue = trim($columns[$columnNumber - 1]->text());
+            $actualValue = trim($columns[$columnNumber]->text());
             // removing multiple spaces, newlines, tabs
             $actualValue = trim(preg_replace('/[\s\t\n\r\x{00a0}]+/iu', " ", $actualValue));
 
-            $html = trim($columns[$columnNumber - 1]->html());
+            $html = trim($columns[$columnNumber]->html());
             // remove "Edit" suffix from value, if it comes from editable cell
             if (preg_match('/<i[^>]+>Edit<\/i>$/iu', $html) === 1) {
                 $actualValue = substr($actualValue, 0, -4);

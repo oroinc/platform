@@ -61,4 +61,15 @@ class HistoryItemRepository extends EntityRepository implements NavigationReposi
 
         return $qb->getQuery()->getArrayResult();
     }
+
+    public function clearHistoryItems(\DateTime $dateTime)
+    {
+        $qb = $this->createQueryBuilder('navigation_history')
+            ->delete()
+            ->where('navigation_history.visitedAt < :dateTime')
+            ->setParameter('dateTime', $dateTime);
+
+        return $qb->getQuery()
+            ->execute();
+    }
 }

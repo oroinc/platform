@@ -2,13 +2,16 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Translation\TranslatorInterface;
-
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Action\Action\FlashMessage;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class FlashMessageTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,6 +26,11 @@ class FlashMessageTest extends \PHPUnit_Framework_TestCase
     protected $translator;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|HtmlTagHelper
+     */
+    protected $htmlTagHelper;
+
+    /**
      * @var FlashMessage
      */
     protected $action;
@@ -30,14 +38,13 @@ class FlashMessageTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->contextAccessor = new ContextAccessor();
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->getMock();
-        $this->action = new FlashMessage($this->contextAccessor, $this->translator);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
 
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->action = new FlashMessage($this->contextAccessor, $this->translator, $this->htmlTagHelper);
+
+        /** @var EventDispatcherInterface $dispatcher */
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->action->setDispatcher($dispatcher);
     }
 
@@ -84,8 +91,11 @@ class FlashMessageTest extends \PHPUnit_Framework_TestCase
             'type_path' => 'concreteType',
             'message_path' => 'concreteMessage'
         ];
+
         $context = new ItemStub($contextData);
         $translatedMessage = 'Translated';
+        $sanitizedMessage = 'Sanitized';
+
         $options = [
             'message' => new PropertyPath('message_path'),
             'type' => new PropertyPath('type_path'),
@@ -96,30 +106,30 @@ class FlashMessageTest extends \PHPUnit_Framework_TestCase
         ];
         $this->action->initialize($options);
 
-        $flashBag = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface')
-            ->getMock();
+        $flashBag = $this->createMock(FlashBagInterface::class);
         $flashBag->expects($this->once())
             ->method('add')
-            ->with('concreteType', $translatedMessage);
+            ->with('concreteType', $sanitizedMessage);
 
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $session = $this->createMock(Session::class);
         $session->expects($this->once())
             ->method('getFlashBag')
-            ->will($this->returnValue($flashBag));
+            ->willReturn($flashBag);
 
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $request = $this->createMock(Request::class);
         $request->expects($this->once())
             ->method('getSession')
-            ->will($this->returnValue($session));
+            ->willReturn($session);
 
         $this->translator->expects($this->once())
             ->method('trans')
             ->with('concreteMessage', ['%some%' => 'other', '%other%' => 'val1'])
-            ->will($this->returnValue($translatedMessage));
+            ->willReturn($translatedMessage);
+
+        $this->htmlTagHelper->expects($this->once())
+            ->method('sanitize')
+            ->with($translatedMessage)
+            ->willReturn($sanitizedMessage);
 
         $this->action->setRequest($request);
         $this->action->execute($context);

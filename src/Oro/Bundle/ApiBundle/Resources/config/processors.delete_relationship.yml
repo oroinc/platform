@@ -29,50 +29,13 @@ services:
     # security_check
     #
 
-    oro_api.delete_relationship.parent_entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@security.authorization_checker'
-            - EDIT
-        tags:
-            - { name: oro.api.processor, action: delete_relationship, group: security_check, priority: 10 }
-
-    # VIEW permissions for the parent entity are required because the response may contains the updated relationship
-    oro_api.delete_relationship.parent_entity_type_security_check.view:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@security.authorization_checker'
-            - VIEW
-            - true
-        tags:
-            - { name: oro.api.processor, action: delete_relationship, group: security_check, priority: 5 }
-
     #
     # load_data
     #
 
-    oro_api.delete_relationship.parent_entity_object_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityObjectSecurityCheck
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@security.authorization_checker'
-            - EDIT
-        tags:
-            - { name: oro.api.processor, action: delete_relationship, group: security_check, priority: -30 }
-
     #
     # transform_data
     #
-
-    oro_api.delete_relationship.initialize_api_form_extension:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\InitializeApiFormExtension
-        arguments:
-            - '@form.registry'
-            - '@oro_api.form.guesser.metadata'
-        tags:
-            - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: 250 }
 
     oro_api.delete_relationship.build_form_builder:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\DeleteRelationship\BuildFormBuilder
@@ -81,18 +44,6 @@ services:
             - '@form.property_accessor'
         tags:
             - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: 100 }
-
-    oro_api.delete_relationship.submit_form:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\SubmitForm
-        tags:
-            - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: -50 }
-
-    oro_api.delete_relationship.collect_form_errors:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\CollectFormErrors
-        arguments:
-            - '@oro_api.constraint_text_extractor'
-        tags:
-            - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: -100 }
 
     #
     # save_data

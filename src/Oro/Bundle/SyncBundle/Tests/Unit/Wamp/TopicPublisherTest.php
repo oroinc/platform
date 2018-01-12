@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Wamp;
 
+use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 use Oro\Bundle\SyncBundle\Wamp\WebSocket;
 
@@ -50,6 +51,13 @@ class TopicPublisherTest extends \PHPUnit_Framework_TestCase
     public function testCheckFalse()
     {
         $this->wamp = new TopicPublisher('example.com', 1);
+        $ticketProvider = $this->createMock(TicketProvider::class);
+        $ticketProvider->expects($this->once())
+            ->method('generateTicket')
+            ->with(true)
+            ->willReturn('test_ticket');
+        $this->wamp->setTicketProvider($ticketProvider);
+
         $this->assertFalse($this->wamp->check());
     }
 }

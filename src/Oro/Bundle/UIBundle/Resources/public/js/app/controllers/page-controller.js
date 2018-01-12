@@ -252,7 +252,7 @@ define([
             if (_.isObject(data)) {
                 model.set(data, options);
             } else {
-                errorHandler.showError(new Error(__('Unexpected content format')));
+                errorHandler.showError(new Error(__('oro.ui.error.unexpected')));
             }
 
             this.publishEvent('page:error', model.getAttributes(), options.actionArgs, jqXHR);

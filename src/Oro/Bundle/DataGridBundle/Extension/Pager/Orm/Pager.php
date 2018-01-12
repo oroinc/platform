@@ -281,4 +281,12 @@ class Pager extends AbstractPager
 
         return $results[0];
     }
+
+    /**
+     * @param array $countQueryHints
+     */
+    public function setCountQueryHints(array $countQueryHints)
+    {
+        $this->countQueryHints = $countQueryHints;
+    }
 }

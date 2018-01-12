@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Create;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -62,12 +61,8 @@ class SaveEntity implements ProcessorInterface
 
         // save entity id into the Context
         if (!$context->hasErrors()) {
-            $metadata = $em->getClassMetadata(ClassUtils::getClass($entity));
-            $id = $metadata->getIdentifierValues($entity);
-            if (!empty($id)) {
-                if (1 === count($id)) {
-                    $id = reset($id);
-                }
+            $id = $context->getMetadata()->getIdentifierValue($entity);
+            if (null !== $id) {
                 $context->setId($id);
             }
         }

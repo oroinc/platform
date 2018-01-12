@@ -145,7 +145,7 @@ class TokenSerializer implements TokenSerializerInterface
      * @param string   $userClass
      * @param string[] $roles
      *
-     * @return TokenInterface
+     * @return TokenInterface|null
      */
     private function createToken($organizationId, $userId, $userClass, array $roles)
     {
@@ -153,6 +153,10 @@ class TokenSerializer implements TokenSerializerInterface
 
         /** @var AbstractUser $user */
         $user = $this->doctrine->getRepository($userClass)->find($userId);
+
+        if (null === $organization || null === $user) {
+            return null;
+        }
 
         $roleObjects = [];
         $allRoles = $user->getRoles();

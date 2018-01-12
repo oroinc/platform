@@ -9,8 +9,37 @@ define([
 
     $.widget('orofilter.multiselect', $.ech.multiselect, {
         options: _.extend({}, $.ech.multiselect.prototype.options, {
+            outerTrigger: null,
             refreshNotOpened: true
         }),
+
+        _create: function() {
+            this.outerTrigger = this.options.outerTrigger;
+            this._superApply(arguments);
+        },
+
+        _bindEvents: function() {
+            var self = this;
+
+            this._bindButtonEvents();
+            this._bindMenuEvents();
+            this._bindHeaderEvents();
+
+            // close each widget when clicking on any other element/anywhere else on the page
+            $(document).on('mousedown.' + self._namespaceID, function(event) {
+                if (self._isOpen && self._isExcluded(event.target)) {
+                    self.close();
+                }
+            });
+
+            // deal with form resets.  the problem here is that buttons aren't
+            // restored to their defaultValue prop on form reset, and the reset
+            // handler fires before the form is actually reset.  delaying it a bit
+            // gives the form inputs time to clear.
+            $(this.element[0].form).on('reset.' + this._namespaceID, function() {
+                setTimeout($.proxy(self.refresh, self), 10);
+            });
+        },
 
         /**
          * Bind update position method after menu is opened
@@ -77,6 +106,21 @@ define([
                 .addClass('hidden-item');
             this._super();
             this.menu.find('.hidden-item').removeClass('hidden-item');
+        },
+
+        _isExcluded: function(target) {
+            var $target = $(target);
+            var isMenu = !!$target.closest(this.menu).length;
+            var isButton = !!$target.closest(this.button).length;
+            var isOuterTrigger = false;
+
+            if (this.outerTrigger && (this.outerTrigger instanceof $) && this.outerTrigger.length) {
+                isOuterTrigger = !!$target.closest(this.outerTrigger).length;
+            }
+
+            return !isMenu &&
+                   !isButton &&
+                   !isOuterTrigger;
         }
     });
 

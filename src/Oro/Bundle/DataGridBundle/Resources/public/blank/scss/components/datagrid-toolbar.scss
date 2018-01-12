@@ -72,6 +72,10 @@
             min-width: 64px;
         }
     }
+
+    .action-selectbox-custom-in-pager {
+        display: inline-block;
+    }
 }
 
 .datagrid-tool {
@@ -186,7 +190,7 @@
     .grid-toolbar {
         justify-content: space-between;
 
-        .action-selectbox_custom_in-pager {
+        .action-selectbox-custom-in-pager {
             margin-right: $offset-x-s;
         }
     }
