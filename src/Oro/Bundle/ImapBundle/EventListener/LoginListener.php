@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\EventListener;
+namespace Oro\Bundle\ImapBundle\EventListener;
 
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
-use Oro\Bundle\EmailBundle\EmailSyncCredentials\SyncCredentialsIssueManager;
+use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**

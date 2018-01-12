@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\EmailSyncCredentials\NotificationSender;
+namespace Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\EmailBundle\EmailSyncCredentials\NotificationSenderInterface;
+use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSenderInterface;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
 /**
@@ -35,9 +35,9 @@ class FlashBagNotificationSender implements NotificationSenderInterface
     public function sendNotification(UserEmailOrigin $emailOrigin)
     {
         if ($emailOrigin->getOwner()) {
-            $notificationMessage = 'oro.email.sync.flash_message.user_box_failed';
+            $notificationMessage = 'oro.imap.sync.flash_message.user_box_failed';
         } else {
-            $notificationMessage = 'oro.email.sync.flash_message.system_box_failed';
+            $notificationMessage = 'oro.imap.sync.flash_message.system_box_failed';
         }
 
         $translatedMessage = $this->translator->trans(

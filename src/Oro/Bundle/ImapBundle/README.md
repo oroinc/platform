@@ -72,3 +72,12 @@ Email synchronization functionality is implemented in the following classes:
  - ImapEmailSynchronizer - extends OroEmailBundle\Sync\AbstractEmailSynchronizer class to work with IMAP mailboxes.
  - ImapEmailSynchronizationProcessor - implements email synchronization algorithm used for synchronize emails through IMAP.
  - EmailSyncCommand - allows to execute email synchronization as CRON job or through command line.
+
+If during synchronization will be detected that conditions for email box not valid already, the owner of this email box will be notified about this:
+
+ - after success login, the owner of the email box will receive flash message;
+ - if the clank server is turned-on, user will receive messages about this issue;
+ - an email to user's email address will be send.
+
+For the system email boxes that has no owner, there is an `oro_imap_sync_origin_credential_notifications` capability. In case if role has access with this
+capability, all the users with this role will receive similar messages as for the user's email box.

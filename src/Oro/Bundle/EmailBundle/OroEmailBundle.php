@@ -12,7 +12,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass;
 use Oro\Component\PhpUtils\ClassLoader;
 use Oro\Bundle\EmailBundle\Async\Topics;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\CredentialsNotificationSenderPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailBodyLoaderPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailOwnerConfigurationPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailSynchronizerPass;
@@ -62,7 +61,6 @@ class OroEmailBundle extends Bundle
         $container->addCompilerPass(new EmailRecipientsProviderPass());
         $container->addCompilerPass(new MailboxProcessPass());
         $container->addCompilerPass(new OverrideServiceSwiftMailer());
-        $container->addCompilerPass(new CredentialsNotificationSenderPass());
 
         $container->addCompilerPass(
             new TaggedServiceLinkRegistryCompilerPass(

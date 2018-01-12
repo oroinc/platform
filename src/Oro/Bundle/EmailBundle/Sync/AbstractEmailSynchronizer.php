@@ -7,9 +7,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\EmailBundle\EmailSyncCredentials\SyncCredentialsIssueManager;
-use Oro\Bundle\EmailBundle\Exception\InvalidCredentialsException;
-use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -60,9 +57,6 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     /** @var string */
     protected $clearInterval = 'P1D';
 
-    /** @var SyncCredentialsIssueManager */
-    private $credentialsIssueManager;
-
     /**
      * Constructor
      *
@@ -93,14 +87,6 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     {
         $this->tokenStorage = $tokenStorage;
         $this->currentToken = $tokenStorage->getToken();
-    }
-
-    /**
-     * @param SyncCredentialsIssueManager $credentialsIssueManager
-     */
-    public function setCredentialsManager(SyncCredentialsIssueManager $credentialsIssueManager)
-    {
-        $this->credentialsIssueManager = $credentialsIssueManager;
     }
 
     /**
@@ -175,18 +161,8 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
             } catch (ORMException $ex) {
                 $failedOriginIds[] = $origin->getId();
                 break;
-            } catch (InvalidCredentialsException $ex) {
-                // save information of invalid origin
-                $this->credentialsIssueManager->addInvalidOrigin($origin);
-                $failedOriginIds[] = $origin->getId();
-                break;
             } catch (\Exception $ex) {
                 $failedOriginIds[] = $origin->getId();
-            }
-
-            // remove success processed origin
-            if ($origin instanceof UserEmailOrigin) {
-                $this->credentialsIssueManager->removeOriginFromTheFailed($origin);
             }
 
             if ($maxTasks > 0 && count($processedOrigins) >= $maxTasks) {

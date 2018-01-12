@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\EmailSyncCredentials\Driver;
+namespace Oro\Bundle\ImapBundle\OriginSyncCredentials\Driver;
 
 use Psr\Log\LoggerInterface;
 
@@ -9,7 +9,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\EmailBundle\EmailSyncCredentials\WrongCredentialsOriginsDriverInterface;
+use Oro\Bundle\ImapBundle\OriginSyncCredentials\WrongCredentialsOriginsDriverInterface;
 
 /**
  * DBAL Storage of wrong credential sync origins.
@@ -35,22 +35,29 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
     /**
      * {@inheritdoc}
      */
-    public function addOrigin($emailOriginId, $ownerId)
+    public function addOrigin($emailOriginId, $ownerId = null)
     {
-        $this->logger->notice('Invalid sync origin was detected.', ['origin_id' => $emailOriginId]);
+        $this->logger->notice('Email origin with wrong credentials was detected.', ['origin_id' => $emailOriginId]);
         $connection = $this->getConnection();
-        $existingRecord = $connection->createQueryBuilder()
+        $request = $connection->createQueryBuilder()
             ->select('origin_id')
-            ->from('oro_email_wrong_creds_origin')
-            ->where('origin_id = :emailOriginId')
-            ->andWhere('owner_id = :ownerId')
-            ->setParameters(['emailOriginId' => $emailOriginId, 'ownerId' => $ownerId])
+            ->from('oro_imap_wrong_creds_origin')
+            ->where('origin_id = :emailOriginId');
+        if ($ownerId) {
+            $request->andWhere('owner_id = :ownerId')
+                ->setParameter('ownerId', $ownerId);
+        } else {
+            $request->andWhere('owner_id is null');
+        }
+
+        $existingRecord = $request
+            ->setParameter('emailOriginId', $emailOriginId)
             ->execute()
             ->fetchColumn();
 
         if (!$existingRecord) {
             $connection->insert(
-                'oro_email_wrong_creds_origin',
+                'oro_imap_wrong_creds_origin',
                 ['origin_id' => $emailOriginId, 'owner_id' => $ownerId]
             );
         }
@@ -61,17 +68,21 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
      */
     public function getAllOrigins()
     {
+        $origins = [];
+
         $wrongOriginIds = $this->getConnection()->createQueryBuilder()
             ->select('origin_id')
-            ->from('oro_email_wrong_creds_origin')
+            ->from('oro_imap_wrong_creds_origin')
             ->execute()
             ->fetchAll();
 
-        $origins =  $this->getOriginRepository()->createQueryBuilder('o')
-            ->where('o.id in (:ids)')
-            ->setParameter('ids', $wrongOriginIds)
-            ->getQuery()
-            ->getResult();
+        if (count($wrongOriginIds)) {
+            $origins =  $this->getOriginRepository()->createQueryBuilder('o')
+                ->where('o.id in (:ids)')
+                ->setParameter('ids', $wrongOriginIds)
+                ->getQuery()
+                ->getResult();
+        }
 
         return $origins;
     }
@@ -81,9 +92,11 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
      */
     public function getAllOriginsByOwnerId($ownerId = null)
     {
+        $origins = [];
+
         $request = $this->getConnection()->createQueryBuilder()
             ->select('origin_id')
-            ->from('oro_email_wrong_creds_origin');
+            ->from('oro_imap_wrong_creds_origin');
 
         if ($ownerId) {
             $request->andWhere('owner_id = :ownerId')
@@ -95,11 +108,13 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
         $wrongOriginIds = $request->execute()
             ->fetchAll();
 
-        $origins =  $this->getOriginRepository()->createQueryBuilder('o')
-            ->where('o.id in (:ids)')
-            ->setParameter('ids', $wrongOriginIds)
-            ->getQuery()
-            ->getResult();
+        if (count($wrongOriginIds)) {
+            $origins =  $this->getOriginRepository()->createQueryBuilder('o')
+                ->where('o.id in (:ids)')
+                ->setParameter('ids', $wrongOriginIds)
+                ->getQuery()
+                ->getResult();
+        }
 
         return $origins;
     }
@@ -107,9 +122,13 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
     /**
      * {@inheritdoc}
      */
-    public function deleteOrigin($emailOrigin)
+    public function deleteOrigin($emailOriginId)
     {
-        $this->getConnection()->delete('oro_email_wrong_creds_origin', ['origin_id' => $emailOrigin]);
+        $this->logger->debug(
+            'Remove email origin from wrong credentials origins info storage.',
+            ['origin_id' => $emailOriginId]
+        );
+        $this->getConnection()->delete('oro_imap_wrong_creds_origin', ['origin_id' => $emailOriginId]);
     }
 
     /**
@@ -117,8 +136,8 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
      */
     public function deleteAllOrigins()
     {
-        $this->logger->debug('Clear the origins info storage.');
-        $this->getConnection()->exec('DELETE FROM oro_email_wrong_creds_origin');
+        $this->logger->debug('Clear email origin with wrong credentials storage.');
+        $this->getConnection()->exec('DELETE FROM oro_imap_wrong_creds_origin');
     }
 
     /**

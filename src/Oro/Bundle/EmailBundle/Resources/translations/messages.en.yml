@@ -382,14 +382,7 @@ oro:
                 success: Email sync completed.
                 error: Email sync failed.
                 processing: Email sync has started. Please wait, the grid will be updated after it is complete...
-        sync:
-            flash_message:
-                user_box_failed: The synchronization of your email box with username "%username%" and host "%host%" was failed. Please check the credentials at the email configuraton page.
-                system_box_failed: The synchronization of the system email box with username "%username%" and host "%host%" was failed. Please check the credentials at the email configuraton page.
-            acl:
-                credential_system_notifications:
-                    label: Recive notification messages for wrong system mail boxes
-                    description: In case if the sync of system mailbox was not sucsessful by wrong credentials, the user will recive the message about this system mail box.
+
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
 "Sent": "Sent"

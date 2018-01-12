@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\EmailSyncCredentials\NotificationSender;
+namespace Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender;
 
-use Oro\Bundle\EmailBundle\EmailSyncCredentials\NotificationSenderInterface;
+use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSenderInterface;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 
@@ -28,9 +28,10 @@ class SocketNotificationSender implements NotificationSenderInterface
     public function sendNotification(UserEmailOrigin $emailOrigin)
     {
         $originOwner = $emailOrigin->getOwner();
-        $topicName = $originOwner ? 'oro/email_sync_fail_u_' . $originOwner->getId() : 'oro/email_sync_fail_system';
+        $topicName = $originOwner ? 'oro/imap_sync_fail_u_' . $originOwner->getId() : 'oro/imap_sync_fail_system';
 
-        $this->topicPublisher->send($topicName,
+        $this->topicPublisher->send(
+            $topicName,
             [
                 'username' => $emailOrigin->getUser(),
                 'host' => $emailOrigin->getImapHost()

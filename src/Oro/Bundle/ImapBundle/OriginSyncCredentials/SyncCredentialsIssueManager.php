@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\EmailSyncCredentials;
+namespace Oro\Bundle\ImapBundle\OriginSyncCredentials;
 
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -88,21 +88,17 @@ class SyncCredentialsIssueManager
         $this->credentialsDriver->deleteAllOrigins();
     }
 
+    /**
+     * Sends the messages to the notification channels about the given user's wrong credential sync email boxes
+     * and deletes the information about wrong boxes from the storage to avoid notification duplications.
+     *
+     * @param User $user
+     */
     public function processInvalidOriginsForUser(User $user)
     {
         $this->processUserOrigins($this->credentialsDriver->getAllOriginsByOwnerId($user->getId()));
-        if ($this->authorizationChecker->isGranted('oro_email_credential_system_notifications')) {
+        if ($this->authorizationChecker->isGranted('oro_imap_sync_origin_credential_notifications')) {
             $this->processUserOrigins($this->credentialsDriver->getAllOriginsByOwnerId());
-        }
-    }
-
-    private function processUserOrigins(array $invalidOrigins)
-    {
-        foreach ($invalidOrigins as $invalidOrigin) {
-            foreach ($this->userNotificationSenders as $notificationSender) {
-                $notificationSender->sendNotification($invalidOrigin);
-            }
-            $this->credentialsDriver->deleteOrigin($invalidOrigin->getId());
         }
     }
 
@@ -114,5 +110,20 @@ class SyncCredentialsIssueManager
     public function removeOriginFromTheFailed(UserEmailOrigin $emailOrigin)
     {
         $this->credentialsDriver->deleteOrigin($emailOrigin->getId());
+    }
+
+    /**
+     * Sends the messages to user notification channels
+     *
+     * @param array $invalidOrigins
+     */
+    private function processUserOrigins(array $invalidOrigins)
+    {
+        foreach ($invalidOrigins as $invalidOrigin) {
+            foreach ($this->userNotificationSenders as $notificationSender) {
+                $notificationSender->sendNotification($invalidOrigin);
+            }
+            $this->credentialsDriver->deleteOrigin($invalidOrigin->getId());
+        }
     }
 }
