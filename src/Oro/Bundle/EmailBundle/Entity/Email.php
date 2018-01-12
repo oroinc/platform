@@ -96,7 +96,7 @@ class Email extends ExtendEmail
     /**
      * @var string
      *
-     * @ORM\Column(name="from_name", type="string", length=255)
+     * @ORM\Column(name="from_name", type="string", length=320)
      * @JMS\Type("string")
      */
     protected $fromName;

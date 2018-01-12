@@ -77,7 +77,7 @@ class TranslationControllerTest extends WebTestCase
             $this->getReference(LoadTranslations::TRANSLATION2)->getId(),
         ];
 
-        $this->client->request('GET', $this->getUrl('oro_translation_mass_reset', [
+        $this->client->request('POST', $this->getUrl('oro_translation_mass_reset', [
             'gridName' => self::DATAGRID_NAME,
             'actionName' => self::RESET_ACTION_NAME,
             'inset' => 1,
@@ -100,7 +100,7 @@ class TranslationControllerTest extends WebTestCase
 
     public function testMassResetError()
     {
-        $this->client->request('GET', $this->getUrl('oro_translation_mass_reset', [
+        $this->client->request('POST', $this->getUrl('oro_translation_mass_reset', [
             'gridName' => self::DATAGRID_NAME,
             'actionName' => self::RESET_ACTION_NAME,
             'inset' => 1,

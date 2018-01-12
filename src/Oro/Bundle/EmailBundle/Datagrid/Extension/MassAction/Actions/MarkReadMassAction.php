@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction\Actions;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction\MarkMassActionHandler;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
+use Symfony\Component\HttpFoundation\Request;
 
 class MarkReadMassAction extends AbstractMassAction
 {
@@ -40,5 +41,21 @@ class MarkReadMassAction extends AbstractMassAction
         $options['confirmation'] = false;
 
         return parent::setOptions($options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAllowedRequestTypes()
+    {
+        return [Request::METHOD_POST];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getRequestType()
+    {
+        return Request::METHOD_POST;
     }
 }

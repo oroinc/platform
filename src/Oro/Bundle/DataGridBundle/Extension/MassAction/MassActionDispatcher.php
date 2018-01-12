@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class MassActionDispatcher
 {
+    const REQUEST_TYPE = 'request_type';
+
     /**
      * @var Manager
      */
@@ -63,7 +65,11 @@ class MassActionDispatcher
     {
         $parameters = $this->massActionParametersParser->parse($request);
 
-        $requestData = array_merge($request->query->all(), $request->request->all());
+        $requestData = array_merge(
+            $request->query->all(),
+            $request->request->all(),
+            [self::REQUEST_TYPE => $request->getMethod()]
+        );
 
         return $this->dispatch($datagridName, $actionName, $parameters, $requestData);
     }
@@ -107,12 +113,42 @@ class MassActionDispatcher
         // perform mass action
         $handler = $this->massActionHelper->getHandler($massAction);
 
+        $this->assertRequestType($massAction, $data);
+
         // Call service
         $resultIterator = $this->getIterator($datagrid, $massAction, $selectedItems);
 
         $handlerArgs = new MassActionHandlerArgs($massAction, $datagrid, $resultIterator, $data);
 
         return $handler->handle($handlerArgs);
+    }
+
+    /**
+     * Perform http method check
+     *
+     * @param MassActionInterface $massAction
+     * @param array $data
+     *
+     * @throws LogicException
+     */
+    protected function assertRequestType(MassActionInterface $massAction, array $data)
+    {
+        if (!isset($data[self::REQUEST_TYPE])) {
+            return;
+        }
+
+        if ($this->massActionHelper->isRequestMethodAllowed($massAction, $data[self::REQUEST_TYPE])) {
+            return;
+        }
+
+        throw new LogicException(
+            sprintf(
+                'There is not allowed "%s" HTTP method received. Please check "%s" parameter for action "%s"',
+                $data[self::REQUEST_TYPE],
+                MassActionExtension::ALLOWED_REQUEST_TYPES,
+                $massAction->getName()
+            )
+        );
     }
 
     /**

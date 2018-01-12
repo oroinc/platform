@@ -6,9 +6,9 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityObjectSecurityCheck;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorOrmRelatedTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
 
-class ParentEntityObjectSecurityCheckTest extends GetSubresourceProcessorOrmRelatedTestCase
+class ParentEntityObjectSecurityCheckTest extends GetSubresourceProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $authorizationChecker;
@@ -23,7 +23,6 @@ class ParentEntityObjectSecurityCheckTest extends GetSubresourceProcessorOrmRela
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $this->processor = new ParentEntityObjectSecurityCheck(
-            $this->doctrineHelper,
             $this->authorizationChecker,
             'VIEW'
         );
@@ -34,7 +33,7 @@ class ParentEntityObjectSecurityCheckTest extends GetSubresourceProcessorOrmRela
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenAccessGrantedForManageableParentEntity()
+    public function testProcessWhenAccessGranted()
     {
         $parentEntity = new Product();
 
@@ -51,7 +50,7 @@ class ParentEntityObjectSecurityCheckTest extends GetSubresourceProcessorOrmRela
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function testProcessWhenAccessDeniedForManageableParentEntity()
+    public function testProcessWhenAccessDenied()
     {
         $parentEntity = new Product();
 
@@ -59,20 +58,6 @@ class ParentEntityObjectSecurityCheckTest extends GetSubresourceProcessorOrmRela
             ->method('isGranted')
             ->with('VIEW', $this->identicalTo($parentEntity))
             ->willReturn(false);
-
-        $this->context->setParentClassName(get_class($parentEntity));
-        $this->context->setParentEntity($parentEntity);
-        $this->processor->process($this->context);
-    }
-
-    public function testAccessShouldBeAlwaysGrantedForNotManageableParentEntity()
-    {
-        $parentEntity = new \stdClass();
-
-        $this->notManageableClassNames = [get_class($parentEntity)];
-
-        $this->authorizationChecker->expects($this->never())
-            ->method('isGranted');
 
         $this->context->setParentClassName(get_class($parentEntity));
         $this->context->setParentEntity($parentEntity);
