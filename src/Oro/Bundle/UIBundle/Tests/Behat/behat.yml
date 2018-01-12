@@ -1,5 +1,20 @@
 oro_behat_extension:
+  suites:
+    OroUIBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroUIBundle::DragAndDropContext
+        - OroDataGridBundle::GridContext
+      paths:
+        - '@OroUIBundle/Tests/Behat/Features'
+
   elements:
+    Sidebar Drag Handler:
+      selector: '.ui-resizable-handle.ui-resizable-e.resizable-area'
+
+    Sidebar:
+      selector: '.content-with-sidebar--sidebar'
+
     Page:
       selector:
         type: xpath

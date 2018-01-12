@@ -1451,6 +1451,17 @@ class OroMainContext extends MinkContext implements
      */
     public function dragAndDropElementToAnotherOne($elementName, $dropZoneName, $xOffset = null, $yOffset = null)
     {
+        $this->dragAndDropElement($elementName, $dropZoneName, $xOffset, $yOffset);
+    }
+
+    /**
+     * @param string $elementName
+     * @param string $dropZoneName
+     * @param int $xOffset
+     * @param int $yOffset
+     */
+    public function dragAndDropElement($elementName, $dropZoneName, $xOffset = null, $yOffset = null)
+    {
         /** @var Selenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
         $webDriverSession = $driver->getWebDriverSession();
@@ -1463,19 +1474,38 @@ class OroMainContext extends MinkContext implements
         ]);
         $webDriverSession->buttondown();
 
-        $dropZone = $this->createElement($dropZoneName);
-        $destination = $webDriverSession->element('xpath', $dropZone->getXpath());
+        $moveToOptions = ['element' => null];
 
-        $moveToOptions = ['element' => $destination->getID()];
+        if ($dropZoneName) {
+            $dropZone = $this->createElement($dropZoneName);
+            $destination = $webDriverSession->element('xpath', $dropZone->getXpath());
+
+            $moveToOptions['element'] = $destination->getID();
+        }
+
         if (!is_null($xOffset)) {
             $moveToOptions['xoffset'] = $xOffset;
         }
         if (!is_null($yOffset)) {
-            $moveToOptions['yoffset'] = $xOffset;
+            $moveToOptions['yoffset'] = $yOffset;
         }
         $this->waitForAjax();
         $webDriverSession->moveto($moveToOptions);
         $webDriverSession->buttonup();
+    }
+
+    /**
+     * @Given /^I check element "(?P<elementName>[\w\s]+)" has width "(?P<width>[\w\s]+)"$/
+     */
+    public function checkElementWidth($elementName, $width = 0)
+    {
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $elementClass = '.' . str_replace(' ', '.',  $this->createElement($elementName)->getAttribute('class'));
+        $javascipt = <<<JS
+            return jQuery('$elementClass').outerWidth();
+JS;
+        self::assertEquals($width, $driver->evaluateScript($javascipt));
     }
 
     /**
