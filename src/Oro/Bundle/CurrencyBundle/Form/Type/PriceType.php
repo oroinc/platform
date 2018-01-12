@@ -51,7 +51,7 @@ class PriceType extends AbstractType
         $isRequiredPrice = $this->isRequired($options);
 
         if (empty($options['hide_currency'])) {
-            $currencyType = CurrencySelectionType::NAME;
+            $currencyType = $options['currency_selection_type'];
             $currencyOptions = [
                 'additional_currencies' => $options['additional_currencies'],
                 'currencies_list' => $options['currencies_list'],
@@ -97,7 +97,8 @@ class PriceType extends AbstractType
             'full_currency_list' => false,
             'currency_empty_value' => 'oro.currency.currency.form.choose',
             'compact' => false,
-            'validation_groups'=> ['Default']
+            'validation_groups'=> ['Default'],
+            'currency_selection_type'=> CurrencySelectionType::NAME
         ]);
     }
 
