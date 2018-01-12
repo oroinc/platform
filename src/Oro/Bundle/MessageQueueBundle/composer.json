@@ -5,7 +5,7 @@
     "keywords": ["ORO", "Messaging", "Queue"],
     "license": "MIT",
     "require": {
-        "php": ">=7.1",
+        "php": "7.1.*",
         "symfony/framework-bundle": "2.3.*",
         "oro/message-queue": "dev-master"
     },

@@ -5,7 +5,7 @@
     "keywords": ["ORO", "BAP", "Config"],
     "license": "MIT",
     "require": {
-        "php": ">=7.1",
+        "php": "7.1.*",
         "symfony/config": "2.8.*",
         "symfony/dependency-injection": "2.8.*",
         "symfony/yaml": "2.8.*",

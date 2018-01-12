@@ -6,7 +6,7 @@
     "homepage": "https://github.com/orocrm/RequireJSBundle",
     "license": "MIT",
     "require": {
-        "php": ">=7.1",
+        "php": "7.1.*",
         "symfony/symfony": "2.8.*, !=2.8.10",
         "doctrine/doctrine-cache-bundle": "1.3.*",
         "npm-asset/requirejs": "2.3.*"

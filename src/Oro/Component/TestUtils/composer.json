@@ -5,7 +5,7 @@
     "keywords": ["ORO", "BAP", "Test", "PhpUnit", "Utils", "Util"],
     "license": "MIT",
     "require": {
-      "php": ">=7.1",
+      "php": "7.1.*",
       "doctrine/common": "2.5.*",
       "doctrine/dbal": "2.5.*",
       "doctrine/orm": "2.5.*",

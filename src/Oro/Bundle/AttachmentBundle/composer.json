@@ -5,7 +5,7 @@
     "keywords": ["BAP", "Attachment", "File", "Image"],
     "license": "MIT",
     "require": {
-        "php": ">=7.1",
+        "php": "7.1.*",
         "symfony/symfony": "2.8.*, !=2.8.10",
         "liip/imagine-bundle": "1.7.*",
         "oro/gaufrette-bundle": "dev-master"

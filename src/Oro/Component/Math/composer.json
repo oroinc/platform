@@ -5,7 +5,7 @@
     "keywords": ["ORO", "BAP", "Math"],
     "license": "MIT",
     "require": {
-        "php": ">=7.1",
+        "php": "7.1.*",
         "brick/math": "0.5.*"
     },
     "autoload": {
