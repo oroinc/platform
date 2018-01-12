@@ -967,4 +967,21 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->configCache->flushAllConfigurable());
     }
+
+    public function testGetConfigurableWithNullEntityClass()
+    {
+        $this->assertNull($this->configCache->getConfigurable(null));
+    }
+
+    public function testSaveConfigurableWithNullEntityClass()
+    {
+        $this->assertFalse($this->configCache->saveConfigurable(true, null));
+    }
+
+    public function testSaveConfigurableValuesWithNullEntityClass()
+    {
+        $this->assertFalse($this->configCache->saveConfigurableValues(null, true, ['field' => true]));
+        $this->assertAttributeSame([], 'configurableEntities', $this->configCache);
+        $this->assertAttributeSame([], 'configurableFields', $this->configCache);
+    }
 }
