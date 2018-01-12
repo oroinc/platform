@@ -6,6 +6,7 @@ use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 use Akeneo\Bundle\BatchBundle\Item\ExecutionContext;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Configuration\AttributeImportExportConfigurationProvider;
+use Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\SyncBundle\Content\SimpleTagGenerator;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
@@ -18,8 +19,10 @@ class AttributesImportFinishNotificationListenerTest extends \PHPUnit_Framework_
 {
     use EntityTrait;
 
+    const ENTITY_ID = 27;
+
     /**
-     * @var TopicSender|\PHPUnit_Framework_MockObject_MockObject
+     * @var AttributesImportTopicSender|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $topicSender;
 
@@ -30,7 +33,7 @@ class AttributesImportFinishNotificationListenerTest extends \PHPUnit_Framework_
 
     protected function setUp()
     {
-        $this->topicSender = $this->createMock(TopicSender::class);
+        $this->topicSender = $this->createMock(AttributesImportTopicSender::class);
         $this->attributesImportFinishNotificationListener =
             new AttributesImportFinishNotificationListener($this->topicSender);
     }
@@ -44,7 +47,7 @@ class AttributesImportFinishNotificationListenerTest extends \PHPUnit_Framework_
 
         $this->topicSender
             ->expects($this->never())
-            ->method('sendToAll');
+            ->method('send');
 
         $this->attributesImportFinishNotificationListener->onAfterAttributesImport($event);
     }
@@ -60,7 +63,7 @@ class AttributesImportFinishNotificationListenerTest extends \PHPUnit_Framework_
 
         $this->topicSender
             ->expects($this->never())
-            ->method('sendToAll');
+            ->method('send');
 
         $this->attributesImportFinishNotificationListener->onAfterAttributesImport($event);
     }
@@ -68,10 +71,9 @@ class AttributesImportFinishNotificationListenerTest extends \PHPUnit_Framework_
     public function testOnAfterAttributesImport()
     {
         $jobResult = (new JobResult())->setSuccessful(true);
-        $entityId = 777;
         $context = (new ExecutionContext())->put(
-            AttributesImportFinishNotificationListener::FIELD_CONFIG_MODEL_ID_KEY,
-            $entityId
+            AttributesImportFinishNotificationListener::ENTITY_CONFIG_MODEL_ID_KEY,
+            self::ENTITY_ID
         );
         /** @var \Akeneo\Bundle\BatchBundle\Entity\JobExecution $jobExecution */
         $jobExecution = $this->getEntity(JobExecution::class, [
@@ -82,27 +84,10 @@ class AttributesImportFinishNotificationListenerTest extends \PHPUnit_Framework_
         ]);
         $event = new AfterJobExecutionEvent($jobExecution, $jobResult);
 
-        $tags = ['tag1'];
-        $tagGenerator = $this->createMock(TagGeneratorInterface::class);
-        $tagGenerator
-            ->expects($this->once())
-            ->method('generate')
-            ->with([
-                SimpleTagGenerator::STATIC_NAME_KEY =>
-                    AttributesImportFinishNotificationListener::ATTRIBUTE_IMPORT_FINISH_TAG,
-                SimpleTagGenerator::IDENTIFIER_KEY => [$entityId]
-            ])
-            ->willReturn($tags);
-
         $this->topicSender
             ->expects($this->once())
-            ->method('getGenerator')
-            ->willReturn($tagGenerator);
-
-        $this->topicSender
-            ->expects($this->once())
-            ->method('sendToAll')
-            ->with($tags);
+            ->method('send')
+            ->with(self::ENTITY_ID);
 
         $this->attributesImportFinishNotificationListener->onAfterAttributesImport($event);
     }

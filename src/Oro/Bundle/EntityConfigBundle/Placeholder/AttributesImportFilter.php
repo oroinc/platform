@@ -6,9 +6,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
-use Oro\Bundle\EntityConfigBundle\EventListener\AttributesImportFinishNotificationListener;
-use Oro\Bundle\SyncBundle\Content\SimpleTagGenerator;
-use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
+use Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender;
 
 class AttributesImportFilter
 {
@@ -18,9 +16,9 @@ class AttributesImportFilter
     private $entityAliasResolver;
 
     /**
-     * @var TagGeneratorInterface
+     * @var AttributesImportTopicSender
      */
-    private $tagGenerator;
+    private $topicSender;
 
     /**
      * @var ConfigManager
@@ -29,16 +27,16 @@ class AttributesImportFilter
 
     /**
      * @param EntityAliasResolver $entityAliasResolver
-     * @param TagGeneratorInterface $tagGenerator
+     * @param AttributesImportTopicSender $topicSender
      * @param ConfigManager $configManager
      */
     public function __construct(
         EntityAliasResolver $entityAliasResolver,
-        TagGeneratorInterface $tagGenerator,
+        AttributesImportTopicSender $topicSender,
         ConfigManager $configManager
     ) {
         $this->entityAliasResolver = $entityAliasResolver;
-        $this->tagGenerator = $tagGenerator;
+        $this->topicSender = $topicSender;
         $this->configManager = $configManager;
     }
 
@@ -50,7 +48,7 @@ class AttributesImportFilter
     {
         $entityClass = $this->entityAliasResolver->getClassByAlias($entityAlias);
 
-        return $this->hasEntityClassAtrributes($entityClass);
+        return $this->hasEntityClassAttributes($entityClass);
     }
 
     /**
@@ -63,14 +61,14 @@ class AttributesImportFilter
             return false;
         }
 
-        return $this->hasEntityClassAtrributes($entity->getClassName());
+        return $this->hasEntityClassAttributes($entity->getClassName());
     }
 
     /**
      * @param string $entityClass
      * @return bool
      */
-    private function hasEntityClassAtrributes(string $entityClass): bool
+    private function hasEntityClassAttributes(string $entityClass): bool
     {
         $entityConfig = $this->configManager->getEntityConfig('attribute', $entityClass);
 
@@ -82,7 +80,7 @@ class AttributesImportFilter
      * @return array
      * @throws \LogicException
      */
-    public function getTagByAlias($entityAlias)
+    public function getTopicByAlias($entityAlias)
     {
         $entityClass = $this->entityAliasResolver->getClassByAlias($entityAlias);
         $entityConfigModel = $this->configManager->getConfigEntityModel($entityClass);
@@ -91,29 +89,15 @@ class AttributesImportFilter
             throw new \LogicException(sprintf('No entity config model found for class %s', $entityClass));
         }
 
-        return $this->generateTag($entityConfigModel);
+        return $this->getTopicByEntity($entityConfigModel);
     }
 
     /**
      * @param EntityConfigModel $entity
      * @return array
-     * @throws \InvalidArgumentException
      */
-    public function getTagByEntity(EntityConfigModel $entity)
+    public function getTopicByEntity(EntityConfigModel $entity)
     {
-        return $this->generateTag($entity);
-    }
-
-    /**
-     * @param EntityConfigModel $entityConfigModel
-     * @return array
-     */
-    private function generateTag($entityConfigModel)
-    {
-        return $this->tagGenerator->generate([
-            SimpleTagGenerator::STATIC_NAME_KEY
-            => AttributesImportFinishNotificationListener::ATTRIBUTE_IMPORT_FINISH_TAG,
-            SimpleTagGenerator::IDENTIFIER_KEY => [$entityConfigModel->getId()]
-        ]);
+        return ['topic' => $this->topicSender->getTopic($entity->getId())];
     }
 }

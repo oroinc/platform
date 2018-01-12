@@ -8,8 +8,8 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\EventListener\AttributesImportFinishNotificationListener;
+use Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender;
 use Oro\Bundle\SyncBundle\Content\SimpleTagGenerator;
-use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Placeholder\AttributesImportFilter;
 use Oro\Component\Testing\Unit\EntityTrait;
@@ -21,6 +21,7 @@ class AttributesImportFilterTest extends \PHPUnit_Framework_TestCase
     const ENTITY_ALIAS = 'someAlias';
     const ENTITY_CLASS = 'someClass';
     const ENTITY_ID = 712;
+    const TOPIC = 'Topic';
 
     /**
      * @var EntityAliasResolver|\PHPUnit_Framework_MockObject_MockObject
@@ -28,9 +29,9 @@ class AttributesImportFilterTest extends \PHPUnit_Framework_TestCase
     protected $entityAliasResolver;
 
     /**
-     * @var TagGeneratorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var AttributesImportTopicSender|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $tagGenerator;
+    protected $topicSender;
 
     /**
      * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
@@ -44,16 +45,13 @@ class AttributesImportFilterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entityAliasResolver = $this->getMockBuilder(EntityAliasResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->tagGenerator = $this->createMock(TagGeneratorInterface::class);
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityAliasResolver = $this->createMock(EntityAliasResolver::class);
+        $this->topicSender = $this->createMock(AttributesImportTopicSender::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+
         $this->attributesImportFilter = new AttributesImportFilter(
             $this->entityAliasResolver,
-            $this->tagGenerator,
+            $this->topicSender,
             $this->configManager
         );
     }
@@ -147,7 +145,7 @@ class AttributesImportFilterTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testGetTagByAliasWhenNoEntityConfigModel()
+    public function testGetTopicByAliasWhenNoEntityConfigModel()
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('No entity config model found for class ' . self::ENTITY_CLASS);
@@ -164,10 +162,14 @@ class AttributesImportFilterTest extends \PHPUnit_Framework_TestCase
             ->with(self::ENTITY_CLASS)
             ->willReturn(null);
 
-        $this->attributesImportFilter->getTagByAlias(self::ENTITY_ALIAS);
+        $this->topicSender
+            ->expects($this->never())
+            ->method('getTopic');
+
+        $this->attributesImportFilter->getTopicByAlias(self::ENTITY_ALIAS);
     }
 
-    public function testGetTagByAlias()
+    public function testGetTopicByAlias()
     {
         $this->entityAliasResolver
             ->expects($this->once())
@@ -182,36 +184,29 @@ class AttributesImportFilterTest extends \PHPUnit_Framework_TestCase
             ->with(self::ENTITY_CLASS)
             ->willReturn($entityConfigModel);
 
-        $tagData = [['tag1']];
-        $this->tagGenerator
+        $this->topicSender
             ->expects($this->once())
-            ->method('generate')
-            ->with([
-                SimpleTagGenerator::STATIC_NAME_KEY
-                => AttributesImportFinishNotificationListener::ATTRIBUTE_IMPORT_FINISH_TAG,
-                SimpleTagGenerator::IDENTIFIER_KEY => [self::ENTITY_ID]
-            ])
-            ->willReturn($tagData);
+            ->method('getTopic')
+            ->with(self::ENTITY_ID)
+            ->willReturn(self::TOPIC);
 
-        $this->assertEquals($tagData, $this->attributesImportFilter->getTagByAlias(self::ENTITY_ALIAS));
+        $this->assertEquals(
+            ['topic' => self::TOPIC],
+            $this->attributesImportFilter->getTopicByAlias(self::ENTITY_ALIAS)
+        );
     }
 
-    public function testGetTagByEntityWhenNotEntityConfigModel()
+    public function testGetTopicByEntity()
     {
-        $tagData = [['tag1']];
-        $this->tagGenerator
+        $this->topicSender
             ->expects($this->once())
-            ->method('generate')
-            ->with([
-                SimpleTagGenerator::STATIC_NAME_KEY
-                => AttributesImportFinishNotificationListener::ATTRIBUTE_IMPORT_FINISH_TAG,
-                SimpleTagGenerator::IDENTIFIER_KEY => [self::ENTITY_ID]
-            ])
-            ->willReturn($tagData);
+            ->method('getTopic')
+            ->with(self::ENTITY_ID)
+            ->willReturn(self::TOPIC);
 
         /** @var EntityConfigModel $entity */
         $entity = $this->getEntity(EntityConfigModel::class, ['id' => self::ENTITY_ID]);
 
-        $this->assertEquals($tagData, $this->attributesImportFilter->getTagByEntity($entity));
+        $this->assertEquals(['topic' => self::TOPIC], $this->attributesImportFilter->getTopicByEntity($entity));
     }
 }

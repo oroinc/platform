@@ -146,49 +146,4 @@ class TopicSenderTest extends \PHPUnit_Framework_TestCase
         $tags = [self::TEST_TAG1, self::TEST_TAG2];
         $this->sender->send($tags);
     }
-
-    public function testSendToAllWithEmptyTags()
-    {
-        $this->publisher
-            ->expects($this->never())
-            ->method('send');
-
-        $this->sender->send([]);
-    }
-
-    public function testSendToAllWhenExceptionIsThrown()
-    {
-        $tags = ['tag'];
-        $exception = new \Exception('Exception message');
-        $this->publisher
-            ->expects($this->once())
-            ->method('send')
-            ->willThrowException($exception);
-
-        $this->logger
-            ->expects($this->once())
-            ->method('error')
-            ->with('Failed to publish a message to {topic}.', [
-                'topic' => TopicSender::UPDATE_TOPIC,
-                'exception' => $exception,
-                'tags' => [['tagname' => 'tag', 'username' => null]]
-            ]);
-
-        $this->sender->send($tags);
-    }
-
-    public function testSendToAll()
-    {
-        $tags = ['tag'];
-        $this->publisher
-            ->expects($this->once())
-            ->method('send')
-            ->with(TopicSender::UPDATE_TOPIC, json_encode([['username' => null, 'tagname' => 'tag']]));
-
-        $this->logger
-            ->expects($this->never())
-            ->method('error');
-
-        $this->sender->send($tags);
-    }
 }

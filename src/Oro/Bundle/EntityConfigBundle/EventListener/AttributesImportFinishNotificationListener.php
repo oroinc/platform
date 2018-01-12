@@ -4,28 +4,26 @@ namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Configuration\AttributeImportExportConfigurationProvider;
+use Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender;
 use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
-use Oro\Bundle\SyncBundle\Content\SimpleTagGenerator;
-use Oro\Bundle\SyncBundle\Content\TopicSender;
 
 /**
  * This listener notifies about import finish via web sockets.
  */
 class AttributesImportFinishNotificationListener
 {
-    const FIELD_CONFIG_MODEL_ID_KEY = 'entity_id';
-    const ATTRIBUTE_IMPORT_FINISH_TAG = 'AttributeImportFinish';
+    const ENTITY_CONFIG_MODEL_ID_KEY = 'entity_id';
 
     /**
-     * @var TopicSender
+     * @var AttributesImportTopicSender
      */
     private $topicSender;
 
     /**
-     * @param TopicSender $topicSender
+     * @param AttributesImportTopicSender $topicSender
      */
-    public function __construct(TopicSender $topicSender)
+    public function __construct(AttributesImportTopicSender $topicSender)
     {
         $this->topicSender = $topicSender;
     }
@@ -38,16 +36,11 @@ class AttributesImportFinishNotificationListener
         $jobExecution = $event->getJobExecution();
         $jobResult = $event->getJobResult();
 
-        if ($this->isApplicable($jobResult, $jobExecution)) {
-            $this->topicSender->sendToAll(
-                $this->topicSender->getGenerator()->generate([
-                    SimpleTagGenerator::STATIC_NAME_KEY => self::ATTRIBUTE_IMPORT_FINISH_TAG,
-                    SimpleTagGenerator::IDENTIFIER_KEY => [
-                        $jobExecution->getExecutionContext()->get(self::FIELD_CONFIG_MODEL_ID_KEY)
-                    ]
-                ])
-            );
+        if (!$this->isApplicable($jobResult, $jobExecution)) {
+            return;
         }
+
+        $this->topicSender->send((int)$jobExecution->getExecutionContext()->get(self::ENTITY_CONFIG_MODEL_ID_KEY));
     }
 
     /**
@@ -55,10 +48,17 @@ class AttributesImportFinishNotificationListener
      * @param JobExecution $jobExecution
      * @return bool
      */
-    protected function isApplicable(JobResult $jobResult, JobExecution $jobExecution)
+    protected function isApplicable(JobResult $jobResult, JobExecution $jobExecution): bool
     {
-        return $jobResult->isSuccessful() &&
-            (AttributeImportExportConfigurationProvider::ATTRIBUTE_IMPORT_FROM_CSV_JOB_NAME
-            === $jobExecution->getJobInstance()->getAlias());
+        if (!$jobResult->isSuccessful()) {
+            return false;
+        }
+
+        if (AttributeImportExportConfigurationProvider::ATTRIBUTE_IMPORT_FROM_CSV_JOB_NAME
+            !== $jobExecution->getJobInstance()->getAlias()) {
+            return false;
+        }
+
+        return true;
     }
 }
