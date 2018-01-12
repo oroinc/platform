@@ -14,8 +14,7 @@ Feature: Resize Sidebar
     And I check element "Sidebar" has width "320"
     And I resize Sidebar Drag Handler by vector [300,0]
     And I check element "Sidebar" has width "600"
-#    Uncomment when 13357 will be merged
-#    And I reload the page
+    And I reload the page
     And I check element "Sidebar" has width "600"
     And I resize Sidebar Drag Handler by vector [-300,0]
     Then I check element "Sidebar" has width "320"
@@ -25,8 +24,7 @@ Feature: Resize Sidebar
     And I check element "Sidebar" has width "320"
     And I resize Sidebar Drag Handler by vector [300,0]
     And I check element "Sidebar" has width "600"
-#    Uncomment when 13357 will be merged
-#    And I reload the page
+    And I reload the page
     And I check element "Sidebar" has width "600"
     And I resize Sidebar Drag Handler by vector [-300,0]
     And I check element "Sidebar" has width "320"
@@ -36,8 +34,7 @@ Feature: Resize Sidebar
     And I check element "Sidebar" has width "320"
     And I resize Sidebar Drag Handler by vector [300,0]
     And I check element "Sidebar" has width "600"
-#    Uncomment when 13357 will be merged
-#    And I reload the page
+    And I reload the page
     And I check element "Sidebar" has width "600"
     And I resize Sidebar Drag Handler by vector [-300,0]
     And I check element "Sidebar" has width "320"
@@ -49,8 +46,7 @@ Feature: Resize Sidebar
     And I check element "Sidebar" has width "320"
     And I resize Sidebar Drag Handler by vector [300,0]
     And I check element "Sidebar" has width "600"
-#    Uncomment when 13357 will be merged
-#    And I reload the page
+    And I reload the page
     And I check element "Sidebar" has width "600"
     And I resize Sidebar Drag Handler by vector [-300,0]
     And I check element "Sidebar" has width "320"
