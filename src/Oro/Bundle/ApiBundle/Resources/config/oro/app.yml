@@ -79,7 +79,6 @@ oro_api:
         - form.type.integer
         - form.type.number
         - form.type.money
-        - form.type.percent
         - form.type.date
         - form.type.time
         - form.type.duration
@@ -153,7 +152,7 @@ oro_api:
         text:
             form_type: textarea
         percent:
-            form_type: percent
+            form_type: number
         money:
             form_type: oro_api_number
             options:
