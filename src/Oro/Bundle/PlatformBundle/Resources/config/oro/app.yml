@@ -9,6 +9,7 @@ doctrine:
                 dbname:   %database_name%
                 user:     %database_user%
                 password: %database_password%
+                options:  %database_driver_options%
                 charset:  UTF8
             session:
                 driver:   %database_driver%
@@ -17,6 +18,7 @@ doctrine:
                 dbname:   %database_name%
                 user:     %database_user%
                 password: %database_password%
+                options:  %database_driver_options%
                 charset:  UTF8
             config:
                 driver:   %database_driver%
@@ -25,6 +27,7 @@ doctrine:
                 dbname:   %database_name%
                 user:     %database_user%
                 password: %database_password%
+                options:  %database_driver_options%
                 charset:  UTF8
     orm:
         default_entity_manager:      default
