@@ -7,14 +7,14 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 
-use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiSecurityFirewallCompilerPass;
+use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\SecurityFirewallCompilerPass;
 use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
-use Oro\Bundle\ApiBundle\Http\Firewall\ApiExceptionListener;
+use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
 use Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener;
 
-class ApiSecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
+class SecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ApiSecurityFirewallCompilerPass */
+    /** @var SecurityFirewallCompilerPass */
     private $compiler;
 
     /** @var ContainerBuilder */
@@ -23,7 +23,7 @@ class ApiSecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->container = new ContainerBuilder();
-        $this->compiler = new ApiSecurityFirewallCompilerPass();
+        $this->compiler = new SecurityFirewallCompilerPass();
     }
 
     public function testProcessOnEmptySecurityConfig()
@@ -112,7 +112,7 @@ class ApiSecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
         $contextFirewallListener = $this->container->getDefinition('oro_security.context_listener.main.testFirewall');
         self::assertEquals(SecurityFirewallContextListener::class, $contextFirewallListener->getClass());
         self::assertEquals('oro_security.context_listener.main', (string)$contextFirewallListener->getArgument(0));
-        self::assertEquals(ApiExceptionListener::class, $exceptionListenerDefinition->getClass());
+        self::assertEquals(SecurityFirewallExceptionListener::class, $exceptionListenerDefinition->getClass());
 
         $listeners = $contextFirewallContext->getArgument(0);
         self::assertCount(2, $listeners);

@@ -85,7 +85,7 @@ class RestJsonApiSupportedDataTypesTest extends RestJsonApiTestCase
                     'fieldDate'        => '2017-01-21',
                     'fieldTime'        => '10:20:30',
                     'fieldGuid'        => '6f690d83-9b60-4da4-9c47-1b163229db6d',
-                    //'fieldPercent'     => 0.123, TODO: uncomment after merge BAP-13666
+                    'fieldPercent'     => 0.123,
                     'fieldMoney'       => '123.4567',
                     'fieldDuration'    => 123,
                     'fieldMoneyValue'  => '123.4567',
@@ -119,7 +119,7 @@ class RestJsonApiSupportedDataTypesTest extends RestJsonApiTestCase
                 'fieldDate'        => $entity->fieldDate->format('Y-m-d'),
                 'fieldTime'        => $entity->fieldTime->format('H:i:s'),
                 'fieldGuid'        => $entity->fieldGuid,
-                //'fieldPercent'     => $entity->fieldPercent, TODO: uncomment after merge BAP-13666
+                'fieldPercent'     => $entity->fieldPercent,
                 'fieldMoney'       => $entity->fieldMoney,
                 'fieldDuration'    => $entity->fieldDuration,
                 'fieldMoneyValue'  => $entity->fieldMoneyValue,
@@ -152,7 +152,7 @@ class RestJsonApiSupportedDataTypesTest extends RestJsonApiTestCase
                     'fieldDate'        => '2017-01-21',
                     'fieldTime'        => '10:20:30',
                     'fieldGuid'        => '6f690d83-9b60-4da4-9c47-1b163229db6d',
-                    //'fieldPercent'     => 0.123, TODO: uncomment after merge BAP-13666
+                    'fieldPercent'     => 0.123,
                     'fieldMoney'       => '123.4567',
                     'fieldDuration'    => 123,
                     'fieldMoneyValue'  => '123.4567',
@@ -186,7 +186,7 @@ class RestJsonApiSupportedDataTypesTest extends RestJsonApiTestCase
                 'fieldDate'        => $entity->fieldDate->format('Y-m-d'),
                 'fieldTime'        => $entity->fieldTime->format('H:i:s'),
                 'fieldGuid'        => $entity->fieldGuid,
-                //'fieldPercent'     => $entity->fieldPercent, TODO: uncomment after merge BAP-13666
+                'fieldPercent'     => $entity->fieldPercent,
                 'fieldMoney'       => $entity->fieldMoney,
                 'fieldDuration'    => $entity->fieldDuration,
                 'fieldMoneyValue'  => $entity->fieldMoneyValue,

@@ -8,9 +8,9 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
-use Oro\Bundle\ApiBundle\Http\Firewall\ApiExceptionListener;
+use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
 
-class ApiSecurityFirewallCompilerPass implements CompilerPassInterface
+class SecurityFirewallCompilerPass implements CompilerPassInterface
 {
     /** @var array */
     private $contextListeners = [];
@@ -20,26 +20,15 @@ class ApiSecurityFirewallCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        // config does not contains firewalls config
         $securityConfigs = $container->getExtensionConfig('security');
-        if (!array_key_exists('firewalls', $securityConfigs[0])) {
-            return;
-        }
-
-        // firewalls config is empty
-        $firewalls = $securityConfigs[0]['firewalls'];
-        if (empty($firewalls)) {
+        if (empty($securityConfigs[0]['firewalls'])) {
             return;
         }
 
         $sessionOptions = $container->getParameter('session.storage.options');
+        $firewalls = $securityConfigs[0]['firewalls'];
         foreach ($firewalls as $firewallName => $firewallConfig) {
-            // process firewall only if it is stateless and have context parameter
-            if (!array_key_exists('stateless', $firewallConfig)
-                || !array_key_exists('context', $firewallConfig)
-                || !$firewallConfig['stateless']
-                || null === $firewallConfig['context']
-            ) {
+            if (!$this->isStatelessFirewallWithContext($firewallConfig)) {
                 continue;
             }
 
@@ -82,18 +71,34 @@ class ApiSecurityFirewallCompilerPass implements CompilerPassInterface
             // replace the exception listener class
             $exceptionListenerRef = $contextDef->getArgument(1);
             $exceptionDefinition = $container->getDefinition($exceptionListenerRef);
-            $exceptionDefinition->setClass(ApiExceptionListener::class);
+            $exceptionDefinition->setClass(SecurityFirewallExceptionListener::class);
             $exceptionDefinition->addMethodCall('setSessionOptions', [$sessionOptions]);
         }
     }
 
     /**
+     * Checks whether a firewall is stateless and have context parameter
+     *
+     * @param array $firewallConfig
+     *
+     * @return bool
+     */
+    private function isStatelessFirewallWithContext(array $firewallConfig)
+    {
+        return
+            array_key_exists('stateless', $firewallConfig)
+            && array_key_exists('context', $firewallConfig)
+            && $firewallConfig['stateless']
+            && $firewallConfig['context'];
+    }
+
+    /**
      * @param ContainerBuilder $container
-     * @param string $contextKey
+     * @param string           $contextKey
      *
      * @return string
      */
-    protected function createContextListener(ContainerBuilder $container, $contextKey)
+    private function createContextListener(ContainerBuilder $container, $contextKey)
     {
         if (isset($this->contextListeners[$contextKey])) {
             return $this->contextListeners[$contextKey];
