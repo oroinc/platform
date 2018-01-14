@@ -44,6 +44,7 @@
     | normalize_result | -80 | -70 |
 
 * A handling of `percent` data type in POST and PATCH requests was fixed. Before the fix the percent value in GET and POST/PATCH requests was inconsistent, in POST/PATCH requests it was divided by 100, but GET request returns it as is. In this fix the division by 100 was removed.
+* For string filters the default value of `allow_array` option was changed from `true` to `false`. This was done to allow filter data if a string field contains a comma.
 #### SegmentBundle
 * Refactored `SegmentComponent` js-component to use `EntityStructureDataProvider`.
 #### SidebarBundle

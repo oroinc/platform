@@ -20,6 +20,11 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee:
         organization: '@organization'
         owner: '@TestBusinessUnit1'
         position: developer
+    TestEmployee3:
+        name: TestEmployee, with comma in name
+        organization: '@organization'
+        owner: '@TestBusinessUnit1'
+        position: developer
 Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
     TestBusinessUnit1:
         name: TestBusinessUnit1

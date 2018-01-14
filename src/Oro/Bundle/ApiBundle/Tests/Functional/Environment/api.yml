@@ -88,6 +88,8 @@ api:
                     property_path: id
             filters:
                 fields:
+                    key:
+                        allow_array: true
                     name: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomCompositeIdentifier:
             identifier_field_names: ['key1', 'key2']
