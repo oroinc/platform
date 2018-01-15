@@ -26,11 +26,25 @@ class ResetPasswordMassActionTest extends \PHPUnit_Framework_TestCase
 
     public function testSetOptions()
     {
-        $this->resetAction = new ResetPasswordMassAction($this->configuration);
+        $this->resetAction = new ResetPasswordMassAction();
         $this->resetAction->setOptions($this->configuration);
 
         $options = $this->resetAction->getOptions();
-        $this->assertEquals('oro_user_mass_password_reset', $options->offsetGet('route'));
-        $this->assertEquals('oro_datagrid.mass_action.forced_password_reset.handler', $options->offsetGet('handler'));
+
+        $this->assertEquals(
+            [
+                'route' => 'oro_user_mass_password_reset',
+                'handler' => 'oro_datagrid.mass_action.forced_password_reset.handler',
+                'entity_name' => 'test',
+                'data_identifier' => 'test',
+                'name' => 'test',
+                'route_parameters' => [],
+                'frontend_handle' => 'ajax',
+                'frontend_type' => 'mass',
+                'allowedRequestTypes' => ['POST'],
+                'requestType' => 'POST'
+            ],
+            $options->toArray()
+        );
     }
 }

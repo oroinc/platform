@@ -442,3 +442,26 @@ services:
             - '@oro_entity_config.provider.entity'
         tags:
             - { name: kernel.event_listener, event: oro_entity.structure.options, method: onOptionsRequest }
+
+    oro_entity_config.event_listener.attributes_import_finish_notification_listener:
+        class: 'Oro\Bundle\EntityConfigBundle\EventListener\AttributesImportFinishNotificationListener'
+        lazy: true
+        arguments:
+            - '@oro_entity_config.websocket.attributes_import_topic_sender'
+            - '@oro_security.token_accessor'
+        tags:
+            - {name: kernel.event_listener, event: oro.import_export.after_job_execution, method: onAfterAttributesImport }
+
+    oro_entity_config.placeholder.attributes_import_filter:
+        class: 'Oro\Bundle\EntityConfigBundle\Placeholder\AttributesImportFilter'
+        arguments:
+            - '@oro_entity.entity_alias_resolver'
+            - '@oro_entity_config.websocket.attributes_import_topic_sender'
+            - '@oro_entity_config.config_manager'
+
+    oro_entity_config.websocket.attributes_import_topic_sender:
+        class: 'Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender'
+        lazy: true
+        arguments:
+            - '@oro_wamp.publisher'
+            - '@oro_security.token_accessor'

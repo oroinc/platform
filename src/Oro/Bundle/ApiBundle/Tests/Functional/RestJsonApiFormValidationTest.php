@@ -97,6 +97,6 @@ class RestJsonApiFormValidationTest extends RestJsonApiTestCase
             $this->getUrl('oro_rest_api_patch', ['entity' => $entityType, 'id' => '1']),
             ['data' => ['type' => $entityType, 'id' => '1', 'attributes' => ['notExistingField' => null]]]
         );
-        self::assertApiResponseStatusCodeEquals($response, [400, 403, 405], $entityType, 'post');
+        self::assertApiResponseStatusCodeEquals($response, [400, 403, 404, 405], $entityType, 'post');
     }
 }

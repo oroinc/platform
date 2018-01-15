@@ -34,15 +34,6 @@ services:
     # security_check
     #
 
-    oro_api.delete_list.entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@security.authorization_checker'
-            - DELETE
-        tags:
-            - { name: oro.api.processor, action: delete_list, group: security_check, priority: 10 }
-
     #
     # build_query
     #
@@ -71,6 +62,14 @@ services:
         tags:
             - { name: oro.api.processor, action: delete_list, group: load_data, priority: -10 }
 
+    oro_api.delete.entity_objects_security_check:
+        class: \Oro\Bundle\ApiBundle\Processor\Shared\EntityObjectsSecurityCheck
+        arguments:
+            - '@security.authorization_checker'
+            - DELETE
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: load_data, priority: -70 }
+
     #
     # delete_data
     #
@@ -87,11 +86,6 @@ services:
             - '@service_container'
         tags:
             - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -20 }
-
-    oro_api.delete_list.validate_deletion_result:
-            class: Oro\Bundle\ApiBundle\Processor\Delete\ValidateDeletionResult
-            tags:
-                - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -200 }
 
     #
     # normalize_result

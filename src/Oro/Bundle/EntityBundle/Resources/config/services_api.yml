@@ -1,0 +1,17 @@
+services:
+    oro_entity.api.processor.normalize_input.entity_fallback_validator:
+        class: Oro\Bundle\EntityBundle\Api\Processor\ValidateEntityFallback
+        arguments:
+            - '@oro_entity.fallback.resolver.entity_fallback_resolver'
+            - '@oro_api.value_normalizer'
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_input, priority: -32 }
+            - { name: oro.api.processor, action: update, group: normalize_input, priority: -32 }
+
+    oro_entity.api.processor.load_data.entitues_structure:
+        class: Oro\Bundle\EntityBundle\Api\Processor\LoadEntityStructureData
+        arguments:
+            - '@oro_entity.provider.structure_data'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\EntityBundle\Model\EntityStructure }
+            - { name: oro.api.processor, action: get, group: load_data, class: Oro\Bundle\EntityBundle\Model\EntityStructure }

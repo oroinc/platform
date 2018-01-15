@@ -52,37 +52,17 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: security_check, priority: 10 }
 
-    # VIEW permissions are required to update an entity because the updated entity should be returned in response
-    # the "security_check" group is disabled for the "get" action is executed by
-    # the "oro_api.update.load_normalized_entity" processor
-    # so, if you add own security processor for the "get" action, add it here as well
-    oro_api.update.entity_type_security_check.view:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@security.authorization_checker'
-            - VIEW
-            - true
-        tags:
-            - { name: oro.api.processor, action: update, group: security_check, priority: 5 }
-
-    #
-    # build_query
-    #
-
-    oro_api.update.protect_query_by_acl:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_security.acl_helper'
-            - '@oro_security.acl.annotation_provider'
-            - EDIT
-        tags:
-            - { name: oro.api.processor, action: update, group: build_query, priority: -90 }
-
     #
     # load_data
     #
+
+    oro_api.update.entity_object_security_check:
+        class: \Oro\Bundle\ApiBundle\Processor\Shared\EntityObjectSecurityCheck
+        arguments:
+            - '@security.authorization_checker'
+            - EDIT
+        tags:
+            - { name: oro.api.processor, action: update, group: load_data, priority: -70 }
 
     #
     # transform_data
@@ -94,11 +74,6 @@ services:
             - '@oro_api.form_helper'
         tags:
             - { name: oro.api.processor, action: update, group: transform_data, priority: 100 }
-
-    oro_api.update.submit_form:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\SubmitForm
-        tags:
-            - { name: oro.api.processor, action: update, group: transform_data, priority: -50 }
 
     #
     # save_data

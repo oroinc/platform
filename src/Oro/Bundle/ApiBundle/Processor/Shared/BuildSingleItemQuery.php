@@ -45,14 +45,13 @@ class BuildSingleItemQuery implements ProcessorInterface
     {
         /** @var SingleItemContext $context */
 
-        if ($context->hasQuery()) {
-            // a query is already built
+        if ($context->hasResult()) {
+            // data already exist
             return;
         }
 
-        $criteria = $context->getCriteria();
-        if (null === $criteria) {
-            // the criteria object does not exist
+        if ($context->hasQuery()) {
+            // a query is already built
             return;
         }
 
@@ -71,7 +70,11 @@ class BuildSingleItemQuery implements ProcessorInterface
             $context->getId(),
             $context->getMetadata()
         );
-        $this->criteriaConnector->applyCriteria($query, $criteria);
+
+        $criteria = $context->getCriteria();
+        if (null !== $criteria) {
+            $this->criteriaConnector->applyCriteria($query, $criteria);
+        }
 
         $context->setQuery($query);
     }
