@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
@@ -39,6 +38,30 @@ class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
                         'id'         => '<toString(@TestEmployee1->id)>',
                         'attributes' => [
                             'name' => 'TestEmployee1'
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testFilterByStringFieldWithComma()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter' => ['name' => 'TestEmployee, with comma in name']]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type'       => $entityType,
+                        'id'         => '<toString(@TestEmployee3->id)>',
+                        'attributes' => [
+                            'name' => 'TestEmployee, with comma in name'
                         ]
                     ]
                 ]

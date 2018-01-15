@@ -8,7 +8,7 @@
 * Added JS `EntityStructureDataProvider`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js) (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md))
 * Added `FieldChoiceView`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/views/field-choice-view.js) Backbone view, as replacement for jQuery widget `oroentity.fieldChoice`.
 #### EntityExtendBundle
-* The `Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper::convertName` method will throw an exception when the `iconv` function fails on converting the input string, instead of hashing the input string.
+* The `Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper::convertName` method was renamed to `convertEnumNameToCode`, visibility of this method was changed from `public` to `private` and it will throw an exception when the `iconv` function fails on converting the input string, instead of hashing the input string.
 #### QueryDesignerBundle
 * Added `FunctionChoiceView`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/QueryDesignerBundle/Resources/public/js/app/views/function-choice-view.js) Backbone view, as replacement for jQuery widget `oroquerydesigner.functionChoice`.
 #### SegmentBundle
@@ -44,6 +44,7 @@
     | normalize_result | -80 | -70 |
 
 * A handling of `percent` data type in POST and PATCH requests was fixed. Before the fix the percent value in GET and POST/PATCH requests was inconsistent, in POST/PATCH requests it was divided by 100, but GET request returns it as is. In this fix the division by 100 was removed.
+* For string filters the default value of `allow_array` option was changed from `true` to `false`. This was done to allow filter data if a string field contains a comma.
 #### SegmentBundle
 * Refactored `SegmentComponent` js-component to use `EntityStructureDataProvider`.
 #### SidebarBundle

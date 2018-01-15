@@ -476,10 +476,6 @@ class RestJsonApiSupportedDataTypesTest extends RestJsonApiTestCase
     public function equalArrayFilterDataProvider()
     {
         return [
-            'by string field'      => [
-                ['fieldString' => 'String 1,String 3'],
-                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
-            ],
             'by integer field'     => [
                 ['fieldInt' => '1,3'],
                 [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
