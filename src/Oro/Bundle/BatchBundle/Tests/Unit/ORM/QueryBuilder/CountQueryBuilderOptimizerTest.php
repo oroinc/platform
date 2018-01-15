@@ -595,6 +595,9 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
         $this->assertNotEmpty($countQb->getQuery()->getSQL());
     }
 
+    /**
+     * @return array
+     */
     public function getCountQueryBuilderDataProviderWithEventDispatcher()
     {
         return [
@@ -649,12 +652,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'request_with_2_3th_join_tables_without_deleting'           => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
-                        ->from('Test:User', 'u')
-                        ->leftJoin('u.organization', 'o', Join::WITH, 'o.id = 456')
-                        ->leftJoin('o.businessUnits', 'businessUnits', Join::WITH, 'businessUnits.id = 123')
-                        ->leftJoin('o.users', 'users', Join::WITH, 'users.id = 123')
-                        ->select('u.id, o.username');
+                    return $this->getQueryBuilderWith3thJoinTables($em);
                 },
                 [],
                 'expectedDQL'  => 'SELECT u.id FROM Test:User u '
@@ -664,12 +662,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'request_with_2_3th_join_tables_delete_3th_join_table'      => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
-                        ->from('Test:User', 'u')
-                        ->leftJoin('u.organization', 'o', Join::WITH, 'o.id = 456')
-                        ->leftJoin('o.businessUnits', 'businessUnits', Join::WITH, 'businessUnits.id = 123')
-                        ->leftJoin('o.users', 'users', Join::WITH, 'users.id = 123')
-                        ->select('u.id, o.username');
+                    return $this->getQueryBuilderWith3thJoinTables($em);
                 },
                 ['businessUnits'],
                 'expectedDQL'  => 'SELECT u.id FROM Test:User u '
@@ -678,17 +671,12 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'request_with_2_3th_join_tables_delete_both_3th_join_table' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
-                        ->from('Test:User', 'u')
-                        ->leftJoin('u.organization', 'o', Join::WITH, 'o.id = 456')
-                        ->leftJoin('o.businessUnits', 'businessUnits', Join::WITH, 'businessUnits.id = 123')
-                        ->leftJoin('o.users', 'users', Join::WITH, 'users.id = 123')
-                        ->select('u.id, o.username');
+                    return $this->getQueryBuilderWith3thJoinTables($em);
                 },
                 ['businessUnits', 'users'],
                 'expectedDQL'  => 'SELECT u.id FROM Test:User u'
             ],
-            'request_with_3_joins_2_manyToOne_through_oneToMany' => [
+            'request_with_3_joins_2_manyToOne_through_oneToMany'        => [
                 'queryBuilder' => function ($em) {
                     return self::createQueryBuilder($em)
                         ->from('Test:EmailOrigin', 'eo')
@@ -704,5 +692,20 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
                     . 'LEFT JOIN primaryEmail.status emailStatus WHERE emailStatus.name IS NOT NULL'
             ]
         ];
+    }
+
+    /**
+     * @param EntityManager $entityManager
+     *
+     * @return QueryBuilder
+     */
+    private function getQueryBuilderWith3thJoinTables($entityManager)
+    {
+        return self::createQueryBuilder($entityManager)
+            ->from('Test:User', 'u')
+            ->leftJoin('u.organization', 'o', Join::WITH, 'o.id = 456')
+            ->leftJoin('o.businessUnits', 'businessUnits', Join::WITH, 'businessUnits.id = 123')
+            ->leftJoin('o.users', 'users', Join::WITH, 'users.id = 123')
+            ->select('u.id, o.username');
     }
 }

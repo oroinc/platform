@@ -208,9 +208,6 @@ class CountQueryBuilderOptimizer
                 $groupByAliases,
                 $useNonSymmetricJoins
             );
-        }
-
-        if (count($joinAliases) !== count($collectedAliases)) {
             $relationJoinAliases = $this->addRequiredJoins(
                 $requiredJoinAliases,
                 $fromQueryPart,
