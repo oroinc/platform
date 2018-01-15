@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Http\Firewall;
+namespace Oro\Bundle\ApiBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener;
 
-class ApiExceptionListener extends ExceptionListener
+class SecurityFirewallExceptionListener extends ExceptionListener
 {
     /** @var array */
     protected $sessionOptions;

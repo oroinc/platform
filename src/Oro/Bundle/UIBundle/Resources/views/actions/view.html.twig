@@ -237,6 +237,7 @@
     {% block sync_content_tags %}
         {# block added just for possibility to disable it in child templates if needed #}
         {{ syncMacro.syncContentTags(entity) }}
+        {% placeholder view_entity_sync_content_tags with {entity: entity} %}
     {% endblock %}
 </div>
 {% endblock content %}

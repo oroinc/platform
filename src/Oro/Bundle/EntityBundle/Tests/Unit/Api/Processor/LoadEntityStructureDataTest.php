@@ -5,13 +5,13 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Api\Processor;
 use Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
-use Oro\Bundle\EntityBundle\Api\Processor\EntityStructureLoadDataProcessor;
+use Oro\Bundle\EntityBundle\Api\Processor\LoadEntityStructureData;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider;
 
-class EntityStructureLoadDataProcessorTest extends \PHPUnit_Framework_TestCase
+class LoadEntityStructureDataTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var EntityStructureLoadDataProcessor */
+    /** @var LoadEntityStructureData */
     protected $processor;
 
     /** @var EntityStructureDataProvider|\PHPUnit_Framework_MockObject_MockObject */
@@ -23,7 +23,7 @@ class EntityStructureLoadDataProcessorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->provider = $this->createMock(EntityStructureDataProvider::class);
-        $this->processor = new EntityStructureLoadDataProcessor($this->provider);
+        $this->processor = new LoadEntityStructureData($this->provider);
     }
 
     public function testProcessGetList()

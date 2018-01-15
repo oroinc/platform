@@ -5,11 +5,11 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Api\Processor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Entity\SettablePriceAwareInterface;
-use Oro\Bundle\CurrencyBundle\Api\Processor\SetPriceByValueAndCurrencyProcessor;
+use Oro\Bundle\CurrencyBundle\Api\Processor\SetPriceByValueAndCurrency;
 
-class SetPriceByValueAndCurrencyProcessorTest extends FormProcessorTestCase
+class SetPriceByValueAndCurrencyTest extends FormProcessorTestCase
 {
-    /** @var SetPriceByValueAndCurrencyProcessor */
+    /** @var SetPriceByValueAndCurrency */
     protected $processor;
 
     /**
@@ -19,7 +19,7 @@ class SetPriceByValueAndCurrencyProcessorTest extends FormProcessorTestCase
     {
         parent::setUp();
 
-        $this->processor = new SetPriceByValueAndCurrencyProcessor();
+        $this->processor = new SetPriceByValueAndCurrency();
     }
 
     public function testProcessWithoutRequestData()

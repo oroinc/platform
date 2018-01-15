@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\Loader\AbstractLoader;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
@@ -96,9 +97,27 @@ class InlineEditColumnOptionsGuesser
             $ruleKey = $reflectionClass->getNamespaceName() === substr(AbstractLoader::DEFAULT_NAMESPACE, 1, -1)
                 ? $reflectionClass->getShortName()
                 : $reflectionClass->getName();
-            $rules[$ruleKey] = (array)$constraint;
+            if (!isset($rules[$ruleKey])) {
+                $rules[$ruleKey] = (array)$constraint;
+            } elseif (!$this->isDefaultConstraint($rules[$ruleKey])) {
+                $rules[$ruleKey][] = $constraint;
+            }
         }
 
         return $rules;
+    }
+
+    /**
+     * @param Constraint|array $constraint
+     *
+     * @return bool
+     */
+    private function isDefaultConstraint($constraint)
+    {
+        if (is_array($constraint)) {
+            return in_array(Constraint::DEFAULT_GROUP, $constraint['groups'], true);
+        }
+
+        return in_array(Constraint::DEFAULT_GROUP, $constraint->groups, true);
     }
 }

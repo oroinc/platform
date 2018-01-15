@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Http\Firewall;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\EventListener;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,17 +12,17 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
-use Oro\Bundle\ApiBundle\Http\Firewall\ApiExceptionListener;
+use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
 
-class ApiExceptionListenerTest extends \PHPUnit_Framework_TestCase
+class SecurityFirewallExceptionListenerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var array */
     protected $sessionOptions = ['name' => 'OROID'];
 
     public function testSetSessionOptions()
     {
-        /** @var ApiExceptionListener $listener */
-        $listener = $this->createApiExceptionListener();
+        /** @var SecurityFirewallExceptionListener $listener */
+        $listener = $this->createSecurityFirewallExceptionListener();
         $listener->setSessionOptions($this->sessionOptions);
 
         $this->assertObjectHasAttribute('sessionOptions', $listener);
@@ -57,7 +57,7 @@ class ApiExceptionListenerTest extends \PHPUnit_Framework_TestCase
         /**
          * Execute
          */
-        $listener = $this->createApiExceptionListener(true);
+        $listener = $this->createSecurityFirewallExceptionListener(true);
         $listener->setSessionOptions($this->sessionOptions);
         $listener->onKernelException($event);
     }
@@ -87,7 +87,7 @@ class ApiExceptionListenerTest extends \PHPUnit_Framework_TestCase
         /**
          * Execute
          */
-        $listener = $this->createApiExceptionListener(true);
+        $listener = $this->createSecurityFirewallExceptionListener(true);
         $listener->setSessionOptions($this->sessionOptions);
         $listener->onKernelException($event);
     }
@@ -104,9 +104,9 @@ class ApiExceptionListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param bool $fullSetup
      *
-     * @return ApiExceptionListener
+     * @return SecurityFirewallExceptionListener
      */
-    protected function createApiExceptionListener($fullSetup = false)
+    protected function createSecurityFirewallExceptionListener($fullSetup = false)
     {
         /** @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject $tokenStorage */
         $tokenStorage = $this->createMock(
@@ -137,7 +137,7 @@ class ApiExceptionListenerTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue(new Response('OK')));
         }
 
-        return new ApiExceptionListener(
+        return new SecurityFirewallExceptionListener(
             $tokenStorage,
             $trustResolver,
             $this->createMock('Symfony\Component\Security\Http\HttpUtils'),

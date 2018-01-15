@@ -1,6 +1,6 @@
 services:
     oro_entity.api.processor.normalize_input.entity_fallback_validator:
-        class: Oro\Bundle\EntityBundle\Api\Processor\EntityFallbackValidateProcessor
+        class: Oro\Bundle\EntityBundle\Api\Processor\ValidateEntityFallback
         arguments:
             - '@oro_entity.fallback.resolver.entity_fallback_resolver'
             - '@oro_api.value_normalizer'
@@ -9,7 +9,7 @@ services:
             - { name: oro.api.processor, action: update, group: normalize_input, priority: -32 }
 
     oro_entity.api.processor.load_data.entitues_structure:
-        class: Oro\Bundle\EntityBundle\Api\Processor\EntityStructureLoadDataProcessor
+        class: Oro\Bundle\EntityBundle\Api\Processor\LoadEntityStructureData
         arguments:
             - '@oro_entity.provider.structure_data'
         tags:
