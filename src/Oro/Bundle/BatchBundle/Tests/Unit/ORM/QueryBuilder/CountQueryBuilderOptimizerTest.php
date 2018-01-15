@@ -687,6 +687,21 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
                 },
                 ['businessUnits', 'users'],
                 'expectedDQL'  => 'SELECT u.id FROM Test:User u'
+            ],
+            'request_with_3_joins_2_manyToOne_through_oneToMany' => [
+                'queryBuilder' => function ($em) {
+                    return self::createQueryBuilder($em)
+                        ->from('Test:EmailOrigin', 'eo')
+                        ->leftJoin('eo.owner', 'u')
+                        ->leftJoin('u.emails', 'primaryEmail', Join::WITH, 'primaryEmail.primary = true')
+                        ->leftJoin('primaryEmail.status', 'emailStatus')
+                        ->where('emailStatus.name IS NOT NULL')
+                        ->select('u.id');
+                },
+                ['primaryEmail'],
+                'expectedDQL'  => 'SELECT eo.id FROM Test:EmailOrigin eo LEFT JOIN eo.owner u '
+                    . 'LEFT JOIN u.emails primaryEmail WITH primaryEmail.primary = true '
+                    . 'LEFT JOIN primaryEmail.status emailStatus WHERE emailStatus.name IS NOT NULL'
             ]
         ];
     }
