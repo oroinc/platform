@@ -153,6 +153,14 @@ class ImportExportContext extends OroFeatureContext implements
             $processor = $processorName;
         }
 
+        $this->downloadTemplateFileByProcessor($processor);
+    }
+
+    /**
+     * @param string $processor
+     */
+    public function downloadTemplateFileByProcessor($processor)
+    {
         $this->openImportModalAndReturnImportSubmitButton();
 
         $exportButton = $this->createElement('ActiveExportTemplateButton');
