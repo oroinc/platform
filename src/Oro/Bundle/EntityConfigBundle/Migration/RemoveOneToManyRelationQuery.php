@@ -4,13 +4,13 @@ namespace Oro\Bundle\EntityConfigBundle\Migration;
 
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
-class RemoveManyToOneRelationQuery extends RemoveRelationQuery
+class RemoveOneToManyRelationQuery extends RemoveRelationQuery
 {
     /**
      * {@inheritdoc}
      */
     public function getRelationType()
     {
-        return RelationType::MANY_TO_ONE;
+        return RelationType::ONE_TO_MANY;
     }
 }
