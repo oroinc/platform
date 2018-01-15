@@ -8,7 +8,7 @@ use Oro\Bundle\CurrencyBundle\Entity\SettablePriceAwareInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
-class SetPriceByValueAndCurrencyProcessor implements ProcessorInterface
+class SetPriceByValueAndCurrency implements ProcessorInterface
 {
     /**
      * {@inheritdoc}
