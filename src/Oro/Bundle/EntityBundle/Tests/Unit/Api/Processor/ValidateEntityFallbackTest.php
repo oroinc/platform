@@ -7,9 +7,9 @@ use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
-use Oro\Bundle\EntityBundle\Api\Processor\EntityFallbackValidateProcessor;
+use Oro\Bundle\EntityBundle\Api\Processor\ValidateEntityFallback;
 
-class EntityFallbackValidateProcessorTest extends \PHPUnit_Framework_TestCase
+class ValidateEntityFallbackTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var EntityFallbackResolver|\PHPUnit_Framework_MockObject_MockObject
@@ -22,9 +22,9 @@ class EntityFallbackValidateProcessorTest extends \PHPUnit_Framework_TestCase
     protected $valueNormalizer;
 
     /**
-     * @var EntityFallbackValidateProcessor
+     * @var ValidateEntityFallback
      */
-    protected $entityFallbackValidateProcessor;
+    protected $processor;
 
     /**
      * @var CreateContext|\PHPUnit_Framework_MockObject_MockObject
@@ -42,7 +42,7 @@ class EntityFallbackValidateProcessorTest extends \PHPUnit_Framework_TestCase
         $this->valueNormalizer->expects($this->once())
             ->method('normalizeValue')
             ->willReturn('entityfieldfallbackvalues');
-        $this->entityFallbackValidateProcessor = new EntityFallbackValidateProcessor(
+        $this->processor = new ValidateEntityFallback(
             $this->fallbackResolver,
             $this->valueNormalizer
         );
@@ -65,7 +65,7 @@ class EntityFallbackValidateProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('getRequestData')
             ->willReturn($requestData);
 
-        $this->entityFallbackValidateProcessor->process($this->context);
+        $this->processor->process($this->context);
     }
 
     public function getIgnoreTestProvider()
@@ -122,7 +122,7 @@ class EntityFallbackValidateProcessorTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $this->entityFallbackValidateProcessor->process($this->context);
+        $this->processor->process($this->context);
     }
 
     public function getErrorOnInvalidIncludedItemProvider()
@@ -198,7 +198,7 @@ class EntityFallbackValidateProcessorTest extends \PHPUnit_Framework_TestCase
             $this->context->expects($this->never())->method('addError');
         }
 
-        $this->entityFallbackValidateProcessor->process($this->context);
+        $this->processor->process($this->context);
     }
 
     public function getValidationErrorTestProvider()

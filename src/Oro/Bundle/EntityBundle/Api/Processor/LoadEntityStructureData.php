@@ -10,7 +10,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
-class EntityStructureLoadDataProcessor implements ProcessorInterface
+class LoadEntityStructureData implements ProcessorInterface
 {
     /** @var EntityStructureDataProvider */
     protected $entityStructureProvider;

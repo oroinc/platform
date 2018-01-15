@@ -19,7 +19,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 /**
  * @todo this processor should be replaced with a validator in BAP-15805
  */
-class EntityFallbackValidateProcessor implements ProcessorInterface
+class ValidateEntityFallback implements ProcessorInterface
 {
     /**
      * @var EntityFallbackResolver

@@ -49,7 +49,7 @@ class AttributeWriter extends EntityFieldWriter
         $this->configManager->persist($attributeConfig);
 
         $isSerialized = $this->serializedFieldProvider->isSerialized($fieldConfigModel);
-        $extendConfig = $attributeProvider->getConfig($className, $fieldName);
+        $extendConfig = $extendProvider->getConfig($className, $fieldName);
         $extendConfig->set('is_serialized', $isSerialized);
         $this->configManager->persist($extendConfig);
     }
