@@ -105,7 +105,7 @@ Once preset is defined, its name can be used to configure the provider
 Direct definition of `fieldsFilterer`, `optionsFilter`, `exclude` and `include` options have higer priority over defined in used `filterPreset`. That allows customise filter configuration for certain provider.
 
 ### Entity tree
-Data provider has magic property `entityTree` that returns linked objects. It allows to navigate over entities and their relations.
+Data provider has magic property <a name="entity-tree">`entityTree`</a> that returns linked objects. It allows to navigate over entities and their relations.
 ```js
     console.log(provider.entityTree); 
     { // list with enumerable entities
@@ -216,7 +216,7 @@ Entity nodes have magic property `__entity`, that returns information about the 
     }
 ```
 
-There's method `getEntityTreeNodeByPropertyPath` in `EntityStructureDataProvider` allows to get the node by property path string
+There's method <a name="get-entity-tree-node-by-property-path">`getEntityTreeNodeByPropertyPath`</a> in `EntityStructureDataProvider` allows to get the node by property path string
 ```js
     var node = provider.getEntityTreeNodeByPropertyPath('user.roles.label');
 
