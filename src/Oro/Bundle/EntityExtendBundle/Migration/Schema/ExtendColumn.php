@@ -124,6 +124,20 @@ class ExtendColumn extends Column
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @return ExtendColumn
+     */
+    public function setDefault($default)
+    {
+        if ($this->constructed) {
+            $this->setOptions([OroOptions::KEY => ['extend' => ['default' => $default]]]);
+        }
+
+        return parent::setDefault($default);
+    }
+
+    /**
      * @return ExtendColumn
      */
     public function enableExtendOptions()

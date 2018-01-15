@@ -12,10 +12,13 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 
 /**
  * Makes sure that the filters configuration contains all supported filters
  * and all filters are fully configured.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class CompleteFilters extends CompleteSection
 {
@@ -113,6 +116,10 @@ class CompleteFilters extends CompleteSection
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
     ) {
+        if (is_subclass_of($metadata->name, AbstractEnumValue::class)) {
+            $this->completeEnumIdentifierFilter($definition, $filters);
+        }
+
         $idFieldNames = $definition->getIdentifierFieldNames();
         foreach ($idFieldNames as $fieldName) {
             $field = $definition->getField($fieldName);
@@ -175,6 +182,15 @@ class CompleteFilters extends CompleteSection
         foreach ($relations as $propertyPath => $dataType) {
             $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
             if ($fieldName) {
+                $field = $definition->getField($fieldName);
+                $targetDefinition = $field->getTargetEntity();
+                if (null !== $targetDefinition) {
+                    $targetClass = $field->getTargetClass();
+                    if ($targetClass && is_subclass_of($targetClass, AbstractEnumValue::class)) {
+                        $this->completeEnumIdentifierFilter($targetDefinition, $filters, $fieldName);
+                    }
+                }
+
                 $filter = $filters->getOrAddField($fieldName);
                 if (!$filter->hasDataType()) {
                     $filter->setDataType($dataType);
@@ -225,6 +241,36 @@ class CompleteFilters extends CompleteSection
                 'associationKind'       => $associationKind
             ]);
             $filter->setOptions($options);
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param FiltersConfig          $filters
+     * @param string|null            $filterName
+     */
+    protected function completeEnumIdentifierFilter(
+        EntityDefinitionConfig $definition,
+        FiltersConfig $filters,
+        $filterName = null
+    ) {
+        $idFieldNames = $definition->getIdentifierFieldNames();
+        if (count($idFieldNames) !== 1) {
+            return;
+        }
+
+        $idFieldName = $idFieldNames[0];
+        $idField = $definition->getField($idFieldName);
+        if (null === $idField || $idField->getPropertyPath($idFieldName) !== 'id') {
+            return;
+        }
+
+        if (null === $filterName) {
+            $filterName = $idFieldName;
+        }
+        $filter = $filters->getOrAddField($filterName);
+        if (!$filter->hasArrayAllowed()) {
+            $filter->setArrayAllowed();
         }
     }
 

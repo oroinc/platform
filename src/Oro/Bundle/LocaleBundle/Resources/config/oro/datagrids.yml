@@ -22,7 +22,7 @@ datagrids:
                         - { join: l.parentLocalization, alias: pl }
         properties:
             id: ~
-            title:
+            title_localized:
                 type: localized_value
                 data_name: titles
             view_link:
@@ -87,7 +87,7 @@ datagrids:
                 name:
                     data_name: name
                 title:
-                    data_name: title
+                    data_name: title_localized
                 language:
                     data_name: languageCode
                 formattingCode:
@@ -105,7 +105,7 @@ datagrids:
                     data_name: l.name
                 title:
                     type: string
-                    data_name: title
+                    data_name: title_localized
                 language:
                     type: choice
                     data_name: lng.id

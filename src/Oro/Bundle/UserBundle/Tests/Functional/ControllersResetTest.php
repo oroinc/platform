@@ -115,7 +115,7 @@ class ControllersResetTest extends WebTestCase
 
         $ids = [$user->getId()];
         $crawler = $this->client->request(
-            'GET',
+            'POST',
             $this->getUrl(
                 'oro_user_mass_password_reset',
                 [
