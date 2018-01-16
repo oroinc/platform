@@ -154,6 +154,7 @@ oro:
             new_password.label:             New password
             enter_new_password.label:       New password
             enter_new_password_again.label: Repeat password
+            password_generate.label:        Generate Password
             reset:
                 label: Reset
                 ttl_already_requested.message: The password for this user has already been requested within the last 24 hours
@@ -387,6 +388,7 @@ oro:
                     label: Require a special character
                     tooltip: >
                         Special chars: !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space
+                send_password_in_invitation_email.label: 'Send plain text password in invitation emails'
         mass_actions:
             enable_users:
                 success_message: '%count% user(s) were enabled'
