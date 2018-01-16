@@ -16,6 +16,7 @@ class ClearNavigationHistoryCommandTest extends KernelTestCase
 {
     public function testExecuteWithNonValidInterval()
     {
+        $this->markTestSkipped('Must be redone. See BB-13410');
         $kernel = static::createKernel();
         $kernel->boot();
 
@@ -32,6 +33,7 @@ class ClearNavigationHistoryCommandTest extends KernelTestCase
 
     public function testExecuteWithValidInterval()
     {
+        $this->markTestSkipped('Must be redone. See BB-13410');
         $kernel = static::createKernel();
         $kernel->boot();
 
