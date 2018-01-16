@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Bundle\ApiBundle\Processor\ListContext;
 
 /**
@@ -14,6 +15,17 @@ use Oro\Bundle\ApiBundle\Processor\ListContext;
  */
 class LoadEntitiesByOrmQuery implements ProcessorInterface
 {
+    /** @var QueryHintResolverInterface */
+    protected $queryHintResolver;
+
+    /**
+     * @param QueryHintResolverInterface $queryHintResolver
+     */
+    public function __construct(QueryHintResolverInterface $queryHintResolver)
+    {
+        $this->queryHintResolver = $queryHintResolver;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -28,8 +40,11 @@ class LoadEntitiesByOrmQuery implements ProcessorInterface
 
         $query = $context->getQuery();
         if ($query instanceof QueryBuilder) {
-            $context->setResult($query->getQuery()->getResult());
+            $query = $query->getQuery();
+            $this->queryHintResolver->resolveHints($query, $context->getConfig()->getHints());
+            $context->setResult($query->getResult());
         } elseif ($query instanceof Query) {
+            $this->queryHintResolver->resolveHints($query, $context->getConfig()->getHints());
             $context->setResult($query->getResult());
         }
     }
