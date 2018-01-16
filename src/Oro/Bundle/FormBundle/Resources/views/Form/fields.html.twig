@@ -9,7 +9,7 @@
         {% set url = '' %}
     {% endif %}
     {% if configs.placeholder is defined %}
-        {% set configs = configs|merge({'placeholder': configs.placeholder|trans }) %}
+        {% set configs = configs|merge({'placeholder': configs.placeholder|trans|escape }) %}
     {% endif %}
     {% if configs.result_template_twig is defined and configs.result_template_twig %}
         {% set configs = configs|merge({'result_template': include(configs.result_template_twig) }) %}

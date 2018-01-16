@@ -71,23 +71,38 @@ class ProtectQueryByAcl implements ProcessorInterface
         $config = $context->getConfig();
 
         $permission = null;
-        if (!$config || !$config->hasAclResource()) {
-            $permission = $this->permission;
-        } else {
+        if ($config && $config->hasAclResource()) {
             $aclResource = $config->getAclResource();
             if ($aclResource) {
-                $aclAnnotation = $this->aclAnnotationProvider->findAnnotationById($aclResource);
-                if ($aclAnnotation
-                    && $aclAnnotation->getType() === 'entity'
-                    && $aclAnnotation->getClass() === $entityClass
-                ) {
-                    $permission = $aclAnnotation->getPermission();
-                }
+                $permission = $this->getEntityPermissionByAclResource($aclResource, $entityClass);
             }
+        } else {
+            $permission = $this->permission;
         }
 
         if ($permission) {
             $this->aclHelper->applyAclToCriteria($entityClass, $criteria, $permission);
         }
+    }
+
+    /**
+     * @param string $aclResource
+     * @param string $entityClass
+     *
+     * @return string|null
+     */
+    private function getEntityPermissionByAclResource($aclResource, $entityClass)
+    {
+        $permission = null;
+
+        $aclAnnotation = $this->aclAnnotationProvider->findAnnotationById($aclResource);
+        if ($aclAnnotation
+            && $aclAnnotation->getType() === 'entity'
+            && $aclAnnotation->getClass() === $entityClass
+        ) {
+            $permission = $aclAnnotation->getPermission();
+        }
+
+        return $permission;
     }
 }

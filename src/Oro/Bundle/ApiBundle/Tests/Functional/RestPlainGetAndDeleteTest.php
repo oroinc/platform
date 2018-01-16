@@ -81,14 +81,8 @@ class RestPlainGetAndDeleteTest extends RestPlainApiTestCase
                         ['entity' => $entityType, 'id' => implode(',', $id)]
                     )
                 );
-                if ($response->getStatusCode() == 204 && !in_array('get', $excludedActions, true)) {
-                    // check if entity was really deleted
-                    $response = $this->request(
-                        'GET',
-                        $this->getUrl('oro_rest_api_get', ['entity' => $entityType, 'id' => $id[0]])
-                    );
-                    self::assertApiResponseStatusCodeEquals($response, 404, $entityType, 'get');
-                }
+                // @todo: remove 400 and 403 status coded here
+                self::assertApiResponseStatusCodeEquals($response, [204, 400, 403], $entityType, 'delete_list');
             }
         }
     }

@@ -38,6 +38,7 @@ class OrmPagerExtension extends AbstractPagerExtension
             $this->pager->setCountQb($datasource->getCountQb(), $datasource->getCountQueryHints());
         }
         $this->pager->setQueryBuilder($datasource->getQueryBuilder());
+        $this->pager->setCountQueryHints($datasource->getCountQueryHints());
         $this->pager->setSkipAclCheck($config->isDatasourceSkipAclApply());
         $this->pager->setAclPermission($config->getDatasourceAclApplyPermission());
         $this->pager->setSkipCountWalker(

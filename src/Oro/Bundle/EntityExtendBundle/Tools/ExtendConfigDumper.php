@@ -372,6 +372,7 @@ class ExtendConfigDumper
                     'length'    => $fieldConfig->get('length'),
                     'precision' => $fieldConfig->get('precision'),
                     'scale'     => $fieldConfig->get('scale'),
+                    'default'   => $fieldConfig->get('default'),
                 ];
             }
         }

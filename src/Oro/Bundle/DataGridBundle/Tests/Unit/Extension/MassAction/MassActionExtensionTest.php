@@ -2,20 +2,23 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Csrf\CsrfToken;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
+use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionFactory;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionMetadataFactory;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var MassActionFactory|\PHPUnit_Framework_MockObject_MockObject */
@@ -91,6 +94,14 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
         $action->expects(self::once())
             ->method('getAclResource')
             ->willReturn(null);
+        $actionConfig = $this->createMock(ActionConfiguration::class);
+        $action->expects(self::once())
+            ->method('getOptions')
+            ->willReturn($actionConfig);
+        $actionConfig->expects(self::once())
+            ->method('offsetGetByPath')
+            ->with(MassActionExtension::ALLOWED_REQUEST_TYPES)
+            ->willReturn(null);
 
         $this->actionFactory->expects(self::once())
             ->method('createAction')
@@ -118,6 +129,109 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             $metadata->toArray()
         );
+    }
+
+    public function testVisitMetadataWithMassActionsAndValidHTTPMethods()
+    {
+        $actionName = 'action1';
+        $actionConfig = ['type' => 'type1'];
+        $expectedActionConfig = ['type' => 'type1', 'token' => 'csrf-token'];
+        $actionMetadata = ['type' => 'type1', 'label' => 'label1'];
+
+        $config = DatagridConfiguration::create(
+            [
+                'mass_actions' => [
+                    $actionName => $actionConfig
+                ]
+            ]
+        );
+        $metadata = MetadataObject::create([]);
+
+        $action = $this->createMock(MassActionInterface::class);
+        $action->expects(self::once())
+            ->method('getName')
+            ->willReturn($actionName);
+        $actionConfig = $this->createMock(ActionConfiguration::class);
+        $action->expects(self::once())
+            ->method('getOptions')
+            ->willReturn($actionConfig);
+        $actionConfig->expects(self::once())
+            ->method('offsetGetByPath')
+            ->with(MassActionExtension::ALLOWED_REQUEST_TYPES)
+            ->willReturn(['POST', 'DELETE']);
+
+        $this->actionFactory->expects(self::once())
+            ->method('createAction')
+            ->with($actionName, $expectedActionConfig)
+            ->willReturn($action);
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+        $this->actionMetadataFactory->expects(self::once())
+            ->method('createActionMetadata')
+            ->with(self::identicalTo($action))
+            ->willReturn($actionMetadata);
+
+        $this->tokenManager->expects(self::once())
+            ->method('getToken')
+            ->with($actionName)
+            ->willReturn(new CsrfToken($actionName, 'csrf-token'));
+
+        $this->extension->visitMetadata($config, $metadata);
+
+        self::assertEquals(
+            [
+                'massActions' => [
+                    $actionName => $actionMetadata
+                ]
+            ],
+            $metadata->toArray()
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\DataGridBundle\Exception\RuntimeException
+     * @expectedExceptionMessage Action parameter "allowedRequestTypes" contains wrong HTTP method. Given "POST, DELETE, WRONG", allowed: "GET, POST, DELETE, PUT, PATCH".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testVisitMetadataWithMassActionsAndNotValidHTTPMethods()
+    {
+        $actionName = 'action1';
+        $actionConfig = ['type' => 'type1'];
+        $expectedActionConfig = ['type' => 'type1', 'token' => 'csrf-token'];
+
+        $config = DatagridConfiguration::create(
+            [
+                'mass_actions' => [
+                    $actionName => $actionConfig
+                ]
+            ]
+        );
+        $metadata = MetadataObject::create([]);
+
+        $action = $this->createMock(MassActionInterface::class);
+        $actionConfig = $this->createMock(ActionConfiguration::class);
+        $action->expects(self::once())
+            ->method('getOptions')
+            ->willReturn($actionConfig);
+        $actionConfig->expects(self::once())
+            ->method('offsetGetByPath')
+            ->with(MassActionExtension::ALLOWED_REQUEST_TYPES)
+            ->willReturn(['POST', 'DELETE', 'WRONG']);
+
+        $this->actionFactory->expects(self::once())
+            ->method('createAction')
+            ->with($actionName, $expectedActionConfig)
+            ->willReturn($action);
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        $this->tokenManager->expects(self::once())
+            ->method('getToken')
+            ->with($actionName)
+            ->willReturn(new CsrfToken($actionName, 'csrf-token'));
+
+        $this->extension->visitMetadata($config, $metadata);
     }
 
     public function testVisitMetadataWithAclProtectedMassActionAndAccessGranted()
@@ -156,6 +270,14 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createActionMetadata')
             ->with(self::identicalTo($action))
             ->willReturn($actionMetadata);
+        $actionConfig = $this->createMock(ActionConfiguration::class);
+        $action->expects(self::once())
+            ->method('getOptions')
+            ->willReturn($actionConfig);
+        $actionConfig->expects(self::once())
+            ->method('offsetGetByPath')
+            ->with(MassActionExtension::ALLOWED_REQUEST_TYPES)
+            ->willReturn(null);
 
         $this->tokenManager->expects(self::once())
             ->method('getToken')
@@ -204,6 +326,14 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturn(false);
         $this->actionMetadataFactory->expects(self::never())
             ->method('createActionMetadata');
+        $actionConfig = $this->createMock(ActionConfiguration::class);
+        $action->expects(self::once())
+            ->method('getOptions')
+            ->willReturn($actionConfig);
+        $actionConfig->expects(self::once())
+            ->method('offsetGetByPath')
+            ->with(MassActionExtension::ALLOWED_REQUEST_TYPES)
+            ->willReturn(null);
 
         $this->tokenManager->expects(self::once())
             ->method('getToken')
@@ -273,6 +403,14 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createActionMetadata')
             ->with(self::identicalTo($action))
             ->willReturn($actionMetadata);
+        $actionConfig = $this->createMock(ActionConfiguration::class);
+        $action->expects(self::once())
+            ->method('getOptions')
+            ->willReturn($actionConfig);
+        $actionConfig->expects(self::once())
+            ->method('offsetGetByPath')
+            ->with(MassActionExtension::ALLOWED_REQUEST_TYPES)
+            ->willReturn(null);
 
         $this->tokenManager->expects(self::once())
             ->method('getToken')
@@ -328,6 +466,14 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createActionMetadata')
             ->with(self::identicalTo($action))
             ->willReturn($actionMetadata);
+        $actionConfig = $this->createMock(ActionConfiguration::class);
+        $action->expects(self::once())
+            ->method('getOptions')
+            ->willReturn($actionConfig);
+        $actionConfig->expects(self::once())
+            ->method('offsetGetByPath')
+            ->with(MassActionExtension::ALLOWED_REQUEST_TYPES)
+            ->willReturn(null);
 
         $this->tokenManager->expects(self::once())
             ->method('getToken')
@@ -377,6 +523,14 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturn(false);
         $this->actionMetadataFactory->expects(self::never())
             ->method('createActionMetadata');
+        $actionConfig = $this->createMock(ActionConfiguration::class);
+        $action->expects(self::once())
+            ->method('getOptions')
+            ->willReturn($actionConfig);
+        $actionConfig->expects(self::once())
+            ->method('offsetGetByPath')
+            ->with(MassActionExtension::ALLOWED_REQUEST_TYPES)
+            ->willReturn(null);
 
         $this->tokenManager->expects(self::once())
             ->method('getToken')
@@ -429,6 +583,14 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createActionMetadata')
             ->with(self::identicalTo($action))
             ->willReturn($actionMetadata);
+        $actionConfig = $this->createMock(ActionConfiguration::class);
+        $action->expects(self::once())
+            ->method('getOptions')
+            ->willReturn($actionConfig);
+        $actionConfig->expects(self::once())
+            ->method('offsetGetByPath')
+            ->with(MassActionExtension::ALLOWED_REQUEST_TYPES)
+            ->willReturn(null);
 
         $this->tokenManager->expects(self::once())
             ->method('getToken')
@@ -502,6 +664,14 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturn($action);
         $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
+        $actionConfig = $this->createMock(ActionConfiguration::class);
+        $action->expects(self::once())
+            ->method('getOptions')
+            ->willReturn($actionConfig);
+        $actionConfig->expects(self::once())
+            ->method('offsetGetByPath')
+            ->with(MassActionExtension::ALLOWED_REQUEST_TYPES)
+            ->willReturn(null);
 
         $this->tokenManager->expects(self::once())
             ->method('getToken')
@@ -549,6 +719,14 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('isGranted')
             ->with($actionConfig['acl_resource'])
             ->willReturn(true);
+        $actionConfig = $this->createMock(ActionConfiguration::class);
+        $action->expects(self::once())
+            ->method('getOptions')
+            ->willReturn($actionConfig);
+        $actionConfig->expects(self::once())
+            ->method('offsetGetByPath')
+            ->with(MassActionExtension::ALLOWED_REQUEST_TYPES)
+            ->willReturn(null);
 
         $this->tokenManager->expects(self::once())
             ->method('getToken')
@@ -596,6 +774,14 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('isGranted')
             ->with($actionConfig['acl_resource'])
             ->willReturn(false);
+        $actionConfig = $this->createMock(ActionConfiguration::class);
+        $action->expects(self::once())
+            ->method('getOptions')
+            ->willReturn($actionConfig);
+        $actionConfig->expects(self::once())
+            ->method('offsetGetByPath')
+            ->with(MassActionExtension::ALLOWED_REQUEST_TYPES)
+            ->willReturn(null);
 
         $this->tokenManager->expects(self::once())
             ->method('getToken')

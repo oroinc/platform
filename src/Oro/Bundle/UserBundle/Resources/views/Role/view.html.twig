@@ -49,9 +49,9 @@
 
     {% set additionalBlock %}
         {% if (entity.organization is defined) %}
-            {{ UI.renderHtmlProperty('oro.user.role.organization.label'|trans, entity.organization) }}
+            {{ UI.renderProperty('oro.user.role.organization.label'|trans, entity.organization) }}
         {% endif %}
-        {{ UI.renderHtmlProperty('oro.user.role.extend_description.label'|trans, entity.extendDescription) }}
+        {{ UI.renderHtmlProperty('oro.user.role.extend_description.label'|trans, entity.extendDescription|oro_html_sanitize) }}
     {% endset %}
 
     {% set rolePermissionsGrid %}

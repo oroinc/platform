@@ -40,7 +40,7 @@ class OroApiBundle extends Bundle
             new Compiler\ApiDocConfigurationCompilerPass(),
             PassConfig::TYPE_BEFORE_REMOVING
         );
-        $container->addCompilerPass(new Compiler\ApiSecurityFirewallCompilerPass());
+        $container->addCompilerPass(new Compiler\SecurityFirewallCompilerPass());
         $container->addCompilerPass(new Compiler\DocumentBuilderConfigurationCompilerPass());
         $container->addCompilerPass(new Compiler\ErrorCompleterConfigurationCompilerPass());
 

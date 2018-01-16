@@ -17,8 +17,6 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
 
 /**
  * Handle User forms
- *
- * @SuppressWarnings(PHPMD.ExcessiveParameterList)
  */
 class UserHandler extends AbstractUserHandler
 {
@@ -120,15 +118,14 @@ class UserHandler extends AbstractUserHandler
             $this->manager->setAuthStatus($user, UserManager::STATUS_ACTIVE);
         }
 
+        $isNewUser = !$user->getId();
+        $plainPassword = $this->handleNewUser($user);
+
         $this->manager->updateUser($user);
 
-        if ($this->form->has('inviteUser')
-            && $this->form->has('plainPassword')
-            && $this->form->get('inviteUser')->getViewData()
-            && $this->form->get('plainPassword')->getViewData()
-        ) {
+        if ($isNewUser && $this->form->has('inviteUser') && $this->form->get('inviteUser')->getViewData()) {
             try {
-                $this->sendInviteMail($user, $this->form->get('plainPassword')->getViewData()['first']);
+                $this->sendInviteMail($user, $plainPassword);
             } catch (\Exception $ex) {
                 $this->logger->error('Invitation email sending failed.', ['exception' => $ex]);
                 $this->flashBag->add(
@@ -137,6 +134,30 @@ class UserHandler extends AbstractUserHandler
                 );
             }
         }
+    }
+
+    /**
+     * @param User $user
+     * @return string
+     */
+    protected function handleNewUser(User $user)
+    {
+        if ($user->getId()) {
+            return '';
+        }
+
+        $sendPasswordInEmail = $this->userConfigManager &&
+            $this->userConfigManager->get('oro_user.send_password_in_invitation_email');
+
+        if (!$sendPasswordInEmail && !$user->getConfirmationToken()) {
+            $user->setConfirmationToken($user->generateToken());
+        }
+
+        if ($this->form->has('passwordGenerate') && $this->form->get('passwordGenerate')->getData()) {
+            $user->setPlainPassword($this->manager->generatePassword(10));
+        }
+
+        return $sendPasswordInEmail ? $user->getPlainPassword() : '';
     }
 
     /**

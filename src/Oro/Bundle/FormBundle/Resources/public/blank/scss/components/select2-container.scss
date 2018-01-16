@@ -130,7 +130,8 @@
     border-radius: $select2-drop-border-radius;
     box-shadow: 0 3px 5px rgba(0, 0, 0, .15);
 
-    .select2-highlighted {
+    .select2-highlighted,
+    .select2-result.active {
         background-color: get-color('ui', 'focus');
         color: get-color('additional', 'ultra');
     }
@@ -210,6 +211,11 @@
     color: inherit;
 
     white-space: nowrap;
+
+    @include element-state('hover') {
+        text-decoration: none;
+        color: inherit;
+    }
 }
 
 .select2-drop-undermask,

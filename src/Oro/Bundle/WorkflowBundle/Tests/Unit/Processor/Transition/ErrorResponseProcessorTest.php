@@ -18,9 +18,6 @@ class ErrorResponseProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildResponseFromDefinedFields()
     {
-        $response = new Response();
-        $response->setStatusCode(418, 'message');
-
         /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
@@ -32,7 +29,12 @@ class ErrorResponseProcessorTest extends \PHPUnit_Framework_TestCase
             ->withConsecutive(['responseCode'], ['responseMessage'])
             ->willReturnOnConsecutiveCalls(418, 'message');
 
-        $context->expects($this->once())->method('setResult')->with($response);
+        $context->expects($this->once())->method('setResult')->willReturnCallback(
+            function (Response $response) {
+                $this->assertEquals(418, $response->getStatusCode());
+                $this->assertAttributeEquals('message', 'statusText', $response);
+            }
+        );
         $context->expects($this->once())->method('setProcessed')->with(true);
 
         $this->processor->process($context);
@@ -40,9 +42,6 @@ class ErrorResponseProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildResponseFromError()
     {
-        $response = new Response();
-        $response->setStatusCode(500, 'error message');
-
         /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
@@ -55,7 +54,12 @@ class ErrorResponseProcessorTest extends \PHPUnit_Framework_TestCase
             ->willReturn(null);
 
         $context->expects($this->once())->method('getError')->willReturn(new \Exception('error message'));
-        $context->expects($this->once())->method('setResult')->with($response);
+        $context->expects($this->once())->method('setResult')->willReturnCallback(
+            function (Response $response) {
+                $this->assertEquals(500, $response->getStatusCode());
+                $this->assertAttributeEquals('error message', 'statusText', $response);
+            }
+        );
         $context->expects($this->once())->method('setProcessed')->with(true);
 
         $this->processor->process($context);
