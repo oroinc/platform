@@ -378,23 +378,6 @@ define(function(require) {
 
                 return paths.length ? '/' + paths.join('/') : null;
             }
-        },
-
-        /**
-         * Check native browser scroll size
-         * @return {number}
-         */
-        getScrollbarSize: function() {
-            var size = 0;
-            var element = document.createElement('div');
-            element.style.cssText = 'width: 100px; height: 100px; overflow: scroll; position: absolute; top: -9999px;';
-            document.body.appendChild(element);
-
-            size = element.offsetWidth - element.clientWidth;
-
-            document.body.removeChild(element);
-
-            return size;
         }
     });
 
