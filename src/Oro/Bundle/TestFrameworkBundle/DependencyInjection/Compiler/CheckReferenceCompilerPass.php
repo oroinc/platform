@@ -45,6 +45,7 @@ class CheckReferenceCompilerPass implements CompilerPassInterface
      * @param ContainerBuilder $container
      * @param Definition $definition
      * @param array $call
+     * @throws \Exception
      */
     private function checkCall(ContainerBuilder $container, Definition $definition, array $call)
     {

@@ -53,6 +53,7 @@ class Configuration implements ConfigurationInterface
                 'password_upper_case' => ['value' => true, 'type' => 'boolean'],
                 'password_numbers' => ['value' => true, 'type' => 'boolean'],
                 'password_special_chars' => ['value' => false, 'type' => 'boolean'],
+                'send_password_in_invitation_email' => ['type' => 'boolean', 'value' => false],
             ]
         );
 
