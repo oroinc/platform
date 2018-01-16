@@ -566,7 +566,7 @@ define(function(require) {
                     }
                     var omitRelationFields = this.options.itemLevelLimit <= parts.length;
                     parts.pop();
-                    var levelLimit = this.options.itemLevelLimit - parts.length;
+                    var levelLimit = this.options.itemLevelLimit - parts.length - 1;
                     var treeNode = this.entityDataProvider
                         .getEntityTreeNodeByPropertyPath(parts.join(this.strings.childSeparator));
                     if (treeNode && treeNode.__isEntity) {
