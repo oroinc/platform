@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
@@ -40,22 +41,17 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->entityManagerBag = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityManagerBag = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag');
 
-        $this->configManager  = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager  = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigManager');
+
         $this->configProvider = new ConfigProviderMock($this->configManager, 'extend');
         $this->configManager->expects($this->any())
             ->method('getProvider')
             ->with('extend')
             ->willReturn($this->configProvider);
 
-        $this->generator = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\EntityGenerator')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->generator = $this->createMock('Oro\Bundle\EntityExtendBundle\Tools\EntityGenerator');
 
         $this->extendEntityConfigProvider = $this->createMock(ExtendEntityConfigProviderInterface::class);
 
@@ -205,7 +201,10 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
         /** @var AbstractEntityConfigDumperExtension $extension */
         $extension = $this->createMock(AbstractEntityConfigDumperExtension::class);
         $configId = new EntityConfigId('somescope', 'SomeClass');
-        $config = new Config($configId, ['param1' => 'value1', 'upgradeable' => true]);
+        $config = new Config(
+            $configId,
+            ['param1' => 'value1', 'upgradeable' => true, 'extend_class' => \stdClass::class]
+        );
 
         $this->extendEntityConfigProvider->expects($this->once())
             ->method('getExtendEntityConfigs')
@@ -214,8 +213,59 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->once())
             ->method('flush');
 
-        $this->dumper->addExtension($extension);
+        $this->configProvider->addFieldConfig(
+            'SomeClass',
+            'field1',
+            'boolean',
+            [
+                'is_extend' => true,
+                'default' => true
+            ]
+        );
 
+        $this->dumper->addExtension($extension);
         $this->dumper->updateConfig();
+
+        $this->assertEquals(
+            new Config(
+                $configId,
+                [
+                    'param1' => 'value1',
+                    'upgradeable' => true,
+                    'schema' => [
+                        'class' => 'SomeClass',
+                        'entity' => \stdClass::class,
+                        'type' => 'Extend',
+                        'property' => [
+                            'field1' => []
+                        ],
+                        'relation' => [],
+                        'default' => [],
+                        'addremove' => [],
+                        'doctrine' => [
+                            \stdClass::class => [
+                                'type' => 'mappedSuperclass',
+                                'fields' => [
+                                    'field1' => [
+                                        'column' => 'field1',
+                                        'type' => 'boolean',
+                                        'nullable' => true,
+                                        'length' => null,
+                                        'precision' => null,
+                                        'scale' => null,
+                                        'default' => true,
+                                    ]
+                                ]
+                            ]
+                        ],
+                        'parent' => false,
+                        'inherit' => false
+                    ],
+                    'state' => ExtendScope::STATE_ACTIVE,
+                    'extend_class' => \stdClass::class
+                ]
+            ),
+            $config
+        );
     }
 }

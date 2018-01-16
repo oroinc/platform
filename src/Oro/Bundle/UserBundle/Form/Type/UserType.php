@@ -6,8 +6,8 @@ use Doctrine\ORM\EntityRepository;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -111,25 +111,6 @@ class UserType extends AbstractType
         $this->addOrganizationField($builder);
         $builder
             ->add(
-                'plainPassword',
-                'repeated',
-                [
-                    'invalid_message' => 'oro.user.message.password_mismatch',
-                    'type'           => 'password',
-                    'required'       => true,
-                    'first_options' => [
-                        'label' => 'oro.user.password.label',
-                        'tooltip' => $this->optionsProvider->getTooltip(),
-                        'attr' => [
-                            'data-validation' => $this->optionsProvider->getDataValidationOption()
-                        ]
-                    ],
-                    'second_options' => [
-                        'label' => 'oro.user.password_re.label',
-                    ],
-                ]
-            )
-            ->add(
                 'emails',
                 'collection',
                 [
@@ -146,6 +127,60 @@ class UserType extends AbstractType
             ->add('avatar', 'oro_image', ['label' => 'oro.user.avatar.label', 'required' => false]);
 
         $this->addInviteUserField($builder);
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData'], 10);
+    }
+
+    /**
+     * @param FormEvent $event
+     */
+    public function preSetData(FormEvent $event)
+    {
+        $form = $event->getForm();
+
+        /** @var User $data */
+        $data = $event->getData();
+        if (!$data instanceof User) {
+            return;
+        }
+
+        $passwordOptions = [
+            'invalid_message' => 'oro.user.message.password_mismatch',
+            'type' => 'password',
+            'required' => false,
+            'first_options' => [
+                'label' => 'oro.user.password.label',
+                'tooltip' => $this->optionsProvider->getTooltip(),
+                'attr' => [
+                    'autocomplete' => 'new-password',
+                    'data-validation' => $this->optionsProvider->getDataValidationOption(),
+                ]
+            ],
+            'second_options' => ['label' => 'oro.user.password_re.label'],
+        ];
+
+        if (!$data->getId()) {
+            $form
+                ->add(
+                    'passwordGenerate',
+                    'checkbox',
+                    [
+                        'required' => false,
+                        'label' => 'oro.user.password.password_generate.label',
+                        'mapped' => false
+                    ]
+                );
+
+            $passwordOptions = array_merge(
+                $passwordOptions,
+                [
+                    'required' => true,
+                    'validation_groups' => ['Registration'],
+                ]
+            );
+        }
+
+        $form->add('plainPassword', 'repeated', $passwordOptions);
     }
 
     /**
@@ -157,19 +192,7 @@ class UserType extends AbstractType
             [
                 'data_class'           => 'Oro\Bundle\UserBundle\Entity\User',
                 'intention'            => 'user',
-                'validation_groups'    => function ($form) {
-                    if ($form instanceof FormInterface) {
-                        $user = $form->getData();
-                    } elseif ($form instanceof FormView) {
-                        $user = $form->vars['value'];
-                    } else {
-                        $user = null;
-                    }
-
-                    return $user && $user->getId()
-                        ? ['Roles', 'Default']
-                        : ['Registration', 'Roles', 'Default'];
-                },
+                'validation_groups'    => ['Roles', 'Default'],
                 'ownership_disabled'   => $this->isMyProfilePage
             ]
         );

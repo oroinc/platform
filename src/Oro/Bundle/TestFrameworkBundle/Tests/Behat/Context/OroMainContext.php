@@ -778,7 +778,7 @@ class OroMainContext extends MinkContext implements
             $attribute = $button->getAttribute($attributeName);
 
             self::assertNotNull($attribute, sprintf("Attribute with name '%s' not found", $attributeName));
-            self::assertEquals($expectedValue, $attribute);
+            self::assertContains($expectedValue, $attribute);
         }
     }
 

@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": ">=7.0",
+        "php": "7.1.*",
         "ext-intl": "*",
         "ext-mbstring": "*",
         "ext-gd": "*",
@@ -32,8 +32,8 @@
         "sensio/distribution-bundle": "5.0.*",
         "sensio/framework-extra-bundle": "3.0.*",
         "incenteev/composer-parameter-handler": "2.1.2",
-        "jms/serializer": "1.4.2",
-        "jms/serializer-bundle": "1.1.0",
+        "jms/serializer": "1.5.0",
+        "jms/serializer-bundle": "1.2.*",
         "kriswallsmith/assetic": "1.4.0",
         "knplabs/knp-menu": "2.2.*",
         "knplabs/knp-menu-bundle": "2.1.*",

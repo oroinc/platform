@@ -17,4 +17,9 @@ class TestComment
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
+    /**
+     * @ORM\Column(name="unassigned", type="boolean")
+     */
+    protected $unassigned;
 }
