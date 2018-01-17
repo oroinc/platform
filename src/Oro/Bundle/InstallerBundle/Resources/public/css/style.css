@@ -594,6 +594,40 @@ a.button:hover {
     padding: 0 5px
 }
 
+.horizontal-form .row-oro.oro-multiselect-holder > div {
+    width: 85%;
+}
+
+.horizontal-form .row-oro .oro-item-collection {
+    width: 100%;
+}
+
+.horizontal-form .row-oro > div, .btn.removeRow {
+    display: inline-block;
+}
+
+.horizontal-form .btn.removeRow {
+    vertical-align: top;
+    margin-left: 5px;
+    margin-top: 5px;
+}
+
+.horizontal-form .row-oro .control-group {
+    padding: 0px;
+}
+
+.horizontal-form .row-oro a.add-list-item {
+    font: bold 11px Arial;
+    text-decoration: none;
+    background-color: #EEEEEE;
+    color: #333333;
+    padding: 2px 6px 2px 6px;
+    border-top: 1px solid #CCCCCC;
+    border-right: 1px solid #333333;
+    border-bottom: 1px solid #333333;
+    border-left: 1px solid #CCCCCC;
+}
+
 .validation-tooltip {
     color: red;
     padding: 10px 0 0;
