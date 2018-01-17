@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Bundle\ApiBundle\Processor\Shared\SetTotalCountHeader;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
+use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 
 class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
 {
@@ -13,22 +17,23 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
     const REQUEST_TOTAL_COUNT_HEADER_VALUE = 'totalCount';
     const RESPONSE_TOTAL_COUNT_HEADER_NAME = 'X-Include-Total-Count';
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|CountQueryBuilderOptimizer */
+    protected $countQueryBuilderOptimizer;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|QueryHintResolverInterface */
+    protected $queryHintResolver;
+
     /** @var SetTotalCountHeader */
     protected $processor;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $countQueryBuilderOptimizer;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->countQueryBuilderOptimizer = $this
-            ->getMockBuilder('Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->countQueryBuilderOptimizer = $this->createMock(CountQueryBuilderOptimizer::class);
+        $this->queryHintResolver = $this->createMock(QueryHintResolverInterface::class);
 
-        $this->processor = new SetTotalCountHeader($this->countQueryBuilderOptimizer);
+        $this->processor = new SetTotalCountHeader($this->countQueryBuilderOptimizer, $this->queryHintResolver);
     }
 
     public function testProcessWithoutRequestHeader()
@@ -105,6 +110,9 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
     public function testProcessQueryBuilder()
     {
         $entityClass = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group';
+        $hints = ['test_hint'];
+        $config = new EntityDefinitionConfig();
+        $config->setHints($hints);
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
 
@@ -117,12 +125,16 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
                     return $qb;
                 }
             );
+        $this->queryHintResolver->expects($this->once())
+            ->method('resolveHints')
+            ->with(self::isInstanceOf(Query::class), $hints);
 
         $this->context->getRequestHeaders()->set(
             self::REQUEST_INCLUDE_HEADER_NAME,
             [self::REQUEST_TOTAL_COUNT_HEADER_VALUE]
         );
         $this->context->setQuery($query);
+        $this->context->setConfig($config);
         $this->processor->process($this->context);
 
         // mocked fetchColumn method in StatementMock returns null value (0 records in db)
@@ -135,14 +147,22 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
     public function testProcessQuery()
     {
         $entityClass = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group';
+        $hints = ['test_hint'];
+        $config = new EntityDefinitionConfig();
+        $config->setHints($hints);
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
+
+        $this->queryHintResolver->expects($this->once())
+            ->method('resolveHints')
+            ->with(self::isInstanceOf(Query::class), $hints);
 
         $this->context->getRequestHeaders()->set(
             self::REQUEST_INCLUDE_HEADER_NAME,
             [self::REQUEST_TOTAL_COUNT_HEADER_VALUE]
         );
         $this->context->setQuery($query->getQuery());
+        $this->context->setConfig($config);
         $this->processor->process($this->context);
 
         // mocked fetchColumn method in StatementMock returns null value (0 records in db)
@@ -161,11 +181,15 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
             . '"stdClass" given.'
         );
 
+        $config = new EntityDefinitionConfig();
+        $config->setHints(['test_hint']);
+
         $this->context->getRequestHeaders()->set(
             self::REQUEST_INCLUDE_HEADER_NAME,
             [self::REQUEST_TOTAL_COUNT_HEADER_VALUE]
         );
         $this->context->setQuery(new \stdClass());
+        $this->context->setConfig($config);
         $this->processor->process($this->context);
     }
 }

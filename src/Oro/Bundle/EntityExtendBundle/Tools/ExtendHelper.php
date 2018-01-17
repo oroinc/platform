@@ -167,7 +167,7 @@ class ExtendHelper
             throw new \InvalidArgumentException('$enumName must not be empty.');
         }
 
-        $result = self::convertName($enumName);
+        $result = self::convertEnumNameToCode($enumName);
 
         if (empty($result) && $throwExceptionIfInvalidName) {
             throw new \InvalidArgumentException(
@@ -250,7 +250,7 @@ class ExtendHelper
             throw new \InvalidArgumentException('$enumValueName must not be empty.');
         }
 
-        $result = self::convertName($enumValueName);
+        $result = self::convertEnumNameToCode($enumValueName);
 
         if (strlen($result) > self::MAX_ENUM_VALUE_ID_LENGTH) {
             $hash   = dechex(crc32($result));
@@ -267,14 +267,13 @@ class ExtendHelper
     }
 
     /**
-     * Convert enum code/value
-     *
-     * @throws \RuntimeException
+     * Converts enum name to enum code
      *
      * @param string $name
+     *
      * @return string
      */
-    public static function convertName($name)
+    private static function convertEnumNameToCode($name)
     {
         if ($name && function_exists('iconv')) {
             $originalName = $name;

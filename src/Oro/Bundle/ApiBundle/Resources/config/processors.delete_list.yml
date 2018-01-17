@@ -59,6 +59,8 @@ services:
 
     oro_api.delete_list.load_data_by_orm_query:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntitiesByOrmQuery
+        arguments:
+            - '@oro_entity.query_hint_resolver'
         tags:
             - { name: oro.api.processor, action: delete_list, group: load_data, priority: -10 }
 

@@ -57,7 +57,7 @@ filters:
         operators: '=,!=,<,<=,>,>='
     'filter[fieldString]':
         requirement: '.+'
-        type: 'string or array'
+        type: 'string'
         operators: '=,!='
     'filter[fieldTime]':
         requirement: '\d{2}:\d{2}(:\d{2}(\.\d+)?)?|\d{2}:\d{2}(:\d{2}(\.\d+)?)?..\d{2}:\d{2}(:\d{2}(\.\d+)?)?'

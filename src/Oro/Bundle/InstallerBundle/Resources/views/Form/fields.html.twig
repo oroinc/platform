@@ -23,6 +23,56 @@
 {{ block('form_row') }}
 {% endblock %}
 
+{% block _oro_installer_configuration_database_oro_installer_database_driver_options_row %}
+    <script type="text/javascript">
+        $(function () {
+            $(document).on('click', '.removeRow', function(e) {
+                e.preventDefault();
+
+                $(this).closest('*[data-content]').remove();
+            });
+        });
+
+        $(document).on('click', '.add-list-item', function(e) {
+            var getOroCollectionInfo = function($listContainer) {
+                var index = $listContainer.data('last-index');
+                var prototypeName = $listContainer.attr('data-prototype-name') || '__name__';
+                var html = $listContainer.attr('data-prototype');
+
+                return {
+                    nextIndex: index,
+                    prototypeHtml: html,
+                    prototypeName: prototypeName
+                };
+            };
+
+            var getOroCollectionNextItemHtml = function(collectionInfo) {
+                return collectionInfo.prototypeHtml
+                    .replace(new RegExp(collectionInfo.prototypeName, 'g'), collectionInfo.nextIndex);
+            };
+
+            e.preventDefault();
+
+            var containerSelector = '.collection-fields-list';
+            var $listContainer = $(this).closest('.row-oro').find(containerSelector).first();
+            var rowCountAdd = $(containerSelector).data('row-count-add') || 1;
+
+            var collectionInfo = getOroCollectionInfo($listContainer);
+            console.log(collectionInfo);
+            for (var i = 1; i <= rowCountAdd; i++) {
+                var nextItemHtml = getOroCollectionNextItemHtml(collectionInfo);
+                collectionInfo.nextIndex++;
+                $listContainer.append(nextItemHtml).data('last-index', collectionInfo.nextIndex);
+            }
+            $listContainer.find('input.position-input').each(function(i, el) {
+                $(el).val(i);
+            });
+        });
+    </script>
+
+    {{ block('form_row') }}
+{% endblock %}
+
 {% block _oro_installer_configuration_database_oro_installer_database_driver_row %}
 <script type="text/javascript">
     $(function () {
