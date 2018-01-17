@@ -140,7 +140,7 @@ services:
     oro_imap.manager.clear:
         class: %oro_imap.imap_clear_manager.class%
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_entity.event_listener.entity_modify_created_updated_properties_listener'
         calls:
             - [setLogger, ['@logger']]
