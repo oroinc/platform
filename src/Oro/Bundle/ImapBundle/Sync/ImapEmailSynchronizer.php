@@ -14,6 +14,7 @@ use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Exception\InvalidCredentialsException;
 use Oro\Bundle\ImapBundle\Exception\SocketTimeoutException;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
@@ -152,6 +153,11 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         try {
             parent::doSyncOrigin($origin, $settings);
         } catch (InvalidCredentialsException $ex) {
+            // save information of invalid origin
+            $this->credentialsIssueManager->addInvalidOrigin($origin);
+
+            throw $ex;
+        } catch (OAuth2ConnectException $ex) {
             // save information of invalid origin
             $this->credentialsIssueManager->addInvalidOrigin($origin);
 

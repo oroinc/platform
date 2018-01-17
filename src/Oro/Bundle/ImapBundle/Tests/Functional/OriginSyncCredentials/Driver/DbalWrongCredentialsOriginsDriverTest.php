@@ -63,13 +63,11 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
 
         $connection->insert('oro_imap_wrong_creds_origin', ['origin_id'=> $emailOriginId, 'owner_id' => $ownerId]);
 
-
         $this->logger->expects($this->once())
             ->method('notice')
             ->with('Email origin with wrong credentials was detected.', ['origin_id' => $emailOriginId]);
 
         $this->driver->addOrigin($emailOriginId, $ownerId);
-
 
         $dbData = $connection->fetchAll('select origin_id, owner_id from oro_imap_wrong_creds_origin');
         $this->assertEquals(

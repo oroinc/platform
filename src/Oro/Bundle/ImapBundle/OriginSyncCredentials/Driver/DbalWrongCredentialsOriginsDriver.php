@@ -6,8 +6,8 @@ use Psr\Log\LoggerInterface;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\ImapBundle\Entity\Repository\UserEmailOriginRepository;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\WrongCredentialsOriginsDriverInterface;
 
@@ -77,11 +77,7 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
             ->fetchAll();
 
         if (count($wrongOriginIds)) {
-            $origins =  $this->getOriginRepository()->createQueryBuilder('o')
-                ->where('o.id in (:ids)')
-                ->setParameter('ids', $wrongOriginIds)
-                ->getQuery()
-                ->getResult();
+            $origins = $this->getOriginRepository()->getOriginsByIds($wrongOriginIds);
         }
 
         return $origins;
@@ -105,15 +101,10 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
             $request->andWhere('owner_id is null');
         }
 
-        $wrongOriginIds = $request->execute()
-            ->fetchAll();
+        $wrongOriginIds = $request->execute()->fetchAll();
 
         if (count($wrongOriginIds)) {
-            $origins =  $this->getOriginRepository()->createQueryBuilder('o')
-                ->where('o.id in (:ids)')
-                ->setParameter('ids', $wrongOriginIds)
-                ->getQuery()
-                ->getResult();
+            $origins = $this->getOriginRepository()->getOriginsByIds($wrongOriginIds);
         }
 
         return $origins;
@@ -149,7 +140,7 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
     }
 
     /**
-     * @return EntityRepository
+     * @return UserEmailOriginRepository
      */
     private function getOriginRepository()
     {
