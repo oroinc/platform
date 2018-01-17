@@ -9,7 +9,7 @@ define(function(require) {
 
     AddressBookWidgetComponent = AddressBookComponent.extend({
         optionNames: AddressBookComponent.prototype.optionNames.concat([
-            'addressCreateUrl', 'addressUpdateRoute', 'addressDeleteRoute'
+            'wid', 'addressCreateUrl', 'addressUpdateRoute', 'addressDeleteRoute'
         ]),
 
         initialize: function() {
