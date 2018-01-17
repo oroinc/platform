@@ -16,6 +16,11 @@ define(function() {
     // copied from https://developer.mozilla.org/
     /* jshint ignore:start */
     // jscs:disable
+    Object.setPrototypeOf = Object.setPrototypeOf || function(obj, proto) {
+        obj.__proto__ = proto;
+        return obj;
+    };
+
     if (!Function.prototype.bind) {
         Function.prototype.bind = function(oThis) {
             if (typeof this !== 'function') {
