@@ -2,9 +2,10 @@ define(function(require) {
     'use strict';
 
     var ConstantNode = require('oroexpressionlanguage/js/library/node/constant-node');
+    var Compiler = require('oroexpressionlanguage/js/library/compiler');
 
     describe('oroexpressionlanguage/js/library/node/constant-node', function() {
-        it('compilation', function() {
+        it('evaluation', function() {
             var testData = [
                 [false, false],
                 [true, true],
@@ -21,8 +22,7 @@ define(function(require) {
             });
         });
 
-        // @todo test has to be turned on once Compiler is complete
-        /*it('evaluation', function() {
+        it('compilation', function() {
             var testData = [
                 ['false', false],
                 ['true', true],
@@ -39,6 +39,6 @@ define(function(require) {
                 node.compile(compiler);
                 expect(compiler.getSource()).toBe(caseData[0]);
             });
-        });*/
+        });
     });
 });
