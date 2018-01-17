@@ -28,12 +28,12 @@ class UpdateEntityConfigQuery extends ParametrizedMigrationQuery
     private $key;
 
     /**
-     * @param string $entityFrom FQCN
-     * @param string $entityTo FQCN
+     * @param string $entityFrom   FQCN
+     * @param string $entityTo     FQCN
      * @param string $relationType one of \Oro\Bundle\EntityExtendBundle\Extend\RelationType constants
      * @param string $field
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      */
     public function __construct($entityFrom, $entityTo, $relationType, $field, $key, $value)
     {
@@ -78,7 +78,7 @@ class UpdateEntityConfigQuery extends ParametrizedMigrationQuery
 
     /**
      * @param LoggerInterface $logger
-     * @param bool $dryRun
+     * @param bool            $dryRun
      */
     protected function updateConfiguration(LoggerInterface $logger, $dryRun = false)
     {
@@ -93,9 +93,9 @@ class UpdateEntityConfigQuery extends ParametrizedMigrationQuery
                 '{key} value for entity `{entity}` config field `{field}`' .
                 ' was not updated as relation `{relation}` is not defined in configuration.',
                 [
-                    'key' => ucfirst($this->key),
-                    'entity' => $this->entityFrom,
-                    'field' => $this->field,
+                    'key'      => ucfirst($this->key),
+                    'entity'   => $this->entityFrom,
+                    'field'    => $this->field,
                     'relation' => $fullRelationName
                 ]
             );
@@ -111,10 +111,10 @@ class UpdateEntityConfigQuery extends ParametrizedMigrationQuery
     }
 
     /**
-     * @param int $id
-     * @param string $data
+     * @param int             $id
+     * @param string          $data
      * @param LoggerInterface $logger
-     * @param bool $dryRun
+     * @param bool            $dryRun
      */
     protected function updateEntityConfig($id, $data, LoggerInterface $logger, $dryRun = false)
     {
@@ -131,6 +131,7 @@ class UpdateEntityConfigQuery extends ParametrizedMigrationQuery
 
     /**
      * @param LoggerInterface $logger
+     *
      * @return array
      */
     protected function fetchEntityConfigRow(LoggerInterface $logger)
