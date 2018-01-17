@@ -42,5 +42,5 @@ oro.imap:
             system_box_failed: The synchronization of the system email box with username "%username%" and host "%host%" was failed. Please check the credentials at the email configuraton page.
         acl:
             credential_system_notifications:
-                label: Recive notification messages for wrong system mail boxes
+                label: Receive notification messages for wrong system mail boxes
                 description: In case if the sync of system mailbox was not sucsessful by wrong credentials, the user will recive the message about this system mail box.
