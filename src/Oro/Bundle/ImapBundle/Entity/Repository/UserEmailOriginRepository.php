@@ -42,6 +42,5 @@ class UserEmailOriginRepository extends EntityRepository
             ->setParameter('ids', $originIds)
             ->getQuery()
             ->getResult();
-
     }
 }
