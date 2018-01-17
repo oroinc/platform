@@ -22,6 +22,67 @@ class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
         ]);
     }
 
+    public function testTotalCount()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['size' => 2]],
+            ['HTTP_X-Include' => 'totalCount']
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type'       => $entityType,
+                        'id'         => '<toString(@TestEmployee1->id)>',
+                        'attributes' => [
+                            'name' => 'TestEmployee1'
+                        ]
+                    ],
+                    [
+                        'type'       => $entityType,
+                        'id'         => '<toString(@TestEmployee2->id)>',
+                        'attributes' => [
+                            'name' => 'TestEmployee2'
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+
+        self::assertEquals(3, $response->headers->get('X-Include-Total-Count'));
+    }
+
+    public function testTotalCountWithFilterByField()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter' => ['name' => 'TestEmployee1']],
+            ['HTTP_X-Include' => 'totalCount']
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type'       => $entityType,
+                        'id'         => '<toString(@TestEmployee1->id)>',
+                        'attributes' => [
+                            'name' => 'TestEmployee1'
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+
+        self::assertEquals(1, $response->headers->get('X-Include-Total-Count'));
+    }
+
     public function testFilterByField()
     {
         $entityType = $this->getEntityType(TestEmployee::class);

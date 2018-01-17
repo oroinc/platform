@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+
 class RemoveManyToOneRelationQuery extends RemoveRelationQuery
 {
     /**
@@ -9,6 +11,6 @@ class RemoveManyToOneRelationQuery extends RemoveRelationQuery
      */
     public function getRelationType()
     {
-        return RemoveRelationQuery::MANY_TO_ONE;
+        return RelationType::MANY_TO_ONE;
     }
 }

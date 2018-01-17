@@ -7,9 +7,11 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\ListContext;
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
@@ -28,12 +30,19 @@ class SetTotalCountHeader implements ProcessorInterface
     /** @var CountQueryBuilderOptimizer */
     protected $countQueryBuilderOptimizer;
 
+    /** @var QueryHintResolverInterface */
+    protected $queryHintResolver;
+
     /**
      * @param CountQueryBuilderOptimizer $countQueryOptimizer
+     * @param QueryHintResolverInterface $queryHintResolver
      */
-    public function __construct(CountQueryBuilderOptimizer $countQueryOptimizer)
-    {
+    public function __construct(
+        CountQueryBuilderOptimizer $countQueryOptimizer,
+        QueryHintResolverInterface $queryHintResolver
+    ) {
         $this->countQueryBuilderOptimizer = $countQueryOptimizer;
+        $this->queryHintResolver = $queryHintResolver;
     }
 
     /**
@@ -63,7 +72,7 @@ class SetTotalCountHeader implements ProcessorInterface
 
         $query = $context->getQuery();
         if (null !== $query && null === $totalCount) {
-            $totalCount = $this->calculateTotalCount($query);
+            $totalCount = $this->calculateTotalCount($query, $context->getConfig());
         }
 
         if (null !== $totalCount) {
@@ -101,20 +110,23 @@ class SetTotalCountHeader implements ProcessorInterface
     }
 
     /**
-     * @param mixed $query
+     * @param mixed                       $query
+     * @param EntityDefinitionConfig|null $config
      *
      * @return int
      */
-    protected function calculateTotalCount($query)
+    protected function calculateTotalCount($query, EntityDefinitionConfig $config = null)
     {
         if ($query instanceof QueryBuilder) {
             $countQuery = $this->countQueryBuilderOptimizer
                 ->getCountQueryBuilder($query)
                 ->getQuery();
+            $this->resolveQueryHints($countQuery, $config);
         } elseif ($query instanceof Query) {
             $countQuery = $this->cloneQuery($query)
                 ->setMaxResults(null)
                 ->setFirstResult(null);
+            $this->resolveQueryHints($countQuery, $config);
         } elseif ($query instanceof SqlQueryBuilder) {
             $countQuery = $this->cloneQuery($query)
                 ->setMaxResults(null)
@@ -137,6 +149,19 @@ class SetTotalCountHeader implements ProcessorInterface
         }
 
         return QueryCountCalculator::calculateCount($countQuery);
+    }
+
+    /**
+     * @param Query                       $query
+     * @param EntityDefinitionConfig|null $config
+     */
+    protected function resolveQueryHints(Query $query, EntityDefinitionConfig $config = null)
+    {
+        $hints = [];
+        if (null !== $config) {
+            $hints = $config->getHints();
+        }
+        $this->queryHintResolver->resolveHints($query, $hints);
     }
 
     /**

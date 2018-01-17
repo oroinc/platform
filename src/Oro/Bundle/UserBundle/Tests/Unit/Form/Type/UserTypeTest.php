@@ -111,10 +111,6 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
         }
         $builder->expects($this->at(++$order))
             ->method('add')
-            ->with('plainPassword', 'repeated')
-            ->will($this->returnValue($builder));
-        $builder->expects($this->at(++$order))
-            ->method('add')
             ->with('emails', 'collection')
             ->will($this->returnValue($builder));
         $builder->expects($this->at(++$order))

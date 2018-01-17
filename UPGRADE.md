@@ -1,5 +1,7 @@
-## FROM 2.3.0 to 2.3.1
+## FROM 2.5.0 to 2.6.0
+* Changed minimum required php version to 7.1
 
+## FROM 2.3.0 to 2.3.1
 * A full rebuilding of the backend search index is required due to tokenizer configuration has been changed.
 
 ## FROM 2.0.0 to 2.1.0

@@ -13,5 +13,6 @@ config:
         'oro/datagrid/cell/action-permissions-cell': 'orouser/js/datagrid/cell/action-permissions-cell.js'
         'orouser/js/app/modules/validator-constraints-module': 'orouser/js/app/modules/validator-constraints-module.js'
         'orouser/js/views/user-apikey-gen-view': 'bundles/orouser/js/views/user-apikey-gen-view.js'
+        'orouser/js/components/password-generate': 'bundles/orouser/js/components/password-generate.js'
     appmodules:
         - orouser/js/app/modules/validator-constraints-module
