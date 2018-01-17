@@ -440,7 +440,7 @@ class RootJobStatusCalculatorTest extends \PHPUnit_Framework_TestCase
         self::assertEquals(Job::STATUS_RUNNING, $rootJob->getStatus());
     }
 
-    public function testShouldLoadChildJobsFromDatabaseUsingArrayHydratorIfPersistentCollectionIsNotInitialized()
+    public function testShouldLoadChildJobsFromDatabaseUsinScalarHydratorIfPersistentCollectionIsNotInitialized()
     {
         $rootJob = new Job();
 
@@ -474,7 +474,7 @@ class RootJobStatusCalculatorTest extends \PHPUnit_Framework_TestCase
             ->method('getQuery')
             ->willReturn($query);
         $query->expects(self::once())
-            ->method('getArrayResult')
+            ->method('getScalarResult')
             ->willReturn([
                 ['id' => 10, 'status' => Job::STATUS_SUCCESS],
                 ['id' => 20, 'status' => Job::STATUS_RUNNING],

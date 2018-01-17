@@ -215,7 +215,7 @@ class RootJobStatusCalculator
             if ($childJobs->isInitialized()) {
                 $childJobs = $childJobs->toArray();
             } else {
-                // using ArrayHydrator instead of ObjectHydrator gives a slight performance improvement,
+                // using ScalarHydrator instead of ObjectHydrator gives a slight performance improvement,
                 // especially when there are a lot of child jobs
                 $childJobs = [];
                 $rows = $this->jobStorage->createJobQueryBuilder('e')
@@ -223,7 +223,7 @@ class RootJobStatusCalculator
                     ->where('e.rootJob = :rootJob')
                     ->setParameter('rootJob', $rootJob)
                     ->getQuery()
-                    ->getArrayResult();
+                    ->getScalarResult();
                 foreach ($rows as $row) {
                     $job = $this->jobStorage->createJob();
                     $job->setId($row['id']);
