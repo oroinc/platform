@@ -1,0 +1,6 @@
+config:
+    paths:
+#        'oroexpressionlanguage/js/library/expression-syntax-error': 'bundles/oroexpressionlanguage/js/library/expression-syntax-error.js'
+
+        'oroexpressionlanguage/js/library/node/node': 'bundles/oroexpressionlanguage/js/library/node/node.js'
+        'oroexpressionlanguage/js/library/node/constant-node': 'bundles/oroexpressionlanguage/js/library/node/constant-node.js'
