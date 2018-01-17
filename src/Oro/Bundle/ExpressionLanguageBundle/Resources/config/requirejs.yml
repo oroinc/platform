@@ -3,6 +3,7 @@ config:
         'oroexpressionlanguage/lib/php-to-js/addcslashes': 'bundles/oroexpressionlanguage/lib/php-to-js/addcslashes.js'
 
         'oroexpressionlanguage/js/library/node/constant-node': 'bundles/oroexpressionlanguage/js/library/node/constant-node.js'
+        'oroexpressionlanguage/js/library/node/name-node': 'bundles/oroexpressionlanguage/js/library/node/name-node.js'
         'oroexpressionlanguage/js/library/node/node': 'bundles/oroexpressionlanguage/js/library/node/node.js'
 
         'oroexpressionlanguage/js/library/compiler': 'bundles/oroexpressionlanguage/js/library/compiler.js'
