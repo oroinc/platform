@@ -21,7 +21,7 @@
                data-page-component-options="{{ {
                    'view': 'oroimportexport/js/app/views/export-button-view',
                    'entity': configuration.entityClass,
-                   'routeOptions': configuration.routeOptions|default({}),
+                   'routeOptions': configuration.routeOptions|default({})|merge(options|default({})),
                    'exportTitle': configuration.exportPopupTitle|default(exportLabel),
                    'exportProcessor': exportProcessor|default(null),
                    'exportJob': configuration.exportJobName|default(null),

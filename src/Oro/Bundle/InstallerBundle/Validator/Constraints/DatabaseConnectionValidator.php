@@ -20,6 +20,7 @@ class DatabaseConnectionValidator extends ConstraintValidator
             'password' => $value['oro_installer_database_password'],
             'driver'   => $value['oro_installer_database_driver'],
             'charset'  => 'UTF8',
+            'driverOptions' => $value['oro_installer_database_driver_options']
         );
 
         try {
