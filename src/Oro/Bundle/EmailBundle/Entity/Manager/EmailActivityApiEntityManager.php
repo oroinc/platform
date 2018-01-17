@@ -91,9 +91,10 @@ class EmailActivityApiEntityManager extends ApiEntityManager
                     $qb->andWhere(
                         $qb->expr()->neq(
                             QueryBuilderUtil::getSelectExprByAlias($qb, 'entityId'),
-                            $currentUser->getId()
+                            ':currentUserId'
                         )
                     );
+                    $qb->setParameter('currentUserId', $currentUser->getId());
                 }
             }
         );
