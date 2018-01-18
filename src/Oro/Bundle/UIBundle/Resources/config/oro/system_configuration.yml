@@ -15,6 +15,7 @@ system_configuration:
         oro_ui.application_url:
             data_type: string
             type: 'Symfony\Component\Form\Extension\Core\Type\UrlType'
+            search_type: text
             options:
                 default_protocol: 'http'
                 label: oro.ui.system_configuration.fields.application_url.label
@@ -24,6 +25,7 @@ system_configuration:
         oro_ui.navbar_position:
             data_type: string
             type: choice
+            search_type: choice
             options:
                 label: oro.ui.system_configuration.fields.navbar_position.label
                 choices:

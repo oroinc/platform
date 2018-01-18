@@ -11,6 +11,7 @@ system_configuration:
         oro_user.password_min_length:
             data_type: integer
             type: integer
+            search_type: text
             priority: 40
             options:
                 label:  oro.user.system_configuration.fields.password_min_length.label
