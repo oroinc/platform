@@ -141,7 +141,7 @@ services:
     oro_imap.manager.clear:
         class: %oro_imap.imap_clear_manager.class%
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_entity.event_listener.entity_modify_created_updated_properties_listener'
         calls:
             - [setLogger, ['@logger']]
@@ -226,6 +226,11 @@ services:
             - @translator
         tags:
             - { name: validator.constraint_validator, alias: oro_imap.validator.email_folders }
+
+    oro_imap.listener.user_email_change:
+        class: Oro\Bundle\ImapBundle\EventListener\UserEmailChangeListener
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: '%oro_user.entity.class%', event: preUpdate }
 
     oro_imap.origin_credentials.issue_manager:
         class: Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager

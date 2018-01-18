@@ -247,9 +247,8 @@ class EmailUserRepository extends EntityRepository
         $queryBuilder = $this->createQueryBuilder('eu');
         $queryBuilder
             ->leftJoin('eu.folders', 'folders')
-            ->andWhere($queryBuilder->expr()->in('folders', ':folder'))
-            ->setParameter('folder', $folder->getId())
-            ->groupBy('eu');
+            ->andWhere($queryBuilder->expr()->eq('folders', ':folder'))
+            ->setParameter('folder', $folder->getId());
         if ($offset) {
             $queryBuilder->setFirstResult($offset);
         }
