@@ -205,4 +205,54 @@ class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
             $response
         );
     }
+
+    public function testPagination()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['number' => 2, 'size' => 2]]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id'   => '<toString(@TestEmployee3->id)>'
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testSorting()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['sort' => '-id']
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id'   => '<toString(@TestEmployee3->id)>'
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id'   => '<toString(@TestEmployee2->id)>'
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id'   => '<toString(@TestEmployee1->id)>'
+                    ],
+                ]
+            ],
+            $response
+        );
+    }
 }
