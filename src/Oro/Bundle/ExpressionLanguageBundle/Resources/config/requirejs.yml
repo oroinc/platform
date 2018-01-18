@@ -2,6 +2,7 @@ config:
     paths:
         'oroexpressionlanguage/lib/php-to-js/addcslashes': 'bundles/oroexpressionlanguage/lib/php-to-js/addcslashes.js'
 
+        'oroexpressionlanguage/js/library/node/arguments-node': 'bundles/oroexpressionlanguage/js/library/node/arguments-node.js'
         'oroexpressionlanguage/js/library/node/array-node': 'bundles/oroexpressionlanguage/js/library/node/array-node.js'
         'oroexpressionlanguage/js/library/node/conditional-node': 'bundles/oroexpressionlanguage/js/library/node/conditional-node.js'
         'oroexpressionlanguage/js/library/node/constant-node': 'bundles/oroexpressionlanguage/js/library/node/constant-node.js'
