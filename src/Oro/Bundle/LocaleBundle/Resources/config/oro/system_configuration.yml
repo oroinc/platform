@@ -111,6 +111,7 @@ system_configuration:
         oro_locale.temperature_unit:
             data_type: string
             type: choice
+            search_type: choice
             priority: 20
             options:
                 label: oro.locale.system_configuration.fields.temperature_unit.label
@@ -125,6 +126,7 @@ system_configuration:
         oro_locale.wind_speed_unit:
             data_type: string
             type: choice
+            search_type: choice
             priority: 10
             options:
                 label: oro.locale.system_configuration.fields.wind_speed_unit.label

@@ -133,12 +133,14 @@ class SettingsFormHandler
 ### Fields
 
 Field declaration have required property `type`.
-`type` - refers to form type of which field should be created
-`tooltip` - show additional info about field
-`acl_resource` - determines acl resource to check permissions to change config field value(optional)
-`priority` - sort order for displaying(optional)
-`ui_only` - indicates whether a field is used only on UI and do not related to any variable (optional, defaults to false)
-`property_path` - overrides configuration key where field's value will be stored (by default field's name used as path)
+* `data_type` - must be specified for all fields except `ui_only` ones
+* `type` - refers to form type of which field should be created
+* `search_type` - indicates how to search by field value, read more in the [Search Type Provider](#search-type-provider) section
+* `tooltip` - show additional info about field
+* `acl_resource` - determines acl resource to check permissions to change config field value(optional)
+* `priority` - sort order for displaying(optional)
+* `ui_only` - indicates whether a field is used only on UI and do not related to any variable (optional, defaults to false)
+* `property_path` - overrides configuration key where field's value will be stored (by default field's name used as path)
 
 Also `options` available property here, it's just a proxy to form type definition
 
@@ -148,7 +150,9 @@ Also `options` available property here, it's just a proxy to form type definitio
 system_configuration:
     fields:
         date_format:
+            data_type: string
             type: text # can be any custom type
+            search_type: text
             options:
                label: 'Date format'
                tooltip: 'Some additional information'
@@ -208,4 +212,76 @@ system_configuration:
                 oro_crm_pro_outlook.contacts_sync_direction: ~
             tasks:
                 oro_crm_pro_outlook.tasks_enabled: ~
+```
+
+#### Search Type Provider
+
+You can add your own rules how system configuration search should work.
+By default search works:
+- for [group](#groups) titles, look at the [`GroupSearchProvider`](../../Provider/GroupSearchProvider.php)
+- for [field](#fields) labels and tooltips, look at the [`FieldSearchProvider`](../../Provider/FieldSearchProvider.php)
+- for [fields](#fields) with `search_type: text`, look at the [`FieldSearchProvider`](../../Provider/FieldSearchProvider.php)
+- for [fields](#fields) with `search_type: choice`, look at the [`FieldSearchProvider`](../../Provider/FieldSearchProvider.php)
+
+##### Defining a Search Provider
+
+Create your own `DemoSearchProvider` that implements [`SearchProviderInterface`](../../Provider/SearchProviderInterface.php).
+
+```php
+<?php
+
+namespace Acme\Bundle\DemoBundle\Provider;
+
+use Oro\Bundle\ConfigBundle\Config\ConfigBag;
+use Oro\Bundle\ConfigBundle\Provider\SearchProviderInterface;
+
+class DemoSearchProvider implements SearchProviderInterface
+{
+    /** @var ConfigBag */
+    private $configBag;
+
+    /**
+     * @param ConfigBag $configBag
+     */
+    public function __construct(ConfigBag $configBag)
+    {
+        // use config bag to obtain group or field configuration data
+        $this->configBag = $configBag;
+    }
+
+    /**
+     * Determines whether this provider is applicable for the given name
+     */
+    public function supports($name)
+    {
+        // example how the field can be determined
+        return $this->configBag->getFieldsRoot($name) !== false;
+    }
+
+    /**
+     * Returns configuration search data by given name
+     */
+    public function getData($name)
+    {
+        // example how to to filter by `search_type` 
+        $field = $this->configBag->getFieldsRoot($name);
+        if ($field['search_type'] === 'your_own_search_type') {
+            // return your own search data for current field
+        }
+
+        return [];
+    }
+}
+```
+
+Register your search provider as a service in the DI container with the `oro_config.configuration_search_provider` tag:
+
+```yaml
+acme_demo.configuration_search_provider.demo:
+    class: Acme\Bundle\DemoBundle\Provider\DemoSearchProvider
+    public: false
+    arguments:
+        - '@oro_config.config_bag'
+    tags:
+        - { name: oro_config.configuration_search_provider, priority: 20 }
 ```

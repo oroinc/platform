@@ -15,6 +15,7 @@ system_configuration:
         oro_sso.domains:
             data_type: array
             type: oro_textlist
+            search_type: text
             options:
                 label:      oro.sso.system_configuration.fields.domains.label
                 tooltip:    oro.sso.system_configuration.fields.domains.tooltip
