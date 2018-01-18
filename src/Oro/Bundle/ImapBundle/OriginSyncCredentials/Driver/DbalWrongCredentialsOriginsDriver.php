@@ -127,7 +127,7 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
      */
     public function deleteAllOrigins()
     {
-        $this->logger->debug('Clear email origin with wrong credentials storage.');
+        $this->logger->debug('Вelete email origin with wrong credentials from the storage.');
         $this->getConnection()->exec('DELETE FROM oro_imap_wrong_creds_origin');
     }
 
