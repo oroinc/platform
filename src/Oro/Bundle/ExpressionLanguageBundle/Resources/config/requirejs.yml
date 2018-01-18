@@ -6,6 +6,7 @@ config:
         'oroexpressionlanguage/js/library/node/array-node': 'bundles/oroexpressionlanguage/js/library/node/array-node.js'
         'oroexpressionlanguage/js/library/node/conditional-node': 'bundles/oroexpressionlanguage/js/library/node/conditional-node.js'
         'oroexpressionlanguage/js/library/node/constant-node': 'bundles/oroexpressionlanguage/js/library/node/constant-node.js'
+        'oroexpressionlanguage/js/library/node/function-node': 'bundles/oroexpressionlanguage/js/library/node/function-node.js'
         'oroexpressionlanguage/js/library/node/name-node': 'bundles/oroexpressionlanguage/js/library/node/name-node.js'
         'oroexpressionlanguage/js/library/node/node': 'bundles/oroexpressionlanguage/js/library/node/node.js'
         'oroexpressionlanguage/js/library/node/unary-node': 'bundles/oroexpressionlanguage/js/library/node/unary-node.js'
