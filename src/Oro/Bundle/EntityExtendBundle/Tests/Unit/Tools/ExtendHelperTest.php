@@ -189,7 +189,7 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
             ['test---123', 'test_123'],
             ['test---___123', 'test_123'],
             ['test- - - _ _ _ 123', 'test_123'],
-            ['test \/()[]~!@#$%^&*_+`', 'test_'],
+            ['test \/()[]~!@#$%^&*_+,.`', 'test_'],
         ];
     }
 

@@ -7,6 +7,7 @@ system_configuration:
         oro_activity_list.sorting_field:
             data_type: string
             type: choice
+            search_type: choice
             options:
                 label: oro.activitylist.system_configuration.fields.sorting_field.label
                 choices:
@@ -17,6 +18,7 @@ system_configuration:
         oro_activity_list.sorting_direction:
             data_type: string
             type: choice
+            search_type: choice
             options:
                 label: oro.activitylist.system_configuration.fields.sorting_direction.label
                 choices:
@@ -27,6 +29,7 @@ system_configuration:
         oro_activity_list.per_page:
             data_type: integer
             type: choice
+            search_type: choice
             options:
                 label: oro.activitylist.system_configuration.fields.per_page.label
                 choices:
@@ -39,6 +42,7 @@ system_configuration:
         oro_activity_list.grouping:
             data_type: boolean
             type: choice
+            search_type: choice
             options:
                 label: oro.activitylist.system_configuration.email_threads.use_threads_in_activities.label
                 choices:

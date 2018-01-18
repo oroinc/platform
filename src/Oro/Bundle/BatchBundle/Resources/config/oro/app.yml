@@ -8,6 +8,7 @@ doctrine:
                 dbname:   %database_name%
                 user:     %database_user%
                 password: %database_password%
+                options:  %database_driver_options%
                 charset:  UTF8
     orm:
         entity_managers:

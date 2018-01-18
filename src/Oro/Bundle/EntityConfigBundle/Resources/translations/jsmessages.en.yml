@@ -8,3 +8,4 @@ oro:
         noname: No name
         remove_confirmation_title: Remove Attribute Group with system attributes
         remove_confirmation_text: Are you sure to delete this Attribute Group? All system attributes will be moved to first one automatically.
+        attributes_import_has_finished: "Attributes import has finished, please <a href='#' data-action='page-refresh'>refresh the page</a>"

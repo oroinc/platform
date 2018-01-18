@@ -18,8 +18,9 @@ class SecurityFirewallContextListener implements ListenerInterface
     protected $tokenStorage;
 
     /**
-     * @param ListenerInterface $innerListener
-     * @param array             $sessionOptions
+     * @param ListenerInterface     $innerListener
+     * @param array                 $sessionOptions
+     * @param TokenStorageInterface $tokenStorage
      */
     public function __construct(
         ListenerInterface $innerListener,

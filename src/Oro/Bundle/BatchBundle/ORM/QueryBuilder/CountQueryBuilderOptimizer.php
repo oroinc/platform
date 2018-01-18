@@ -208,6 +208,15 @@ class CountQueryBuilderOptimizer
                 $groupByAliases,
                 $useNonSymmetricJoins
             );
+            $relationJoinAliases = $this->addRequiredJoins(
+                $requiredJoinAliases,
+                $fromQueryPart,
+                $this->removeAliasesFromQueryJoinParts($joinQueryPart, $collectedAliases),
+                $groupByAliases,
+                false
+            );
+
+            $joinAliases = array_unique(array_merge($joinAliases, $relationJoinAliases));
         }
 
         foreach ($rootAliases as $rootAlias) {

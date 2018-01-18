@@ -11,6 +11,7 @@ system_configuration:
         oro_entity_pagination.limit:
             data_type: integer
             type: text
+            search_type: text
             priority: 90
             options:
                 label: oro.entity_pagination.system_configuration.fields.limit.label

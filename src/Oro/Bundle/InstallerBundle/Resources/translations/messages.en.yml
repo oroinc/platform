@@ -20,7 +20,11 @@ form:
             drop_none:    None
             drop_app:     Application Tables
             drop_full:    All Tables
-            mysql_hint:   To support supplemental characters (e.g. emojis), recommended character set for MySQL is utf8mb4
+            mysql_hint:   To support supplemental characters (e.g. emojis), it is recommended to use utf8mb4 character set for MySQL
+            driver_options:
+                label: Driver Options
+                option_key.label: Option Key
+                option_value.label: Option Value
         mailer:
             header:       Mailer settings
             host:         Host
@@ -102,7 +106,7 @@ process:
             header:        Finish
             greeting:      Success!!!
             content:       'You are now ready to start using Oro.<br>For help please join our community <a href="http://community.oroinc.com">forums</a>.'
-            check-background-command: 'Make sure that consumer command "oro:message-queue:consume" was running <a href="https://oroinc.com/doc/orocrm/current/book/installation#activating-background-tasks" class="helper">?</a>'
+            check-background-command: 'Ensure that at least one consumer service is running. Use the oro:message-queue:consume command to launch a consumer service instance <a href="https://oroinc.com/doc/orocrm/current/book/installation#activating-background-tasks" class="helper">?</a>'
     button:
         back:              Back
         next:              Next
