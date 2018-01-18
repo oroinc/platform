@@ -122,7 +122,7 @@ class Imap extends \Zend\Mail\Storage\Imap
         if ($params->accessToken === null) {
             $response = $this->protocol->login($params->user, $password);
             if (!$response) {
-                throw new InvalidCredentialsException('cannot login, user or password wrong');
+                throw new InvalidCredentialsException('Cannot login. User or password is incorrect.');
             }
             $this->checkAndSetCapability($response);
         } else {
