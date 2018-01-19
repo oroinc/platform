@@ -1,5 +1,9 @@
 <?php //@codingStandardsIgnoreFile?>
 <?php $attr = array_merge($form->vars['attr'], $attr) ?>
+<?php if (!isset($attr['id'])) {
+    $attr['id'] = $form->vars['id'];
+} ?>
+
 <?php $options = ['attr' => $attr] ?>
 
 <?php $action = isset($form_action) ? $form_action : (isset($form_route_name) ? $view['router']->generate($form_route_name, $form_route_parameters) : null) ?>

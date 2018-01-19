@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Filter\FilterInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
@@ -32,11 +33,19 @@ class BuildCriteria implements ProcessorInterface
             return;
         }
 
+        /** @var FilterInterface[] $filters */
         $filters = $context->getFilters();
-        $filterValues = $context->getFilterValues()->getAll();
-        foreach ($filterValues as $filterKey => $filterValue) {
-            if ($filters->has($filterKey)) {
-                $filter = $filters->get($filterKey);
+        $filterValues = $context->getFilterValues();
+
+        /**
+         * it is important to iterate by $filters, not by $filterValues,
+         * because the the order of filters is matter,
+         * e.g. "page size" filter should be processed before "page number" filter
+         * @see \Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultPaging::addPageNumberFilter
+         */
+        foreach ($filters as $filterKey => $filter) {
+            if ($filterValues->has($filterKey)) {
+                $filterValue = $filterValues->get($filterKey);
                 try {
                     $filter->apply($criteria, $filterValue);
                 } catch (\Exception $e) {

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
+use Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider;
 use Oro\Bundle\ConfigBundle\Tests\Unit\Provider\AbstractProviderTest;
 use Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider;
 
@@ -29,9 +30,16 @@ class UserConfigurationFormProviderTest extends AbstractProviderTest
         ConfigBag $configBag,
         TranslatorInterface $translator,
         FormFactoryInterface $formFactory,
-        AuthorizationCheckerInterface $authorizationChecker
+        AuthorizationCheckerInterface $authorizationChecker,
+        ChainSearchProvider $searchProvider
     ) {
-        return new UserConfigurationFormProvider($configBag, $translator, $formFactory, $authorizationChecker);
+        return new UserConfigurationFormProvider(
+            $configBag,
+            $translator,
+            $formFactory,
+            $authorizationChecker,
+            $searchProvider
+        );
     }
 
     /**

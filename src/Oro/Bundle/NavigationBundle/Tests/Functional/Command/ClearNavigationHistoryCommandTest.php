@@ -2,69 +2,51 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Command;
 
-use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-
-use Oro\Bundle\NavigationBundle\Command\ClearNavigationHistoryCommand;
+use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
+use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\NavigationHistoryItemData;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
 
-class ClearNavigationHistoryCommandTest extends KernelTestCase
+class ClearNavigationHistoryCommandTest extends WebTestCase
 {
+    public function setUp()
+    {
+        $this->initClient();
+        $this->loadFixtures([NavigationHistoryItemData::class]);
+    }
+
     public function testExecuteWithNonValidInterval()
     {
-        $this->markTestSkipped('Must be redone. See BB-13410');
-        $kernel = static::createKernel();
-        $kernel->boot();
-
-        $application = new Application($kernel);
-        $application->add(new ClearNavigationHistoryCommand());
-
-        $command = $application->find('oro:navigation:history:clear');
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(['--interval' => 'invalid']);
-
-        $output = $commandTester->getDisplay();
-        $this->assertContains('Value \'invalid\' should be valid date interval', $output);
+        $this->assertContains(
+            "Value 'invalid' should be valid date interval",
+            $this->runCommand('oro:navigation:history:clear', ['--interval' => 'invalid'])
+        );
     }
 
     public function testExecuteWithValidInterval()
     {
-        $this->markTestSkipped('Must be redone. See BB-13410');
-        $kernel = static::createKernel();
-        $kernel->boot();
+        /** @var HistoryItemRepository $repo */
+        $repo = $this->getContainer()->get('oro_entity.doctrine_helper')
+            ->getEntityRepositoryForClass(NavigationHistoryItem::class);
 
-        $application = new Application($kernel);
+        $this->assertCount(5, $repo->findAll());
 
-        /** @var Command $commandMock */
-        $commandMock = $this->getMockBuilder(ClearNavigationHistoryCommand::class)
-            ->setMethods(['someName'])
-            ->getMock();
+        $this->assertContains(
+            "'2' items deleted from navigation history.",
+            $this->runCommand('oro:navigation:history:clear', ['--interval' => '3 days'])
+        );
 
-        $application->add($commandMock);
+        /** @var NavigationHistoryItem[] $items */
+        $items = $repo->findAll();
 
-        $repository = $this->createMock(HistoryItemRepository::class);
-        $repository->expects($this->once())
-            ->method('clearHistoryItems')
-            ->willReturn(5);
+        $this->assertCount(3, $items);
 
-
-        $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($repository);
-
-        $kernel->getContainer()->set('doctrine.orm.entity_manager', $entityManager);
-
-        $command = $application->find('oro:navigation:history:clear');
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(['--interval' => '1 day']);
-
-        $output = $commandTester->getDisplay();
-
-        $this->assertContains("5' items deleted from navigation history.", $output);
+        foreach ($items as $item) {
+            $this->assertTrue(in_array($item->getTitle(), [
+                NavigationHistoryItemData::NAVIGATION_HISTORY_ITEM_3,
+                NavigationHistoryItemData::NAVIGATION_HISTORY_ITEM_4,
+                NavigationHistoryItemData::NAVIGATION_HISTORY_ITEM_5,
+            ]));
+        }
     }
 }

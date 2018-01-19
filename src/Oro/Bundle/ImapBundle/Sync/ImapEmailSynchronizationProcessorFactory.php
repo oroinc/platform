@@ -5,12 +5,16 @@ namespace Oro\Bundle\ImapBundle\Sync;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
+use Psr\Log\LoggerAwareTrait;
+
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 
 class ImapEmailSynchronizationProcessorFactory
 {
+    use LoggerAwareTrait;
+
     /** @var ManagerRegistry */
     protected $doctrine;
 
@@ -47,13 +51,16 @@ class ImapEmailSynchronizationProcessorFactory
         $emailManager,
         KnownEmailAddressCheckerInterface $knownEmailAddressChecker
     ) {
-        return new ImapEmailSynchronizationProcessor(
+        $processor = new ImapEmailSynchronizationProcessor(
             $this->getEntityManager(),
             $this->emailEntityBuilder,
             $knownEmailAddressChecker,
             $emailManager,
             $this->removeManager
         );
+        $processor->setEmailErrorsLogger($this->logger);
+
+        return $processor;
     }
 
     /**
