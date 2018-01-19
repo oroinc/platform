@@ -175,6 +175,29 @@ class QueryHintResolverTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testAddHintsWithParameters()
+    {
+        $query = $this->getQuery();
+        $query->setParameter('parameter_name', 10);
+        $query->setParameter('parameter_name2', 100);
+
+        $this->queryHintResolver->addHints(
+            $query,
+            [
+                ['name' => 'HINT_WITH_PARAMETER', 'value' => ':parameter_name'],
+                ['name' => 'HINT_WITH_PARAMETER2', 'value' => ['id' => ':parameter_name2']]
+            ]
+        );
+
+        $this->assertEquals(
+            [
+                'HINT_WITH_PARAMETER' => 10,
+                'HINT_WITH_PARAMETER2' => ['id' => 100]
+            ],
+            $query->getHints()
+        );
+    }
+
     public function testResolveHints()
     {
         $query = $this->getQuery();

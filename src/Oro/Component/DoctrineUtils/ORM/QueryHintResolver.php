@@ -130,7 +130,7 @@ class QueryHintResolver implements QueryHintResolverInterface
                 $this->addHint(
                     $query,
                     $this->resolveHintName($hint['name']),
-                    isset($hint['value']) ? $hint['value'] : true
+                    isset($hint['value']) ? $this->resolveHintValue($query, $hint['value']) : true
                 );
             } elseif (is_string($hint)) {
                 $this->addHint($query, $this->resolveHintName($hint), true);
@@ -153,5 +153,29 @@ class QueryHintResolver implements QueryHintResolverInterface
         }
 
         return $name;
+    }
+
+    /**
+     * @param Query $query
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    private function resolveHintValue(Query $query, $value)
+    {
+        if (is_string($value) && $value[0] === ':') {
+            $parameterName = substr($value, 1);
+            if ($query->getParameter($parameterName) !== null) {
+                return $query->getParameter($parameterName)->getValue();
+            }
+        }
+
+        if (is_array($value)) {
+            foreach ($value as $key => $item) {
+                $value[$key] = $this->resolveHintValue($query, $item);
+            }
+        }
+
+        return $value;
     }
 }
