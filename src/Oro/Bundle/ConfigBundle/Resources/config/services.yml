@@ -83,6 +83,7 @@ services:
             - '@translator'
             - '@form.factory'
             - '@security.authorization_checker'
+            - '@oro_config.configuration_search_provider.chain'
         calls:
             - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
         tags:
@@ -164,3 +165,26 @@ services:
             - '@oro_message_queue.consumption.cache_state'
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
+
+    oro_config.configuration_search_provider.chain:
+        class: Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider
+        public: false
+
+    oro_config.configuration_search_provider.group:
+        class: Oro\Bundle\ConfigBundle\Provider\GroupSearchProvider
+        public: false
+        arguments:
+            - '@oro_config.config_bag'
+            - '@translator'
+        tags:
+            - { name: oro_config.configuration_search_provider, priority: 0 }
+
+    oro_config.configuration_search_provider.field:
+        class: Oro\Bundle\ConfigBundle\Provider\FieldSearchProvider
+        public: false
+        arguments:
+            - '@oro_config.config_bag'
+            - '@translator'
+            - '@oro_config.manager'
+        tags:
+            - { name: oro_config.configuration_search_provider, priority: 10 }

@@ -285,14 +285,7 @@ class FieldProviderTest extends EntityFieldProviderTest
             ]
         ];
 
-        /**
-         * Changed expected result according to changes
-         * in user defined sorting algorithm in php7
-         * https://bugs.php.net/bug.php?id=69158
-         */
-        if (version_compare(PHP_VERSION, '7.0.0') >= 0) {
-            array_splice($expectedResult[0][0], 0, 2, [ $expectedResult[0][0][1], $expectedResult[0][0][0] ]);
-        }
+        array_splice($expectedResult[0][0], 0, 2, [ $expectedResult[0][0][1], $expectedResult[0][0][0] ]);
 
         return $expectedResult;
     }

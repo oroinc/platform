@@ -377,6 +377,10 @@ class ConfigCache
      */
     public function getConfigurable($className, $fieldName = null)
     {
+        if (!$className) {
+            return null;
+        }
+
         $this->ensureModelCacheLoaded($className);
 
         if ($fieldName) {
@@ -403,6 +407,10 @@ class ConfigCache
      */
     public function saveConfigurable($flag, $className, $fieldName = null, $localCacheOnly = false)
     {
+        if (!$className) {
+            return false;
+        }
+
         $this->ensureModelCacheLoaded($className);
 
         if ($fieldName) {
@@ -435,6 +443,10 @@ class ConfigCache
      */
     public function saveConfigurableValues($className, $classFlag, $fieldFlags)
     {
+        if (!$className) {
+            return false;
+        }
+
         $this->configurableEntities[$className] = $classFlag;
         $this->configurableFields[$className] = $fieldFlags;
 

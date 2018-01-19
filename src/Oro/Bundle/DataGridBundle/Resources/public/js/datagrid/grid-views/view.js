@@ -98,6 +98,9 @@ define(function(require) {
         /** @property */
         showErrorMessage: true,
 
+        /** @property */
+        adjustDocumentTitle: true,
+
         /**
          * Initializer.
          *
@@ -992,8 +995,9 @@ define(function(require) {
                 return;
             }
 
-            var newTitle = this._createTitle();
-            mediator.execute('adjustTitle', newTitle, true);
+            if (this.adjustDocumentTitle) {
+                mediator.execute('adjustTitle', this._createTitle(), true);
+            }
         },
 
         /**

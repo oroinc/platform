@@ -23,6 +23,7 @@ use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\Tree\AbstractNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
+use Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
 use Oro\Bundle\ConfigBundle\Form\Type\FormType;
@@ -44,6 +45,9 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
     /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
+    /** @var ChainSearchProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $searchProvider;
+
     /**
      * Get parent checkbox label for test
      *
@@ -53,9 +57,10 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
 
     /**
      * @param ConfigBag $configBag
-     * @param $translator
-     * @param $formFactory
-     * @param $authorizationChecker
+     * @param TranslatorInterface $translator
+     * @param FormFactoryInterface $formFactory
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param ChainSearchProvider $searchProvider
      *
      * @return AbstractProvider
      */
@@ -63,7 +68,8 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         ConfigBag $configBag,
         TranslatorInterface $translator,
         FormFactoryInterface $formFactory,
-        AuthorizationCheckerInterface $authorizationChecker
+        AuthorizationCheckerInterface $authorizationChecker,
+        ChainSearchProvider $searchProvider
     );
 
     /**
@@ -92,6 +98,8 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
             ->will($this->returnArgument(0));
 
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+
+        $this->searchProvider = $this->createMock(ChainSearchProvider::class);
     }
 
     protected function tearDown()
@@ -102,6 +110,9 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider getApiTreeProvider
+     *
+     * @param string $path
+     * @param array $expectedTree
      */
     public function testGetApiTree($path, $expectedTree)
     {
@@ -179,13 +190,19 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider exceptionDataProvider
+     *
+     * @param string $filename
+     * @param string $exception
+     * @param string $message
+     * @param string $method
+     * @param array $arguments
      */
     public function testExceptions($filename, $exception, $message, $method, $arguments)
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath($filename));
-        call_user_func_array(array($provider, $method), $arguments);
+        call_user_func_array([$provider, $method], $arguments);
     }
 
     /**
@@ -244,13 +261,6 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
                 'method'    => 'getTree',
                 'arguments' => []
             ],
-            'bad group definition get JsTree' => [
-                'filename'  => 'bad_group_definition.yml',
-                'exception' => ItemNotFoundException::class,
-                'message'   => 'Group "NOT_EXITED_GROUP" is not defined.',
-                'method'    => 'getJsTree',
-                'arguments' => []
-            ],
             'bad - undefined field in api_tree' => [
                 'filename'  => 'bad_undefined_field_in_api_tree.yml',
                 'exception' => InvalidConfigurationException::class,
@@ -307,6 +317,9 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         $this->assertEquals($expectedSubGroup, $activeSubGroup);
     }
 
+    /**
+     * @return array
+     */
     public function activeGroupsDataProvider()
     {
         return [
@@ -364,15 +377,24 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
 
         $configBag = new ConfigBag($config, $container);
 
-        $provider = $this->getProvider($configBag, $this->translator, $this->factory, $this->authorizationChecker);
+        $provider = $this->getProvider(
+            $configBag,
+            $this->translator,
+            $this->factory,
+            $this->authorizationChecker,
+            $this->searchProvider
+        );
 
         return $provider;
     }
 
+    /**
+     * @return array
+     */
     public function getExtensions()
     {
         $subscriber = $this->getMockBuilder(ConfigSubscriber::class)
-            ->setMethods(array('__construct'))
+            ->setMethods(['__construct'])
             ->disableOriginalConstructor()->getMock();
         $container = $this->createMock(ContainerInterface::class);
 
@@ -380,16 +402,16 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         $formFieldType  = new FormFieldType();
         $useParentScope = new ParentScopeCheckbox();
 
-        return array(
+        return [
             new PreloadedExtension(
-                array(
+                [
                     $formType->getName()       => $formType,
                     $formFieldType->getName()  => $formFieldType,
                     $useParentScope->getName() => $useParentScope
-                ),
-                array()
+                ],
+                []
             ),
-        );
+        ];
     }
 
     /**
@@ -427,6 +449,22 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
 
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition.yml'));
         $provider->setFeatureChecker($featureChecker);
+
+        $this->searchProvider->expects($this->any())
+            ->method('supports')
+            ->willReturn(true);
+
+        $this->searchProvider
+            ->expects($this->exactly(6))
+            ->method('getData')
+            ->willReturn(
+                ['Third group'],
+                ['Fourth group'],
+                ['title some field', 'tooltip some field'],
+                ['title some other field'],
+                ['Another branch first group'],
+                ['Another branch second group']
+            );
 
         $result = $provider->getJsTree();
         $expected = [
@@ -554,7 +592,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         $result = [];
         if ($node instanceof GroupNodeDefinition) {
             $result[$node->getName()]['children'] = [];
-            foreach ($node as $childNode) {
+            foreach ($node->getIterator() as $childNode) {
                 $result[$node->getName()]['children'] = array_merge(
                     $result[$node->getName()]['children'],
                     $this->getNodeNamesTree($childNode)

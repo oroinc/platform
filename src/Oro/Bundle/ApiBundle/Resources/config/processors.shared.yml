@@ -801,6 +801,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetTotalCountHeader
         arguments:
             - '@oro_batch.orm.query_builder.count_query_optimizer'
+            - '@oro_entity.query_hint_resolver'
         tags:
             - { name: oro.api.processor, action: get_list, group: finalize, priority: -10 }
             - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -10 }

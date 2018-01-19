@@ -1,17 +1,10 @@
-// @theme: default
+// @theme: default;
 
 $input-padding: 11px;
 $input-padding--m: 10px 9px;
 $input-padding--s: 7px 9px;
 $input-padding--x-s: 6px 9px;
 $input-date-height: 40px;
-$input-font-size: $base-ui-element-font-size;
-$input-font-family: $base-ui-element-font-family;
-$input-line-height: $base-ui-element-line-height;
-$input-border: $base-ui-element-border;
-$input-border-radius: $base-ui-element-border-radius;
-$input-background-color: $base-ui-element-bg-color;
-$input-color: $base-ui-element-color;
 
 // Hover
 $input-border-color-hover-state: get-color('ui', 'normal');

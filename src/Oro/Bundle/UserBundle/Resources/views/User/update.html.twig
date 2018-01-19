@@ -67,25 +67,38 @@
 <div class="user-profile-cols">
     {% set id = 'user-profile' %}
 
+    {% set formRows = [
+        form.enabled is defined ? form_row(form.enabled),
+        form_row(form.username),
+        form.plainPassword is defined ? form_row(form.plainPassword) : '',
+        form_row(form.namePrefix),
+        form_row(form.firstName),
+        form_row(form.middleName),
+        form_row(form.lastName),
+        form_row(form.nameSuffix),
+        form_row(form.birthday),
+        form_row(form.avatar),
+        form.vars.value.id ? '' : form_row(form.inviteUser),
+    ] %}
+
+    {% if form.passwordGenerate is defined %}
+        {% set formRows = formRows|merge([
+            form_row(form.passwordGenerate)
+        ]) %}
+        <span data-page-component-module="orouser/js/components/password-generate"
+              data-page-component-options="{{ {
+                  checkbox: '[data-name="field__password-generate"]',
+                  passwordInput: '[data-name="field__first"],[data-name="field__second"]'
+              }|json_encode }}"></span>
+    {% endif %}
+
     {% set dataBlocks = [{
         'title': 'General'|trans,
         'class': 'active',
         'subblocks': [
             {
                 'title': '',
-                'data': [
-                    form.enabled is defined ? form_row(form.enabled),
-                    form_row(form.username),
-                    form.plainPassword is defined ? form_row(form.plainPassword) : '',
-                    form_row(form.namePrefix),
-                    form_row(form.firstName),
-                    form_row(form.middleName),
-                    form_row(form.lastName),
-                    form_row(form.nameSuffix),
-                    form_row(form.birthday),
-                    form_row(form.avatar),
-                    form.vars.value.id ? '' : form_row(form.inviteUser),
-                ]
+                'data': formRows
             },
             {
                 'title': '',

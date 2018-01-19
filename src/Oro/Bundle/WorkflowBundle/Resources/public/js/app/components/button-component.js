@@ -48,12 +48,14 @@ define(function(require) {
                     });
                     this.$button.on('click', function(e) {
                         e.preventDefault();
-                        $(this).data('executor').call();
+
+                        self._onClickButtonExecutor(this);
                     });
                 } else {
                     this.$button.on('click', function(e) {
                         e.preventDefault();
-                        mediator.execute('redirectTo', {url: self.$button.data('transition-url')}, {redirect: true});
+
+                        self._onClickButtonRedirect(this);
                     });
                 }
             } else {
@@ -71,6 +73,22 @@ define(function(require) {
                     });
                 }
             }
+        },
+
+        /**
+         * @param clickedButton
+         * @private
+         */
+        _onClickButtonExecutor: function(clickedButton) {
+            $(clickedButton).data('executor').call();
+        },
+
+        /**
+         * @param clickedButton
+         * @private
+         */
+        _onClickButtonRedirect: function(clickedButton) {
+            mediator.execute('redirectTo', {url: this.$button.data('transition-url')}, {redirect: true});
         },
 
         dispose: function() {

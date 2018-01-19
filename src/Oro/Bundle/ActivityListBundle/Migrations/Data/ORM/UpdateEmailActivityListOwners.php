@@ -85,13 +85,15 @@ class UpdateEmailActivityListOwners extends AbstractFixture implements Container
             /** @var Email $email */
             $email = $manager->getRepository(Email::class)->find($entity->getRelatedActivityId());
 
-            foreach ($email->getEmailUsers() as $emailUser) {
-                $activityOwner = $this->getActivityOwner($manager, $entity, $emailUser);
+            if ($email) {
+                foreach ($email->getEmailUsers() as $emailUser) {
+                    $activityOwner = $this->getActivityOwner($manager, $entity, $emailUser);
 
-                if (!$activityOwner) {
-                    $activityOwner = $this->prepareActivityOwner($entity, $emailUser);
+                    if (!$activityOwner) {
+                        $activityOwner = $this->prepareActivityOwner($entity, $emailUser);
 
-                    $manager->persist($activityOwner);
+                        $manager->persist($activityOwner);
+                    }
                 }
             }
         }

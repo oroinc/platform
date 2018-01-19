@@ -11,6 +11,7 @@ system_configuration:
         oro_user.password_min_length:
             data_type: integer
             type: integer
+            search_type: text
             priority: 40
             options:
                 label:  oro.user.system_configuration.fields.password_min_length.label
@@ -51,6 +52,15 @@ system_configuration:
                 tooltip: oro.user.system_configuration.fields.password_special_chars.tooltip
                 required: false
 
+        oro_user.send_password_in_invitation_email:
+            data_type: boolean
+            type: oro_config_checkbox
+            priority: 10
+            options:
+                label: oro.user.system_configuration.fields.send_password_in_invitation_email.label
+                tooltip: oro.user.system_configuration.fields.send_password_in_invitation_email.tooltip
+                required: false
+
     tree:
         system_configuration:
             platform:
@@ -67,3 +77,5 @@ system_configuration:
                                             - oro_user.password_lower_case
                                             - oro_user.password_upper_case
                                             - oro_user.password_special_chars
+                                            # The backend user should not be able to enable this option in the UI
+                                            #- oro_user.send_password_in_invitation_email

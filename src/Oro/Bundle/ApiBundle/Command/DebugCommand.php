@@ -51,7 +51,13 @@ class DebugCommand extends AbstractDebugCommand
                 'processors',
                 null,
                 InputOption::VALUE_NONE,
-                'Shows a list of all processors which'
+                'Shows a list of all processors'
+            )
+            ->addOption(
+                'processors-without-description',
+                null,
+                InputOption::VALUE_NONE,
+                'Shows a list of all processors without a description'
             );
         parent::configure();
     }
@@ -69,22 +75,33 @@ class DebugCommand extends AbstractDebugCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $showAllProcessors = $input->getOption('processors');
-        if ($showAllProcessors) {
+        $showProcessors = $input->getOption('processors');
+        if ($showProcessors) {
             $this->dumpAllProcessors($output, $this->getRequestType($input));
-        } else {
-            $action = $input->getArgument('action');
-            if (empty($action)) {
-                $this->dumpActions($output);
-            } else {
-                $attributes = $input->getOption('attribute');
-                $group = $input->getArgument('group');
-                if ($group) {
-                    $attributes[] = sprintf('group:%s', $group);
-                }
-                $this->dumpProcessors($output, $action, $this->getRequestType($input), $attributes);
-            }
+
+            return;
         }
+
+        $showProcessorsWithoutDescription = $input->getOption('processors-without-description');
+        if ($showProcessorsWithoutDescription) {
+            $this->dumpProcessorsWithoutDescription($output, $this->getRequestType($input));
+
+            return;
+        }
+
+        $action = $input->getArgument('action');
+        if (empty($action)) {
+            $this->dumpActions($output);
+
+            return;
+        }
+
+        $attributes = $input->getOption('attribute');
+        $group = $input->getArgument('group');
+        if ($group) {
+            $attributes[] = sprintf('group:%s', $group);
+        }
+        $this->dumpProcessors($output, $action, $this->getRequestType($input), $attributes);
     }
 
     /**
@@ -217,6 +234,46 @@ class DebugCommand extends AbstractDebugCommand
         }
 
         $table->render();
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param RequestType     $requestType
+     */
+    protected function dumpProcessorsWithoutDescription(OutputInterface $output, RequestType $requestType)
+    {
+        $output->writeln('The list of processors that do not have a description:');
+
+        /** @var ProcessorBagInterface $processorBag */
+        $processorBag = $this->getContainer()->get('oro_api.processor_bag');
+
+        $context = new Context();
+        $context->set(ApiContext::REQUEST_TYPE, $requestType);
+
+        $applicableChecker = new ChainApplicableChecker();
+        $applicableChecker->addChecker(new Util\RequestTypeApplicableChecker());
+
+        $processorClasses = [];
+        $actions = $processorBag->getActions();
+        foreach ($actions as $action) {
+            $context->setAction($action);
+            $processors = $processorBag->getProcessors($context);
+            $processors->setApplicableChecker($applicableChecker);
+            foreach ($processors as $processor) {
+                if ($processor instanceof TraceableProcessor) {
+                    $processor = $processor->getProcessor();
+                }
+                $processorClasses[] = get_class($processor);
+            }
+        }
+        $processorClasses = array_unique($processorClasses);
+        sort($processorClasses);
+        foreach ($processorClasses as $processorClass) {
+            $processorDescription = $this->getClassDocComment($processorClass);
+            if (empty($processorDescription)) {
+                $output->writeln(' - ' . $processorClass);
+            }
+        }
     }
 
     /**

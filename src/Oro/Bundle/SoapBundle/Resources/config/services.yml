@@ -105,3 +105,17 @@ services:
         public: false
         tags:
             - { name: nelmio_api_doc.extractor.handler }
+
+    oro_soap.client.factory:
+        class: 'Oro\Bundle\SoapBundle\Client\Factory\NativeSoapClientFactory'
+        public: false
+
+    oro_soap.client:
+        class: 'Oro\Bundle\SoapBundle\Client\SoapClient'
+        public: false
+        arguments:
+            - '@oro_soap.client.factory'
+
+    oro_soap.client.factory.settings:
+        class: 'Oro\Bundle\SoapBundle\Client\Settings\Factory\SoapClientSettingsFactory'
+        public: false
