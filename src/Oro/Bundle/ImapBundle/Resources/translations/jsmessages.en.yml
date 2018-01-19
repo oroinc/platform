@@ -18,4 +18,4 @@ oro.imap:
     sync:
         flash_message:
             user_box_failed: Synchronization with your mailbox (username "{{ username }}" hosted on "{{ host }}") has failed. Please check the connection credentials on the email configuraton page.
-            system_box_failed: Synchronization with the system mailbox (username "{{ username }}" host on "{{ host }}") has failed. Please check the connection credentials on the email configuraton page.
+            system_box_failed: Synchronization with the system mailbox (username "{{ username }}" hosted on "{{ host }}") has failed. Please check the connection credentials on the email configuraton page.

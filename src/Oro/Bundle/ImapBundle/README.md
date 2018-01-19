@@ -77,7 +77,7 @@ Email synchronization functionality is implemented in the following classes:
 
 When during the synchronization, the mailbox IMAP connection settings become invalid for any reason, the mailbox owner is notified using the following channels:
 
- - After a success login to the Oro application, the mailbox owner receives a notification via a flash message.
+ - After a successful login to the Oro application, the mailbox owner receives a notification via a flash message.
  - If the clank server is turned on, the user receives messages about the issue.
  - Oro application sends an email to owner's email address.
 
