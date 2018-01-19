@@ -37,7 +37,7 @@ class RootJobStatusCalculator
      * @param Job  $job
      * @param bool $calculateProgress
      *
-     * @return bool true if root job was stopped
+     * @return bool true in the case when the status of "root" job changed on stop status by this method
      */
     public function calculate(Job $job, $calculateProgress = false)
     {
