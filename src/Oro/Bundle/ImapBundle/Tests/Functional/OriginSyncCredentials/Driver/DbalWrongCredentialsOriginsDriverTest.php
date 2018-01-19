@@ -179,7 +179,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
 
         $this->logger->expects($this->once())
             ->method('debug')
-            ->with('Clear email origin with wrong credentials storage.');
+            ->with('Delete email origins with wrong credentials from the storage.');
 
         $this->driver->deleteAllOrigins();
 
