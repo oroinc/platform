@@ -1,7 +1,7 @@
 OroImapBundle
 =============
 
-This bundle provides a functionality to work with email servers through IMAP protocol.
+This bundle provides a functionality to work with the email servers through IMAP protocol.
 
 Dependencies
 ------------
@@ -54,15 +54,17 @@ Usage
 
 Synchronization with IMAP servers
 ---------------------------------
-Each user who want to synchronize own emails with BAP need to configure own IMAP mailbox on the user details page. He/she just need to enter correct host, port, security type and credentials.
-During the synchronization we load emails from user's inbox and outbox by the following algorithm:
+To synchronize personal emails using Oro application, users need to configure their own IMAP mailbox on the user details page. The required information is the host, port, security type and credentials for the IMAP integration.
 
- - If a user's mailbox is newer synchronized yet then we load emails for the last year only.
- - We load all emails for selected folders according to synchronization settings (User menu -> My user -> Edit -> Email synchronization settings tab).
- - If a folder is deleted on IMAP server, it will be deleted in OroCRM as well. Folders with existing emails that already have been synchronized will not be deleted in OroCRM.
- - After changing synchronization settings folders will be synchronized automatically (not emails).
+During the synchronization, Oro application loads emails from the user's inbox and outbox folders using the following algorithm:
 
-By default the synchronization is executed by CRON every 30 minutes. Also you can execute it manually using the following command:
+ - If a user's mailbox is synchronized for the first time, Oro application loads emails sent and received last year only.
+ - Only emails in the folders that are enabled for synchronization in the User Configuration settings are synchronized. To check the settings,select **My user** in the user menu, click **Edit** on the user details page, and navigate to the Email Synchronization Settings section.
+ - When an empty folder is deleted on the email server, during the synchronization via IMAP it gets deleted in the OroCRM. Folders with the existing emails that have already been synchronized remain intact and are kept by the OroCRM.
+ - When the synchronization settings change, folders are synchronized automatically, but not the emails.
+
+By default the synchronization is executed by a CRON job every 30 minutes. Outside that schedule, launch synchronization manually using the following command:
+
 ```bash
 php app/console oro:cron:imap-sync
 ```
@@ -71,13 +73,13 @@ Email synchronization functionality is implemented in the following classes:
 
  - ImapEmailSynchronizer - extends OroEmailBundle\Sync\AbstractEmailSynchronizer class to work with IMAP mailboxes.
  - ImapEmailSynchronizationProcessor - implements email synchronization algorithm used for synchronize emails through IMAP.
- - EmailSyncCommand - allows to execute email synchronization as CRON job or through command line.
+ - EmailSyncCommand - allows to execute email synchronization as a CRON job or through the command line.
 
-If during synchronization will be detected that conditions for email box not valid already, the owner of this email box will be notified about this:
+When during the synchronization, the mailbox IMAP connection settings become invalid for any reason, the mailbox owner is notified using the following channels:
 
- - after success login, the owner of the email box will receive flash message;
- - if the clank server is turned-on, user will receive messages about this issue;
- - an email to user's email address will be send.
+ - After a successful login to the Oro application, the mailbox owner receives a notification via a flash message.
+ - If the clank server is turned on, the user receives messages about the issue.
+ - Oro application sends an email to owner's email address.
 
-For the system email boxes that has no owner, there is an `oro_imap_sync_origin_credential_notifications` capability. In case if role has access with this
-capability, all the users with this role will receive similar messages as for the user's email box.
+For the system mailboxes that have no owner, there is an `oro_imap_sync_origin_credential_notifications` capability. Users of any role with this
+capability enabled, are notified using the channels mentioned above.
