@@ -1,3 +1,26 @@
+## 2.7.0 (Unreleased)
+
+### Added
+#### EntityBundle
+* Added method `getEntityTreeNodeByPropertyPath` to JS `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js#L903-L947) (see [documentation](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md#get-entity-tree-node-by-property-path))
+* Added magic property `entityTree` to `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js#L1061-L1079) (see [documentation](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md#entity-tree)) that allows walk through entity fields tree
+* Added JS `EntityTreeNode` [[?]](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-tree-node.js) that used by `EntityStructureDataProvider`
+#### FormBundle
+* Added JS `ExpressionEditorComponent` [[?]](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/FormBundle/Resources/public/js/app/components/expression-editor-component.js) (see [documentation](https://github.com/oroinc/platform/blob/2.7.0/src/Oro/Bundle/FormBundle/Resources/doc/reference/expression-editor.md#component) that used instead regular `ViewComponent` in formtype options of rule editor. It's designed to prepare instance of `EntityStructureDataProvider` and create instance of `ExpressionEditorView`
+expression-editor-component.js
+
+### Changed
+#### EntityBundle
+* Refactored JS `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js) (see [documentation](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md))
+	- method `getPropertyPathByPath` renamed to `getRelativePropertyPathByPath`
+	- method `getPathByPropertyPath` renamed to `getPathByRelativePropertyPath`
+	- method `getPathByPropertyPathSafely` renamed to `getPathByRelativePropertyPathSafely`
+#### FormBundle
+* Refactored `ExpressionEditorView` [[?]](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/FormBundle/Resources/public/js/app/views/expression-editor-view.js) (see [documentation](https://github.com/oroinc/platform/blob/2.7.0/src/Oro/Bundle/FormBundle/Resources/doc/reference/expression-editor.md#view))
+* Refactored [[?]](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/FormBundle/Resources/public/js/expression-editor-util.js) (see [documentation](https://github.com/oroinc/platform/blob/2.7.0/src/Oro/Bundle/FormBundle/Resources/doc/reference/expression-editor.md#util))
+	- made it descendant of `BaseClass`
+	- changed options format
+
 ## 2.6.0 (Unreleased)
 
 ### Added
@@ -11,14 +34,8 @@
 * Added JS `EntityModel`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/models/entity-model.js) (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-model.md))
 * Added JS `EntityStructureDataProvider`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js) (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md))
 * Added `FieldChoiceView`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/views/field-choice-view.js) Backbone view, as replacement for jQuery widget `oroentity.fieldChoice`.
-* Added method `getEntityTreeNodeByPropertyPath` to JS `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js#L903-L947) (see [documentation](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md#get-entity-tree-node-by-property-path))
-* Added magic property `entityTree` to `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js#L1061-L1079) (see [documentation](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md#entity-tree)) that allows walk through entity fields tree
-* Added JS `EntityTreeNode` [[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-tree-node.js) that used by `EntityStructureDataProvider`
 #### EntityExtendBundle
 * The `Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper::convertName` method was renamed to `convertEnumNameToCode`, visibility of this method was changed from `public` to `private` and it will throw an exception when the `iconv` function fails on converting the input string, instead of hashing the input string.
-#### FormBundle
-* Added JS `ExpressionEditorComponent` [[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/FormBundle/Resources/public/js/app/components/expression-editor-component.js) (see [documentation](https://github.com/oroinc/platform/blob/2.6.0/src/Oro/Bundle/FormBundle/Resources/doc/reference/expression-editor.md#component) that used instead regular `ViewComponent` in formtype options of rule editor. It's designed to prepare instance of `EntityStructureDataProvider` and create instance of `ExpressionEditorView`
-expression-editor-component.js
 #### QueryDesignerBundle
 * Added `FunctionChoiceView`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/QueryDesignerBundle/Resources/public/js/app/views/function-choice-view.js) Backbone view, as replacement for jQuery widget `oroquerydesigner.functionChoice`.
 #### SegmentBundle
@@ -55,16 +72,6 @@ expression-editor-component.js
 
 * A handling of `percent` data type in POST and PATCH requests was fixed. Before the fix the percent value in GET and POST/PATCH requests was inconsistent, in POST/PATCH requests it was divided by 100, but GET request returns it as is. In this fix the division by 100 was removed.
 * For string filters the default value of `allow_array` option was changed from `true` to `false`. This was done to allow filter data if a string field contains a comma.
-#### EntityBundle
-* Refactored JS `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js) (see [documentation](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md))
-	- method `getPropertyPathByPath` renamed to `getRelativePropertyPathByPath`
-	- method `getPathByPropertyPath` renamed to `getPathByRelativePropertyPath`
-	- method `getPathByPropertyPathSafely` renamed to `getPathByRelativePropertyPathSafely`
-#### FormBundle
-* Refactored `ExpressionEditorView` [[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/FormBundle/Resources/public/js/app/views/expression-editor-view.js) (see [documentation](https://github.com/oroinc/platform/blob/2.6.0/src/Oro/Bundle/FormBundle/Resources/doc/reference/expression-editor.md#view))
-* Refactored [[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/FormBundle/Resources/public/js/expression-editor-util.js) (see [documentation](https://github.com/oroinc/platform/blob/2.6.0/src/Oro/Bundle/FormBundle/Resources/doc/reference/expression-editor.md#util))
-	- make it descendant of `BaseClass`
-	- change options format
 #### SegmentBundle
 * Refactored `SegmentComponent` js-component to use `EntityStructureDataProvider`.
 #### SidebarBundle
