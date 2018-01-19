@@ -12,6 +12,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
+use Oro\Bundle\EmailBundle\Exception\EmailAddressParseException;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
 class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
@@ -277,5 +278,38 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailAddressProxy',
             $this->builder->getEmailAddressEntityClass()
         );
+    }
+
+    /**
+     * @dataProvider validateEmailDataProvider
+     */
+    public function testValidateEmailAddress($email, $expectedException, $message)
+    {
+        if ($expectedException) {
+            $this->expectException($expectedException);
+            $this->expectExceptionMessage($message);
+        }
+        $this->builder->address($email);
+    }
+
+    public function validateEmailDataProvider()
+    {
+        return [
+            [
+                'email' => 'testemail',
+                'expectedException' => EmailAddressParseException::class,
+                'expectedExceptionMessage' => 'Not valid email address'
+            ],
+            [
+                'email' => str_repeat('domain', 50).'@mail.com',
+                'expectedException' => EmailAddressParseException::class,
+                'expectedExceptionMessage' => 'Email address is too long'
+            ],
+            [
+                'email' => 'test@example.com',
+                'expectedException' => null,
+                'expectedExceptionMessage' => ''
+            ]
+        ];
     }
 }

@@ -89,6 +89,10 @@ services:
             - '@doctrine'
             - '@oro_email.email.entity.builder'
             - '@oro_imap.imap_email_remove_manager'
+        calls:
+            - ['setLogger', ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: oro_imap_email }
 
     oro_imap.imap_email_remove_manager:
         class: %oro_imap.imap_email_remove_manager.class%
