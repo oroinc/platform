@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDefaultAndNull;
 
 /**
  * @dbIsolationPerTest
  */
-class RestJsonApiNotNullAndNotBlankTest extends DefaultAndNullTestCase
+class NotNullAndNotBlankTest extends DefaultAndNullTestCase
 {
     public function testCreateShouldCheckNotBlankConstraintIfValueIsNotSpecified()
     {

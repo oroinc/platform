@@ -1,10 +1,11 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
+use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class RestJsonApiGetWithIncludeFieldsTest extends RestJsonApiTestCase
+class GetWithIncludeFieldsTest extends RestJsonApiTestCase
 {
     /**
      * @param array $params

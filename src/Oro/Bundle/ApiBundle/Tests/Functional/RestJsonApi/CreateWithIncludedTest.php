@@ -1,14 +1,15 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
+use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProductType;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
+class CreateWithIncludedTest extends RestJsonApiTestCase
 {
     /**
      * @return Organization

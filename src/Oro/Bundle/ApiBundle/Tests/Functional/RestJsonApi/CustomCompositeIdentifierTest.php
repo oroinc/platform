@@ -1,14 +1,15 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Request\Rest\EntityIdTransformer;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomCompositeIdentifier as TestEntity;
+use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
 /**
  * @dbIsolationPerTest
  */
-class RestJsonApiCustomCompositeIdentifierTest extends RestJsonApiTestCase
+class CustomCompositeIdentifierTest extends RestJsonApiTestCase
 {
     /**
      * {@inheritdoc}

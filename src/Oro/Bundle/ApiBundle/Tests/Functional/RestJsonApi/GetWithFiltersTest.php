@@ -1,12 +1,13 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
+use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 
-class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
+class GetWithFiltersTest extends RestJsonApiTestCase
 {
     /**
      * {@inheritdoc}

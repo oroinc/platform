@@ -1,10 +1,11 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
+use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
-class RestJsonApiRelationshipsTest extends RestJsonApiTestCase
+class RelationshipsTest extends RestJsonApiTestCase
 {
     /**
      * @param string         $entityClass

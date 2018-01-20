@@ -1,11 +1,13 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDefaultAndNull;
+use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
 class DefaultAndNullTestCase extends RestJsonApiTestCase
 {

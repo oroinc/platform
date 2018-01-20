@@ -1,11 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
+use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProductType;
 
-class RestJsonApiGetWithRenamedFieldsTest extends RestJsonApiTestCase
+class GetWithRenamedFieldsTest extends RestJsonApiTestCase
 {
     /**
      * {@inheritdoc}

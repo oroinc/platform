@@ -1,15 +1,16 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Extend\Entity\TestApiE1 as TestEntity1;
 use Extend\Entity\TestApiE2 as TestEntity2;
 use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadEnumsData;
+use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
 /**
  * @dbIsolationPerTest
  */
-class RestJsonApiCustomEntityTest extends RestJsonApiTestCase
+class CustomEntityTest extends RestJsonApiTestCase
 {
     /**
      * {@inheritdoc}

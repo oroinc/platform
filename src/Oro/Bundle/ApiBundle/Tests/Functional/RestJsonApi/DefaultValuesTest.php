@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDefaultAndNull;
 
 /**
  * @dbIsolationPerTest
  */
-class RestJsonApiDefaultValuesTest extends DefaultAndNullTestCase
+class DefaultValuesTest extends DefaultAndNullTestCase
 {
     /**
      * {@inheritdoc}

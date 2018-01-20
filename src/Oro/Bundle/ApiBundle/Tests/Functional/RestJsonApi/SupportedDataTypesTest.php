@@ -1,13 +1,14 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes;
+use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
 /**
  * @dbIsolationPerTest
  */
-class RestJsonApiSupportedDataTypesTest extends RestJsonApiTestCase
+class SupportedDataTypesTest extends RestJsonApiTestCase
 {
     /**
      * {@inheritdoc}

@@ -1,13 +1,15 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier as TestLinkEntity;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObjects as TestEntity;
+use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
 /**
  * @dbIsolationPerTest
  */
-class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
+class NestedCollectionTest extends RestJsonApiTestCase
 {
     /**
      * {@inheritdoc}
@@ -16,7 +18,7 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
     {
         parent::setUp();
 
-        $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/nested_object.yml']);
+        $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/nested_collection.yml']);
     }
 
     public function testGet()
@@ -31,10 +33,10 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
         self::assertEquals((string)$entity->getId(), $result['data']['id']);
         self::assertEquals(
             [
-                'firstName' => 'first name',
-                'lastName'  => 'last name'
+                ['firstName' => 'Item 1', 'lastName'  => 'item1'],
+                ['firstName' => 'Item 2', 'lastName'  => 'item2'],
             ],
-            $result['data']['attributes']['name']
+            $result['data']['attributes']['links']
         );
     }
 
@@ -46,9 +48,9 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
             'data' => [
                 'type'       => $entityType,
                 'attributes' => [
-                    'name' => [
-                        'firstName' => 'first name',
-                        'lastName'  => 'last name'
+                    'links' => [
+                        ['firstName' => 'Item 1', 'lastName'  => 'item1'],
+                        ['firstName' => 'Item 2', 'lastName'  => 'item2'],
                     ]
                 ]
             ]
@@ -59,20 +61,25 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
         $result = self::jsonToArray($response->getContent());
         self::assertEquals(
             [
-                'firstName' => 'first name',
-                'lastName'  => 'last name'
+                ['firstName' => 'Item 1', 'lastName'  => 'item1'],
+                ['firstName' => 'Item 2', 'lastName'  => 'item2'],
             ],
-            $result['data']['attributes']['name']
+            $result['data']['attributes']['links']
         );
 
         // test that the data was created
         $this->getEntityManager()->clear();
         $entity = $this->getEntityManager()->find(TestEntity::class, (int)$result['data']['id']);
-        self::assertEquals('first name', $entity->getFirstName());
-        self::assertEquals('last name', $entity->getLastName());
+        /** @var TestLinkEntity[] $links */
+        $links = $entity->getLinks();
+        self::assertCount(2, $links);
+        self::assertEquals('Item 1', $links[0]->name, '$links[0]->firstName');
+        self::assertEquals('item1', $links[0]->key, '$links[0]->lastName');
+        self::assertEquals('Item 2', $links[1]->name, '$links[1]->firstName');
+        self::assertEquals('item2', $links[1]->key, '$links[1]->lastName');
     }
 
-    public function testCreateWithoutNestedObjectData()
+    public function testCreateWithoutNestedCollectionData()
     {
         $entityType = $this->getEntityType(TestEntity::class);
 
@@ -85,15 +92,15 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
         $response = $this->post(['entity' => $entityType], $data);
 
         $result = self::jsonToArray($response->getContent());
-        self::assertNull(
-            $result['data']['attributes']['name']
+        self::assertSame(
+            [],
+            $result['data']['attributes']['links']
         );
 
         // test that the data was created
         $this->getEntityManager()->clear();
         $entity = $this->getEntityManager()->find(TestEntity::class, (int)$result['data']['id']);
-        self::assertNull($entity->getFirstName());
-        self::assertNull($entity->getLastName());
+        self::assertCount(0, $entity->getLinks());
     }
 
     public function testUpdate()
@@ -107,9 +114,9 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
                 'type'       => $entityType,
                 'id'         => (string)$entity->getId(),
                 'attributes' => [
-                    'name' => [
-                        'firstName' => 'new first name',
-                        'lastName'  => 'new last name'
+                    'links' => [
+                        ['firstName' => 'Item 2', 'lastName'  => 'item2'],
+                        ['firstName' => 'Item 3', 'lastName'  => 'item3'],
                     ]
                 ]
             ]
@@ -123,20 +130,25 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
         $result = self::jsonToArray($response->getContent());
         self::assertEquals(
             [
-                'firstName' => 'new first name',
-                'lastName'  => 'new last name'
+                ['firstName' => 'Item 2', 'lastName'  => 'item2'],
+                ['firstName' => 'Item 3', 'lastName'  => 'item3'],
             ],
-            $result['data']['attributes']['name']
+            $result['data']['attributes']['links']
         );
 
         // test that the data was updated
         $this->getEntityManager()->clear();
         $entity = $this->getEntityManager()->find(TestEntity::class, $entity->getId());
-        self::assertEquals('new first name', $entity->getFirstName());
-        self::assertEquals('new last name', $entity->getLastName());
+        /** @var TestLinkEntity[] $links */
+        $links = $entity->getLinks();
+        self::assertCount(2, $links);
+        self::assertEquals('Item 2', $links[0]->name, '$links[0]->firstName');
+        self::assertEquals('item2', $links[0]->key, '$links[0]->lastName');
+        self::assertEquals('Item 3', $links[1]->name, '$links[1]->firstName');
+        self::assertEquals('item3', $links[1]->key, '$links[1]->lastName');
     }
 
-    public function testUpdateToNull()
+    public function testUpdateToEmpty()
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity');
@@ -147,7 +159,7 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
                 'type'       => $entityType,
                 'id'         => (string)$entity->getId(),
                 'attributes' => [
-                    'name' => null
+                    'links' => []
                 ]
             ]
         ];
@@ -158,51 +170,14 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
         );
 
         $result = self::jsonToArray($response->getContent());
-        self::assertNull(
-            $result['data']['attributes']['name']
+        self::assertSame(
+            [],
+            $result['data']['attributes']['links']
         );
 
         // test that the data was updated
         $this->getEntityManager()->clear();
         $entity = $this->getEntityManager()->find(TestEntity::class, $entity->getId());
-        self::assertNull($entity->getFirstName());
-        self::assertNull($entity->getLastName());
-    }
-
-    public function testUpdateWithEmptyArray()
-    {
-        /** @var TestEntity $entity */
-        $entity = $this->getReference('test_entity');
-        $entityType = $this->getEntityType(TestEntity::class);
-
-        $data = [
-            'data' => [
-                'type'       => $entityType,
-                'id'         => (string)$entity->getId(),
-                'attributes' => [
-                    'name' => []
-                ]
-            ]
-        ];
-
-        $response = $this->patch(
-            ['entity' => $entityType, 'id' => (string)$entity->getId()],
-            $data
-        );
-
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
-            [
-                'firstName' => 'first name',
-                'lastName'  => 'last name'
-            ],
-            $result['data']['attributes']['name']
-        );
-
-        // test that the data was updated
-        $this->getEntityManager()->clear();
-        $entity = $this->getEntityManager()->find(TestEntity::class, $entity->getId());
-        self::assertEquals('first name', $entity->getFirstName());
-        self::assertEquals('last name', $entity->getLastName());
+        self::assertCount(0, $entity->getLinks());
     }
 }

@@ -1,15 +1,16 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadNestedAssociationData;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDefaultAndNull as TestRelatedEntity;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObjects as TestEntity;
+use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
 /**
  * @dbIsolationPerTest
  */
-class RestJsonApiNestedAssociationTest extends RestJsonApiTestCase
+class NestedAssociationTest extends RestJsonApiTestCase
 {
     /**
      * {@inheritdoc}
@@ -29,7 +30,23 @@ class RestJsonApiNestedAssociationTest extends RestJsonApiTestCase
 
         $response = $this->get(['entity' => $entityType, 'id' => (string)$entity->getId()]);
         $this->assertResponseContains(
-            '@OroApiBundle/Tests/Functional/responses/rest_json_nested_association/test_get.yml',
+            [
+                'data' => [
+                    'type'          => $entityType,
+                    'id'            => '<toString(@test_entity->id)>',
+                    'attributes'    => [
+                        'name' => null
+                    ],
+                    'relationships' => [
+                        'relatedEntity' => [
+                            'data' => [
+                                'type' => $this->getEntityType(TestRelatedEntity::class),
+                                'id'   => '<toString(@test_related_entity1->id)>'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
             $response
         );
     }

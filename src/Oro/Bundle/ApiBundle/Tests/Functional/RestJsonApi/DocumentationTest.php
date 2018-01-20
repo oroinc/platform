@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor;
@@ -12,13 +12,14 @@ use Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
+use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class RestJsonApiDocumentationTest extends RestJsonApiTestCase
+class DocumentationTest extends RestJsonApiTestCase
 {
     const VIEW = 'rest_json_api';
 

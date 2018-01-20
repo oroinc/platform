@@ -1,14 +1,14 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
-use Oro\Bundle\ApiBundle\Request\Rest\EntityIdTransformer;
-use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCompositeIdentifier as TestEntity;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier as TestEntity;
+use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
 /**
  * @dbIsolationPerTest
  */
-class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
+class CustomIdentifierTest extends RestJsonApiTestCase
 {
     /**
      * {@inheritdoc}
@@ -18,28 +18,22 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
         parent::setUp();
 
         $this->loadFixtures([
-            '@OroApiBundle/Tests/Functional/DataFixtures/composite_identifier.yml'
+            '@OroApiBundle/Tests/Functional/DataFixtures/custom_identifier.yml'
         ]);
     }
 
     /**
-     * @param string $key1
-     * @param int    $key2
+     * @param string $key
      *
      * @return string
      */
-    private function getEntityId($key1, $key2)
+    private function getEntityId($key)
     {
-        return http_build_query(
-            ['renamedKey1' => $key1, 'key2' => $key2],
-            '',
-            EntityIdTransformer::COMPOSITE_ID_SEPARATOR
-        );
+        return $key;
     }
 
     public function testGetList()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $response = $this->cget(['entity' => $entityType]);
@@ -49,9 +43,10 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
                 'data' => [
                     [
                         'type'          => $entityType,
-                        'id'            => $this->getEntityId('item 1', 1),
+                        'id'            => $this->getEntityId('item 1'),
                         'attributes'    => [
-                            'name' => 'Item 1'
+                            'databaseId' => '@test_custom_id1->id',
+                            'name'       => 'Item 1'
                         ],
                         'relationships' => [
                             'parent'   => [
@@ -64,9 +59,10 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
                     ],
                     [
                         'type'          => $entityType,
-                        'id'            => $this->getEntityId('item 2', 2),
+                        'id'            => $this->getEntityId('item 2'),
                         'attributes'    => [
-                            'name' => 'Item 2'
+                            'databaseId' => '@test_custom_id2->id',
+                            'name'       => 'Item 2'
                         ],
                         'relationships' => [
                             'parent'   => [
@@ -79,17 +75,18 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
                     ],
                     [
                         'type'          => $entityType,
-                        'id'            => $this->getEntityId('item 3', 3),
+                        'id'            => $this->getEntityId('item 3'),
                         'attributes'    => [
-                            'name' => 'Item 3'
+                            'databaseId' => '@test_custom_id3->id',
+                            'name'       => 'Item 3'
                         ],
                         'relationships' => [
                             'parent'   => [
-                                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1', 1)]
+                                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1')]
                             ],
                             'children' => [
                                 'data' => [
-                                    ['type' => $entityType, 'id' => $this->getEntityId('item 2', 2)]
+                                    ['type' => $entityType, 'id' => $this->getEntityId('item 2')]
                                 ]
                             ]
                         ]
@@ -102,7 +99,6 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
 
     public function testGetListWithTitles()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $response = $this->cget(
@@ -115,21 +111,21 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
                 'data' => [
                     [
                         'type' => $entityType,
-                        'id'   => $this->getEntityId('item 1', 1),
+                        'id'   => $this->getEntityId('item 1'),
                         'meta' => [
                             'title' => 'item 1 Item 1'
                         ]
                     ],
                     [
                         'type' => $entityType,
-                        'id'   => $this->getEntityId('item 2', 2),
+                        'id'   => $this->getEntityId('item 2'),
                         'meta' => [
                             'title' => 'item 2 Item 2'
                         ]
                     ],
                     [
                         'type' => $entityType,
-                        'id'   => $this->getEntityId('item 3', 3),
+                        'id'   => $this->getEntityId('item 3'),
                         'meta' => [
                             'title' => 'item 3 Item 3'
                         ]
@@ -142,7 +138,6 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
 
     public function testGetListWithTitlesAndIncludedDataRequested()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $response = $this->cget(
@@ -155,21 +150,21 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
                 'data'     => [
                     [
                         'type' => $entityType,
-                        'id'   => $this->getEntityId('item 1', 1),
+                        'id'   => $this->getEntityId('item 1'),
                         'meta' => [
                             'title' => 'item 1 Item 1'
                         ]
                     ],
                     [
                         'type' => $entityType,
-                        'id'   => $this->getEntityId('item 2', 2),
+                        'id'   => $this->getEntityId('item 2'),
                         'meta' => [
                             'title' => 'item 2 Item 2'
                         ]
                     ],
                     [
                         'type' => $entityType,
-                        'id'   => $this->getEntityId('item 3', 3),
+                        'id'   => $this->getEntityId('item 3'),
                         'meta' => [
                             'title' => 'item 3 Item 3'
                         ]
@@ -178,7 +173,7 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
                 'included' => [
                     [
                         'type' => $entityType,
-                        'id'   => $this->getEntityId('item 1', 1),
+                        'id'   => $this->getEntityId('item 1'),
                         'meta' => [
                             'title' => 'item 1 Item 1'
                         ]
@@ -191,7 +186,6 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
 
     public function testGetListSortById()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $response = $this->cget(
@@ -204,15 +198,15 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
                 'data' => [
                     [
                         'type' => $entityType,
-                        'id'   => $this->getEntityId('item 3', 3)
+                        'id'   => $this->getEntityId('item 3')
                     ],
                     [
                         'type' => $entityType,
-                        'id'   => $this->getEntityId('item 2', 2)
+                        'id'   => $this->getEntityId('item 2')
                     ],
                     [
                         'type' => $entityType,
-                        'id'   => $this->getEntityId('item 1', 1)
+                        'id'   => $this->getEntityId('item 1')
                     ]
                 ]
             ],
@@ -222,12 +216,11 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
 
     public function testGetListFilterById()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $response = $this->cget(
             ['entity' => $entityType],
-            ['filter[id]' => $this->getEntityId('item 3', 3)]
+            ['filter[id]' => $this->getEntityId('item 3')]
         );
 
         $this->assertResponseContains(
@@ -235,17 +228,18 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
                 'data' => [
                     [
                         'type'          => $entityType,
-                        'id'            => $this->getEntityId('item 3', 3),
+                        'id'            => $this->getEntityId('item 3'),
                         'attributes'    => [
-                            'name' => 'Item 3'
+                            'databaseId' => '@test_custom_id3->id',
+                            'name'       => 'Item 3'
                         ],
                         'relationships' => [
                             'parent'   => [
-                                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1', 1)]
+                                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1')]
                             ],
                             'children' => [
                                 'data' => [
-                                    ['type' => $entityType, 'id' => $this->getEntityId('item 2', 2)]
+                                    ['type' => $entityType, 'id' => $this->getEntityId('item 2')]
                                 ]
                             ]
                         ]
@@ -258,12 +252,11 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
 
     public function testGetListFilterBySeveralIds()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $response = $this->cget(
             ['entity' => $entityType],
-            ['filter[id]' => $this->getEntityId('item 1', 1) . ',' . $this->getEntityId('item 3', 3)]
+            ['filter[id]' => $this->getEntityId('item 1') . ',' . $this->getEntityId('item 3')]
         );
 
         $this->assertResponseContains(
@@ -271,9 +264,10 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
                 'data' => [
                     [
                         'type'          => $entityType,
-                        'id'            => $this->getEntityId('item 1', 1),
+                        'id'            => $this->getEntityId('item 1'),
                         'attributes'    => [
-                            'name' => 'Item 1'
+                            'databaseId' => '@test_custom_id1->id',
+                            'name'       => 'Item 1'
                         ],
                         'relationships' => [
                             'parent'   => [
@@ -286,17 +280,54 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
                     ],
                     [
                         'type'          => $entityType,
-                        'id'            => $this->getEntityId('item 3', 3),
+                        'id'            => $this->getEntityId('item 3'),
                         'attributes'    => [
-                            'name' => 'Item 3'
+                            'databaseId' => '@test_custom_id3->id',
+                            'name'       => 'Item 3'
                         ],
                         'relationships' => [
                             'parent'   => [
-                                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1', 1)]
+                                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1')]
                             ],
                             'children' => [
                                 'data' => [
-                                    ['type' => $entityType, 'id' => $this->getEntityId('item 2', 2)]
+                                    ['type' => $entityType, 'id' => $this->getEntityId('item 2')]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListFilterByDatabasePrimaryKey()
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[databaseId]' => '@test_custom_id3->id']
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type'          => $entityType,
+                        'id'            => $this->getEntityId('item 3'),
+                        'attributes'    => [
+                            'databaseId' => '@test_custom_id3->id',
+                            'name'       => 'Item 3'
+                        ],
+                        'relationships' => [
+                            'parent'   => [
+                                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1')]
+                            ],
+                            'children' => [
+                                'data' => [
+                                    ['type' => $entityType, 'id' => $this->getEntityId('item 2')]
                                 ]
                             ]
                         ]
@@ -309,12 +340,11 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
 
     public function testGetListFilterByField()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $response = $this->cget(
             ['entity' => $entityType],
-            ['filter[name]' => 'Item+3']
+            ['filter[name]' => 'Item 3']
         );
 
         $this->assertResponseContains(
@@ -322,17 +352,18 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
                 'data' => [
                     [
                         'type'          => $entityType,
-                        'id'            => $this->getEntityId('item 3', 3),
+                        'id'            => $this->getEntityId('item 3'),
                         'attributes'    => [
-                            'name' => 'Item 3'
+                            'databaseId' => '@test_custom_id3->id',
+                            'name'       => 'Item 3'
                         ],
                         'relationships' => [
                             'parent'   => [
-                                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1', 1)]
+                                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1')]
                             ],
                             'children' => [
                                 'data' => [
-                                    ['type' => $entityType, 'id' => $this->getEntityId('item 2', 2)]
+                                    ['type' => $entityType, 'id' => $this->getEntityId('item 2')]
                                 ]
                             ]
                         ]
@@ -345,26 +376,26 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
 
     public function testGet()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
-        $response = $this->get(['entity' => $entityType, 'id' => $this->getEntityId('item 3', 3)]);
+        $response = $this->get(['entity' => $entityType, 'id' => $this->getEntityId('item 3')]);
 
         $this->assertResponseContains(
             [
                 'data' => [
                     'type'          => $entityType,
-                    'id'            => $this->getEntityId('item 3', 3),
+                    'id'            => $this->getEntityId('item 3'),
                     'attributes'    => [
-                        'name' => 'Item 3'
+                        'databaseId' => '@test_custom_id3->id',
+                        'name'       => 'Item 3'
                     ],
                     'relationships' => [
                         'parent'   => [
-                            'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1', 1)]
+                            'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1')]
                         ],
                         'children' => [
                             'data' => [
-                                ['type' => $entityType, 'id' => $this->getEntityId('item 2', 2)]
+                                ['type' => $entityType, 'id' => $this->getEntityId('item 2')]
                             ]
                         ]
                     ]
@@ -374,13 +405,45 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
         );
     }
 
+    public function testExcludeDatabasePrimaryKey()
+    {
+        $this->appendEntityConfig(
+            TestEntity::class,
+            [
+                'fields' => [
+                    'databaseId' => [
+                        'exclude' => true
+                    ]
+                ]
+            ]
+        );
+
+        $entityType = $this->getEntityType(TestEntity::class);
+
+        $response = $this->get(['entity' => $entityType, 'id' => $this->getEntityId('item 3')]);
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type'       => $entityType,
+                    'id'         => $this->getEntityId('item 3'),
+                    'attributes' => [
+                        'name' => 'Item 3'
+                    ],
+                ],
+            ],
+            $response
+        );
+        $content = self::jsonToArray($response->getContent());
+        self::assertFalse(isset($content['data']['attributes']['databaseId']));
+    }
+
     public function testGetWithTitles()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $response = $this->get(
-            ['entity' => $entityType, 'id' => $this->getEntityId('item 3', 3)],
+            ['entity' => $entityType, 'id' => $this->getEntityId('item 3')],
             ['meta' => 'title']
         );
 
@@ -388,7 +451,7 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
             [
                 'data' => [
                     'type' => $entityType,
-                    'id'   => $this->getEntityId('item 3', 3),
+                    'id'   => $this->getEntityId('item 3'),
                     'meta' => [
                         'title' => 'item 3 Item 3'
                     ]
@@ -400,11 +463,10 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
 
     public function testGetWithTitlesAndIncludedDataRequested()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $response = $this->get(
-            ['entity' => $entityType, 'id' => $this->getEntityId('item 3', 3)],
+            ['entity' => $entityType, 'id' => $this->getEntityId('item 3')],
             ['meta' => 'title', 'fields[' . $entityType . ']' => 'id,parent', 'include' => 'parent']
         );
 
@@ -412,7 +474,7 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
             [
                 'data'     => [
                     'type' => $entityType,
-                    'id'   => $this->getEntityId('item 3', 3),
+                    'id'   => $this->getEntityId('item 3'),
                     'meta' => [
                         'title' => 'item 3 Item 3'
                     ]
@@ -420,7 +482,7 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
                 'included' => [
                     [
                         'type' => $entityType,
-                        'id'   => $this->getEntityId('item 1', 1),
+                        'id'   => $this->getEntityId('item 1'),
                         'meta' => [
                             'title' => 'item 1 Item 1'
                         ]
@@ -433,29 +495,22 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
 
     public function testCreate()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $data = [
             'data' => [
                 'type'          => $entityType,
-                'id'            => $this->getEntityId('new item', 10),
+                'id'            => $this->getEntityId('new item'),
                 'attributes'    => [
                     'name' => 'New Item'
                 ],
                 'relationships' => [
                     'parent'   => [
-                        'data' => [
-                            'type' => $entityType,
-                            'id'   => $this->getEntityId('item 1', 1)
-                        ]
+                        'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1')]
                     ],
                     'children' => [
                         'data' => [
-                            [
-                                'type' => $entityType,
-                                'id'   => $this->getEntityId('item 1', 1)
-                            ]
+                            ['type' => $entityType, 'id' => $this->getEntityId('item 1')]
                         ]
                     ]
                 ]
@@ -468,17 +523,17 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
             [
                 'data' => [
                     'type'          => $entityType,
-                    'id'            => $this->getEntityId('new item', 10),
+                    'id'            => $this->getEntityId('new item'),
                     'attributes'    => [
                         'name' => 'New Item'
                     ],
                     'relationships' => [
                         'parent'   => [
-                            'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1', 1)]
+                            'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1')]
                         ],
                         'children' => [
                             'data' => [
-                                ['type' => $entityType, 'id' => $this->getEntityId('item 1', 1)]
+                                ['type' => $entityType, 'id' => $this->getEntityId('item 1')]
                             ]
                         ]
                     ]
@@ -491,66 +546,60 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
         /** @var TestEntity $createdEntity */
         $createdEntity = $this->getEntityManager()
             ->getRepository(TestEntity::class)
-            ->findOneBy(['key1' => 'new item', 'key2' => 10]);
+            ->findOneBy(['key' => 'new item']);
         self::assertNotNull($createdEntity);
 
+        $result = self::jsonToArray($response->getContent());
+        self::assertSame($createdEntity->id, $result['data']['attributes']['databaseId']);
+
         self::assertSame('New Item', $createdEntity->name);
-        self::assertSame($this->getReference('test_composite_id1')->key1, $createdEntity->getParent()->key1);
-        self::assertSame($this->getReference('test_composite_id1')->key2, $createdEntity->getParent()->key2);
+        self::assertSame($this->getReference('test_custom_id1')->id, $createdEntity->getParent()->id);
         self::assertCount(1, $createdEntity->getChildren());
-        $childEntity = $createdEntity->getChildren()->first();
-        self::assertSame($this->getReference('test_composite_id1')->key1, $childEntity->key1);
-        self::assertSame($this->getReference('test_composite_id1')->key2, $childEntity->key2);
+        self::assertSame($this->getReference('test_custom_id1')->id, $createdEntity->getChildren()->first()->id);
     }
 
     public function testUpdate()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $data = [
             'data' => [
                 'type'          => $entityType,
-                'id'            => $this->getEntityId('item 1', 1),
+                'id'            => $this->getEntityId('item 1'),
                 'attributes'    => [
-                    'name' => 'Updated Name'
+                    'databaseId' => '@test_custom_id1->id',
+                    'name'       => 'Updated Name'
                 ],
                 'relationships' => [
                     'parent'   => [
-                        'data' => [
-                            'type' => $entityType,
-                            'id'   => $this->getEntityId('item 2', 2)
-                        ]
+                        'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 2')]
                     ],
                     'children' => [
                         'data' => [
-                            [
-                                'type' => $entityType,
-                                'id'   => $this->getEntityId('item 2', 2)
-                            ]
+                            ['type' => $entityType, 'id' => $this->getEntityId('item 2')]
                         ]
                     ]
                 ]
             ]
         ];
 
-        $response = $this->patch(['entity' => $entityType, 'id' => $this->getEntityId('item 1', 1)], $data);
+        $response = $this->patch(['entity' => $entityType, 'id' => $this->getEntityId('item 1')], $data);
 
         $this->assertResponseContains(
             [
                 'data' => [
                     'type'          => $entityType,
-                    'id'            => $this->getEntityId('item 1', 1),
+                    'id'            => $this->getEntityId('item 1'),
                     'attributes'    => [
                         'name' => 'Updated Name'
                     ],
                     'relationships' => [
                         'parent'   => [
-                            'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 2', 2)]
+                            'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 2')]
                         ],
                         'children' => [
                             'data' => [
-                                ['type' => $entityType, 'id' => $this->getEntityId('item 2', 2)]
+                                ['type' => $entityType, 'id' => $this->getEntityId('item 2')]
                             ]
                         ]
                     ]
@@ -563,15 +612,12 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
         /** @var TestEntity $updatedEntity */
         $updatedEntity = $this->getEntityManager()
             ->getRepository(TestEntity::class)
-            ->findOneBy(['key1' => 'item 1', 'key2' => 1]);
+            ->findOneBy(['key' => 'item 1']);
         self::assertNotNull($updatedEntity);
         self::assertSame('Updated Name', $updatedEntity->name);
-        self::assertSame($this->getReference('test_composite_id2')->key1, $updatedEntity->getParent()->key1);
-        self::assertSame($this->getReference('test_composite_id2')->key2, $updatedEntity->getParent()->key2);
+        self::assertSame($this->getReference('test_custom_id2')->id, $updatedEntity->getParent()->id);
         self::assertCount(1, $updatedEntity->getChildren());
-        $childEntity = $updatedEntity->getChildren()->first();
-        self::assertSame($this->getReference('test_composite_id2')->key1, $childEntity->key1);
-        self::assertSame($this->getReference('test_composite_id2')->key2, $childEntity->key2);
+        self::assertSame($this->getReference('test_custom_id2')->id, $updatedEntity->getChildren()->first()->id);
     }
 
     public function testDelete()
@@ -581,38 +627,38 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
         $data = [
             'data' => [
                 'type'       => $entityType,
-                'id'         => $this->getEntityId('item 3', 3),
+                'id'         => $this->getEntityId('item 3'),
                 'attributes' => [
                     'name' => 'Updated Name'
                 ]
             ]
         ];
 
-        $this->delete(['entity' => $entityType, 'id' => $this->getEntityId('item 3', 3)], $data);
+        $this->delete(['entity' => $entityType, 'id' => $this->getEntityId('item 3')], $data);
 
         $this->getEntityManager()->clear();
         $deletedEntity = $this->getEntityManager()
             ->getRepository(TestEntity::class)
-            ->findOneBy(['key1' => 'item 3', 'key2' => 3]);
+            ->findOneBy(['key' => 'item 3']);
         self::assertNull($deletedEntity);
     }
 
     public function testGetSubresourceForToOneAssociation()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $response = $this->getSubresource(
-            ['entity' => $entityType, 'id' => $this->getEntityId('item 3', 3), 'association' => 'parent']
+            ['entity' => $entityType, 'id' => $this->getEntityId('item 3'), 'association' => 'parent']
         );
 
         $this->assertResponseContains(
             [
                 'data' => [
                     'type'          => $entityType,
-                    'id'            => $this->getEntityId('item 1', 1),
+                    'id'            => $this->getEntityId('item 1'),
                     'attributes'    => [
-                        'name' => 'Item 1'
+                        'databaseId' => '@test_custom_id1->id',
+                        'name'       => 'Item 1'
                     ],
                     'relationships' => [
                         'parent'   => [
@@ -630,11 +676,10 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
 
     public function testGetSubresourceForToOneAssociationWithTitles()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $response = $this->getSubresource(
-            ['entity' => $entityType, 'id' => $this->getEntityId('item 3', 3), 'association' => 'parent'],
+            ['entity' => $entityType, 'id' => $this->getEntityId('item 3'), 'association' => 'parent'],
             ['meta' => 'title']
         );
 
@@ -642,7 +687,7 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
             [
                 'data' => [
                     'type' => $entityType,
-                    'id'   => $this->getEntityId('item 1', 1),
+                    'id'   => $this->getEntityId('item 1'),
                     'meta' => [
                         'title' => 'item 1 Item 1',
                     ]
@@ -654,11 +699,10 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
 
     public function testGetSubresourceForToManyAssociation()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $response = $this->getSubresource(
-            ['entity' => $entityType, 'id' => $this->getEntityId('item 3', 3), 'association' => 'children']
+            ['entity' => $entityType, 'id' => $this->getEntityId('item 3'), 'association' => 'children']
         );
 
         $this->assertResponseContains(
@@ -666,9 +710,10 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
                 'data' => [
                     [
                         'type'          => $entityType,
-                        'id'            => $this->getEntityId('item 2', 2),
+                        'id'            => $this->getEntityId('item 2'),
                         'attributes'    => [
-                            'name' => 'Item 2'
+                            'databaseId' => '@test_custom_id2->id',
+                            'name'       => 'Item 2'
                         ],
                         'relationships' => [
                             'parent'   => [
@@ -687,11 +732,10 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
 
     public function testGetSubresourceForToManyAssociationWithTitles()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $response = $this->getSubresource(
-            ['entity' => $entityType, 'id' => $this->getEntityId('item 3', 3), 'association' => 'children'],
+            ['entity' => $entityType, 'id' => $this->getEntityId('item 3'), 'association' => 'children'],
             ['meta' => 'title']
         );
 
@@ -700,7 +744,7 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
                 'data' => [
                     [
                         'type' => $entityType,
-                        'id'   => $this->getEntityId('item 2', 2),
+                        'id'   => $this->getEntityId('item 2'),
                         'meta' => [
                             'title' => 'item 2 Item 2',
                         ]
@@ -713,16 +757,15 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
 
     public function testGetRelationshipForToOneAssociation()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $response = $this->getRelationship(
-            ['entity' => $entityType, 'id' => $this->getEntityId('item 3', 3), 'association' => 'parent']
+            ['entity' => $entityType, 'id' => $this->getEntityId('item 3'), 'association' => 'parent']
         );
 
         $this->assertResponseContains(
             [
-                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1', 1)]
+                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1')]
             ],
             $response
         );
@@ -730,17 +773,16 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
 
     public function testGetRelationshipForToManyAssociation()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $response = $this->getRelationship(
-            ['entity' => $entityType, 'id' => $this->getEntityId('item 3', 3), 'association' => 'children']
+            ['entity' => $entityType, 'id' => $this->getEntityId('item 3'), 'association' => 'children']
         );
 
         $this->assertResponseContains(
             [
                 'data' => [
-                    ['type' => $entityType, 'id' => $this->getEntityId('item 2', 2)]
+                    ['type' => $entityType, 'id' => $this->getEntityId('item 2')]
                 ]
             ],
             $response
@@ -749,13 +791,12 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
 
     public function testUpdateRelationshipForToOneAssociation()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $this->patchRelationship(
-            ['entity' => $entityType, 'id' => $this->getEntityId('item 3', 3), 'association' => 'parent'],
+            ['entity' => $entityType, 'id' => $this->getEntityId('item 3'), 'association' => 'parent'],
             [
-                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 2', 2)]
+                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 2')]
             ]
         );
 
@@ -763,23 +804,21 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
         /** @var TestEntity $updatedEntity */
         $updatedEntity = $this->getEntityManager()
             ->getRepository(TestEntity::class)
-            ->findOneBy(['key1' => 'item 3', 'key2' => 3]);
+            ->findOneBy(['key' => 'item 3']);
         self::assertNotNull($updatedEntity);
-        self::assertSame($this->getReference('test_composite_id2')->key1, $updatedEntity->getParent()->key1);
-        self::assertSame($this->getReference('test_composite_id2')->key2, $updatedEntity->getParent()->key2);
+        self::assertSame($this->getReference('test_custom_id2')->id, $updatedEntity->getParent()->id);
     }
 
     public function testUpdateRelationshipForToManyAssociation()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $this->patchRelationship(
-            ['entity' => $entityType, 'id' => $this->getEntityId('item 3', 3), 'association' => 'children'],
+            ['entity' => $entityType, 'id' => $this->getEntityId('item 3'), 'association' => 'children'],
             [
                 'data' => [
-                    ['type' => $entityType, 'id' => $this->getEntityId('item 1', 1)],
-                    ['type' => $entityType, 'id' => $this->getEntityId('item 2', 2)],
+                    ['type' => $entityType, 'id' => $this->getEntityId('item 1')],
+                    ['type' => $entityType, 'id' => $this->getEntityId('item 2')],
                 ]
             ]
         );
@@ -788,32 +827,24 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
         /** @var TestEntity $updatedEntity */
         $updatedEntity = $this->getEntityManager()
             ->getRepository(TestEntity::class)
-            ->findOneBy(['key1' => 'item 3', 'key2' => 3]);
+            ->findOneBy(['key' => 'item 3']);
         self::assertNotNull($updatedEntity);
         self::assertCount(2, $updatedEntity->getChildren());
-        $ids = [];
-        $child = $updatedEntity->getChildren()->get(0);
-        $ids[$child->key1] = ['key1' => $child->key1, 'key2' => $child->key2];
-        $child = $updatedEntity->getChildren()->get(1);
-        $ids[$child->key1] = ['key1' => $child->key1, 'key2' => $child->key2];
-        ksort($ids);
-        $ids = array_values($ids);
-        self::assertSame($this->getReference('test_composite_id1')->key1, $ids[0]['key1']);
-        self::assertSame($this->getReference('test_composite_id1')->key2, $ids[0]['key2']);
-        self::assertSame($this->getReference('test_composite_id2')->key1, $ids[1]['key1']);
-        self::assertSame($this->getReference('test_composite_id2')->key2, $ids[1]['key2']);
+        $ids = [$updatedEntity->getChildren()->get(0)->id, $updatedEntity->getChildren()->get(1)->id];
+        sort($ids);
+        self::assertSame($this->getReference('test_custom_id1')->id, $ids[0]);
+        self::assertSame($this->getReference('test_custom_id2')->id, $ids[1]);
     }
 
     public function testDeleteRelationshipForToManyAssociation()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $this->deleteRelationship(
-            ['entity' => $entityType, 'id' => $this->getEntityId('item 3', 3), 'association' => 'children'],
+            ['entity' => $entityType, 'id' => $this->getEntityId('item 3'), 'association' => 'children'],
             [
                 'data' => [
-                    ['type' => $entityType, 'id' => $this->getEntityId('item 2', 2)]
+                    ['type' => $entityType, 'id' => $this->getEntityId('item 2')]
                 ]
             ]
         );
@@ -822,21 +853,20 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
         /** @var TestEntity $updatedEntity */
         $updatedEntity = $this->getEntityManager()
             ->getRepository(TestEntity::class)
-            ->findOneBy(['key1' => 'item 3', 'key2' => 3]);
+            ->findOneBy(['key' => 'item 3']);
         self::assertNotNull($updatedEntity);
         self::assertCount(0, $updatedEntity->getChildren());
     }
 
     public function testAddRelationshipForToManyAssociation()
     {
-        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $this->postRelationship(
-            ['entity' => $entityType, 'id' => $this->getEntityId('item 3', 3), 'association' => 'children'],
+            ['entity' => $entityType, 'id' => $this->getEntityId('item 3'), 'association' => 'children'],
             [
                 'data' => [
-                    ['type' => $entityType, 'id' => $this->getEntityId('item 1', 1)]
+                    ['type' => $entityType, 'id' => $this->getEntityId('item 1')]
                 ]
             ]
         );
@@ -845,19 +875,12 @@ class RestJsonApiCompositeIdentifierTest extends RestJsonApiTestCase
         /** @var TestEntity $updatedEntity */
         $updatedEntity = $this->getEntityManager()
             ->getRepository(TestEntity::class)
-            ->findOneBy(['key1' => 'item 3', 'key2' => 3]);
+            ->findOneBy(['key' => 'item 3']);
         self::assertNotNull($updatedEntity);
         self::assertCount(2, $updatedEntity->getChildren());
-        $ids = [];
-        $child = $updatedEntity->getChildren()->get(0);
-        $ids[$child->key1] = ['key1' => $child->key1, 'key2' => $child->key2];
-        $child = $updatedEntity->getChildren()->get(1);
-        $ids[$child->key1] = ['key1' => $child->key1, 'key2' => $child->key2];
-        ksort($ids);
-        $ids = array_values($ids);
-        self::assertSame($this->getReference('test_composite_id1')->key1, $ids[0]['key1']);
-        self::assertSame($this->getReference('test_composite_id1')->key2, $ids[0]['key2']);
-        self::assertSame($this->getReference('test_composite_id2')->key1, $ids[1]['key1']);
-        self::assertSame($this->getReference('test_composite_id2')->key2, $ids[1]['key2']);
+        $ids = [$updatedEntity->getChildren()->get(0)->id, $updatedEntity->getChildren()->get(1)->id];
+        sort($ids);
+        self::assertSame($this->getReference('test_custom_id1')->id, $ids[0]);
+        self::assertSame($this->getReference('test_custom_id2')->id, $ids[1]);
     }
 }

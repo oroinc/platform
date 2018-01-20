@@ -1,11 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
-class RestJsonApiNotAccessibleResourceTest extends RestJsonApiTestCase
+class NotAccessibleResourceTest extends RestJsonApiTestCase
 {
     /**
      * @param string $action
