@@ -3,27 +3,127 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class GetWithIncludeFieldsTest extends RestJsonApiTestCase
 {
+    public function testIncludeFilterWhenItIsNotSupportedForApiResource()
+    {
+        $this->appendEntityConfig(
+            User::class,
+            [
+                'disable_inclusion' => true
+            ]
+        );
+
+        $entityType = $this->getEntityType(User::class);
+        $response = $this->cget(['entity' => $entityType], ['include' => 'owner'], [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The filter is not supported.',
+                'source' => ['parameter' => 'include']
+            ],
+            $response
+        );
+    }
+
+    public function testFieldsFilterWhenItIsNotSupportedForPrimaryApiResource()
+    {
+        $this->appendEntityConfig(
+            User::class,
+            [
+                'disable_fieldset' => true
+            ]
+        );
+
+        $entityType = $this->getEntityType(User::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['fields' => ['users' => 'firstName', 'businessunits' => 'name']],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The filter is not supported.',
+                'source' => ['parameter' => 'fields[users]']
+            ],
+            $response
+        );
+    }
+
+    public function testFieldsFilterWhenItIsNotSupportedForRelatedApiResource()
+    {
+        $this->appendEntityConfig(
+            BusinessUnit::class,
+            [
+                'disable_fieldset' => true
+            ]
+        );
+
+        $entityType = $this->getEntityType(User::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['fields' => ['users' => 'firstName', 'businessunits' => 'name'], 'include' => 'owner'],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The filter is not supported.',
+                'source' => ['parameter' => 'fields[businessunits]']
+            ],
+            $response
+        );
+    }
+
+    public function testFieldsFilterForUnknownApiResource()
+    {
+        $entityType = $this->getEntityType(User::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['fields' => ['unknown' => 'name'], 'page' => ['size' => 1]],
+            [],
+            false
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => $entityType, 'id' => '1']
+                ]
+            ],
+            $response
+        );
+    }
+
     /**
      * @param array $params
      * @param array $expects
      *
-     * @dataProvider getParamsAndExpectation
+     * @dataProvider includeAndFieldsFiltersProvider
      */
-    public function testGetEntityWithIncludeParameter($params, $expects)
+    public function testIncludeAndFieldsFilters($params, $expects)
     {
         $entityType = $this->getEntityType(User::class);
-        $response = $this->cget(['entity' => $entityType, 'page[size]' => 1], $params);
+
+        $params['page']['size'] = 1;
+        $response = $this->cget(['entity' => $entityType], $params);
+
         $this->assertResponseContains($expects, $response);
     }
 
     /**
      * @return array
      */
-    public function getParamsAndExpectation()
+    public function includeAndFieldsFiltersProvider()
     {
         return [
             'Filter root entity fields. Only listed should returns without any relations and inclusions' => [
@@ -32,7 +132,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                         'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled'
                     ],
                 ],
-                'expects' => 'output_1.yml'
+                'expects' => 'include_fields_1.yml'
             ],
             'Wrong field names should be skipped' => [
                 'params'  => [
@@ -41,7 +141,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                         'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled,wrongFieldName'
                     ],
                 ],
-                'expects' => 'output_1.yml'
+                'expects' => 'include_fields_1.yml'
             ],
             'Includes should not be added due they are missed in root entity fields' => [
                 'params'  => [
@@ -50,7 +150,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                         'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled'
                     ],
                 ],
-                'expects' => 'output_1.yml'
+                'expects' => 'include_fields_1.yml'
             ],
             'Included owner and filter it\'s fields (all except createdAt, updatedAt) ' => [
                 'params'  => [
@@ -60,7 +160,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                         'businessunits' => 'name,phone,website,email,fax,organization,owner,users'
                     ],
                 ],
-                'expects' => 'output_2.yml'
+                'expects' => 'include_fields_2.yml'
             ],
             'Owner and Roles not included, so we cannot filter their fields, only relations will be returned' => [
                 'params'  => [
@@ -72,7 +172,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                         'userroles' => 'name'
                     ],
                 ],
-                'expects' => 'output_3.yml'
+                'expects' => 'include_fields_3.yml'
             ],
             'Wrong separator' => [
                 'params'  => [
@@ -80,7 +180,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                         'users' => 'phone, title, username,email,firstName,middleName.lastName,enabled'
                     ],
                 ],
-                'expects' => 'output_4.yml'
+                'expects' => 'include_fields_4.yml'
             ],
             'Include of third level entity' => [
                 'params'  => [
@@ -91,7 +191,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                         'organizations' => 'enabled'
                     ],
                 ],
-                'expects' => 'output_5.yml'
+                'expects' => 'include_fields_5.yml'
             ],
         ];
     }

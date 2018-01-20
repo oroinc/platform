@@ -10,9 +10,11 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+use Oro\Bundle\ApiBundle\Exception\ValidationExceptionInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 
 class RequestActionProcessor extends ActionProcessor implements LoggerAwareInterface
 {
@@ -80,17 +82,7 @@ class RequestActionProcessor extends ActionProcessor implements LoggerAwareInter
             }
         } catch (\Exception $e) {
             if (null !== $this->logger) {
-                if ($context->isSoftErrorsHandling()) {
-                    $this->logger->warning(
-                        sprintf('An exception occurred in "%s" processor.', $processorId),
-                        array_merge(['exception' => $e], $this->getLogContext($context))
-                    );
-                } else {
-                    $this->logger->error(
-                        sprintf('The execution of "%s" processor is failed.', $processorId),
-                        array_merge(['exception' => $e], $this->getLogContext($context))
-                    );
-                }
+                $this->logException($e, $processorId, $context);
             }
 
             if (self::NORMALIZE_RESULT_GROUP === $processors->getGroup() || $context->getLastGroup()) {
@@ -158,6 +150,31 @@ class RequestActionProcessor extends ActionProcessor implements LoggerAwareInter
         }
 
         return $exception;
+    }
+
+    /**
+     * @param \Exception                $e
+     * @param string                    $processorId
+     * @param ComponentContextInterface $context
+     */
+    protected function logException(\Exception $e, string $processorId, ComponentContextInterface $context)
+    {
+        $underlyingException = ExceptionUtil::getProcessorUnderlyingException($e);
+        if ($underlyingException instanceof ValidationExceptionInterface) {
+            return;
+        }
+
+        if ($context instanceof Context && $context->isSoftErrorsHandling()) {
+            $this->logger->warning(
+                sprintf('An exception occurred in "%s" processor.', $processorId),
+                array_merge(['exception' => $e], $this->getLogContext($context))
+            );
+        } else {
+            $this->logger->error(
+                sprintf('The execution of "%s" processor is failed.', $processorId),
+                array_merge(['exception' => $e], $this->getLogContext($context))
+            );
+        }
     }
 
     /**

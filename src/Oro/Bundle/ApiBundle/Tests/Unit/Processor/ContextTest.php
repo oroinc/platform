@@ -13,6 +13,8 @@ use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -23,10 +25,10 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class ContextTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
     protected $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProvider */
     protected $metadataProvider;
 
     /** @var Context */
@@ -34,12 +36,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
+        $this->metadataProvider = $this->createMock(MetadataProvider::class);
 
         $this->context = new Context($this->configProvider, $this->metadataProvider);
     }
@@ -880,6 +878,57 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->context->get(Context::METADATA));
 
         $this->assertEquals($config, $this->context->getConfig());
+
+        // test that metadata are loaded only once
+        $this->assertNull($this->context->getMetadata());
+    }
+
+    public function testLoadMetadataWhenExceptionOccursInLoadConfig()
+    {
+        $version = '1.1';
+        $requestType = 'rest';
+        $entityClass = 'Test\Class';
+        $configExtras = [
+            new TestConfigSection('section1'),
+            new TestConfigSection('section2')
+        ];
+        $exception = new \RuntimeException('some error');
+
+        $metadataExtras = [new TestMetadataExtra('extra1')];
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setConfigExtras($configExtras);
+        $this->context->setMetadataExtras($metadataExtras);
+        $this->context->setClassName($entityClass);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                $entityClass,
+                $version,
+                new RequestType([$requestType]),
+                $configExtras
+            )
+            ->willThrowException($exception);
+        $this->metadataProvider->expects($this->never())
+            ->method('getMetadata');
+
+        try {
+            $this->context->getConfig(); // load config
+        } catch (\RuntimeException $e) {
+            $this->assertSame($exception, $e);
+        }
+
+        // test that metadata are not loaded yet
+        $this->assertFalse($this->context->hasMetadata());
+
+        // load metadata
+        $this->assertNull($this->context->getMetadata());
+
+        $this->assertTrue($this->context->hasMetadata());
+        $this->assertTrue($this->context->has(Context::METADATA));
+        $this->assertNull($this->context->get(Context::METADATA));
 
         // test that metadata are loaded only once
         $this->assertNull($this->context->getMetadata());

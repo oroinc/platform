@@ -64,7 +64,7 @@ class GetWithTableInheritanceTest extends RestJsonApiTestCase
                     ],
                     'sort'   => '-id'
                 ],
-                'expects' => 'output_inheritance_1.yml'
+                'expects' => 'table_inheritance_1.yml'
             ],
             'Related entity with table inheritance (expanded)' => [
                 'params'  => [
@@ -75,7 +75,7 @@ class GetWithTableInheritanceTest extends RestJsonApiTestCase
                     ],
                     'sort'    => '-id'
                 ],
-                'expects' => 'output_inheritance_2.yml'
+                'expects' => 'table_inheritance_2.yml'
             ],
         ];
     }

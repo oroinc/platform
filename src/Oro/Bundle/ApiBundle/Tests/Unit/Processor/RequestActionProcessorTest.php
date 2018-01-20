@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\SimpleProcessorFactory;
+use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\RequestActionProcessor;
@@ -764,6 +765,47 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
             $logger->expects($this->never())
                 ->method('warning');
         }
+
+        $this->processor->process($context);
+
+        $this->assertEquals(
+            [$error],
+            $context->getErrors()
+        );
+    }
+
+    public function testWhenValidationExceptionOccurs()
+    {
+        $logger = $this->createMock('Psr\Log\LoggerInterface');
+        $this->processor->setLogger($logger);
+
+        $context = $this->getContext();
+
+        $exception = new NotSupportedConfigOperationException('Test\Class', 'test_operation');
+
+        $error = Error::createByException($exception);
+
+        $processor1 = $this->addProcessor('processor1', 'group1');
+        $processor2 = $this->addProcessor('processor2', 'group1');
+        $processor3 = $this->addProcessor('processor3', 'group2');
+        $processor10 = $this->addProcessor('processor10', RequestActionProcessor::NORMALIZE_RESULT_GROUP);
+
+        $processor1->expects($this->once())
+            ->method('process')
+            ->with($this->identicalTo($context))
+            ->willThrowException($exception);
+        $processor2->expects($this->never())
+            ->method('process');
+        $processor3->expects($this->never())
+            ->method('process');
+        $processor10->expects($this->once())
+            ->method('process')
+            ->with($this->identicalTo($context));
+
+        $logger->expects($this->never())
+            ->method('error');
+        $logger->expects($this->never())
+            ->method('warning');
 
         $this->processor->process($context);
 

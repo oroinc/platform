@@ -8,6 +8,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Oro\Bundle\ApiBundle\Exception\ExceptionInterface as ApiException;
+use Oro\Bundle\ApiBundle\Exception\ValidationExceptionInterface;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
@@ -48,6 +49,9 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
         ) {
             return Response::HTTP_FORBIDDEN;
         }
+        if ($underlyingException instanceof ValidationExceptionInterface) {
+            return Response::HTTP_BAD_REQUEST;
+        }
 
         return Response::HTTP_INTERNAL_SERVER_ERROR;
     }
@@ -65,10 +69,12 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
      */
     public function getExceptionType(\Exception $exception)
     {
-        return ValueNormalizerUtil::humanizeClassName(
-            get_class(ExceptionUtil::getProcessorUnderlyingException($exception)),
-            'Exception'
-        );
+        $underlyingException = ExceptionUtil::getProcessorUnderlyingException($exception);
+        if ($underlyingException instanceof ValidationExceptionInterface) {
+            return Constraint::REQUEST_DATA;
+        }
+
+        return ValueNormalizerUtil::humanizeClassName(get_class($underlyingException), 'Exception');
     }
 
     /**

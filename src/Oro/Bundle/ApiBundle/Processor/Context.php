@@ -857,13 +857,17 @@ class Context extends ApiContext implements ContextInterface
         }
 
         try {
-            $metadata = $this->metadataProvider->getMetadata(
-                $entityClass,
-                $this->getVersion(),
-                $this->getRequestType(),
-                $this->getConfig(),
-                $this->getMetadataExtras()
-            );
+            $metadata = null;
+            $config = $this->getConfig();
+            if (null !== $config) {
+                $metadata = $this->metadataProvider->getMetadata(
+                    $entityClass,
+                    $this->getVersion(),
+                    $this->getRequestType(),
+                    $config,
+                    $this->getMetadataExtras()
+                );
+            }
             $this->processLoadedMetadata($metadata);
         } catch (\Exception $e) {
             $this->processLoadedMetadata(null);
