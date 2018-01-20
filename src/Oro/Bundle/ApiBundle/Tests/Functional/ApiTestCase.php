@@ -43,14 +43,6 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * @return array
-     */
-    protected function getRequestParameters()
-    {
-        return $this->generateWsseAuthHeader();
-    }
-
-    /**
      * @return RequestType
      */
     abstract protected function getRequestType();

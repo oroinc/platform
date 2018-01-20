@@ -38,9 +38,13 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
         $this->processorFactory = new SimpleProcessorFactory();
         $this->processorBagConfigBuilder = new ProcessorBagConfigBuilder();
         $this->processorBag = new ProcessorBag($this->processorBagConfigBuilder, $this->processorFactory);
-        $this->processorBagConfigBuilder->addGroup('group1', self::TEST_ACTION);
-        $this->processorBagConfigBuilder->addGroup('group2', self::TEST_ACTION);
-        $this->processorBagConfigBuilder->addGroup(RequestActionProcessor::NORMALIZE_RESULT_GROUP, self::TEST_ACTION);
+        $this->processorBagConfigBuilder->addGroup('group1', self::TEST_ACTION, -10);
+        $this->processorBagConfigBuilder->addGroup('group2', self::TEST_ACTION, -20);
+        $this->processorBagConfigBuilder->addGroup(
+            RequestActionProcessor::NORMALIZE_RESULT_GROUP,
+            self::TEST_ACTION,
+            -30
+        );
 
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
