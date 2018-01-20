@@ -11,7 +11,6 @@ use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -40,33 +39,6 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
 
         $this->context = new Context($this->configProvider, $this->metadataProvider);
-    }
-
-    public function testVersion()
-    {
-        $this->assertNull($this->context->getVersion());
-
-        $this->context->setVersion('test');
-        $this->assertEquals('test', $this->context->getVersion());
-        $this->assertEquals('test', $this->context->get(Context::VERSION));
-    }
-
-    public function testRequestType()
-    {
-        $this->assertEquals(new RequestType([]), $this->context->getRequestType());
-
-        $this->context->getRequestType()->add('test');
-        $this->assertEquals(new RequestType(['test']), $this->context->getRequestType());
-        $this->assertEquals(new RequestType(['test']), $this->context->get(Context::REQUEST_TYPE));
-
-        $this->context->getRequestType()->add('another');
-        $this->assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
-        $this->assertEquals(new RequestType(['test', 'another']), $this->context->get(Context::REQUEST_TYPE));
-
-        // test that already existing type is not added twice
-        $this->context->getRequestType()->add('another');
-        $this->assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
-        $this->assertEquals(new RequestType(['test', 'another']), $this->context->get(Context::REQUEST_TYPE));
     }
 
     /**
@@ -1075,49 +1047,6 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->context->setCriteria($criteria);
         $this->assertSame($criteria, $this->context->getCriteria());
         $this->assertSame($criteria, $this->context->get(Context::CRITERIA));
-    }
-
-    public function testErrors()
-    {
-        $this->assertFalse($this->context->hasErrors());
-        $this->assertSame([], $this->context->getErrors());
-
-        $this->context->addError(new Error());
-        $this->assertTrue($this->context->hasErrors());
-        $this->assertCount(1, $this->context->getErrors());
-
-        $this->context->resetErrors();
-        $this->assertFalse($this->context->hasErrors());
-        $this->assertSame([], $this->context->getErrors());
-    }
-
-    public function testSoftErrorsHandling()
-    {
-        $this->assertFalse($this->context->isSoftErrorsHandling());
-        $this->assertFalse($this->context->has(Context::SOFT_ERRORS_HANDLING));
-
-        $this->context->setSoftErrorsHandling(true);
-        $this->assertTrue($this->context->isSoftErrorsHandling());
-        $this->assertTrue($this->context->has(Context::SOFT_ERRORS_HANDLING));
-        $this->assertTrue($this->context->get(Context::SOFT_ERRORS_HANDLING));
-
-        $this->context->setSoftErrorsHandling(false);
-        $this->assertFalse($this->context->isSoftErrorsHandling());
-        $this->assertFalse($this->context->has(Context::SOFT_ERRORS_HANDLING));
-    }
-
-    public function testProcessed()
-    {
-        $this->assertFalse($this->context->isProcessed('test'));
-
-        $this->context->setProcessed('test');
-        $this->context->setProcessed('another');
-        $this->assertTrue($this->context->isProcessed('test'));
-        $this->assertTrue($this->context->isProcessed('another'));
-
-        $this->context->clearProcessed('test');
-        $this->assertFalse($this->context->isProcessed('test'));
-        $this->assertTrue($this->context->isProcessed('another'));
     }
 
     /**
