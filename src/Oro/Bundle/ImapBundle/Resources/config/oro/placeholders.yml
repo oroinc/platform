@@ -1,0 +1,9 @@
+placeholders:
+    placeholders:
+        scripts_after:
+            items:
+                oro_imap_sync_origin_credential_notifications_topic: ~
+
+    items:
+        oro_imap_sync_origin_credential_notifications_topic:
+            template: OroImapBundle::credentialsTopicSubscribe.html.twig
