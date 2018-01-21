@@ -17,8 +17,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
             ]
         );
 
-        $entityType = $this->getEntityType(User::class);
-        $response = $this->cget(['entity' => $entityType], ['include' => 'owner'], [], false);
+        $response = $this->cget(['entity' => 'users'], ['include' => 'owner'], [], false);
 
         $this->assertResponseValidationError(
             [
@@ -39,9 +38,8 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
             ]
         );
 
-        $entityType = $this->getEntityType(User::class);
         $response = $this->cget(
-            ['entity' => $entityType],
+            ['entity' => 'users'],
             ['fields' => ['users' => 'firstName', 'businessunits' => 'name']],
             [],
             false
@@ -66,9 +64,8 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
             ]
         );
 
-        $entityType = $this->getEntityType(User::class);
         $response = $this->cget(
-            ['entity' => $entityType],
+            ['entity' => 'users'],
             ['fields' => ['users' => 'firstName', 'businessunits' => 'name'], 'include' => 'owner'],
             [],
             false
@@ -86,9 +83,8 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
 
     public function testFieldsFilterForUnknownApiResource()
     {
-        $entityType = $this->getEntityType(User::class);
         $response = $this->cget(
-            ['entity' => $entityType],
+            ['entity' => 'users'],
             ['fields' => ['unknown' => 'name'], 'page' => ['size' => 1]],
             [],
             false
@@ -97,102 +93,565 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(
             [
                 'data' => [
-                    ['type' => $entityType, 'id' => '1']
+                    ['type' => 'users', 'id' => '1']
                 ]
             ],
             $response
         );
     }
 
-    /**
-     * @param array $params
-     * @param array $expects
-     *
-     * @dataProvider includeAndFieldsFiltersProvider
-     */
-    public function testIncludeAndFieldsFilters($params, $expects)
+    public function testFieldsFilter()
     {
-        $entityType = $this->getEntityType(User::class);
+        $params = [
+            'page'   => ['size' => 1],
+            'fields' => [
+                'users' => 'username,firstName,middleName,lastName,email,enabled,owner'
+            ]
+        ];
+        $extectedResponse = [
+            'data' => [
+                [
+                    'type'          => 'users',
+                    'id'            => '1',
+                    'attributes'    => [
+                        'username'   => 'admin',
+                        'email'      => 'admin@example.com',
+                        'firstName'  => 'John',
+                        'middleName' => null,
+                        'lastName'   => 'Doe',
+                        'enabled'    => true
+                    ],
+                    'relationships' => [
+                        'owner' => [
+                            'data' => ['type' => 'businessunits', 'id' => '1']
+                        ]
+                    ]
+                ]
+            ]
+        ];
 
-        $params['page']['size'] = 1;
-        $response = $this->cget(['entity' => $entityType], $params);
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($extectedResponse, $response);
 
-        $this->assertResponseContains($expects, $response);
+        $data = self::jsonToArray($response->getContent());
+        self::assertCount(count($extectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
+        self::assertCount(count($extectedResponse['data'][0]['relationships']), $data['data'][0]['relationships']);
+        self::assertFalse(isset($data['data']['included']));
     }
 
-    /**
-     * @return array
-     */
-    public function includeAndFieldsFiltersProvider()
+    public function testFieldsFilterWithWrongSeparators()
     {
-        return [
-            'Filter root entity fields. Only listed should returns without any relations and inclusions' => [
-                'params'  => [
-                    'fields' => [
-                        'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled'
-                    ],
-                ],
-                'expects' => 'include_fields_1.yml'
-            ],
-            'Wrong field names should be skipped' => [
-                'params'  => [
-                    'include' => 'wrongFieldName1,wrongFieldName2',
-                    'fields' => [
-                        'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled,wrongFieldName'
-                    ],
-                ],
-                'expects' => 'include_fields_1.yml'
-            ],
-            'Includes should not be added due they are missed in root entity fields' => [
-                'params'  => [
-                    'include' => 'owner,organization',
-                    'fields'  => [
-                        'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled'
-                    ],
-                ],
-                'expects' => 'include_fields_1.yml'
-            ],
-            'Included owner and filter it\'s fields (all except createdAt, updatedAt) ' => [
-                'params'  => [
-                    'include' => 'owner,organization',
-                    'fields'  => [
-                        'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled,owner',
-                        'businessunits' => 'name,phone,website,email,fax,organization,owner,users'
-                    ],
-                ],
-                'expects' => 'include_fields_2.yml'
-            ],
-            'Owner and Roles not included, so we cannot filter their fields, only relations will be returned' => [
-                'params'  => [
-                    'include' => 'organization',
-                    'fields'  => [
-                        'users' => 'username,firstName,lastName,email,organization,owner,roles',
-                        'businessunits' => 'name,phone,website,email,fax',
-                        'organizations' => 'enabled',
-                        'userroles' => 'name'
-                    ],
-                ],
-                'expects' => 'include_fields_3.yml'
-            ],
-            'Wrong separator' => [
-                'params'  => [
-                    'fields' => [
-                        'users' => 'phone, title, username,email,firstName,middleName.lastName,enabled'
-                    ],
-                ],
-                'expects' => 'include_fields_4.yml'
-            ],
-            'Include of third level entity' => [
-                'params'  => [
-                    'include' => 'owner,owner.organization',
-                    'fields'  => [
-                        'users' => 'username,email,owner',
-                        'businessunits' => 'name,organization',
-                        'organizations' => 'enabled'
-                    ],
-                ],
-                'expects' => 'include_fields_5.yml'
-            ],
+        $params = [
+            'page'   => ['size' => 1],
+            'fields' => [
+                'users' => 'phone, title, username,email,middleName.lastName,enabled'
+            ]
         ];
+        $extectedResponse = [
+            'data' => [
+                [
+                    'type'       => 'users',
+                    'id'         => '1',
+                    'attributes' => [
+                        'phone'   => null,
+                        'email'   => 'admin@example.com',
+                        'enabled' => true
+                    ]
+                ]
+            ]
+        ];
+
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($extectedResponse, $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertCount(count($extectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
+        self::assertFalse(isset($data['data'][0]['relationships']));
+        self::assertFalse(isset($data['data']['included']));
+    }
+
+    public function testIncludeFilterWithWrongFieldName()
+    {
+        $params = [
+            'page'   => ['size' => 1],
+            'fields' => [
+                'include' => 'wrongField',
+                'users'   => 'username,owner'
+            ]
+        ];
+        $extectedResponse = [
+            'data' => [
+                [
+                    'type'          => 'users',
+                    'id'            => '1',
+                    'attributes'    => [
+                        'username' => 'admin'
+                    ],
+                    'relationships' => [
+                        'owner' => [
+                            'data' => ['type' => 'businessunits', 'id' => '1']
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($extectedResponse, $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertCount(count($extectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
+        self::assertCount(count($extectedResponse['data'][0]['relationships']), $data['data'][0]['relationships']);
+        self::assertFalse(isset($data['data']['included']));
+    }
+
+    public function testIncludeFilter()
+    {
+        $params = [
+            'page'    => ['size' => 1],
+            'include' => 'owner,organization'
+        ];
+        $extectedResponse = [
+            'data'     => [
+                [
+                    'type'          => 'users',
+                    'id'            => '1',
+                    'relationships' => [
+                        'owner'        => [
+                            'data' => ['type' => 'businessunits', 'id' => '1']
+                        ],
+                        'organization' => [
+                            'data' => ['type' => 'organizations', 'id' => '1']
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                ['type' => 'businessunits', 'id' => '1'],
+                ['type' => 'organizations', 'id' => '1']
+            ]
+        ];
+
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($extectedResponse, $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertTrue(count($data['data'][0]['attributes']) > 0);
+        self::assertTrue(count($data['data'][0]['relationships']) > 0);
+        self::assertCount(count($extectedResponse['included']), $data['included']);
+        self::assertTrue(count($data['included'][0]['attributes']) > 0);
+        self::assertTrue(count($data['included'][0]['relationships']) > 0);
+        self::assertTrue(count($data['included'][1]['attributes']) > 0);
+        self::assertTrue(count($data['included'][1]['relationships']) > 0);
+    }
+
+    public function testIncludeFilterWhenIncludeFieldsExistInFieldsFilter()
+    {
+        $params = [
+            'page'    => ['size' => 1],
+            'include' => 'owner,organization',
+            'fields'  => [
+                'users'         => 'username,owner,organization',
+                'businessunits' => 'name,users',
+                'organizations' => 'enabled'
+            ]
+        ];
+        $extectedResponse = [
+            'data'     => [
+                [
+                    'type'          => 'users',
+                    'id'            => '1',
+                    'attributes'    => [
+                        'username' => 'admin'
+                    ],
+                    'relationships' => [
+                        'owner'        => [
+                            'data' => ['type' => 'businessunits', 'id' => '1']
+                        ],
+                        'organization' => [
+                            'data' => ['type' => 'organizations', 'id' => '1']
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                [
+                    'type'          => 'businessunits',
+                    'id'            => '1',
+                    'attributes'    => [
+                        'name' => 'Main'
+                    ],
+                    'relationships' => [
+                        'users' => [
+                            'data' => [
+                                ['type' => 'users', 'id' => '1']
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'type'       => 'organizations',
+                    'id'         => '1',
+                    'attributes' => [
+                        'enabled' => true
+                    ]
+                ]
+            ]
+        ];
+
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($extectedResponse, $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertCount(count($extectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
+        self::assertCount(count($extectedResponse['data'][0]['relationships']), $data['data'][0]['relationships']);
+        self::assertCount(count($extectedResponse['included']), $data['included']);
+
+        $firstIncludedIndex = -1;
+        $secondIncludedIndex = -1;
+        foreach ($extectedResponse['included'] as $index => $item) {
+            if ('businessunits' === $item['type']) {
+                $firstIncludedIndex = $index;
+            }
+            if ('organizations' === $item['type']) {
+                $secondIncludedIndex = $index;
+            }
+        }
+
+        self::assertCount(
+            count($extectedResponse['included'][0]['attributes']),
+            $data['included'][$firstIncludedIndex]['attributes']
+        );
+        self::assertCount(
+            count($extectedResponse['included'][0]['relationships']),
+            $data['included'][$firstIncludedIndex]['relationships']
+        );
+        self::assertCount(
+            count($extectedResponse['included'][0]['attributes']),
+            $data['included'][$secondIncludedIndex]['attributes']
+        );
+        self::assertFalse(
+            isset($data['included'][$secondIncludedIndex]['relationships'])
+        );
+    }
+
+    public function testIncludeFilterWhenIncludeFieldsDoNotExistInFieldsFilter()
+    {
+        $params = [
+            'page'    => ['size' => 1],
+            'include' => 'owner,organization',
+            'fields'  => [
+                'users' => 'username'
+            ]
+        ];
+        $extectedResponse = [
+            'data' => [
+                [
+                    'type'       => 'users',
+                    'id'         => '1',
+                    'attributes' => [
+                        'username' => 'admin'
+                    ]
+                ]
+            ]
+        ];
+
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($extectedResponse, $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertCount(count($extectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
+        self::assertFalse(isset($data['data'][0]['relationships']));
+        self::assertFalse(isset($data['data']['included']));
+    }
+
+    public function testIncludeFilterForSecondLevelRelatedEntity()
+    {
+        $params = [
+            'page'    => ['size' => 1],
+            'include' => 'owner.organization'
+        ];
+        $extectedResponse = [
+            'data'     => [
+                [
+                    'type'          => 'users',
+                    'id'            => '1',
+                    'relationships' => [
+                        'owner' => [
+                            'data' => ['type' => 'businessunits', 'id' => '1']
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                [
+                    'type'          => 'businessunits',
+                    'id'            => '1',
+                    'relationships' => [
+                        'organization' => [
+                            'data' => ['type' => 'organizations', 'id' => '1']
+                        ]
+                    ]
+                ],
+                ['type' => 'organizations', 'id' => '1']
+            ]
+        ];
+
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($extectedResponse, $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertCount(count($extectedResponse['included']), $data['included']);
+    }
+
+    public function testIncludeFilterForSecondLevelRelatedEntityWhenIncludeFieldsExistInFieldsFilter()
+    {
+        $params = [
+            'page'    => ['size' => 1],
+            'include' => 'owner.organization',
+            'fields'  => [
+                'users'         => 'owner',
+                'businessunits' => 'organization'
+            ]
+        ];
+        $extectedResponse = [
+            'data'     => [
+                [
+                    'type'          => 'users',
+                    'id'            => '1',
+                    'relationships' => [
+                        'owner' => [
+                            'data' => ['type' => 'businessunits', 'id' => '1']
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                [
+                    'type'          => 'businessunits',
+                    'id'            => '1',
+                    'relationships' => [
+                        'organization' => [
+                            'data' => ['type' => 'organizations', 'id' => '1']
+                        ]
+                    ]
+                ],
+                ['type' => 'organizations', 'id' => '1']
+            ]
+        ];
+
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($extectedResponse, $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertCount(count($extectedResponse['included']), $data['included']);
+    }
+
+    public function testIncludeFilterForSecondLevelRelatedEntityWhenIncludeFieldsDoNotExistInFieldsFilter()
+    {
+        $params = [
+            'page'    => ['size' => 1],
+            'include' => 'owner.organization',
+            'fields'  => [
+                'users'         => 'username',
+                'businessunits' => 'name'
+            ]
+        ];
+        $extectedResponse = [
+            'data' => [
+                [
+                    'type'       => 'users',
+                    'id'         => '1',
+                    'attributes' => [
+                        'username' => 'admin'
+                    ]
+                ]
+            ]
+        ];
+
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($extectedResponse, $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertFalse(isset($data['included']));
+    }
+
+    public function testIncludeFilterForSecondLevelRelatedEntityWhenSecondIncludeFieldsExistInFieldsFilter()
+    {
+        $params = [
+            'page'    => ['size' => 1],
+            'include' => 'owner.organization',
+            'fields'  => [
+                'users'         => 'owner',
+                'businessunits' => 'name'
+            ]
+        ];
+        $extectedResponse = [
+            'data'     => [
+                [
+                    'type'          => 'users',
+                    'id'            => '1',
+                    'relationships' => [
+                        'owner' => [
+                            'data' => ['type' => 'businessunits', 'id' => '1']
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                ['type' => 'businessunits', 'id' => '1']
+            ]
+        ];
+
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($extectedResponse, $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertCount(count($extectedResponse['included']), $data['included']);
+    }
+
+    public function testIncludeFilterForFirstAndSecondLevelRelatedEntity()
+    {
+        $params = [
+            'page'    => ['size' => 1],
+            'include' => 'owner,owner.organization'
+        ];
+        $extectedResponse = [
+            'data'     => [
+                [
+                    'type'          => 'users',
+                    'id'            => '1',
+                    'relationships' => [
+                        'owner' => [
+                            'data' => ['type' => 'businessunits', 'id' => '1']
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                [
+                    'type'          => 'businessunits',
+                    'id'            => '1',
+                    'relationships' => [
+                        'organization' => [
+                            'data' => ['type' => 'organizations', 'id' => '1']
+                        ]
+                    ]
+                ],
+                ['type' => 'organizations', 'id' => '1']
+            ]
+        ];
+
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($extectedResponse, $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertCount(count($extectedResponse['included']), $data['included']);
+    }
+
+    public function testIncludeFilterForFirstAndSecondLevelRelatedEntityWhenIncludeFieldsExistInFieldsFilter()
+    {
+        $params = [
+            'page'    => ['size' => 1],
+            'include' => 'owner,owner.organization',
+            'fields'  => [
+                'users'         => 'owner',
+                'businessunits' => 'organization'
+            ]
+        ];
+        $extectedResponse = [
+            'data'     => [
+                [
+                    'type'          => 'users',
+                    'id'            => '1',
+                    'relationships' => [
+                        'owner' => [
+                            'data' => ['type' => 'businessunits', 'id' => '1']
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                [
+                    'type'          => 'businessunits',
+                    'id'            => '1',
+                    'relationships' => [
+                        'organization' => [
+                            'data' => ['type' => 'organizations', 'id' => '1']
+                        ]
+                    ]
+                ],
+                ['type' => 'organizations', 'id' => '1']
+            ]
+        ];
+
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($extectedResponse, $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertCount(count($extectedResponse['included']), $data['included']);
+    }
+
+    public function testIncludeFilterFoFirstAndrSecondLevelRelatedEntityWhenIncludeFieldsDoNotExistInFieldsFilter()
+    {
+        $params = [
+            'page'    => ['size' => 1],
+            'include' => 'owner,owner.organization',
+            'fields'  => [
+                'users'         => 'username',
+                'businessunits' => 'name'
+            ]
+        ];
+        $extectedResponse = [
+            'data' => [
+                [
+                    'type'       => 'users',
+                    'id'         => '1',
+                    'attributes' => [
+                        'username' => 'admin'
+                    ]
+                ]
+            ]
+        ];
+
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($extectedResponse, $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertFalse(isset($data['included']));
+    }
+
+    public function testIncludeFilterForFirstAndSecondLevelRelatedEntityWhenSecondIncludeFieldsExistInFieldsFilter()
+    {
+        $params = [
+            'page'    => ['size' => 1],
+            'include' => 'owner,owner.organization',
+            'fields'  => [
+                'users'         => 'owner',
+                'businessunits' => 'name'
+            ]
+        ];
+        $extectedResponse = [
+            'data'     => [
+                [
+                    'type'          => 'users',
+                    'id'            => '1',
+                    'relationships' => [
+                        'owner' => [
+                            'data' => ['type' => 'businessunits', 'id' => '1']
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                ['type' => 'businessunits', 'id' => '1']
+            ]
+        ];
+
+        $response = $this->cget(['entity' => 'users'], $params);
+        $this->assertResponseContains($extectedResponse, $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertCount(count($extectedResponse['included']), $data['included']);
     }
 }
