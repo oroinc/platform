@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Symfony\Component\HttpFoundation\Response;
+
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Shared\RemoveResponseErrors;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
-use Symfony\Component\HttpFoundation\Response;
 
 class RemoveResponseErrorsTest extends GetListProcessorTestCase
 {
@@ -24,7 +25,7 @@ class RemoveResponseErrorsTest extends GetListProcessorTestCase
         $this->context->addError(Error::create('some error'));
         $this->processor->process($this->context);
 
-        $this->assertTrue($this->context->hasErrors());
+        self::assertTrue($this->context->hasErrors());
     }
 
     public function testProcessWhenNoErrors()
@@ -32,37 +33,24 @@ class RemoveResponseErrorsTest extends GetListProcessorTestCase
         $this->context->setResponseStatusCode(Response::HTTP_OK);
         $this->processor->process($this->context);
 
-        $this->assertFalse($this->context->hasErrors());
+        self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenResponseCanContainErrorsInBody()
+    public function testProcessWhenResponseCanContainErrorsInContent()
     {
         $this->context->setResponseStatusCode(Response::HTTP_BAD_REQUEST);
         $this->context->addError(Error::create('some error'));
         $this->processor->process($this->context);
 
-        $this->assertTrue($this->context->hasErrors());
+        self::assertTrue($this->context->hasErrors());
     }
 
-    /**
-     * @dataProvider getStatusCodesWithoutBody
-     */
-    public function testProcessWhenResponseShouldNotContainErrorsInBody($statusCode)
+    public function testProcessWhenResponseShouldNotContainErrorsInContent()
     {
-        $this->context->setResponseStatusCode($statusCode);
+        $this->context->setResponseStatusCode(Response::HTTP_METHOD_NOT_ALLOWED);
         $this->context->addError(Error::create('some error'));
         $this->processor->process($this->context);
 
-        $this->assertFalse($this->context->hasErrors());
-    }
-
-    /**
-     * @return array
-     */
-    public function getStatusCodesWithoutBody()
-    {
-        return [
-            [Response::HTTP_METHOD_NOT_ALLOWED],
-        ];
+        self::assertFalse($this->context->hasErrors());
     }
 }
