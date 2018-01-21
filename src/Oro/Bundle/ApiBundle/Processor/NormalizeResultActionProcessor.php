@@ -5,6 +5,10 @@ namespace Oro\Bundle\ApiBundle\Processor;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
 use Oro\Component\ChainProcessor\ActionProcessor;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
@@ -12,6 +16,7 @@ use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Exception\ValidationExceptionInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
+use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 
 class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAwareInterface
 {
@@ -123,8 +128,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
      */
     protected function logException(\Exception $e, string $processorId, ComponentContextInterface $context)
     {
-        $underlyingException = ExceptionUtil::getProcessorUnderlyingException($e);
-        if ($underlyingException instanceof ValidationExceptionInterface) {
+        if (!$this->isLoggableException(ExceptionUtil::getProcessorUnderlyingException($e))) {
             return;
         }
 
@@ -139,6 +143,28 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
                 array_merge(['exception' => $e], $this->getLogContext($context))
             );
         }
+    }
+
+    /**
+     * Indicates whether the given exceptions need to be added to the log.
+     *
+     * @param \Exception $e
+     *
+     * @return bool
+     */
+    protected function isLoggableException(\Exception $e)
+    {
+        if ($e instanceof HttpExceptionInterface) {
+            return $e->getStatusCode() >= Response::HTTP_INTERNAL_SERVER_ERROR;
+        }
+        if ($e instanceof AccessDeniedException || $e instanceof ForbiddenException) {
+            return false;
+        }
+        if ($e instanceof ValidationExceptionInterface) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

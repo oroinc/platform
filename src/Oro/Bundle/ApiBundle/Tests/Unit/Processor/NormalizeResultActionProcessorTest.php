@@ -2,17 +2,28 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
+use Psr\Log\LoggerInterface;
+
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\SimpleProcessorFactory;
 use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\NormalizeResultContext;
 use Oro\Bundle\ApiBundle\Processor\NormalizeResultActionProcessor;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,6 +34,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
 
     /** @var ProcessorBagConfigBuilder */
     protected $processorBagConfigBuilder;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    protected $configProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProvider */
+    protected $metadataProvider;
 
     /** @var ProcessorBag */
     protected $processorBag;
@@ -43,12 +60,8 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
             -3
         );
 
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
+        $this->metadataProvider = $this->createMock(MetadataProvider::class);
 
         $this->processor = new NormalizeResultActionProcessor(
             $this->processorBag,
@@ -68,6 +81,17 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $context->setVersion('1.2');
 
         return $context;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     */
+    protected function setLogger()
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $this->processor->setLogger($logger);
+
+        return $logger;
     }
 
     /**
@@ -128,8 +152,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
-            $this->processor->setLogger($logger);
+            $logger = $this->setLogger();
         }
 
         $context = $this->getContext();
@@ -173,10 +196,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(
-            [$error],
-            $context->getErrors()
-        );
+        self::assertEquals([$error], $context->getErrors());
     }
 
     /**
@@ -186,8 +206,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
-            $this->processor->setLogger($logger);
+            $logger = $this->setLogger();
         }
 
         $context = $this->getContext();
@@ -232,10 +251,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(
-            [$error],
-            $context->getErrors()
-        );
+        self::assertEquals([$error], $context->getErrors());
     }
 
     /**
@@ -245,8 +261,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
-            $this->processor->setLogger($logger);
+            $logger = $this->setLogger();
         }
 
         $context = $this->getContext();
@@ -283,10 +298,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(
-            [$error],
-            $context->getErrors()
-        );
+        self::assertEquals([$error], $context->getErrors());
     }
 
     /**
@@ -296,8 +308,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
-            $this->processor->setLogger($logger);
+            $logger = $this->setLogger();
         }
 
         $context = $this->getContext();
@@ -332,10 +343,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(
-            [$error],
-            $context->getErrors()
-        );
+        self::assertEquals([$error], $context->getErrors());
     }
 
     /**
@@ -345,8 +353,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
-            $this->processor->setLogger($logger);
+            $logger = $this->setLogger();
         }
 
         $context = $this->getContext();
@@ -384,10 +391,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(
-            [$error],
-            $context->getErrors()
-        );
+        self::assertEquals([$error], $context->getErrors());
     }
 
     /**
@@ -397,8 +401,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
-            $this->processor->setLogger($logger);
+            $logger = $this->setLogger();
         }
 
         $context = $this->getContext();
@@ -434,10 +437,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(
-            [$error],
-            $context->getErrors()
-        );
+        self::assertEquals([$error], $context->getErrors());
     }
 
     /**
@@ -447,8 +447,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
-            $this->processor->setLogger($logger);
+            $logger = $this->setLogger();
         }
 
         $context = $this->getContext();
@@ -502,8 +501,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
-            $this->processor->setLogger($logger);
+            $logger = $this->setLogger();
         }
 
         $context = $this->getContext();
@@ -549,10 +547,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(
-            [$error],
-            $context->getErrors()
-        );
+        self::assertEquals([$error], $context->getErrors());
     }
 
     /**
@@ -562,8 +557,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
-            $this->processor->setLogger($logger);
+            $logger = $this->setLogger();
         }
 
         $context = $this->getContext();
@@ -592,7 +586,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor10->expects($this->never())
             ->method('process');
 
-        $this->expectException('\Oro\Bundle\ApiBundle\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(sprintf('An unexpected error occurred: %s.', $error->getTitle()));
 
         if (null !== $logger) {
@@ -613,8 +607,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
-            $this->processor->setLogger($logger);
+            $logger = $this->setLogger();
         }
 
         $context = $this->getContext();
@@ -653,10 +646,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(
-            [$error],
-            $context->getErrors()
-        );
+        self::assertEquals([$error], $context->getErrors());
     }
 
     /**
@@ -666,8 +656,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
-            $this->processor->setLogger($logger);
+            $logger = $this->setLogger();
         }
 
         $context = $this->getContext();
@@ -717,8 +706,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
-            $this->processor->setLogger($logger);
+            $logger = $this->setLogger();
         }
 
         $context = $this->getContext();
@@ -760,10 +748,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(
-            [$error],
-            $context->getErrors()
-        );
+        self::assertEquals([$error], $context->getErrors());
     }
 
     /**
@@ -773,8 +758,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
-            $this->processor->setLogger($logger);
+            $logger = $this->setLogger();
         }
 
         $context = $this->getContext();
@@ -809,10 +793,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(
-            [$error],
-            $context->getErrors()
-        );
+        self::assertEquals([$error], $context->getErrors());
     }
 
     /**
@@ -822,8 +803,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
-            $this->processor->setLogger($logger);
+            $logger = $this->setLogger();
         }
 
         $context = $this->getContext();
@@ -859,10 +839,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(
-            [$error],
-            $context->getErrors()
-        );
+        self::assertEquals([$error], $context->getErrors());
     }
 
     /**
@@ -872,8 +849,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
-            $this->processor->setLogger($logger);
+            $logger = $this->setLogger();
         }
 
         $context = $this->getContext();
@@ -917,14 +893,15 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($internalPhpError->getLine(), $errorException->getLine());
     }
 
-    public function testWhenValidationExceptionOccurs()
+    /**
+     * @param \Exception $exception
+     * @dataProvider notLoggableExceptionProvider
+     */
+    public function testWhenNotLoggableExceptionOccurs(\Exception $exception)
     {
-        $logger = $this->createMock('Psr\Log\LoggerInterface');
-        $this->processor->setLogger($logger);
+        $logger = $this->setLogger();
 
         $context = $this->getContext();
-
-        $exception = new NotSupportedConfigOperationException('Test\Class', 'test_operation');
 
         $error = Error::createByException($exception);
 
@@ -952,9 +929,79 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(
-            [$error],
-            $context->getErrors()
-        );
+        self::assertEquals([$error], $context->getErrors());
+    }
+
+    /**
+     * @return array
+     */
+    public function notLoggableExceptionProvider()
+    {
+        return [
+            [new HttpException(Response::HTTP_BAD_REQUEST)],
+            [new HttpException(Response::HTTP_METHOD_NOT_ALLOWED)],
+            [new AccessDeniedException()],
+            [new ForbiddenException('some reason')],
+            [new NotSupportedConfigOperationException('Test\Class', 'test_operation')]
+        ];
+    }
+
+    /**
+     * @param HttpException $exception
+     * @dataProvider httpInternalServerErrorExceptionProvider
+     */
+    public function testWhenHttpInternalServerErrorExceptionOccurs(HttpException $exception)
+    {
+        $logger = $this->setLogger();
+
+        $context = $this->getContext();
+
+        $error = Error::createByException($exception);
+
+        $processor1 = $this->addProcessor('processor1', 'group1');
+        $processor2 = $this->addProcessor('processor2', 'group1');
+        $processor3 = $this->addProcessor('processor3', 'group2');
+        $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
+
+        $processor1->expects($this->once())
+            ->method('process')
+            ->with($this->identicalTo($context))
+            ->willThrowException($exception);
+        $processor2->expects($this->never())
+            ->method('process');
+        $processor3->expects($this->never())
+            ->method('process');
+        $processor10->expects($this->once())
+            ->method('process')
+            ->with($this->identicalTo($context));
+
+        $logger->expects($this->once())
+            ->method('error')
+            ->with(
+                'The execution of "processor1" processor is failed.',
+                [
+                    'exception'   => $exception,
+                    'action'      => self::TEST_ACTION,
+                    'requestType' => 'rest,json_api',
+                    'version'     => '1.2'
+                ]
+            );
+        $logger->expects($this->never())
+            ->method('warning');
+
+        $this->processor->process($context);
+
+        self::assertEquals([$error], $context->getErrors());
+    }
+
+    /**
+     * @return array
+     */
+    public function httpInternalServerErrorExceptionProvider()
+    {
+        return [
+            [new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR)],
+            [new HttpException(Response::HTTP_NOT_IMPLEMENTED)]
+        ];
     }
 }

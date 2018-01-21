@@ -98,7 +98,10 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit_Framework_TestCase
             [new ActionNotAllowedException(), 'action not allowed exception'],
             [new ForbiddenException('Reason.'), 'forbidden exception'],
             [new ResourceNotAccessibleException(), 'resource not accessible exception'],
-            [new NotSupportedConfigOperationException('Test\Class', 'test_operation'), 'request data constraint'],
+            [
+                new NotSupportedConfigOperationException('Test\Class', 'test_operation'),
+                'not supported config operation exception'
+            ],
         ];
     }
 

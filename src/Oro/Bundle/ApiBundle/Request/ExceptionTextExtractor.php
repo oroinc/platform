@@ -49,6 +49,14 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
         ) {
             return Response::HTTP_FORBIDDEN;
         }
+
+        /**
+         * check for ValidationExceptionInterface should be at the end,
+         * because some exceptions can implement several interfaces and
+         * ValidationExceptionInterface should have lowest priority
+         * e.g. an exception can implement both ValidationExceptionInterface and HttpExceptionInterface,
+         * but the status code for it should be retrieved from HttpExceptionInterface
+         */
         if ($underlyingException instanceof ValidationExceptionInterface) {
             return Response::HTTP_BAD_REQUEST;
         }
@@ -69,12 +77,10 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
      */
     public function getExceptionType(\Exception $exception)
     {
-        $underlyingException = ExceptionUtil::getProcessorUnderlyingException($exception);
-        if ($underlyingException instanceof ValidationExceptionInterface) {
-            return Constraint::REQUEST_DATA;
-        }
-
-        return ValueNormalizerUtil::humanizeClassName(get_class($underlyingException), 'Exception');
+        return ValueNormalizerUtil::humanizeClassName(
+            get_class(ExceptionUtil::getProcessorUnderlyingException($exception)),
+            'Exception'
+        );
     }
 
     /**
