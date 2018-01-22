@@ -11,8 +11,9 @@ use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -23,10 +24,10 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class ContextTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
     protected $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProvider */
     protected $metadataProvider;
 
     /** @var Context */
@@ -34,41 +35,10 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
+        $this->metadataProvider = $this->createMock(MetadataProvider::class);
 
         $this->context = new Context($this->configProvider, $this->metadataProvider);
-    }
-
-    public function testVersion()
-    {
-        $this->assertNull($this->context->getVersion());
-
-        $this->context->setVersion('test');
-        $this->assertEquals('test', $this->context->getVersion());
-        $this->assertEquals('test', $this->context->get(Context::VERSION));
-    }
-
-    public function testRequestType()
-    {
-        $this->assertEquals(new RequestType([]), $this->context->getRequestType());
-
-        $this->context->getRequestType()->add('test');
-        $this->assertEquals(new RequestType(['test']), $this->context->getRequestType());
-        $this->assertEquals(new RequestType(['test']), $this->context->get(Context::REQUEST_TYPE));
-
-        $this->context->getRequestType()->add('another');
-        $this->assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
-        $this->assertEquals(new RequestType(['test', 'another']), $this->context->get(Context::REQUEST_TYPE));
-
-        // test that already existing type is not added twice
-        $this->context->getRequestType()->add('another');
-        $this->assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
-        $this->assertEquals(new RequestType(['test', 'another']), $this->context->get(Context::REQUEST_TYPE));
     }
 
     /**
@@ -885,6 +855,57 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->context->getMetadata());
     }
 
+    public function testLoadMetadataWhenExceptionOccursInLoadConfig()
+    {
+        $version = '1.1';
+        $requestType = 'rest';
+        $entityClass = 'Test\Class';
+        $configExtras = [
+            new TestConfigSection('section1'),
+            new TestConfigSection('section2')
+        ];
+        $exception = new \RuntimeException('some error');
+
+        $metadataExtras = [new TestMetadataExtra('extra1')];
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setConfigExtras($configExtras);
+        $this->context->setMetadataExtras($metadataExtras);
+        $this->context->setClassName($entityClass);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                $entityClass,
+                $version,
+                new RequestType([$requestType]),
+                $configExtras
+            )
+            ->willThrowException($exception);
+        $this->metadataProvider->expects($this->never())
+            ->method('getMetadata');
+
+        try {
+            $this->context->getConfig(); // load config
+        } catch (\RuntimeException $e) {
+            $this->assertSame($exception, $e);
+        }
+
+        // test that metadata are not loaded yet
+        $this->assertFalse($this->context->hasMetadata());
+
+        // load metadata
+        $this->assertNull($this->context->getMetadata());
+
+        $this->assertTrue($this->context->hasMetadata());
+        $this->assertTrue($this->context->has(Context::METADATA));
+        $this->assertNull($this->context->get(Context::METADATA));
+
+        // test that metadata are loaded only once
+        $this->assertNull($this->context->getMetadata());
+    }
+
     public function testMetadataWhenItIsSetExplicitly()
     {
         $metadata = new EntityMetadata();
@@ -1026,49 +1047,6 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->context->setCriteria($criteria);
         $this->assertSame($criteria, $this->context->getCriteria());
         $this->assertSame($criteria, $this->context->get(Context::CRITERIA));
-    }
-
-    public function testErrors()
-    {
-        $this->assertFalse($this->context->hasErrors());
-        $this->assertSame([], $this->context->getErrors());
-
-        $this->context->addError(new Error());
-        $this->assertTrue($this->context->hasErrors());
-        $this->assertCount(1, $this->context->getErrors());
-
-        $this->context->resetErrors();
-        $this->assertFalse($this->context->hasErrors());
-        $this->assertSame([], $this->context->getErrors());
-    }
-
-    public function testSoftErrorsHandling()
-    {
-        $this->assertFalse($this->context->isSoftErrorsHandling());
-        $this->assertFalse($this->context->has(Context::SOFT_ERRORS_HANDLING));
-
-        $this->context->setSoftErrorsHandling(true);
-        $this->assertTrue($this->context->isSoftErrorsHandling());
-        $this->assertTrue($this->context->has(Context::SOFT_ERRORS_HANDLING));
-        $this->assertTrue($this->context->get(Context::SOFT_ERRORS_HANDLING));
-
-        $this->context->setSoftErrorsHandling(false);
-        $this->assertFalse($this->context->isSoftErrorsHandling());
-        $this->assertFalse($this->context->has(Context::SOFT_ERRORS_HANDLING));
-    }
-
-    public function testProcessed()
-    {
-        $this->assertFalse($this->context->isProcessed('test'));
-
-        $this->context->setProcessed('test');
-        $this->context->setProcessed('another');
-        $this->assertTrue($this->context->isProcessed('test'));
-        $this->assertTrue($this->context->isProcessed('another'));
-
-        $this->context->clearProcessed('test');
-        $this->assertFalse($this->context->isProcessed('test'));
-        $this->assertTrue($this->context->isProcessed('another'));
     }
 
     /**

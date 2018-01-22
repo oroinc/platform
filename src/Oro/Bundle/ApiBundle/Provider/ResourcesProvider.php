@@ -138,6 +138,16 @@ class ResourcesProvider
     }
 
     /**
+     * Removes all entries from the cache.
+     */
+    public function clearCache()
+    {
+        $this->accessibleResources = null;
+        $this->excludedActions = null;
+        $this->resourcesCache->clear();
+    }
+
+    /**
      * @param string      $version
      * @param RequestType $requestType
      *

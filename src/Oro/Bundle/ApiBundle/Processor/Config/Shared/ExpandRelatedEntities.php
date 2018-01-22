@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -52,6 +53,10 @@ class ExpandRelatedEntities implements ProcessorInterface
         }
 
         $entityClass = $context->getClassName();
+        if (!$definition->isInclusionEnabled()) {
+            throw new NotSupportedConfigOperationException($entityClass, ExpandRelatedEntitiesConfigExtra::NAME);
+        }
+
         if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
             $this->completeEntityAssociations(
                 $this->doctrineHelper->getEntityMetadataForClass($entityClass),

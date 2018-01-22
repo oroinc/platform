@@ -4,27 +4,37 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\JsonApi\JsonApiDocument;
 
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\ErrorCompleter;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
 class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ExceptionTextExtractorInterface */
     protected $exceptionTextExtractor;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    protected $valueNormalizer;
 
     /** @var ErrorCompleter */
     protected $errorCompleter;
 
     protected function setUp()
     {
-        $this->exceptionTextExtractor = $this
-            ->createMock('Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface');
+        $this->exceptionTextExtractor = $this->createMock(ExceptionTextExtractorInterface::class);
+        $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
-        $this->errorCompleter = new ErrorCompleter($this->exceptionTextExtractor);
+        $this->errorCompleter = new ErrorCompleter($this->exceptionTextExtractor, $this->valueNormalizer);
     }
 
     public function testCompleteErrorWithoutInnerException()
@@ -448,6 +458,85 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setSource(ErrorSource::createByPointer('/data/attributes/groups/1/name'));
 
         $this->errorCompleter->complete($error, $metadata);
+        $this->assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForExpandRelatedEntitiesConfigFilterConstraint()
+    {
+        $exception = new NotSupportedConfigOperationException(
+            'Test\Class',
+            ExpandRelatedEntitiesConfigExtra::NAME
+        );
+
+        $error = new Error();
+        $error->setInnerException($exception);
+
+        $expectedError = new Error();
+        $expectedError->setStatusCode(400);
+        $expectedError->setCode('test code');
+        $expectedError->setTitle('filter constraint');
+        $expectedError->setDetail('The filter is not supported.');
+        $expectedError->setSource(ErrorSource::createByParameter('include'));
+        $expectedError->setInnerException($exception);
+
+        $this->exceptionTextExtractor->expects($this->once())
+            ->method('getExceptionStatusCode')
+            ->with($this->identicalTo($exception))
+            ->willReturn(400);
+        $this->exceptionTextExtractor->expects($this->once())
+            ->method('getExceptionCode')
+            ->with($this->identicalTo($exception))
+            ->willReturn('test code');
+        $this->exceptionTextExtractor->expects($this->never())
+            ->method('getExceptionType');
+        $this->exceptionTextExtractor->expects($this->never())
+            ->method('getExceptionText');
+
+        $this->errorCompleter->complete($error);
+        $this->assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForFilterFieldsConfigFilterConstraint()
+    {
+        $exception = new NotSupportedConfigOperationException(
+            'Test\Class',
+            FilterFieldsConfigExtra::NAME
+        );
+
+        $error = new Error();
+        $error->setInnerException($exception);
+
+        $expectedError = new Error();
+        $expectedError->setStatusCode(400);
+        $expectedError->setCode('test code');
+        $expectedError->setTitle('filter constraint');
+        $expectedError->setDetail('The filter is not supported.');
+        $expectedError->setSource(ErrorSource::createByParameter('fields[test_entity]'));
+        $expectedError->setInnerException($exception);
+
+        $this->exceptionTextExtractor->expects($this->once())
+            ->method('getExceptionStatusCode')
+            ->with($this->identicalTo($exception))
+            ->willReturn(400);
+        $this->exceptionTextExtractor->expects($this->once())
+            ->method('getExceptionCode')
+            ->with($this->identicalTo($exception))
+            ->willReturn('test code');
+        $this->exceptionTextExtractor->expects($this->never())
+            ->method('getExceptionType');
+        $this->exceptionTextExtractor->expects($this->never())
+            ->method('getExceptionText');
+
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->with(
+                'Test\Class',
+                DataType::ENTITY_TYPE,
+                new RequestType([RequestType::JSON_API])
+            )
+            ->willReturn('test_entity');
+
+        $this->errorCompleter->complete($error);
         $this->assertEquals($expectedError, $error);
     }
 }

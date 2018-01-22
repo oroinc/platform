@@ -32,7 +32,7 @@ interface ProcessorBagInterface
     public function getActions();
 
     /**
-     * Gets all groups registered for the given action and have at least one processor.
+     * Gets all groups registered for the given action.
      * The returned groups are sorted by its priority.
      *
      * @param string $action An action
