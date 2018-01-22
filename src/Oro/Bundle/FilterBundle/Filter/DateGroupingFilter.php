@@ -9,6 +9,7 @@ use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
@@ -148,6 +149,7 @@ class DateGroupingFilter extends ChoiceFilter
         /* @var OrmDatasource $datasource */
         $qb = $datasource->getQueryBuilder();
         $added = false;
+        $direction = QueryBuilderUtil::getSortOrder($direction);
 
         foreach ([self::TYPE_YEAR, self::TYPE_QUARTER, self::TYPE_MONTH, self::TYPE_DAY] as $groupBy) {
             $columnName = $this->getSelectAlias($groupBy);
@@ -191,7 +193,10 @@ class DateGroupingFilter extends ChoiceFilter
      */
     private function getSelectAlias($postfix)
     {
-        return $this->get(self::COLUMN_NAME) . ucfirst($postfix);
+        $selectAlias = $this->get(self::COLUMN_NAME) . ucfirst($postfix);
+        QueryBuilderUtil::checkField($selectAlias);
+
+        return $selectAlias;
     }
 
     /**

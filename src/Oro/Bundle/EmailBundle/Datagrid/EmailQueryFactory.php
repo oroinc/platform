@@ -212,11 +212,6 @@ class EmailQueryFactory
             )
             ->groupBy('m.thread');
 
-        $exprs = [
-            $qb->expr()->isNull('e.thread'),
-            $qb->expr()->eq('e.head', 'TRUE')
-        ];
-
         $threadedExpressions = null;
         $threadedExpressionsParameters = null;
         if ($datagrid && $filters) {
@@ -228,7 +223,8 @@ class EmailQueryFactory
 
         if ($threadedExpressions) {
             $filterQb = $qb->getEntityManager()->createQueryBuilder();
-            $filterExpressions = call_user_func_array([$filterQb->expr(), 'andX'], $threadedExpressions);
+            $filterExpressions = $filterQb->expr()->andX();
+            $filterExpressions->addMultiple($threadedExpressions);
             $filterQb
                 ->select('IDENTITY(mm.thread)')
                 ->from('OroEmailBundle:EmailUser', 'uu')
@@ -240,10 +236,11 @@ class EmailQueryFactory
                 $notThreadedExpressionsParameters
             ) = $this->prepareSearchFiltersForQueryBuilder($qb, $datagrid, $filters, 'e');
 
-            $expression = call_user_func_array(
-                [$qb->expr(), 'andX'],
-                array_merge($exprs, $notThreadedExpressions)
+            $expression = $qb->expr()->andX(
+                $qb->expr()->isNull('e.thread'),
+                $qb->expr()->eq('e.head', 'TRUE')
             );
+            $expression->addMultiple($notThreadedExpressions);
 
             $qb->andWhere(
                 $qb->expr()->orX(
