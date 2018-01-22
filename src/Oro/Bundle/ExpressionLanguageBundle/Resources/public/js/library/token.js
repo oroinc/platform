@@ -21,7 +21,6 @@ define(function() {
         PUNCTUATION_TYPE: {value: 'punctuation'}
     });
 
-
     Token.prototype = {
         constructor: Token,
 

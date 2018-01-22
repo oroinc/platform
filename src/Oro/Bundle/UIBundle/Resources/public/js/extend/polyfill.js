@@ -79,6 +79,14 @@ define(function() {
         });
     }
 
+    if (typeof Object.values !== 'function') {
+        Object.values = function values(obj) {
+            return Object.keys(obj).reduce(function(values, key) {
+                return values.concat([obj[key]]);
+            }, []);
+        };
+    }
+
     if (!String.prototype.padStart) {
         String.prototype.padStart = function padStart(targetLength,padString) {
             targetLength = targetLength>>0; //truncate if number or convert non-number to 0;

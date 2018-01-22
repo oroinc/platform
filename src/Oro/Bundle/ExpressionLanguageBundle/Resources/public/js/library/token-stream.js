@@ -12,7 +12,7 @@ define(function(require) {
         this.tokens = tokens;
         this.current = tokens[0];
         this.expression = expression || '';
-        this.position = 0
+        this.position = 0;
     }
 
     TokenStream.prototype = {
