@@ -133,6 +133,7 @@ define(function(require) {
          * Toggle found/not-found class for all elements based on found highlighted elements
          */
         toggleElements: function() {
+            _.each(this.findElements(_.keys(this.toggleSelectors)), this.toggleElement, this);
             if (this.isElementHighlighted(this.$el)) {
                 _.each(this.findElements(_.keys(this.toggleSelectors)), this.toggleElement, this);
             }
@@ -238,7 +239,9 @@ define(function(require) {
                     $el.replaceWith($el.html());
                 });
 
-                this.setElementContent($el, $content);
+                if (!this._isFieldChoice($el)) {
+                    this.setElementContent($el, $content);
+                }
             }, this);
 
             this.$el.find(this.findNotFoundClass).removeClass(this.notFoundClass);
@@ -252,8 +255,16 @@ define(function(require) {
          * @return {jQuery}
          */
         getElementContent: function($el) {
+            var content;
+
             var isPopover = $el.data('popover');
-            var content = !isPopover ? $el.html() : $el.data('popover').getContent();
+            if (isPopover) {
+                content = $el.data('popover').getContent();
+            } else if (this._isField($el) && !this._isFieldChoice($el)) {
+                content = $el.val();
+            } else {
+                content = $el.html();
+            }
 
             return $('<div/>').html(content);
         },
@@ -268,6 +279,10 @@ define(function(require) {
             var isPopover = $el.data('popover');
             if (isPopover) {
                 $el.data('popover').updateContent($content.html());
+                $el.toggleClass(this.elementHighlightClass, this.isElementContentHighlighted($content, false));
+            } else if (this._isFieldChoice($el)) {
+                $el.parent().toggleClass(this.elementHighlightClass, this.isElementContentHighlighted($content, false));
+            } else if (this._isField($el)) {
                 $el.toggleClass(this.elementHighlightClass, this.isElementContentHighlighted($content, false));
             } else {
                 $el.html($content.html());
@@ -306,6 +321,36 @@ define(function(require) {
                     this.highlightElementContent($children);
                 }
             }, this);
+        },
+
+        /**
+         * Check if given element is field
+         *
+         * @param {jQuery} $element
+         */
+        _isFieldChoice: function($element) {
+            var $child;
+            var isFieldChoice = this._isField($element) && $element.is('select');
+            if (!isFieldChoice) {
+                $child = $element.children('select');
+                if ($child.length) {
+                    return true;
+                }
+            }
+
+            return isFieldChoice;
+        },
+
+        /**
+         * Check if given element is field
+         *
+         * @param {jQuery} $element
+         */
+        _isField: function($element) {
+            var elementName = $element.data('name');
+            var fieldName = 'field__value';
+
+            return elementName === fieldName;
         }
     });
 

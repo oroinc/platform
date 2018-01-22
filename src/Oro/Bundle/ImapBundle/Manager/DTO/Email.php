@@ -5,7 +5,6 @@ namespace Oro\Bundle\ImapBundle\Manager\DTO;
 use Oro\Bundle\EmailBundle\Model\EmailHeader;
 use Oro\Bundle\ImapBundle\Mail\Storage\Body;
 use Oro\Bundle\ImapBundle\Mail\Storage\Message;
-use Oro\Bundle\ImapBundle\Mail\Storage\Exception\InvalidBodyFormatException;
 
 class Email extends EmailHeader
 {
@@ -63,6 +62,16 @@ class Email extends EmailHeader
         $this->id = $id;
 
         return $this;
+    }
+
+    /**
+     * Get Message object
+     *
+     * @return Message
+     */
+    public function getMessage()
+    {
+        return $this->message;
     }
 
     /**

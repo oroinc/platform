@@ -47,6 +47,9 @@ class ProcessorBag implements ProcessorBagInterface
         $this->debug = $debug;
         $this->applicableCheckerFactory = $applicableCheckerFactory ?: new ProcessorApplicableCheckerFactory();
         $this->processorIteratorFactory = $processorIteratorFactory ?: new ProcessorIteratorFactory();
+        if ($this->processorIteratorFactory instanceof ProcessorBagAwareIteratorFactoryInterface) {
+            $this->processorIteratorFactory->setProcessorBag($this);
+        }
     }
 
     /**

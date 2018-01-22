@@ -12,10 +12,10 @@
  *   jQuery UI Dialog 1.10.2
  *
  */
-define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _, __) {
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui'], function ($, _, __) {
     'use strict';
-    $.widget( "ui.dialog", $.ui.dialog, {
-        version: "2.0.0",
+    $.widget( 'ui.dialog', $.ui.dialog, {
+        version: '2.0.0',
 
         _limitToEl: false,
 
@@ -30,10 +30,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
             dblclick: false,
             titlebar: false,
             icons: {
-                close: "ui-icon-closethick",
-                maximize: "ui-icon-extlink",
-                minimize: "ui-icon-minus",
-                restore: "ui-icon-newwin"
+                close: 'ui-icon-closethick',
+                maximize: 'ui-icon-extlink',
+                minimize: 'ui-icon-minus',
+                restore: 'ui-icon-newwin'
             },
             snapshot: null,
             state: 'normal',
@@ -112,7 +112,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
 
         showActionsContainer: function() {
             if (!this.uiDialogButtonPane.parent().length) {
-                this.uiDialog.addClass("ui-dialog-buttons");
+                this.uiDialog.addClass('ui-dialog-buttons');
                 this.uiDialogButtonPane.appendTo( this.uiDialog );
             }
         },
@@ -144,11 +144,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
 
             var widget = this.widget();
 
-            this._trigger("beforeMinimize");
+            this._trigger('beforeMinimize');
             this._saveSnapshot();
-            this._setState("minimized");
+            this._setState('minimized');
             this._toggleButtons();
-            this._trigger("minimize");
+            this._trigger('minimize');
             widget.hide();
 
             this._getMinimizeTo().show();
@@ -186,7 +186,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
         _collapse: function () {
             var newHeight = this._getTitleBarHeight();
 
-            this._trigger("beforeCollapse");
+            this._trigger('beforeCollapse');
             this._saveSnapshot();
             // modify dialog size (after hiding content)
             this._setOptions({
@@ -195,9 +195,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
                 maxHeight: newHeight
             });
             // mark new state
-            this._setState("collapsed");
+            this._setState('collapsed');
             // trigger custom event
-            this._trigger("collapse");
+            this._trigger('collapse');
 
             return this;
         },
@@ -207,32 +207,32 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
                 this._normalize();
             }
 
-            this._trigger("beforeMaximize");
+            this._trigger('beforeMaximize');
             this._saveSnapshot();
             this._calculateNewMaximizedDimensions($.proxy(function() {
-                this._setState("maximized");
+                this._setState('maximized');
                 this._toggleButtons();
-                this._trigger("maximize");
+                this._trigger('maximize');
             }, this));
 
             return this;
         },
 
         _restore: function () {
-            this._trigger("beforeRestore");
+            this._trigger('beforeRestore');
             // restore to normal
             this._restoreWithoutTriggerEvent();
-            this._setState("normal");
+            this._setState('normal');
             this._toggleButtons();
-            this._trigger("restore");
+            this._trigger('restore');
 
             return this;
         },
 
         _normalize: function() {
-            if (this.state() != 'normal') {
+            if (this.state() !== 'normal') {
                 this.disableStateChangeTrigger = true;
-                this._setOption("state", "normal");
+                this._setOption('state', 'normal');
                 this.disableStateChangeTrigger = false;
             }
         },
@@ -242,7 +242,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
             if (!this.bottomLine.length) {
                 this.bottomLine = $('<div id="dialog-extend-parent-bottom"></div>');
                 this.bottomLine.css({
-                    position: "fixed",
+                    position: 'fixed',
                     bottom: 0,
                     left: 0
                 })
@@ -257,14 +257,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
                 this.options.minimizeTo = $('<div id="dialog-extend-fixed-container"></div>');
                 this.options.minimizeTo.addClass('ui-dialog-minimize-container');
                 this.options.minimizeTo
-                    .css({
-                        position: "fixed",
-                        bottom: 1,
-                        left: this._limitTo().offset().left,
-                        zIndex: 9999
-                    })
-                    .hide()
-                    .appendTo(this._appendTo());
+                .css({
+                    position: 'fixed',
+                    bottom: 1,
+                    left: this._limitTo().offset().left,
+                    zIndex: 9999
+                })
+                .hide()
+                .appendTo(this._appendTo());
             }
         },
 
@@ -310,8 +310,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
         _size: function() {
             var cssProperties = _.pick(this.options, ['width', 'height', 'maxWidth', 'minWidth']);
             this.uiDialog.css(cssProperties);
-            if ( this.uiDialog.is( ":data(ui-resizable)" ) ) {
-                this.uiDialog.resizable( "option", "minHeight", this._minHeight() );
+            if ( this.uiDialog.is( ':data(ui-resizable)' ) ) {
+                this.uiDialog.resizable( 'option', 'minHeight', this._minHeight() );
             }
         },
 
@@ -327,7 +327,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
         },
 
         _getTitleBarHeight: function() {
-            return this.uiDialogTitlebar.height() + 15
+            return this.uiDialogTitlebar.height() + 15;
         },
 
         _getContainerHeight: function() {
@@ -351,7 +351,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
 
         _initButtons: function (el) {
             var self = this;
-            if (typeof el == 'undefined') {
+            if (typeof el === 'undefined') {
                 el = this;
             }
             // start operation on titlebar
@@ -360,21 +360,21 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
             // move 'close' button to button-pane
             this._buttons = {};
             this.uiDialogTitlebarClose
-                // override some unwanted jquery-ui styles
-                .css({ "position": "static", "top": "auto", "right": "auto", "margin": 0 })
-                .attr('title', __('close'))
-                // change icon
-                .find(".ui-icon").removeClass("ui-icon-closethick").addClass(this.options.icons.close).end()
-                // move to button-pane
-                .appendTo(buttonPane)
-                .end();
+            // override some unwanted jquery-ui styles
+            .css({ 'position': 'static', 'top': 'auto', 'right': 'auto', 'margin': 0 })
+            .attr('title', __('close'))
+            // change icon
+            .find('.ui-icon').removeClass('ui-icon-closethick').addClass(this.options.icons.close).end()
+            // move to button-pane
+            .appendTo(buttonPane)
+            .end();
             // append other buttons to button-pane
             var types =  ['maximize', 'restore', 'minimize'];
             for (var key in types) {
-                if (typeof types[key] == 'string') {
+                if (typeof types[key] === 'string') {
                     var type = types[key];
                     var button = this.options.icons[type];
-                    if (typeof this.options.icons[type] == 'string') {
+                    if (typeof this.options.icons[type] === 'string') {
                         button = '<a class="ui-dialog-titlebar-' + type + ' ui-corner-all" href="#" title="' + __(type)+ '"><span class="ui-icon ' + this.options.icons[type] + '">' + type + '</span></a>';
 
                     } else {
@@ -382,19 +382,19 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
                     }
                     button = $(button);
                     button
-                        .attr("role", "button")
-                        .mouseover(function () {
-                            $(this).addClass("ui-state-hover");
-                        })
-                        .mouseout(function () {
-                            $(this).removeClass("ui-state-hover");
-                        })
-                        .focus(function () {
-                            $(this).addClass("ui-state-focus");
-                        })
-                        .blur(function () {
-                            $(this).removeClass("ui-state-focus");
-                        });
+                    .attr('role', 'button')
+                    .mouseover(function() {
+                        $(this).addClass('ui-state-hover');
+                    })
+                    .mouseout(function() {
+                        $(this).removeClass('ui-state-hover');
+                    })
+                    .focus(function() {
+                        $(this).addClass('ui-state-focus');
+                    })
+                    .blur(function() {
+                        $(this).removeClass('ui-state-focus');
+                    });
                     this._buttons[type] = button;
                     buttonPane.append(button);
                 }
@@ -402,43 +402,43 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
 
             this.uiDialogTitlebarClose.toggle(this.options.allowClose);
 
-            this._buttons['maximize']
-                .toggle(this.options.allowMaximize)
-                .click(function (e) {
-                    e.preventDefault();
-                    self.maximize();
-                });
+            this._buttons.maximize
+            .toggle(this.options.allowMaximize)
+            .click(function (e) {
+                e.preventDefault();
+                self.maximize();
+            });
 
-            this._buttons['minimize']
-                .toggle(this.options.allowMinimize)
-                .click(function (e) {
-                    e.preventDefault();
-                    self.minimize();
-                });
+            this._buttons.minimize
+            .toggle(this.options.allowMinimize)
+            .click(function (e) {
+                e.preventDefault();
+                self.minimize();
+            });
 
-            this._buttons['restore']
-                .hide()
-                .click(function (e) {
-                    e.preventDefault();
-                    self.restore();
-                });
+            this._buttons.restore
+            .hide()
+            .click(function (e) {
+                e.preventDefault();
+                self.restore();
+            });
 
             // other titlebar behaviors
             this.uiDialogTitlebar
-                // on-dblclick-titlebar : maximize/minimize/collapse/restore
-                .dblclick(function (evt) {
-                    if (self.options.dblclick && self.options.dblclick.length) {
-                        if (self.state() != 'normal') {
-                            self.restore();
-                        } else {
-                            self[self.options.dblclick]();
-                        }
+            // on-dblclick-titlebar : maximize/minimize/collapse/restore
+            .dblclick(function (evt) {
+                if (self.options.dblclick && self.options.dblclick.length) {
+                    if (self.state() !== 'normal') {
+                        self.restore();
+                    } else {
+                        self[self.options.dblclick]();
                     }
-                })
-                // avoid text-highlight when double-click
-                .select(function () {
-                    return false;
-                });
+                }
+            })
+            // avoid text-highlight when double-click
+            .select(function () {
+                return false;
+            });
 
             return this;
         },
@@ -473,17 +473,17 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
                 case false:
                     // do nothing
                     break;
-                case "transparent":
+                case 'transparent':
                     // remove title style
                     this.uiDialogTitlebar
-                        .css({
-                            "background-color": "transparent",
-                            "background-image": "none",
-                            "border": 0
-                        });
+                    .css({
+                        'background-color': 'transparent',
+                        'background-image': 'none',
+                        'border': 0
+                    });
                     break;
                 default:
-                    $.error("jQuery.dialogExtend Error : Invalid <titlebar> value '" + this.options.titlebar + "'");
+                    $.error('jQuery.dialogExtend Error : Invalid <titlebar> value "' + this.options.titlebar + '"');
             }
 
             return this;
@@ -497,10 +497,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
             var original = this._loadSnapshot();
             // restore dialog
             this._setOptions({
-                    resizable: original.config.resizable,
-                    height: original.size.height - this._getTitleBarHeight(),
-                    maxHeight: original.size.maxHeight
-                });
+                resizable: original.config.resizable,
+                height: original.size.height - this._getTitleBarHeight(),
+                maxHeight: original.size.maxHeight
+            });
 
             return this;
         },
@@ -578,7 +578,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
             if ($.isFunction(this[method])) {
                 this[method]();
             } else {
-                $.error("jQuery.dialogExtend Error : Cannot restore dialog from unknown state '" + beforeState + "'")
+                $.error('jQuery.dialogExtend Error : Cannot restore dialog from unknown state "' + beforeState + '"');
             }
 
             return this;
@@ -586,7 +586,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
 
         _saveSnapshot: function () {
             // remember all configs under normal state
-            if (this.state() == "normal") {
+            if (this.state() === 'normal') {
                 this._setOption('snapshot', this.snapshot());
             }
 
@@ -604,7 +604,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
                     width: this.options.width,
                     maxHeight: this.options.maxHeight
                 },
-                "position": this.widget().offset()
+                'position': this.widget().offset()
             };
         },
 
@@ -613,13 +613,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
         },
 
         _setOption: function(key, value) {
-            if (key == 'state') {
+            if (key === 'state') {
                 this._initializeState(value);
             }
 
             this._superApply(arguments);
 
-            if (key == 'appendTo') {
+            if (key === 'appendTo') {
                 this._initializeContainer();
             }
         },
@@ -645,7 +645,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
         _initializeContainer: function() {
             // Fix parent position
             var appendTo = this._appendTo();
-            if (appendTo.css('position') == 'static') {
+            if (appendTo.css('position') === 'static') {
                 appendTo.css('position', 'relative');
             }
         },
@@ -655,16 +655,16 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
             this.options.state = state;
             // toggle data state
             this.widget()
-                .removeClass("ui-dialog-normal ui-dialog-maximized ui-dialog-minimized ui-dialog-collapsed")
-                .addClass("ui-dialog-" + state);
+            .removeClass('ui-dialog-normal ui-dialog-maximized ui-dialog-minimized ui-dialog-collapsed')
+            .addClass('ui-dialog-' + state);
 
             // Trigger state change event
             if (!this.disableStateChangeTrigger) {
                 var snapshot = this._loadSnapshot();
-                if (!snapshot && this.state() == 'normal') {
+                if (!snapshot && this.state() === 'normal') {
                     snapshot = this.snapshot();
                 }
-                this._trigger("stateChange", null, {
+                this._trigger('stateChange', null, {
                     state: this.state(),
                     oldState: oldState,
                     snapshot: snapshot
@@ -676,15 +676,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
 
         _toggleButtons: function () {
             // show or hide buttons & decide position
-            this._buttons['maximize']
-                .toggle(this.state() != "maximized" && this.options.allowMaximize);
+            this._buttons.maximize
+            .toggle(this.state() !== 'maximized' && this.options.allowMaximize);
 
-            this._buttons['minimize']
-                .toggle(this.state() != "minimized" && this.options.allowMinimize);
+            this._buttons.minimize
+            .toggle(this.state() !== 'minimized' && this.options.allowMinimize);
 
-            this._buttons['restore']
-                .toggle(this.state() != "normal" && ( this.options.allowMaximize || this.options.allowMinimize ))
-                .css({ "right": this.state() == "maximized" ? "1.4em" : this.state() == "minimized" ? !this.options.allowMaximize ? "1.4em" : "2.5em" : "-9999em" });
+            this._buttons.restore
+            .toggle(this.state() !== 'normal' && ( this.options.allowMaximize || this.options.allowMinimize ))
+            .css({ 'right': this.state() === 'maximized' ? '1.4em' : this.state() === 'minimized' ? !this.options.allowMaximize ? '1.4em' : '2.5em' : '-9999em' });
 
             return this;
         },
@@ -692,14 +692,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
         _verifySettings: function () {
             var self = this;
             var checkOption = function(option, options) {
-                if (self.options[option] && options.indexOf(self.options[option]) == -1) {
-                    $.error("jQuery.dialogExtend Error : Invalid <" + option + "> value '" + self.options[option] + "'");
+                if (self.options[option] && options.indexOf(self.options[option]) === -1) {
+                    $.error('jQuery.dialogExtend Error : Invalid <' + option + '> value "' + self.options[option] + '"');
                     self.options[option] = false;
                 }
             };
 
-            checkOption('dblclick', ["maximize", "minimize", "collapse"]);
-            checkOption('titlebar', ["transparent"]);
+            checkOption('dblclick', ['maximize', 'minimize', 'collapse']);
+            checkOption('titlebar', ['transparent']);
 
             return this;
         }

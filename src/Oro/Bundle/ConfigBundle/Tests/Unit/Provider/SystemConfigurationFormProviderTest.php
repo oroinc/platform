@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
+use Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider;
 use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
 
 use Symfony\Component\Form\FormFactoryInterface;
@@ -28,9 +29,16 @@ class SystemConfigurationFormProviderTest extends AbstractProviderTest
         ConfigBag $configBag,
         TranslatorInterface $translator,
         FormFactoryInterface $formFactory,
-        AuthorizationCheckerInterface $authorizationChecker
+        AuthorizationCheckerInterface $authorizationChecker,
+        ChainSearchProvider $searchProvider
     ) {
-        return new SystemConfigurationFormProvider($configBag, $translator, $formFactory, $authorizationChecker);
+        return new SystemConfigurationFormProvider(
+            $configBag,
+            $translator,
+            $formFactory,
+            $authorizationChecker,
+            $searchProvider
+        );
     }
 
 

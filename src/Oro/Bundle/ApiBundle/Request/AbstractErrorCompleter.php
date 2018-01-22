@@ -4,7 +4,11 @@ namespace Oro\Bundle\ApiBundle\Request;
 
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 
 abstract class AbstractErrorCompleter implements ErrorCompleterInterface
 {
@@ -51,7 +55,9 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
     protected function completeTitle(Error $error)
     {
         if (null === $error->getTitle()) {
-            if (null !== $error->getInnerException()) {
+            if ($this->isConfigFilterConstraintViolation($error)) {
+                $error->setTitle(Constraint::FILTER);
+            } elseif (null !== $error->getInnerException()) {
                 $title = $this->exceptionTextExtractor->getExceptionType($error->getInnerException());
                 if (null !== $title) {
                     $error->setTitle($title);
@@ -71,11 +77,36 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
      */
     protected function completeDetail(Error $error)
     {
-        if (null === $error->getDetail() && null !== $error->getInnerException()) {
-            $detail = $this->exceptionTextExtractor->getExceptionText($error->getInnerException());
-            if (null !== $detail) {
-                $error->setDetail($detail);
+        if (null === $error->getDetail()) {
+            if ($this->isConfigFilterConstraintViolation($error)) {
+                $error->setDetail('The filter is not supported.');
+            } elseif (null !== $error->getInnerException()) {
+                $detail = $this->exceptionTextExtractor->getExceptionText($error->getInnerException());
+                if (null !== $detail) {
+                    $error->setDetail($detail);
+                }
             }
         }
+    }
+
+    /**
+     * @param Error $error
+     *
+     * @return bool
+     */
+    protected function isConfigFilterConstraintViolation(Error $error)
+    {
+        if (null === $error->getInnerException()) {
+            return false;
+        }
+
+        $underlyingException = ExceptionUtil::getProcessorUnderlyingException($error->getInnerException());
+
+        return
+            $underlyingException instanceof NotSupportedConfigOperationException
+            && (
+                ExpandRelatedEntitiesConfigExtra::NAME === $underlyingException->getOperation()
+                || FilterFieldsConfigExtra::NAME === $underlyingException->getOperation()
+            );
     }
 }

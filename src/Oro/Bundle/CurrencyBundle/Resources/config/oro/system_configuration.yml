@@ -24,6 +24,7 @@ system_configuration:
         oro_currency.currency_display:
             data_type: string
             type: choice
+            search_type: choice
             priority: 10
             options:
                 label: oro.currency.system_configuration.fields.currency_display.label

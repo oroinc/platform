@@ -93,7 +93,7 @@ This action has the following processor groups:
 | load_data | Loading of the data. | |
 | normalize_data | Converting the loaded data into an array. | In most cases the processors from this group are skipped because most of the entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details, see [LoadEntityByEntitySerializer](../../Processor/Shared/LoadEntityByEntitySerializer.php). |
 | finalize | Final validation of loaded data and adding the required response headers. | |
-| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
 For examples of usage, see the `getAction` method of [RestApiController](../../Controller/RestApiController.php).
 
@@ -125,7 +125,7 @@ This action has the following processor groups:
 | load_data | Loading of the data. | |
 | normalize_data | Converting the loaded data into an array. | In most cases the processors from this group are skipped because most of the entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details, see [LoadEntitiesByEntitySerializer](../../Processor/Shared/LoadEntitiesByEntitySerializer.php). |
 | finalize | Final validation of the loaded data and adding the required response headers. | |
-| normalize_result | Building the action result. | The processors from this group are executed even if a processor of one of the previous groups throws an exception. For implementation details, see [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+| normalize_result | Building the action result. | The processors from this group are executed even if a processor of one of the previous groups throws an exception. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
 For examples of usage, see the `cgetAction` method of [RestApiController](../../Controller/RestApiController.php).
 
@@ -156,7 +156,7 @@ This action has the following processor groups:
 | load_data | Loading an entity that should be deleted and storing it in the `result` property of the context. | |
 | delete_data | Deleting the entity stored in the `result` property of the context. | |
 | finalize | Adding the required response headers. | |
-| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
 For examples of usage, see the `deleteAction` method of [RestApiController](../../Controller/RestApiController.php).
 
@@ -194,7 +194,7 @@ This action has the following processor groups:
 | load_data | Loading the list of entities to be deleted and storing it in the `result` property of the context. | |
 | delete_data | Deleting the entities list stored in the `result` property of the context. | |
 | finalize | Adding the required response headers. | |
-| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
 For examples of usage, see the `deleteListAction` method of [RestApiController](../../Controller/RestApiController.php).
 
@@ -227,7 +227,7 @@ This action has the following processor groups:
 | save_data | Validating and persisting an entity. | |
 | normalize_data | Converting created entity into an array. | |
 | finalize | Adding the required response headers. | |
-| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
 For examples of usage, see the `postAction` method of [RestApiController](../../Controller/RestApiController.php).
 
@@ -260,7 +260,7 @@ This action has the following processor groups:
 | save_data | Validating and persisting the entity. | |
 | normalize_data | Converting the updated entity into an array. | |
 | finalize | Adding the required response headers. | |
-| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
 For examples of usage, see the `patchAction` method of [RestApiController](../../Controller/RestApiController.php).
 
@@ -292,7 +292,7 @@ This action has the following processor groups:
 | load_data | Loading the data. | |
 | normalize_data | Converting loaded data into an array. | In most cases the processors from this group are skipped because most of the entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadEntityByEntitySerializer](../../Processor/Shared/LoadEntityByEntitySerializer.php) and [LoadEntitiesByEntitySerializer](../../Processor/Shared/LoadEntitiesByEntitySerializer.php). |
 | finalize | Final validation of the loaded data and adding the required response headers. | |
-| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
 For examples of usage, see the `getAction` method of [RestApiSubresourceController](../../Controller/RestApiSubresourceController.php).
 
@@ -324,7 +324,7 @@ This action has the following processor groups:
 | load_data | Loading the data. | |
 | normalize_data | Converting loaded data into an array. | In most cases the processors from this group are skipped because most of the entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadEntityByEntitySerializer](../../Processor/Shared/LoadEntityByEntitySerializer.php) and [LoadEntitiesByEntitySerializer](../../Processor/Shared/LoadEntitiesByEntitySerializer.php). |
 | finalize | Final validation of the loaded data and adding the required response headers. | |
-| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
 For examples of usage, see the `getAction` method of [RestApiRelationshipController](../../Controller/RestApiRelationshipController.php).
 
@@ -356,7 +356,7 @@ This action has the following processor groups:
 | transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
 | save_data | Validating and persisting the entity. | |
 | finalize | Adding the required response headers. | |
-| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
 For examples of usage, see the `patchAction` method of [RestApiRelationshipController](../../Controller/RestApiRelationshipController.php).
 
@@ -388,7 +388,7 @@ This action has the following processor groups:
 | transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
 | save_data | Validating and persisting the entity. | |
 | finalize | Adding the required response headers. | |
-| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
 For examples of usage, see the `postAction` method of [RestApiRelationshipController](../../Controller/RestApiRelationshipController.php).
 
@@ -420,7 +420,7 @@ This action has the following processor groups:
 | transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
 | save_data | Validating and persisting the entity. | |
 | finalize | Adding the required response headers. | |
-| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
 For examples of usage, see the `deleteAction` method of [RestApiRelationshipController](../../Controller/RestApiRelationshipController.php).
 
@@ -678,7 +678,7 @@ Parent entity metadata related methods:
 To create a new action you need to create two classes:
 
 - **context** - This class represents an context in scope of which an action is executed. An instance of this class is used to store the input and output data and share the data between processors. This class must extend [ApiContext](../../Processor/ApiContext.php). Depending on your needs, you can use another classes derived from [ApiContext](../../Processor/ApiContext.php), for example [Context](../../Processor/Context.php), [SingleItemContext](../../Processor/SingleItemContext.php) or [ListContext](../../Processor/ListContext.php).
-- **main processor** - This class is the main entry point for an action and responsible for creating an instance of the context class and executing all worker processors. This class must extend [ActionProcessor](../../../../Component/ChainProcessor/ActionProcessor.php) and implement the `createContextObject` method. Depending on your needs, you can use another classes derived from [ActionProcessor](../../../../Component/ChainProcessor/ActionProcessor.php), for example [RequestActionProcessor](../../Processor/RequestActionProcessor.php).
+- **main processor** - This class is the main entry point for an action and responsible for creating an instance of the context class and executing all worker processors. This class must extend [ActionProcessor](../../../../Component/ChainProcessor/ActionProcessor.php) and implement the `createContextObject` method. Depending on your needs, you can use another classes derived from [ActionProcessor](../../../../Component/ChainProcessor/ActionProcessor.php), for example [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php).
 
 ```php
 <?php

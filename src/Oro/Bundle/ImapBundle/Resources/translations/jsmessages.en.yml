@@ -1,17 +1,21 @@
 oro.imap:
     connection:
-        success:     Connection established successfully!
+        success:     Connection is established successfully!
         error:       Parameters are not valid!
         imap:
-            success: IMAP connection established successfully
-            error:   Could not establish IMAP connection
+            success: IMAP connection is established successfully
+            error:   Could not establish the IMAP connection
         smtp:
-            success: SMTP connection established successfully
-            error:   Could not establish SMTP connection
+            success: SMTP connection is established successfully
+            error:   Could not establish the SMTP connection
         google.oauth:
             error:
-                emptyClientId: Parameter Client id is empty in Google Integration Settings. You need configure google settings in Configuration.
+                emptyClientId: Client id parameter value is empty in the Google Integration Settings. Please, configure Google settings in the application system configuration to proceed with Google OAuth.
                 access_deny: Access deny
                 request: Something has gone wrong.
                 closed_auth: Something has gone wrong. Please address your administrator to check the google API key settings.
                 blocked_popup: Something has gone wrong. Please make sure that pop-ups are enabled.
+    sync:
+        flash_message:
+            user_box_failed: Synchronization with your mailbox (username "{{ username }}" hosted on "{{ host }}") has failed. Please check the connection credentials on the email configuraton page.
+            system_box_failed: Synchronization with the system mailbox (username "{{ username }}" hosted on "{{ host }}") has failed. Please check the connection credentials on the email configuraton page.

@@ -66,6 +66,7 @@ system_configuration:
         oro_email.minimum_input_length:
             data_type: integer
             type: number
+            search_type: text
             options:
                 label: oro.email.system_configuration.email_autocomplete_configuration.minimum_input_length.label
                 precision: 0
@@ -75,6 +76,7 @@ system_configuration:
         oro_email.signature:
             data_type: string
             type: oro_rich_text
+            search_type: text
             options:
                 label: oro.email.system_configuration.signature_configuration.signature.label
                 required: false
@@ -82,6 +84,7 @@ system_configuration:
         oro_email.append_signature:
             data_type: boolean
             type: choice
+            search_type: choice
             options:
                 label: oro.email.system_configuration.signature_configuration.append_signature.label
                 choices:
@@ -91,6 +94,7 @@ system_configuration:
         oro_email.default_button_reply:
             data_type: integer
             type: choice
+            search_type: choice
             options:
                 label: oro.email.system_configuration.reply_configuration.default_button.label
                 choices:
@@ -109,6 +113,7 @@ system_configuration:
         oro_email.smtp_settings_host:
             data_type: string
             type: text
+            search_type: text
             options:
                 attr: {data-class: smtp_settings}
                 label: oro.email.system_configuration.smtp_settings.host.label
@@ -121,6 +126,7 @@ system_configuration:
         oro_email.smtp_settings_port:
             data_type: number
             type: number
+            search_type: text
             options:
                 attr: {data-class: smtp_settings}
                 label: oro.email.system_configuration.smtp_settings.port.label
@@ -133,6 +139,7 @@ system_configuration:
         oro_email.smtp_settings_encryption:
             data_type: string
             type: choice
+            search_type: choice
             options:
                 attr: {data-class: smtp_settings}
                 label: oro.email.system_configuration.smtp_settings.encryption.label
@@ -148,6 +155,7 @@ system_configuration:
         oro_email.smtp_settings_username:
             data_type: string
             type: text
+            search_type: text
             options:
                 attr: {data-class: smtp_settings}
                 label: oro.email.system_configuration.smtp_settings.username.label
@@ -181,6 +189,7 @@ system_configuration:
         oro_email.attachment_sync_max_size:
             data_type: number
             type: number
+            search_type: text
             priority: 50
             options:
                 label: oro.email.system_configuration.attachment_sync.max_size.label
@@ -190,6 +199,7 @@ system_configuration:
         oro_email.attachment_preview_limit:
             data_type: number
             type: number
+            search_type: text
             priority: 40
             options:
                 label: oro.email.system_configuration.attachment_sync.preview_limit.label
@@ -216,6 +226,7 @@ system_configuration:
         oro_email.threads_grouping:
             data_type: boolean
             type: choice
+            search_type: choice
             options:
                 label: oro.email.system_configuration.email_threads.use_threads.label
                 choices:
