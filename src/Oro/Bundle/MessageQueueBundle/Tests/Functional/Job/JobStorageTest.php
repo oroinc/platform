@@ -418,4 +418,39 @@ class JobStorageTest extends WebTestCase
         // the job should not be found because we updated a record that does not exist in DB
         $this->assertNull($this->jobStorage->findJobById($job->getId()));
     }
+
+    public function testGetChildStatusesWithJobCountByRootJob()
+    {
+        /**
+         * @var $job Job
+         */
+        $job = $this->getJobReference(LoadJobData::JOB_5);
+
+        $expectedResult = [
+            Job::STATUS_NEW => 2,
+            Job::STATUS_RUNNING => 1,
+            Job::STATUS_CANCELLED => 1
+        ];
+
+        $result = $this->jobStorage->getChildStatusesWithJobCountByRootJob($job);
+
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function testGetChildJobIdsByRootJobAndStatus()
+    {
+        /**
+         * @var $job Job
+         */
+        $job = $this->getJobReference(LoadJobData::JOB_5);
+
+        $expectedResult = [
+            $this->getJobReference(LoadJobData::JOB_9)->getId(),
+            $this->getJobReference(LoadJobData::JOB_6)->getId(),
+        ];
+
+        $result = $this->jobStorage->getChildJobIdsByRootJobAndStatus($job, Job::STATUS_NEW);
+
+        $this->assertSame($expectedResult, $result);
+    }
 }

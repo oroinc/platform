@@ -2,35 +2,34 @@
 
 namespace Oro\Component\MessageQueue\Job;
 
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\PersistentCollection;
+use Oro\Component\MessageQueue\Checker\JobStatusChecker;
+use Oro\Component\MessageQueue\StatusCalculator\AbstractStatusCalculator;
+use Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver;
 
 class RootJobStatusCalculator
 {
-    /** @var string[] */
-    private static $finishStatuses = [
-        Job::STATUS_SUCCESS,
-        Job::STATUS_FAILED,
-        Job::STATUS_STALE
-    ];
-
-    /** @var string[] */
-    private static $stopStatuses = [
-        Job::STATUS_SUCCESS,
-        Job::STATUS_FAILED,
-        Job::STATUS_CANCELLED,
-        Job::STATUS_STALE
-    ];
-
     /** @var JobStorage */
     private $jobStorage;
 
+    /** @var JobStatusChecker */
+    private $jobStatusChecker;
+
+    /** @var StatusCalculatorResolver */
+    private $statusCalculatorResolver;
+
     /**
-     * @param JobStorage $jobStorage
+     * @param JobStorage               $jobStorage
+     * @param JobStatusChecker         $jobStatusChecker
+     * @param StatusCalculatorResolver $statusCalculatorResolver
      */
-    public function __construct(JobStorage $jobStorage)
-    {
+    public function __construct(
+        JobStorage $jobStorage,
+        JobStatusChecker $jobStatusChecker,
+        StatusCalculatorResolver $statusCalculatorResolver
+    ) {
         $this->jobStorage = $jobStorage;
+        $this->jobStatusChecker = $jobStatusChecker;
+        $this->statusCalculatorResolver = $statusCalculatorResolver;
     }
 
     /**
@@ -42,39 +41,45 @@ class RootJobStatusCalculator
     public function calculate(Job $job, $calculateProgress = false)
     {
         $rootJob = $this->getRootJob($job);
-        if ($this->isJobStopped($rootJob)) {
+        if ($this->jobStatusChecker->isJobStopped($rootJob)) {
             return false;
         }
 
         $rootStopped = false;
-        $childJobs = $this->getChildJobs($rootJob);
+        $statusAndProgressCalculator = $this->statusCalculatorResolver->getCalculatorForRootJob($rootJob);
         $this->jobStorage->saveJob($rootJob, function (Job $rootJob) use (
             &$rootStopped,
             $calculateProgress,
-            $childJobs
+            $statusAndProgressCalculator
         ) {
-            if (!$this->isJobStopped($rootJob)) {
-                $rootStopped = $this->updateRootJob($rootJob, $childJobs, $calculateProgress);
+            if (!$this->jobStatusChecker->isJobStopped($rootJob)) {
+                $rootStopped = $this->updateRootJob($rootJob, $statusAndProgressCalculator, $calculateProgress);
             }
         });
+
+        $statusAndProgressCalculator->clean();
 
         return $rootStopped;
     }
 
     /**
-     * @param Job   $rootJob
-     * @param Job[] $childJobs
-     * @param bool  $calculateProgress
+     * @param Job                      $rootJob
+     * @param AbstractStatusCalculator $statusAndProgressCalculator
+     * @param bool                     $calculateProgress
      *
      * @return bool
      */
-    private function updateRootJob(Job $rootJob, array $childJobs, $calculateProgress)
-    {
+    private function updateRootJob(
+        Job $rootJob,
+        AbstractStatusCalculator $statusAndProgressCalculator,
+        $calculateProgress
+    ) {
         $rootStopped = false;
         $rootJob->setLastActiveAt(new \DateTime());
 
-        $rootJob->setStatus($this->calculateRootJobStatus($childJobs));
-        if ($this->isJobStopped($rootJob)) {
+        $rootJobStatus = $statusAndProgressCalculator->calculateRootJobStatus();
+        $rootJob->setStatus($rootJobStatus);
+        if ($this->jobStatusChecker->isJobStopped($rootJob)) {
             $rootStopped = true;
             $calculateProgress = true;
             if (!$rootJob->getStoppedAt()) {
@@ -83,110 +88,13 @@ class RootJobStatusCalculator
         }
 
         if ($calculateProgress) {
-            $progress = $this->calculateRootJobProgress($childJobs);
+            $progress = $statusAndProgressCalculator->calculateRootJobProgress();
             if ($rootJob->getJobProgress() !== $progress) {
                 $rootJob->setJobProgress($progress);
             }
         }
 
         return $rootStopped;
-    }
-
-    /**
-     * @param Job[] $jobs
-     *
-     * @return float
-     */
-    private function calculateRootJobProgress(array $jobs)
-    {
-        $numberOfChildren = count($jobs);
-        if (0 === $numberOfChildren) {
-            return 0;
-        }
-
-        $processed = 0;
-        foreach ($jobs as $job) {
-            if ($this->isJobFinished($job)) {
-                $processed++;
-            }
-        }
-
-        return round($processed / $numberOfChildren, 4);
-    }
-
-    /**
-     * @param Job[] $jobs
-     *
-     * @return string
-     */
-    private function calculateRootJobStatus(array $jobs)
-    {
-        $new = 0;
-        $running = 0;
-        $cancelled = 0;
-        $failed = 0;
-        $success = 0;
-        $failedRedelivery = 0;
-
-        foreach ($jobs as $job) {
-            switch ($job->getStatus()) {
-                case Job::STATUS_NEW:
-                    $new++;
-                    break;
-                case Job::STATUS_RUNNING:
-                case Job::STATUS_STALE:
-                    $running++;
-                    break;
-                case Job::STATUS_CANCELLED:
-                    $cancelled++;
-                    break;
-                case Job::STATUS_FAILED:
-                    $failed++;
-                    break;
-                case Job::STATUS_FAILED_REDELIVERED:
-                    $failedRedelivery++;
-                    break;
-                case Job::STATUS_SUCCESS:
-                    $success++;
-                    break;
-                default:
-                    throw new \LogicException(sprintf(
-                        'Got unsupported job status: id: "%s" status: "%s"',
-                        $job->getId(),
-                        $job->getStatus()
-                    ));
-            }
-        }
-
-        return $this->getRootJobStatus($new, $running, $cancelled, $failed, $success, $failedRedelivery);
-    }
-
-    /**
-     * @param int $new
-     * @param int $running
-     * @param int $cancelled
-     * @param int $failed
-     * @param int $success
-     * @param int $failedRedelivery
-     *
-     * @return string
-     */
-    private function getRootJobStatus($new, $running, $cancelled, $failed, $success, $failedRedelivery)
-    {
-        $status = Job::STATUS_NEW;
-        if (!$new && !$running && !$failedRedelivery) {
-            if ($cancelled) {
-                $status = Job::STATUS_CANCELLED;
-            } elseif ($failed) {
-                $status = Job::STATUS_FAILED;
-            } else {
-                $status = Job::STATUS_SUCCESS;
-            }
-        } elseif ($running || $cancelled || $failed || $success || $failedRedelivery) {
-            $status = Job::STATUS_RUNNING;
-        }
-
-        return $status;
     }
 
     /**
@@ -201,60 +109,5 @@ class RootJobStatusCalculator
         }
 
         return $job->getRootJob();
-    }
-
-    /**
-     * @param Job $rootJob
-     *
-     * @return Job[]
-     */
-    private function getChildJobs(Job $rootJob)
-    {
-        $childJobs = $rootJob->getChildJobs();
-        if ($childJobs instanceof PersistentCollection) {
-            if ($childJobs->isInitialized()) {
-                $childJobs = $childJobs->toArray();
-            } else {
-                // using ScalarHydrator instead of ObjectHydrator gives a slight performance improvement,
-                // especially when there are a lot of child jobs
-                $childJobs = [];
-                $rows = $this->jobStorage->createJobQueryBuilder('e')
-                    ->select('e.id, e.status')
-                    ->where('e.rootJob = :rootJob')
-                    ->setParameter('rootJob', $rootJob)
-                    ->getQuery()
-                    ->getScalarResult();
-                foreach ($rows as $row) {
-                    $job = $this->jobStorage->createJob();
-                    $job->setId($row['id']);
-                    $job->setStatus($row['status']);
-                    $childJobs[] = $job;
-                }
-            }
-        } elseif ($childJobs instanceof Collection) {
-            $childJobs = $childJobs->toArray();
-        }
-
-        return $childJobs;
-    }
-
-    /**
-     * @param Job $job
-     *
-     * @return bool
-     */
-    private function isJobStopped(Job $job)
-    {
-        return in_array($job->getStatus(), self::$stopStatuses, true);
-    }
-
-    /**
-     * @param Job $job
-     *
-     * @return bool
-     */
-    private function isJobFinished(Job $job)
-    {
-        return in_array($job->getStatus(), self::$finishStatuses, true);
     }
 }

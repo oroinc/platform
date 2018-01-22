@@ -1,14 +1,13 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\PersistentCollection;
-use Doctrine\ORM\QueryBuilder;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Job\RootJobStatusCalculator;
+use Oro\Component\MessageQueue\Checker\JobStatusChecker;
+use Oro\Component\MessageQueue\StatusCalculator\CollectionCalculator;
+use Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -25,7 +24,26 @@ class RootJobStatusCalculatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->jobStorage = $this->createMock(JobStorage::class);
 
-        $this->rootJobStatusCalculator = new RootJobStatusCalculator($this->jobStorage);
+        $jobStatusChecker = new JobStatusChecker();
+        $statusCalculator = new CollectionCalculator();
+        $statusCalculator->setJobStatusChecker($jobStatusChecker);
+
+        $statusCalculatorResolver = $this->createMock(StatusCalculatorResolver::class);
+        $statusCalculatorResolver
+            ->method('getCalculatorForRootJob')
+            ->willReturnCallback(
+                function (Job $rootJob) use ($statusCalculator) {
+                    $statusCalculator->init($rootJob);
+                    return $statusCalculator;
+                }
+            );
+
+
+        $this->rootJobStatusCalculator = new RootJobStatusCalculator(
+            $this->jobStorage,
+            $jobStatusChecker,
+            $statusCalculatorResolver
+        );
     }
 
     public function stopStatusProvider()
@@ -358,7 +376,7 @@ class RootJobStatusCalculatorTest extends \PHPUnit_Framework_TestCase
             [[Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_RUNNING], 0.6667],
             [[Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_SUCCESS], 1],
             [[Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_CANCELLED], 0.6667],
-            [[Job::STATUS_SUCCESS, Job::STATUS_STALE, Job::STATUS_STALE], 1],
+            [[Job::STATUS_SUCCESS, Job::STATUS_STALE, Job::STATUS_STALE], 0.3333],
         ];
     }
 
@@ -411,86 +429,5 @@ class RootJobStatusCalculatorTest extends \PHPUnit_Framework_TestCase
 
         self::assertEquals(Job::STATUS_SUCCESS, $rootJob->getStatus());
         self::assertEquals(1, $rootJob->getJobProgress());
-    }
-
-    public function testShouldNotLoadChildJobsFromDatabaseIfPersistentCollectionIsInitialized()
-    {
-        $rootJob = new Job();
-
-        $childJob1 = new Job();
-        $childJob1->setStatus(Job::STATUS_SUCCESS);
-        $childJob2 = new Job();
-        $childJob2->setStatus(Job::STATUS_RUNNING);
-
-        $childJobCollection = new PersistentCollection(
-            $this->createMock(EntityManager::class),
-            Job::class,
-            new ArrayCollection([$childJob1, $childJob2])
-        );
-        $rootJob->setChildJobs($childJobCollection);
-
-        $this->jobStorage->expects(self::once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $job, $callback) {
-                $callback($job);
-            });
-
-        $this->rootJobStatusCalculator->calculate($rootJob);
-
-        self::assertEquals(Job::STATUS_RUNNING, $rootJob->getStatus());
-    }
-
-    public function testShouldLoadChildJobsFromDatabaseUsinScalarHydratorIfPersistentCollectionIsNotInitialized()
-    {
-        $rootJob = new Job();
-
-        $childJobCollection = new PersistentCollection(
-            $this->createMock(EntityManager::class),
-            Job::class,
-            new ArrayCollection()
-        );
-        $childJobCollection->setInitialized(false);
-        $rootJob->setChildJobs($childJobCollection);
-
-        $qb = $this->createMock(QueryBuilder::class);
-        $query = $this->createMock(AbstractQuery::class);
-        $this->jobStorage->expects(self::once())
-            ->method('createJobQueryBuilder')
-            ->with('e')
-            ->willReturn($qb);
-        $qb->expects(self::once())
-            ->method('select')
-            ->with('e.id, e.status')
-            ->willReturnSelf();
-        $qb->expects(self::once())
-            ->method('where')
-            ->with('e.rootJob = :rootJob')
-            ->willReturnSelf();
-        $qb->expects(self::once())
-            ->method('setParameter')
-            ->with('rootJob', self::isInstanceOf($rootJob))
-            ->willReturnSelf();
-        $qb->expects(self::once())
-            ->method('getQuery')
-            ->willReturn($query);
-        $query->expects(self::once())
-            ->method('getScalarResult')
-            ->willReturn([
-                ['id' => 10, 'status' => Job::STATUS_SUCCESS],
-                ['id' => 20, 'status' => Job::STATUS_RUNNING],
-            ]);
-        $this->jobStorage->expects(self::exactly(2))
-            ->method('createJob')
-            ->willReturn(new Job());
-
-        $this->jobStorage->expects(self::once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $job, $callback) {
-                $callback($job);
-            });
-
-        $this->rootJobStatusCalculator->calculate($rootJob);
-
-        self::assertEquals(Job::STATUS_RUNNING, $rootJob->getStatus());
     }
 }
