@@ -15,6 +15,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Exception\EmailAddressParseException;
 use Oro\Bundle\EmailBundle\Exception\UnexpectedTypeException;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
@@ -198,6 +199,7 @@ class EmailEntityBuilder
     public function address($email)
     {
         $pureEmail = $this->emailAddressHelper->extractPureEmailAddress($email);
+        $this->validateEmailAddress($pureEmail);
         $result    = $this->batch->getAddress($pureEmail);
         if ($result === null) {
             $result = $this->emailAddressManager->newEmailAddress()
@@ -206,6 +208,23 @@ class EmailEntityBuilder
         }
 
         return $result;
+    }
+
+    /**
+     * Check is email address valid
+     *
+     * @param $email
+     */
+    private function validateEmailAddress($email)
+    {
+        $atPos = strrpos($email, '@');
+        if ($atPos === false) {
+            throw new EmailAddressParseException(sprintf('Not valid email address: %s', $email));
+        }
+
+        if (strlen($email) > 255) {
+            throw new EmailAddressParseException(sprintf('Email address is too long: %s', $email));
+        }
     }
 
     /**

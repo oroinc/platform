@@ -204,8 +204,7 @@ api:
                             - Email: ~
 ```
 
-
-If an error occurs in a processor, the main execution flow is interrupted and the control is passed to a special group of processors named **normalize_result**. This is true for all types of errors except for the errors that occur in processors of the **normalize_result** group. if If any of the processors of this group raises an exception this groups, the execution flow is interrupted. However, these processors can safely add new errors into the [Context](./actions.md#context-class) and the execution of the next processors will not be interrupted. For the implementation details, see [RequestActionProcessor](../../Processor/RequestActionProcessor.php).
+If an error occurs in a processor, the main execution flow is interrupted and the control is passed to a special group of processors named **normalize_result**. This is true for all types of errors except for the errors that occur in processors of the **normalize_result** group. if If any of the processors of this group raises an exception this groups, the execution flow is interrupted. However, these processors can safely add new errors into the [Context](./actions.md#context-class) and the execution of the next processors will not be interrupted. For the implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php).
 
 An error is represented by the [Error](../../Model/Error.php) class. Additionally, the [ErrorSource](../../Model/ErrorSource.php) class can be used to specify a source of an error, e.g. the name of a URI parameter or the path to a property in the  data. These classes have the following methods:
 
@@ -314,7 +313,7 @@ class LoadEntityByEntitySerializer implements ProcessorInterface
 }
 ```
 
-This way is good to for unexpected and security errors (for security errors just throw `Symfony\Component\Security\Core\Exception\AccessDeniedException`). The raised exception is converted to the **Error** object automatically by [RequestActionProcessor](../../Processor/RequestActionProcessor.php). The services named as exception text extractors automatically fill the meaningful properties of the error objects (like HTTP status code, title, and description) based on the underlying exception object. The default implementation of such extractor is [ExceptionTextExtractor](../../Request/ExceptionTextExtractor.php). To add a new extractor, create a class that implements [ExceptionTextExtractorInterface](../../Request/ExceptionTextExtractorInterface.php) and tag it with `oro.api.exception_text_extractor` in the dependency injection container.
+This way is good to for unexpected and security errors (for security errors just throw `Symfony\Component\Security\Core\Exception\AccessDeniedException`). The raised exception is converted to the **Error** object automatically by [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). The services named as exception text extractors automatically fill the meaningful properties of the error objects (like HTTP status code, title, and description) based on the underlying exception object. The default implementation of such extractor is [ExceptionTextExtractor](../../Request/ExceptionTextExtractor.php). To add a new extractor, create a class that implements [ExceptionTextExtractorInterface](../../Request/ExceptionTextExtractorInterface.php) and tag it with `oro.api.exception_text_extractor` in the dependency injection container.
 
 Another way to add an **Error** object to the context is good for validation errors because it allows you to add several errors:
 

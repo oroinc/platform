@@ -2,14 +2,41 @@
 
 namespace Oro\Bundle\ApiBundle\Request\JsonApi;
 
+use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddFieldsFilter;
+use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddIncludeFilter;
 use Oro\Bundle\ApiBundle\Request\AbstractErrorCompleter;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 class ErrorCompleter extends AbstractErrorCompleter
 {
+    /** @var ValueNormalizer */
+    private $valueNormalizer;
+
+    /**
+     * @param ExceptionTextExtractorInterface $exceptionTextExtractor
+     * @param ValueNormalizer                 $valueNormalizer
+     */
+    public function __construct(
+        ExceptionTextExtractorInterface $exceptionTextExtractor,
+        ValueNormalizer $valueNormalizer
+    ) {
+        parent::__construct($exceptionTextExtractor);
+        $this->valueNormalizer = $valueNormalizer;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -29,7 +56,11 @@ class ErrorCompleter extends AbstractErrorCompleter
     public function completeSource(Error $error, EntityMetadata $metadata = null)
     {
         $source = $error->getSource();
-        if (null !== $source && !$source->getPointer() && $source->getPropertyPath()) {
+        if (null === $source && $this->isConfigFilterConstraintViolation($error)) {
+            $error->setSource(
+                ErrorSource::createByParameter($this->getConfigFilterConstraintParameter($error))
+            );
+        } elseif (null !== $source && !$source->getPointer() && $source->getPropertyPath()) {
             $propertyPath = $source->getPropertyPath();
             if (!$metadata) {
                 $error->setDetail($this->appendSourceToMessage($error->getDetail(), $propertyPath));
@@ -41,20 +72,9 @@ class ErrorCompleter extends AbstractErrorCompleter
                 } elseif (array_key_exists($propertyPath, $metadata->getFields())) {
                     $pointer = [JsonApiDoc::ATTRIBUTES, $propertyPath];
                 } else {
-                    $parts = explode('.', $propertyPath);
-                    if (array_key_exists($parts[0], $metadata->getAssociations())) {
-                        $association = $metadata->getAssociation($parts[0]);
-                        $pointer = DataType::isAssociationAsField($association->getDataType())
-                            ? [JsonApiDoc::ATTRIBUTES, $parts[0]]
-                            : [JsonApiDoc::RELATIONSHIPS, $parts[0], JsonApiDoc::DATA];
-                        if (count($parts) > 1) {
-                            $pointer[] = $parts[1];
-                            if (DataType::isAssociationAsField($association->getDataType())
-                                && !$association->isCollapsed()
-                            ) {
-                                $pointer = array_merge($pointer, array_slice($parts, 2));
-                            }
-                        }
+                    $path = explode('.', $propertyPath);
+                    if (array_key_exists($path[0], $metadata->getAssociations())) {
+                        $pointer = $this->getAssociationPointer($path, $metadata->getAssociation($path[0]));
                     } else {
                         $error->setDetail($this->appendSourceToMessage($error->getDetail(), $propertyPath));
                         $error->setSource(null);
@@ -69,12 +89,35 @@ class ErrorCompleter extends AbstractErrorCompleter
     }
 
     /**
+     * @param string[]            $path
+     * @param AssociationMetadata $association
+     *
+     * @return string[]
+     */
+    private function getAssociationPointer(array $path, AssociationMetadata $association)
+    {
+        $pointer = DataType::isAssociationAsField($association->getDataType())
+            ? [JsonApiDoc::ATTRIBUTES, $path[0]]
+            : [JsonApiDoc::RELATIONSHIPS, $path[0], JsonApiDoc::DATA];
+        if (count($path) > 1) {
+            $pointer[] = $path[1];
+            if (DataType::isAssociationAsField($association->getDataType())
+                && !$association->isCollapsed()
+            ) {
+                $pointer = array_merge($pointer, array_slice($path, 2));
+            }
+        }
+
+        return $pointer;
+    }
+
+    /**
      * @param string $message
      * @param string $source
      *
      * @return string
      */
-    protected function appendSourceToMessage($message, $source)
+    private function appendSourceToMessage($message, $source)
     {
         if (!$this->endsWith($message, '.')) {
             $message .= '.';
@@ -89,8 +132,45 @@ class ErrorCompleter extends AbstractErrorCompleter
      *
      * @return bool
      */
-    protected function endsWith($haystack, $needle)
+    private function endsWith($haystack, $needle)
     {
         return substr($haystack, -strlen($needle)) === $needle;
+    }
+
+    /**
+     * @param Error $error
+     *
+     * @return string
+     */
+    private function getConfigFilterConstraintParameter(Error $error)
+    {
+        /** @var NotSupportedConfigOperationException $e */
+        $e = ExceptionUtil::getProcessorUnderlyingException($error->getInnerException());
+        if (ExpandRelatedEntitiesConfigExtra::NAME === $e->getOperation()) {
+            return AddIncludeFilter::FILTER_KEY;
+        }
+        if (FilterFieldsConfigExtra::NAME === $e->getOperation()) {
+            return sprintf(AddFieldsFilter::FILTER_KEY_TEMPLATE, $this->getEntityType($e->getClassName()));
+        }
+
+        throw new \LogicException(sprintf(
+            'Unexpected type of NotSupportedConfigOperationException: %s.',
+            $e->getOperation()
+        ));
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return string
+     */
+    private function getEntityType($entityClass)
+    {
+        return ValueNormalizerUtil::convertToEntityType(
+            $this->valueNormalizer,
+            $entityClass,
+            new RequestType([RequestType::JSON_API]),
+            false
+        );
     }
 }

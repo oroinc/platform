@@ -2,13 +2,20 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
 
-use Oro\Bundle\ApiBundle\Processor\ApiContext;
+use Oro\Component\ChainProcessor\Context;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
  * Represents a context for processors of "normalize_value" action.
  */
-class NormalizeValueContext extends ApiContext
+class NormalizeValueContext extends Context
 {
+    /** the request type */
+    const REQUEST_TYPE = 'requestType';
+
+    /** API version */
+    const VERSION = 'version';
+
     /** a data-type of a value */
     const DATA_TYPE = 'dataType';
 
@@ -22,22 +29,48 @@ class NormalizeValueContext extends ApiContext
     const RANGE_ALLOWED = 'rangeAllowed';
 
     /** @var string */
-    private $arrayDelimiter;
+    private $arrayDelimiter = ',';
 
     /** @var string */
-    private $rangeDelimiter;
+    private $rangeDelimiter = '..';
 
     /** @var bool */
     private $processed = false;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function initialize()
+    public function __construct()
     {
-        parent::initialize();
-        $this->arrayDelimiter = ',';
-        $this->rangeDelimiter = '..';
+        $this->set(self::REQUEST_TYPE, new RequestType([]));
+    }
+
+    /**
+     * Gets the current request type.
+     * A request can belong to several types, e.g. "rest" and "json_api".
+     *
+     * @return RequestType
+     */
+    public function getRequestType()
+    {
+        return $this->get(self::REQUEST_TYPE);
+    }
+
+    /**
+     * Gets API version
+     *
+     * @return string
+     */
+    public function getVersion()
+    {
+        return $this->get(self::VERSION);
+    }
+
+    /**
+     * Sets API version
+     *
+     * @param string $version
+     */
+    public function setVersion($version)
+    {
+        $this->set(self::VERSION, $version);
     }
 
     /**
