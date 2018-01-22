@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment;
 
-use Doctrine\Common\Cache\CacheProvider;
-
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 
 class TestConfigRegistry
 {
@@ -22,8 +21,8 @@ class TestConfigRegistry
     /** @var MetadataProvider */
     private $metadataProvider;
 
-    /** @var CacheProvider */
-    private $resourcesCache;
+    /** @var ResourcesProvider */
+    private $resourcesProvider;
 
     /** @var bool */
     private $isResourcesCacheAffected = false;
@@ -33,20 +32,20 @@ class TestConfigRegistry
      * @param ConfigProvider         $configProvider
      * @param RelationConfigProvider $relationConfigProvider
      * @param MetadataProvider       $metadataProvider
-     * @param CacheProvider          $resourcesCache
+     * @param ResourcesProvider      $resourcesProvider
      */
     public function __construct(
         TestConfigBag $configBag,
         ConfigProvider $configProvider,
         RelationConfigProvider $relationConfigProvider,
         MetadataProvider $metadataProvider,
-        CacheProvider $resourcesCache
+        ResourcesProvider $resourcesProvider
     ) {
         $this->configBag = $configBag;
         $this->configProvider = $configProvider;
         $this->relationConfigProvider = $relationConfigProvider;
         $this->metadataProvider = $metadataProvider;
-        $this->resourcesCache = $resourcesCache;
+        $this->resourcesProvider = $resourcesProvider;
     }
 
     /**
@@ -77,7 +76,7 @@ class TestConfigRegistry
         $this->relationConfigProvider->clearCache();
         $this->metadataProvider->clearCache();
         if ($this->isResourcesCacheAffected) {
-            $this->resourcesCache->deleteAll();
+            $this->resourcesProvider->clearCache();
         }
     }
 }

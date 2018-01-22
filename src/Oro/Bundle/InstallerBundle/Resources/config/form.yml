@@ -40,3 +40,8 @@ services:
             - Oro\Bundle\UserBundle\Entity\User
         tags:
             - { name: form.type, alias: oro_installer_setup }
+
+    oro_installer.form.type.configuration.driver_option:
+        class: 'Oro\Bundle\InstallerBundle\Form\Type\Configuration\DriverOptionType'
+        tags:
+            - { name: form.type, alias: oro_installer_configuration_driver_option }

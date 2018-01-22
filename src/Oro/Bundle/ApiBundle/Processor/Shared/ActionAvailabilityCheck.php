@@ -9,8 +9,8 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 
 /**
- * Validates whether an access to the requested action of entity specified
- * in the "class" property of the Context is granted.
+ * Validates whether the requested action of entity specified
+ * in the "class" property of the Context is not excluded.
  */
 class ActionAvailabilityCheck implements ProcessorInterface
 {

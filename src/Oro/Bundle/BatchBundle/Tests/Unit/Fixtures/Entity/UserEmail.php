@@ -20,4 +20,15 @@ class UserEmail
      * @ORM\ManyToOne(targetEntity="User", inversedBy="emails")
      */
     protected $user;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    protected $primary;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="EmailStatus", cascade={"persist"})
+     * @ORM\JoinColumn(name="status_id", referencedColumnName="id")
+     */
+    protected $status;
 }

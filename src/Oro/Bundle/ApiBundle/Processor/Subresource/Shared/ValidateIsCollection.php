@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+use Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 
 /**
@@ -20,14 +20,7 @@ class ValidateIsCollection implements ProcessorInterface
         /** @var SubresourceContext $context */
 
         if (!$context->isCollection()) {
-            throw new RuntimeException(
-                sprintf(
-                    'The "%s" action supports only a collection valued relationship. Association: %s::%s.',
-                    $context->getAction(),
-                    $context->getParentClassName(),
-                    $context->getAssociationName()
-                )
-            );
+            throw new ActionNotAllowedException();
         }
     }
 }

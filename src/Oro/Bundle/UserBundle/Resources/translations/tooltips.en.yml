@@ -1,0 +1,1 @@
+oro.user.system_configuration.fields.send_password_in_invitation_email.tooltip: 'This option defines whether or not the password is sent in a plain text in the invitation email. Always keep it disabled in production.'

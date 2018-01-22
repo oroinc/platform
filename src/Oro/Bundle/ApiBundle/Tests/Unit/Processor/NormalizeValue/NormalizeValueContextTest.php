@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\NormalizeValue;
 
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class NormalizeValueContextTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,6 +13,42 @@ class NormalizeValueContextTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->context = new NormalizeValueContext();
+    }
+
+    public function testRequestType()
+    {
+        $this->assertEquals(new RequestType([]), $this->context->getRequestType());
+
+        $this->context->getRequestType()->add('test');
+        $this->assertEquals(new RequestType(['test']), $this->context->getRequestType());
+        $this->assertEquals(
+            new RequestType(['test']),
+            $this->context->get(NormalizeValueContext::REQUEST_TYPE)
+        );
+
+        $this->context->getRequestType()->add('another');
+        $this->assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
+        $this->assertEquals(
+            new RequestType(['test', 'another']),
+            $this->context->get(NormalizeValueContext::REQUEST_TYPE)
+        );
+
+        // test that already existing type is not added twice
+        $this->context->getRequestType()->add('another');
+        $this->assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
+        $this->assertEquals(
+            new RequestType(['test', 'another']),
+            $this->context->get(NormalizeValueContext::REQUEST_TYPE)
+        );
+    }
+
+    public function testVersion()
+    {
+        $this->assertNull($this->context->getVersion());
+
+        $this->context->setVersion('test');
+        $this->assertEquals('test', $this->context->getVersion());
+        $this->assertEquals('test', $this->context->get(NormalizeValueContext::VERSION));
     }
 
     public function testProcessed()

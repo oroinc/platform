@@ -7,35 +7,15 @@ use Doctrine\DBAL\Types\Type;
 
 use Psr\Log\LoggerInterface;
 
-use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
-abstract class RemoveRelationQuery extends ParametrizedMigrationQuery
+abstract class RemoveRelationQuery extends RemoveFieldQuery
 {
-    const MANY_TO_ONE = 'manyToOne';
-    const MANY_TO_MANY = 'manyToMany';
-
-    /**
-     * @var string
-     */
-    protected $entityClass;
-
-    /**
-     * @var string
-     */
-    protected $associationName;
-
-    /**
-     * @param string $entityClass
-     * @param string $associationName
-     */
-    public function __construct($entityClass, $associationName)
-    {
-        $this->entityClass = $entityClass;
-        $this->associationName = $associationName;
-    }
-
     /**
      * Returns the type of the relation, for example manyToMany, or manyToOne
+     *
      * @return string
      */
     abstract public function getRelationType();
@@ -45,7 +25,7 @@ abstract class RemoveRelationQuery extends ParametrizedMigrationQuery
      */
     public function getDescription()
     {
-        return "Remove association '{$this->associationName}' on '{$this->entityClass}'.";
+        return 'Remove config for relation ' . $this->entityField . ' of entity ' . $this->entityClass;
     }
 
     /**
@@ -53,71 +33,141 @@ abstract class RemoveRelationQuery extends ParametrizedMigrationQuery
      */
     public function execute(LoggerInterface $logger)
     {
-        $targetClass = null;
+        $entityRow = $this->getEntityRow($this->entityClass);
+        if (!$entityRow) {
+            $logger->info("Entity '{$this->entityClass}' not found");
 
-        $sql = 'SELECT f.id, f.data
-            FROM oro_entity_config_field as f
-            INNER JOIN oro_entity_config as e ON f.entity_id = e.id
-            WHERE e.class_name = ?
-            AND field_name = ?
-            LIMIT 1';
+            return;
+        }
+        $entityData = $this->connection->convertToPHPValue($entityRow['data'], Type::TARRAY);
 
-        $fieldRow = $this->connection->fetchAssoc($sql, [$this->entityClass, $this->associationName]);
-
+        $fieldRow = $this->getFieldRow($this->entityClass, $this->entityField);
         if (!$fieldRow) {
-            $logger->info("Field '{$this->associationName}' not found in '{$this->entityClass}'");
+            $logger->info("Relation '{$this->entityField}' not found in '{$this->entityClass}'");
+
+            return;
+        }
+        $fieldData = $this->connection->convertToPHPValue($fieldRow['data'], Type::TARRAY);
+
+        if (!$this->isOwningSide($entityData, $fieldData)) {
+            $logger->info("Removal of relation config is possible only from owning side");
 
             return;
         }
 
-        $fieldData = $this->connection->convertToPHPValue($fieldRow['data'], Type::TARRAY);
+        // delete owning side field config
+        $this->removeFieldConfig($logger, $fieldRow['id']);
 
-        $this->executeQuery($logger, 'DELETE FROM oro_entity_config_field WHERE id = ?', [$fieldRow['id']]);
+        $relationKey = $fieldData['extend']['relation_key'];
 
-        $targetClass = $fieldData['extend']['target_entity'];
+        // update owning side entity config
+        $this->updateEntityData(
+            $logger,
+            $entityData,
+            $this->entityClass,
+            $this->entityField,
+            $relationKey
+        );
 
-        $sql = 'SELECT e.data FROM oro_entity_config as e WHERE e.class_name = ? LIMIT 1';
-        $entityRow = $this->connection->fetchAssoc($sql, [$this->entityClass]);
-        $this->updateEntityData($logger, $targetClass, $entityRow['data']);
+        $relationTargetFieldId = $entityData['extend']['relation'][$relationKey]['target_field_id'];
+        if ($relationTargetFieldId instanceof FieldConfigId) {
+            $targetFieldRow = $this->getFieldRow(
+                $relationTargetFieldId->getClassName(),
+                $relationTargetFieldId->getFieldName()
+            );
+
+            // delete target side field config
+            if ($targetFieldRow) {
+                $this->removeFieldConfig($logger, $targetFieldRow['id']);
+            }
+
+            // update target side entity config
+            $targetEntityRow = $this->getEntityRow($fieldData['extend']['target_entity']);
+            if ($targetEntityRow) {
+                $targetEntityData = $this->connection->convertToPHPValue($targetEntityRow['data'], Type::TARRAY);
+                $this->updateEntityData(
+                    $logger,
+                    $targetEntityData,
+                    $relationTargetFieldId->getClassName(),
+                    $relationTargetFieldId->getFieldName(),
+                    $relationKey
+                );
+            }
+        }
     }
 
     /**
-     * @param LoggerInterface $logger
-     * @param string $targetClass
-     * @param string $data
+     * @param array $entityData
+     * @param array $fieldData
+     *
+     * @return bool
      */
-    protected function updateEntityData(LoggerInterface $logger, $targetClass, $data)
+    protected function isOwningSide($entityData, $fieldData)
     {
-        $data = $data ? $this->connection->convertToPHPValue($data, Type::TARRAY) : [];
+        $relationKey = $fieldData['extend']['relation_key'];
+        $isOwningSide = $entityData['extend']['relation'][$relationKey]['owner'];
 
-        $relationType = $this->getRelationType();
-        $extendKey = sprintf($relationType.'|%s|%s|%s', $this->entityClass, $targetClass, $this->associationName);
-        if (isset($data['extend']['relation'][$extendKey])) {
-            unset($data['extend']['relation'][$extendKey]);
-        }
-        if (isset($data['extend']['schema']['relation'][$this->associationName])) {
-            unset($data['extend']['schema']['relation'][$this->associationName]);
-        }
+        return $isOwningSide || $this->getRelationType() === RelationType::ONE_TO_MANY;
+    }
 
-        $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
+    /**
+     * @param string $entityClass
+     *
+     * @return array
+     */
+    protected function getEntityRow($entityClass)
+    {
+        $getEntitySql = 'SELECT e.data 
+                FROM oro_entity_config as e 
+                WHERE e.class_name = ? 
+                LIMIT 1';
 
-        $this->executeQuery(
-            $logger,
-            'UPDATE oro_entity_config SET data = ? WHERE class_name = ?',
-            [$data, $this->entityClass]
+        return $this->connection->fetchAssoc(
+            $getEntitySql,
+            [$entityClass]
         );
     }
 
     /**
      * @param LoggerInterface $logger
-     * @param string $sql
-     * @param array $parameters
+     * @param array           $entityData
+     * @param string          $entityClass
+     * @param string          $fieldName
+     * @param string          $relationKey
+     *
      * @throws DBALException
      */
-    protected function executeQuery(LoggerInterface $logger, $sql, array $parameters = [])
-    {
-        $statement = $this->connection->prepare($sql);
-        $statement->execute($parameters);
-        $this->logQuery($logger, $sql, $parameters);
+    protected function updateEntityData(
+        LoggerInterface $logger,
+        $entityData,
+        $entityClass,
+        $fieldName,
+        $relationKey
+    ) {
+        if (isset($entityData['extend']['relation'][$relationKey])) {
+            unset($entityData['extend']['relation'][$relationKey]);
+        }
+        if (isset($entityData['extend']['schema']['relation'][$fieldName])) {
+            unset($entityData['extend']['schema']['relation'][$fieldName]);
+        }
+        if (isset($entityData['extend']['schema']['addremove'][$fieldName])) {
+            unset($entityData['extend']['schema']['addremove'][$fieldName]);
+        }
+
+        $defaultRelationFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
+        if (isset($entityData['extend']['schema']['default'][$defaultRelationFieldName])) {
+            unset($entityData['extend']['schema']['default'][$defaultRelationFieldName]);
+        }
+
+        $data = $this->connection->convertToDatabaseValue($entityData, Type::TARRAY);
+
+        $this->executeQuery(
+            $logger,
+            'UPDATE oro_entity_config SET data = ? WHERE class_name = ?',
+            [
+                $data,
+                $entityClass
+            ]
+        );
     }
 }
