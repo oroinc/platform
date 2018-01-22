@@ -1277,7 +1277,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
         self::assertNotNull($flashMessage, 'Can\'t find flash message');
 
-        $regex = '/\d+ entities were deleted/';
+        $regex = '/\d+ entities have been deleted successfully/';
         self::assertRegExp($regex, $flashMessage->getText());
     }
 
