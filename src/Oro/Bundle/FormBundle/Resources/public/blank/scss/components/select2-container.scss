@@ -113,6 +113,13 @@
             transform: rotate(180deg);
         }
     }
+
+    &.select2-container-disabled {
+        .select2-choice {
+            background: get-color('additional', 'light');
+            cursor: default;
+        }
+    }
 }
 
 .select2-drop {
