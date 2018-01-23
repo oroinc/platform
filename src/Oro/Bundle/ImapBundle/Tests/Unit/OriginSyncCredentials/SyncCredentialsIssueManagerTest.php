@@ -68,9 +68,10 @@ class SyncCredentialsIssueManagerTest extends \PHPUnit_Framework_TestCase
         $this->credentialsDriver->expects($this->once())
             ->method('deleteAllOrigins');
 
-        $this->manager->processInvalidOrigins();
+        $processedOrigins = $this->manager->processInvalidOrigins();
 
         $this->assertEquals([$origin], $notificationSender->processedOrigins);
+        $this->assertEquals([$origin], $processedOrigins);
     }
 
     public function testProcessInvalidOriginsForUserWithoutPermissionToGetSystemOriginNotifications()
