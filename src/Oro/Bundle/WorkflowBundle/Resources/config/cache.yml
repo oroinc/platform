@@ -45,10 +45,3 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_workflow.changes.subscriber }
-
-    oro_workflow.cache.provider.workflow_definition:
-        public: false
-        parent: oro.cache.abstract
-#        class: Doctrine\Common\Cache\ArrayCache
-        calls:
-            - [ setNamespace, [ 'workflow_definition' ] ]
