@@ -37,7 +37,7 @@ class CollectionCalculator extends AbstractStatusCalculator
             }
         }
 
-        return round($processed / $numberOfChildren, 4);
+        return $this->doJobProgressCalculation($processed, $numberOfChildren);
     }
 
     /**

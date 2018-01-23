@@ -99,6 +99,17 @@ abstract class AbstractStatusCalculator
     }
 
     /**
+     * @param int $processedChildrenCount
+     * @param int $childrenCount
+     *
+     * @return float
+     */
+    protected function doJobProgressCalculation($processedChildrenCount, $childrenCount)
+    {
+        return round($processedChildrenCount / $childrenCount, 4);
+    }
+
+    /**
      * @param array $childrenInternalJobStatusCounts
      *
      * @return string

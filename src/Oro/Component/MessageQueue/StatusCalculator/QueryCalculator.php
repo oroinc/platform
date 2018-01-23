@@ -49,16 +49,16 @@ class QueryCalculator extends AbstractStatusCalculator
         }
 
         $processed = 0;
-        $allChildCount = 0;
+        $childrenCount = 0;
         foreach ($this->childJobStatusCounts as $jobStatus => $childJobCount) {
             if ($this->jobStatusChecker->isFinishedJobStatus($jobStatus)) {
                 $processed += $childJobCount;
             }
 
-            $allChildCount += $childJobCount;
+            $childrenCount += $childJobCount;
         }
 
-        return round($processed / $allChildCount, 4);
+        return $this->doJobProgressCalculation($processed, $childrenCount);
     }
 
     /**
