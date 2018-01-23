@@ -143,6 +143,7 @@ class RequestEntity extends AbstractAction
         // apply where condition
         $counter = 0;
         foreach ($where as $field => $value) {
+            QueryBuilderUtil::checkIdentifier($field);
             $parameter = 'parameter_' . $counter;
             $field = 'e.' . $field;
             if ($this->isCaseInsensitive()) {
