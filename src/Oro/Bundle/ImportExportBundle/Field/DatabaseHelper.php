@@ -99,7 +99,7 @@ class DatabaseHelper
 
         $storageKey = $this->getStorageKey($serializationCriteria);
 
-        if (empty($this->entities[$entityName]) || empty($this->entities[$entityName][$storageKey])) {
+        if (empty($this->entities[$entityName]) || !array_key_exists($storageKey, $this->entities[$entityName])) {
             /** @var EntityRepository $entityRepository */
             $entityRepository = $this->doctrineHelper->getEntityRepository($entityName);
             $queryBuilder = $entityRepository->createQueryBuilder('e')
@@ -207,6 +207,7 @@ class DatabaseHelper
      */
     protected function getStorageKey(array $criteria = [])
     {
+        ksort($criteria);
         return serialize($criteria);
     }
 

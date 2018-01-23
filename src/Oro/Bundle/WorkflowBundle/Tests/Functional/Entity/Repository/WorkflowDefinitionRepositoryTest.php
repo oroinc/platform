@@ -3,6 +3,10 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 
 use Doctrine\Common\Persistence\Proxy;
+use Doctrine\DBAL\Logging\DebugStack;
+use Doctrine\DBAL\Logging\EchoSQLLogger;
+use Doctrine\Common\Cache\Cache;
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ScopeBundle\Manager\ScopeCriteriaProviderInterface;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
@@ -18,6 +22,9 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefiniti
 
 class WorkflowDefinitionRepositoryTest extends WebTestCase
 {
+    /** @var EntityManager */
+    protected $em;
+
     /** @var WorkflowDefinitionRepository */
     protected $repository;
 
@@ -31,13 +38,22 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
     {
         $this->initClient();
 
-        $this->repository = $this->getContainer()->get('doctrine')
-            ->getManagerForClass(WorkflowDefinition::class)
-            ->getRepository(WorkflowDefinition::class);
+        $this->em = $this->getContainer()->get('oro_entity.doctrine_helper')
+            ->getEntityManagerForClass(WorkflowDefinition::class);
+
+        $this->repository = $this->em->getRepository(WorkflowDefinition::class);
 
         $this->scopeManager = $this->getContainer()->get('oro_scope.scope_manager');
 
         $this->loadFixtures([LoadWorkflowDefinitionScopes::class]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function tearDown()
+    {
+        $this->repository->invalidateCache();
     }
 
     /**
@@ -134,6 +150,32 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
         $this->assertGreaterThanOrEqual(1, count($result));
         $this->assertContains(WorkflowAwareEntity::class, $result);
         $this->assertNotContains(Item::class, $result);
+    }
+
+    public function testInvalidateCache()
+    {
+        $config = $this->em->getConnection()->getConfiguration();
+        $oldLogger = $config->getSQLLogger();
+
+        $logger = new DebugStack();
+        $config->setSQLLogger($logger);
+
+        $this->repository->findActive();
+        $this->assertCount(1, $logger->queries);
+
+        $this->repository->findActive();
+        $this->repository->findActive();
+        $this->assertCount(1, $logger->queries);
+
+        $this->repository->invalidateCache();
+        $this->repository->findActive();
+        $this->assertCount(2, $logger->queries);
+
+        $this->repository->findActive();
+        $this->repository->findActive();
+        $this->assertCount(2, $logger->queries);
+
+        $config->setSQLLogger($oldLogger);
     }
 
     /**
