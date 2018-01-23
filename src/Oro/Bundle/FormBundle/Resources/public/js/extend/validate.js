@@ -394,7 +394,6 @@ define(function(require) {
             }
         },
         highlight: function(element) {
-            this.settings.unhighlight.call(this, element);
             var $el = getErrorTarget(element);
             $el.addClass('error')
                 .closest('.controls').addClass('validation-error');
@@ -404,8 +403,7 @@ define(function(require) {
             var $el = $(element);
             $el.removeClass('error')
                 .closest('.controls')
-                .removeClass('validation-error')
-                .find('.error').removeClass('error');
+                .removeClass('validation-error');
             $el.closest('.control-group').find('.control-label').removeClass('validation-error');
         },
         // ignore all invisible elements except input type=hidden
