@@ -519,7 +519,7 @@ HTML;
     {
         // @codingStandardsIgnoreStart
         $expected = <<<HTML
-<form name="form_for_layout_renderer_test" method="post" action="test.php" data-ftid="form_for_layout_renderer_test" data-name="form__form-for-layout-renderer-test">
+<form name="form_for_layout_renderer_test" method="post" action="test.php" data-ftid="form_for_layout_renderer_test" data-name="form__form-for-layout-renderer-test" id="form_for_layout_renderer_test">
 <input type="hidden" name="_method" value="PATCH"/>
 HTML;
         // @codingStandardsIgnoreEnd

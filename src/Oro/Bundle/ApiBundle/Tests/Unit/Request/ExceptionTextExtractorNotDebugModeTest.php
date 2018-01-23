@@ -7,6 +7,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException;
+use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
 use Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractor;
@@ -64,6 +65,7 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit_Framework_TestCase
             [new ActionNotAllowedException(), 405],
             [new ForbiddenException('Reason.'), 403],
             [new ResourceNotAccessibleException(), 404],
+            [new NotSupportedConfigOperationException('Test\Class', 'test_operation'), 400],
         ];
     }
 
@@ -96,6 +98,10 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit_Framework_TestCase
             [new ActionNotAllowedException(), 'action not allowed exception'],
             [new ForbiddenException('Reason.'), 'forbidden exception'],
             [new ResourceNotAccessibleException(), 'resource not accessible exception'],
+            [
+                new NotSupportedConfigOperationException('Test\Class', 'test_operation'),
+                'not supported config operation exception'
+            ],
         ];
     }
 
@@ -181,6 +187,10 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit_Framework_TestCase
             [
                 new ResourceNotAccessibleException(),
                 'The resource is not accessible.'
+            ],
+            [
+                new NotSupportedConfigOperationException('Test\Class', 'test_operation'),
+                'Requested unsupported operation "test_operation" when building config for "Test\Class".'
             ],
         ];
     }

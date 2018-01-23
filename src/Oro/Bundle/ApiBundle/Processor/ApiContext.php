@@ -13,6 +13,9 @@ abstract class ApiContext extends BaseContext
     /** API version */
     const VERSION = 'version';
 
+    /** @var array[]|null */
+    private $processed;
+
     public function __construct()
     {
         $this->initialize();
@@ -55,5 +58,46 @@ abstract class ApiContext extends BaseContext
     public function setVersion($version)
     {
         $this->set(self::VERSION, $version);
+    }
+
+    /**
+     * Marks a work as already done.
+     * In the most cases this method is useless because it is easy to determine
+     * when a work is already done just checking a state of a context.
+     * But in case if a processor does a complex work, it might be required
+     * to mark a work as already done directly.
+     *
+     * @param string $operationName The name of an operation that represents some work
+     */
+    public function setProcessed($operationName)
+    {
+        $this->processed[$operationName] = true;
+    }
+
+    /**
+     * Marks a work as not done yet.
+     *
+     * @param string $operationName The name of an operation that represents some work
+     */
+    public function clearProcessed($operationName)
+    {
+        if ($this->isProcessed($operationName)) {
+            unset($this->processed[$operationName]);
+        }
+    }
+
+    /**
+     * Checks whether a work is already done.
+     *
+     * @param string $operationName The name of an operation that represents some work
+     *
+     * @return bool
+     */
+    public function isProcessed($operationName)
+    {
+        return
+            null !== $this->processed
+            && array_key_exists($operationName, $this->processed)
+            && $this->processed[$operationName];
     }
 }

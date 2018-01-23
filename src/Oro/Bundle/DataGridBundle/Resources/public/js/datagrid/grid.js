@@ -628,9 +628,19 @@ define(function(require) {
 
         /**
          * Resets selection state
+         *
+         * @param {Object|null} restoreState
          */
-        resetSelectionState: function() {
+        resetSelectionState: function(restoreState) {
             this.collection.trigger('backgrid:selectNone');
+
+            if (restoreState && restoreState.selectedIds) {
+                this.collection.each(function(model) {
+                    if (restoreState.selectedIds.indexOf(model) !== -1) {
+                        model.trigger('backgrid:selected', model, true);
+                    }
+                });
+            }
         },
 
         /**

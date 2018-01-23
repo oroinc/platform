@@ -87,6 +87,8 @@ trait LocalizedEntityTrait
             }
         }
 
+        trigger_error('Call to undefined method '.__CLASS__.'::'.$name.'()', E_USER_ERROR);
+
         return null;
     }
 

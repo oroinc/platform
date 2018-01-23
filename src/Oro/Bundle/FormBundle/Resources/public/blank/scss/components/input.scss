@@ -49,6 +49,11 @@
         }
     }
 
+    &[type="number"] {
+        // fix FireFox platform styles
+        box-shadow: $input-number-box-shadow;
+    }
+
     &--short {
         width: $input-width-short;
     }
