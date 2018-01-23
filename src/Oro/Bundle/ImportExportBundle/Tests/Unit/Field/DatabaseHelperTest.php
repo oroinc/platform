@@ -2,14 +2,18 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\File;
 
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Fixtures\TestEntity;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Fixtures\TestOrganization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_CLASS = 'stdClass';
@@ -330,5 +334,36 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($reference));
 
         $this->assertEquals($reference, $this->helper->getEntityReference($entity));
+    }
+
+    public function testFindOneByCacheWithoutEntity()
+    {
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects($this->once())
+            ->method('getOneOrNullResult')
+            ->willReturn(null);
+
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects($this->any())
+            ->method('andWhere')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->any())
+            ->method('setParameters')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->any())
+            ->method('setMaxResults')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $this->repository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+
+        $this->assertNull($this->helper->findOneBy(self::TEST_CLASS, ['field1' => 'value1', 'field2' => 'value2']));
+
+        //check cache
+        $this->assertNull($this->helper->findOneBy(self::TEST_CLASS, ['field2' => 'value2', 'field1' => 'value1']));
     }
 }

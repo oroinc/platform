@@ -136,7 +136,7 @@ services:
     oro_workflow.registry:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'
         arguments:
-            - '@oro_workflow.provider.workflow_definition'
+            - '@oro_entity.doctrine_helper'
             - '@oro_workflow.workflow_assembler'
             - '@oro_workflow.registry.definition_filters'
 
@@ -144,7 +144,7 @@ services:
     oro_workflow.registry.system:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'
         arguments:
-            - '@oro_workflow.provider.workflow_definition'
+            - '@oro_entity.doctrine_helper'
             - '@oro_workflow.workflow_assembler'
             - '@oro_workflow.registry.definition_filters.system'
 
@@ -580,18 +580,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }
-
-    oro_workflow.provider.workflow_definition:
-        class: 'Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionProvider'
-        arguments:
-            - '@doctrine'
-            - '@oro_workflow.cache.provider.workflow_definition'
-        tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: postPersist, method: invalidateCache }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: postUpdate, method: invalidateCache }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: postRemove, method: invalidateCache }
-            - { name: oro_workflow.changes.listener, event: oro.workflow.activated, method: invalidateCache }
-            - { name: oro_workflow.changes.listener, event: oro.workflow.deactivated, method: invalidateCache }
 
     oro_workflow.emailtemplate.variable_provider.entity:
         class: 'Oro\Bundle\WorkflowBundle\Provider\EntityVariablesProvider'
