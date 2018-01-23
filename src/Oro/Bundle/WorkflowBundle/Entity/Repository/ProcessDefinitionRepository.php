@@ -15,6 +15,10 @@ class ProcessDefinitionRepository extends EntityRepository
      */
     public function findLikeName($like, $escapeChar = '!')
     {
+        if (\strlen($escapeChar) > 1) {
+            throw new \InvalidArgumentException(sprintf('Unexpected escape char "%s"', $escapeChar));
+        }
+
         $qb = $this->createQueryBuilder('p');
         
         return $qb->where($qb->expr()->like('p.name', sprintf(":nameLike ESCAPE '%s'", $escapeChar)))
