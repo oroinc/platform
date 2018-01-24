@@ -390,6 +390,7 @@ class AssociationManager
         return $qb
             ->select(
                 QueryBuilderUtil::sprintf('target.%s AS id', $targetIdFieldName),
+                'e.id AS entityId',
                 (string)$qb->expr()->literal($associationOwnerClass) . ' AS entityClass',
                 $this->entityNameResolver->prepareNameDQL(
                     $this->entityNameResolver->getNameDQL($associationOwnerClass, 'e'),

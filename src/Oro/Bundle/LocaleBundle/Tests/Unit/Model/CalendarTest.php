@@ -79,7 +79,7 @@ class CalendarTest extends TestCase
         if (null !== $defaultLocale) {
             \Locale::setDefault($defaultLocale);
         }
-        $this->assertEquals($expected, $this->calendar->getMonthNames($width));
+        $this->assertEquals($expected, $this->calendar->getMonthNames($width), '', 0.0, 10, false, true);
     }
 
     public function getMonthNamesDataProvider()

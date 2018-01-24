@@ -212,6 +212,11 @@ class EmailQueryFactory
             )
             ->groupBy('m.thread');
 
+        $expression = $qb->expr()->andX(
+            $qb->expr()->isNull('e.thread'),
+            $qb->expr()->eq('e.head', 'TRUE')
+        );
+
         $threadedExpressions = null;
         $threadedExpressionsParameters = null;
         if ($datagrid && $filters) {
@@ -236,10 +241,6 @@ class EmailQueryFactory
                 $notThreadedExpressionsParameters
             ) = $this->prepareSearchFiltersForQueryBuilder($qb, $datagrid, $filters, 'e');
 
-            $expression = $qb->expr()->andX(
-                $qb->expr()->isNull('e.thread'),
-                $qb->expr()->eq('e.head', 'TRUE')
-            );
             $expression->addMultiple($notThreadedExpressions);
 
             $qb->andWhere(
@@ -258,7 +259,6 @@ class EmailQueryFactory
                 $qb->setParameter($param->getName(), $param->getValue(), $param->getType());
             }
         } else {
-            $expression = call_user_func_array([$qb->expr(), 'andX'], $exprs);
             $qb->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->in('eu.id', $innerQb->getDQL()),
@@ -407,7 +407,7 @@ class EmailQueryFactory
             foreach ($searchFilters as $columnName => $filterData) {
                 $filterConfig = $filterTypes[$columnName];
                 $filterConfig['data_name'] = $alias
-                    ? sprintf('%s.%s', $alias, $filterColumnsMap[$columnName])
+                    ? QueryBuilderUtil::getField($alias, $filterColumnsMap[$columnName])
                     : $filterConfig['data_name'];
 
                 $datasourceAdapter = new OrmFilterDatasourceAdapter($queryBuilder);

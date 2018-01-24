@@ -210,7 +210,7 @@ class FindEntitiesTest extends \PHPUnit_Framework_TestCase
             ->willReturnSelf();
         $queryBuilder->expects($this->once())
             ->method('orderBy')
-            ->with('e.createdDate', $options['order_by']['createdDate'])
+            ->with('e.createdDate', strtoupper($options['order_by']['createdDate']))
             ->willReturnSelf();
         $queryBuilder->expects($this->once())
             ->method('getQuery')

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Security;
 
+use Doctrine\ORM\Query\Expr;
 use Oro\Bundle\TagBundle\Security\SecurityProvider;
 
 class SecuityProviderTest extends \PHPUnit_Framework_TestCase
@@ -52,6 +53,10 @@ class SecuityProviderTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->once())
             ->method('getEntityManager')
             ->will($this->returnValue($em));
+
+        $qb->expects($this->any())
+            ->method('expr')
+            ->willReturn(new Expr());
 
         if ($expectedAllowedEntities) {
             if (count($expectedAllowedEntities) != count($entities)) {
