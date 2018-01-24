@@ -20,6 +20,11 @@ class LoadJobData extends AbstractFixture implements ContainerAwareInterface
     const JOB_2 = 'job.2';
     const JOB_3 = 'job.3';
     const JOB_4 = 'job.4';
+    const JOB_5 = 'job.5';
+    const JOB_6 = 'job.6';
+    const JOB_7 = 'job.7';
+    const JOB_8 = 'job.8';
+    const JOB_9 = 'job.9';
 
     /** @var ContainerInterface */
     private $container;
@@ -46,6 +51,32 @@ class LoadJobData extends AbstractFixture implements ContainerAwareInterface
             'name' => self::JOB_4,
             'status' => Job::STATUS_NEW,
             'root_job' => self::JOB_3
+        ],
+        self::JOB_5 => [
+            'name' => self::JOB_5,
+            'owner_id' => 'owner-id-5',
+            'unique' => true,
+            'status' => Job::STATUS_NEW,
+        ],
+        self::JOB_6 => [
+            'name' => self::JOB_6,
+            'status' => Job::STATUS_NEW,
+            'root_job' => self::JOB_5
+        ],
+        self::JOB_7 => [
+            'name' => self::JOB_7,
+            'status' => Job::STATUS_RUNNING,
+            'root_job' => self::JOB_5
+        ],
+        self::JOB_8 => [
+            'name' => self::JOB_8,
+            'status' => Job::STATUS_CANCELLED,
+            'root_job' => self::JOB_5
+        ],
+        self::JOB_9 => [
+            'name' => self::JOB_9,
+            'status' => Job::STATUS_NEW,
+            'root_job' => self::JOB_5
         ],
     ];
 
