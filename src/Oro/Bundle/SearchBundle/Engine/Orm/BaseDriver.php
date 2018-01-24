@@ -299,13 +299,13 @@ abstract class BaseDriver implements DBALPersisterInterface
 
     /**
      * @param string $fieldType
-     * @param int    $index
+     * @param string|int $index
      *
      * @return string
      */
     public function getJoinAlias($fieldType, $index)
     {
-        return sprintf('%sField%d', $fieldType, $index);
+        return sprintf('%sField%s', $fieldType, $index);
     }
 
     /**
