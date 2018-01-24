@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -203,14 +204,21 @@ class UserController extends Controller
     /**
      * @Route("/widget/info/{id}", name="oro_user_widget_info", requirements={"id"="\d+"})
      * @Template
-     * @AclAncestor("oro_user_user_view")
      */
     public function infoAction(User $user)
     {
+        $isViewProfile = (bool)$this->getRequest()->query->get('viewProfile', false);
+
+        if (!(($isViewProfile && $this->getUser()->getId() === $user->getId())
+            || $this->isGranted('oro_user_user_view', $user))
+        ) {
+            throw new AccessDeniedException();
+        }
+
         return array(
             'entity'      => $user,
             'userApi'     => $this->getUserApi($user),
-            'viewProfile' => (bool)$this->getRequest()->query->get('viewProfile', false)
+            'viewProfile' => $isViewProfile
         );
     }
 
