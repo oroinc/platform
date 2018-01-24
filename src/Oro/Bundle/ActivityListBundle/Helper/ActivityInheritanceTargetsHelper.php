@@ -111,7 +111,7 @@ class ActivityInheritanceTargetsHelper
      * @param string   $target
      * @param string[] $path
      * @param string   $entityIdExpr
-     * @param integer  $uniqueKey
+     * @param string  $uniqueKey
      *
      * @return QueryBuilder
      */
@@ -125,8 +125,9 @@ class ActivityInheritanceTargetsHelper
         $subQueryBuilder->select($alias . '.id')->from($target, $alias);
 
         foreach ($path as $key => $field) {
+            QueryBuilderUtil::checkIdentifier($key);
             $newAlias = 't_' . $uniqueKey . '_' . $key;
-            if (is_array($field)) {
+            if (\is_array($field)) {
                 $subQueryBuilder->join(
                     $field['join'],
                     $newAlias,
