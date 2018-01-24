@@ -450,6 +450,7 @@ class JobStorageTest extends WebTestCase
         ];
 
         $result = $this->jobStorage->getChildJobIdsByRootJobAndStatus($job, Job::STATUS_NEW);
+        rsort($result);
 
         $this->assertSame($expectedResult, $result);
     }
