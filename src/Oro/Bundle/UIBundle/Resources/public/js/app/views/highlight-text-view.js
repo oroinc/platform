@@ -288,19 +288,6 @@ define(function(require) {
                 $el.html($content.html());
                 $el.toggleClass(this.elementHighlightClass, this.isElementContentHighlighted($el));
             }
-
-            /*
-            fix text-transform: capitalize issue in Chrome
-            input text "Email Settings"
-            after highlight we get "Email Sett<span>ing</span>S" with capitalized "S" symbol
-            after fix we get "Email Sett<span>ing</span>s"
-             */
-            if ($el.css('text-transform') === 'capitalize') {
-                $el.css('text-transform', 'none');
-                setTimeout(function() {
-                    $el.css('text-transform', 'capitalize');
-                }, 0);
-            }
         },
 
         /**
