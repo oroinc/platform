@@ -20,5 +20,6 @@ config:
         'oroexpressionlanguage/js/library/expression': 'bundles/oroexpressionlanguage/js/library/expression.js'
         'oroexpressionlanguage/js/library/lexer': 'bundles/oroexpressionlanguage/js/library/lexer.js'
         'oroexpressionlanguage/js/library/parsed-expression': 'bundles/oroexpressionlanguage/js/library/parsed-expression.js'
+        'oroexpressionlanguage/js/library/parser': 'bundles/oroexpressionlanguage/js/library/parser.js'
         'oroexpressionlanguage/js/library/token': 'bundles/oroexpressionlanguage/js/library/token.js'
         'oroexpressionlanguage/js/library/token-stream': 'bundles/oroexpressionlanguage/js/library/token-stream.js'
