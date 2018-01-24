@@ -2,11 +2,13 @@
 
 namespace Oro\Component\MessageQueue\Job;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\UnitOfWork;
 
@@ -102,6 +104,60 @@ class JobStorage
             ->setParameter('name', $name)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * @param Job $rootJob
+     *
+     * @return []
+     */
+    public function getChildStatusesWithJobCountByRootJob(Job $rootJob)
+    {
+        $rawChildStatusesWithJobCount = $this->createJobQueryBuilder('job')
+            ->select('COUNT(job.id) AS childCount', 'job.status')
+            ->where('job.rootJob = :rootJob')
+            ->groupBy('job.status')
+            ->setParameter('rootJob', $rootJob)
+            ->getQuery()
+            ->getScalarResult();
+
+        $childStatusesWithJobCount = [];
+        foreach ($rawChildStatusesWithJobCount as $childStatusWithJobCount) {
+            $childStatusesWithJobCount[$childStatusWithJobCount['status']] = $childStatusWithJobCount['childCount'];
+        }
+
+        return $childStatusesWithJobCount;
+    }
+
+    /**
+     * @param Job    $rootJob
+     * @param string $status
+     *
+     * @return array
+     */
+    public function getChildJobIdsByRootJobAndStatus(Job $rootJob, $status)
+    {
+        $qb = $this->createJobQueryBuilder('job');
+        $rawChildJobIds = $qb
+            ->select('job.id')
+            ->where(
+                $qb->expr()->andX(
+                    'job.rootJob = :rootJob',
+                    'job.status = :status'
+                )
+            )
+            ->setParameters(
+                new ArrayCollection(
+                    [
+                        new Parameter('rootJob', $rootJob),
+                        new Parameter('status', $status),
+                    ]
+                )
+            )
+            ->getQuery()
+            ->getScalarResult();
+
+        return array_column($rawChildJobIds, 'id');
     }
 
     /**
