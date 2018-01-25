@@ -237,6 +237,7 @@ abstract class BaseDriver implements DBALPersisterInterface
                         $fieldSelect,
                         sprintf('%s as countValue', $queryBuilder->expr()->countDistinct('search.id'))
                     ]);
+                    QueryBuilderUtil::checkField($fieldName);
                     $queryBuilder->groupBy($fieldName);
 
                     foreach ($queryBuilder->getQuery()->getArrayResult() as $row) {
@@ -554,6 +555,7 @@ abstract class BaseDriver implements DBALPersisterInterface
         foreach ($selects as $select) {
             list($type, $name) = Criteria::explodeFieldTypeName($select);
             QueryBuilderUtil::checkIdentifier($name);
+            QueryBuilderUtil::checkIdentifier($type);
 
             $joinField = $this->getJoinField($type);
             list($joinAlias, $uniqIndex) = $this->getJoinAttributes($name, $type, $qb->getAllAliases());
