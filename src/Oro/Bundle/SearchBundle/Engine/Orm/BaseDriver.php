@@ -289,7 +289,7 @@ abstract class BaseDriver implements DBALPersisterInterface
      * Add text search to qb
      *
      * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param integer                    $index
+     * @param string                     $index
      * @param array                      $searchCondition
      * @param boolean                    $setOrderBy
      *
@@ -450,7 +450,7 @@ abstract class BaseDriver implements DBALPersisterInterface
      * Add non string search to qb
      *
      * @param QueryBuilder $qb
-     * @param integer $index
+     * @param string $index
      * @param array $searchCondition
      *
      * @return string

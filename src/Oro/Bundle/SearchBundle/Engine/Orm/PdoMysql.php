@@ -58,7 +58,7 @@ class PdoMysql extends BaseDriver
      * Add text search to qb
      *
      * @param  QueryBuilder $qb
-     * @param  integer      $index
+     * @param  string       $index
      * @param  array        $searchCondition
      * @param  boolean      $setOrderBy
      *
@@ -119,7 +119,7 @@ class PdoMysql extends BaseDriver
      *
      * @param QueryBuilder $qb
      * @param string $fieldValue
-     * @param $index
+     * @param string $index
      *
      * @return string
      */
@@ -134,7 +134,7 @@ class PdoMysql extends BaseDriver
      *
      * @param QueryBuilder $qb
      * @param string $fieldValue
-     * @param $index
+     * @param string $index
      *
      * @return string
      */
@@ -279,8 +279,8 @@ class PdoMysql extends BaseDriver
      *
      * @param QueryBuilder $qb
      * @param array        $words
-     * @param              $index
-     * @param  array       $searchCondition
+     * @param string $index
+     * @param array       $searchCondition
      *
      * @return string
      */
@@ -312,7 +312,7 @@ class PdoMysql extends BaseDriver
 
     /**
      * @param  QueryBuilder $qb
-     * @param  int          $index
+     * @param  string       $index
      * @param  array        $words
      * @param  array        $searchCondition
      *
@@ -343,7 +343,7 @@ class PdoMysql extends BaseDriver
 
     /**
      * @param  QueryBuilder $qb
-     * @param  int          $index
+     * @param  string       $index
      * @param  string       $value
      * @param  array        $searchCondition
      * @param  string       $operator
@@ -376,7 +376,7 @@ class PdoMysql extends BaseDriver
     /**
      * @param QueryBuilder $qb
      * @param string $fieldValue
-     * @param int $index
+     * @param string $index
      * @param array $searchCondition
      * @return string
      */

@@ -55,7 +55,7 @@ class PdoPgsql extends BaseDriver
      * Add text search to qb
      *
      * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param integer                    $index
+     * @param string                     $index
      * @param array                      $searchCondition
      * @param boolean                    $setOrderBy
      *
@@ -116,7 +116,7 @@ class PdoPgsql extends BaseDriver
     /**
      * Create search string for string parameters (contains)
      *
-     * @param integer $index
+     * @param string $index
      * @param bool    $useFieldName
      * @param string  $operator
      *
@@ -137,7 +137,7 @@ class PdoPgsql extends BaseDriver
     /**
      * Create fulltext search string for string parameters (contains)
      *
-     * @param integer $index
+     * @param string $index
      * @param bool    $useFieldName
      *
      * @return string
@@ -206,7 +206,7 @@ class PdoPgsql extends BaseDriver
     /**
      * Create search string for string parameters (not contains)
      *
-     * @param integer $index
+     * @param string $index
      * @param bool    $useFieldName
      *
      * @return string
@@ -228,7 +228,7 @@ class PdoPgsql extends BaseDriver
      * Set string parameter for qb
      *
      * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param integer                    $index
+     * @param string                     $index
      * @param string                     $fieldValue
      * @param string                     $searchCondition
      */
@@ -262,20 +262,19 @@ class PdoPgsql extends BaseDriver
      * Set fulltext range order by
      *
      * @param QueryBuilder $qb
-     * @param int $index
+     * @param string $index
      */
     protected function setTextOrderBy(QueryBuilder $qb, $index)
     {
-        $index = (int)$index;
         $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
 
-        $qb->addSelect(sprintf('TsRank(%s.value, :quotedValue%d) as rankField%d', $joinAlias, $index, $index))
+        $qb->addSelect(sprintf('TsRank(%s.value, :quotedValue%s) as rankField%s', $joinAlias, $index, $index))
            ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
 
-        $parameter = $qb->getParameter(sprintf('value%d', $index));
+        $parameter = $qb->getParameter(sprintf('value%s', $index));
         $quotedValue = sprintf('\'%s\'', $parameter->getValue());
 
-        $qb->setParameter(sprintf('quotedValue%d', $index), $quotedValue);
+        $qb->setParameter(sprintf('quotedValue%s', $index), $quotedValue);
     }
 
     /**
