@@ -59,7 +59,6 @@ class WorkflowDefinitionProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetActiveDefinitions()
     {
         $this->configureORM('findActive', [$this->definition]);
-        $this->configureCache([$this->definition]);
 
         $this->provider->getActiveDefinitions();
         //Call again to verify if cache called
@@ -69,7 +68,6 @@ class WorkflowDefinitionProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetDefinitionsForRelatedEntity()
     {
         $this->configureORM('findForRelatedEntity', [$this->definition], StubEntity::class);
-        $this->configureCache([$this->definition]);
 
         $this->provider->getDefinitionsForRelatedEntity(StubEntity::class);
         //Call again to verify if cache called
@@ -79,7 +77,6 @@ class WorkflowDefinitionProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetActiveDefinitionsForRelatedEntity()
     {
         $this->configureORM('findActiveForRelatedEntity', [$this->definition], StubEntity::class);
-        $this->configureCache([$this->definition]);
 
         $this->provider->getActiveDefinitionsForRelatedEntity(StubEntity::class);
         //Call again to verify if cache called
@@ -88,7 +85,8 @@ class WorkflowDefinitionProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidateCache()
     {
-        $this->cache->expects($this->once())->method('deleteAll');
+        $this->managerRegistry->expects($this->once())->method('getRepository')->willReturn($this->repository);
+        $this->repository->expects($this->once())->method('invalidateCache');
         $this->provider->invalidateCache();
     }
 
@@ -163,33 +161,24 @@ class WorkflowDefinitionProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param mixed $result
-     */
-    protected function configureCache($result)
-    {
-        $this->cache->expects($this->once())->method('save');
-        $this->cache->expects($this->exactly(2))->method('fetch')->willReturnOnConsecutiveCalls(false, $result);
-    }
-
-    /**
      * @param string $repositoryMethod
      * @param mixed $repositoryResult
      * @param mixed|null $repositoryMethodWith
      */
     protected function configureORM($repositoryMethod, $repositoryResult, $repositoryMethodWith = null)
     {
-        $this->managerRegistry->expects($this->once())
+        $this->managerRegistry->expects($this->atLeastOnce())
             ->method('getRepository')
             ->with(WorkflowDefinition::class)
             ->willReturn($this->repository);
 
         if ($repositoryMethodWith) {
-            $this->repository->expects($this->once())
+            $this->repository->expects($this->atLeastOnce())
                 ->method($repositoryMethod)
                 ->with($repositoryMethodWith)
                 ->willReturn($repositoryResult);
         } else {
-            $this->repository->expects($this->once())
+            $this->repository->expects($this->atLeastOnce())
                 ->method($repositoryMethod)
                 ->willReturn($repositoryResult);
         }

@@ -12,6 +12,12 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 
+/**
+ * @deprecated Will be removed at 2.7
+ * Dont use this class. Use methods of
+ * \Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository
+ * directly instead
+ */
 class WorkflowDefinitionProvider
 {
     /** @var ManagerRegistry */
@@ -37,7 +43,7 @@ class WorkflowDefinitionProvider
     public function invalidateCache()
     {
         $this->internalCache->deleteAll();
-        $this->cacheProvider->deleteAll();
+        $this->getEntityRepository()->invalidateCache();
     }
 
     /**
@@ -45,15 +51,7 @@ class WorkflowDefinitionProvider
      */
     public function getActiveDefinitions()
     {
-        $cacheId = 'active_workflow_definitions';
-        $definitions = $this->fetchCache($cacheId);
-
-        if (false === $definitions) {
-            $definitions = $this->getEntityRepository()->findActive();
-            $this->saveCache($cacheId, $definitions);
-        }
-
-        return $definitions;
+        return $this->getEntityRepository()->findActive();
     }
 
     /**
@@ -63,16 +61,7 @@ class WorkflowDefinitionProvider
      */
     public function getDefinitionsForRelatedEntity($entityClass)
     {
-        $cacheId = 'workflow_definitions_for_' . $entityClass;
-
-        $definitions = $this->fetchCache($cacheId);
-
-        if (false === $definitions) {
-            $definitions = $this->getEntityRepository()->findForRelatedEntity($entityClass);
-            $this->saveCache($cacheId, $definitions);
-        }
-
-        return $definitions;
+        return $this->getEntityRepository()->findForRelatedEntity($entityClass);
     }
 
     /**
@@ -82,16 +71,7 @@ class WorkflowDefinitionProvider
      */
     public function getActiveDefinitionsForRelatedEntity($entityClass)
     {
-        $cacheId = 'active_workflow_definitions_for_' . $entityClass;
-
-        $definitions = $this->fetchCache($cacheId);
-
-        if (false === $definitions) {
-            $definitions = $this->getEntityRepository()->findActiveForRelatedEntity($entityClass);
-            $this->saveCache($cacheId, $definitions);
-        }
-
-        return $definitions;
+        return $this->getEntityRepository()->findActiveForRelatedEntity($entityClass);
     }
 
     /**
@@ -132,11 +112,7 @@ class WorkflowDefinitionProvider
      */
     protected function fetchCache($id)
     {
-        if ($this->cacheProvider->fetch('has_cached_values')) {
-            return $this->internalCache->fetch($id);
-        }
-
-        return false;
+        return $this->internalCache->fetch($id);
     }
 
     /**
@@ -147,7 +123,6 @@ class WorkflowDefinitionProvider
      */
     protected function saveCache($id, $data)
     {
-        $this->cacheProvider->save('has_cached_values', true);
         return $this->internalCache->save($id, $data);
     }
 
