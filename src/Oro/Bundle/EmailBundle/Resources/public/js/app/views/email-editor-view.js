@@ -60,7 +60,7 @@ define(function(require) {
             } else {
                 url = routing.generate(
                     'oro_user_profile_configuration',
-                    {'activeGroup': 'platform', 'activeSubGroup': 'email_configuration'}
+                    {activeGroup: 'platform', activeSubGroup: 'email_configuration'}
                 );
                 message = this.model.get('isSignatureEditable') ?
                     __('oro.email.thread.no_signature', {url: url}) :
@@ -183,7 +183,6 @@ define(function(require) {
                 .parents('.control-group.taggable-field')
                 .find('label').html(__('oro.email.to'));
             this.addForgedAsterisk();
-
         },
 
         hideField: function(fieldName) {
@@ -194,7 +193,7 @@ define(function(require) {
             if (this.$('span.show' + fieldName).length > 0) {
                 return;
             }
-            this.$('.cc-bcc-holder').append('<span class="show' + fieldName + '">' + fieldName +  '</span>');
+            this.$('.cc-bcc-holder').append('<span class="show' + fieldName + '">' + fieldName + '</span>');
             this.$('.show' + fieldName).on('click', _.bind(function(e) {
                 e.stopPropagation();
                 var target = e.target;

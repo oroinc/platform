@@ -17,7 +17,7 @@ define(function(require) {
                 throw new Error('Missing required "loadWidget" option');
             }
             if (!options.filterModel) {
-                throw  new Error('Missing required "filterModel" option');
+                throw new Error('Missing required "filterModel" option');
             }
             _.extend(this, _.pick(options, ['filterModel', 'loadWidget']));
             options.filterer = _.bind(this.filterModel.filterer, this.filterModel);

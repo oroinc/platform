@@ -20,7 +20,7 @@ define([
         navigationElementType: null,
 
         events: {
-            'click': 'onToggle'
+            click: 'onToggle'
         },
 
         listen: {

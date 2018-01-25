@@ -1,4 +1,3 @@
-/** @lends LoadMoreCollection */
 define(function(require) {
     'use strict';
 
@@ -17,7 +16,7 @@ define(function(require) {
      */
     var LoadMoreCollection;
 
-    LoadMoreCollection = RoutingCollection.extend(/** @exports LoadMoreCollection.prototype */{
+    LoadMoreCollection = RoutingCollection.extend(/** @lends LoadMoreCollection.prototype */{
         routeDefaults: {
             /**
              * Initial quantity of items to load

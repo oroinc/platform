@@ -10,8 +10,8 @@ define(function(require) {
 
     TransitionDialogWidget = DialogWidget.extend({
         listen: {
-            'transitionSuccess': 'onTransitionSuccess',
-            'transitionFailure': 'onTransitionFailure'
+            transitionSuccess: 'onTransitionSuccess',
+            transitionFailure: 'onTransitionFailure'
         },
 
         /**

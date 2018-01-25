@@ -1,5 +1,5 @@
 define(['jquery', 'underscore', 'oroui/js/mediator'
-    ], function($, _, mediator) {
+], function($, _, mediator) {
     'use strict';
 
     var initHandler = function(collection) {

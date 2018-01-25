@@ -13,10 +13,25 @@
     }
   }
 
+  &-element {
+    &:first-letter {
+      text-transform: none;
+    }
+
+    label& {
+      span {
+        font-weight: normal;
+      }
+    }
+  }
+
   &-element[class^="fa-"],
   &-element[class*=" fa-"] {
     background-color: @highlightTextColor;
-    padding: 1px 2px;
+    box-shadow: 0 -1px 0 0 @highlightTextColor,
+                2px 0 0 0 @highlightTextColor,
+                0 1px 0 0 @highlightTextColor,
+                -2px 0 0 0 @highlightTextColor;
   }
 
   &-element.selector,

@@ -27,5 +27,4 @@ define(function(require) {
     });
 
     return CommentCollection;
-
 });

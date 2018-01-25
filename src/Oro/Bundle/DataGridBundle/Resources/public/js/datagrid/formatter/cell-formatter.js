@@ -1,5 +1,5 @@
 define(['underscore', 'backgrid', 'oroui/js/tools/text-util'
-    ], function(_, Backgrid, textUtil) {
+], function(_, Backgrid, textUtil) {
     'use strict';
 
     /**

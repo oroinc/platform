@@ -52,7 +52,7 @@ define(function(require) {
             };
             var nvp = query.split('&');
             var data = {};
-            for (var i = 0 ; i < nvp.length ; i++) {
+            for (var i = 0; i < nvp.length; i++) {
                 var pair = nvp[i].split('=');
                 if (pair.length < 2) {
                     continue;
@@ -63,10 +63,10 @@ define(function(require) {
                 var path = name.match(/(^[^\[]+)(\[.*\]$)?/);
                 var first = path[1];
                 if (path[2]) {
-                    //case of 'array[level1]' || 'array[level1][level2]'
+                    // case of 'array[level1]' || 'array[level1][level2]'
                     path = path[2].match(/(?=\[(.*)\]$)/)[1].split('][');
                 } else {
-                    //case of 'name'
+                    // case of 'name'
                     path = [];
                 }
                 path.unshift(first);
@@ -155,8 +155,7 @@ define(function(require) {
                 }
                 return false;
             } else {
-                // jshint -W116
-                return value1 == value2;
+                return value1 == value2; // eslint-disable-line eqeqeq
             }
         },
 
@@ -187,7 +186,7 @@ define(function(require) {
         /**
          * Are we have touch screen
          */
-        isTouchDevice: function()  {
+        isTouchDevice: function() {
             return ('ontouchstart' in window && window.ontouchstart) ||
                 ('DocumentTouch' in window && document instanceof window.DocumentTouch);
         },
@@ -302,10 +301,8 @@ define(function(require) {
          */
         createRandomUUID: function() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                // jshint -W016
                 var r = Math.random() * 16 | 0;
                 var v = c === 'x' ? r : (r & 0x3 | 0x8);
-                // jshint +W016
                 return v.toString(16);
             });
         },
@@ -352,7 +349,7 @@ define(function(require) {
                 return '//' + tagName + '[@id="' + element.id + '"]';
             } else {
                 // Use nodeName (instead of localName) so namespace prefix is included (if any).
-                for (; element && element.nodeType === 1; element = element.parentNode)  {
+                for (; element && element.nodeType === 1; element = element.parentNode) {
                     var index = 0;
                     tagName = element.nodeName.toLowerCase();
                     // EXTRA TEST FOR ELEMENT.ID

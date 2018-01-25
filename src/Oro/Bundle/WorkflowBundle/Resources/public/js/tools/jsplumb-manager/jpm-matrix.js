@@ -13,7 +13,9 @@ define(function(require) {
         this.width = 8;
         this.cells = _.range(orders.length).map(
             function() {
-                return _.range(that.width).map(function() { return []; });
+                return _.range(that.width).map(function() {
+                    return [];
+                });
             }
         );
         this.cellMap = {};
@@ -100,7 +102,7 @@ define(function(require) {
                 return step.get('order');
             });
             var sortedKeys = _.each(_.keys(groupedSteps), parseInt).sort();
-            //fill cells
+            // fill cells
             for (row = 0; row < sortedKeys.length; row++) {
                 key = sortedKeys[row];
                 for (col = 0; col < groupedSteps[key].length; col++) {
@@ -114,7 +116,7 @@ define(function(require) {
                     this.cellMap[stepName] = cell;
                 }
             }
-            //set children
+            // set children
             for (row = 0; row < this.cells.length; row++) {
                 for (col = 0; col < this.cells[row].length; col++) {
                     if (this.cells[row][col].length) {

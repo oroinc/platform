@@ -77,7 +77,7 @@ define(function(require) {
                 }
             }
 
-            var collectionItem = data.itemId ? _.findWhere(collection, {'itemId': data.itemId}) : null;
+            var collectionItem = data.itemId ? _.findWhere(collection, {itemId: data.itemId}) : null;
             if (collectionItem) {
                 _.extend(collectionItem, data);
             } else {

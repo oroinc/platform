@@ -17,7 +17,6 @@ placeholders:
                 oro_email_action_send_email_button:
                     order: 20
 
-
     items:
         oro_send_email_button:
             template: OroEmailBundle:Email:activityButton.html.twig

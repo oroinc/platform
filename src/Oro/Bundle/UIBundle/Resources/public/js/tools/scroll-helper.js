@@ -193,8 +193,8 @@ define(function(require) {
             };
             if (
                 (resultRect.top === 0 && resultRect.bottom === 0) || // no-data block is shown
-                    (resultRect.top > this.documentHeight() && forceInvisible)
-                ) {
+                (resultRect.top > this.documentHeight() && forceInvisible)
+            ) {
                 // no need to calculate anything
                 return resultRect;
             }
@@ -215,7 +215,7 @@ define(function(require) {
                 borders = $.fn.getBorders(current);
 
                 var style = window.getComputedStyle(current);
-                if (style.overflowX !== 'visible' || style.overflowY  !== 'visible') {
+                if (style.overflowX !== 'visible' || style.overflowY !== 'visible') {
                     if (resultRect.top < midRect.top + borders.top) {
                         resultRect.top = midRect.top + borders.top;
                     }

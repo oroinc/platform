@@ -43,19 +43,19 @@ define(function(require) {
 
         _bindWidgetEvents: function(widget) {
             widget.on({
-                'beforeContentLoad': function() {
+                beforeContentLoad: function() {
                     mediator.execute('showLoading');
                 },
-                'formSave': function(data) {
+                formSave: function(data) {
                     performTransition($(this.saveAndTransitButtonSelector), data);
                 },
-                'formSaveError': function() {
+                formSaveError: function() {
                     mediator.execute('hideLoading');
                 },
-                'transitionSuccess': function(response) {
+                transitionSuccess: function(response) {
                     TransitionEventHandlers.getOnSuccess($('<div>'))(response);
                 },
-                'transitionFailure': function(responseCode) {
+                transitionFailure: function(responseCode) {
                     TransitionEventHandlers.getOnFailure($('<div>'))({status: responseCode}, '', '');
                 }
             });

@@ -25,13 +25,13 @@ define(function(require) {
          */
         toggleState: function() {
             switch (this.get('state')) {
-            case constants.SIDEBAR_MINIMIZED:
-                this.set('state', constants.SIDEBAR_MAXIMIZED);
-                break;
+                case constants.SIDEBAR_MINIMIZED:
+                    this.set('state', constants.SIDEBAR_MAXIMIZED);
+                    break;
 
-            case constants.SIDEBAR_MAXIMIZED:
-                this.set('state', constants.SIDEBAR_MINIMIZED);
-                break;
+                case constants.SIDEBAR_MAXIMIZED:
+                    this.set('state', constants.SIDEBAR_MINIMIZED);
+                    break;
             }
         }
     });

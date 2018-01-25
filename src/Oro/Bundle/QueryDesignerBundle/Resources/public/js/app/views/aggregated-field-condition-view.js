@@ -145,9 +145,9 @@ define(function(require) {
         _getFilterCriterion: function() {
             var criterion = AggregatedFieldConditionView.__super__._getFilterCriterion.call(this);
             $.extend(true, criterion, {
-                'data': {
-                    'params': {
-                        'filter_by_having': true
+                data: {
+                    params: {
+                        filter_by_having: true
                     }
                 }
             });

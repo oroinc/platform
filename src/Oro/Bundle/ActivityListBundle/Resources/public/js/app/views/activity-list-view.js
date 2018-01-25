@@ -44,14 +44,14 @@ define(function(require) {
         },
 
         EDIT_DIALOG_CONFIGURATION_DEFAULTS: {
-            'regionEnabled': false,
-            'incrementalPosition': false,
-            'alias': 'activity_list:item:update',
-            'dialogOptions': {
-                'modal': true,
-                'resizable': true,
-                'width': 515,
-                'autoResize': true
+            regionEnabled: false,
+            incrementalPosition: false,
+            alias: 'activity_list:item:update',
+            dialogOptions: {
+                modal: true,
+                resizable: true,
+                width: 515,
+                autoResize: true
             }
         },
 
@@ -232,7 +232,6 @@ define(function(require) {
             this.collection.setPageFilterDate(model.attributes[this.collection.pager.sortingField]);
             this.collection.setPageFilterIds(sameModelIds.length ? sameModelIds : [model.id]);
             this.collection.setPageFilterAction('prev');
-
         },
         _setupPageFilterForNextAction: function() {
             var model = this.collection.last();
@@ -397,7 +396,7 @@ define(function(require) {
 
         _editItem: function(model, extraOptions) {
             if (!this.itemEditDialog) {
-                var unescapeHTML = function unescapeHtml(unsafe) {
+                var unescapeHTML = function unescapeHTML(unsafe) {
                     return unsafe
                         .replace(/&nbsp;/g, ' ')
                         .replace(/&amp;/g, '&')
@@ -408,10 +407,10 @@ define(function(require) {
                 };
 
                 var dialogConfiguration = $.extend(true, {}, this.EDIT_DIALOG_CONFIGURATION_DEFAULTS, extraOptions, {
-                    'url': this._getUrl('itemEdit', model),
-                    'title': unescapeHTML(model.get('subject')),
-                    'dialogOptions': {
-                        'close': _.bind(function() {
+                    url: this._getUrl('itemEdit', model),
+                    title: unescapeHTML(model.get('subject')),
+                    dialogOptions: {
+                        close: _.bind(function() {
                             delete this.itemEditDialog;
                         }, this)
                     }
@@ -435,11 +434,11 @@ define(function(require) {
         _onItemDelete: function(model) {
             this._showLoading();
             try {
-                //in case deleting the last item on page - will show the previous one
+                // in case deleting the last item on page - will show the previous one
                 if (this.collection.getCount() === 1) {
-                    //the first page never has pageFilters
-                    //in case 2nd page and last item deletion - just reset pageFilter, this will give the 1st page
-                    //in all other cases simulate `Prev` action
+                    // the first page never has pageFilters
+                    // in case 2nd page and last item deletion - just reset pageFilter, this will give the 1st page
+                    // in all other cases simulate `Prev` action
                     if (this.collection.getPage() <= 2) {
                         this.collection.resetPageFilter();
                     } else {
@@ -483,7 +482,7 @@ define(function(require) {
         _getUrl: function(actionKey, model) {
             var className = model.getRelatedActivityClass();
             var route = this.options.configuration[className].routes[actionKey];
-            return routing.generate(route, {'id': model.get('relatedActivityId')});
+            return routing.generate(route, {id: model.get('relatedActivityId')});
         },
 
         _getMessage: function(labelKey) {

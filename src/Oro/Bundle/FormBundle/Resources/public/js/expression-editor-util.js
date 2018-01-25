@@ -1,4 +1,3 @@
-/*jshint -W054 *///ignore The Function constructor is a form of eval
 define(function(require) {
     'use strict';
 
@@ -11,19 +10,19 @@ define(function(require) {
          * RegEx, used for expression analyze, autocomplete and validate
          */
         regex: {
-            itemPartBeforeCursor: /^.*[ ]/g,   //1 == prod|uct.id and ... => prod
-            itemPartAfterCursor: /[ ].*$/g,    //1 == prod|uct.id and ... => uct.id
-            findArray: /\[[^\[\]]*\]/,  //[1, [2]] or [3] => [3]
-            splitExpressionToItems: /([ \(\)])/,    //item1 or (item2) => [item1, ,or, ,(,items2,)]
-            clearStringSpecialSymbols: /\\\\|\\['"]/g,  //\|\"|\' =>
-            clearString: /"[^"]*"|'[^']*'/g,    //'string' => "string" => ""
-            replaceDataSourceId: /^\[\s*\d+\s*\]/,  //dataSource[1] => dataSource
-            cutDataSourceId: /\[(.*?)\]/g,   //dataSource[1] => "1", dataSource[] => ""
-            removeDuplicatedWhitespaces: /\s+/g,    //"  " => " "
-            removeBracketsWhitespaces: /(\()\s|\s(\))/g,   //"( " => "(", " )" => ")",
-            nativeReplaceLogicalIOperations: /&&|\|\|/g,   //&& => &, || => &
-            nativeReplaceAllowedBeforeTest: /true|false|indexOf/g,   //true|false|... =>
-            nativeFindNotAllowed: /[;a-z]/i     //any not allowed symbols before JS execution
+            itemPartBeforeCursor: /^.*[ ]/g, // 1 == prod|uct.id and ... => prod
+            itemPartAfterCursor: /[ ].*$/g, // 1 == prod|uct.id and ... => uct.id
+            findArray: /\[[^\[\]]*\]/, // [1, [2]] or [3] => [3]
+            splitExpressionToItems: /([ \(\)])/, // item1 or (item2) => [item1, ,or, ,(,items2,)]
+            clearStringSpecialSymbols: /\\\\|\\['"]/g, // \|\"|\' =>
+            clearString: /"[^"]*"|'[^']*'/g, // 'string' => "string" => ""
+            replaceDataSourceId: /^\[\s*\d+\s*\]/, // dataSource[1] => dataSource
+            cutDataSourceId: /\[(.*?)\]/g, // dataSource[1] => "1", dataSource[] => ""
+            removeDuplicatedWhitespaces: /\s+/g, // "  " => " "
+            removeBracketsWhitespaces: /(\()\s|\s(\))/g, // "( " => "(", " )" => ")",
+            nativeReplaceLogicalIOperations: /&&|\|\|/g, // && => &, || => &
+            nativeReplaceAllowedBeforeTest: /true|false|indexOf/g, // true|false|... =>
+            nativeFindNotAllowed: /[;a-z]/i // any not allowed symbols before JS execution
         },
 
         /**
@@ -32,7 +31,7 @@ define(function(require) {
         strings: {
             childSeparator: '.',
             itemSeparator: ' ',
-            arrayPlaceholder: '{array}'//used to remove nested arrays
+            arrayPlaceholder: '{array}'// used to remove nested arrays
         },
 
         /**
@@ -227,9 +226,9 @@ define(function(require) {
          * @private
          */
         _clearStrings: function(expression) {
-            //remove `\`, `\"` and `\'` symbols
+            // remove `\`, `\"` and `\'` symbols
             expression = expression.replace(this.regex.clearStringSpecialSymbols, '');
-            //clear strings and convert quotes
+            // clear strings and convert quotes
             expression = expression.replace(this.regex.clearString, '""');
             return expression;
         },
@@ -248,17 +247,17 @@ define(function(require) {
 
             var items = this._splitExpressionToItems(expression);
             var item;
-            //check all items
+            // check all items
             for (var i = 0; i < items.length; i++) {
                 item = items[i];
-                //check all data sources in item
+                // check all data sources in item
                 for (var j = 0; j < this.dataSourceNames.length; j++) {
                     item = item.split(new RegExp('(' + this.dataSourceNames[j] + ')'));
                     if (item.length < 2 || item[0] !== '') {
-                        //data source not found in item or not in item beginning
+                        // data source not found in item or not in item beginning
                         continue;
                     } else if (item[2].indexOf(this.strings.childSeparator) === 0) {
-                        //not valid
+                        // not valid
                         return false;
                     }
 
@@ -295,19 +294,19 @@ define(function(require) {
             while (expression.indexOf('[') !== -1 && expression.indexOf(']') !== -1) {
                 array = expression.match(this.regex.findArray);
                 if (array.length === 0) {
-                    //we have not closed array
+                    // we have not closed array
                     return false;
                 }
 
                 array = array[0];
                 if (!this._validateNativeJS(array.replace(new RegExp(arrayPlaceholder, 'g'), '[]'))) {
-                    //array not valid
+                    // array not valid
                     return false;
                 }
 
                 changedExpression = expression.replace(array, arrayPlaceholder);
                 if (changedExpression === expression) {
-                    return false;//recursion
+                    return false;// recursion
                 }
 
                 expression = changedExpression;
@@ -380,7 +379,7 @@ define(function(require) {
             if (this.regex.nativeFindNotAllowed.test(testExpression)) {
                 return false;
             }
-            //replace all "&&" and "||" to "&", because if first part of "&&" or "||" return true or false - JS ignore(do not execute) second part
+            // replace all "&&" and "||" to "&", because if first part of "&&" or "||" return true or false - JS ignore(do not execute) second part
             expression = expression.replace(this.regex.nativeReplaceLogicalIOperations, '&');
             try {
                 var f = new Function('return ' + expression);

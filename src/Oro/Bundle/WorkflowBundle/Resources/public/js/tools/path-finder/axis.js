@@ -1,5 +1,5 @@
-define(['./extends', './interval2d', './directions', './point2d'],
-function(__extends, Interval2d, directions, Point2d) {
+define(['./extends', './interval2d', './directions', './point2d'
+], function(__extends, Interval2d, directions, Point2d) {
     'use strict';
     __extends(Axis, Interval2d);
 

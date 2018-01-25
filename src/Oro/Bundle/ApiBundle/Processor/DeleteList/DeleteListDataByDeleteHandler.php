@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\DeleteList;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
+use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Shared\DeleteDataByDeleteHandler as BaseProcessor;
+use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 
 /**
  * Deletes entities by DeleteHandler.
@@ -15,16 +15,16 @@ class DeleteListDataByDeleteHandler extends BaseProcessor
     /**
      * {@inheritdoc}
      */
-    protected function processDelete(ContextInterface $context, DeleteHandler $handler)
+    protected function processDelete(Context $context, DeleteHandler $handler)
     {
         /** @var DeleteListContext $context */
 
-        $entityList = $context->getResult();
-        if (!is_array($entityList) && !$entityList instanceof \Traversable) {
+        $entities = $context->getResult();
+        if (!is_array($entities) && !$entities instanceof \Traversable) {
             throw new RuntimeException(
                 sprintf(
                     'The result property of the Context should be array or Traversable, "%s" given.',
-                    is_object($entityList) ? get_class($entityList) : gettype($entityList)
+                    is_object($entities) ? get_class($entities) : gettype($entities)
                 )
             );
         }
@@ -32,7 +32,7 @@ class DeleteListDataByDeleteHandler extends BaseProcessor
         $entityManager = $this->doctrineHelper->getEntityManagerForClass($context->getClassName());
         $entityManager->getConnection()->beginTransaction();
         try {
-            foreach ($entityList as $entity) {
+            foreach ($entities as $entity) {
                 $handler->processDelete($entity, $entityManager);
             }
             $entityManager->getConnection()->commit();

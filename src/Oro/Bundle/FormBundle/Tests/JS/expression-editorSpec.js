@@ -6,12 +6,12 @@ define(function(require) {
     var ExpressionEditorView = require('oroform/js/app/views/expression-editor-view');
     var DataProviderMock = require('./Fixture/entity-structure-data-provider-mock.js');
 
-    //fixtures
+    // fixtures
     var entitiesData = JSON.parse(require('text!./Fixture/entities-data.json'));
     var html = require('text!./Fixture/expression-editor-template.html');
     var dataSource = require('text!./Fixture/data-source.html');
 
-    //variables
+    // variables
     var expressionEditorView = null;
     var typeahead = null;
 
@@ -30,7 +30,6 @@ define(function(require) {
     }
 
     describe('oroform/js/app/views/expression-editor-view', function() {
-
         beforeEach(function() {
             window.setFixtures(html);
             var options = createEditorOptions({itemLevelLimit: 3});

@@ -41,13 +41,13 @@ define(function(require) {
             var drawGraph = _.bind(this.drawGraph, this);
             var start;
 
-            Flotr.EventAdapter.observe(container, 'flotr:mousedown',  function(e) {
+            Flotr.EventAdapter.observe(container, 'flotr:mousedown', function(e) {
                 start = graph.getEventPosition(e);
                 Flotr.EventAdapter.observe(container, 'flotr:mousemove', onMove);
                 Flotr.EventAdapter.observe(container, 'flotr:mouseup', onStop);
             });
 
-            function onStop () {
+            function onStop() {
                 Flotr.EventAdapter.stopObserving(container, 'flotr:mousemove', onMove);
             }
 
@@ -82,34 +82,34 @@ define(function(require) {
                     shadowSize: 0,
                     fillOpacity: 1,
                     lineWidth: 7.5,
-                    centered: true,
+                    centered: true
                 },
                 mouse: {
                     track: true,
                     relative: false,
                     position: 'ne',
-                    trackFormatter: _.bind(this.trackFormatter, this),
+                    trackFormatter: _.bind(this.trackFormatter, this)
                 },
                 yaxis: {
                     autoscale: true,
                     autoscaleMargin: 0.3,
                     noTicks: 2,
                     tickFormatter: _.bind(this.YTickFormatter, this),
-                    title: options.data_schema.value.label,
+                    title: options.data_schema.value.label
                 },
                 xaxis: {
                     min: xSize.min,
                     max: xSize.max,
                     tickFormatter: _.bind(this.XTickFormatter, this),
-                    title: options.data_schema.label.label,
+                    title: options.data_schema.label.label
                 },
                 grid: {
-                    verticalLines: false,
+                    verticalLines: false
                 },
                 legend: {
                     show: true,
                     noColumns: 1,
-                    position: 'nw',
+                    position: 'nw'
                 }
             };
 

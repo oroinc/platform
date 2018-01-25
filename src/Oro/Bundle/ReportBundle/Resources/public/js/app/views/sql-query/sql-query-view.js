@@ -37,7 +37,6 @@ define(function(require) {
                 linkLabel: this.linkLabel,
                 gridName: this.grid.name
             };
-
         },
         onUpdate: function() {
             this.metadata = this.grid.metadata;

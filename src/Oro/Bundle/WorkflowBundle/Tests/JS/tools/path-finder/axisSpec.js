@@ -8,7 +8,6 @@ define(function(require) {
     var directions = require('oroworkflow/js/tools/path-finder/directions');
 
     describe('oroworkflow/js/tools/path-finder/axis', function() {
-
         beforeEach(function() {
             this.graph = new Graph();
             this.axis = new Axis(new Point2d(0, 0), new Point2d(0, 100), this.graph, 1);
@@ -171,7 +170,7 @@ define(function(require) {
             });
 
             it('should have valid connection list', function() {
-                var axis =  this.axis;
+                var axis = this.axis;
                 expect(axis.connections.length).toBe(2);
                 expect(axis.connections[0]).toEqual(axis.nodes[1].connections[directions.TOP_TO_BOTTOM.id]);
                 expect(axis.connections[0]).toEqual(axis.nodes[2].connections[directions.BOTTOM_TO_TOP.id]);

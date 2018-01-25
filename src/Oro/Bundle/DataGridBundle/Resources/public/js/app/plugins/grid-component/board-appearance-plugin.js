@@ -240,7 +240,7 @@ define(function(require) {
          */
         saveApiAccessorDefaults: {
             'class': 'oroui/js/tools/api-accessor',
-            http_method: 'PATCH'
+            'http_method': 'PATCH'
         },
 
         /**
@@ -280,7 +280,7 @@ define(function(require) {
                 _.extend(column.transition, BoardAppearancePlugin.transitionDefaults);
             });
 
-            return $.when.apply($, [
+            return $.when(
                 tools.loadModuleAndReplace(options, 'board_view'),
                 tools.loadModuleAndReplace(options, 'card_view'),
                 tools.loadModuleAndReplace(options, 'column_header_view'),
@@ -291,7 +291,7 @@ define(function(require) {
                 $.when.apply($, options.columns.map(function(column) {
                     return tools.loadModuleAndReplace(column.transition.save_api_accessor, 'class');
                 }))
-            ]);
+            );
         }
     });
 

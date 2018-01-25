@@ -104,7 +104,7 @@ define(['underscore'], function(_) {
 
         it('Get component object data - scalar', function() {
             var shortcut = _.extend({}, testWidgetConfiguration, {scalarOption: 'height'});
-            var testPageComponentOptions =  _.extend({}, testWidgetConfiguration.options, {'height': 80});
+            var testPageComponentOptions = _.extend({}, testWidgetConfiguration.options, {height: 80});
 
             expect(componentShortcutsManager.getComponentData(shortcut, 80)).toEqual({
                 pageComponentModule: testWidgetConfiguration.moduleName,

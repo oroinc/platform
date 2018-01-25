@@ -1,5 +1,5 @@
 define(['orosync/js/sync', 'requirejs-exposure'
-    ], function(sync, requirejsExposure) {
+], function(sync, requirejsExposure) {
     'use strict';
 
     var exposure = requirejsExposure.disclose('orosync/js/sync');
@@ -7,7 +7,6 @@ define(['orosync/js/sync', 'requirejs-exposure'
     describe('orosync/js/sync', function() {
         var service;
         var messenger;
-        var __;
         exposure.backup('service');
 
         beforeEach(function() {
@@ -18,7 +17,7 @@ define(['orosync/js/sync', 'requirejs-exposure'
 
             messenger = jasmine.createSpyObj('messenger', ['notificationMessage', 'notificationFlashMessage']);
 
-            exposure.substitute('__').by(__ = jasmine.createSpy('__'));
+            exposure.substitute('__').by(jasmine.createSpy('__'));
             exposure.substitute('messenger').by(messenger);
         });
 

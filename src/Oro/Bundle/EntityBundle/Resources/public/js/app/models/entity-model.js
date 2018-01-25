@@ -21,9 +21,9 @@ define(function(require) {
         ROUTE: {
             'create': 'oro_rest_api_post',
             'update': 'oro_rest_api_patch',
-            'patch':  'oro_rest_api_patch',
+            'patch': 'oro_rest_api_patch',
             'delete': 'oro_rest_api_delete',
-            'read':   'oro_rest_api_get'
+            'read': 'oro_rest_api_get'
         },
 
         /**
@@ -300,7 +300,7 @@ define(function(require) {
         toString: function() {
             return _.result(this._meta, 'title') || '';
         }
-    }), /** @lends EntityModel */  {
+    }), /** @lends EntityModel */ {
         /**
          * Build global ID on a base of identifier properties of passed object
          *

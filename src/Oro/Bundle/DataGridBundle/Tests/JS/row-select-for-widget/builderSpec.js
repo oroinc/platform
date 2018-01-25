@@ -40,7 +40,9 @@ define(function(require) {
         it('processDatagridOptions() - missing wid option ', function() {
             var options = getOptions({multiSelect: false});
 
-            var functionThatThrows = function() { return builder.processDatagridOptions($.Deferred(), options); };
+            var functionThatThrows = function() {
+                return builder.processDatagridOptions($.Deferred(), options);
+            };
 
             expect(functionThatThrows).toThrow(Error('"wid" has to be defined'));
         });

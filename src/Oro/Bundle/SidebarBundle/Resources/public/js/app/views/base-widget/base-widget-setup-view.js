@@ -11,7 +11,7 @@ define(function(require) {
         tagName: 'form',
 
         listen: {
-            'ok': 'onOk'
+            ok: 'onOk'
         },
 
         validation: {},

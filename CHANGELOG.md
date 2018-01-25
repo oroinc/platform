@@ -21,6 +21,10 @@ expression-editor-component.js
 	- made it descendant of `BaseClass`
 	- changed options format
 
+### Removed
+#### WorkflowBundle
+* Removed cache provider `oro_workflow.cache.provider.workflow_definition`. Doctrine result cache is used instead of.
+
 ## 2.6.0 (Unreleased)
 
 ### Added

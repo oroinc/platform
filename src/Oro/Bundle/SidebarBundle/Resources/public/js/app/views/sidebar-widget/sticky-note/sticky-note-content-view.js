@@ -7,7 +7,7 @@ define(function(require) {
 
     StickyNoteContentView = BaseView.extend({
         listen: {
-            'change': 'render'
+            change: 'render'
         },
 
         render: function() {

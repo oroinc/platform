@@ -45,15 +45,15 @@ define(function(require) {
                 itemFallback: '.fallback-item-fallback'
             },
             icons: {
-                new: {
+                'new': {
                     html: '<i class="fa-folder-o"></i>',
                     event: 'expandChildItems'
                 },
-                edited: {
+                'edited': {
                     html: '<i class="fa-folder"></i>',
                     event: 'expandChildItems'
                 },
-                save: {
+                'save': {
                     html: '<i class="fa-folder-open"></i>',
                     event: 'collapseChildItems'
                 }
@@ -107,7 +107,7 @@ define(function(require) {
             this.mapItemToChildren();
 
             this.getValueEl(this.$el).each(function() {
-                //self.cloneValueToChildren(self.getItemEl(this)); uncomment on merging master
+                // self.cloneValueToChildren(self.getItemEl(this)); uncomment on merging master
             });
 
             this.fixFallbackWidth();
@@ -139,7 +139,6 @@ define(function(require) {
 
             this.getFallbackEl(this.$el)
                 .change(_.bind(this.switchFallbackTypeEvent, this));
-
         },
 
         /**
@@ -209,7 +208,6 @@ define(function(require) {
          * @param {Event} e
          */
         switchFallbackTypeEvent: function(e) {
-
             var $item = this.getItemEl(e.currentTarget);
 
             this.mapItemToChildren();
@@ -268,7 +266,7 @@ define(function(require) {
         switchUseFallback: function($item) {
             var $useFallback = this.getUseFallbackEl($item);
             if ($useFallback.length === 0) {
-                return ;
+                return;
             }
 
             var checked = $useFallback.get(0).checked;
