@@ -55,15 +55,22 @@ class SendCredentialNotificationsCommand extends ContainerAwareCommand implement
         $processedOrigins = $this->getContainer()
             ->get('oro_imap.origin_credentials.issue_manager')
             ->processInvalidOrigins();
-        $output->writeln('<info>Processed origins:</info>', OutputInterface::VERBOSITY_DEBUG);
-        foreach ($processedOrigins as $processedOrigin) {
+        if (count($processedOrigins)) {
+            $output->writeln('<info>Processed origins:</info>', OutputInterface::VERBOSITY_DEBUG);
+            foreach ($processedOrigins as $processedOrigin) {
+                $output->writeln(
+                    sprintf(
+                        '<comment>id: %s, username: %s, host: %s</comment>',
+                        $processedOrigin->getId(),
+                        $processedOrigin->getUser(),
+                        $processedOrigin->getImapHost()
+                    ),
+                    OutputInterface::VERBOSITY_DEBUG
+                );
+            }
+        } else {
             $output->writeln(
-                sprintf(
-                    '<comment>id: %s, username: %s, host: %s</comment>',
-                    $processedOrigin->getId(),
-                    $processedOrigin->getUser(),
-                    $processedOrigin->getImapHost()
-                ),
+                '<info>Invalid credentials origins was not found</info>',
                 OutputInterface::VERBOSITY_DEBUG
             );
         }
