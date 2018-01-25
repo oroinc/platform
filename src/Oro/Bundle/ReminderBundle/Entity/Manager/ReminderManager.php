@@ -39,12 +39,20 @@ class ReminderManager
         if (!$entityId) {
             return;
         }
-
+        
         $reminders = $entity->getReminders();
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
 
         $em = $this->doctrineHelper->getEntityManager('OroReminderBundle:Reminder');
 
+        $empty = function ($element) {
+            if($element instanceof Collection) {
+                return $element->isEmpty();
+            }
+            return empty($element);
+        };
+
+        $persist = true;
         if ($reminders instanceof RemindersPersistentCollection) {
             if ($reminders->isDirty()) {
                 foreach ($reminders->getInsertDiff() as $reminder) {
@@ -54,26 +62,17 @@ class ReminderManager
                     $em->remove($reminder);
                 }
             }
-            if (!$reminders->isEmpty()) {
+            $persist = false;
+        }
+
+        if (is_array($reminders) || $reminders instanceof Collection) {
+            if (!$empty($reminders)) {
                 $reminderData = $entity->getReminderData();
                 foreach ($reminders as $reminder) {
                     $this->syncEntityReminder($reminder, $reminderData, $entityClass, $entityId);
-                }
-            }
-        } elseif ($reminders instanceof Collection) {
-            if (!$reminders->isEmpty()) {
-                $reminderData = $entity->getReminderData();
-                foreach ($reminders as $reminder) {
-                    $this->syncEntityReminder($reminder, $reminderData, $entityClass, $entityId);
-                    $em->persist($reminder);
-                }
-            }
-        } elseif (is_array($reminders)) {
-            if (!empty($reminders)) {
-                $reminderData = $entity->getReminderData();
-                foreach ($reminders as $reminder) {
-                    $this->syncEntityReminder($reminder, $reminderData, $entityClass, $entityId);
-                    $em->persist($reminder);
+                    if($persist) {
+                        $em->persist($reminder);
+                    }
                 }
             }
         }
