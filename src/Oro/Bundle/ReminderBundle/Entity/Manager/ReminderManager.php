@@ -46,7 +46,7 @@ class ReminderManager
         $em = $this->doctrineHelper->getEntityManager('OroReminderBundle:Reminder');
 
         $empty = function ($element) {
-            if($element instanceof Collection) {
+            if ($element instanceof Collection) {
                 return $element->isEmpty();
             }
             return empty($element);
@@ -70,7 +70,7 @@ class ReminderManager
                 $reminderData = $entity->getReminderData();
                 foreach ($reminders as $reminder) {
                     $this->syncEntityReminder($reminder, $reminderData, $entityClass, $entityId);
-                    if($persist) {
+                    if ($persist) {
                         $em->persist($reminder);
                     }
                 }
