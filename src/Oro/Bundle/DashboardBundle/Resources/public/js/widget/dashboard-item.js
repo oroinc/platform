@@ -28,7 +28,7 @@ define([
                 event.preventDefault();
                 if (this.state.expanded) {
                     this.collapse();
-                }else {
+                } else {
                     this.expand();
                 }
             },
@@ -206,7 +206,6 @@ define([
                 this.trigger('expand', this.$el, this);
                 mediator.trigger('widget:dashboard:expand:' + this.getWid(), this.$el, this);
                 this.widgetContentContainer.slideDown();
-
             }
 
             if ($chart.length > 0) {

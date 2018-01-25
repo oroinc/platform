@@ -6,7 +6,7 @@ define(function(require) {
 
     EntityStructuresCollection = EntityCollection.extend({
         ROUTE: {
-            'read': 'oro_rest_api_cget'
+            read: 'oro_rest_api_cget'
         },
 
         type: 'entitystructures',

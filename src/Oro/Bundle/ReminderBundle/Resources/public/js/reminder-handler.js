@@ -110,7 +110,7 @@ define(
                 var removeIds = reminder.duplicateIds || [];
                 removeIds.push(reminder.id);
 
-                $.post(url, {'ids': removeIds});
+                $.post(url, {ids: removeIds});
 
                 this.removeDates[uniqueId] = new Date();
 
@@ -139,7 +139,6 @@ define(
                             self.removeReminder(event.data.uniqueId);
                             event.data.actions.close();
                         });
-
                 }, this);
 
                 $('.alert-reminder .close').unbind('click').bind('click', function() {

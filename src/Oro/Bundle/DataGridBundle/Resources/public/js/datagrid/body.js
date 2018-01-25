@@ -111,7 +111,9 @@ define([
                     emptyText: this.emptyText,
                     columns: this.columns
                 }).render().el;
-                this.fallbackSelector = _.map(fallbackElement.classList, function(name) {return '.' + name;}).join('');
+                this.fallbackSelector = _.map(fallbackElement.classList, function(name) {
+                    return '.' + name;
+                }).join('');
                 this.$el.append(fallbackElement);
             }
             Body.__super__.initFallback.apply(this, arguments);

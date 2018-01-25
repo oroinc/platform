@@ -161,7 +161,6 @@ define([
      *  - process links with redirect options
      * @override
      */
-    // jshint -W071
     Chaplin.Layout.prototype.openLink = _.wrap(Chaplin.Layout.prototype.openLink, function(func, event) {
         var href;
         var options;

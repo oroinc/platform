@@ -34,12 +34,12 @@ define(function(require) {
                 if (mailbox.active) {
                     folders =
                         _.where(mailbox.folder, {syncEnabled: true})
-                        .map(function(folder) {
-                            return {
-                                id: Number(folder.id),
-                                text: folder.fullName
-                            };
-                        });
+                            .map(function(folder) {
+                                return {
+                                    id: Number(folder.id),
+                                    text: folder.fullName
+                                };
+                            });
                     if (folders.length > 0) {
                         if (text) {
                             mailboxes.push({

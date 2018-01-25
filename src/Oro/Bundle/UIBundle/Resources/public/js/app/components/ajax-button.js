@@ -10,11 +10,11 @@ define(function(require) {
     function onClick(e) {
         e.preventDefault();
 
-        var method         = $(e.currentTarget).data('method');
-        var url            = $(e.currentTarget).data('url');
-        var redirect       = $(e.currentTarget).data('redirect');
+        var method = $(e.currentTarget).data('method');
+        var url = $(e.currentTarget).data('url');
+        var redirect = $(e.currentTarget).data('redirect');
         var successMessage = $(e.currentTarget).data('success-message');
-        var errorMessage   = $(e.currentTarget).data('error-message');
+        var errorMessage = $(e.currentTarget).data('error-message');
 
         mediator.execute('showLoading');
 

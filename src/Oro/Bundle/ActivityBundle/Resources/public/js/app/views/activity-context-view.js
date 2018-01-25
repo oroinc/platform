@@ -39,8 +39,8 @@ define(function(require) {
             this.collection.on('add', function(model) {
                 var gridUrl = encodeURI(self.options.params.grid_path + '/' + model.attributes.className);
                 var view = self.template({
-                        entity: model
-                    });
+                    entity: model
+                });
                 var $view = $(view);
 
                 if (model.attributes.first) {

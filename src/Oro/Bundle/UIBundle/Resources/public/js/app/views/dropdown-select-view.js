@@ -46,7 +46,7 @@ define(function(require) {
             var data = DropdownSelectView.__super__.getTemplateData.call(this);
             _.defaults(data, _.pick(this, 'buttonClass', 'useButtonGroup', 'useCaret'));
             data.options = _.map(this.selectOptions, this._selectOptionIteratee, this);
-            var selectedOption = _.findWhere(data.options, {'selected': true});
+            var selectedOption = _.findWhere(data.options, {selected: true});
             data.selectedLabel = selectedOption.label;
             data.selectedValue = selectedOption.value;
             return data;
@@ -84,7 +84,9 @@ define(function(require) {
 
         select: function(value) {
             this.selectedValue = value;
-            var escapedValue = value.replace(/[&<>"'`]/g, function(a) {return '\\' + a;});
+            var escapedValue = value.replace(/[&<>"'`]/g, function(a) {
+                return '\\' + a;
+            });
             var $option = this.$('[data-value="' + escapedValue + '"]');
             this.$('.dropdown-menu li').removeClass('selected');
             $option.closest('li').addClass('selected');

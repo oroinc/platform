@@ -89,15 +89,15 @@ define([
 
         loadContentHTML: function(url) {
             var options = {
-                    url: url,
-                    type: 'get',
-                    dataType: 'html',
-                    data: {
-                        _widgetContainer: 'dialog',
-                        targetActivityClass: this.get('targetEntityData').class,
-                        targetActivityId: this.get('targetEntityData').id
-                    }
-                };
+                url: url,
+                type: 'get',
+                dataType: 'html',
+                data: {
+                    _widgetContainer: 'dialog',
+                    targetActivityClass: this.get('targetEntityData').class,
+                    targetActivityId: this.get('targetEntityData').id
+                }
+            };
 
             this.set('isContentLoading', true);
             return $.ajax(options)

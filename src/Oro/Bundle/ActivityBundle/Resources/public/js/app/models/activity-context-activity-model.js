@@ -19,7 +19,7 @@ define(function(require) {
             var param = {
                 activity: this.get('activityClassAlias'),
                 id: this.get('entityId'),
-                entity:  this.get('targetClassName'),
+                entity: this.get('targetClassName'),
                 entityId: this.get('targetId')
             };
 

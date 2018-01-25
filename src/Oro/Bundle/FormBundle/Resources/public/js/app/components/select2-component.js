@@ -24,7 +24,7 @@ define(function(require) {
         initialize: function(options) {
             var config = options.configs || {};
 
-            //Check enable icon for each option and set default template
+            // Check enable icon for each option and set default template
             if (config.showIcon) {
                 if (!config.result_template) {
                     config.result_template = this.resultTemplate;
@@ -144,7 +144,9 @@ define(function(require) {
                 config.formatSelection = formatFabric(config, config.selection_template || false);
             }
             _.defaults(config, {
-                escapeMarkup: function(m) { return m; },
+                escapeMarkup: function(m) {
+                    return m;
+                },
                 dropdownAutoWidth: true,
                 openOnEnter: null
             });
@@ -281,8 +283,8 @@ define(function(require) {
             }
             var result = '';
             var highlight = function(str) {
-                    return object.children ? str : highlightSelection(str, query);
-                };
+                return object.children ? str : highlightSelection(str, query);
+            };
             if (object._html !== undefined) {
                 result = _.escape(object._html);
             } else if (jsTemplate) {

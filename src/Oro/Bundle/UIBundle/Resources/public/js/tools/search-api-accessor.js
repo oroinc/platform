@@ -1,4 +1,3 @@
-/** @lends SearchApiAccessor */
 define(function(require) {
     'use strict';
 
@@ -20,7 +19,7 @@ define(function(require) {
     var _ = require('underscore');
     var ApiAccessor = require('./api-accessor');
 
-    SearchApiAccessor = ApiAccessor.extend(/** @exports SearchApiAccessor.prototype */{
+    SearchApiAccessor = ApiAccessor.extend(/** @lends SearchApiAccessor.prototype */{
         DEFAULT_HTTP_METHOD: 'GET',
 
         initialize: function(options) {
@@ -36,8 +35,7 @@ define(function(require) {
             if (!options.query_parameter_names) {
                 options.query_parameter_names = [];
             }
-            options.query_parameter_names.push.apply(options.query_parameter_names,
-                ['page', 'per_page', 'name', 'query']);
+            options.query_parameter_names.push('page', 'per_page', 'name', 'query');
             options.query_parameter_names = _.uniq(options.query_parameter_names);
             this.searchHandlerName = options.search_handler_name;
             this.valueFieldName = options.value_field_name || 'id';

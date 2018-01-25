@@ -135,7 +135,6 @@ define(function(require) {
             if (this.auditFilter) {
                 this.auditFilter.dispose();
                 delete this.auditFilter;
-
             }
 
             DataAuditConditionView.__super__._appendFilter.call(this, filter);
