@@ -1457,17 +1457,6 @@ class OroMainContext extends MinkContext implements
      */
     public function dragAndDropElementToAnotherOne($elementName, $dropZoneName, $xOffset = null, $yOffset = null)
     {
-        $this->dragAndDropElement($elementName, $dropZoneName, $xOffset, $yOffset);
-    }
-
-    /**
-     * @param string $elementName
-     * @param string $dropZoneName
-     * @param int $xOffset
-     * @param int $yOffset
-     */
-    public function dragAndDropElement($elementName, $dropZoneName, $xOffset = null, $yOffset = null)
-    {
         /** @var Selenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
         $webDriverSession = $driver->getWebDriverSession();
@@ -1507,9 +1496,11 @@ class OroMainContext extends MinkContext implements
     {
         /** @var Selenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
-        $elementClass = '.' . str_replace(' ', '.',  $this->createElement($elementName)->getAttribute('class'));
+        $xpath = $this->createElement($elementName)->getXpath();
         $javascipt = <<<JS
-            return jQuery('$elementClass').outerWidth();
+return jQuery(
+    document.evaluate("{$xpath}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue
+).outerWidth();
 JS;
         self::assertEquals($width, $driver->evaluateScript($javascipt));
     }

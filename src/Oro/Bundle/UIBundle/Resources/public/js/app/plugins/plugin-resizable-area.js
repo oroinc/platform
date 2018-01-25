@@ -13,7 +13,7 @@ define(function(require) {
          * @property {Options}
          */
         defaults: {
-            useResizable: !_.isMobile()
+            useResizable: true
         },
 
         /**
@@ -39,11 +39,6 @@ define(function(require) {
         $resizableEl: null,
 
         /**
-         * @property {jQuery}
-         */
-        $extraEl: null,
-
-        /**
          * @inheritDoc
          */
         initialize: function(main, options) {
@@ -55,10 +50,6 @@ define(function(require) {
 
             if (_.isObject(this.options.resizableOptions)) {
                 this.resizableOptions =  _.defaults({}, this.options.resizableOptions, this.resizableOptions);
-            }
-
-            if (this.main.$(this.options.$extraEl).length) {
-                this.$extraEl = this.main.$(this.options.$extraEl);
             }
 
             if (this.main.$(this.options.$resizableEl).length) {
@@ -76,8 +67,6 @@ define(function(require) {
                 return;
             }
 
-            this._destroyResizable();
-
             ResizableArea.__super__.dispose.apply(this, arguments);
         },
 
@@ -93,9 +82,9 @@ define(function(require) {
             this.$resizableEl
                 .resizable(
                     _.extend(
+                        {},
                         this.resizableOptions,
                         {
-                            resize: this._onResize.bind(this),
                             stop: this._onResizeEnd.bind(this)
                         }
                     )
@@ -126,7 +115,6 @@ define(function(require) {
             if (_.isBoolean(restore)) {
                 this.removeCalculatedSize();
             }
-
             ResizableArea.__super__.disable.call(this);
         },
 
@@ -153,17 +141,6 @@ define(function(require) {
          * @param {Object} ui
          * @private
          */
-        _onResize: function(event, ui) {
-            this.$extraEl.css({
-                width: this.calculateSize(ui.size.width)
-            });
-        },
-
-        /**
-         * @param {Event} event
-         * @param {Object} ui
-         * @private
-         */
         _onResizeEnd: function(event, ui) {
             this._savePreviousSize(ui.size.width);
         },
@@ -179,7 +156,6 @@ define(function(require) {
             oldValue = oldValue ? JSON.parse(oldValue) : {};
 
             newValue[this.options.$resizableEl] = {width: size};
-            newValue[this.options.$extraEl] = {width: this.calculateSize(size)};
 
             persistentStorage.setItem(ResizableArea.STORAGE_KEY,
                 JSON.stringify(_.extend({}, oldValue, newValue))
@@ -190,16 +166,12 @@ define(function(require) {
             ResizableArea.setPreviousState(this.main.$el);
         },
 
-        removePreviusState: function() {
+        removePreviousState: function() {
             var state = JSON.parse(persistentStorage.getItem(ResizableArea.STORAGE_KEY));
 
             if (_.isObject(state)) {
                 if (_.has(state, this.options.$resizableEl)) {
                     delete state[this.options.$resizableEl];
-                }
-
-                if (_.has(state, this.options.$extraEl)) {
-                    delete state[this.options.$extraEl];
                 }
 
                 if (_.isEmpty(state)) {
@@ -209,26 +181,13 @@ define(function(require) {
         },
 
         removeCalculatedSize: function() {
-            this.$extraEl
-                .add(this.$resizableEl)
-                .css({
-                    width: ''
-                });
-        },
-
-        /**
-         * @param {Number} size
-         * @returns {string}
-         */
-        calculateSize: function(size) {
-            return _.isNumber(size) ? 'calc(100% - ' + size + 'px)' : '';
+            this.$resizableEl.css({width: ''});
         }
     });
 
     /**
      * @static
      */
-
     ResizableArea.STORAGE_KEY = 'custom-style-elements-cache';
 
     /**

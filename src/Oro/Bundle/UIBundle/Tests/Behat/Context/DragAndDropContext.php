@@ -32,8 +32,13 @@ class DragAndDropContext extends OroFeatureContext implements OroPageObjectAware
      * @param integer $xOffset
      * @param integer $yOffset
      */
-    public function iDragAndDropElementByOffset($xOffset = 0, $yOffset = 0)
+    public function iResizeSidebarByOffset($xOffset = 0, $yOffset = 0)
     {
-        $this->oroMainContext->dragAndDropElement("Sidebar Drag Handler", null, (int) $xOffset, (int) $yOffset);
+        $this->oroMainContext->dragAndDropElementToAnotherOne(
+            "Sidebar Drag Handler",
+            null,
+            (int) $xOffset,
+            (int) $yOffset
+        );
     }
 }

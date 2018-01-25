@@ -4,6 +4,7 @@ oro_behat_extension:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
         - OroUIBundle::DragAndDropContext
+        - OroFormBundle::FormContext
         - OroDataGridBundle::GridContext
       paths:
         - '@OroUIBundle/Tests/Behat/Features'

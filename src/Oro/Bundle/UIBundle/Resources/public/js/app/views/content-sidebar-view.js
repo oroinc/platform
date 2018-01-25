@@ -17,7 +17,7 @@ define(function(require) {
         sidebar: '[data-role="sidebar"]',
         scrollbar: '[data-role="sidebar"]',
         content: '[data-role="content"]',
-        destroyResizable: false
+        resizableSidebar: !tools.isMobile()
     }, config);
 
     ContentSidebarView = BaseView.extend({
@@ -26,7 +26,8 @@ define(function(require) {
             'fixSidebarHeight',
             'sidebar',
             'scrollbar',
-            'content'
+            'content',
+            'resizableSidebar'
         ]),
 
         autoRender: config.autoRender,
@@ -39,6 +40,8 @@ define(function(require) {
 
         content: config.content,
 
+        resizableSidebar: config.resizableSidebar,
+
         events: {
             'click [data-role="sidebar-minimize"]': 'minimize',
             'click [data-role="sidebar-maximize"]': 'maximize'
@@ -48,14 +51,12 @@ define(function(require) {
          * {@inheritDoc}
          */
         initialize: function(options) {
-            this.pluginManager = new PluginManager(this);
-            this.pluginManager.create(ResizableAreaPlugin, {
-                $resizableEl: this.sidebar,
-                $extraEl: this.content
-            });
-
+            if (this.resizableSidebar) {
+                this.initResizableSidebar();
+            }
             ContentSidebarView.__super__.initialize.call(this, arguments);
         },
+
 
         /**
          * {@inheritDoc}
@@ -65,10 +66,20 @@ define(function(require) {
                 layoutHelper.setAvailableHeight(this.scrollbar, this.$el);
             }
 
-            var state = tools.unpackFromQueryString(location.search).sidebar || 'on';
-            this._toggle(state);
+            this._toggle(this.getSidebarState());
 
             ContentSidebarView.__super__.render.apply(this, arguments);
+        },
+
+        initResizableSidebar: function() {
+            this.pluginManager = new PluginManager(this);
+            this.pluginManager.create(ResizableAreaPlugin, {
+                $resizableEl: this.sidebar
+            });
+        },
+
+        getSidebarState: function() {
+            return tools.unpackFromQueryString(location.search).sidebar || 'on'
         },
 
         minimize: function() {
@@ -86,10 +97,13 @@ define(function(require) {
         _toggle: function(state) {
             var show = state === 'on';
 
+            if (this.resizableSidebar) {
+                if (!show) {
+                    this.pluginManager.getInstance(ResizableAreaPlugin).removePreviousState();
+                }
+                this.pluginManager[show ? 'enable' : 'disable'](ResizableAreaPlugin);
+            }
             this.$(this.sidebar).toggleClass('content-sidebar-minimized', !show);
-            this.$(this.content).toggleClass('content-sidebar-minimized', !show);
-
-            this.pluginManager[show ? 'enable' : 'disable'](ResizableAreaPlugin);
             mediator.execute('changeUrlParam', 'sidebar', show ? null : state);
         },
 
@@ -97,7 +111,9 @@ define(function(require) {
          * @inheritDoc
          */
         dispose: function() {
-            this.pluginManager.dispose();
+            if (this.pluginManager) {
+                this.pluginManager.dispose();
+            }
 
             ContentSidebarView.__super__.dispose.call(this);
         }
