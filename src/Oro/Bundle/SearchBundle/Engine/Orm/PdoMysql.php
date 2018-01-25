@@ -298,7 +298,8 @@ class PdoMysql extends BaseDriver
         $result = $qb->expr()->orX();
         foreach (array_values($words) as $key => $value) {
             $valueParameter = 'value' . $index . '_w' . $key;
-            $result->add("$joinAlias.value LIKE :$valueParameter");
+            QueryBuilderUtil::checkIdentifier($valueParameter);
+            $result->add($qb->expr()->like($joinAlias. '.value', ':' . $valueParameter));
             $qb->setParameter($valueParameter, "%$value%");
         }
         if ($this->isConcreteField($fieldName) && !$this->isAllDataField($fieldName)) {
