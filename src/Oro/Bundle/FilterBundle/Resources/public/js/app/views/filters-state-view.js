@@ -21,7 +21,6 @@ define(function(require) {
         },
 
         initialize: function(options) {
-
             _.extend(this, _.pick(options, ['filters']));
 
             _.each(this.filters, function(filter) {

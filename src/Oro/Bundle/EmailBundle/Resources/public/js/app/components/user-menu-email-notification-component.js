@@ -32,7 +32,7 @@ define(function(require) {
                 emails = JSON.parse(emails);
             }
             this.collection = new EmailNotificationCollection(emails);
-            this.countModel = new EmailNotificationCountModel({'unreadEmailsCount': options.count});
+            this.countModel = new EmailNotificationCountModel({unreadEmailsCount: options.count});
             this.dropdownContainer = options._sourceElement.parent();
 
             this.notificationHandler = _.debounce(_.bind(this._notificationHandler, this), 1000);

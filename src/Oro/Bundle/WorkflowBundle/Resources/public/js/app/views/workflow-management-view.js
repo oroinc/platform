@@ -82,8 +82,8 @@ define(function(require) {
                         (!query.term || query.term === stepLabel || _.indexOf(stepLabel, query.term) !== -1)
                     ) {
                         steps.push({
-                            'id': step.get('name'),
-                            'text': step.get('label')
+                            id: step.get('name'),
+                            text: step.get('label')
                         });
                     }
                 }, this);
@@ -94,10 +94,10 @@ define(function(require) {
             this.$startStepEl = this.$('[name="start_step"]');
 
             var select2Options = {
-                'allowClear': true,
-                'query': getSteps,
-                'placeholder': __('Choose step...'),
-                'initSelection': _.bind(function(element, callback) {
+                allowClear: true,
+                query: getSteps,
+                placeholder: __('Choose step...'),
+                initSelection: _.bind(function(element, callback) {
                     var startStep = this.model.getStepByName(element.val());
                     callback({
                         id: startStep.get('name'),
@@ -159,7 +159,7 @@ define(function(require) {
         },
 
         onStepRemove: function(step) {
-            //Deselect start_step if it was removed
+            // Deselect start_step if it was removed
             if (this.$startStepEl.val() === step.get('name')) {
                 this.$startStepEl.inputWidget('val', '');
             }

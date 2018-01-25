@@ -1,5 +1,5 @@
 define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
-    ], function(_, Backbone, AbstractWidget) {
+], function(_, Backbone, AbstractWidget) {
     'use strict';
 
     var $ = Backbone.$;
@@ -37,8 +37,8 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
                 this.options.template = _.template(this.options.template);
             }
             var params = _.extend({
-                'title': this.options.title,
-                'contentClasses': this.options.contentClasses
+                title: this.options.title,
+                contentClasses: this.options.contentClasses
             }, this.options.templateParams);
             this.widget = $(this.options.template(params));
             this.widget.addClass(this.options.cssClass);

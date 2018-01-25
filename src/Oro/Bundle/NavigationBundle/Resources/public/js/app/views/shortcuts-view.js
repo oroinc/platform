@@ -20,7 +20,7 @@ define(function(require) {
         },
 
         events: {
-            'change': 'onChange'
+            change: 'onChange'
         },
 
         data: {},
@@ -71,11 +71,11 @@ define(function(require) {
                         if (item.item.dialog) {
                             var config = item.item.dialog_config;
                             var options = {
-                                type: config.widget.type,
-                                multiple: config.widget.multiple,
+                                'type': config.widget.type,
+                                'multiple': config.widget.multiple,
                                 'refresh-widget-alias': config.widget.refreshWidgetAlias,
                                 'reload-grid-name': config.widget.reloadGridName,
-                                options: {
+                                'options': {
                                     alias: config.widget.options.alias,
                                     dialogOptions: {
                                         title: __(config.widget.options.dialogOptions.title),
@@ -87,7 +87,7 @@ define(function(require) {
                                         width: config.widget.options.dialogOptions.width
                                     }
                                 },
-                                createOnEvent: 'click'
+                                'createOnEvent': 'click'
                             };
                             var dataUrl = routing.generate(config.dataUrl, {
                                 entityClass: self.entityClass,
@@ -115,7 +115,7 @@ define(function(require) {
                     items.first().addClass('active');
                     this.$menu.html(items);
                     return this;
-                }, 'click': function(e) {
+                }, click: function(e) {
                     e.stopPropagation();
                     e.preventDefault();
                     if (!this.$menu.find('.active').data('isDialog')) {
@@ -137,7 +137,7 @@ define(function(require) {
                 process(this.cache[query]);
                 this.render();
             } else {
-                var url = routing.generate(this.sourceUrl, {'query': query});
+                var url = routing.generate(this.sourceUrl, {query: query});
                 $.get(url, _.bind(function(data) {
                     this.data = data;
                     var result = [];

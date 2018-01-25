@@ -467,6 +467,7 @@ services:
         class: Oro\Bundle\ApiBundle\Request\JsonApi\ErrorCompleter
         arguments:
             - '@oro_api.exception_text_extractor'
+            - '@oro_api.value_normalizer'
         tags:
             - { name: oro.api.error_completer, requestType: json_api }
 

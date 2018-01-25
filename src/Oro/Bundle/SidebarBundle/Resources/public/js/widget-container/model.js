@@ -10,13 +10,13 @@ define([
      */
     return Backbone.Model.extend({
         defaults: {
-            icon:       '',
-            iconClass:  '',
-            module:     '',
-            position:   0,
-            title:      '',
-            settings:   {},
-            state:      constants.WIDGET_MINIMIZED,
+            icon: '',
+            iconClass: '',
+            module: '',
+            position: 0,
+            title: '',
+            settings: {},
+            state: constants.WIDGET_MINIMIZED,
             widgetName: '',
             highlighted: false
         },

@@ -1,0 +1,6 @@
+acls:
+    oro_imap_sync_origin_credential_notifications:
+        type: action
+        label: oro.imap.sync.acl.credential_system_notifications.label
+        description: oro.imap.sync.acl.credential_system_notifications.description
+        group_name: ""

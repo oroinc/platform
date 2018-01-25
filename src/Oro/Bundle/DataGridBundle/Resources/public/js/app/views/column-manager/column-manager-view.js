@@ -41,8 +41,12 @@ define(function(require) {
          */
         updateView: function() {
             var models = this._getFilteredModels();
-            var hasUnrenderable = Boolean(_.find(models, function(model) {return !model.get('renderable');}));
-            var hasRenderable = Boolean(_.find(models, function(model) {return model.get('renderable');}));
+            var hasUnrenderable = Boolean(_.find(models, function(model) {
+                return !model.get('renderable');
+            }));
+            var hasRenderable = Boolean(_.find(models, function(model) {
+                return model.get('renderable');
+            }));
             var hasChanged = Boolean(_.find(models, function(model) {
                 return model.get('renderable') !== model.get('metadata').renderable;
             }));

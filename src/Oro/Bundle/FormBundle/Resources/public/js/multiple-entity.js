@@ -1,5 +1,5 @@
 define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multiple-entity/model', 'oro/dialog-widget'
-    ], function(_, routing, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
+], function(_, routing, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
     'use strict';
 
     var $ = Backbone.$;
@@ -11,20 +11,20 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
      */
     return Backbone.View.extend({
         options: {
-            addedElement:              null,
-            allowAction:               true,
-            collection:                null,
-            defaultElement:            null,
-            elementTemplate:           null,
+            addedElement: null,
+            allowAction: true,
+            collection: null,
+            defaultElement: null,
+            elementTemplate: null,
             entitiesContainerSelector: '.entities',
-            itemsPerRow:               4,
-            name:                      null,
-            removedElement:            null,
-            selectionUrl:              null,
-            selectionRouteName:        null,
-            selectionRouteParams:      {},
-            selectorWindowTitle:       null,
-            template:                  null
+            itemsPerRow: 4,
+            name: null,
+            removedElement: null,
+            selectionUrl: null,
+            selectionRouteName: null,
+            selectionRouteParams: {},
+            selectorWindowTitle: null,
+            template: null
         },
 
         events: {
@@ -172,14 +172,14 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
                 }
 
                 this.selectorDialog = new DialogWidget({
-                    url:   url,
+                    url: url,
                     title: this.options.selectorWindowTitle,
                     stateEnabled: false,
                     dialogOptions: {
-                        'modal': true,
-                        'width': 1024,
-                        'height': 500,
-                        'close': _.bind(function() {
+                        modal: true,
+                        width: 1024,
+                        height: 500,
+                        close: _.bind(function() {
                             this.selectorDialog = null;
                         }, this)
                     }
@@ -200,7 +200,7 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
             return url + separator +
                 'added=' + (added || '') +
                 '&removed=' + (removed || '') +
-                '&default=' + (defaultEl || '') ;
+                '&default=' + (defaultEl || '');
         },
 
         processSelectedEntities: function(added, addedModels, removed) {

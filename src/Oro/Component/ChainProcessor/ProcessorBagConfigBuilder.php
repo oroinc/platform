@@ -14,7 +14,7 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
      */
     private $initialData;
 
-    /** @var array [action => [group, ...], ...] */
+    /** @var array [action => [group, ... (groups are ordered by priority)], ...] */
     private $groups;
 
     /** @var array [action => [[processor id, [attribute name => attribute value, ...]], ...], ...] */
@@ -37,9 +37,7 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
      */
     public function getGroups()
     {
-        if (null !== $this->initialData) {
-            $this->build();
-        }
+        $this->ensureInitialized();
 
         return $this->groups;
     }
@@ -49,9 +47,7 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
      */
     public function getProcessors()
     {
-        if (null !== $this->initialData) {
-            $this->build();
-        }
+        $this->ensureInitialized();
 
         return $this->processors;
     }
@@ -66,6 +62,25 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
     public function addGroup($group, $action, $priority = 0)
     {
         $this->assertNotFrozen();
+
+        if (!empty($this->initialData['groups'][$action])) {
+            $existingGroups = $this->initialData['groups'][$action];
+            foreach ($existingGroups as $existingGroup => $existingPriority) {
+                if ($group !== $existingGroup && $priority === $existingPriority) {
+                    throw new \InvalidArgumentException(
+                        sprintf(
+                            'The priority %s cannot be used for the group "%s"'
+                            . ' because the group with this priority already exists.'
+                            . ' Existing group: "%s". Action: "%s".',
+                            $priority,
+                            $group,
+                            $existingGroup,
+                            $action
+                        )
+                    );
+                }
+            }
+        }
 
         $this->initialData['groups'][$action][$group] = $priority;
     }
@@ -96,7 +111,7 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
     /**
      * Checks whether the processor bag can be modified
      */
-    public function assertNotFrozen()
+    private function assertNotFrozen()
     {
         if (null === $this->initialData) {
             throw new \RuntimeException('The ProcessorBag is frozen.');
@@ -104,12 +119,38 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
     }
 
     /**
+     * Makes sure that $this->groups and $this->processors are initialized
+     */
+    private function ensureInitialized()
+    {
+        if (null !== $this->initialData) {
+            $this->buildProcessors();
+            $this->buildGroups();
+            $this->initialData = null;
+        }
+    }
+
+    /**
+     * Initializes $this->groups
+     */
+    private function buildGroups()
+    {
+        $this->groups = [];
+        $allGroups = !empty($this->initialData['groups'])
+            ? $this->initialData['groups']
+            : [];
+        foreach ($allGroups as $action => $groups) {
+            arsort($groups);
+            $this->groups[$action] = array_keys($groups);
+        }
+    }
+
+    /**
      * Initializes $this->processors
      */
-    private function build()
+    private function buildProcessors()
     {
         $this->processors = [];
-        $this->groups = [];
 
         if (!empty($this->initialData['processors'])) {
             $groups = [];
@@ -142,8 +183,6 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
                 );
             }
         }
-
-        $this->initialData = null;
     }
 
     /**
@@ -156,7 +195,6 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
     private function getSortedProcessors($action, $actionData, $groups)
     {
         $processors = [];
-        $processorGroups = [];
         foreach ($actionData as $priority => $priorityData) {
             foreach ($priorityData as $processor) {
                 if (isset($processor[1]['group'])) {
@@ -172,9 +210,6 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
                     }
                     $groupPriority = $groups[$action][$group];
                     $processorPriority = self::calculatePriority($priority, $groupPriority);
-                    if (!isset($processorGroups[$group])) {
-                        $processorGroups[$group] = $groupPriority;
-                    }
                 } else {
                     $processorPriority = self::calculatePriority($priority);
                 }
@@ -182,9 +217,6 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
             }
         }
         $processors = $this->sortByPriorityAndFlatten($processors);
-
-        arsort($processorGroups);
-        $this->groups[$action] = array_keys($processorGroups);
 
         return $processors;
     }

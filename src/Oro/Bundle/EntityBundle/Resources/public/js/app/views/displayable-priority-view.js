@@ -8,7 +8,7 @@ define(function(require) {
     DisplayablePriorityView = BaseView.extend({
         autoRender: true,
 
-        optionNames:  BaseView.prototype.optionNames.concat(['prioritySelector']),
+        optionNames: BaseView.prototype.optionNames.concat(['prioritySelector']),
 
         events: {
             'change [data-field="is_displayable"]': 'onChange'

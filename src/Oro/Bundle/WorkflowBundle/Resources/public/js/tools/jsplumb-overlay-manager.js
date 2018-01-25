@@ -30,7 +30,7 @@ define(function(require) {
     });
 
     function OverlayBlock(el, overlay, points) {
-        this.super.apply(this, arguments);
+        OverlayBlock.__super__.apply(this, arguments);
         this.jsPlumbOverlayInstance = overlay;
         this.location = overlay.getLocation();
         this._originalLocation = this.location;
@@ -43,9 +43,8 @@ define(function(require) {
     }
 
     OverlayBlock.prototype = Object.create(Block.prototype);
+    OverlayBlock.__super__ = Block;
     _.extend(OverlayBlock.prototype, {
-        super: Block,
-
         _fillSegments: function(points) {
             var i;
             var segment;

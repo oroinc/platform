@@ -184,7 +184,6 @@ self::processTemplateData('@inventory_level.product_unit_precision.product-1.lit
 
 The `processTemplateData` method can process a string, an array, or a YAML file.
 
-
 ## Dump the Response into a YAML Template
 
 When you develop new tests for REST API, it may be convenient to dump responses into a YAML template:

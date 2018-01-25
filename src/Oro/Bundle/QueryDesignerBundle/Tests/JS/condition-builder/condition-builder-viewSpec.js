@@ -9,8 +9,12 @@ define(function(require) {
     var initialValue = JSON.parse(require('text!../Fixture/condition-builder/initial-value.json'));
     var runtimeValue = JSON.parse(require('text!../Fixture/condition-builder/runtime-value.json'));
 
-    define('condition-builder/condition-item-stub-view', function() { return StubConditionView; });
-    define('condition-builder/matrix-condition-stub-view', function() { return StubConditionView; });
+    define('condition-builder/condition-item-stub-view', function() {
+        return StubConditionView;
+    });
+    define('condition-builder/matrix-condition-stub-view', function() {
+        return StubConditionView;
+    });
 
     describe('oroquerydesigner/js/app/views/condition-builder/condition-builder-view', function() {
         var builderView;
@@ -214,7 +218,7 @@ define(function(require) {
                 expect(builderView.getValue()).toEqual([
                     {criteria: 'matrix-condition', great: 10},
                     'AND',
-                    [[ ], 'AND', {equal: 5}, 'OR', {criteria: 'matrix-condition', less: 8}]
+                    [[], 'AND', {equal: 5}, 'OR', {criteria: 'matrix-condition', less: 8}]
                 ]);
             });
         });
@@ -267,7 +271,9 @@ define(function(require) {
                     'OR',
                     [{equal: 5}, 'OR', {criteria: 'matrix-condition', less: 8}]
                 ];
-                builderView.once('change', function(value) { actualValue = value; });
+                builderView.once('change', function(value) {
+                    actualValue = value;
+                });
                 operator1.setValue('OR');
                 expect(actualValue).toEqual(expectedValue);
             });
@@ -279,7 +285,9 @@ define(function(require) {
                     'AND',
                     [{equal: 5}, 'AND', {criteria: 'matrix-condition', less: 8}]
                 ];
-                builderView.once('change', function(value) { actualValue = value; });
+                builderView.once('change', function(value) {
+                    actualValue = value;
+                });
                 operator2.setValue('AND');
                 expect(actualValue).toEqual(expectedValue);
             });

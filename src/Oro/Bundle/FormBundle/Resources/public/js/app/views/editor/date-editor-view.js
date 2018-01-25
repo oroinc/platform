@@ -1,4 +1,3 @@
-/** @lends DateEditorView */
 define(function(require) {
     'use strict';
 
@@ -79,10 +78,10 @@ define(function(require) {
         DROPDOWN_BELOW_INPUT_CSS_CLASS: 'dropdown-below-input',
         DEFAULT_OPTIONS: {
             dateInputAttrs: {
-                placeholder: __('oro.form.choose_date'),
-                name: 'date',
-                autocomplete: 'off',
-                'data-validation': JSON.stringify({Date: {}}),
+                'placeholder': __('oro.form.choose_date'),
+                'name': 'date',
+                'autocomplete': 'off',
+                'data-validation': JSON.stringify({Date: {}})
             },
             datePickerOptions: {
                 altFormat: 'yy-mm-dd',

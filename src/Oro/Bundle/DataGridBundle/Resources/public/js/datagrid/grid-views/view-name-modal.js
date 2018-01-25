@@ -22,7 +22,7 @@ define(function(require) {
                 defaultLabel: __('oro.datagrid.action.set_as_default_grid_view'),
                 defaultChecked: options.defaultChecked || false
             });
-            options.okText =  __('oro.datagrid.gridView.save_name');
+            options.okText = __('oro.datagrid.gridView.save_name');
 
             ViewNameModal.__super__.initialize.call(this, options);
 

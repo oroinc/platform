@@ -22,7 +22,7 @@ define(function(require) {
         initialize: function(options) {
             this.changesByCategory = {};
 
-            var categories  = options.data;
+            var categories = options.data;
             categories.unshift({
                 id: 'all',
                 label: __('oro.role.tabs.all.label'),

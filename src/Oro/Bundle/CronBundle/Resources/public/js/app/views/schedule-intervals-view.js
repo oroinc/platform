@@ -8,8 +8,8 @@ define(function(require) {
     ScheduleIntervalsView = BaseView.extend({
         options: {
             selectors: {
-                'row': '[data-role="schedule-interval-row"]',
-                'rowError': '[data-role="schedule-interval-row-error"]'
+                row: '[data-role="schedule-interval-row"]',
+                rowError: '[data-role="schedule-interval-row-error"]'
             }
         },
 

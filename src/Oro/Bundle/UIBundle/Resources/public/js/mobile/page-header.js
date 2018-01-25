@@ -1,5 +1,5 @@
 define(['jquery', 'oroui/js/mediator', 'orotranslation/js/translator', '../content-processor/dropdown-button'
-    ], function($, mediator, __) {
+], function($, mediator, __) {
     'use strict';
 
     var containerSelector = '.navigation.navbar-extra .title-buttons-container';

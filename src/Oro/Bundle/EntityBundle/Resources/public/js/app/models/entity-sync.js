@@ -9,9 +9,9 @@ define(function(require) {
     var methodMap = {
         'create': 'POST',
         'update': 'PATCH',
-        'patch':  'PATCH',
+        'patch': 'PATCH',
         'delete': 'DELETE',
-        'read':   'GET'
+        'read': 'GET'
     };
 
     sync = function(method, model, options) {

@@ -27,9 +27,9 @@ define([
             this.collection = options.collection;
 
             this.listenTo(this.collection, {
-                'beforeFetch': this._beforeCollectionFetch,
-                'updateState': this._onUpdateCollectionState,
-                'reset': this._onCollectionReset
+                beforeFetch: this._beforeCollectionFetch,
+                updateState: this._onUpdateCollectionState,
+                reset: this._onCollectionReset
             });
 
             this.isVisible = true;
@@ -163,8 +163,8 @@ define([
                 var shortName = '__' + name;
                 var filterState;
 
-                //Reset to initial state,
-                //todo: should be removed after complete story about filter states
+                // Reset to initial state,
+                // todo: should be removed after complete story about filter states
                 if (filter.defaultEnabled === false && filter.enabled === true) {
                     this.disableFilter(filter);
                 }

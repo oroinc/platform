@@ -78,6 +78,7 @@ services:
         calls:
             - ['setMessageProducer', ['@oro_message_queue.client.message_producer']]
             - [setLogger, ['@logger']]
+            - ['setCredentialsManager', ['@oro_imap.origin_credentials.issue_manager']]
         tags:
             - { name: oro_email.email_synchronizer }
 
@@ -89,6 +90,10 @@ services:
             - '@doctrine'
             - '@oro_email.email.entity.builder'
             - '@oro_imap.imap_email_remove_manager'
+        calls:
+            - ['setLogger', ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: oro_imap_email }
 
     oro_imap.imap_email_remove_manager:
         class: %oro_imap.imap_email_remove_manager.class%
@@ -230,3 +235,48 @@ services:
         class: Oro\Bundle\ImapBundle\EventListener\UserEmailChangeListener
         tags:
             - { name: doctrine.orm.entity_listener, entity: '%oro_user.entity.class%', event: preUpdate }
+
+    oro_imap.origin_credentials.issue_manager:
+        class: Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager
+        arguments:
+            - '@oro_imap.origin_credentials.storage_dbal'
+            - '@security.authorization_checker'
+
+    oro_imap.origin_credentials.storage_dbal:
+        class: Oro\Bundle\ImapBundle\OriginSyncCredentials\Driver\DbalWrongCredentialsOriginsDriver
+        public: false
+        arguments:
+            - '@doctrine'
+            - '@logger'
+
+    oro_imap.origin_credentials.notification_sender.socket:
+        class: Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender\SocketNotificationSender
+        arguments:
+            - '@oro_wamp.publisher'
+        tags:
+            - {name: oro_imap.origin_credentials.notification_sender}
+
+    oro_imap.origin_credentials.notification_sender.email:
+        class: Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender\EmailNotificationSender
+        arguments:
+            - '@oro_config.global'
+            - '@oro_email.email_renderer'
+            - '@doctrine'
+            - '@oro_email.direct_mailer'
+        tags:
+            - {name: oro_imap.origin_credentials.notification_sender}
+
+    oro_imap.origin_credentials.notification_sender.flash_bag:
+        class: Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender\FlashBagNotificationSender
+        arguments:
+            - '@request_stack'
+            - '@translator'
+        tags:
+            - {name: oro_imap.origin_credentials.user_notification_sender}
+
+    oro_imap.listener.login:
+        class: Oro\Bundle\ImapBundle\EventListener\LoginListener
+        arguments:
+             - '@oro_imap.origin_credentials.issue_manager'
+        tags:
+            - { name: kernel.event_listener, event: security.interactive_login, method: onLogin }

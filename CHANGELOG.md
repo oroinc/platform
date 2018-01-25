@@ -1,3 +1,9 @@
+## 2.7.0 (Unreleased)
+
+### Removed
+#### WorkflowBundle
+* Removed cache provider `oro_workflow.cache.provider.workflow_definition`. Doctrine result cache is used instead of.
+
 ## 2.6.0 (Unreleased)
 
 ### Added

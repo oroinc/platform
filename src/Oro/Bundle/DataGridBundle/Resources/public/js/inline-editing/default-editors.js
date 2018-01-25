@@ -1,4 +1,3 @@
- /** @lends defaultEditors */
 define(function(require) {
     'use strict';
 

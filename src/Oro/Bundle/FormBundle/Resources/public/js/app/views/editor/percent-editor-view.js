@@ -1,4 +1,3 @@
-/** @lends NumberEditorView */
 define(function(require) {
     'use strict';
 
@@ -61,7 +60,7 @@ define(function(require) {
     var PercentEditorView;
     var NumberEditorView = require('./number-editor-view');
 
-    PercentEditorView = NumberEditorView.extend(/** @exports PercentEditorView.prototype */{
+    PercentEditorView = NumberEditorView.extend(/** @lends PercentEditorView.prototype */{
         className: 'number-editor',
 
         parseRawValue: function(value) {

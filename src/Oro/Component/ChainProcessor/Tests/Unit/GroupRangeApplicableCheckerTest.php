@@ -224,6 +224,129 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testFirstGroupEqualsLastGroup()
+    {
+        $context = new Context();
+        $context->setAction('action1');
+        $context->setFirstGroup('group2');
+        $context->setLastGroup('group2');
+
+        $builder = new ProcessorBagConfigBuilder();
+        $processorBag = new ProcessorBag($builder, $this->getProcessorFactory());
+
+        $builder->addGroup('group1', 'action1', -10);
+        $builder->addGroup('group2', 'action1', -20);
+        $builder->addGroup('group3', 'action1', -30);
+
+        $builder->addProcessor('processor1_no_group', [], 'action1');
+        $builder->addProcessor('processor1', [], 'action1', 'group1');
+        $builder->addProcessor('processor2', [], 'action1', 'group2');
+        $builder->addProcessor('processor3', [], 'action1', 'group3');
+        $builder->addProcessor('processor3_no_group', [], 'action1', null, -255);
+
+        self::assertProcessors(
+            [
+                'processor1_no_group',
+                'processor2',
+                'processor3_no_group',
+            ],
+            $processorBag->getProcessors($context)
+        );
+    }
+
+    public function testFirstGroupEqualsLastGroupWithoutUngroupedProcessors()
+    {
+        $context = new Context();
+        $context->setAction('action1');
+        $context->setFirstGroup('group2');
+        $context->setLastGroup('group2');
+
+        $builder = new ProcessorBagConfigBuilder();
+        $processorBag = new ProcessorBag($builder, $this->getProcessorFactory());
+
+        $builder->addGroup('group1', 'action1', -10);
+        $builder->addGroup('group2', 'action1', -20);
+        $builder->addGroup('group3', 'action1', -30);
+
+        $builder->addProcessor('processor1', [], 'action1', 'group1');
+        $builder->addProcessor('processor2', [], 'action1', 'group2');
+        $builder->addProcessor('processor3', [], 'action1', 'group3');
+
+        self::assertProcessors(
+            ['processor2'],
+            $processorBag->getProcessors($context)
+        );
+    }
+
+    public function testFirstGroupEqualsLastGroupWithoutProcessorsInThisGroup()
+    {
+        $context = new Context();
+        $context->setAction('action1');
+        $context->setFirstGroup('group2');
+        $context->setLastGroup('group2');
+
+        $builder = new ProcessorBagConfigBuilder();
+        $processorBag = new ProcessorBag($builder, $this->getProcessorFactory());
+
+        $builder->addGroup('group1', 'action1', -10);
+        $builder->addGroup('group2', 'action1', -20);
+        $builder->addGroup('group3', 'action1', -30);
+
+        $builder->addProcessor('processor1', [], 'action1', 'group1');
+        $builder->addProcessor('processor3', [], 'action1', 'group3');
+
+        self::assertProcessors(
+            [],
+            $processorBag->getProcessors($context)
+        );
+    }
+
+    public function testFirstGroupAndLastGroupWithoutProcessorsInFirstGroup()
+    {
+        $context = new Context();
+        $context->setAction('action1');
+        $context->setFirstGroup('group2');
+        $context->setLastGroup('group3');
+
+        $builder = new ProcessorBagConfigBuilder();
+        $processorBag = new ProcessorBag($builder, $this->getProcessorFactory());
+
+        $builder->addGroup('group1', 'action1', -10);
+        $builder->addGroup('group2', 'action1', -20);
+        $builder->addGroup('group3', 'action1', -30);
+
+        $builder->addProcessor('processor1', [], 'action1', 'group1');
+        $builder->addProcessor('processor3', [], 'action1', 'group3');
+
+        self::assertProcessors(
+            ['processor3'],
+            $processorBag->getProcessors($context)
+        );
+    }
+
+    public function testFirstGroupAndLastGroupWithoutProcessorsInLastGroup()
+    {
+        $context = new Context();
+        $context->setAction('action1');
+        $context->setFirstGroup('group1');
+        $context->setLastGroup('group2');
+
+        $builder = new ProcessorBagConfigBuilder();
+        $processorBag = new ProcessorBag($builder, $this->getProcessorFactory());
+
+        $builder->addGroup('group1', 'action1', -10);
+        $builder->addGroup('group2', 'action1', -20);
+        $builder->addGroup('group3', 'action1', -30);
+
+        $builder->addProcessor('processor1', [], 'action1', 'group1');
+        $builder->addProcessor('processor3', [], 'action1', 'group3');
+
+        self::assertProcessors(
+            ['processor1'],
+            $processorBag->getProcessors($context)
+        );
+    }
+
     /**
      * @return ProcessorFactoryInterface
      */

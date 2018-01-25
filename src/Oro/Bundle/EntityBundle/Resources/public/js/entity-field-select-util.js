@@ -1,5 +1,5 @@
 define(['underscore'
-    ], function(_) {
+], function(_) {
     'use strict';
 
     // define a constructor
@@ -179,11 +179,9 @@ define(['underscore'
 
         _getFieldApplicableConditions: function(field, entity) {
             return _.extend({
-                    entity: entity,
-                    field: field.name
-                },
-                _.pick(field, ['type', 'identifier'])
-            );
+                entity: entity,
+                field: field.name
+            }, _.pick(field, ['type', 'identifier']));
         },
 
         _convertData: function(fields, entityName, parentFieldId) {

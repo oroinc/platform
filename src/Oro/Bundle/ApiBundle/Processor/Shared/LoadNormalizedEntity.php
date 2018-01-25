@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
-use Oro\Bundle\ApiBundle\Processor\RequestActionProcessor;
+use Oro\Bundle\ApiBundle\Processor\NormalizeResultActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
@@ -83,7 +83,7 @@ class LoadNormalizedEntity implements ProcessorInterface
             $getContext->setResult($context->getResult());
         }
         $getContext->skipGroup('security_check');
-        $getContext->skipGroup(RequestActionProcessor::NORMALIZE_RESULT_GROUP);
+        $getContext->skipGroup(NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
         $getContext->setSoftErrorsHandling(true);
 
         return $getContext;

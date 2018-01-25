@@ -34,7 +34,7 @@ define([
             sorters: [],
             columns: {},
             deletable: false,
-            editable:  false,
+            editable: false,
             is_default: false,
             shared_by: null,
             freezeName: ''
@@ -87,10 +87,10 @@ define([
          */
         toGridState: function() {
             return {
-                filters:    this.get('filters'),
-                sorters:    this.get('sorters'),
-                columns:    this.get('columns'),
-                gridView:   this.get('name'),
+                filters: this.get('filters'),
+                sorters: this.get('sorters'),
+                columns: this.get('columns'),
+                gridView: this.get('name'),
                 appearanceType: this.get('appearanceType') !== '' ? this.get('appearanceType') : void 0,
                 appearanceData: this.get('appearanceData')
             };

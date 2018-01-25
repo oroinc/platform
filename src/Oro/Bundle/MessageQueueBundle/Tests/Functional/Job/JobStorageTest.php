@@ -418,4 +418,50 @@ class JobStorageTest extends WebTestCase
         // the job should not be found because we updated a record that does not exist in DB
         $this->assertNull($this->jobStorage->findJobById($job->getId()));
     }
+
+    public function testGetChildStatusesWithJobCountByRootJob()
+    {
+        /**
+         * @var $job Job
+         */
+        $job = $this->getJobReference(LoadJobData::JOB_5);
+
+        $expectedResult = [
+            Job::STATUS_NEW => 2,
+            Job::STATUS_RUNNING => 1,
+            Job::STATUS_CANCELLED => 1
+        ];
+
+        $result = $this->jobStorage->getChildStatusesWithJobCountByRootJob($job);
+
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function testGetChildJobIdsByRootJobAndStatus()
+    {
+        /**
+         * @var $job Job
+         */
+        $job = $this->getJobReference(LoadJobData::JOB_5);
+
+        $expectedResult = [
+            $this->getJobReference(LoadJobData::JOB_6)->getId(),
+            $this->getJobReference(LoadJobData::JOB_9)->getId()
+        ];
+
+        /**
+         * Result work of this function depends on engine
+         * In PGSQL it returns array of ids in desc order, every id has integer type,
+         * But in mysql it will be array of ids in asc order, every id has string type
+         */
+        $result = $this->jobStorage->getChildJobIdsByRootJobAndStatus($job, Job::STATUS_NEW);
+
+        /**
+         * Make result independent on db engine
+         */
+        sort($result);
+        $preparedResult = array_map('intval', $result);
+
+        $this->assertSame($expectedResult, $preparedResult);
+    }
 }

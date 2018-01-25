@@ -1,5 +1,5 @@
-/*global $, bootbox, Util*/
-/*jshint -W098*/
+/* global $, bootbox, Util */
+// eslint-disable-next-line no-unused-vars
 function Util(rootMessagesElements) {
     'use strict';
 
@@ -16,12 +16,12 @@ function Util(rootMessagesElements) {
         message: 'Test message. Just a stub',
         className: 'confirm-dialog',
         buttons: {
-            cancel: {
+            'cancel': {
                 label: 'Cancel',
                 callback: function() {
                 }
             },
-            continue: {
+            'continue': {
                 className: 'btn-danger',
                 callback: function() {
                 }
@@ -56,10 +56,10 @@ function Util(rootMessagesElements) {
                 message: message,
                 onEscape: cancelCallback,
                 buttons: {
-                    cancel: {
+                    'cancel': {
                         callback: cancelCallback
                     },
-                    continue: {
+                    'continue': {
                         label: continueLabel,
                         callback: continueCallback
                     }

@@ -252,8 +252,18 @@
 
 {% block form_start_widget %}
     {% set attr = form.vars.attr|merge(attr) %}
-    {% set options = {attr: attr} %}
+    {% if attr.id is not defined %}
+        {% set attr = attr|merge({
+            id: form.vars.id
+        }) %}
+    {% endif %}
+    {%- for attrname, attrvalue in attr if attrvalue is iterable -%}
+        {% set attr = attr|merge({
+            (attrname): attrvalue|json_encode
+        }) %}
+    {%- endfor -%}
 
+    {% set options = {attr: attr} %}
     {% set action = form_action is defined ? form_action : (form_route_name is defined ? path(form_route_name, form_route_parameters) : null) -%}
     {% if action is not same as(null) %}
         {% set options =  options|merge({action: action}) %}

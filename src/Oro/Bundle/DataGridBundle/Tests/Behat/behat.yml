@@ -162,9 +162,7 @@ oro_behat_extension:
         locator: '//*[contains(@data-sticky-target,"top-sticky-panel")]/descendant::button[contains(@class,"hidden-on-desktop")]/descendant::span[contains(@class,"fa-user")]/ancestor::button'
 
     Manage Grid Fullscreen Popup:
-      selector:
-        type: xpath
-        locator: '//*[contains(@class, "fullscreen-popup")]/span[contains(.,"Manage grid")]'
+      selector: '.fullscreen-popup .datagrid-manager'
 
     Select All Button:
       selector: 'a[data-role="column-manager-select-all"]'

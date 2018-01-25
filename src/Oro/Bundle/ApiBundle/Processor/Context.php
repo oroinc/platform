@@ -20,7 +20,6 @@ use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
-use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
@@ -30,16 +29,10 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
-class Context extends ApiContext implements ContextInterface
+class Context extends NormalizeResultContext implements ContextInterface
 {
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
-
-    /**
-     * a value indicates whether errors should just stop processing
-     * or an exception should be thrown is any error occurred
-     */
-    const SOFT_ERRORS_HANDLING = 'softErrorsHandling';
 
     /** a prefix for all configuration sections */
     const CONFIG_PREFIX = 'config_';
@@ -71,14 +64,8 @@ class Context extends ApiContext implements ContextInterface
     /** a list of filters is used to add additional restrictions to a query is used to get result data */
     const FILTERS = 'filters';
 
-    /** @var array[]|null */
-    private $processed;
-
     /** @var FilterValueAccessorInterface */
     private $filterValues;
-
-    /** @var Error[] */
-    private $errors;
 
     /** @var ConfigProvider */
     protected $configProvider;
@@ -278,92 +265,6 @@ class Context extends ApiContext implements ContextInterface
     public function setCriteria($criteria)
     {
         $this->set(self::CRITERIA, $criteria);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasErrors()
-    {
-        return !empty($this->errors);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getErrors()
-    {
-        return null !== $this->errors
-            ? $this->errors
-            : [];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addError(Error $error)
-    {
-        if (null === $this->errors) {
-            $this->errors = [];
-        }
-        $this->errors[] = $error;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function resetErrors()
-    {
-        $this->errors = null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isSoftErrorsHandling()
-    {
-        return (bool)$this->get(self::SOFT_ERRORS_HANDLING);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setSoftErrorsHandling($softErrorsHandling)
-    {
-        if ($softErrorsHandling) {
-            $this->set(self::SOFT_ERRORS_HANDLING, true);
-        } else {
-            $this->remove(self::SOFT_ERRORS_HANDLING);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setProcessed($operationName)
-    {
-        $this->processed[$operationName] = true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function clearProcessed($operationName)
-    {
-        if ($this->isProcessed($operationName)) {
-            unset($this->processed[$operationName]);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isProcessed($operationName)
-    {
-        return
-            null !== $this->processed
-            && array_key_exists($operationName, $this->processed)
-            && $this->processed[$operationName];
     }
 
     /**
@@ -857,13 +758,17 @@ class Context extends ApiContext implements ContextInterface
         }
 
         try {
-            $metadata = $this->metadataProvider->getMetadata(
-                $entityClass,
-                $this->getVersion(),
-                $this->getRequestType(),
-                $this->getConfig(),
-                $this->getMetadataExtras()
-            );
+            $metadata = null;
+            $config = $this->getConfig();
+            if (null !== $config) {
+                $metadata = $this->metadataProvider->getMetadata(
+                    $entityClass,
+                    $this->getVersion(),
+                    $this->getRequestType(),
+                    $config,
+                    $this->getMetadataExtras()
+                );
+            }
             $this->processLoadedMetadata($metadata);
         } catch (\Exception $e) {
             $this->processLoadedMetadata(null);

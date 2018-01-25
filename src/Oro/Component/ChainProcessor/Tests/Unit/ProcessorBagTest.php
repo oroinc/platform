@@ -87,10 +87,42 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         $this->builder->addProcessor('processor5', [], 'action1', 'group1');
 
         self::assertSame(
-            ['group3', 'group1'],
+            ['group3', 'group2', 'group1'],
             $this->processorBag->getActionGroups('action1')
         );
     }
+
+    public function testActionGroupsSorting()
+    {
+        $this->builder->addGroup('group3', 'action1', -30);
+        $this->builder->addGroup('group2', 'action1', -20);
+        $this->builder->addGroup('group1', 'action1', -10);
+
+        $this->builder->addProcessor('processor1', [], 'action1', 'group1');
+        $this->builder->addProcessor('processor2', [], 'action1', 'group1');
+        $this->builder->addProcessor('processor3', [], 'action1', 'group3');
+        $this->builder->addProcessor('processor4', [], 'action1', 'group3');
+        $this->builder->addProcessor('processor5', [], 'action1', 'group1');
+
+        self::assertSame(
+            ['group1', 'group2', 'group3'],
+            $this->processorBag->getActionGroups('action1')
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The priority 1 cannot be used for the group "group3" because the group with this priority already exists. Existing group: "group1". Action: "action1".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testActionGroupsWithIdenticalPriority()
+    {
+        $this->builder->addGroup('group1', 'action1', 1);
+        $this->builder->addGroup('group2', 'action2', 1);
+        $this->builder->addGroup('group3', 'action1', 1);
+    }
+
 
     public function testBagWithoutGroups()
     {
