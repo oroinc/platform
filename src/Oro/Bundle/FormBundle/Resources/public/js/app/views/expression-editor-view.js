@@ -45,13 +45,13 @@ define(function(require) {
         delay: 50,
 
         events: {
-            'focus': 'debouncedAutocomplete',
-            'click': 'debouncedAutocomplete',
-            'input': 'debouncedAutocomplete',
-            'keyup': 'debouncedValidate',
-            'change': 'debouncedValidate',
-            'blur': 'debouncedValidate',
-            'paste': 'debouncedValidate'
+            focus: 'debouncedAutocomplete',
+            click: 'debouncedAutocomplete',
+            input: 'debouncedAutocomplete',
+            keyup: 'debouncedValidate',
+            change: 'debouncedValidate',
+            blur: 'debouncedValidate',
+            paste: 'debouncedValidate'
         },
 
         constructor: function(options) {

@@ -388,7 +388,7 @@ define(function(require) {
                     exclude: [{relationType: 'manyToMany'}],
                     fieldsFilterWhitelist: {
                         'Oro\\Bundle\\UserBundle\\Entity\\Group': {
-                            'roles': true
+                            roles: true
                         }
                     }
                 });
@@ -432,7 +432,7 @@ define(function(require) {
                     exclude: [{relationType: 'manyToMany'}],
                     fieldsFilterWhitelist: {
                         'Oro\\Bundle\\UserBundle\\Entity\\User': {
-                            'groups': true
+                            groups: true
                         }
                     }
                 }, applicant1).then(function(provider) {
@@ -462,8 +462,8 @@ define(function(require) {
                     isRestrictiveWhitelist: true,
                     fieldsFilterWhitelist: {
                         'Oro\\Bundle\\UserBundle\\Entity\\User': {
-                            'groups': true,
-                            'firstName': true
+                            groups: true,
+                            firstName: true
                         }
                     }
                 }, applicant1).then(function(provider) {
@@ -489,7 +489,7 @@ define(function(require) {
                     rootEntity: 'Oro\\Bundle\\UserBundle\\Entity\\User',
                     fieldsFilterBlacklist: {
                         'Oro\\Bundle\\UserBundle\\Entity\\User': {
-                            'roles': true
+                            roles: true
                         }
                     }
                 }, applicant1).then(function(provider) {
@@ -593,25 +593,25 @@ define(function(require) {
 
             it('returns objects tree', function() {
                 expect(provider.entityTree).toEqual({
-                    user: jasmine.objectContaining({
+                    'user': jasmine.objectContaining({
                         firstName: jasmine.objectContaining({__isEntity: false, __isField: true}),
                         roles: jasmine.objectContaining({
-                            role: jasmine.objectContaining({__isEntity: false, __isField: true}),
-                            users: jasmine.any(Object),
+                            'role': jasmine.objectContaining({__isEntity: false, __isField: true}),
+                            'users': jasmine.any(Object),
                             'Oro\\Bundle\\UserBundle\\Entity\\Group::roles': jasmine.objectContaining({
                                 'Oro\\Bundle\\UserBundle\\Entity\\User::groups': jasmine.any(Object),
-                                id: jasmine.objectContaining({__isEntity: false, __isField: true}),
-                                name: jasmine.objectContaining({__isEntity: false, __isField: true}),
-                                roles: jasmine.any(Object)
+                                'id': jasmine.objectContaining({__isEntity: false, __isField: true}),
+                                'name': jasmine.objectContaining({__isEntity: false, __isField: true}),
+                                'roles': jasmine.any(Object)
                             })
                         })
                     }),
-                    userrole: jasmine.any(Object),
-                    'Oro\\Bundle\\UserBundle\\Entity\\Group':  jasmine.objectContaining({
+                    'userrole': jasmine.any(Object),
+                    'Oro\\Bundle\\UserBundle\\Entity\\Group': jasmine.objectContaining({
                         'Oro\\Bundle\\UserBundle\\Entity\\User::groups': jasmine.any(Object),
-                        id: jasmine.objectContaining({__isEntity: false, __isField: true}),
-                        name: jasmine.objectContaining({__isEntity: false, __isField: true}),
-                        roles: jasmine.any(Object)
+                        'id': jasmine.objectContaining({__isEntity: false, __isField: true}),
+                        'name': jasmine.objectContaining({__isEntity: false, __isField: true}),
+                        'roles': jasmine.any(Object)
                     })
                 });
             });
@@ -732,8 +732,8 @@ define(function(require) {
                 var node = provider.getEntityTreeNodeByPropertyPath('user.roles');
 
                 expect(node).toEqual(jasmine.objectContaining({
-                    role: jasmine.objectContaining({__isEntity: false, __isField: true}),
-                    users: jasmine.any(Object),
+                    'role': jasmine.objectContaining({__isEntity: false, __isField: true}),
+                    'users': jasmine.any(Object),
                     'Oro\\Bundle\\UserBundle\\Entity\\Group::roles': jasmine.any(Object)
                 }));
                 expect(node).toEqual(jasmine.objectContaining({

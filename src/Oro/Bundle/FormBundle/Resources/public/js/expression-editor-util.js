@@ -482,20 +482,20 @@ define(function(require) {
          */
         _prepareAutocompleteData: function(expression, position) {
             var autocompleteData = {
-                expression: expression,//full expression
-                position: position,//cursor position
-                item: '',//item under cursor or just "item"
-                beforeItem: '',//part of expression before item
-                afterItem: '',//part of expression after item
-                itemChild: [],//child of item
-                itemLastChildIndex: 0,//index of last child of item
-                itemLastChild: '',//last child of item
-                itemCursorIndex: 0,//index of an item child under cursor
-                itemCursorChild: '',//item child under cursor
-                itemsType: '',// `entities` or `operations`
-                items: {},//list of items for autocomplete
-                dataSourceKey: '',//key of data source if item is data source
-                dataSourceValue: ''//value of data source if item is data source
+                expression: expression, // full expression
+                position: position, // cursor position
+                item: '', // item under cursor or just "item"
+                beforeItem: '', // part of expression before item
+                afterItem: '', // part of expression after item
+                itemChild: [], // child of item
+                itemLastChildIndex: 0, // index of last child of item
+                itemLastChild: '', // last child of item
+                itemCursorIndex: 0, // index of an item child under cursor
+                itemCursorChild: '', // item child under cursor
+                itemsType: '', // `entities` or `operations`
+                items: {}, // list of items for autocomplete
+                dataSourceKey: '', // key of data source if item is data source
+                dataSourceValue: ''// value of data source if item is data source
             };
 
             this._setAutocompleteItem(autocompleteData);

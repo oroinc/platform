@@ -394,7 +394,6 @@ define(function(require) {
                         !this.isRestrictiveWhitelist &&
                         !this._isBlacklistedField(entityClassName, field) &&
                         this._matchFieldFilterers(entityClassName, field);
-
                 }, this);
             }
 
