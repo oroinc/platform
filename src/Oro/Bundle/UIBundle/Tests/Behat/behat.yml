@@ -10,11 +10,23 @@ oro_behat_extension:
         - '@OroUIBundle/Tests/Behat/Features'
 
   elements:
+    Sidebar:
+      selector: '.content-with-sidebar--sidebar'
+
+    Closed Sidebar:
+      selector: '.content-sidebar-minimized'
+
     Sidebar Drag Handler:
       selector: '.ui-resizable-handle.ui-resizable-e.resizable-area'
 
-    Sidebar:
-      selector: '.content-with-sidebar--sidebar'
+    Not Resizable Sidebar:
+     selector: '.content-with-sidebar--sidebar.ui-resizable-disabled'
+
+    Close Sidebar Trigger:
+      selector: 'div[data-role="sidebar-minimize"]'
+
+    Open Sidebar Trigger:
+      selector: 'div[data-role="sidebar-maximize"]'
 
     Page:
       selector:
