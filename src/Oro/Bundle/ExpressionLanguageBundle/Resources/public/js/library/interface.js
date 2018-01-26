@@ -11,9 +11,10 @@ define(function() {
         expectToBeImplementedBy: function(obj) {
             var missingMethods = [];
             for (var name in this.methods) {
-                if (this.methods.hasOwnProperty(name) &&
-                    (typeof obj[name] !== 'function' || obj[name].length !== this.methods[name].length)) {
-
+                if (
+                    this.methods.hasOwnProperty(name) &&
+                    (typeof obj[name] !== 'function' || obj[name].length !== this.methods[name].length)
+                ) {
                     missingMethods.push(name);
                 }
             }

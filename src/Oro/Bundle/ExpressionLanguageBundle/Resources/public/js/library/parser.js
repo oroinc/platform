@@ -22,7 +22,6 @@ define(function(require) {
      */
     function Parser(functions) {
         this.functions = functions;
-
     }
 
     Parser.prototype = {

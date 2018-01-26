@@ -23,7 +23,7 @@ define(function(require) {
          * @return {TokenStream} a token stream instance
          * @throws {ExpressionSyntaxError}
          */
-        tokenize: function(expression) { /*jshint -W071 */
+        tokenize: function(expression) {
             expression = expression.replace(/[\r\n\t\v\f]/g, ' ');
             var cursor = 0;
             var tokens = [];
@@ -46,7 +46,7 @@ define(function(require) {
                 if (NUMBER_REGEXP.test(expressionPart)) {
                     // numbers
                     match = expressionPart.match(NUMBER_REGEXP);
-                    var number = parseFloat(match[0]);  // floats
+                    var number = parseFloat(match[0]); // floats
                     if (match[0].match(/^[0-9]+/) && number <= Number.MAX_SAFE_INTEGER) {
                         number = parseInt(match[0], 10); // integers lower than the maximum
                     }
@@ -73,7 +73,6 @@ define(function(require) {
 
                     tokens.push(new Token(Token.PUNCTUATION_TYPE, expression[cursor], cursor + 1));
                     ++cursor;
-
                 } else if (STRING_REGEXP.test(expressionPart)) {
                     // strings
                     match = expressionPart.match(STRING_REGEXP);

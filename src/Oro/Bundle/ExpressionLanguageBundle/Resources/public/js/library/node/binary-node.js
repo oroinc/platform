@@ -1,4 +1,3 @@
-/* jshint bitwise: false, eqeqeq: false */
 define(function(require) {
     'use strict';
 
@@ -19,6 +18,9 @@ define(function(require) {
     BinaryNode.__super__ = Node;
 
     var REGEXP = /^\/([\w\W]+)\/([a-z]+)?$/i;
+    // minified code of range method
+    // eslint-disable-next-line max-len
+    var rangeFuncRawMin = 'function(r,a){var o,e,n,t=[],h,i=isNaN(r),C=isNaN(a),k="charCodeAt";for(i||C?i&&C?(h=!0,o=r[k](0),e=a[k](0)):(o=i?0:r,e=C?0:a):(o=r,e=a),n=!(o>e);n?o<=e:o>=e;n?++o:--o)t.push(h?String.fromCharCode(o):o);return t}';
 
     Object.assign(BinaryNode.prototype, {
         constructor: BinaryNode,
@@ -73,8 +75,7 @@ define(function(require) {
                     return;
                 case '..':
                     compiler
-                        // minified code of range method
-                        .raw('(function(r,a){var o,e,n,t=[],h,i=isNaN(r),C=isNaN(a),k="charCodeAt";for(i||C?i&&C?(h=!0,o=r[k](0),e=a[k](0)):(o=i?0:r,e=C?0:a):(o=r,e=a),n=!(o>e);n?o<=e:o>=e;n?++o:--o)t.push(h?String.fromCharCode(o):o);return t})(') // jscs:disable
+                        .raw('(' + rangeFuncRawMin + ')(')
                         .compile(this.nodes[0])
                         .raw(', ')
                         .compile(this.nodes[1])
@@ -123,11 +124,11 @@ define(function(require) {
                 case '&':
                     return left & right;
                 case '==':
-                    return left == right;
+                    return left == right; // eslint-disable-line eqeqeq
                 case '===':
                     return left === right;
                 case '!=':
-                    return left != right;
+                    return left != right; // eslint-disable-line eqeqeq
                 case '!==':
                     return left !== right;
                 case '<':

@@ -15,7 +15,7 @@ define(function(require) {
         });
 
         it('evaluation', function() {
-            expect(arrayNode.evaluate()).toEqual({'b': 'a', 0: 'b'});
+            expect(arrayNode.evaluate()).toEqual({b: 'a', 0: 'b'});
         });
 
         it('compilation', function() {
