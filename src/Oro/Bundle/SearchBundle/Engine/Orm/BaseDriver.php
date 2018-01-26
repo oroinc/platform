@@ -220,7 +220,8 @@ abstract class BaseDriver implements DBALPersisterInterface
         foreach ($query->getAggregations() as $name => $options) {
             $field = $options['field'];
             $function = $options['function'];
-            list($fieldType, $fieldName) = Criteria::explodeFieldTypeName($field);
+            $fieldName = Criteria::explodeFieldTypeName($field)[1];
+            QueryBuilderUtil::checkField($fieldName);
 
             // prepare query builder to apply grouping
             $aggregatedQuery = clone $query;
@@ -237,7 +238,6 @@ abstract class BaseDriver implements DBALPersisterInterface
                         $fieldSelect,
                         sprintf('%s as countValue', $queryBuilder->expr()->countDistinct('search.id'))
                     ]);
-                    QueryBuilderUtil::checkField($fieldName);
                     $queryBuilder->groupBy($fieldName);
 
                     foreach ($queryBuilder->getQuery()->getArrayResult() as $row) {
@@ -259,7 +259,7 @@ abstract class BaseDriver implements DBALPersisterInterface
                     break;
 
                 default:
-                    throw new \LogicException(sprintf('Aggregating function %s is not suppored', $function));
+                    throw new \LogicException(sprintf('Aggregating function %s is not supported', $function));
             }
         }
 
