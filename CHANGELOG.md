@@ -1,6 +1,37 @@
+## 2.7.0 (Unreleased)
+
+### Added
+#### EntityBundle
+* Added method `getEntityTreeNodeByPropertyPath` to JS `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js#L903-L947) (see [documentation](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md#get-entity-tree-node-by-property-path))
+* Added magic property `entityTree` to `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js#L1061-L1079) (see [documentation](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md#entity-tree)) that allows walk through entity fields tree
+* Added JS `EntityTreeNode` [[?]](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-tree-node.js) that used by `EntityStructureDataProvider`
+#### FormBundle
+* Added JS `ExpressionEditorComponent` [[?]](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/FormBundle/Resources/public/js/app/components/expression-editor-component.js) (see [documentation](https://github.com/oroinc/platform/blob/2.7.0/src/Oro/Bundle/FormBundle/Resources/doc/reference/expression-editor.md#component) that used instead regular `ViewComponent` in formtype options of rule editor. It's designed to prepare instance of `EntityStructureDataProvider` and create instance of `ExpressionEditorView`
+expression-editor-component.js
+
+### Changed
+#### EntityBundle
+* Refactored JS `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js) (see [documentation](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md))
+	- method `getPropertyPathByPath` renamed to `getRelativePropertyPathByPath`
+	- method `getPathByPropertyPath` renamed to `getPathByRelativePropertyPath`
+	- method `getPathByPropertyPathSafely` renamed to `getPathByRelativePropertyPathSafely`
+#### FormBundle
+* Refactored `ExpressionEditorView` [[?]](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/FormBundle/Resources/public/js/app/views/expression-editor-view.js) (see [documentation](https://github.com/oroinc/platform/blob/2.7.0/src/Oro/Bundle/FormBundle/Resources/doc/reference/expression-editor.md#view))
+* Refactored [[?]](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/FormBundle/Resources/public/js/expression-editor-util.js) (see [documentation](https://github.com/oroinc/platform/blob/2.7.0/src/Oro/Bundle/FormBundle/Resources/doc/reference/expression-editor.md#util))
+	- made it descendant of `BaseClass`
+	- changed options format
+
+### Removed
+#### WorkflowBundle
+* Removed cache provider `oro_workflow.cache.provider.workflow_definition`. Doctrine result cache is used instead of.
+
 ## 2.6.0 (Unreleased)
 
 ### Added
+#### ConfigBundle
+* Added configuration search provider functionality (see [documentation](./src/Oro/Bundle/ConfigBundle/Resources/doc/system_configuration.md#search-type-provider))
+    * Service should be registered as a service with the `oro_config.configuration_search_provider` tag.
+    * Class should implement `Oro\Bundle\ConfigBundle\Provider\SearchProviderInterface` interface.
 #### EntityBundle
 * Added event `oro_entity.structure.options` (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/events.md#entity-structure-options-event))
 * Added provider `Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider` for getting data of entities structure (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/entity_structure_data_provider.md))

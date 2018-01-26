@@ -29,9 +29,9 @@ define(function(require) {
         // See format options on parseDate
         dateFormat: localeSettings.getVendorDateTimeFormat('jquery_ui', 'date', 'mm/dd/yy'),
         firstDay: localeSettings.getCalendarFirstDayOfWeek() - 1, // The first day of the week, Sun = 0, Mon = 1, ...
-        //isRTL: false, // True if right-to-left language, false if left-to-right
-        //showMonthAfterYear: false, // True if the year select precedes month, false for month then year
-        //yearSuffix: "" // Additional text to append to the year in the month headers
+        // isRTL: false, // True if right-to-left language, false if left-to-right
+        // showMonthAfterYear: false, // True if the year select precedes month, false for month then year
+        // yearSuffix: "" // Additional text to append to the year in the month headers
         gotoCurrent: true, // True if today link goes back to current selection instead
         applyTodayDateSelection: true // Select the date on Today button click
     };
@@ -79,10 +79,10 @@ define(function(require) {
                 // highlighted today date in system timezone
                 inst.dpDiv
                     .find('td > a.ui-state-default').each(function() {
-                    if (today.date().toString() === this.innerHTML) {
-                        $(this).addClass('ui-state-highlight').parent().addClass('ui-datepicker-today');
-                    }
-                });
+                        if (today.date().toString() === this.innerHTML) {
+                            $(this).addClass('ui-state-highlight').parent().addClass('ui-datepicker-today');
+                        }
+                    });
             }
         };
     })();

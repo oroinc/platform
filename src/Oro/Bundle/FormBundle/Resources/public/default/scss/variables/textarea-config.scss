@@ -1,15 +1,8 @@
-// @theme: default
+// @theme: default;
 
 $textarea-padding: 11px;
 $textarea-padding--m: 10px 9px;
 $textarea-padding--s: 8px 9px;
-$textarea-font-size: $base-ui-element-font-size;
-$textarea-font-family: $base-ui-element-font-family;
-$textarea-line-height: $base-ui-element-line-height;
-$textarea-border: $base-ui-element-border;
-$textarea-border-radius: $base-ui-element-border-radius;
-$textarea-background-color: $base-ui-element-bg-color;
-$textarea-color: $base-ui-element-color;
 
 // Hover
 $textarea-border-color-hover-state: get-color('ui', 'normal');

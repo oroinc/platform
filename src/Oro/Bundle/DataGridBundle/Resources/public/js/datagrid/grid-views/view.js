@@ -98,6 +98,9 @@ define(function(require) {
         /** @property */
         showErrorMessage: true,
 
+        /** @property */
+        adjustDocumentTitle: true,
+
         /**
          * Initializer.
          *
@@ -425,32 +428,32 @@ define(function(require) {
 
             model.save(
                 null, {
-                wait: true,
-                success: function(savedModel) {
-                    var currentDefaultViewModel = self._getCurrentDefaultViewModel();
-                    var isCurrentDefault = currentDefaultViewModel === model;
-                    var isCurrentWasDefault = currentDefaultViewModel === undefined;
-                    if (model.get('is_default') && !isCurrentDefault) {
-                        // if current view hadn't default property and it is going to be
-                        currentDefaultViewModel.set({is_default: false});
-                    } else if (isCurrentWasDefault) {
-                        // if current view had 'default' property and this property was removed, there are no
-                        // views with 'default' property and it shall be set to system view.
-                        self._getDefaultSystemViewModel().set({is_default: true});
+                    wait: true,
+                    success: function(savedModel) {
+                        var currentDefaultViewModel = self._getCurrentDefaultViewModel();
+                        var isCurrentDefault = currentDefaultViewModel === model;
+                        var isCurrentWasDefault = currentDefaultViewModel === undefined;
+                        if (model.get('is_default') && !isCurrentDefault) {
+                            // if current view hadn't default property and it is going to be
+                            currentDefaultViewModel.set({is_default: false});
+                        } else if (isCurrentWasDefault) {
+                            // if current view had 'default' property and this property was removed, there are no
+                            // views with 'default' property and it shall be set to system view.
+                            self._getDefaultSystemViewModel().set({is_default: true});
+                        }
+
+                        model.set({
+                            label: savedModel.get('label')
+                        });
+
+                        self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
+                    },
+                    errorHandlerMessage: self.showErrorMessage,
+                    error: function(model, response, options) {
+                        model.set('label', model.previous('label'));
+                        self.onError(model, response, options);
                     }
-
-                    model.set({
-                        'label': savedModel.get('label')
-                    });
-
-                    self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
-                },
-                errorHandlerMessage: self.showErrorMessage,
-                error: function(model, response, options) {
-                    model.set('label', model.previous('label'));
-                    self.onError(model, response, options);
-                }
-            });
+                });
         },
 
         onError: function(model, response, options) {
@@ -530,9 +533,9 @@ define(function(require) {
             }
             return $.post(
                 routing.generate(this.route, {
-                    id: id,
-                    default: isDefault,
-                    gridName: gridName
+                    'id': id,
+                    'default': isDefault,
+                    'gridName': gridName
                 }),
                 {},
                 function(response) {
@@ -992,8 +995,9 @@ define(function(require) {
                 return;
             }
 
-            var newTitle = this._createTitle();
-            mediator.execute('adjustTitle', newTitle, true);
+            if (this.adjustDocumentTitle) {
+                mediator.execute('adjustTitle', this._createTitle(), true);
+            }
         },
 
         /**

@@ -3,18 +3,21 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\ExpandRelatedEntities;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
     protected $configProvider;
 
     /** @var ExpandRelatedEntities */
@@ -24,13 +27,8 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configProvider = $this
-            ->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->configProvider = $this->createMock(ConfigProvider::class);
 
         $this->processor = new ExpandRelatedEntities(
             $this->doctrineHelper,
@@ -46,6 +44,22 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
 
         $this->doctrineHelper->expects($this->never())
             ->method('isManageableEntityClass');
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException
+     * @expectedExceptionMessage Requested unsupported operation "expand_related_entities" when building config for "Test\Class".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testProcessForDisabledInclusion()
+    {
+        $config = [
+            'disable_inclusion' => true
+        ];
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);

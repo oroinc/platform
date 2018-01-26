@@ -18,10 +18,10 @@ define(function(require) {
         options: {
             template: null,
             data: {
-                'label': '',
-                'property_path': '',
-                'property_path_text': '',
-                'required': false
+                label: '',
+                property_path: '',
+                property_path_text: '',
+                required: false
             },
             entity_field_template: null,
             entity: null,
@@ -55,7 +55,8 @@ define(function(require) {
         onAdd: function() {
             var formData = helper.getFormData(this.form);
 
-            formData.property_path = this.options.entityFieldsProvider.getPropertyPathByPath(formData.property_path);
+            formData.property_path = this.options
+                .entityFieldsProvider.getRelativePropertyPathByPath(formData.property_path);
             formData.required = formData.hasOwnProperty('required');
 
             this.resetForm();
@@ -86,7 +87,7 @@ define(function(require) {
         editRow: function(data) {
             this.fieldSelectorEl.inputWidget(
                 'val',
-                this.options.entityFieldsProvider.getPathByPropertyPathSafely(data.property_path)
+                this.options.entityFieldsProvider.getPathByRelativePropertyPathSafely(data.property_path)
             );
             this.form.find('[name=itemId]').val(data.itemId || '');
             this.labelEl.val(data.isSystemLabel ? '' : data.label);
@@ -99,9 +100,11 @@ define(function(require) {
             this._deferredRender();
             this.form = $(this.template(this.options.data)).filter('form');
             this.form.validate({
-                'submitHandler': _.bind(this.onAdd, this)
+                submitHandler: _.bind(this.onAdd, this)
             });
-            this.form.on('submit', function(e) {e.preventDefault();});
+            this.form.on('submit', function(e) {
+                e.preventDefault();
+            });
             this.initFieldChoiceView(this.form);
 
             this.submitBtn = this.form.find('[type=submit]');

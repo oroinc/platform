@@ -1,49 +1,63 @@
 define(function(require) {
     'use strict';
 
-    require('jasmine-jquery');
     var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
     var ExpressionEditorView = require('oroform/js/app/views/expression-editor-view');
+    var DataProviderMock = require('./Fixture/entity-structure-data-provider-mock.js');
 
-    //fixtures
-    var options = JSON.parse(require('text!./Fixture/expression-editor-options.json'));
+    // fixtures
+    var entitiesData = JSON.parse(require('text!./Fixture/entities-data.json'));
     var html = require('text!./Fixture/expression-editor-template.html');
+    var dataSource = require('text!./Fixture/data-source.html');
 
-    //variables
-    var expressionEditorUtil = null;
+    // variables
     var expressionEditorView = null;
     var typeahead = null;
-    var el = null;
+
+    require('jasmine-jquery');
+
+    function createEditorOptions(customOptions) {
+        return _.defaults(customOptions, {
+            autoRender: true,
+            el: '#expression-editor',
+            entityDataProvider: new DataProviderMock(entitiesData),
+            dataSource: {
+                pricelist: dataSource
+            },
+            rootEntities: ['pricelist', 'product']
+        });
+    }
 
     describe('oroform/js/app/views/expression-editor-view', function() {
-
         beforeEach(function() {
             window.setFixtures(html);
-
-            expressionEditorView = new ExpressionEditorView(_.defaults({}, {
-                el: '#expression-editor'
-            }, options));
-
-            expressionEditorUtil = expressionEditorView.util;
+            var options = createEditorOptions({itemLevelLimit: 3});
+            expressionEditorView = new ExpressionEditorView(options);
             typeahead = expressionEditorView.typeahead;
-            el = expressionEditorView.el;
         });
 
         afterEach(function() {
             expressionEditorView.dispose();
             expressionEditorView = null;
-            expressionEditorUtil = null;
             typeahead = null;
-            el = null;
         });
 
         describe('check initialization', function() {
-            it('component is defined', function() {
-                expect(_.isObject(expressionEditorUtil)).toBeTruthy();
+            it('view is defined and instance of BaseView', function() {
+                expect(expressionEditorView).toEqual(jasmine.any(BaseView));
             });
-
-            it('view is defined', function() {
-                expect(_.isObject(expressionEditorView)).toBeTruthy();
+            it('util throw an exeption when required options is missed', function() {
+                expect(function() {
+                    var options = createEditorOptions({entityDataProvider: null});
+                    expressionEditorView = new ExpressionEditorView(options);
+                }).toThrowError();
+            });
+            it('util throw an exeption when "itemLevelLimit" option is too small', function() {
+                expect(function() {
+                    var options = createEditorOptions({itemLevelLimit: 1});
+                    expressionEditorView = new ExpressionEditorView(options);
+                }).toThrowError();
             });
         });
 
@@ -55,8 +69,8 @@ define(function(require) {
                 'product.category.id': true,
                 'product.id == 1.234': true,
                 'product.id in [1, 2, 3, 4, 5]': true,
-                'product.sku matches test': false,
-                'product.sku matches "test"': true,
+                'product.status matches test': false,
+                'product.status matches "test"': true,
                 'product.id matches "test"': false,
                 'product.id not in [1, 2, 3, 4, 5]': true,
                 'product.id == product.id': true,
@@ -71,7 +85,7 @@ define(function(require) {
                 ')product.id == 5 and product.id == 10(': false,
                 '(product.id == 5() and product.id == 10)': false,
                 '{product.id == 5 and product.id == 10}': false,
-                '(product.id == 5 and product.id == 10) or (product.sku in ["sku1", "sku2", "sku3"])': true,
+                '(product.id == 5 and product.id == 10) or (product.status in ["status1", "status2"])': true,
                 'pricelist': false,
                 'pricelist.': false,
                 'pricelist.id': false,
@@ -93,34 +107,37 @@ define(function(require) {
 
             _.each(checks, function(result, check) {
                 it('should' + (!result ? ' not' : '') + ' be valid when "' + check + '"', function() {
-                    expect(expressionEditorUtil.validate(check)).toEqual(result);
+                    expect(expressionEditorView.util.validate(check)).toEqual(result);
                 });
             });
         });
 
         describe('check autocomplete logic', function() {
             it('chain select', function() {
-                el.value = 'pro';
+                expressionEditorView.el.value = 'pro';
                 typeahead.lookup();
-                for (var i = 0; i < 5; i++) {
-                    typeahead.select();
-                }
-
-                expect(el.value).toEqual('product.attributeFamily.code != pricelist[].');
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.');
+                typeahead.lookup();
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.brand.');
+                typeahead.lookup();
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.brand.id ');
+                typeahead.lookup();
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.brand.id != ');
+                typeahead.lookup();
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.brand.id != pricelist[].');
             });
 
             it('check suggested items for "product.category."', function() {
-                el.value = 'product.category.';
-                el.selectionStart = el.value.length;
+                expressionEditorView.el.value = 'product.category.';
+                typeahead.lookup();
 
                 expect(typeahead.source()).toEqual([
-                    'createdAt',
                     'id',
-                    'left',
-                    'level',
-                    'materializedPath',
-                    'right',
-                    'root',
                     'updatedAt'
                 ]);
             });
@@ -128,36 +145,19 @@ define(function(require) {
             it('check suggested items if previous item is entity or scalar(not operation)', function() {
                 var values = ['product.featured', '1', '1 in [1,2,3]', '(1 == 1)'];
                 _.each(values, function(value) {
-                    el.value = value + ' ';
-                    el.selectionStart = el.value.length;
+                    expressionEditorView.el.value = value + ' ';
+                    expressionEditorView.el.selectionStart = expressionEditorView.el.value.length;
                     typeahead.lookup();
 
-                    expect(typeahead.source()).toEqual([
-                        '!=',
-                        '%',
-                        '*',
-                        '+',
-                        '-',
-                        '/',
-                        '<',
-                        '<=',
-                        '==',
-                        '>',
-                        '>=',
-                        'and',
-                        'in',
-                        'matches',
-                        'not in',
-                        'or'
-                    ]);
+                    expect(typeahead.source()).toContain('!=');
                 });
             });
 
             it('check suggested items if previous item is operation', function() {
                 var values = ['', '+', '(1 =='];
                 _.each(values, function(value) {
-                    el.value = value + ' ';
-                    el.selectionStart = el.value.length;
+                    expressionEditorView.el.value = value + ' ';
+                    expressionEditorView.el.selectionStart = expressionEditorView.el.value.length;
                     typeahead.lookup();
 
                     expect(typeahead.source()).toEqual([
@@ -166,80 +166,177 @@ define(function(require) {
                     ]);
                 });
             });
-
-            it('check nesting level 1', function() {
-                expressionEditorUtil.options.itemLevelLimit = 1;
-                expressionEditorUtil._prepareItems();
-
-                expect(_.keys(expressionEditorUtil.entitiesItems)).toEqual([]);
-            });
-
-            it('check level 2', function() {
-                expressionEditorUtil.options.itemLevelLimit = 2;
-                expressionEditorUtil._prepareItems();
-
-                expect(_.keys(expressionEditorUtil.entitiesItems.product.child)).toEqual([
-                    'featured',
-                    'id',
-                    'inventory_status',
-                    'sku',
-                    'status',
-                    'type',
-                    'createdAt',
-                    'updatedAt'
-                ]);
-            });
-
-            it('check level 3', function() {
-                expressionEditorUtil.options.itemLevelLimit = 3;
-                expressionEditorUtil._prepareItems();
-
-                expect(_.keys(expressionEditorUtil.entitiesItems.product.child.category.child)).toEqual([
-                    'id',
-                    'left',
-                    'level',
-                    'materializedPath',
-                    'right',
-                    'root',
-                    'createdAt',
-                    'updatedAt'
-                ]);
-            });
         });
 
         describe('check value update after inserting selected value', function() {
             it('inserting in the field start', function() {
-                var checks = [];
-                checks.push([2, 'pro', 'product.']);
-                checks.push([8, 'product. == 10', 'product.attributeFamily. == 10']);
-                checks.push([12, 'product.id !', 'product.id != ']);
+                expressionEditorView.el.value = 'pro';
+                expressionEditorView.el.selectionStart = 2;
+                typeahead.lookup();
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.');
 
-                _.each(checks, function(check) {
-                    el.value = check[1];
-                    el.selectionStart = check[0];
+                expressionEditorView.el.value = 'product. == 10';
+                expressionEditorView.el.selectionStart = 8;
+                typeahead.lookup();
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.brand. == 10');
 
-                    typeahead.lookup();
-                    typeahead.select();
-
-                    expect(el.value).toEqual(check[2]);
-                });
+                expressionEditorView.el.value = 'product.id !';
+                expressionEditorView.el.selectionStart = 12;
+                typeahead.lookup();
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.id != ');
             });
         });
 
         describe('check data source render', function() {
             it('shown if type pricel', function() {
-                el.value = 'pricel';
+                expressionEditorView.el.value = 'pricel';
                 typeahead.lookup();
                 typeahead.select();
                 var $dataSource = expressionEditorView.getDataSource('pricelist').$widget;
 
                 expect($dataSource.is(':visible')).toBeTruthy();
 
-                el.value = 'pricelist[1].id + product.id';
-                el.selectionStart = 27;
+                expressionEditorView.el.value = 'pricelist[1].id + product.id';
+                expressionEditorView.el.selectionStart = 27;
                 typeahead.lookup();
 
                 expect($dataSource.is(':visible')).toBeFalsy();
+            });
+        });
+    });
+
+    describe('oroform/js/app/views/expression-editor-view', function() {
+        describe('when limit is `2`', function() {
+            beforeEach(function() {
+                window.setFixtures(html);
+                var options = createEditorOptions({itemLevelLimit: 2});
+                expressionEditorView = new ExpressionEditorView(options);
+                typeahead = expressionEditorView.typeahead;
+            });
+
+            afterEach(function() {
+                expressionEditorView.dispose();
+                expressionEditorView = null;
+                typeahead = null;
+            });
+            it('second level is present', function() {
+                expressionEditorView.el.value = 'pro';
+                typeahead.lookup();
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.');
+                expect(typeahead.source()).toEqual([
+                    'id',
+                    'status'
+                ]);
+            });
+
+            it('third level is missed', function() {
+                expressionEditorView.el.value = 'pro';
+                typeahead.lookup();
+                expect(typeahead.source()).toContain('product');
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.');
+                expect(typeahead.source()).toContain('id');
+                typeahead.select();
+                expect(typeahead.source()).toContain('!=');
+            });
+        });
+
+        describe('when limit is `4`', function() {
+            beforeEach(function() {
+                window.setFixtures(html);
+                var options = createEditorOptions({itemLevelLimit: 4});
+                expressionEditorView = new ExpressionEditorView(options);
+                typeahead = expressionEditorView.typeahead;
+            });
+
+            afterEach(function() {
+                expressionEditorView.dispose();
+                expressionEditorView = null;
+                typeahead = null;
+            });
+            it('fourth level is present', function() {
+                expressionEditorView.el.value = 'pro';
+                typeahead.lookup();
+                expect(typeahead.source()).toContain('product');
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.');
+                expressionEditorView.el.value += 'cat';
+                typeahead.lookup();
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.category.');
+                expressionEditorView.el.value += 'par';
+                typeahead.lookup();
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.category.parentCategory.');
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.category.parentCategory.id ');
+            });
+
+            it('fifth level is missed', function() {
+                expressionEditorView.el.value = 'pro';
+                typeahead.lookup();
+                expect(typeahead.source()).toContain('product');
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.');
+                expressionEditorView.el.value += 'cat';
+                typeahead.lookup();
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.category.');
+                expressionEditorView.el.value += 'par';
+                typeahead.lookup();
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.category.parentCategory.');
+                expect(typeahead.source()).not.toContain('parentCategory');
+            });
+        });
+        describe('when allowed operations configured', function() {
+            beforeEach(function() {
+                window.setFixtures(html);
+            });
+
+            afterEach(function() {
+                expressionEditorView.dispose();
+                expressionEditorView = null;
+                typeahead = null;
+            });
+            it('only math operations is accessible', function() {
+                var options = createEditorOptions({
+                    allowedOperations: ['math'],
+                    itemLevelLimit: 2
+                });
+                expressionEditorView = new ExpressionEditorView(options);
+                typeahead = expressionEditorView.typeahead;
+                expressionEditorView.el.value = 'pro';
+                typeahead.lookup();
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.');
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.id ');
+                expect(typeahead.source()).toContain('+');
+                expect(typeahead.source()).not.toContain('!=');
+                expect(typeahead.source()).not.toContain('and');
+                expect(typeahead.source()).not.toContain('match');
+            });
+            it('only equality and compare operations are accessible', function() {
+                var options = createEditorOptions({
+                    allowedOperations: ['equality', 'compare'],
+                    itemLevelLimit: 2
+                });
+                expressionEditorView = new ExpressionEditorView(options);
+                typeahead = expressionEditorView.typeahead;
+                expressionEditorView.el.value = 'pro';
+                typeahead.lookup();
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.');
+                typeahead.select();
+                expect(expressionEditorView.el.value).toEqual('product.id ');
+                expect(typeahead.source()).toContain('<');
+                expect(typeahead.source()).toContain('!=');
+                expect(typeahead.source()).not.toContain('+');
             });
         });
     });

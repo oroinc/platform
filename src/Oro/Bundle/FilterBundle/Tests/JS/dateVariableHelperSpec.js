@@ -4,13 +4,13 @@ define([
     'use strict';
 
     var dateVariableHelper = new DateVariableHelper({
-        'value': {
-            '10': 'current day',
-            '11': 'current day without year'
+        value: {
+            10: 'current day',
+            11: 'current day without year'
         },
-        'dayofweek': {
-            '10': 'current day',
-            '15': 'first day of quarter'
+        dayofweek: {
+            10: 'current day',
+            15: 'first day of quarter'
         }
     });
 

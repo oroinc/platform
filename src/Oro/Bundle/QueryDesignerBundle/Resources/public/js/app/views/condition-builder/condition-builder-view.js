@@ -53,7 +53,7 @@ define(function(require) {
         currentDraggingElementHeight: 0,
 
         /**
-         * @type {Object<string, View>}
+         * @type {Object.<string, View>}
          */
         criteriaModules: undefined,
 
@@ -63,7 +63,7 @@ define(function(require) {
         value: null,
 
         /**
-         * @type {Object<string, ConditionView>}
+         * @type {Object.<string, ConditionView>}
          */
         conditions: undefined,
 
@@ -221,7 +221,7 @@ define(function(require) {
         assignConditionSubview: function(conditionView) {
             this.subview('condition:' + conditionView.cid, conditionView);
             this.listenTo(conditionView, {
-                'change': this._checkValueChange
+                change: this._checkValueChange
             });
             this._checkValueChange();
         },
@@ -334,7 +334,9 @@ define(function(require) {
             }
 
             var subviews = this._createConditionGroupSubviews(value);
-            var elements = _.map(subviews, function(view) { return view.el;});
+            var elements = _.map(subviews, function(view) {
+                return view.el;
+            });
             this.$content.append(elements);
             // all elements have to be added to DOM first before assigning subviews
             _.each(subviews, function(view) {
@@ -542,7 +544,7 @@ define(function(require) {
             }
 
             this.$content.find('.sortable-placeholder').css({
-                'height': this.currentDraggingElementHeight
+                height: this.currentDraggingElementHeight
             });
         },
 

@@ -1,4 +1,4 @@
-/*global gapi */
+/* global gapi */
 define(function(require) {
     'use strict';
 
@@ -35,9 +35,9 @@ define(function(require) {
         requestToken: function() {
             gapi.auth.authorize(
                 {
-                    'client_id': this.$clientIdElement.val(),
-                    'scope': this.scopes.join(' '),
-                    'immediate': false
+                    client_id: this.$clientIdElement.val(),
+                    scope: this.scopes.join(' '),
+                    immediate: false
                 }, _.bind(this.checkAuthorization, this));
         },
 
@@ -48,7 +48,7 @@ define(function(require) {
 
         requestProfile: function() {
             var request = gapi.client.gmail.users.getProfile({
-                'userId': 'me'
+                userId: 'me'
             });
 
             request.execute(_.bind(this.responseProfile, this));
@@ -60,7 +60,7 @@ define(function(require) {
             }
 
             this.view.render();
-        },
+        }
     });
 
     return GoogleSyncCheckbox;

@@ -30,7 +30,7 @@ define([
         $fields: null,
 
         events: {
-            'click': 'onSubmit'
+            click: 'onSubmit'
         },
 
         listen: {
@@ -141,7 +141,7 @@ define([
                         value = element.is(':checked') ? 1 : 0;
 
                         if (value === 0) { // do not send the value of checkbox,
-                            return;       // it will be set as false in the backend
+                            return; // it will be set as false in the backend
                         }
                     }
 

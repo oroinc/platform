@@ -43,14 +43,6 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * @return array
-     */
-    protected function getRequestParameters()
-    {
-        return $this->generateWsseAuthHeader();
-    }
-
-    /**
      * @return RequestType
      */
     abstract protected function getRequestType();
@@ -354,7 +346,7 @@ abstract class ApiTestCase extends WebTestCase
      *                                     cache. E.g. this can happen when an association is renamed or excluded,
      *                                     or when a API resource is added or excluded
      */
-    public function appendEntityConfig($entityClass, array $config, $affectResourcesCache = false)
+    protected function appendEntityConfig($entityClass, array $config, $affectResourcesCache = false)
     {
         $this->getConfigRegistry()->appendEntityConfig($entityClass, $config, $affectResourcesCache);
         // disable the kernel reboot to avoid loosing of changes in configs

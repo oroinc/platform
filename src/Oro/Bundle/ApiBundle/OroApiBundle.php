@@ -29,6 +29,9 @@ class OroApiBundle extends Bundle
         $container->addCompilerPass(new Compiler\ExceptionTextExtractorConfigurationCompilerPass());
         $container->addCompilerPass(new Compiler\ConstraintTextExtractorConfigurationCompilerPass());
         $container->addCompilerPass(new Compiler\QueryExpressionCompilerPass());
+        $container->addCompilerPass(new Compiler\SecurityFirewallCompilerPass());
+        $container->addCompilerPass(new Compiler\DocumentBuilderConfigurationCompilerPass());
+        $container->addCompilerPass(new Compiler\ErrorCompleterConfigurationCompilerPass());
         $container->addCompilerPass(
             new LoadApplicableCheckersCompilerPass('oro_api.processor_bag', 'oro.api.processor.applicable_checker')
         );
@@ -40,9 +43,6 @@ class OroApiBundle extends Bundle
             new Compiler\ApiDocConfigurationCompilerPass(),
             PassConfig::TYPE_BEFORE_REMOVING
         );
-        $container->addCompilerPass(new Compiler\SecurityFirewallCompilerPass());
-        $container->addCompilerPass(new Compiler\DocumentBuilderConfigurationCompilerPass());
-        $container->addCompilerPass(new Compiler\ErrorCompleterConfigurationCompilerPass());
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $container->addCompilerPass(

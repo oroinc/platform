@@ -6,6 +6,9 @@ define(function(require) {
     var _ = require('underscore');
 
     function setInnerElementPosition(label) {
+        if (!label.length) {
+            return;
+        }
         var offset = label.offset();
         var marginTop = label.css('marginTop').replace('px', '');
         var marginLeft = label.css('marginLeft').replace('px', '');

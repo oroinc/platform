@@ -53,7 +53,7 @@ define(function(require) {
 
         addItem: function(data) {
             var collection = this.getCollection();
-            var fieldId = this.options.entityFieldsProvider.getPathByPropertyPathSafely(data.property_path);
+            var fieldId = this.options.entityFieldsProvider.getPathByRelativePropertyPathSafely(data.property_path);
             var fieldChoiceView = this.options.fieldsChoiceView;
             var hasEntityField = this.options.entityFieldsProvider.validatePath(fieldId);
             data.isSystemLabel = !data.label;
@@ -77,7 +77,7 @@ define(function(require) {
                 }
             }
 
-            var collectionItem = data.itemId ? _.findWhere(collection, {'itemId': data.itemId}) : null;
+            var collectionItem = data.itemId ? _.findWhere(collection, {itemId: data.itemId}) : null;
             if (collectionItem) {
                 _.extend(collectionItem, data);
             } else {

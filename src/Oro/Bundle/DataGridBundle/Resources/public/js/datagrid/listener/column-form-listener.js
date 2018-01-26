@@ -38,10 +38,10 @@ define([
 
             this.selectRows();
             this.listenTo(options.grid.collection, {
-                'sync': this.selectRows,
-                'excludeRow': this._excludeRow,
-                'includeRow': this._includeRow,
-                'setState': this.setState
+                sync: this.selectRows,
+                excludeRow: this._excludeRow,
+                includeRow: this._includeRow,
+                setState: this.setState
             });
         },
 
@@ -162,7 +162,9 @@ define([
             if (!string) {
                 return [];
             }
-            return _.map(string.split(','), function(val) { return val ? String(val) : null; });
+            return _.map(string.split(','), function(val) {
+                return val ? String(val) : null;
+            });
         },
 
         /**

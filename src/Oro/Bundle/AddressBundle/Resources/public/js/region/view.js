@@ -20,7 +20,7 @@ define(function(require) {
      */
     return Backbone.View.extend({
         events: {
-            'change': 'selectionChanged'
+            change: 'selectionChanged'
         },
 
         switchState: config.switchState,

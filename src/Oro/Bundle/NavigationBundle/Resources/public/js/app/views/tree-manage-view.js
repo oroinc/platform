@@ -103,7 +103,7 @@ define(function(require) {
 
                     var message = _.__(self.successMessage, {
                         nodeText: data.node.text,
-                        'reload_link': reloadLink
+                        reload_link: reloadLink
                     });
                     messenger.notificationFlashMessage('success', message);
                 },

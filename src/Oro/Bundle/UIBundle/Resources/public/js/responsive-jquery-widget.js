@@ -2,9 +2,9 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
     'use strict';
 
     var SERVICE_AREA = 60; // extra area for some kind of sidebars, etc.
-    var SCREEN_SMALL = 1280 - SERVICE_AREA; //WXGA 16:9 1280x720
-    var SCREEN_MEDIUM = 1360 - SERVICE_AREA; //HD ~16:9 1360x768
-    var SCREEN_LARGE = 1600 - SERVICE_AREA; //HD+ 16:9 1600x900
+    var SCREEN_SMALL = 1280 - SERVICE_AREA; // WXGA 16:9 1280x720
+    var SCREEN_MEDIUM = 1360 - SERVICE_AREA; // HD ~16:9 1360x768
+    var SCREEN_LARGE = 1600 - SERVICE_AREA; // HD+ 16:9 1600x900
 
     /**
      * Widget makes layout responive

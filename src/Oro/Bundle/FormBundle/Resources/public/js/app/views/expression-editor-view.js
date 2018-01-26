@@ -44,25 +44,47 @@ define(function(require) {
          */
         delay: 50,
 
+        events: {
+            focus: 'debouncedAutocomplete',
+            click: 'debouncedAutocomplete',
+            input: 'debouncedAutocomplete',
+            keyup: 'debouncedValidate',
+            change: 'debouncedValidate',
+            blur: 'debouncedValidate',
+            paste: 'debouncedValidate'
+        },
+
+        constructor: function(options) {
+            this.debouncedAutocomplete = _.debounce(function(e) {
+                if (!this.disposed) {
+                    this.autocomplete(e);
+                }
+            }.bind(this), this.delay);
+            this.debouncedValidate = _.debounce(function(e) {
+                if (!this.disposed) {
+                    this.validate(e);
+                }
+            }.bind(this), this.delay);
+            ExpressionEditorView.__super__.constructor.call(this, options);
+        },
+
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            this.util = new ExpressionEditorUtil(options);
+            var utilOptions = _.pick(options,
+                'itemLevelLimit', 'allowedOperations', 'operations', 'rootEntities', 'entityDataProvider');
+            utilOptions.dataSourceNames = _.keys(options.dataSource);
+            this.util = new ExpressionEditorUtil(utilOptions);
 
             this.autocompleteData = this.autocompleteData || {};
             this.dataSource = this.dataSource || {};
             this.dataSourceInstances = this.dataSourceInstances || {};
 
-            this.initAutocomplete();
-
             return ExpressionEditorView.__super__.initialize.apply(this, arguments);
         },
 
-        /**
-         * Initialize autocomplete widget
-         */
-        initAutocomplete: function() {
+        render: function() {
             this.$el.typeahead({
                 minLength: 0,
                 items: 20,
@@ -96,37 +118,6 @@ define(function(require) {
             delete this.dataSourceInstances;
 
             return ExpressionEditorView.__super__.dispose.apply(this, arguments);
-        },
-
-        /**
-         * @inheritDoc
-         */
-        delegateEvents: function(events) {
-            var result = ExpressionEditorView.__super__.delegateEvents.apply(this, arguments);
-
-            var self = this;
-            var namespace = this.eventNamespace();
-            var autocomplete = _.debounce(function(e) {
-                if (!self.disposed) {
-                    self.autocomplete(e);
-                }
-            }, this.delay);
-            var validate = _.debounce(function(e) {
-                if (!self.disposed) {
-                    self.validate(e);
-                }
-            }, this.delay);
-
-            this.$el
-                .on('focus' + namespace, autocomplete)
-                .on('click' + namespace, autocomplete)
-                .on('input' + namespace, autocomplete)
-                .on('keyup' + namespace, validate)
-                .on('change' + namespace, validate)
-                .on('blur' + namespace, validate)
-                .on('paste' + namespace, validate);
-
-            return result;
         },
 
         /**
@@ -194,8 +185,7 @@ define(function(require) {
          */
         _typeaheadHighlighter: function(item) {
             var original = Typeahead.prototype.highlighter;
-            var hasChild = !!this.autocompleteData.items[item].child;
-            var suffix = hasChild ? '&hellip;' : '';
+            var suffix = this.autocompleteData.items[item].hasChildren ? '&hellip;' : '';
             return original.call(this.typeahead, item) + suffix;
         },
 
@@ -210,7 +200,7 @@ define(function(require) {
             this.util.updateAutocompleteItem(this.autocompleteData, item);
             var position = this.autocompleteData.position;
             this.$el.one('change', function() {
-                //set correct position after typeahead call change event
+                // set correct position after typeahead call change event
                 this.selectionStart = this.selectionEnd = position;
             });
 
@@ -224,12 +214,7 @@ define(function(require) {
          * @return {Object}
          */
         getDataSource: function(dataSourceKey) {
-            var dataSource = this.dataSourceInstances[dataSourceKey];
-            if (!dataSource) {
-                return this._initializeDataSource(dataSourceKey);
-            }
-
-            return dataSource;
+            return this.dataSourceInstances[dataSourceKey] || this._initializeDataSource(dataSourceKey);
         },
 
         /**
@@ -251,12 +236,12 @@ define(function(require) {
 
             this.$el.after(dataSource.$widget).trigger('content:changed');
 
-            dataSource.$field.on('change', _.bind(function() {
+            dataSource.$field.on('change', _.bind(function(e) {
                 if (!dataSource.active) {
                     return;
                 }
 
-                this.util.updateDataSourceValue(this.autocompleteData, dataSource.$field.val());
+                this.util.updateDataSourceValue(this.autocompleteData, $(e.currentTarget).val());
                 this.$el.val(this.autocompleteData.expression)
                     .change().focus();
 
@@ -281,7 +266,7 @@ define(function(require) {
                 return;
             }
 
-            this.autocompleteData.items = {};//hide autocomplete list
+            this.autocompleteData.items = {};// hide autocomplete list
 
             var dataSource = this.getDataSource(dataSourceKey);
             dataSource.$field.val(dataSourceValue).change();

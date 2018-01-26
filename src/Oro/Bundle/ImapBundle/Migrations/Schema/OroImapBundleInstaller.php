@@ -16,7 +16,7 @@ class OroImapBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_5';
+        return 'v1_6';
     }
 
     /**
@@ -30,6 +30,7 @@ class OroImapBundleInstaller implements Installation
         $this->createOroEmailImapTable($schema);
         v13::addSmtpFieldsToOroEmailOriginTable($schema);
         v14::addAccessTokenFieldsToOroEmailOriginTable($schema);
+        $this->addOroImapWrongCredsOriginTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroEmailFolderImapForeignKeys($schema);
@@ -120,5 +121,19 @@ class OroImapBundleInstaller implements Installation
             ['onDelete' => null, 'onUpdate' => null],
             'FK_17E00D834F00B133'
         );
+    }
+
+    /**
+     * Add oro_imap_wrong_creds_origin table.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroImapWrongCredsOriginTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_imap_wrong_creds_origin');
+        $table->addColumn('origin_id', 'integer', ['notnull' => true]);
+        $table->addColumn('owner_id', 'integer', ['notnull' => false]);
+        $table->setPrimaryKey(['origin_id']);
+        $table->addIndex(['owner_id']);
     }
 }

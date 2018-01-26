@@ -24,12 +24,9 @@ class ValidateIsCollectionTest extends GetSubresourceProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "add_relationship" action supports only a collection valued relationship. Association: Test\Class::test.
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException
      */
-    // @codingStandardsIgnoreEnd
     public function testProcessWhenIsCollectionFlagIsFalse()
     {
         $this->context->setAction(ApiActions::ADD_RELATIONSHIP);

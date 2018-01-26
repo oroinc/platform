@@ -20,10 +20,10 @@ define([
         widgetOptions: null,
         widgetComponent: null,
         widgetDefaultOptions: {
-            type: 'dialog',
-            multiple: false,
+            'type': 'dialog',
+            'multiple': false,
             'reload-grid-name': '',
-            options: {
+            'options': {
                 dialogOptions: {
                     title: __('Update item'),
                     allowMaximize: false,

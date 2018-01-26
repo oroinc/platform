@@ -69,8 +69,8 @@ define([
          */
         updateState: function(selectState) {
             this.$('[data-select]:checkbox').prop({
-                'indeterminate': !selectState.isEmpty(),
-                'checked': !selectState.get('inset')
+                indeterminate: !selectState.isEmpty(),
+                checked: !selectState.get('inset')
             });
         },
 
@@ -119,7 +119,6 @@ define([
             } else if ($el.is('[data-select-all-visible]')) {
                 // Handles click on selectAllVisible button
                 this.collection.trigger('backgrid:selectAllVisible');
-
             } else if ($el.is('[data-select-none]')) {
                 // Handles click on selectNone button
                 this.collection.trigger('backgrid:selectNone');

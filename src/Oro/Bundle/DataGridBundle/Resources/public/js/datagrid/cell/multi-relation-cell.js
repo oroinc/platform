@@ -70,7 +70,9 @@ define([
                 html = value.count > 0 ? (
                     '<span class="multiselect-value-wrapper"><span class="value-item">' +
                     value.data
-                        .map(function(item) {return item.label;})
+                        .map(function(item) {
+                            return item.label;
+                        })
                         .join('</span><span class="value-item">') +
                     '</span></span>'
                 ) : '';

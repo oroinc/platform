@@ -245,10 +245,10 @@ define([
             var distY = !$prev[0] ? options.marginY :
                 $prev.position().top + $prev.outerHeight(true) + options.fontSize * 1.2;
             var style = {
-                    size: options.fontSize * 1.2,
-                    color: options.fontColor,
-                    weight: 1.5
-                };
+                size: options.fontSize * 1.2,
+                color: options.fontColor,
+                weight: 1.5
+            };
             options.htmlText = true;
             style.textAlign = 'left';
             style.textBaseline = 'top';
@@ -256,7 +256,7 @@ define([
 
             var html = [];
             var divStyle =
-                    style.textBaseline + ':' + (distY - style.size)  + 'px;' +
+                    style.textBaseline + ':' + (distY - style.size) + 'px;' +
                     style.textAlign + ':' + (distX + 10) + 'px;';
 
             html.push('<div style="', divStyle, '" class="flotr-grid-label funnel-label">', series.label, '</div>');
@@ -325,5 +325,4 @@ define([
             return this._total;
         }
     });
-
 });

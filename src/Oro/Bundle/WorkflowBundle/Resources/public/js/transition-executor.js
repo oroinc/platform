@@ -1,7 +1,7 @@
 define([
     'jquery',
     'oroui/js/mediator',
-    'oroworkflow/js/transition-event-handlers',
+    'oroworkflow/js/transition-event-handlers'
 ], function($, mediator, TransitionEventHandlers) {
     'use strict';
 
@@ -14,7 +14,7 @@ define([
     return function(element, data, pageRefresh) {
         TransitionEventHandlers.getOnStart(element, pageRefresh)();
 
-        $.getJSON(element.data('transition-url'), data ? {'data': data} : null)
+        $.getJSON(element.data('transition-url'), data ? {data: data} : null)
             .done(TransitionEventHandlers.getOnSuccess(element, pageRefresh))
             .fail(TransitionEventHandlers.getOnFailure(element, pageRefresh));
     };

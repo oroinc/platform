@@ -3,11 +3,15 @@
 namespace Oro\Bundle\ImapBundle\Sync;
 
 use Doctrine\ORM\EntityManager;
+
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Exception\EmailAddressParseException;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
@@ -47,6 +51,9 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     /** @var int */
     private $processStartTime;
 
+    /** @var  LoggerInterface */
+    private $emailErrorsLogger;
+
     /**
      * Constructor
      *
@@ -66,6 +73,14 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         parent::__construct($em, $emailEntityBuilder, $knownEmailAddressChecker);
         $this->manager = $manager;
         $this->removeManager = $removeManager;
+    }
+
+    /**
+     * @param LoggerInterface $emailErrorsLogger
+     */
+    public function setEmailErrorsLogger(LoggerInterface $emailErrorsLogger)
+    {
+        $this->emailErrorsLogger = $emailErrorsLogger;
     }
 
     /**
@@ -280,7 +295,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 }
 
                 if (false === $this->getSettings()->isForceMode()
-                    || (true  === $this->getSettings()->isForceMode() && count($relatedExistingImapEmails) === 0)
+                    || (true === $this->getSettings()->isForceMode() && count($relatedExistingImapEmails) === 0)
                 ) {
                     $imapEmail = $this->createImapEmail($email->getId()->getUid(), $emailUser->getEmail(), $imapFolder);
                     $newImapEmails[] = $imapEmail;
@@ -293,6 +308,13 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                         )
                     );
                 }
+            } catch (EmailAddressParseException $e) {
+                $errorContext = [];
+                $headers = $email->getMessage()->getHeaders();
+                foreach ($headers as $header) {
+                    $errorContext[$header->getFieldName()] = $header->getFieldValue();
+                }
+                $this->emailErrorsLogger->error($e->getMessage(), ['headers' => json_encode($errorContext)]);
             } catch (\Exception $e) {
                 $this->logger->warning(
                     sprintf(

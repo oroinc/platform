@@ -1,4 +1,3 @@
-/*global define*/
 define(function(require) {
     'use strict';
 
@@ -132,7 +131,7 @@ define(function(require) {
                     ids.push(email.get('id'));
                 }
             });
-            this._markAsRead({'ids': ids});
+            this._markAsRead({ids: ids});
         },
 
         onClickMarkAsRead: function() {

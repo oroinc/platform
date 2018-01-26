@@ -12,7 +12,7 @@ define(function(require) {
 
     var config = _.extend({
         populateDefault: true
-    },  module.config());
+    }, module.config());
 
     /**
      * Select filter: filter value as select option

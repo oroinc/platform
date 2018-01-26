@@ -4,7 +4,6 @@ define(function(require) {
     var $ = require('jquery');
     var Backbone = require('backbone');
     var requirejsExposure = require('requirejs-exposure');
-    var markup = require('text!./Fixture/aggregated-field-condition/markup.html');
     var data = JSON.parse(require('text!./Fixture/aggregated-field-condition/entities.json'));
     var filters = JSON.parse(require('text!./Fixture/aggregated-field-condition/filters.json'));
     var columnsData = JSON.parse(require('text!./Fixture/aggregated-field-condition/columnsData.json'));
@@ -16,7 +15,6 @@ define(function(require) {
     var exposure = requirejsExposure.disclose('oroquerydesigner/js/app/views/field-condition-view');
 
     describe('oroquerydesigner/js/app/views/aggregated-field-condition-view', function() {
-
         var aggregatedFieldConditionView;
 
         describe('without initial value', function() {
@@ -24,7 +22,6 @@ define(function(require) {
             beforeEach(function(done) {
                 FieldChoiceMock.setData(data);
                 exposure.substitute('FieldChoiceView').by(FieldChoiceMock);
-                window.setFixtures(markup);
                 columnsCollection = new Backbone.Collection(columnsData);
                 aggregatedFieldConditionView = new AggregatedFieldConditionView({
                     autoRender: true,
@@ -51,36 +48,34 @@ define(function(require) {
 
             it('is instance of FieldConditionView', function() {
                 expect(aggregatedFieldConditionView).toEqual(jasmine.any(FieldConditionView));
-
             });
         });
 
         describe('with initial value', function() {
             var columnsCollection;
             var initialValue = {
-                'columnName': 'id',
-                'criterion': {
-                    'filter': 'number',
-                    'data': {
-                        'value': 1,
-                        'type': '3',
-                        'params': {
-                            'filter_by_having': true
+                columnName: 'id',
+                criterion: {
+                    filter: 'number',
+                    data: {
+                        value: 1,
+                        type: '3',
+                        params: {
+                            filter_by_having: true
                         }
                     }
                 },
-                'func': {
-                    'name': 'Count',
-                    'group_type': 'aggregates',
-                    'group_name': 'number'
+                func: {
+                    name: 'Count',
+                    group_type: 'aggregates',
+                    group_name: 'number'
                 },
-                'criteria': 'aggregated-condition-item'
+                criteria: 'aggregated-condition-item'
             };
 
             beforeEach(function(done) {
                 FieldChoiceMock.setData(data);
                 exposure.substitute('FieldChoiceView').by(FieldChoiceMock);
-                window.setFixtures(markup);
                 columnsCollection = new Backbone.Collection(columnsData);
                 aggregatedFieldConditionView = new AggregatedFieldConditionView({
                     autoRender: true,

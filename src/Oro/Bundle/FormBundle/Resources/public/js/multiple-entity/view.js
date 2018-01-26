@@ -1,5 +1,5 @@
 define(['underscore', 'backbone', 'oro/dialog-widget'
-    ], function(_, Backbone, DialogWidget) {
+], function(_, Backbone, DialogWidget) {
     'use strict';
 
     /**
@@ -43,12 +43,12 @@ define(['underscore', 'backbone', 'oro/dialog-widget'
             e.stopImmediatePropagation();
             e.preventDefault();
             var widget = new DialogWidget({
-                'url': this.options.model.get('link'),
-                'title': this.options.model.get('label'),
+                url: this.options.model.get('link'),
+                title: this.options.model.get('label'),
                 dialogOptions: {
-                    'allowMinimize': true,
-                    'width': 675,
-                    'autoResize': true
+                    allowMinimize: true,
+                    width: 675,
+                    autoResize: true
                 }
             });
             widget.render();

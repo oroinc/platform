@@ -142,9 +142,9 @@ define(function(require) {
             }
 
             var stepEditView = new StepEditView({
-                'model': step,
-                'workflow': this.model,
-                'workflowContainer': this.workflowManagementView.$el
+                model: step,
+                workflow: this.model,
+                workflowContainer: this.workflowManagementView.$el
             });
             stepEditView.on('stepAdd', this.addStep, this);
             stepEditView.render();
@@ -224,7 +224,7 @@ define(function(require) {
          * Clean ups workflow model
          */
         resetWorkflow: function() {
-            //Need to manually destroy collection elements to trigger all appropriate events
+            // Need to manually destroy collection elements to trigger all appropriate events
             var resetCollection = function(collection) {
                 if (collection.length) {
                     for (var i = collection.length - 1; i > -1; i--) {
@@ -282,7 +282,7 @@ define(function(require) {
 
             mediator.execute('showLoading');
             this.model.save(null, {
-                'success': _.bind(function() {
+                success: _.bind(function() {
                     mediator.execute('hideLoading');
 
                     var redirectUrl = '';
@@ -307,7 +307,7 @@ define(function(require) {
                     });
                     mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true});
                 }, this),
-                'errorHandlerMessage': function(event, response) {
+                errorHandlerMessage: function(event, response) {
                     var message = __('Could not save workflow.');
                     if (response.responseJSON && response.responseJSON.error) {
                         message = response.responseJSON.error;
@@ -315,7 +315,7 @@ define(function(require) {
 
                     return message;
                 },
-                'error': function(model, response) {
+                error: function(model, response) {
                     mediator.execute('hideLoading');
                 }
             });

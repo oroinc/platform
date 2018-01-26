@@ -14,7 +14,7 @@ define(function(require) {
         if (!el || !_.isFunction(el.getBoundingClientRect)) {
             return null;
         }
-        var rect = _.pick(el.getBoundingClientRect(), ['top', 'right', 'bottom',  'left', 'width', 'height']);
+        var rect = _.pick(el.getBoundingClientRect(), ['top', 'right', 'bottom', 'left', 'width', 'height']);
         _.forEach(el.childNodes, function(child) {
             var childRect = getTreeRect(child);
             if (childRect) {
@@ -39,7 +39,7 @@ define(function(require) {
         POSITION_CLASSES: {
             bottom: 'error-message-below',
             right: 'error-message-right',
-            left: 'error-message-left',
+            left: 'error-message-left'
         },
 
         DROPDOWNS: [
@@ -112,7 +112,7 @@ define(function(require) {
 
         getWithinRect: function() {
             var rect = _.pick(this.within[0].getBoundingClientRect(),
-                ['top', 'right', 'bottom',  'left', 'width', 'height']);
+                ['top', 'right', 'bottom', 'left', 'width', 'height']);
             var headerHeight = this.within.find('thead:first').outerHeight();
             var scroll = $.position.scrollbarWidth();
 

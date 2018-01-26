@@ -12,10 +12,13 @@ use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Oro\Bundle\ImapBundle\Async\Topics;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
+use Oro\Bundle\ImapBundle\Exception\InvalidCredentialsException;
 use Oro\Bundle\ImapBundle\Exception\SocketTimeoutException;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 class ImapEmailSynchronizer extends AbstractEmailSynchronizer
@@ -33,6 +36,9 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
 
     /** @var ImapEmailGoogleOauth2Manager */
     protected $imapEmailGoogleOauth2Manager;
+
+    /** @var SyncCredentialsIssueManager */
+    private $credentialsIssueManager;
 
     /**
      * @param ManagerRegistry $doctrine
@@ -56,6 +62,15 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         $this->connectorFactory     = $connectorFactory;
         $this->encryptor            = $encryptor;
         $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
+    }
+
+
+    /**
+     * @param SyncCredentialsIssueManager $credentialsIssueManager
+     */
+    public function setCredentialsManager(SyncCredentialsIssueManager $credentialsIssueManager)
+    {
+        $this->credentialsIssueManager = $credentialsIssueManager;
     }
 
     /**
@@ -128,5 +143,30 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
 
             return;
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doSyncOrigin(EmailOrigin $origin, SynchronizationProcessorSettings $settings = null)
+    {
+        try {
+            parent::doSyncOrigin($origin, $settings);
+        } catch (InvalidCredentialsException $ex) {
+            // save information of invalid origin
+            $this->credentialsIssueManager->addInvalidOrigin($origin);
+
+            throw $ex;
+        } catch (OAuth2ConnectException $ex) {
+            // save information of invalid origin
+            $this->credentialsIssueManager->addInvalidOrigin($origin);
+
+            throw $ex;
+        } catch (\Exception $ex) {
+            throw $ex;
+        }
+
+        // remove success processed origin
+        $this->credentialsIssueManager->removeOriginFromTheFailed($origin);
     }
 }

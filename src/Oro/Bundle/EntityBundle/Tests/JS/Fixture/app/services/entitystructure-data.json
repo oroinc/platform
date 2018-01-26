@@ -123,8 +123,6 @@
       "attributes": {
         "label": "Group",
         "pluralLabel": "Groups",
-        "alias": "usergroup",
-        "pluralAlias": "usergroups",
         "className": "Oro\\Bundle\\UserBundle\\Entity\\Group",
         "icon": null,
         "options": {

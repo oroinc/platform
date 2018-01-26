@@ -24,7 +24,7 @@ define(function(require) {
     var ExportAction = require('oro/datagrid/action/export-action');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var scrollHelper = require('oroui/js/tools/scroll-helper');
-    var PageableCollection =  require('../pageable-collection');
+    var PageableCollection = require('../pageable-collection');
     var util = require('./util');
     var tools = require('oroui/js/tools');
 
@@ -60,14 +60,14 @@ define(function(require) {
 
         /** @property {Object} */
         selectors: {
-            grid:        '.grid',
-            toolbar:     '[data-grid-toolbar]',
+            grid: '.grid',
+            toolbar: '[data-grid-toolbar]',
             toolbars: {
                 top: '[data-grid-toolbar=top]',
                 bottom: '[data-grid-toolbar=bottom]'
             },
             noDataBlock: '.no-data',
-            filterBox:   '.filter-box',
+            filterBox: '.filter-box',
             loadingMaskContainer: '.other-scroll-container',
             floatTheadContainer: '.floatThead-container'
         },
@@ -105,9 +105,9 @@ define(function(require) {
          * @property {Object} Default properties values
          */
         defaults: {
-            rowClickActionClass:    'row-click-action',
-            rowClassName:           '',
-            toolbarOptions:         {
+            rowClickActionClass: 'row-click-action',
+            rowClassName: '',
+            toolbarOptions: {
                 addResetAction: true,
                 addRefreshAction: true,
                 addColumnManager: true,
@@ -136,12 +136,12 @@ define(function(require) {
                     }
                 }
             },
-            rowClickAction:         undefined,
-            multipleSorting:        true,
-            rowActions:             [],
-            massActions:            new Backbone.Collection(),
+            rowClickAction: undefined,
+            multipleSorting: true,
+            rowActions: [],
+            massActions: new Backbone.Collection(),
             enableFullScreenLayout: false,
-            scopeDelimiter:         ':'
+            scopeDelimiter: ':'
         },
 
         /**
@@ -368,7 +368,7 @@ define(function(require) {
             this.collection.each(function(model) {
                 model.trigger('backgrid:select', model, true);
             });
-            this.selectState.reset({'inset': false});
+            this.selectState.reset({inset: false});
         },
 
         /**
@@ -538,7 +538,6 @@ define(function(require) {
          * @private
          */
         _initColumns: function(options) {
-
             if (Object.keys(this.rowActions).length > 0) {
                 options.columns.push(this._createActionsColumn());
             }
@@ -583,7 +582,7 @@ define(function(require) {
             var column;
             column = new this.actionsColumn({
                 datagrid: this,
-                actions:  this.rowActions,
+                actions: this.rowActions,
                 massActions: this.massActions,
                 manageable: false,
                 order: Infinity
@@ -600,13 +599,13 @@ define(function(require) {
         _createSelectRowColumn: function() {
             var column;
             column = new Backgrid.Column({
-                name:       'massAction',
-                label:      __('Selected Rows'),
+                name: 'massAction',
+                label: __('Selected Rows'),
                 renderable: true,
-                sortable:   false,
-                editable:   false,
+                sortable: false,
+                editable: false,
                 manageable: false,
-                cell:       SelectRowCell,
+                cell: SelectRowCell,
                 headerCell: SelectAllHeaderCell,
                 order: -Infinity
             });
@@ -628,9 +627,19 @@ define(function(require) {
 
         /**
          * Resets selection state
+         *
+         * @param {Object|null} restoreState
          */
-        resetSelectionState: function() {
+        resetSelectionState: function(restoreState) {
             this.collection.trigger('backgrid:selectNone');
+
+            if (restoreState && restoreState.selectedIds) {
+                this.collection.each(function(model) {
+                    if (restoreState.selectedIds.indexOf(model) !== -1) {
+                        model.trigger('backgrid:selected', model, true);
+                    }
+                });
+            }
         },
 
         /**
@@ -640,14 +649,14 @@ define(function(require) {
          * @private
          */
         _createToolbar: function(options) {
-            var ComponentConstructor =  this.collection.options.modules.columnManagerComponentCustom || null;
+            var ComponentConstructor = this.collection.options.modules.columnManagerComponentCustom || null;
             var toolbar;
             var sortActions = this.sortActions;
             var toolbarOptions = {
-                collection:   this.collection,
-                actions:      this._getToolbarActions(),
+                collection: this.collection,
+                actions: this._getToolbarActions(),
                 extraActions: this._getToolbarExtraActions(),
-                columns:      this.columns,
+                columns: this.columns,
                 componentConstructor: ComponentConstructor,
                 addToolbarAction: function(action) {
                     toolbarOptions.actions.push(action);
@@ -1164,7 +1173,7 @@ define(function(require) {
          */
         renderNoDataBlock: function() {
             this._defineNoDataBlock();
-            this.$el.toggleClass('no-data-visible', this.collection.models.length <= 0  || this.noColumnsFlag);
+            this.$el.toggleClass('no-data-visible', this.collection.models.length <= 0 || this.noColumnsFlag);
         },
 
         /**
@@ -1299,7 +1308,6 @@ define(function(require) {
         },
 
         makeComparator: function(attr, order, func) {
-
             return function(left, right) {
                 // extract the values from the models
                 var t;

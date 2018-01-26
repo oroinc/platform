@@ -27,7 +27,7 @@ define(function(require) {
             this.workflow = null;
 
             if (_.isEmpty(this.get('form_options'))) {
-                this.set('form_options', {'attribute_fields': {}});
+                this.set('form_options', {attribute_fields: {}});
             }
 
             if (_.isEmpty(this.get('form_options').attribute_fields)) {

@@ -1,11 +1,9 @@
-/** @lends RoutingCollection */
 define([
     'underscore',
     'orotranslation/js/translator',
     'chaplin',
-    'oroui/js/app/models/base/collection',
-    'oroui/js/mediator'
-], function(_, __, Chaplin, BaseCollection, mediator) {
+    'oroui/js/app/models/base/collection'
+], function(_, __, Chaplin, BaseCollection) {
     'use strict';
 
     /**
@@ -15,7 +13,7 @@ define([
      */
     var BoardDataCollection;
 
-    BoardDataCollection = BaseCollection.extend(/** @exports RoutingCollection.prototype */{
+    BoardDataCollection = BaseCollection.extend(/** @lends RoutingCollection.prototype */{
         /**
          * @inheritDoc
          */

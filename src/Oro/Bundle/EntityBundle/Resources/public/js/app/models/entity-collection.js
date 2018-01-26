@@ -20,7 +20,7 @@ define(function(require) {
         ROUTE: {
             // returns a list of entities of the given type
             // path: /api/{entity}
-            'read':   'oro_rest_api_cget',
+            'read': 'oro_rest_api_cget',
             // deletes a list of entities of the given type by the given filters
             // path: /api/{entity}
             'delete': 'oro_rest_api_cdelete'
@@ -68,7 +68,7 @@ define(function(require) {
          * Converts model in to an object that is used for API requests
          *
          * @param {Object?} options
-         * @return {Object<string, {data: Array<EntityModel.identifier>}>}
+         * @return {Object.<string, {data: Array.<EntityModel.identifier>}>}
          */
         toJSON: function(options) {
             var identifiers = this.map(function(model) {

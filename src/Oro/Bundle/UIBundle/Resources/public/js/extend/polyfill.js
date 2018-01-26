@@ -14,8 +14,7 @@ define(function() {
     };
 
     // copied from https://developer.mozilla.org/
-    /* jshint ignore:start */
-    // jscs:disable
+    /* eslint-disable */
     Object.setPrototypeOf = Object.setPrototypeOf || function(obj, proto) {
         obj.__proto__ = proto;
         return obj;
@@ -155,6 +154,5 @@ define(function() {
             return rpt;
         }
     }
-    // jscs:enable
-    /* jshint ignore:end */
+    /* eslint-enable */
 });
