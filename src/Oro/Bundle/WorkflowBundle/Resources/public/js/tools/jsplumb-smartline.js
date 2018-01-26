@@ -26,7 +26,6 @@ define(function(require) {
         var userSuppliedSegments = null;
         var lastx = null;
         var lasty = null;
-        var lastOrientation;
         var cornerRadius = params.cornerRadius !== null && params.midpoint !== void 0 ? params.cornerRadius : 0;
         var sgn = function(n) {
             return n < 0 ? -1 : n === 0 ? 0 : 1;
@@ -324,7 +323,6 @@ define(function(require) {
             // build segments
             lastx = null;
             lasty = null;
-            lastOrientation = null;
             segments = [];
 
             if (points.length) {
@@ -398,61 +396,60 @@ define(function(require) {
             segments = [];
             lastx = null;
             lasty = null;
-            lastOrientation = null;
 
             var midx = paintInfo.startStubX + ((paintInfo.endStubX - paintInfo.startStubX) * midpoint);
             var midy = paintInfo.startStubY + ((paintInfo.endStubY - paintInfo.startStubY) * midpoint);
             var orientations = {x: [0, 1], y: [1, 0]};
             var commonStubCalculator = function() {
-                    return [paintInfo.startStubX, paintInfo.startStubY, paintInfo.endStubX, paintInfo.endStubY];
-                };
+                return [paintInfo.startStubX, paintInfo.startStubY, paintInfo.endStubX, paintInfo.endStubY];
+            };
             var stubCalculators = {
-                    perpendicular: commonStubCalculator,
-                    orthogonal: commonStubCalculator,
-                    opposite: function(axis) {
-                        var pi = paintInfo;
-                        var idx = axis === 'x' ? 0 : 1;
-                        var areInProximity = {
-                                'x': function() {
-                                    return ((pi.so[idx] === 1 && (
-                                        ((pi.startStubX > pi.endStubX) && (pi.tx > pi.startStubX)) ||
+                perpendicular: commonStubCalculator,
+                orthogonal: commonStubCalculator,
+                opposite: function(axis) {
+                    var pi = paintInfo;
+                    var idx = axis === 'x' ? 0 : 1;
+                    var areInProximity = {
+                        x: function() {
+                            return ((pi.so[idx] === 1 && (
+                                ((pi.startStubX > pi.endStubX) && (pi.tx > pi.startStubX)) ||
                                         ((pi.sx > pi.endStubX) && (pi.tx > pi.sx))))) ||
 
                                         ((pi.so[idx] === -1 && (
-                                        ((pi.startStubX < pi.endStubX) && (pi.tx < pi.startStubX)) ||
+                                            ((pi.startStubX < pi.endStubX) && (pi.tx < pi.startStubX)) ||
                                         ((pi.sx < pi.endStubX) && (pi.tx < pi.sx)))));
-                                },
-                                'y': function() {
-                                    return ((pi.so[idx] === 1 && (
-                                        ((pi.startStubY > pi.endStubY) && (pi.ty > pi.startStubY)) ||
+                        },
+                        y: function() {
+                            return ((pi.so[idx] === 1 && (
+                                ((pi.startStubY > pi.endStubY) && (pi.ty > pi.startStubY)) ||
                                         ((pi.sy > pi.endStubY) && (pi.ty > pi.sy))))) ||
 
                                         ((pi.so[idx] === -1 && (
-                                        ((pi.startStubY < pi.endStubY) && (pi.ty < pi.startStubY)) ||
+                                            ((pi.startStubY < pi.endStubY) && (pi.ty < pi.startStubY)) ||
                                         ((pi.sy < pi.endStubY) && (pi.ty < pi.sy)))));
-                                }
-                            };
-
-                        if (!alwaysRespectStubs && areInProximity[axis]()) {
-                            return {
-                                'x': [
-                                    (paintInfo.sx + paintInfo.tx) / 2,
-                                    paintInfo.startStubY,
-                                    (paintInfo.sx + paintInfo.tx) / 2,
-                                    paintInfo.endStubY
-                                ],
-                                'y': [
-                                    paintInfo.startStubX,
-                                    (paintInfo.sy + paintInfo.ty) / 2,
-                                    paintInfo.endStubX,
-                                    (paintInfo.sy + paintInfo.ty) / 2
-                                ]
-                            }[axis];
-                        } else {
-                            return [paintInfo.startStubX, paintInfo.startStubY, paintInfo.endStubX, paintInfo.endStubY];
                         }
+                    };
+
+                    if (!alwaysRespectStubs && areInProximity[axis]()) {
+                        return {
+                            x: [
+                                (paintInfo.sx + paintInfo.tx) / 2,
+                                paintInfo.startStubY,
+                                (paintInfo.sx + paintInfo.tx) / 2,
+                                paintInfo.endStubY
+                            ],
+                            y: [
+                                paintInfo.startStubX,
+                                (paintInfo.sy + paintInfo.ty) / 2,
+                                paintInfo.endStubX,
+                                (paintInfo.sy + paintInfo.ty) / 2
+                            ]
+                        }[axis];
+                    } else {
+                        return [paintInfo.startStubX, paintInfo.startStubY, paintInfo.endStubX, paintInfo.endStubY];
                     }
-                };
+                }
+            };
 
             var stubs = stubCalculators[paintInfo.anchorOrientation](paintInfo.sourceAxis);
             var idx = paintInfo.sourceAxis === 'x' ? 0 : 1;
@@ -526,17 +523,17 @@ define(function(require) {
                 orthogonal: function(axis, startStub, otherStartStub, endStub, otherEndStub) {
                     var pi = paintInfo;
                     var extent = {
-                        'x': pi.so[0] === -1 ? Math.min(startStub, endStub) : Math.max(startStub, endStub),
-                        'y': pi.so[1] === -1 ? Math.min(startStub, endStub) : Math.max(startStub, endStub)
+                        x: pi.so[0] === -1 ? Math.min(startStub, endStub) : Math.max(startStub, endStub),
+                        y: pi.so[1] === -1 ? Math.min(startStub, endStub) : Math.max(startStub, endStub)
                     }[axis];
 
                     return {
-                        'x': [
+                        x: [
                             [extent, otherStartStub],
                             [extent, otherEndStub],
                             [endStub, otherEndStub]
                         ],
-                        'y': [
+                        y: [
                             [otherStartStub, extent],
                             [otherEndStub, extent],
                             [otherEndStub, endStub]
@@ -545,42 +542,41 @@ define(function(require) {
                 },
                 opposite: function(axis, ss, oss, es) {
                     var pi = paintInfo;
-                    var otherAxis = {'x': 'y', 'y': 'x'}[axis];
-                    var dim = {'x': 'height', 'y': 'width'}[axis];
+                    var otherAxis = {x: 'y', y: 'x'}[axis];
+                    var dim = {x: 'height', y: 'width'}[axis];
                     var comparator = pi['is' + axis.toUpperCase() + 'GreaterThanStubTimes2'];
 
                     if (params.sourceEndpoint.elementId === params.targetEndpoint.elementId) {
                         var _val = oss + ((1 - params.sourceEndpoint.anchor[otherAxis]) * params.sourceInfo[dim]) +
                             _super.maxStub;
                         return {
-                            'x': [
+                            x: [
                                 [ss, _val],
                                 [es, _val]
                             ],
-                            'y': [
+                            y: [
                                 [_val, ss],
                                 [_val, es]
                             ]
                         }[axis];
-
                     } else if (!comparator || (pi.so[idx] === 1 && ss > es) || (pi.so[idx] === -1 && ss < es)) {
                         return {
-                            'x': [
+                            x: [
                                 [ss, midy],
                                 [es, midy]
                             ],
-                            'y': [
+                            y: [
                                 [midx, ss],
                                 [midx, es]
                             ]
                         }[axis];
                     } else if ((pi.so[idx] === 1 && ss < es) || (pi.so[idx] === -1 && ss > es)) {
                         return {
-                            'x': [
+                            x: [
                                 [midx, pi.sy],
                                 [midx, pi.ty]
                             ],
-                            'y': [
+                            y: [
                                 [pi.sx, midy],
                                 [pi.tx, midy]
                             ]

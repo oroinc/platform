@@ -115,7 +115,7 @@ define(function(require) {
             var self = this;
             var $el = this.$el;
 
-            //Create it
+            // Create it
             $el.modal(_.extend({
                 keyboard: this.options.allowCancel,
                 backdrop: this.options.allowCancel ? true : 'static'
@@ -129,7 +129,7 @@ define(function(require) {
                 self.trigger('shown');
             });
 
-            //Adjust the modal and backdrop z-index; for dealing with multiple modals
+            // Adjust the modal and backdrop z-index; for dealing with multiple modals
             var numModals = Backbone.BootstrapModal.count;
             var $backdrop = $('.modal-backdrop:eq(' + numModals + ')');
             var backdropIndex = parseInt($backdrop.css('z-index'), 10);
@@ -173,7 +173,7 @@ define(function(require) {
 
             Backbone.BootstrapModal.count++;
 
-            //Run callback on OK if provided
+            // Run callback on OK if provided
             if (cb) {
                 self.on('ok', cb);
             }
@@ -184,7 +184,7 @@ define(function(require) {
             }
             mediator.trigger('modal:open', this);
 
-            //Focus OK button
+            // Focus OK button
             if (self.options.focusOk) {
                 $el.find('.btn.ok')
                     .one('focusin', function(e) {

@@ -15,8 +15,8 @@ define(function(require) {
 
         listen: {
             'change:fileName model': 'fileNameChange',
-            'change:type model':     'typeChange',
-            'change:icon model':     'iconChange'
+            'change:type model': 'typeChange',
+            'change:icon model': 'iconChange'
         },
 
         getTemplateFunction: function() {

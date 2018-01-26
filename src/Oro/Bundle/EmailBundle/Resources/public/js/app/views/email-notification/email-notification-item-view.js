@@ -45,7 +45,7 @@ define(function(require) {
 
         onClickOpenEmail: function() {
             var url = routing.generate('oro_email_thread_view', {id: this.model.get('id')});
-            this.model.set({'seen': true});
+            this.model.set({seen: true});
             mediator.execute('redirectTo', {url: url});
         },
 

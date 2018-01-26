@@ -1,4 +1,3 @@
-/** @lends RelatedIdRelationEditorView */
 define(function(require) {
     'use strict';
 
@@ -90,8 +89,7 @@ define(function(require) {
     var _ = require('underscore');
     require('jquery.select2');
 
-    RelatedIdRelationEditorView =
-        AbstractRelationEditorView.extend(/** @exports RelatedIdRelationEditorView.prototype */{
+    RelatedIdRelationEditorView = AbstractRelationEditorView.extend(/** @lends RelatedIdRelationEditorView.prototype */{
         DEFAULT_ID_PROPERTY: 'id',
         DEFAULT_TEXT_PROPERTY: 'text',
         initialize: function(options) {

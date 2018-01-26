@@ -1,4 +1,3 @@
-/** @lends TextEditorView */
 define(function(require) {
     'use strict';
 
@@ -74,7 +73,7 @@ define(function(require) {
     var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
 
-    TextEditorView = BaseView.extend(/** @exports TextEditorView.prototype */{
+    TextEditorView = BaseView.extend(/** @lends TextEditorView.prototype */{
         autoRender: true,
         tagName: 'form',
         template: require('tpl!../../../../templates/editor/text-editor.html'),

@@ -25,14 +25,14 @@ define([
         }
 
         var confirmReset = new Modal({
-            title:   __('oro.workflow.workflowdefinition.reset'),
+            title: __('oro.workflow.workflowdefinition.reset'),
             content: __('oro.workflow.workflowdefinition.reset_message'),
-            okText:  __('oro.workflow.workflowdefinition.reset_button_text')
+            okText: __('oro.workflow.workflowdefinition.reset_button_text')
         });
 
         confirmReset.on('ok', function() {
             $.ajax({
-                url:  element.data('url'),
+                url: element.data('url'),
                 type: 'DELETE',
                 success: function() {
                     mediator.execute('refreshPage');

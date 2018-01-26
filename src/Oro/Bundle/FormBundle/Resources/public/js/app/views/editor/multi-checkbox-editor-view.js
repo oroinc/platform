@@ -1,4 +1,3 @@
-/** @lends MultiCheckboxEditorView */
 define(function(require) {
     'use strict';
 
@@ -60,7 +59,7 @@ define(function(require) {
     require('jquery.multiselect');
     require('jquery.multiselect.filter');
 
-    MultiCheckboxEditorView = SelectEditorView.extend(/** @exports MultiCheckboxEditorView.prototype */{
+    MultiCheckboxEditorView = SelectEditorView.extend(/** @lends MultiCheckboxEditorView.prototype */{
         className: 'multi-checkbox-editor',
         template: require('tpl!oroform/templates/editor/multi-checkbox-editor.html'),
 

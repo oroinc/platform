@@ -73,7 +73,7 @@ define([
             this._deferredRender();
             if (this.template) {
                 this.renderCustomTemplate();
-            }else {
+            } else {
                 HeaderRow.__super__.render.apply(this, arguments);
             }
             this._resolveDeferredRender();

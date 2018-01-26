@@ -53,7 +53,7 @@ define(function(require) {
                 if (originalNumber >= 0) {
                     prefix = options.positive_prefix;
                     suffix = options.positive_suffix;
-                } else if (originalNumber < 0)  {
+                } else if (originalNumber < 0) {
                     formattedNumber = formattedNumber.replace('-', '');
                     prefix = options.negative_prefix;
                     suffix = options.negative_suffix;
@@ -188,9 +188,9 @@ define(function(require) {
              */
             formatDuration: function(value) {
                 var result = [];
-                result.push(Math.floor(value / 3600));    // hours
+                result.push(Math.floor(value / 3600)); // hours
                 result.push(Math.floor(value / 60) % 60); // minutes
-                result.push(value % 60);                  // seconds
+                result.push(value % 60); // seconds
                 for (var i = 0; i < result.length; i++) {
                     result[i] = String(result[i]);
                     if (result[i].length < 2) {
@@ -209,8 +209,8 @@ define(function(require) {
             unformatDuration: function(value) {
                 var result = value.split(':');
                 result[0] = parseInt(result[0], 10) * 3600; // hours
-                result[1] = parseInt(result[1], 10) * 60;   // minutes
-                result[2] = parseInt(result[2], 10);        // seconds
+                result[1] = parseInt(result[1], 10) * 60; // minutes
+                result[2] = parseInt(result[2], 10); // seconds
                 result = _.reduce(result, function(res, item) {
                     return res + item;
                 });

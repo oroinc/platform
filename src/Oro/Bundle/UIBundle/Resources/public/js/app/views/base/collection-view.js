@@ -2,7 +2,7 @@ define([
     'underscore',
     'chaplin',
     './view',
-    'oroui/js/app/views/loading-mask-view',
+    'oroui/js/app/views/loading-mask-view'
 ], function(_, Chaplin, View, LoadingMaskView) {
     'use strict';
 

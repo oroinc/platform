@@ -37,8 +37,7 @@ define([
      * @param {Object} options
      * @returns {Backbone.Collection}
      */
-    function resetQuickly () {
-
+    function resetQuickly() {
         var collection = arguments[0];
         var options = arguments[2];
         var resetArgs = _.toArray(arguments).slice(1);
@@ -48,8 +47,7 @@ define([
 
         try {
             collection.reset.apply(collection, resetArgs);
-        }
-        finally {
+        } finally {
             collection.comparator = comparator;
             if (comparator && !options.reset) {
                 collection.sort();
@@ -222,10 +220,10 @@ define([
             }
 
             _.extend(this.queryParams, {
-                currentPage:    this.inputName + '[_pager][_page]',
-                pageSize:       this.inputName + '[_pager][_per_page]',
-                sortBy:         this.inputName + '[_sort_by][%field%]',
-                parameters:     this.inputName + '[_parameters]',
+                currentPage: this.inputName + '[_pager][_page]',
+                pageSize: this.inputName + '[_pager][_per_page]',
+                sortBy: this.inputName + '[_sort_by][%field%]',
+                parameters: this.inputName + '[_parameters]',
                 appearanceType: this.inputName + '[_appearance][_type]',
                 appearanceData: this.inputName + '[_appearance][_data]'
             });
@@ -417,7 +415,6 @@ define([
         // removing models that are no longer present, and merging models that
         // already exist in the collection, as necessary. Similar to **Model#set**,
         // the core operation for updating the data contained by the collection.
-        /*jshint maxstatements:false*/
         set: function(models, options) {
             options = _.defaults({}, options, {add: true, remove: true, merge: true});
             if (options.parse) {
@@ -574,7 +571,6 @@ define([
                 currentPage !== null && currentPage !== void 0 &&
                 firstPage !== null && firstPage !== void 0 &&
                 (mode === 'infinite' ? links : true)) {
-
                 state.totalRecords = totalRecords = this.finiteInt(totalRecords, 'totalRecords');
                 state.firstPage = firstPage = this.finiteInt(firstPage, 'firstPage');
 
@@ -662,7 +658,7 @@ define([
             var qsi = url.indexOf('?');
             if (qsi !== -1) {
                 var nvp = url.slice(qsi + 1).split('&');
-                for (var i = 0 ; i < nvp.length ; i++) {
+                for (var i = 0; i < nvp.length; i++) {
                     var pair = nvp[i].split('=');
                     data[tools.decodeUriComponent(pair[0])] = tools.decodeUriComponent(pair[1]);
                 }
@@ -700,7 +696,6 @@ define([
                 });
 
                 return deferredFetch.promise();
-
             } else {
                 return this._fetch(options);
             }
@@ -760,7 +755,6 @@ define([
 
             if (mode !== 'server') {
                 options.success = function(col, resp, opts) {
-
                     // make sure the caller's intent is obeyed
                     opts = opts || {};
                     if (_.isUndefined(options.silent)) {
@@ -806,7 +800,7 @@ define([
                 var currentPage = state.currentPage;
                 options.success = function(col, resp, opts) {
                     if (currentPage > 1 && _.isEmpty(resp.data) && col.state.totalRecords > 0) {
-                        //load last page, if records not found for current page(for example after records delete)
+                        // load last page, if records not found for current page(for example after records delete)
                         self.getLastPage();
                     }
                     if (success) {
@@ -924,7 +918,7 @@ define([
             if (this.multipleSorting) {
                 // there is always must be at least one sorted column
                 if (_.keys(state.sorters).length <= 1 && !order) {
-                    order = this.getSortDirectionKey('ASC');  // default order
+                    order = this.getSortDirectionKey('ASC'); // default order
                 }
 
                 // last sorting has the lowest priority

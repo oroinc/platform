@@ -38,7 +38,7 @@ define(function(require) {
         },
 
         updateStepMinWidth: function() {
-            var STEP_MAX_WIDTH = 180; //that's taken from css .workflow-flowchart .workflow-step 'max-width' definition
+            var STEP_MAX_WIDTH = 180; // that's taken from css .workflow-flowchart .workflow-step 'max-width' definition
             var currentId = this.el.id;
             var connections = this.jsPlumbSource.getConnections();
             var count = _.countBy(connections, function(connection) {

@@ -122,8 +122,8 @@ define(function(require) {
 
         _getUrlParams: function() {
             var params = {
-                'for_entity': this.entity,
-                'organization': this.organization
+                for_entity: this.entity,
+                organization: this.organization
             };
             if (this.entityId !== null) {
                 params.id = this.entityId;
@@ -133,7 +133,7 @@ define(function(require) {
         },
 
         clear: function() {
-            this.model.set({'imap': {}, 'smtp': []});
+            this.model.set({imap: {}, smtp: []});
         }
     });
 

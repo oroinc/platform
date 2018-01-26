@@ -1,5 +1,4 @@
 define(['jquery'], function($) {
-
     'use strict';
 
     var defaults = {
@@ -7,7 +6,6 @@ define(['jquery'], function($) {
     };
 
     var Print = function(element) {
-
         // get lightGallery core plugin data
         this.core = $(element).data('lightGallery');
 
@@ -33,7 +31,6 @@ define(['jquery'], function($) {
         this.core.$outer.find('.lg-print').on('click.lg', function() {
             _this.printCurrentSlide();
         });
-
     };
 
     /**
@@ -44,11 +41,11 @@ define(['jquery'], function($) {
         var printHtml = $image.prop('outerHTML');
 
         var frame = $('<iframe/>', {
-            'name': 'print-frame'
+            name: 'print-frame'
         });
         frame.css({
-            'position': 'absolute',
-            'top': '-10000px'
+            position: 'absolute',
+            top: '-10000px'
         });
         $('body').append(frame);
 
@@ -78,5 +75,4 @@ define(['jquery'], function($) {
     };
 
     $.fn.lightGallery.modules.print = Print;
-
 });

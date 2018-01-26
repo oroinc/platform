@@ -65,7 +65,7 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
 
         _initEvents: function() {
             this._on(this.$trigger, {
-                'click': this._toggle
+                click: this._toggle
             });
 
             var group = this.options.group;
@@ -90,7 +90,7 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
                 this.$el.removeClass(this.options.openClass)
                     .removeClass(this.options.closeClass);
                 if (!this._isOverflow()) {
-                    //do nothing
+                    // do nothing
                     return;
                 }
             }

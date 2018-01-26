@@ -2,7 +2,7 @@ define([
     'oroui/js/app/models/base/collection',
     './activity-list-model',
     'underscore',
-    'routing',
+    'routing'
 ], function(BaseCollection, ActivityModel, _, routing) {
     'use strict';
 
@@ -12,18 +12,18 @@ define([
         model: ActivityModel,
         route: '',
         routeParameters: {},
-        filter:   {},
+        filter: {},
         defaultPager: {
-            count:    1, //total activities count
-            current:  1, //current page
-            pagesize: 1, //items per page
-            total:    1, //total pages
-            sortingField: 'updatedAt' //the activity list item attribute being used for data sorting
+            count: 1, // total activities count
+            current: 1, // current page
+            pagesize: 1, // items per page
+            total: 1, // total pages
+            sortingField: 'updatedAt' // the activity list item attribute being used for data sorting
         },
         pageFilter: {
             date: null,
             ids: [],
-            action: null //'next' or 'prev' or '' (refresh action)
+            action: null // 'next' or 'prev' or '' (refresh action)
         },
 
         initialize: function() {

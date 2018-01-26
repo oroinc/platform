@@ -20,6 +20,7 @@ define(function(require) {
      * @extends oro.filter.ChoiceFilter
      */
     DictionaryFilter = ChoiceFilter.extend({
+        /* eslint-disable quote-props */
         /**
          * select2 will apply to element with this selector
          */
@@ -59,7 +60,7 @@ define(function(require) {
 
         filterParams: null,
 
-        class: null,
+        'class': null,
 
         select2ConfigData: null,
 
@@ -108,7 +109,7 @@ define(function(require) {
             if (data) {
                 this.previousData = data;
             }
-            select2element.inputWidget('data',  null);
+            select2element.inputWidget('data', null);
         },
 
         /**
@@ -138,7 +139,7 @@ define(function(require) {
                         }
                     ),
                     data: {
-                        'keys': this.value.value
+                        keys: this.value.value
                     },
                     success: function(response) {
                         self.trigger(successEventName, response);
@@ -256,7 +257,7 @@ define(function(require) {
                     self.applyValue();
                 });
             }
-            select2element.inputWidget('data',  values);
+            select2element.inputWidget('data', values);
 
             this._criteriaRenderd = true;
             this._alignCriteria();
@@ -266,11 +267,13 @@ define(function(require) {
          * Return config for select2
          */
         getSelect2Config: function() {
-            var config =  {
+            var config = {
                 multiple: true,
                 containerCssClass: 'dictionary-filter',
                 dropdownAutoWidth: true,
-                escapeMarkup: function(markup) { return markup; }, // let our custom formatter work
+                escapeMarkup: function(markup) {
+                    return markup;
+                }, // let our custom formatter work
                 minimumInputLength: 0,
                 placeholder: __('Choose values')
             };
@@ -326,8 +329,8 @@ define(function(require) {
 
                 if (item) {
                     values.push({
-                        'id': item.id,
-                        'text': item.text
+                        id: item.id,
+                        text: item.text
                     });
                 }
             }, this);
@@ -495,7 +498,7 @@ define(function(require) {
                     _.map(value.value, _.property('text')) :
                     _.chain(value.value)
                         .map(function(id) {
-                            var item =  _.find(self.selectedData, function(item) {
+                            var item = _.find(self.selectedData, function(item) {
                                 return item.id.toString() === id.toString();
                             });
 

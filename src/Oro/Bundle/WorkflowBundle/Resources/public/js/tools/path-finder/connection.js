@@ -109,7 +109,7 @@ define([
         (new Interval2d(
             new Point2d(this.a.recommendedX, this.a.recommendedY),
             new Point2d(this.b.recommendedX, this.b.recommendedY))
-            ).draw(color);
+        ).draw(color);
     };
 
     return Connection;

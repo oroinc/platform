@@ -21,17 +21,25 @@ define(function(require) {
      * @this AbstractSelect2
      */
     function populateCollapsibleResults(container, results, query) {
-        // jshint -W040
         var opts = this.opts;
         var id = opts.id;
         var parent = container.parent();
         var selection = this.val();
 
         var populate = function(results, container, depth, parentStack) {
-            // jscs:disable
-            var i, l, result, selectable, disabled, compound, node, label, innerContainer,
-                formatted, subId, parent, resultId;
-            // jscs:enable
+            var i;
+            var l;
+            var result;
+            var selectable;
+            var disabled;
+            var compound;
+            var node;
+            var label;
+            var innerContainer;
+            var formatted;
+            var subId;
+            var parent;
+            var resultId;
             results = opts.sortResults(results, container, query);
             parent = container.parent();
 
@@ -261,7 +269,6 @@ define(function(require) {
             }
             original.apply(this, _.rest(arguments));
         });
-
     }(Select2['class'].abstract.prototype));
 
     (function(prototype) {
@@ -346,7 +353,6 @@ define(function(require) {
         prototype.moveHighlight = _.wrap(prototype.moveHighlight, overrideMethods.moveHighlight);
         prototype.initContainer = _.wrap(prototype.initContainer, overrideMethods.initContainer);
         prototype.tokenize = _.wrap(prototype.tokenize, overrideMethods.tokenize);
-
     }(Select2['class'].single.prototype));
 
     // Override methods of MultiSelect2 class
@@ -427,13 +433,13 @@ define(function(require) {
         prototype.addSelectedChoiceOptimized = function(data, val) {
             var enableChoice = !data.locked;
             var enabledItem = $(
-                    '<li class=\'select2-search-choice\'>' +
-                    '    <div></div>' +
-                    '    <a href=\'#\' onclick=\'return false;\' ' +
-                    'class=\'select2-search-choice-close\' tabindex=\'-1\'></a>' +
-                    '</li>');
+                '<li class=\'select2-search-choice\'>' +
+                    '<div></div>' +
+                    '<a href=\'#\' onclick=\'return false;\' ' +
+                        'class=\'select2-search-choice-close\' tabindex=\'-1\'></a>' +
+                '</li>');
             var disabledItem = $(
-                    '<li class=\'select2-search-choice select2-locked\'>' +
+                '<li class=\'select2-search-choice select2-locked\'>' +
                     '<div></div>' +
                     '</li>');
             var choice = enableChoice ? enabledItem : disabledItem;
@@ -444,38 +450,37 @@ define(function(require) {
             var formatted;
 
             formatted = this.opts.formatSelection(data, choice.find('div'), this.opts.escapeMarkup);
-            /* jshint ignore:start */
-            if (formatted != undefined) {
+            if (formatted !== undefined) {
                 choice.find('div').replaceWith('<div>' + formatted + '</div>');
             }
             var cssClass = this.opts.formatSelectionCssClass(data, choice.find('div'));
-            if (cssClass != undefined) {
+            if (cssClass !== undefined) {
                 choice.addClass(cssClass);
             }
-            /* jshint ignore:end */
 
             if (enableChoice) {
                 choice.find('.select2-search-choice-close')
                     .on('mousedown', killEvent)
                     .on('click dblclick', this.bind(function(e) {
-                    if (!this.isInterfaceEnabled()) {
-                        return;
-                    }
+                        if (!this.isInterfaceEnabled()) {
+                            return;
+                        }
 
-                    $(e.target).closest('.select2-search-choice').fadeOut('fast', this.bind(function() {
-                        this.unselect($(e.target));
-                        this.selection.find('.select2-search-choice-focus').removeClass('select2-search-choice-focus');
-                        this.close();
-                        this.focusSearch();
-                    })).dequeue();
-                    killEvent(e);
-                })).on('focus', this.bind(function() {
-                    if (!this.isInterfaceEnabled()) {
-                        return;
-                    }
-                    this.container.addClass('select2-container-active');
-                    this.dropdown.addClass('select2-drop-active');
-                }));
+                        $(e.target).closest('.select2-search-choice').fadeOut('fast', this.bind(function() {
+                            this.unselect($(e.target));
+                            this.selection.find('.select2-search-choice-focus')
+                                .removeClass('select2-search-choice-focus');
+                            this.close();
+                            this.focusSearch();
+                        })).dequeue();
+                        killEvent(e);
+                    })).on('focus', this.bind(function() {
+                        if (!this.isInterfaceEnabled()) {
+                            return;
+                        }
+                        this.container.addClass('select2-container-active');
+                        this.dropdown.addClass('select2-drop-active');
+                    }));
             }
 
             choice.data('select2-data', data);
@@ -487,6 +492,5 @@ define(function(require) {
         prototype.postprocessResults = _.wrap(prototype.postprocessResults, overrideMethods.processResult);
 
         prototype.moveHighlight = _.wrap(prototype.moveHighlight, overrideMethods.moveHighlight);
-
     }(Select2['class'].multi.prototype));
 });

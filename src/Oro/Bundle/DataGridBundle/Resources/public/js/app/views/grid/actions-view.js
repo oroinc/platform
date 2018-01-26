@@ -218,7 +218,7 @@ define(function(require) {
 
                 if (launchers.withIcons.length) {
                     this.renderLaunchersList(launchers.withIcons, {withIcons: true})
-                    .appendTo($listsContainer);
+                        .appendTo($listsContainer);
                 }
 
                 if (launchers.withIcons.length && launchers.withoutIcons.length) {
@@ -227,7 +227,7 @@ define(function(require) {
 
                 if (launchers.withoutIcons.length) {
                     this.renderLaunchersList(launchers.withoutIcons, {withIcons: false})
-                    .appendTo($listsContainer);
+                        .appendTo($listsContainer);
                 }
             }
         },

@@ -58,9 +58,9 @@ define(function(require) {
 
         getState: function() {
             var state = {
-                    rectangles: {},
-                    connections: []
-                };
+                rectangles: {},
+                connections: []
+            };
             var endpoints = this.jsPlumbInstance.sourceEndpointDefinitions;
             for (var id in endpoints) {
                 if (endpoints.hasOwnProperty(id)) {
@@ -152,7 +152,9 @@ define(function(require) {
                 sources: graph.rectangles.map(function(item) {
                     return [item.cid, item.left, item.top, item.width, item.height];
                 }),
-                connections: connections.map(function(item) {return item.slice(0, 2);})
+                connections: connections.map(function(item) {
+                    return item.slice(0, 2);
+                })
             };
         }
     };

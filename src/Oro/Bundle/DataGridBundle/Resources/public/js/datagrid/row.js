@@ -40,20 +40,21 @@ define([
 
             var events = this.collection.getCellEventList().getEventsMap();
             // prevent CS error 'cause we must completely repeat Backbone behaviour
-            for (var key in events) { // jshint forin:false
+            // eslint-disable-next-line guard-for-in
+            for (var key in events) {
                 var match = key.match(delegateEventSplitter);
                 var eventName = match[1];
                 var selector = match[2];
-                resultEvents[eventName + ' ' + 'td' + (selector ? ' ' + selector : '')] =
+                resultEvents[eventName + ' td' + (selector ? ' ' + selector : '')] =
                     _.partial(this.delegateEventToCell, key);
             }
 
             // the order is important, please do not move up
             _.extend(resultEvents, {
-                'mousedown': 'onMouseDown',
-                'mouseleave': 'onMouseLeave',
-                'mouseup': 'onMouseUp',
-                'click': 'onClick'
+                mousedown: 'onMouseDown',
+                mouseleave: 'onMouseLeave',
+                mouseup: 'onMouseUp',
+                click: 'onClick'
             });
             return resultEvents;
         },

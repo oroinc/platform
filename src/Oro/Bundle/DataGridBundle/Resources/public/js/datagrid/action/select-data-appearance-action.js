@@ -13,7 +13,7 @@ define([
      * @class   oro.datagrid.action.ResetCollectionAction
      * @extends oro.datagrid.action.AbstractAction
      */
-    SelectDataAppearanceAction =  AbstractAction.extend({
+    SelectDataAppearanceAction = AbstractAction.extend({
         /** @property {Function} */
         launcher: DropdownSelectChoiceLauncher,
 

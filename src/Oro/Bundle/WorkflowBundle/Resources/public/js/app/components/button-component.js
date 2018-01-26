@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define(function(require) {
     'use strict';
 
@@ -64,12 +62,12 @@ define(function(require) {
                 });
                 if (this.$button.data('transition-condition-messages')) {
                     this.$button.popover({
-                        'html': true,
-                        'placement': 'bottom',
-                        'container': $('body'),
-                        'trigger': 'hover',
-                        'title': '<i class="fa-exclamation-circle"></i>' + __('Unmet conditions'),
-                        'content': this.$button.data('transition-condition-messages')
+                        html: true,
+                        placement: 'bottom',
+                        container: $('body'),
+                        trigger: 'hover',
+                        title: '<i class="fa-exclamation-circle"></i>' + __('Unmet conditions'),
+                        content: this.$button.data('transition-condition-messages')
                     });
                 }
             }

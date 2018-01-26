@@ -139,7 +139,6 @@ define(function(require) {
          * @private
          */
         _onClickUpdateCriteria: function(e) {
-
             if (!this._isValid()) {
                 e.stopImmediatePropagation();
                 return;
