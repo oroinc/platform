@@ -19,9 +19,9 @@ define(function(require) {
         options: {
             template: null,
             data: {
-                'label': null,
-                'property_path': null,
-                'required': false
+                label: null,
+                property_path: null,
+                required: false
             }
         },
 

@@ -1,5 +1,5 @@
 define(['underscore', './number'
-    ], function(_, numberValidator) {
+], function(_, numberValidator) {
     'use strict';
 
     var defaultParam = {

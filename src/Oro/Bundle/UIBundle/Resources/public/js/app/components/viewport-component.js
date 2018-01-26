@@ -92,5 +92,4 @@ define(function(require) {
     });
 
     return ViewportComponent;
-
 });

@@ -17,7 +17,7 @@ define(function(require) {
             }
 
             this._on({
-                'click': this._toggle
+                click: this._toggle
             });
 
             mediator.on('collapse-group:' + this.options.group + ':setState', this._setGroupState, this);

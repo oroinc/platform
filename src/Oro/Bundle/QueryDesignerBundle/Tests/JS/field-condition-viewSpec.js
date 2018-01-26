@@ -15,7 +15,6 @@ define(function(require) {
     var exposure = requirejsExposure.disclose('oroquerydesigner/js/app/views/field-condition-view');
 
     describe('oroquerydesigner/js/app/views/field-condition-view', function() {
-
         var fieldConditionView;
 
         describe('without initial value', function() {
@@ -93,12 +92,12 @@ define(function(require) {
 
         describe('with initial value', function() {
             var initialValue = {
-                'columnName': 'name',
-                'criterion': {
-                    'filter': 'string',
-                    'data': {
-                        'type': '1',
-                        'value': 'test'
+                columnName: 'name',
+                criterion: {
+                    filter: 'string',
+                    data: {
+                        type: '1',
+                        value: 'test'
                     }
                 }
             };

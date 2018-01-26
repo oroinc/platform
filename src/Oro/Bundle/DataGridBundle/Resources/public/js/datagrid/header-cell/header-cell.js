@@ -95,7 +95,7 @@ define([
                     }
                 }
                 if (direction !== this.column.get('direction')) {
-                    this.column.set({'direction': direction});
+                    this.column.set({direction: direction});
                 }
             }
         },

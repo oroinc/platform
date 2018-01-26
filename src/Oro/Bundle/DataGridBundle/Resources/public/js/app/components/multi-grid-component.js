@@ -40,7 +40,7 @@ define(function(require) {
                 routeParams = widget.options.routeParams || {};
             });
             if (!_.isEmpty(routeParams)) {
-                params = _.extend({}, params, {'routeParams': routeParams});
+                params = _.extend({}, params, {routeParams: routeParams});
             }
 
             this.contextView = new MultiGridView({
@@ -81,7 +81,7 @@ define(function(require) {
 
             mediator.trigger(
                 dialogWidgetName + ':select',
-                JSON.stringify({'entityClass': targetClass,  'entityId': id})
+                JSON.stringify({entityClass: targetClass, entityId: id})
             );
 
             widgetManager.getWidgetInstanceByAlias(dialogWidgetName, function(dialogWidget) {

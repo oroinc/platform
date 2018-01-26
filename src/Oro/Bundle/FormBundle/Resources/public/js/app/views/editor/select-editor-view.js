@@ -1,4 +1,3 @@
-/** @lends SelectEditorView */
 define(function(require) {
     'use strict';
 
@@ -74,7 +73,7 @@ define(function(require) {
     var $ = require('jquery');
     require('jquery.select2');
 
-    SelectEditorView = TextEditorView.extend(/** @exports SelectEditorView.prototype */{
+    SelectEditorView = TextEditorView.extend(/** @lends SelectEditorView.prototype */{
         className: 'select-editor',
 
         SELECTED_ITEMS_H_MARGIN_BETWEEN: 5,

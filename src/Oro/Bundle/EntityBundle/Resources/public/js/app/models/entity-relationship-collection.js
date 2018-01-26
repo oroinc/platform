@@ -19,12 +19,12 @@ define(function(require) {
             // path: /api/{entity}/{id}/relationships/{association}
             'create': 'oro_rest_api_post_relationship',
             'update': 'oro_rest_api_patch_relationship',
-            'patch':  'oro_rest_api_patch_relationship',
+            'patch': 'oro_rest_api_patch_relationship',
             'delete': 'oro_rest_api_delete_relationship',
             // returns an entity (for to-one association) or a list of entities (for to-many association)
             // connected to the given entity by the given association
             // path: /api/{entity}/{id}/{association}
-            'read':   'oro_rest_api_get_subresource'
+            'read': 'oro_rest_api_get_subresource'
         },
 
         /**

@@ -17,7 +17,7 @@ define(function(require) {
 
         listen: {
             // for some reason events delegated in view constructor does not work
-            addedToParent: 'delegateEvents',
+            'addedToParent': 'delegateEvents',
             // update view on model change
             'change:disabledVisibilityChange model': 'render',
             'change:renderable model': 'updateView'

@@ -130,6 +130,10 @@ class JobStorage
     }
 
     /**
+     * Be warned that
+     * In PGSQL function returns array of ids in DESC order, every id has integer type,
+     * But in MYSQL it will be array of ids in ASC order, every id has string type
+     *
      * @param Job    $rootJob
      * @param string $status
      *

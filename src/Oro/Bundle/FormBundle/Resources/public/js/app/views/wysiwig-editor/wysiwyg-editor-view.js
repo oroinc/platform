@@ -29,7 +29,7 @@ define(function(require) {
             toolbar: ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | bdesk_photo'],
             statusbar: false,
             browser_spellcheck: true,
-            paste_data_images: true //to avoid of a paste plugin restriction
+            paste_data_images: true // to avoid of a paste plugin restriction
         },
 
         events: {
@@ -111,13 +111,13 @@ define(function(require) {
                         }
                     });
                     editor.on('change', function() {
-                        editor.save({'no_events': true});
+                        editor.save({no_events: true});
                     });
                     editor.on('SetContent', function() {
-                        editor.save({'no_events': true});
+                        editor.save({no_events: true});
                     });
                 },
-                'init_instance_callback': function(editor) {
+                init_instance_callback: function(editor) {
                     self.removeSubview('loadingMask');
                     self.tinymceInstance = editor;
                     if (!tools.isMobile()) {
@@ -134,7 +134,7 @@ define(function(require) {
                                     return item.join(': ');
                                 }).join('; ');
                                 tools.addCSSRule('div.mce-container.mce-fullscreen', rules);
-                                self.$el.after($('<div />', {class: 'mce-fullscreen-overlay'}));
+                                self.$el.after($('<div />', {'class': 'mce-fullscreen-overlay'}));
                                 var DOM = editor.target.DOM;
                                 var iframe = editor.iframeElement;
                                 var iframeTop = iframe.getBoundingClientRect().top;

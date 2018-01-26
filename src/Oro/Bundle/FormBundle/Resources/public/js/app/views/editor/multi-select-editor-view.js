@@ -1,4 +1,3 @@
-/** @lends MultiselectEditorView */
 define(function(require) {
     'use strict';
 
@@ -62,7 +61,7 @@ define(function(require) {
     var _ = require('underscore');
     var select2autosizer = require('oroui/js/tools/select2-autosizer');
 
-    MultiSelectEditorView = SelectEditorView.extend(/** @exports MultiSelectEditorView.prototype */{
+    MultiSelectEditorView = SelectEditorView.extend(/** @lends MultiSelectEditorView.prototype */{
         className: 'multi-select-editor',
         initialize: function(options) {
             options.ignore_value_field_name = true;
@@ -108,7 +107,9 @@ define(function(require) {
             var select2Value = this.$('input[name=value]').val();
             var ids;
             if (select2Value !== '') {
-                ids = select2Value.split(',').map(function(id) {return id;});
+                ids = select2Value.split(',').map(function(id) {
+                    return id;
+                });
             } else {
                 ids = [];
             }

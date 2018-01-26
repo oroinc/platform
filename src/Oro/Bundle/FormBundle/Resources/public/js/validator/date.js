@@ -1,5 +1,5 @@
 define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/datetime'
-    ], function(_, __, datetimeFormatter) {
+], function(_, __, datetimeFormatter) {
     'use strict';
 
     var defaultParam = {

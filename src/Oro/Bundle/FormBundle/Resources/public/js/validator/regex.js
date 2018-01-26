@@ -1,5 +1,5 @@
 define(['underscore', 'orotranslation/js/translator'
-    ], function(_, __) {
+], function(_, __) {
     'use strict';
 
     var defaultParam = {

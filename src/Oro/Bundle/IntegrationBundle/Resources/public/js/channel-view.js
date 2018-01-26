@@ -24,7 +24,7 @@ define([
          * Depends on what exact field changed
          */
         fieldsSets: {
-            type:          [],
+            type: [],
             transportType: []
         },
 
@@ -72,8 +72,8 @@ define([
                 var prevVal = $el.data('current');
                 if (!this.isEmpty()) {
                     var confirm = new DeleteConfirmation({
-                        title:   __('oro.integration.change_type'),
-                        okText:  __('Yes'),
+                        title: __('oro.integration.change_type'),
+                        okText: __('Yes'),
                         content: __('oro.integration.submit')
                     });
                     confirm.on('ok', _.bind(function() {

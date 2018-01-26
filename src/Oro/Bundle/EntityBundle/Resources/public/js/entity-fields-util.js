@@ -272,7 +272,7 @@ define(function(require) {
                 result = {
                     parent_entity: null,
                     entity: entity.field.entity.name,
-                    field:  entity.field.name
+                    field: entity.field.name
                 };
                 if (chain.length > 2) {
                     result.parent_entity = chain[chain.length - 2].field.entity.name;

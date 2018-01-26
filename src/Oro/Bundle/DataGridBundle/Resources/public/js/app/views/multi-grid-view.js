@@ -51,15 +51,15 @@ define(function(require) {
                     routeParams = _.extend(
                         {},
                         routeParams,
-                        {'params': self.options.params.routeParams}
+                        {params: self.options.params.routeParams}
                     );
                 }
 
                 var gridUrl = routing.generate('oro_datagrid_widget', routeParams);
 
                 var view = self.template({
-                        entity: model
-                    });
+                    entity: model
+                });
                 var $view = $(view);
 
                 if (model.attributes.first) {

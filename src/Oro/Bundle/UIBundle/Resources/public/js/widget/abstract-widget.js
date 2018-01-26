@@ -737,7 +737,7 @@ define(function(require) {
          * @private
          */
         _onContentLoad: function(content) {
-            var json  = this._getJson(content);
+            var json = this._getJson(content);
 
             if (json) {
                 content = '<div class="widget-content"></div>'; // set empty response to cover base functionality

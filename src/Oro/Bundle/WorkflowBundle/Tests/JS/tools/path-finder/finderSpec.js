@@ -7,7 +7,6 @@ define(function(require) {
     var directions = require('oroworkflow/js/tools/path-finder/directions');
 
     describe('oroworkflow/js/tools/path-finder/finder', function() {
-
         beforeEach(function prepareGraph() {
             var graph = new Graph();
             var rect1 = new Rectangle(100, 100, 100, 100);

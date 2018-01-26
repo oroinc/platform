@@ -6,7 +6,7 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
     var $ = require('jquery');
 
-    accountTypeView =  BaseView.extend({
+    accountTypeView = BaseView.extend({
 
         html: '',
 

@@ -13,7 +13,7 @@ define(function(require) {
         options: null,
 
         listen: {
-            'parentResize': 'passResizeEvent'
+            parentResize: 'passResizeEvent'
         },
 
         /**

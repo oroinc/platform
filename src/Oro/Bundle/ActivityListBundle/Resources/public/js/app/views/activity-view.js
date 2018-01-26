@@ -7,7 +7,7 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
     var mediator = require('oroui/js/mediator');
     var routing = require('routing');
-    var dateTimeFormatter = require('orolocale/js/formatter/datetime');
+    var dateTimeFormatter = require('orolocale/js/formatter/datetime');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
     var CommentComponent = require('orocomment/js/app/components/comment-component');
     var transitionHandler = require('oroworkflow/js/transition-handler');
@@ -76,12 +76,12 @@ define(function(require) {
             // use special model's method to get activity class name with replaced slashes
             data.relatedActivityClass = _.escape(this.model.getRelatedActivityClass());
             if (data.owner_id) {
-                data.owner_url = routing.generate('oro_user_view', {'id': data.owner_id});
+                data.owner_url = routing.generate('oro_user_view', {id: data.owner_id});
             } else {
                 data.owner_url = '';
             }
             if (data.editor_id) {
-                data.editor_url = routing.generate('oro_user_view', {'id': data.editor_id});
+                data.editor_url = routing.generate('oro_user_view', {id: data.editor_id});
             } else {
                 data.editor_url = '';
             }

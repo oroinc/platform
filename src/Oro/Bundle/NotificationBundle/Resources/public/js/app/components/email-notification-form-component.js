@@ -1,4 +1,3 @@
-/** @lends EmailNotificationFormComponent */
 define(function(require) {
     'use strict';
 
@@ -8,7 +7,7 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var BaseComponent = require('oroui/js/app/components/base/component');
 
-    EmailNotificationFormComponent = BaseComponent.extend(/** @exports OfferFormComponent.prototype */ {
+    EmailNotificationFormComponent = BaseComponent.extend(/** @lends EmailNotificationFormComponent.prototype */ {
         options: {
             selectors: {
                 form: null,

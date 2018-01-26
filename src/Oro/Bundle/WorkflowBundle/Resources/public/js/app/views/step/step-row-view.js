@@ -66,8 +66,8 @@ define(function(require) {
                 throw new Error('Model must be an instance of StepModel');
             }
             this.transitionsListView = new TransitionsShortListView({
-                'collection': this.model.getAllowedTransitions(this.options.workflow),
-                'workflow': this.options.workflow,
+                collection: this.model.getAllowedTransitions(this.options.workflow),
+                workflow: this.options.workflow,
                 stepFrom: this.model
             });
             var rowHtml = $(this.template(this.model.toJSON()));

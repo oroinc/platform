@@ -88,8 +88,8 @@ define(function(require) {
             var connection;
             var name = this.model.get('name');
             var startSteps = this.stepCollection.filter(function(item) {
-                    return item.get('allowed_transitions').indexOf(name) !== -1;
-                });
+                return item.get('allowed_transitions').indexOf(name) !== -1;
+            });
             var endStep = this.stepCollection.findWhere({name: this.model.get('step_to')});
             this.addStaleMark();
             for (i = 0; i < startSteps.length; i++) {

@@ -6,7 +6,7 @@ define([
 
     var NotesCollection;
 
-    NotesCollection =  BaseCollection.extend({
+    NotesCollection = BaseCollection.extend({
         model: NoteModel,
         baseUrl: '',
         sorting: 'DESC',
