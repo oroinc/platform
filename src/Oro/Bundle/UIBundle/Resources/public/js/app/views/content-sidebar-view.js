@@ -79,7 +79,7 @@ define(function(require) {
         },
 
         getSidebarState: function() {
-            return tools.unpackFromQueryString(location.search).sidebar || 'on'
+            return tools.unpackFromQueryString(location.search).sidebar || 'on';
         },
 
         minimize: function() {

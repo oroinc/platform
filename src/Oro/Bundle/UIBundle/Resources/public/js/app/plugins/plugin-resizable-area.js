@@ -49,7 +49,7 @@ define(function(require) {
             }
 
             if (_.isObject(this.options.resizableOptions)) {
-                this.resizableOptions =  _.defaults({}, this.options.resizableOptions, this.resizableOptions);
+                this.resizableOptions = _.defaults({}, this.options.resizableOptions, this.resizableOptions);
             }
 
             if (this.main.$(this.options.$resizableEl).length) {
