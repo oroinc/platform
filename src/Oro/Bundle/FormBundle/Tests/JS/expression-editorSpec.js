@@ -5,18 +5,17 @@ define(function(require) {
     var _ = require('underscore');
     var ExpressionEditorView = require('oroform/js/app/views/expression-editor-view');
 
-    //fixtures
+    // fixtures
     var options = JSON.parse(require('text!./Fixture/expression-editor-options.json'));
     var html = require('text!./Fixture/expression-editor-template.html');
 
-    //variables
+    // variables
     var expressionEditorUtil = null;
     var expressionEditorView = null;
     var typeahead = null;
     var el = null;
 
     describe('oroform/js/app/views/expression-editor-view', function() {
-
         beforeEach(function() {
             window.setFixtures(html);
 

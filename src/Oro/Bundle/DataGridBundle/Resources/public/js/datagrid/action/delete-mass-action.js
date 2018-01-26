@@ -146,7 +146,6 @@ define([
                 } else {
                     this.confirmMessage = __(this.confirmMessages.max_limit_message, {max_limit: data.max_limit});
                 }
-
             }
         },
 

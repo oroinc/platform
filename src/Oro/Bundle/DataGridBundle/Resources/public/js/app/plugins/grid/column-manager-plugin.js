@@ -48,7 +48,7 @@ define(function(require) {
             var managedColumns = [];
 
             this.main.columns.each(function(column, i) {
-                var isManageable =  column.get('manageable') !== false;
+                var isManageable = column.get('manageable') !== false;
 
                 // set initial order
                 if (_.isUndefined(column.get('order')) || isManageable) {

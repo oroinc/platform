@@ -17,7 +17,7 @@ define([
     EmailAttachmentLink = BaseView.extend({
         options: {},
         events: {
-            'click': 'linkAttachment'
+            click: 'linkAttachment'
         },
 
         /**

@@ -76,16 +76,21 @@ class SyncCredentialsIssueManager
     /**
      * Sends the messages to the notification channels about wrong credential sync email boxes and deletes
      * the information about wrong boxes from the storage to avoid notification duplications.
+     *
+     * @return UserEmailOrigin[]
      */
     public function processInvalidOrigins()
     {
-        foreach ($this->credentialsDriver->getAllOrigins() as $invalidOrigin) {
+        $processedOrigins = $this->credentialsDriver->getAllOrigins();
+        foreach ($processedOrigins as $invalidOrigin) {
             foreach ($this->notificationSenders as $notificationSender) {
                 $notificationSender->sendNotification($invalidOrigin);
             }
         }
 
         $this->credentialsDriver->deleteAllOrigins();
+
+        return $processedOrigins;
     }
 
     /**

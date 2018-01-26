@@ -227,7 +227,7 @@ define([
 
     // handles page request
     mediator.on('page:request', function(args) {
-        var path = args.route.path !== null && args.route.path !== void 0  ? args.route.path : current.path;
+        var path = args.route.path !== null && args.route.path !== void 0 ? args.route.path : current.path;
         var query = args.route.query !== null && args.route.query !== void 0 ? args.route.query : current.query;
         changeUrl(path, query);
         if (notifier.result) {

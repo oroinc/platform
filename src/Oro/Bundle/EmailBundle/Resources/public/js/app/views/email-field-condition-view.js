@@ -25,8 +25,8 @@ define(function(require) {
         initChoiceInputView: function() {
             var fields = this.entityData.fields.map(function(field) {
                 return {
-                    'id': field.name,
-                    'text': field.label
+                    id: field.name,
+                    text: field.label
                 };
             });
             var choiceInputData = [{

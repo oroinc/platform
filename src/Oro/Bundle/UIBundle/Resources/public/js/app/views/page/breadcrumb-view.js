@@ -39,7 +39,7 @@ define([
             var breadcrumbs = menuView.getActiveItems();
             if (breadcrumbs.length) {
                 this.data = {
-                    'breadcrumb': this.breadcrumbsTemplate({'breadcrumbs': breadcrumbs})
+                    breadcrumb: this.breadcrumbsTemplate({breadcrumbs: breadcrumbs})
                 };
                 this.render();
                 this.data = null;

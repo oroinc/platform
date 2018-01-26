@@ -1,4 +1,3 @@
-/** @lends MultiUseResourceManager */
 define(function(require) {
     'use strict';
     var BaseClass = require('../base-class');
@@ -38,7 +37,7 @@ define(function(require) {
      * @augments [BaseClass](./base-class.md)
      * @exports MultiUseResourceManager
      */
-    var MultiUseResourceManager = BaseClass.extend(/** @exports MultiUseResourceManager.prototype */{
+    var MultiUseResourceManager = BaseClass.extend(/** @lends MultiUseResourceManager.prototype */{
         /**
          * Holders counter
          * @type {number}

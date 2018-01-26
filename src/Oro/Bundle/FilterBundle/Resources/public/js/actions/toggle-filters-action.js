@@ -6,7 +6,7 @@ define(function(require) {
     var AbstractAction = require('oro/datagrid/action/abstract-action');
     var FiltersManager = require('orofilter/js/filters-manager');
 
-    ToggleFiltersAction =  AbstractAction.extend({
+    ToggleFiltersAction = AbstractAction.extend({
         initialize: function(options) {
             var opts = options || {};
 

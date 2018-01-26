@@ -1,4 +1,3 @@
-/** @lends InlineEditableViewComponent */
 define(function(require) {
     'use strict';
 
@@ -75,7 +74,7 @@ define(function(require) {
     var overlayTool = require('oroui/js/tools/overlay');
     var tools = require('oroui/js/tools');
 
-    InlineEditableViewComponent = BaseComponent.extend(/** @exports InlineEditableViewComponent.prototype */{
+    InlineEditableViewComponent = BaseComponent.extend(/** @lends InlineEditableViewComponent.prototype */{
         options: {
             overlay: {
                 zIndex: 1,
@@ -204,7 +203,7 @@ define(function(require) {
         getEditorOptions: function() {
             var viewConfiguration = this.inlineEditingOptions.editor ?
                 this.inlineEditingOptions.editor.view_options :
-            {};
+                {};
 
             if (!this.isInsertEditorModeOverlay()) {
                 viewConfiguration.container = this.view.$el;

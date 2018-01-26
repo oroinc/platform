@@ -9,15 +9,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-
 use Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimiter;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimitResult;
-use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
-use Oro\Bundle\SearchBundle\Async\Topics;
 
 class DeleteMassActionHandler implements MassActionHandlerInterface
 {
@@ -38,12 +34,6 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     /** @var RequestStack */
     protected $requestStack;
 
-    /** @var OptionalListenerManager */
-    protected $listenerManager;
-
-    /** @var  MessageProducerInterface */
-    protected $producer;
-
     /** @var string */
     protected $responseMessage = 'oro.grid.mass_action.delete.success_message';
 
@@ -53,25 +43,19 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param MassDeleteLimiter             $limiter
      * @param RequestStack                  $requestStack
-     * @param OptionalListenerManager       $listenerManager
-     * @param MessageProducerInterface      $producer
      */
     public function __construct(
         ManagerRegistry $registry,
         TranslatorInterface $translator,
         AuthorizationCheckerInterface $authorizationChecker,
         MassDeleteLimiter $limiter,
-        RequestStack $requestStack,
-        OptionalListenerManager $listenerManager,
-        MessageProducerInterface $producer
+        RequestStack $requestStack
     ) {
         $this->registry = $registry;
         $this->translator = $translator;
         $this->authorizationChecker = $authorizationChecker;
         $this->limiter = $limiter;
         $this->requestStack = $requestStack;
-        $this->listenerManager = $listenerManager;
-        $this->producer = $producer;
     }
 
     /**
@@ -97,23 +81,10 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
      * Finish processed batch
      *
      * @param EntityManager $manager
-     * @param string        $entityName
-     * @param array         $deletedIds
      */
-    protected function finishBatch(EntityManager $manager, $entityName, array $deletedIds)
+    protected function finishBatch(EntityManager $manager)
     {
-        $body = [];
-        foreach ($deletedIds as $deletedId) {
-            $body [] = [
-                'class' => $entityName,
-                'id' => $deletedId
-            ];
-        }
-
         $manager->flush();
-
-        $this->producer->send(Topics::INDEX_ENTITIES, $body);
-
         $manager->clear();
     }
 
@@ -227,10 +198,8 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         $queryBuilder = $args->getResults()->getSource();
         $results      = new DeletionIterableResult($queryBuilder);
         $results->setBufferSize(self::FLUSH_BATCH_SIZE);
-        $this->listenerManager->disableListeners(['oro_search.index_listener']);
         // if huge amount data must be deleted
         set_time_limit(0);
-        $deletedIds            = [];
         $entityIdentifiedField = $this->getEntityIdentifierField($args);
         /** @var EntityManager $manager */
         $manager = $this->registry->getManagerForClass($entityName);
@@ -247,19 +216,17 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
                 if (!$this->isDeleteAllowed($entity)) {
                     continue;
                 }
-                $deletedIds[] = $identifierValue;
                 $this->processDelete($entity, $manager);
                 $iteration++;
 
                 if ($iteration % self::FLUSH_BATCH_SIZE === 0) {
-                    $this->finishBatch($manager, $entityName, $deletedIds);
-                    $deletedIds = [];
+                    $this->finishBatch($manager);
                 }
             }
         }
 
         if ($iteration % self::FLUSH_BATCH_SIZE > 0) {
-            $this->finishBatch($manager, $entityName, $deletedIds);
+            $this->finishBatch($manager);
         }
 
         return $this->getDeleteResponse($args, $iteration);

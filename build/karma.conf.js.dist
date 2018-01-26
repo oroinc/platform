@@ -1,5 +1,4 @@
 /* global module */
-// jscs:disable validateIndentation
 module.exports = function(config) {
   'use strict';
 

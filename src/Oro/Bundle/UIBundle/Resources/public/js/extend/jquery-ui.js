@@ -7,7 +7,6 @@ define(function(require) {
 
     /* datepicker extend:start */
     (function() {
-
         var original = {
             _destroyDatepicker: $.datepicker.constructor.prototype._destroyDatepicker
         };
@@ -40,7 +39,6 @@ define(function(require) {
             var pos;
             var isFixed;
             var offset;
-            // jshint -W040
             var input = this;
             var $input = $(this);
 
@@ -110,11 +108,11 @@ define(function(require) {
                     $(this).on(events, $.proxy(updatePos, input));
                     // @TODO develop other approach than hide on scroll
                     // because on mobile devices it's impossible to open calendar without scrolling
-                    /*$(this).on(events, function () {
+                    /* $(this).on(events, function () {
                         // just close datepicker
                         $.datepicker._hideDatepicker();
                         input.blur();
-                    });*/
+                    }); */
                 });
 
             updatePos.call(input);
@@ -211,7 +209,6 @@ define(function(require) {
          * @param {String} simulatedType The corresponding mouse event
          */
         function simulateMouseEvent(event, simulatedType) {
-
             // Ignore multi-touch events
             if (event.originalEvent.touches.length > 1) {
                 return;

@@ -181,14 +181,14 @@ define(function(require) {
 
         executeConfiguredAction: function() {
             switch (this.frontend_handle) {
-            case 'ajax':
-                this._handleAjax();
-                break;
-            case 'redirect':
-                this._handleRedirect();
-                break;
-            default:
-                this._handleWidget();
+                case 'ajax':
+                    this._handleAjax();
+                    break;
+                case 'redirect':
+                    this._handleRedirect();
+                    break;
+                default:
+                    this._handleWidget();
             }
         },
 

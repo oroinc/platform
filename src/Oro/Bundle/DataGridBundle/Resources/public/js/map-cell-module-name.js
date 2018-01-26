@@ -3,14 +3,14 @@ define(function() {
 
     var moduleNameTemplate = 'oro/datagrid/cell/{{type}}-cell';
     var types = {
-            integer:   'number',
-            decimal:   'number',
-            percent:   'number',
-            currency:  'number',
-            array:     'string',
-            simple_array: 'string',
-            enum: 'string'
-        };
+        'integer': 'number',
+        'decimal': 'number',
+        'percent': 'number',
+        'currency': 'number',
+        'array': 'string',
+        'simple_array': 'string',
+        'enum': 'string'
+    };
 
     return function(type) {
         return moduleNameTemplate.replace('{{type}}', types[type] || type);

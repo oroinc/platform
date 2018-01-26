@@ -17,7 +17,7 @@ define(function(require) {
          * @inheritDoc
          */
         initializeWidget: function() {
-            //support for readonly attr
+            // support for readonly attr
             this.$el.on('click mousedown', function(e) {
                 if ($(e.currentTarget).is('[readonly],[disabled]')) {
                     return false;

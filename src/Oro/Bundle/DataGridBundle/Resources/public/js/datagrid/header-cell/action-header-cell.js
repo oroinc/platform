@@ -77,7 +77,7 @@ define([
                 );
             });
 
-            this.subview('actionsPanel', new this.actionsPanel({'actions': actions}));
+            this.subview('actionsPanel', new this.actionsPanel({actions: actions}));
         },
 
         render: function() {

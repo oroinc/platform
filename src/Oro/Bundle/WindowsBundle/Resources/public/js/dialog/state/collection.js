@@ -1,5 +1,5 @@
 define(['backbone', './model'
-    ], function(Backbone, StateModel) {
+], function(Backbone, StateModel) {
     'use strict';
 
     /**

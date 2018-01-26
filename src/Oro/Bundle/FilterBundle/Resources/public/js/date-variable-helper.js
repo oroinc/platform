@@ -83,7 +83,7 @@ define(function(require) {
         isDateVariable: function(value) {
             var result;
             var self = this;
-            //replace -5 +60 modifiers to '', we need clear variable
+            // replace -5 +60 modifiers to '', we need clear variable
             value = value.replace(/( *[\-+]+ *(\d+)?)/, '');
 
             result = _.some(this.objectIndex, function(item) {

@@ -36,36 +36,36 @@ define(function(require) {
                 '<%- button_label %></button>',
             allowed_button_styles: [
                 {
-                    'label': __('Gray button'),
-                    'name': ''
+                    label: __('Gray button'),
+                    name: ''
                 },
                 {
-                    'label': __('Navy blue button'),
-                    'name': 'btn-primary'
+                    label: __('Navy blue button'),
+                    name: 'btn-primary'
                 },
                 {
-                    'label': __('Blue button'),
-                    'name': 'btn-info'
+                    label: __('Blue button'),
+                    name: 'btn-info'
                 },
                 {
-                    'label': __('Green button'),
-                    'name': 'btn-success'
+                    label: __('Green button'),
+                    name: 'btn-success'
                 },
                 {
-                    'label': __('Yellow button'),
-                    'name': 'btn-warning'
+                    label: __('Yellow button'),
+                    name: 'btn-warning'
                 },
                 {
-                    'label': __('Red button'),
-                    'name': 'btn-danger'
+                    label: __('Red button'),
+                    name: 'btn-danger'
                 },
                 {
-                    'label': __('Black button'),
-                    'name': 'btn-inverse'
+                    label: __('Black button'),
+                    name: 'btn-inverse'
                 },
                 {
-                    'label': __('Link'),
-                    'name': 'btn-link'
+                    label: __('Link'),
+                    name: 'btn-link'
                 }
             ]
         },
@@ -133,7 +133,7 @@ define(function(require) {
                 modelUpdateData.name = helper.getNameByString(formData.label, 'transition_');
             }
             var frontendOptions = this.model.get('frontend_options');
-            modelUpdateData.frontend_options =  _.extend({}, frontendOptions, {
+            modelUpdateData.frontend_options = _.extend({}, frontendOptions, {
                 'icon': formData.transition_prototype_icon,
                 'class': formData.button_color
             });
@@ -250,14 +250,14 @@ define(function(require) {
                     label = options.label;
                 }
                 var result = {
-                    'itemId': _.uniqueId(),
-                    'is_entity_attribute': isEntityAttribute,
-                    'attribute_name': attributeName,
-                    'property_path': propertyPath || attributeName,
-                    'required': isRequired,
-                    'label': label,
-                    'isLabelUpdated': false,
-                    'translateLinks': attribute.attributes.translateLinks[this.model.get('name')]
+                    itemId: _.uniqueId(),
+                    is_entity_attribute: isEntityAttribute,
+                    attribute_name: attributeName,
+                    property_path: propertyPath || attributeName,
+                    required: isRequired,
+                    label: label,
+                    isLabelUpdated: false,
+                    translateLinks: attribute.attributes.translateLinks[this.model.get('name')]
                 };
                 if ('options' in formOption) {
                     result.options = _.clone(formOption.options);
@@ -289,14 +289,14 @@ define(function(require) {
                     title = __('Clone transition');
                 }
                 this.widget = new DialogWidget({
-                    'title': title,
-                    'el': this.$el,
-                    'stateEnabled': false,
-                    'incrementalPosition': false,
-                    'dialogOptions': {
-                        'close': _.bind(this.onCancel, this),
-                        'width': 800,
-                        'modal': true
+                    title: title,
+                    el: this.$el,
+                    stateEnabled: false,
+                    incrementalPosition: false,
+                    dialogOptions: {
+                        close: _.bind(this.onCancel, this),
+                        width: 800,
+                        modal: true
                     }
                 });
                 this.widget.render();
@@ -307,9 +307,9 @@ define(function(require) {
             // Disable widget submit handler and set our own instead
             this.widget.form.off('submit');
             this.widget.form.validate({
-                'submitHandler': _.bind(this.onTransitionAdd, this),
-                'ignore': '[type="hidden"]',
-                'highlight': function(element) {
+                submitHandler: _.bind(this.onTransitionAdd, this),
+                ignore: '[type="hidden"]',
+                highlight: function(element) {
                     var tabContent = $(element).closest('.tab-pane');
                     if (tabContent.is(':hidden')) {
                         tabContent

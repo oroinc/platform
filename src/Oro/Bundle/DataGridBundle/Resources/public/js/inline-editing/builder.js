@@ -64,7 +64,7 @@ define(function(require) {
                 },
                 save_api_accessor: {
                     'class': 'oroui/js/tools/api-accessor',
-                    http_method: 'PATCH'
+                    'http_method': 'PATCH'
                 }
             };
         },

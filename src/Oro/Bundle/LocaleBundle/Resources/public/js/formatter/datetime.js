@@ -1,5 +1,5 @@
 define(['../locale-settings', 'moment', 'orotranslation/js/translator'
-    ], function(localeSettings, moment, __) {
+], function(localeSettings, moment, __) {
     'use strict';
 
     var datetimeVendor = 'moment';
@@ -15,22 +15,22 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          * @property {Object}
          */
         frontendFormats: {
-            'day':      localeSettings.getVendorDateTimeFormat(datetimeVendor, 'day'),
-            'date':     localeSettings.getVendorDateTimeFormat(datetimeVendor, 'date'),
-            'time':     localeSettings.getVendorDateTimeFormat(datetimeVendor, 'time'),
-            'datetime': localeSettings.getVendorDateTimeFormat(datetimeVendor, 'datetime')
+            day: localeSettings.getVendorDateTimeFormat(datetimeVendor, 'day'),
+            date: localeSettings.getVendorDateTimeFormat(datetimeVendor, 'date'),
+            time: localeSettings.getVendorDateTimeFormat(datetimeVendor, 'time'),
+            datetime: localeSettings.getVendorDateTimeFormat(datetimeVendor, 'datetime')
         },
 
         /**
          * @property {Object}
          */
         backendFormats: {
-            'day':      'MM-DD',
-            'month':    'MM',
-            'date':     'YYYY-MM-DD',
-            'time':     'HH:mm:ss',
-            'datetime': 'YYYY-MM-DD[T]HH:mm:ssZZ',
-            'datetime_separator': 'T'
+            day: 'MM-DD',
+            month: 'MM',
+            date: 'YYYY-MM-DD',
+            time: 'HH:mm:ss',
+            datetime: 'YYYY-MM-DD[T]HH:mm:ssZZ',
+            datetime_separator: 'T'
         },
 
         /**

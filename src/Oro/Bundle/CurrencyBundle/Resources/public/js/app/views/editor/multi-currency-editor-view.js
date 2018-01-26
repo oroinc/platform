@@ -1,4 +1,3 @@
-/** @lends MultiCurrencyEditorView */
 define(function(require) {
     'use strict';
 
@@ -73,7 +72,7 @@ define(function(require) {
     var multiCurrencyFormatter = require('orocurrency/js/formatter/multi-currency');
     require('jquery.select2');
 
-    MultiCurrencyEditorView = TextEditorView.extend(/** @exports MultiCurrencyEditorView.prototype */{
+    MultiCurrencyEditorView = TextEditorView.extend(/** @lends MultiCurrencyEditorView.prototype */{
         /**
          * Option for select2 widget to show or hide search input for list of currencies
          * @protected

@@ -36,7 +36,7 @@ define(function(require) {
                 );
             });
 
-            this.actionsPanel = new ActionsPanel({'actions': actions, el: options._sourceElement});
+            this.actionsPanel = new ActionsPanel({actions: actions, el: options._sourceElement});
             this.actionsPanel.render();
 
             this.listenTo(this.grid.collection, 'backgrid:refresh', function() {
