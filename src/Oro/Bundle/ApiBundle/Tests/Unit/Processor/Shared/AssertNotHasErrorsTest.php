@@ -3,19 +3,19 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Model\Error;
-use Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors;
+use Oro\Bundle\ApiBundle\Processor\Shared\AssertNotHasErrors;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
-class ProcessErrorsTest extends GetListProcessorTestCase
+class AssertNotHasErrorsTest extends GetListProcessorTestCase
 {
-    /** @var ProcessErrors */
+    /** @var AssertNotHasErrors */
     private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->processor = new ProcessErrors();
+        $this->processor = new AssertNotHasErrors();
     }
 
     public function testProcessWithoutErrorsInContext()

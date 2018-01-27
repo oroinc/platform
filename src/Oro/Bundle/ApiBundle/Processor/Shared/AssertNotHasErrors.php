@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Processor\Context;
  * Checks if there are any errors in the Context,
  * and if so, throws UnhandledErrorsException exception.
  */
-class ProcessErrors implements ProcessorInterface
+class AssertNotHasErrors implements ProcessorInterface
 {
     /**
      * {@inheritdoc}
