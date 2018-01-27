@@ -19,9 +19,10 @@ class ExceptionUtil
         while (null !== $result && $result instanceof ExecutionFailedException) {
             $result = $result->getPrevious();
         }
+        if (null === $result) {
+            $result = $e;
+        }
 
-        return null !== $result
-            ? $result
-            : $e;
+        return $result;
     }
 }
