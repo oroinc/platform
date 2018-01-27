@@ -47,8 +47,8 @@ services:
     # finalize
     #
 
-    oro_api.get.validate_result:
-        class: Oro\Bundle\ApiBundle\Processor\Get\ValidateResult
+    oro_api.get.assert_has_result:
+        class: Oro\Bundle\ApiBundle\Processor\Get\AssertHasResult
         tags:
             - { name: oro.api.processor, action: get, group: finalize, priority: -250 }
 

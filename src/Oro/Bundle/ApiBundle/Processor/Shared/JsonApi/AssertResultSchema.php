@@ -5,12 +5,12 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
-use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDocument;
+use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 
 /**
  * Makes sure that the base structure of the result conforms JSON.API specification.
  */
-class ValidateNormalizedResultSchema implements ProcessorInterface
+class AssertResultSchema implements ProcessorInterface
 {
     /**
      * {@inheritdoc}
@@ -27,7 +27,7 @@ class ValidateNormalizedResultSchema implements ProcessorInterface
             throw new RuntimeException('The result must be an array.');
         }
 
-        $rootSections = [JsonApiDocument::DATA, JsonApiDocument::ERRORS, JsonApiDocument::META];
+        $rootSections = [JsonApiDoc::DATA, JsonApiDoc::ERRORS, JsonApiDoc::META];
         if (count(array_intersect(array_keys($result), $rootSections)) === 0) {
             throw new RuntimeException(
                 sprintf(
@@ -37,22 +37,22 @@ class ValidateNormalizedResultSchema implements ProcessorInterface
             );
         }
 
-        if (array_key_exists(JsonApiDocument::DATA, $result) && array_key_exists(JsonApiDocument::ERRORS, $result)) {
+        if (array_key_exists(JsonApiDoc::DATA, $result) && array_key_exists(JsonApiDoc::ERRORS, $result)) {
             throw new RuntimeException(
                 sprintf(
                     'The sections "%s" and "%s" must not coexist in the result.',
-                    JsonApiDocument::DATA,
-                    JsonApiDocument::ERRORS
+                    JsonApiDoc::DATA,
+                    JsonApiDoc::ERRORS
                 )
             );
         }
 
-        if (array_key_exists(JsonApiDocument::INCLUDED, $result) && !array_key_exists(JsonApiDocument::DATA, $result)) {
+        if (array_key_exists(JsonApiDoc::INCLUDED, $result) && !array_key_exists(JsonApiDoc::DATA, $result)) {
             throw new RuntimeException(
                 sprintf(
                     'The result can contain the "%s" section only together with the "%s" section.',
-                    JsonApiDocument::INCLUDED,
-                    JsonApiDocument::DATA
+                    JsonApiDoc::INCLUDED,
+                    JsonApiDoc::DATA
                 )
             );
         }
