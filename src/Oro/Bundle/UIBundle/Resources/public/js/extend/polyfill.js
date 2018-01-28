@@ -14,8 +14,7 @@ define(function() {
     };
 
     // copied from https://developer.mozilla.org/
-    /* jshint ignore:start */
-    // jscs:disable
+    /* eslint-disable */
     if (!Function.prototype.bind) {
         Function.prototype.bind = function(oThis) {
             if (typeof this !== 'function') {
@@ -43,6 +42,5 @@ define(function() {
             return fBound;
         };
     }
-    // jscs:enable
-    /* jshint ignore:end */
+    /* eslint-enable */
 });

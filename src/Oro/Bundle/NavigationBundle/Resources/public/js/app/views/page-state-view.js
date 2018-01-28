@@ -225,7 +225,7 @@ define([
                 checkIdRoute = pageStateRoutes.data('pagestate-checkid-route');
             }
 
-            var url = routing.generate(checkIdRoute, {'pageId': this._combinePageId()});
+            var url = routing.generate(checkIdRoute, {pageId: this._combinePageId()});
             $.get(url).done(function(data) {
                 var attributes;
                 attributes = {
@@ -382,21 +382,21 @@ define([
                 $.each(el, function(i, input) {
                     var element = form.find('[name="' + input.name + '"]');
                     switch (element.prop('type')) {
-                    case 'checkbox':
-                        element.filter('[value="' +  input.value + '"]').prop('checked', true);
-                        break;
-                    case 'select-multiple':
-                        element
-                            .find('option').prop('selected', false).end()
-                            .find('option[value="' + input.value + '"]').prop('selected', true);
-                        break;
-                    default:
-                        if (input.selectedData) {
-                            element.data('selected-data', input.selectedData);
-                        }
-                        if (input.value !== element.val()) {
-                            element.val(input.value).trigger('change');
-                        }
+                        case 'checkbox':
+                            element.filter('[value="' + input.value + '"]').prop('checked', true);
+                            break;
+                        case 'select-multiple':
+                            element
+                                .find('option').prop('selected', false).end()
+                                .find('option[value="' + input.value + '"]').prop('selected', true);
+                            break;
+                        default:
+                            if (input.selectedData) {
+                                element.data('selected-data', input.selectedData);
+                            }
+                            if (input.value !== element.val()) {
+                                element.val(input.value).trigger('change');
+                            }
                     }
                 });
             });

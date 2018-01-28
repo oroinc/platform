@@ -196,16 +196,16 @@ define(function(require) {
         _openItemEditForm: function(title, url) {
             if (!this.itemEditDialog) {
                 this.itemEditDialog = new DialogWidget({
-                    'url': url,
-                    'title': title,
-                    'regionEnabled': false,
-                    'incrementalPosition': false,
-                    'dialogOptions': {
-                        'modal': true,
-                        'resizable': false,
-                        'width': 675,
-                        'autoResize': true,
-                        'close': _.bind(function() {
+                    url: url,
+                    title: title,
+                    regionEnabled: false,
+                    incrementalPosition: false,
+                    dialogOptions: {
+                        modal: true,
+                        resizable: false,
+                        width: 675,
+                        autoResize: true,
+                        close: _.bind(function() {
                             delete this.itemEditDialog;
                         }, this)
                     }

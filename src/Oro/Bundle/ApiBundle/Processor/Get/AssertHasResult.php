@@ -10,7 +10,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 /**
  * Makes sure that the valid result was added to the Context.
  */
-class ValidateResult implements ProcessorInterface
+class AssertHasResult implements ProcessorInterface
 {
     /**
      * {@inheritdoc}

@@ -43,25 +43,25 @@ define(function(require) {
 
             AttributeSelectComponent.__super__.initialize.call(this, options);
 
-            //Modify dropdown - show already selected attributes (from other groups) in braces
+            // Modify dropdown - show already selected attributes (from other groups) in braces
             $(this.attributeSelect).on('select2-opening', function() {
                 self.addLabelsToAttributesFromOtherGroups();
             });
 
-            //Restore dropdown with initial option labels
+            // Restore dropdown with initial option labels
             $(this.attributeSelect).on('select2-close', function() {
                 self.restoreInitialDropdown();
             });
 
             $(this.attributeSelect).on('selected', function(e) {
-                //Modify selected tag to show initial value (without braces)
+                // Modify selected tag to show initial value (without braces)
                 if (e.val in self.oldOptionLabels) {
-                    var tag =  $(self.attributeSelect).parent().find('.select2-choices li div').last();
+                    var tag = $(self.attributeSelect).parent().find('.select2-choices li div').last();
                     $(tag).html(self.oldOptionLabels[e.val]);
                 }
                 var eventData = {
-                    'ftid': self.ftid,
-                    'selectedValue': e.val
+                    ftid: self.ftid,
+                    selectedValue: e.val
                 };
                 mediator.trigger('attribute-select:selected', eventData);
             });
@@ -145,7 +145,7 @@ define(function(require) {
             }
 
             if (option.length) {
-                //Need this timeout to deffer Change call because it causes some delay and it may be visible on UI
+                // Need this timeout to deffer Change call because it causes some delay and it may be visible on UI
                 setTimeout(function() {
                     $(option).prop('selected', isSelected).change();
                 }, 1);
@@ -153,7 +153,7 @@ define(function(require) {
         },
 
         addLabelsToAttributesFromOtherGroups: function() {
-            var eventData = {'attributeSelects': []};
+            var eventData = {attributeSelects: []};
             mediator.trigger('attribute-select:find-selected-attributes', eventData);
 
             var selectedOptions = [];

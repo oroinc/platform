@@ -13,7 +13,6 @@ define(function(require) {
         var activityConditionView;
 
         describe('without initial value', function() {
-
             beforeEach(function(done) {
                 activityConditionView = new ActivityConditionView({
                     autoRender: true,

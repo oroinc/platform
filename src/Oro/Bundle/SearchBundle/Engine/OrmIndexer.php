@@ -39,7 +39,7 @@ class OrmIndexer extends AbstractIndexer
     public function save($entity, array $context = [])
     {
         $entities = $this->getEntitiesArray($entity);
-        if (false == $entities) {
+        if (!$entities) {
             return false;
         }
 

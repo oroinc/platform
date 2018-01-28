@@ -62,9 +62,9 @@ define(function(require) {
         },
 
         treeEvents: {
-            'after_open.jstree':  'onAfterOpen',
-            'before_open.jstree':  'onBeforeOpen',
-            'after_close.jstree':  'onAfterClose',
+            'after_open.jstree': 'onAfterOpen',
+            'before_open.jstree': 'onBeforeOpen',
+            'after_close.jstree': 'onAfterClose',
             'select_node.jstree': 'onSelect',
             'search.jstree': 'searchResultsFilter',
             'open_node.jstree': 'onOpen'
@@ -153,17 +153,17 @@ define(function(require) {
             this.onSearchDelay = _.debounce(this.onSearch, this.searchTimeout);
 
             var config = {
-                'core': {
-                    'multiple': false,
-                    'data': nodeList,
-                    'check_callback': true,
-                    'force_text': true
+                core: {
+                    multiple: false,
+                    data: nodeList,
+                    check_callback: true,
+                    force_text: true
                 },
-                'state': {
-                    'key': this.viewGroup,
-                    'filter': _.bind(this.onFilter, this)
+                state: {
+                    key: this.viewGroup,
+                    filter: _.bind(this.onFilter, this)
                 },
-                'plugins': ['state', 'wholerow']
+                plugins: ['state', 'wholerow']
             };
 
             this.nodeId = options.nodeId;
@@ -273,7 +273,7 @@ define(function(require) {
 
         onSearchKeypress: function(e) {
             if (e.keyCode === 13) {
-                //enter in search field
+                // enter in search field
                 return this.onSearchEnter(e);
             }
         },

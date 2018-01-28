@@ -85,7 +85,7 @@ define(['jquery', 'jquery.form'], function($) {
         }
 
         options = $.extend(true, {
-            url:  url,
+            url: url,
             type: method || 'GET'
         }, options || {});
 
@@ -98,11 +98,11 @@ define(['jquery', 'jquery.form'], function($) {
 
         query = $.param(arrayData);
         if (extraQuery) {
-            query =  query ? (query + '&' + extraQuery) : extraQuery;
+            query = query ? (query + '&' + extraQuery) : extraQuery;
         }
         if (options.type.toUpperCase() === 'GET') {
             options.url += (options.url.indexOf('?') >= 0 ? '&' : '?') + query;
-            options.data = null;  // data is null for 'get'
+            options.data = null; // data is null for 'get'
         } else {
             options.data = query; // data is the query string for 'post'
         }

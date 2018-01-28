@@ -5,7 +5,7 @@ define(function(require) {
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var HighlightTextView = require('oroui/js/app/views/highlight-text-view');
-    //fixtures
+    // fixtures
     var html = require('text!./Fixture/highlight-text-view.html');
 
     var createView = function(options) {

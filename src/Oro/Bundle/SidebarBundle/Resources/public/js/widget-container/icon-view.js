@@ -11,7 +11,7 @@ define(function(require) {
         template: iconTemplate,
 
         events: {
-            'click': 'onClick'
+            click: 'onClick'
         },
 
         listen: {

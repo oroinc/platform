@@ -45,9 +45,9 @@ define(function(require) {
         /** @property */
         enabled: true,
 
-        hasSortingOrderButton:  config.hasSortingOrderButton,
+        hasSortingOrderButton: config.hasSortingOrderButton,
 
-        disableNotSelectedOption:  config.disableNotSelectedOption,
+        disableNotSelectedOption: config.disableNotSelectedOption,
 
         currentColumn: null,
 
@@ -210,7 +210,7 @@ define(function(require) {
                 columnName = value[0];
                 newDirection = value[1];
             }
-            column = this.columns.findWhere({'name': columnName});
+            column = this.columns.findWhere({name: columnName});
 
             if (column) {
                 if (newDirection) {
@@ -289,7 +289,7 @@ define(function(require) {
                 dropdownCssClass: _.result(this, 'dropdownClassName'),
                 dropdownAutoWidth: true
             };
-            var searchCapabilityGate =  this.SEARCH_CAPABILITY_GATE;
+            var searchCapabilityGate = this.SEARCH_CAPABILITY_GATE;
             if (!this.hasSortingOrderButton) {
                 searchCapabilityGate = Math.floor(searchCapabilityGate / this.DIRECTIONS.length);
             }

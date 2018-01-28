@@ -33,9 +33,9 @@ define(function(require) {
 
     _.extend(JsPlumbManager.prototype, {
         organizeBlocks: function() {
-            /*var steps = this.workflow.get('steps').filter(function(item) {
+            /* var steps = this.workflow.get('steps').filter(function(item) {
                 return !item.get('position');
-            });*/
+            }); */
             var matrix = new Matrix({
                 workflow: this.workflow
             });
@@ -61,7 +61,6 @@ define(function(require) {
             });
             _.each(transforms, function(rule) {
                 rule.apply();
-
             });
             matrix.align().forEachCell(_.bind(function(cell) {
                 var increment = cell.step.get('_is_start') ? -15 : 35;

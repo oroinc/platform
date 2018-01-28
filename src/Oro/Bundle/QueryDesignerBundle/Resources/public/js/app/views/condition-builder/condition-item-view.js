@@ -19,8 +19,8 @@ define(function(require) {
             var view = this._createCriterionView();
             this.subview('criterion', view);
             this.listenTo(view, {
-                'close': this.closeCondition,
-                'change': this.onConditionChange
+                close: this.closeCondition,
+                change: this.onConditionChange
             });
             this.$content.append(view.$el);
             view.render();

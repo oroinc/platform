@@ -64,7 +64,7 @@ define(function(require) {
                 if (!_.isEmpty(data)) {
                     callback(data);
                 }
-            }.bind(this);
+            };
 
             return opts;
         },

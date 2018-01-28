@@ -43,7 +43,7 @@ define(function(require) {
             if (isNaN(rawData)) {
                 return __('oro.datagrid.not_number');
             }
-            return this.formatter.call(this, rawData);
+            return this.formatter(rawData);
         },
 
         /**

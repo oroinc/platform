@@ -10,7 +10,6 @@ define(function() {
         window.localStorage.getItem('dummy-key');
         persistentStorage = window.localStorage;
     } catch (e) {
-
         // catch IE protected mode and browsers w/o localStorage support
 
         // use cookies storage instead
@@ -29,7 +28,9 @@ define(function() {
              * @returns {string}
              */
             getItem: function(sKey) {
-                if (!sKey || !this.hasOwnProperty(sKey)) { return null; }
+                if (!sKey || !this.hasOwnProperty(sKey)) {
+                    return null;
+                }
                 return decodeURIComponent(document.cookie.replace(new RegExp('(?:^|.*;\\s*)' + encodeURIComponent(sKey)
                     .replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=\\s*((?:[^;](?!;))*[^;]?).*'), '$1'));
             },
@@ -41,10 +42,9 @@ define(function() {
              */
             key: function(nKeyId) {
                 return decodeURIComponent(
-                        document.cookie
-                            .replace(/\s*=(?:.(?!;))*$/, '')
-                            .split(/\s*=(?:[^;](?!;))*[^;]?;\s*/
-                    )[nKeyId]);
+                    document.cookie
+                        .replace(/\s*=(?:.(?!;))*$/, '')
+                        .split(/\s*=(?:[^;](?!;))*[^;]?;\s*/)[nKeyId]);
             },
 
             /**
@@ -55,7 +55,9 @@ define(function() {
              * @param sValue {string}
              */
             setItem: function(sKey, sValue) {
-                if (!sKey) { return; }
+                if (!sKey) {
+                    return;
+                }
                 document.cookie = encodeURIComponent(sKey) +
                     '=' + encodeURIComponent(sValue) + '; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/';
                 this.length = document.cookie.match(/=/g).length;
@@ -74,7 +76,9 @@ define(function() {
              * @param sKey {string}
              */
             removeItem: function(sKey) {
-                if (!sKey || !this.hasOwnProperty(sKey)) { return; }
+                if (!sKey || !this.hasOwnProperty(sKey)) {
+                    return;
+                }
                 document.cookie = encodeURIComponent(sKey) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
                 this.length--;
             },
@@ -82,12 +86,10 @@ define(function() {
             /**
              * @inheritDoc
              */
-            // jshint -W001
             hasOwnProperty: function(sKey) {
                 return (new RegExp('(?:^|;\\s*)' + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\='))
                     .test(document.cookie);
             },
-            // jshint +W001
 
             /**
              * When invoked, will empty all keys out of the storage.
@@ -101,5 +103,4 @@ define(function() {
     }
 
     return persistentStorage;
-
 });

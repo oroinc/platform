@@ -1,8 +1,8 @@
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools',
-        'oroui/js/mediator', 'oroui/js/layout',
-        'oroui/js/delete-confirmation', 'oroui/js/scrollspy',
-        'bootstrap', 'jquery-ui'
-    ], function($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy) {
+    'oroui/js/mediator', 'oroui/js/layout',
+    'oroui/js/delete-confirmation', 'oroui/js/scrollspy',
+    'bootstrap', 'jquery-ui'
+], function($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy) {
     'use strict';
 
     /**
@@ -85,7 +85,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                     } else {
                         $(myParent).parent('div.page-container').addClass('right-locked');
                     }
-
                 }
                 $(this).toggleClass('lock-bar-locked');
             });
@@ -219,7 +218,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             $toggle.toggleClass('collapsed', !$(target).hasClass('in'));
         });
         $(document).on('shown.collapse.data-api hidden.collapse.data-api', '.accordion-body', function(e) {
-            if (e.target === e.currentTarget) {   // prevent processing if an event comes from child element
+            if (e.target === e.currentTarget) { // prevent processing if an event comes from child element
                 var $toggle = $(e.target).closest('.accordion-group').find('[data-toggle=collapse]:first');
                 $toggle.toggleClass('collapsed', e.type !== 'shown');
             }
@@ -229,7 +228,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
     /* ============================================================
      * from height_fix.js
      * ============================================================ */
-    //@TODO should be refactored in BAP-4020
+    // @TODO should be refactored in BAP-4020
     $(function() {
         var adjustHeight;
         var anchor = $('#bottom-anchor');
@@ -455,7 +454,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         validateContainer($listContainer);
     });
 
-    //TODO: implement clone row
+    // TODO: implement clone row
 
     $(document).on('click', '.addAfterRow', function(e) {
         e.preventDefault();

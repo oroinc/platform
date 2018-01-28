@@ -109,12 +109,12 @@ define(function(require) {
                     // check if a filter conforms the given criteria
                     matched = self._matchApplicable(filter.applicable, conditions);
                     if (matched && (
-                            _.isNull(matchedBy) ||
+                        _.isNull(matchedBy) ||
                             // new rule is more exact
                             _.size(matchedBy) < _.size(matched) ||
                             // 'type' rule is most low level one, so any other rule can override it
                             (_.size(matchedBy) === 1 && _.has(matchedBy, 'type'))
-                        )) {
+                    )) {
                         matchedBy = matched;
                         filterId = id;
                     }

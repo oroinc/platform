@@ -2,18 +2,20 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
-use Psr\Log\LoggerInterface;
-
+use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Symfony\Component\Debug\BufferingLogger;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\SimpleProcessorFactory;
 use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
-use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+use Oro\Bundle\ApiBundle\Exception\UnhandledErrorsException;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\NormalizeResultContext;
 use Oro\Bundle\ApiBundle\Processor\NormalizeResultActionProcessor;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
@@ -84,11 +86,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return BufferingLogger
      */
     protected function setLogger()
     {
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = new BufferingLogger();
         $this->processor->setLogger($logger);
 
         return $logger;
@@ -98,11 +100,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
      * @param string $processorId
      * @param string $groupName
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|ProcessorInterface
      */
     protected function addProcessor($processorId, $groupName)
     {
-        $processor = $this->createMock('Oro\Component\ChainProcessor\ProcessorInterface');
+        $processor = $this->createMock(ProcessorInterface::class);
         $this->processorFactory->addProcessor($processorId, $processor);
         $this->processorBagConfigBuilder->addProcessor(
             $processorId,
@@ -114,11 +116,14 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         return $processor;
     }
 
+    /**
+     * @return array
+     */
     public function loggerProvider()
     {
         return [
             [false],
-            [true],
+            [true]
         ];
     }
 
@@ -135,17 +140,18 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor1 = $this->addProcessor('processor1', 'group1');
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-        $processor10->expects($this->once())
+            ->with(self::identicalTo($context));
+        $processor10->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
+            ->with(self::identicalTo($context));
 
         $this->processor->process($context);
     }
 
     /**
+     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccurs($withLogger)
@@ -166,40 +172,42 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor3 = $this->addProcessor('processor3', 'group2');
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->willThrowException($exception);
-        $processor2->expects($this->never())
+        $processor2->expects(self::never())
             ->method('process');
-        $processor3->expects($this->never())
+        $processor3->expects(self::never())
             ->method('process');
-        $processor10->expects($this->once())
+        $processor10->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-
-        if (null !== $logger) {
-            $logger->expects($this->once())
-                ->method('error')
-                ->with(
-                    'The execution of "processor1" processor is failed.',
-                    [
-                        'exception'   => $exception,
-                        'action'      => self::TEST_ACTION,
-                        'requestType' => 'rest,json_api',
-                        'version'     => '1.2'
-                    ]
-                );
-            $logger->expects($this->never())
-                ->method('warning');
-        }
+            ->with(self::identicalTo($context));
 
         $this->processor->process($context);
 
         self::assertEquals([$error], $context->getErrors());
+        if (null !== $logger) {
+            self::assertEquals(
+                [
+                    [
+                        'error',
+                        'The execution of "processor1" processor is failed.',
+                        [
+                            'exception'   => $exception,
+                            'action'      => self::TEST_ACTION,
+                            'requestType' => 'rest,json_api',
+                            'version'     => '1.2'
+                        ]
+                    ]
+                ],
+                $logger->cleanLogs()
+            );
+        }
     }
 
     /**
+     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccursAndSoftErrorsHandlingEnabled($withLogger)
@@ -221,40 +229,42 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor3 = $this->addProcessor('processor3', 'group2');
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->willThrowException($exception);
-        $processor2->expects($this->never())
+        $processor2->expects(self::never())
             ->method('process');
-        $processor3->expects($this->never())
+        $processor3->expects(self::never())
             ->method('process');
-        $processor10->expects($this->once())
+        $processor10->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-
-        if (null !== $logger) {
-            $logger->expects($this->never())
-                ->method('error');
-            $logger->expects($this->once())
-                ->method('warning')
-                ->with(
-                    'An exception occurred in "processor1" processor.',
-                    [
-                        'exception'   => $exception,
-                        'action'      => self::TEST_ACTION,
-                        'requestType' => 'rest,json_api',
-                        'version'     => '1.2'
-                    ]
-                );
-        }
+            ->with(self::identicalTo($context));
 
         $this->processor->process($context);
 
         self::assertEquals([$error], $context->getErrors());
+        if (null !== $logger) {
+            self::assertEquals(
+                [
+                    [
+                        'info',
+                        'An exception occurred in "processor1" processor.',
+                        [
+                            'exception'   => $exception,
+                            'action'      => self::TEST_ACTION,
+                            'requestType' => 'rest,json_api',
+                            'version'     => '1.2'
+                        ]
+                    ]
+                ],
+                $logger->cleanLogs()
+            );
+        }
     }
 
     /**
+     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccurs($withLogger)
@@ -273,35 +283,46 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor3 = $this->addProcessor('processor3', 'group2');
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (NormalizeResultContext $context) use ($error) {
                     $context->addError($error);
                 }
             );
-        $processor2->expects($this->never())
+        $processor2->expects(self::never())
             ->method('process');
-        $processor3->expects($this->never())
+        $processor3->expects(self::never())
             ->method('process');
-        $processor10->expects($this->once())
+        $processor10->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-
-        if (null !== $logger) {
-            $logger->expects($this->never())
-                ->method('error');
-            $logger->expects($this->never())
-                ->method('warning');
-        }
+            ->with(self::identicalTo($context));
 
         $this->processor->process($context);
 
         self::assertEquals([$error], $context->getErrors());
+        if (null !== $logger) {
+            self::assertEquals(
+                [
+                    [
+                        'info',
+                        'Error(s) occurred in "processor1" processor.',
+                        [
+                            'errors'      => [['title' => 'some error']],
+                            'action'      => self::TEST_ACTION,
+                            'requestType' => 'rest,json_api',
+                            'version'     => '1.2'
+                        ]
+                    ]
+                ],
+                $logger->cleanLogs()
+            );
+        }
     }
 
     /**
+     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursInLastProcessor($withLogger)
@@ -319,34 +340,45 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor2 = $this->addProcessor('processor2', 'group1');
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-        $processor2->expects($this->once())
+            ->with(self::identicalTo($context));
+        $processor2->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (NormalizeResultContext $context) use ($error) {
                     $context->addError($error);
                 }
             );
-        $processor10->expects($this->once())
+        $processor10->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-
-        if (null !== $logger) {
-            $logger->expects($this->never())
-                ->method('error');
-            $logger->expects($this->never())
-                ->method('warning');
-        }
+            ->with(self::identicalTo($context));
 
         $this->processor->process($context);
 
         self::assertEquals([$error], $context->getErrors());
+        if (null !== $logger) {
+            self::assertEquals(
+                [
+                    [
+                        'info',
+                        'Error(s) occurred in "processor2" processor.',
+                        [
+                            'errors'      => [['title' => 'some error']],
+                            'action'      => self::TEST_ACTION,
+                            'requestType' => 'rest,json_api',
+                            'version'     => '1.2'
+                        ]
+                    ]
+                ],
+                $logger->cleanLogs()
+            );
+        }
     }
 
     /**
+     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursAndSoftErrorsHandlingEnabled($withLogger)
@@ -366,35 +398,46 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor3 = $this->addProcessor('processor3', 'group2');
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (NormalizeResultContext $context) use ($error) {
                     $context->addError($error);
                 }
             );
-        $processor2->expects($this->never())
+        $processor2->expects(self::never())
             ->method('process');
-        $processor3->expects($this->never())
+        $processor3->expects(self::never())
             ->method('process');
-        $processor10->expects($this->once())
+        $processor10->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-
-        if (null !== $logger) {
-            $logger->expects($this->never())
-                ->method('error');
-            $logger->expects($this->never())
-                ->method('warning');
-        }
+            ->with(self::identicalTo($context));
 
         $this->processor->process($context);
 
         self::assertEquals([$error], $context->getErrors());
+        if (null !== $logger) {
+            self::assertEquals(
+                [
+                    [
+                        'info',
+                        'Error(s) occurred in "processor1" processor.',
+                        [
+                            'errors'      => [['title' => 'some error']],
+                            'action'      => self::TEST_ACTION,
+                            'requestType' => 'rest,json_api',
+                            'version'     => '1.2'
+                        ]
+                    ]
+                ],
+                $logger->cleanLogs()
+            );
+        }
     }
 
     /**
+     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursInLastProcessorAndSoftErrorsHandlingEnabled($withLogger)
@@ -413,34 +456,45 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor2 = $this->addProcessor('processor2', 'group1');
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-        $processor2->expects($this->once())
+            ->with(self::identicalTo($context));
+        $processor2->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (NormalizeResultContext $context) use ($error) {
                     $context->addError($error);
                 }
             );
-        $processor10->expects($this->once())
+        $processor10->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-
-        if (null !== $logger) {
-            $logger->expects($this->never())
-                ->method('error');
-            $logger->expects($this->never())
-                ->method('warning');
-        }
+            ->with(self::identicalTo($context));
 
         $this->processor->process($context);
 
         self::assertEquals([$error], $context->getErrors());
+        if (null !== $logger) {
+            self::assertEquals(
+                [
+                    [
+                        'info',
+                        'Error(s) occurred in "processor2" processor.',
+                        [
+                            'errors'      => [['title' => 'some error']],
+                            'action'      => self::TEST_ACTION,
+                            'requestType' => 'rest,json_api',
+                            'version'     => '1.2'
+                        ]
+                    ]
+                ],
+                $logger->cleanLogs()
+            );
+        }
     }
 
     /**
+     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccursAndNormalizeResultGroupIsDisabled($withLogger)
@@ -461,40 +515,43 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor3 = $this->addProcessor('processor3', 'group2');
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->willThrowException($exception);
-        $processor2->expects($this->never())
+        $processor2->expects(self::never())
             ->method('process');
-        $processor3->expects($this->never())
+        $processor3->expects(self::never())
             ->method('process');
-        $processor10->expects($this->never())
+        $processor10->expects(self::never())
             ->method('process');
 
         $this->expectException(get_class($exception));
         $this->expectExceptionMessage($exception->getMessage());
 
-        if (null !== $logger) {
-            $logger->expects($this->once())
-                ->method('error')
-                ->with(
-                    'The execution of "processor1" processor is failed.',
-                    [
-                        'exception'   => $exception,
-                        'action'      => self::TEST_ACTION,
-                        'requestType' => 'rest,json_api',
-                        'version'     => '1.2'
-                    ]
-                );
-            $logger->expects($this->never())
-                ->method('warning');
-        }
-
         $this->processor->process($context);
+
+        if (null !== $logger) {
+            self::assertEquals(
+                [
+                    [
+                        'error',
+                        'The execution of "processor1" processor is failed.',
+                        [
+                            'exception'   => $exception,
+                            'action'      => self::TEST_ACTION,
+                            'requestType' => 'rest,json_api',
+                            'version'     => '1.2'
+                        ]
+                    ]
+                ],
+                $logger->cleanLogs()
+            );
+        }
     }
 
     /**
+     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccursAndNormalizeResultGroupIsDisabledAndSoftErrorsHandlingEnabled($withLogger)
@@ -518,39 +575,41 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor3 = $this->addProcessor('processor3', 'group2');
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->willThrowException($exception);
-        $processor2->expects($this->never())
+        $processor2->expects(self::never())
             ->method('process');
-        $processor3->expects($this->never())
+        $processor3->expects(self::never())
             ->method('process');
-        $processor10->expects($this->never())
+        $processor10->expects(self::never())
             ->method('process');
-
-        if (null !== $logger) {
-            $logger->expects($this->never())
-                ->method('error');
-            $logger->expects($this->once())
-                ->method('warning')
-                ->with(
-                    'An exception occurred in "processor1" processor.',
-                    [
-                        'exception'   => $exception,
-                        'action'      => self::TEST_ACTION,
-                        'requestType' => 'rest,json_api',
-                        'version'     => '1.2'
-                    ]
-                );
-        }
 
         $this->processor->process($context);
 
         self::assertEquals([$error], $context->getErrors());
+        if (null !== $logger) {
+            self::assertEquals(
+                [
+                    [
+                        'info',
+                        'An exception occurred in "processor1" processor.',
+                        [
+                            'exception'   => $exception,
+                            'action'      => self::TEST_ACTION,
+                            'requestType' => 'rest,json_api',
+                            'version'     => '1.2'
+                        ]
+                    ]
+                ],
+                $logger->cleanLogs()
+            );
+        }
     }
 
     /**
+     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursAndNormalizeResultGroupIsDisabled($withLogger)
@@ -571,36 +630,60 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor3 = $this->addProcessor('processor3', 'group2');
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (NormalizeResultContext $context) use ($error) {
                     $context->addError($error);
                 }
             );
-        $processor2->expects($this->never())
+        $processor2->expects(self::never())
             ->method('process');
-        $processor3->expects($this->never())
+        $processor3->expects(self::never())
             ->method('process');
-        $processor10->expects($this->never())
+        $processor10->expects(self::never())
             ->method('process');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage(sprintf('An unexpected error occurred: %s.', $error->getTitle()));
-
-        if (null !== $logger) {
-            $logger->expects($this->once())
-                ->method('error')
-                ->with('The execution of "processor1" processor is failed.');
-            $logger->expects($this->never())
-                ->method('warning');
+        try {
+            $this->processor->process($context);
+            self::fail(sprintf('Expected "%s" exception.', UnhandledErrorsException::class));
+        } catch (UnhandledErrorsException $e) {
+            $expected = new UnhandledErrorsException([$error]);
+            self::assertEquals($expected, $e);
         }
 
-        $this->processor->process($context);
+        if (null !== $logger) {
+            self::assertEquals(
+                [
+                    [
+                        'info',
+                        'Error(s) occurred in "processor1" processor.',
+                        [
+                            'errors'      => [['title' => 'some error']],
+                            'action'      => self::TEST_ACTION,
+                            'requestType' => 'rest,json_api',
+                            'version'     => '1.2'
+                        ]
+                    ],
+                    [
+                        'error',
+                        'Unhandled error(s) occurred in "processor1" processor.',
+                        [
+                            'errors'      => [['title' => 'some error']],
+                            'action'      => self::TEST_ACTION,
+                            'requestType' => 'rest,json_api',
+                            'version'     => '1.2'
+                        ]
+                    ]
+                ],
+                $logger->cleanLogs()
+            );
+        }
     }
 
     /**
+     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursAndNormalizeResultGroupIsDisabledAndSoftErrorsHandlingEnabled($withLogger)
@@ -622,34 +705,45 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor3 = $this->addProcessor('processor3', 'group2');
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (NormalizeResultContext $context) use ($error) {
                     $context->addError($error);
                 }
             );
-        $processor2->expects($this->never())
+        $processor2->expects(self::never())
             ->method('process');
-        $processor3->expects($this->never())
+        $processor3->expects(self::never())
             ->method('process');
-        $processor10->expects($this->never())
+        $processor10->expects(self::never())
             ->method('process');
-
-        if (null !== $logger) {
-            $logger->expects($this->never())
-                ->method('error');
-            $logger->expects($this->never())
-                ->method('warning');
-        }
 
         $this->processor->process($context);
 
         self::assertEquals([$error], $context->getErrors());
+        if (null !== $logger) {
+            self::assertEquals(
+                [
+                    [
+                        'info',
+                        'Error(s) occurred in "processor1" processor.',
+                        [
+                            'errors'      => [['title' => 'some error']],
+                            'action'      => self::TEST_ACTION,
+                            'requestType' => 'rest,json_api',
+                            'version'     => '1.2'
+                        ]
+                    ]
+                ],
+                $logger->cleanLogs()
+            );
+        }
     }
 
     /**
+     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccursInNormalizeResultGroup($withLogger)
@@ -667,39 +761,42 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
         $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-        $processor10->expects($this->once())
+            ->with(self::identicalTo($context));
+        $processor10->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->willThrowException($exception);
-        $processor11->expects($this->never())
+        $processor11->expects(self::never())
             ->method('process');
 
         $this->expectException(get_class($exception));
         $this->expectExceptionMessage($exception->getMessage());
 
-        if (null !== $logger) {
-            $logger->expects($this->once())
-                ->method('error')
-                ->with(
-                    'The execution of "processor10" processor is failed.',
-                    [
-                        'exception'   => $exception,
-                        'action'      => self::TEST_ACTION,
-                        'requestType' => 'rest,json_api',
-                        'version'     => '1.2'
-                    ]
-                );
-            $logger->expects($this->never())
-                ->method('warning');
-        }
-
         $this->processor->process($context);
+
+        if (null !== $logger) {
+            self::assertEquals(
+                [
+                    [
+                        'error',
+                        'The execution of "processor10" processor is failed.',
+                        [
+                            'exception'   => $exception,
+                            'action'      => self::TEST_ACTION,
+                            'requestType' => 'rest,json_api',
+                            'version'     => '1.2'
+                        ]
+                    ]
+                ],
+                $logger->cleanLogs()
+            );
+        }
     }
 
     /**
+     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled($withLogger)
@@ -720,38 +817,40 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
         $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-        $processor10->expects($this->once())
+            ->with(self::identicalTo($context));
+        $processor10->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->willThrowException($exception);
-        $processor11->expects($this->never())
+        $processor11->expects(self::never())
             ->method('process');
-
-        if (null !== $logger) {
-            $logger->expects($this->never())
-                ->method('error');
-            $logger->expects($this->once())
-                ->method('warning')
-                ->with(
-                    'An exception occurred in "processor10" processor.',
-                    [
-                        'exception'   => $exception,
-                        'action'      => self::TEST_ACTION,
-                        'requestType' => 'rest,json_api',
-                        'version'     => '1.2'
-                    ]
-                );
-        }
 
         $this->processor->process($context);
 
         self::assertEquals([$error], $context->getErrors());
+        if (null !== $logger) {
+            self::assertEquals(
+                [
+                    [
+                        'info',
+                        'An exception occurred in "processor10" processor.',
+                        [
+                            'exception'   => $exception,
+                            'action'      => self::TEST_ACTION,
+                            'requestType' => 'rest,json_api',
+                            'version'     => '1.2'
+                        ]
+                    ]
+                ],
+                $logger->cleanLogs()
+            );
+        }
     }
 
     /**
+     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursInNormalizeResultGroup($withLogger)
@@ -769,34 +868,31 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
         $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-        $processor10->expects($this->once())
+            ->with(self::identicalTo($context));
+        $processor10->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (NormalizeResultContext $context) use ($error) {
                     $context->addError($error);
                 }
             );
-        $processor11->expects($this->once())
+        $processor11->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-
-        if (null !== $logger) {
-            $logger->expects($this->never())
-                ->method('error');
-            $logger->expects($this->never())
-                ->method('warning');
-        }
+            ->with(self::identicalTo($context));
 
         $this->processor->process($context);
 
         self::assertEquals([$error], $context->getErrors());
+        if (null !== $logger) {
+            self::assertEquals([], $logger->cleanLogs());
+        }
     }
 
     /**
+     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled($withLogger)
@@ -815,34 +911,31 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
         $processor11 = $this->addProcessor('processor11', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-        $processor10->expects($this->once())
+            ->with(self::identicalTo($context));
+        $processor10->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (NormalizeResultContext $context) use ($error) {
                     $context->addError($error);
                 }
             );
-        $processor11->expects($this->once())
+        $processor11->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-
-        if (null !== $logger) {
-            $logger->expects($this->never())
-                ->method('error');
-            $logger->expects($this->never())
-                ->method('warning');
-        }
+            ->with(self::identicalTo($context));
 
         $this->processor->process($context);
 
         self::assertEquals([$error], $context->getErrors());
+        if (null !== $logger) {
+            self::assertEquals([], $logger->cleanLogs());
+        }
     }
 
     /**
+     * @param bool $withLogger
      * @dataProvider loggerProvider
      */
     public function testWhenInternalPhpErrorOccurs($withLogger)
@@ -861,43 +954,50 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor3 = $this->addProcessor('processor3', 'group2');
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->will(new \PHPUnit_Framework_MockObject_Stub_Exception($internalPhpError));
-        $processor2->expects($this->never())
+        $processor2->expects(self::never())
             ->method('process');
-        $processor3->expects($this->never())
+        $processor3->expects(self::never())
             ->method('process');
-        $processor10->expects($this->once())
+        $processor10->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-
-        if (null !== $logger) {
-            $logger->expects($this->once())
-                ->method('error')
-                ->with('The execution of "processor1" processor is failed.');
-            $logger->expects($this->never())
-                ->method('warning');
-        }
+            ->with(self::identicalTo($context));
 
         $this->processor->process($context);
 
         $errors = $context->getErrors();
-        $this->assertCount(1, $errors);
+        self::assertCount(1, $errors);
         $errorException = $errors[0]->getInnerException();
-        $this->assertInstanceOf(\ErrorException::class, $errorException);
-        $this->assertSame($internalPhpError->getMessage(), $errorException->getMessage());
-        $this->assertSame($internalPhpError->getCode(), $errorException->getCode());
-        $this->assertSame($internalPhpError->getFile(), $errorException->getFile());
-        $this->assertSame($internalPhpError->getLine(), $errorException->getLine());
+        self::assertInstanceOf(\ErrorException::class, $errorException);
+        self::assertSame($internalPhpError->getMessage(), $errorException->getMessage());
+        self::assertSame($internalPhpError->getCode(), $errorException->getCode());
+        self::assertSame($internalPhpError->getFile(), $errorException->getFile());
+        self::assertSame($internalPhpError->getLine(), $errorException->getLine());
+
+        if (null !== $logger) {
+            $logs = $logger->cleanLogs();
+            self::assertCount(1, $logs);
+            unset($logs[0][2]);
+            self::assertEquals(
+                [
+                    [
+                        'error',
+                        'The execution of "processor1" processor is failed.'
+                    ]
+                ],
+                $logs
+            );
+        }
     }
 
     /**
      * @param \Exception $exception
-     * @dataProvider notLoggableExceptionProvider
+     * @dataProvider safeExceptionProvider
      */
-    public function testWhenNotLoggableExceptionOccurs(\Exception $exception)
+    public function testWhenSafeExceptionOccurs(\Exception $exception)
     {
         $logger = $this->setLogger();
 
@@ -910,32 +1010,42 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor3 = $this->addProcessor('processor3', 'group2');
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->willThrowException($exception);
-        $processor2->expects($this->never())
+        $processor2->expects(self::never())
             ->method('process');
-        $processor3->expects($this->never())
+        $processor3->expects(self::never())
             ->method('process');
-        $processor10->expects($this->once())
+        $processor10->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-
-        $logger->expects($this->never())
-            ->method('error');
-        $logger->expects($this->never())
-            ->method('warning');
+            ->with(self::identicalTo($context));
 
         $this->processor->process($context);
 
         self::assertEquals([$error], $context->getErrors());
+        self::assertEquals(
+            [
+                [
+                    'info',
+                    'An exception occurred in "processor1" processor.',
+                    [
+                        'exception'   => $exception,
+                        'action'      => self::TEST_ACTION,
+                        'requestType' => 'rest,json_api',
+                        'version'     => '1.2'
+                    ]
+                ]
+            ],
+            $logger->cleanLogs()
+        );
     }
 
     /**
      * @return array
      */
-    public function notLoggableExceptionProvider()
+    public function safeExceptionProvider()
     {
         return [
             [new HttpException(Response::HTTP_BAD_REQUEST)],
@@ -963,35 +1073,36 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor3 = $this->addProcessor('processor3', 'group2');
         $processor10 = $this->addProcessor('processor10', NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
 
-        $processor1->expects($this->once())
+        $processor1->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context))
+            ->with(self::identicalTo($context))
             ->willThrowException($exception);
-        $processor2->expects($this->never())
+        $processor2->expects(self::never())
             ->method('process');
-        $processor3->expects($this->never())
+        $processor3->expects(self::never())
             ->method('process');
-        $processor10->expects($this->once())
+        $processor10->expects(self::once())
             ->method('process')
-            ->with($this->identicalTo($context));
-
-        $logger->expects($this->once())
-            ->method('error')
-            ->with(
-                'The execution of "processor1" processor is failed.',
-                [
-                    'exception'   => $exception,
-                    'action'      => self::TEST_ACTION,
-                    'requestType' => 'rest,json_api',
-                    'version'     => '1.2'
-                ]
-            );
-        $logger->expects($this->never())
-            ->method('warning');
+            ->with(self::identicalTo($context));
 
         $this->processor->process($context);
 
         self::assertEquals([$error], $context->getErrors());
+        self::assertEquals(
+            [
+                [
+                    'error',
+                    'The execution of "processor1" processor is failed.',
+                    [
+                        'exception'   => $exception,
+                        'action'      => self::TEST_ACTION,
+                        'requestType' => 'rest,json_api',
+                        'version'     => '1.2'
+                    ]
+                ]
+            ],
+            $logger->cleanLogs()
+        );
     }
 
     /**
@@ -1002,6 +1113,106 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         return [
             [new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR)],
             [new HttpException(Response::HTTP_NOT_IMPLEMENTED)]
+        ];
+    }
+
+    /**
+     * @param Error $error
+     * @param array $loggedError
+     * @dataProvider errorForLogConversionProvider
+     */
+    public function testErrorForLogConversion(Error $error, array $loggedError)
+    {
+        $logger = $this->setLogger();
+        $context = $this->getContext();
+
+        $processor1 = $this->addProcessor('processor1', 'group1');
+        $processor1->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context))
+            ->willReturnCallback(
+                function (NormalizeResultContext $context) use ($error) {
+                    $context->addError($error);
+                }
+            );
+
+        $this->processor->process($context);
+
+        self::assertEquals([$error], $context->getErrors());
+        if (null !== $logger) {
+            self::assertEquals(
+                [
+                    [
+                        'info',
+                        'Error(s) occurred in "processor1" processor.',
+                        [
+                            'errors'      => [$loggedError],
+                            'action'      => self::TEST_ACTION,
+                            'requestType' => 'rest,json_api',
+                            'version'     => '1.2'
+                        ]
+                    ]
+                ],
+                $logger->cleanLogs()
+            );
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function errorForLogConversionProvider()
+    {
+        return [
+            [
+                Error::create('some error'),
+                ['title' => 'some error']
+            ],
+            [
+                Error::create(new Label('some error')),
+                ['title' => 'some error']
+            ],
+            [
+                Error::create(null, 'some error'),
+                ['detail' => 'some error']
+            ],
+            [
+                Error::create(null, new Label('some error')),
+                ['detail' => 'some error']
+            ],
+            [
+                Error::create(null)->setStatusCode(400),
+                ['statusCode' => 400]
+            ],
+            [
+                Error::create(null)->setCode('some_code'),
+                ['code' => 'some_code']
+            ],
+            [
+                Error::create(null)->setInnerException(new \Exception('some exception')),
+                ['exception' => 'Exception: some exception']
+            ],
+            [
+                Error::create(null)->setInnerException(
+                    new NotSupportedConfigOperationException('Test\Class', 'test_operation')
+                ),
+                [
+                    'exception' => NotSupportedConfigOperationException::class
+                        . ': Requested unsupported operation "test_operation" when building config for "Test\Class".'
+                ]
+            ],
+            [
+                Error::create(null)->setSource(ErrorSource::createByParameter('parameter1')),
+                ['source.parameter' => 'parameter1']
+            ],
+            [
+                Error::create(null)->setSource(ErrorSource::createByPointer('pointer1')),
+                ['source.pointer' => 'pointer1']
+            ],
+            [
+                Error::create(null)->setSource(ErrorSource::createByPropertyPath('propertyPath1')),
+                ['source.propertyPath' => 'propertyPath1']
+            ]
         ];
     }
 }

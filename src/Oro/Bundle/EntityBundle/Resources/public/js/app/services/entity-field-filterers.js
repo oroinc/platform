@@ -79,7 +79,7 @@ define(function(require) {
             index = field.name.indexOf('::');
             if (index !== -1) {
                 // unidirectional field
-                entityClassName  = field.name.substr(0, index);
+                entityClassName = field.name.substr(0, index);
                 entity = this.collection.getEntityModelByClassName(entityClassName);
                 if (expected && !(entity && _.result(entity.get('options'), 'auditable'))) {
                     return false;

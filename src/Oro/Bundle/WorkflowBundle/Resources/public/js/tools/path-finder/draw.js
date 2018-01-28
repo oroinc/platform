@@ -38,14 +38,14 @@ define(function() {
         var normAY = from.y === minY ? to.y - minY : 0;
         var normBY = to.y === minY ? from.y - minY : 0;
         draw('<path stroke-width="1" stroke="' + color +
-            '" fill="none" d="' + 'M ' + normAX + ' ' + normAY + ' L ' + normBX + ' ' + normBY +
+            '" fill="none" d="M ' + normAX + ' ' + normAY + ' L ' + normBX + ' ' + normBY +
             '"></path>', {
-                top: minY, left: minX , width: Math.abs(normAX - normBX) + 1, height: Math.abs(normAY - normBY) + 1});
+            top: minY, left: minX, width: Math.abs(normAX - normBX) + 1, height: Math.abs(normAY - normBY) + 1});
     };
 
     draw.circle = function(point, radius, color) {
         draw(
-            '<circle fill="' + color + '" r="' + radius + '" ' + 'cx="' + radius + '" cy="' + radius + '"></circle>',
+            '<circle fill="' + color + '" r="' + radius + '" cx="' + radius + '" cy="' + radius + '"></circle>',
             {top: point.y - radius, left: point.x - radius}
         );
     };

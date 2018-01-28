@@ -4,19 +4,19 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\ApiBundle\Processor\Shared\ValidateResultExists;
+use Oro\Bundle\ApiBundle\Processor\Shared\AssertHasResult;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
-class ValidateResultExistsTest extends GetProcessorTestCase
+class AssertHasResultTest extends GetProcessorTestCase
 {
-    /** @var ValidateResultExists */
+    /** @var AssertHasResult */
     protected $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->processor = new ValidateResultExists();
+        $this->processor = new AssertHasResult();
     }
 
     public function testProcessWhenResultExists()

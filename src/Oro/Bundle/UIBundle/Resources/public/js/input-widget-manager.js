@@ -97,14 +97,14 @@ define(function(require) {
             var widgetsByPriority = this.getWidgetsByPriority();
 
             if (options || widgetKey) {
-                //create new widget with options
+                // create new widget with options
                 $inputs.inputWidget('dispose');
             }
 
             _.each($inputs, function(input) {
                 var $input = $(input);
                 if (self.hasWidget($input)) {
-                    return ;
+                    return;
                 }
 
                 for (var i = 0; i < widgetsByPriority.length; i++) {
@@ -196,7 +196,7 @@ define(function(require) {
                 '[data-bound-input-widget], [data-page-component-module], [data-bound-component]' +
                 ')'
             ).filter(function() {
-                //add data-skip-input-widgets to any container to disable widgets inside this container(for example when container is hidden)
+                // add data-skip-input-widgets to any container to disable widgets inside this container(for example when container is hidden)
                 return $(this).closest('[data-skip-input-widgets]').length === 0;
             });
             this.create(foundElements);

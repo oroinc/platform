@@ -1,0 +1,6 @@
+**/.bin/**
+**/node_modules/**
+**/public/lib/**
+**/public/*/vendors/**
+**/Karma/lib/**
+**/*.min.js

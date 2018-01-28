@@ -14,7 +14,7 @@ define(['jquery', 'oroui/js/mediator'], function($, mediator) {
             options.gridPromise.done(function(grid) {
                 grid.listenTo(mediator, 'auto_response_rule:save', function(id) {
                     var param = {};
-                    param[options.inputName] = {'ids': [id]};
+                    param[options.inputName] = {ids: [id]};
                     var paramString = $.param(param);
 
                     var currentUrl = grid.collection.url;
