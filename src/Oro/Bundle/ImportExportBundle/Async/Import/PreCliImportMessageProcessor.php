@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
 use Oro\Bundle\ImportExportBundle\Async\Topics;
@@ -42,12 +43,16 @@ class PreCliImportMessageProcessor extends PreImportMessageProcessorAbstract
      */
     protected function processJob($parentMessageId, $body, $files)
     {
+        $uniqueJobSlug = $body['notifyEmail'];
+        if (isset($body['options']['unique_job_slug'])) {
+            $uniqueJobSlug = $body['options']['unique_job_slug'];
+        }
         $jobName = sprintf(
-            'oro_cli:%s:%s:%s:%s',
+            'oro:%s:%s:%s:%s',
             $body['process'],
             $body['processorAlias'],
             $body['jobName'],
-            $body['notifyEmail']
+            $uniqueJobSlug
         );
 
         $result = $this->jobRunner->runUnique(

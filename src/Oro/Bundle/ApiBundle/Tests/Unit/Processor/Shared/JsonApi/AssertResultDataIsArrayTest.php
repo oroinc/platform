@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 
-use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateNormalizedResultDataIsArray;
+use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AssertResultDataIsArray;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
-class ValidateNormalizedResultDataIsArrayTest extends GetListProcessorTestCase
+class AssertResultDataIsArrayTest extends GetListProcessorTestCase
 {
-    /** @var ValidateNormalizedResultDataIsArray */
+    /** @var AssertResultDataIsArray */
     protected $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->processor = new ValidateNormalizedResultDataIsArray();
+        $this->processor = new AssertResultDataIsArray();
     }
 
     public function testProcessWhenResultDoesNotExist()
