@@ -7,6 +7,7 @@ use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class WorkflowTranslationFilter extends WorkflowFilter
 {
@@ -26,6 +27,7 @@ class WorkflowTranslationFilter extends WorkflowFilter
      */
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
+        QueryBuilderUtil::checkIdentifier($fieldName);
         /* @var $definition WorkflowDefinition */
         $definition = reset($data['value']);
 
