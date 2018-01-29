@@ -19,11 +19,11 @@ define(function(require) {
         },
 
         events: {
-            'mousewheel': 'onMouseWheel',
-            'mousedown': 'onMouseDown',
-            'zoomin': 'onZoomIn',
-            'zoomout': 'onZoomOut',
-            'autozoom': 'onZoomAuto'
+            mousewheel: 'onMouseWheel',
+            mousedown: 'onMouseDown',
+            zoomin: 'onZoomIn',
+            zoomout: 'onZoomOut',
+            autozoom: 'onZoomAuto'
         },
 
         /**

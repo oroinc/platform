@@ -159,7 +159,7 @@ define(function(require) {
 
             this.themeOptions = options.themeOptions || {};
 
-            var customModules =  _.extend(options.metadata.customModules || {}, this.themeOptions.customModules);
+            var customModules = _.extend(options.metadata.customModules || {}, this.themeOptions.customModules);
 
             this.metadata = _.defaults(options.metadata, {
                 columns: [],
@@ -235,7 +235,7 @@ define(function(require) {
             var collectionName = this.gridName;
             var collection = gridContentManager.get(collectionName);
 
-            Grid =  modules.GridView || Grid;
+            Grid = modules.GridView || Grid;
             PageableCollection = modules.PageableCollection || PageableCollection;
 
             collectionModels = {};
@@ -307,7 +307,7 @@ define(function(require) {
                 }, 0);
                 return;
             }
-            this.selectAppearance(appearanceOptions.type,  appearanceOptions);
+            this.selectAppearance(appearanceOptions.type, appearanceOptions);
         },
 
         selectAppearance: function(key, options) {
@@ -431,16 +431,15 @@ define(function(require) {
                 default:
                     metadata.options.toolbarOptions.addAppearanceSwitcher = true;
                     metadata.options.toolbarOptions.availableApperances = appearances.map(function(item) {
-                            return {
-                                key: item.type,
-                                id: item.id || 'by_type',
-                                label: item.label,
-                                className: 'btn',
-                                iconClassName: item.icon,
-                                options: item
-                            };
-                        }
-                    );
+                        return {
+                            key: item.type,
+                            id: item.id || 'by_type',
+                            label: item.label,
+                            className: 'btn',
+                            iconClassName: item.icon,
+                            options: item
+                        };
+                    });
             }
 
             return {

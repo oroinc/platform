@@ -16,10 +16,10 @@ define(function(require) {
         attachedCollection: null,
 
         events: {
-            'click .cancel':                 'cancelClick',
-            'click .upload-new':             'uploadNewClick',
-            'click .attach':                 'attachClick',
-            'input input.filter':            'filterChange'
+            'click .cancel': 'cancelClick',
+            'click .upload-new': 'uploadNewClick',
+            'click .attach': 'attachClick',
+            'input input.filter': 'filterChange'
         },
 
         initialize: function(options) {

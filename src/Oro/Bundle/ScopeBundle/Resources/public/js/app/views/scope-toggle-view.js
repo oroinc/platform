@@ -62,7 +62,6 @@ define(function(require) {
             } else {
                 this.$scopeFields.show();
             }
-
         }
     });
 

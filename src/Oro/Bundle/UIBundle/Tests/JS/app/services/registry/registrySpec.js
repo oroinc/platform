@@ -7,7 +7,6 @@ define(function(require) {
     var EntityRegistry = require('oroui/js/app/services/registry/registry');
 
     describe('oroui/js/app/services/registry/registry', function() {
-
         var registry;
         var applicant1;
         var applicant2;
@@ -66,13 +65,13 @@ define(function(require) {
 
         it('throw error on invalid instance', function() {
             expect(function() {
-                registry.put({}, applicant2);
+                registry.put({}, applicant1);
             }).toThrowError(/globalId/);
         });
 
         it('throw error on attempt to register existing instance', function() {
             expect(function() {
-                registry.put(instance1, applicant2);
+                registry.put(instance1, applicant1);
             }).not.toThrowError();
 
             expect(function() {

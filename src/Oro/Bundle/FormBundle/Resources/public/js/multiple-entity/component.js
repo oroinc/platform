@@ -54,8 +54,8 @@ define(function(require) {
             var id = model.get('id');
             if (model.get(listener.columnName)) {
                 this.addedModels[id] = new MultipleEntityModel({
-                    'id': model.get('id'),
-                    'link': routing.generate(
+                    id: model.get('id'),
+                    link: routing.generate(
                         this.link,
                         {
                             id: model.get('id'),
@@ -63,8 +63,8 @@ define(function(require) {
                             fieldName: this.field_name
                         }
                     ),
-                    'label': this._getLabel(model),
-                    'extraData': this._getExtraData(model)
+                    label: this._getLabel(model),
+                    extraData: this._getExtraData(model)
                 });
             } else if (this.addedModels.hasOwnProperty(id)) {
                 delete this.addedModels[id];
@@ -92,8 +92,8 @@ define(function(require) {
             if (!_.isUndefined(this.extraData)) {
                 for (var j = 0; j < this.extraData.length; j++) {
                     extraData.push({
-                        'label': this.extraData[j].label,
-                        'value': model.get(this.extraData[j].value)
+                        label: this.extraData[j].label,
+                        value: model.get(this.extraData[j].value)
                     });
                 }
             }

@@ -301,8 +301,8 @@ class RestJsonApiTestCase extends ApiTestCase
      *
      * @param array        $routeParameters
      * @param array|string $parameters
-     * @param array $server
-     * @param bool  $assertValid
+     * @param array        $server
+     * @param bool         $assertValid
      *
      * @return Response
      */

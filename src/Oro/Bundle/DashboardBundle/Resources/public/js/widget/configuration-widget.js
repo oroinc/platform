@@ -1,5 +1,5 @@
-define(['orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'underscore'],
-    function(__, routing, DialogWidget, _) {
+define(['orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'underscore'
+], function(__, routing, DialogWidget, _) {
     'use strict';
 
     var ConfigurationWidget = DialogWidget.extend({

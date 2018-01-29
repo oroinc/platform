@@ -78,9 +78,15 @@ define(function(require) {
         it('should correct validate itself', function() {
             var rectangle1 = new Rectangle(10, 20, 30, 40);
             expect(rectangle1 instanceof Rectangle).toBe(true);
-            expect(function() { return new Rectangle(20, 30, -30, 40); }).toThrow(jasmine.any(RangeError));
-            expect(function() { return new Rectangle(20, 30, 30, -40); }).toThrow(jasmine.any(RangeError));
-            expect(function() { return new Rectangle(20, 30, -30, -40); }).toThrow(jasmine.any(RangeError));
+            expect(function() {
+                return new Rectangle(20, 30, -30, 40);
+            }).toThrow(jasmine.any(RangeError));
+            expect(function() {
+                return new Rectangle(20, 30, 30, -40);
+            }).toThrow(jasmine.any(RangeError));
+            expect(function() {
+                return new Rectangle(20, 30, -30, -40);
+            }).toThrow(jasmine.any(RangeError));
         });
 
         it('should correct calculate its sides', function() {

@@ -155,7 +155,9 @@ define(function(require) {
             });
 
             // FF sometimes gives wrong values, need to check
-            sumWidth = _.reduce(widths, function(a, b) {return a + b;});
+            sumWidth = _.reduce(widths, function(a, b) {
+                return a + b;
+            });
 
             if (sumWidth > totalWidth) {
                 widthDecrement = (sumWidth - totalWidth) / widths.length + 0.001;
@@ -401,14 +403,14 @@ define(function(require) {
                 self.scrollVisible = scrollContainer[0].clientHeight < scrollContainer[0].scrollHeight;
                 scrollStateModel.set({
                     visible: self.scrollVisible,
-                    scrollHeight:  scrollContainer[0].scrollHeight,
-                    clientHeight:  scrollContainer[0].clientHeight,
-                    scrollTop:     scrollContainer[0].scrollTop
+                    scrollHeight: scrollContainer[0].scrollHeight,
+                    clientHeight: scrollContainer[0].clientHeight,
+                    scrollTop: scrollContainer[0].scrollTop
                 });
                 // update width in separate cycle
                 // it can change during visibility change
                 scrollStateModel.set({
-                    clientWidth:   scrollContainer[0].clientWidth
+                    clientWidth: scrollContainer[0].clientWidth
                 });
             }
 

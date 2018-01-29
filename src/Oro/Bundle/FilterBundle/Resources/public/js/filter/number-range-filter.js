@@ -34,7 +34,7 @@ define(function(require) {
          * @property {Object}
          */
         typeValues: {
-            between:    7,
+            between: 7,
             notBetween: 8
         },
 
@@ -196,8 +196,8 @@ define(function(require) {
             var oldValue = tools.deepClone(value);
             if (this.isApplicable(value.type)) {
                 if (value.value && value.value_end) {
-                    //if both values are filled
-                    //start/end values if end value is lower than start
+                    // if both values are filled
+                    // start/end values if end value is lower than start
                     if (value.value_end < value.value) {
                         var endValue = value.value_end;
                         value.value_end = value.value;
@@ -206,7 +206,7 @@ define(function(require) {
                 } else {
                     if (value.value || value.value_end) {
                         var type = parseInt(value.type);
-                        //if only one value is filled, replace filter type to less than or more than
+                        // if only one value is filled, replace filter type to less than or more than
                         if (value.value_end) {
                             value.type = type === this.typeValues.between ?
                                 this.fallbackTypeValues.lessThan : this.fallbackTypeValues.moreThan;
@@ -219,7 +219,7 @@ define(function(require) {
                     }
                 }
                 if (!tools.isEqualsLoosely(value, oldValue)) {
-                    //apply new values and filter type
+                    // apply new values and filter type
                     this.setValue(value);
                 }
             }

@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define(function(require) {
     'use strict';
 
@@ -48,12 +46,14 @@ define(function(require) {
                     });
                     this.$button.on('click', function(e) {
                         e.preventDefault();
-                        $(this).data('executor').call();
+
+                        self._onClickButtonExecutor(this);
                     });
                 } else {
                     this.$button.on('click', function(e) {
                         e.preventDefault();
-                        mediator.execute('redirectTo', {url: self.$button.data('transition-url')}, {redirect: true});
+
+                        self._onClickButtonRedirect(this);
                     });
                 }
             } else {
@@ -62,15 +62,31 @@ define(function(require) {
                 });
                 if (this.$button.data('transition-condition-messages')) {
                     this.$button.popover({
-                        'html': true,
-                        'placement': 'bottom',
-                        'container': $('body'),
-                        'trigger': 'hover',
-                        'title': '<i class="fa-exclamation-circle"></i>' + __('Unmet conditions'),
-                        'content': this.$button.data('transition-condition-messages')
+                        html: true,
+                        placement: 'bottom',
+                        container: $('body'),
+                        trigger: 'hover',
+                        title: '<i class="fa-exclamation-circle"></i>' + __('Unmet conditions'),
+                        content: this.$button.data('transition-condition-messages')
                     });
                 }
             }
+        },
+
+        /**
+         * @param clickedButton
+         * @private
+         */
+        _onClickButtonExecutor: function(clickedButton) {
+            $(clickedButton).data('executor').call();
+        },
+
+        /**
+         * @param clickedButton
+         * @private
+         */
+        _onClickButtonRedirect: function(clickedButton) {
+            mediator.execute('redirectTo', {url: this.$button.data('transition-url')}, {redirect: true});
         },
 
         dispose: function() {

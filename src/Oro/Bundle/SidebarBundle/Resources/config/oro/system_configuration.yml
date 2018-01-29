@@ -6,6 +6,7 @@ system_configuration:
         oro_sidebar.sidebar_left_active:
             data_type: boolean
             type: choice
+            search_type: choice
             options:
                 label: oro.sidebar.system_configuration.fields.sidebar_left_active.label
                 choices:
@@ -14,6 +15,7 @@ system_configuration:
         oro_sidebar.sidebar_right_active:
             data_type: boolean
             type: choice
+            search_type: choice
             options:
                 label: oro.sidebar.system_configuration.fields.sidebar_right_active.label
                 choices:

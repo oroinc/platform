@@ -115,6 +115,30 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
+    public function testProcessShouldApplyFiltersInCorrectOrder()
+    {
+        $request = $this->getRequest('filter[label]=val1&filter[name]=val2');
+
+        $filers = $this->context->getFilters();
+        $filers->add('filter[name]', $this->getComparisonFilter('string', 'association.name'));
+        $filers->add('filter[label]', $this->getComparisonFilter('string', 'label'));
+
+        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setCriteria($this->getCriteria());
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            new CompositeExpression(
+                'AND',
+                [
+                    new Comparison('association.name', '=', 'val2'),
+                    new Comparison('label', '=', 'val1'),
+                ]
+            ),
+            $this->context->getCriteria()->getWhereExpression()
+        );
+    }
+
     public function testProcessForUnknownFilter()
     {
         $request = $this->getRequest('filter[name]=val1');

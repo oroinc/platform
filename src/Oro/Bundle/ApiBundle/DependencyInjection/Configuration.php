@@ -93,6 +93,21 @@ class Configuration implements ConfigurationInterface
                 )
                 ->useAttributeAsKey('name')
                 ->prototype('array')
+                    ->validate()
+                        ->always(function ($value) {
+                            if (!empty($value['processing_groups'])) {
+                                $priority = 0;
+                                foreach ($value['processing_groups'] as &$group) {
+                                    if (!isset($group['priority'])) {
+                                        $priority--;
+                                        $group['priority'] = $priority;
+                                    }
+                                }
+                            }
+
+                            return $value;
+                        })
+                    ->end()
                     ->children()
                         ->scalarNode('processor_service_id')
                             ->info('The service id of the action processor. Set for public actions only.')
@@ -104,7 +119,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('array')
                                 ->children()
                                     ->scalarNode('priority')
-                                        ->isRequired()
+                                        ->info('The priority of the group.')
                                         ->cannotBeEmpty()
                                     ->end()
                                 ->end()
@@ -150,12 +165,12 @@ class Configuration implements ConfigurationInterface
                             return $value;
                         })
                     ->end()
-                        ->validate()
-                            ->ifTrue(function ($value) {
-                                return !empty($value['class']) && !empty($value['factory']);
-                            })
-                            ->thenInvalid('The "class" and "factory" should not be used together.')
-                        ->end()
+                    ->validate()
+                        ->ifTrue(function ($value) {
+                            return !empty($value['class']) && !empty($value['factory']);
+                        })
+                        ->thenInvalid('The "class" and "factory" should not be used together.')
+                    ->end()
                     ->children()
                         ->scalarNode('class')
                             ->cannotBeEmpty()

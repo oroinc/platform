@@ -5,16 +5,19 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\FilterFieldsByExtra;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
     protected $valueNormalizer;
 
     /** @var FilterFieldsByExtra */
@@ -24,12 +27,8 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
         $this->processor = new FilterFieldsByExtra(
             $this->doctrineHelper,
@@ -72,6 +71,39 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
             ],
             $this->context->getResult()
         );
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException
+     * @expectedExceptionMessage Requested unsupported operation "filter_fields" when building config for "Test\Class".
+     */
+    public function testProcessForDisabledFieldset()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'disable_fieldset' => true,
+            'fields' => [
+                'field1' => null
+            ]
+        ];
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+    }
+
+    public function testProcessForDisabledFieldsetForEntityIdentifier()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'disable_fieldset' => true,
+            'fields' => [
+                'id' => null
+            ]
+        ];
+
+        $this->context->setClassName(EntityIdentifier::class);
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
     }
 
     /**

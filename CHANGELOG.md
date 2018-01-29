@@ -1,6 +1,17 @@
+## 2.7.0 (Unreleased)
+
+### Removed
+#### WorkflowBundle
+* Removed cache provider `oro_workflow.cache.provider.workflow_definition`. Doctrine result cache is used instead of.
+
 ## 2.6.0 (Unreleased)
+[Show detailed list of changes](incompatibilities-2-6.md)
 
 ### Added
+#### ConfigBundle
+* Added configuration search provider functionality (see [documentation](./src/Oro/Bundle/ConfigBundle/Resources/doc/system_configuration.md#search-type-provider))
+    * Service should be registered as a service with the `oro_config.configuration_search_provider` tag.
+    * Class should implement `Oro\Bundle\ConfigBundle\Provider\SearchProviderInterface` interface.
 #### EntityBundle
 * Added event `oro_entity.structure.options` (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/events.md#entity-structure-options-event))
 * Added provider `Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider` for getting data of entities structure (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/entity_structure_data_provider.md))

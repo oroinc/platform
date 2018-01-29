@@ -28,7 +28,7 @@ define(function(require) {
         markAllAsRead: function() {
             for (var i in this.models) {
                 if (this.models.hasOwnProperty(i)) {
-                    this.models[i].set({'seen': 1});
+                    this.models[i].set({seen: 1});
                 }
             }
             this.unreadEmailsCount = 0;
@@ -49,7 +49,7 @@ define(function(require) {
             return EmailNotificationCollection.__super__.parse.call(this, response, q);
         },
 
-        //TODO: remove after server side gets work correctly
+        // TODO: remove after server side gets work correctly
         checkServerResponse: function(response) {
             var length = response.emails.length;
             var count = Number(response.count);

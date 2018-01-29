@@ -1,4 +1,3 @@
-/** @lends MultiRelationEditorView */
 define(function(require) {
     'use strict';
 
@@ -68,7 +67,7 @@ define(function(require) {
     var _ = require('underscore');
     var select2autosizer = require('oroui/js/tools/select2-autosizer');
 
-    MultiRelationEditorView = RelatedIdRelationEditorView.extend(/** @exports MultiRelationEditorView.prototype */{
+    MultiRelationEditorView = RelatedIdRelationEditorView.extend(/** @lends MultiRelationEditorView.prototype */{
         className: 'multi-relation-editor',
         initialize: function(options) {
             options.ignore_value_field_name = true;
@@ -104,7 +103,9 @@ define(function(require) {
             } else {
                 value = [];
             }
-            return value.map(function(item) {return item.id;}).join(',');
+            return value.map(function(item) {
+                return item.id;
+            }).join(',');
         },
 
         filterInitialResultItem: function(choices) {
@@ -141,7 +142,9 @@ define(function(require) {
             var select2Value = this.$('input[name=value]').val();
             var ids;
             if (select2Value !== '') {
-                ids = select2Value.split(',').map(function(id) {return parseInt(id);});
+                ids = select2Value.split(',').map(function(id) {
+                    return parseInt(id);
+                });
             } else {
                 ids = [];
             }

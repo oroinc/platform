@@ -8,6 +8,8 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -51,12 +53,20 @@ class FilterFieldsByExtra implements ProcessorInterface
             return;
         }
 
+        $entityClass = $context->getClassName();
+        if (!$definition->isFieldsetEnabled()) {
+            if (is_a($entityClass, EntityIdentifier::class, true)) {
+                return;
+            }
+
+            throw new NotSupportedConfigOperationException($entityClass, FilterFieldsConfigExtra::NAME);
+        }
+
         $normalizedFieldFilters = $this->normalizeFieldFilters(
             $context->get(FilterFieldsConfigExtra::NAME),
             $context->getRequestType()
         );
 
-        $entityClass = $context->getClassName();
         if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
             $this->filterEntityFields($definition, $entityClass, $normalizedFieldFilters);
         } else {

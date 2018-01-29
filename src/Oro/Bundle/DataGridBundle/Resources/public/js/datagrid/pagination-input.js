@@ -52,7 +52,7 @@ define([
                 return;
             }
 
-            pageIndex = state.firstPage === 0 ? pageIndex - 1  : pageIndex;
+            pageIndex = state.firstPage === 0 ? pageIndex - 1 : pageIndex;
             if (pageIndex < state.firstPage) {
                 pageIndex = state.firstPage;
                 $(e.target).val(state.firstPage === 0 ? state.firstPage + 1 : state.firstPage);

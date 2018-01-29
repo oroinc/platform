@@ -1,4 +1,3 @@
-/** @lends TagsView */
 define(function(require) {
     'use strict';
     var BaseView = require('oroui/js/app/views/base/view');

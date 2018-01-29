@@ -229,8 +229,11 @@ services:
     oro_search.async.message_processor.index_entities_by_id:
         class: 'Oro\Bundle\SearchBundle\Async\IndexEntitiesByIdMessageProcessor'
         arguments:
-            - '@oro_message_queue.client.message_producer'
-            - '@monolog.logger'
+            - '@oro_message_queue.job.runner'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_search.search.engine.indexer'
+        calls:
+            - [setLogger,  ['@monolog.logger']]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -269,6 +272,7 @@ services:
         arguments:
             - '@oro_message_queue.client.message_producer'
             - '@oro_entity.doctrine_helper'
+            - '@oro_search.transformer.message'
 
     oro_search.extension.search_filter:
         class: %oro_search.extension.search_filter.class%
@@ -318,3 +322,9 @@ services:
        class: Oro\Bundle\SearchBundle\Utils\SearchAllText
        arguments:
             - '@translator'
+
+    oro_search.transformer.message:
+        class: Oro\Bundle\SearchBundle\Transformer\MessageTransformer
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        public: false

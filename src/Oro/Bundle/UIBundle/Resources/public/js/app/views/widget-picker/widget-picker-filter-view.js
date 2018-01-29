@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var  WidgetPickerFilterView;
+    var WidgetPickerFilterView;
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
 

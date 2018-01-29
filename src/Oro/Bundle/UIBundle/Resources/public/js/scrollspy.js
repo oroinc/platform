@@ -51,13 +51,13 @@ define(function(require) {
             var $spy = $(this);
             var href = $spy.attr('href');
             if (href) {
-                href = href.replace(/.*(?=#[^\s]+$)/, ''); //strip for ie7
+                href = href.replace(/.*(?=#[^\s]+$)/, ''); // strip for ie7
             }
             var menuSelector = $spy.data('target') || href || '';
             // make target to be container related
             $spy.data('target', '#' + containerId + ' ' + menuSelector);
 
-            container.find(menuSelector  + ' .nav li > a').each(function() {
+            container.find(menuSelector + ' .nav li > a').each(function() {
                 var $target;
                 var $link = $(this);
                 var target = $link.data('target') || $link.attr('href');

@@ -223,21 +223,21 @@ interface ContextInterface extends ComponentContextInterface
      * But in case if a processor does a complex work, it might be required
      * to mark a work as already done directly.
      *
-     * @param string $operationName The name of an opperation that represents some work
+     * @param string $operationName The name of an operation that represents some work
      */
     public function setProcessed($operationName);
 
     /**
      * Marks a work as not done yet.
      *
-     * @param string $operationName The name of an opperation that represents some work
+     * @param string $operationName The name of an operation that represents some work
      */
     public function clearProcessed($operationName);
 
     /**
      * Checks whether a work is already done.
      *
-     * @param string $operationName The name of an opperation that represents some work
+     * @param string $operationName The name of an operation that represents some work
      *
      * @return bool
      */

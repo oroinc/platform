@@ -19,8 +19,8 @@ define(['underscore', 'asap'], function(_, asap) {
         isMobile: function() {
             var elem = document.getElementsByTagName('body')[0];
             return elem && (' ' + elem.className + ' ')
-                    .replace(/[\t\r\n\f]/g, ' ')
-                    .indexOf(' mobile-version ') !== -1;
+                .replace(/[\t\r\n\f]/g, ' ')
+                .indexOf(' mobile-version ') !== -1;
         },
 
         isDesktop: function() {

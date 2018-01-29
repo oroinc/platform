@@ -210,7 +210,7 @@ define(function(require) {
             this.util.updateAutocompleteItem(this.autocompleteData, item);
             var position = this.autocompleteData.position;
             this.$el.one('change', function() {
-                //set correct position after typeahead call change event
+                // set correct position after typeahead call change event
                 this.selectionStart = this.selectionEnd = position;
             });
 
@@ -281,7 +281,7 @@ define(function(require) {
                 return;
             }
 
-            this.autocompleteData.items = {};//hide autocomplete list
+            this.autocompleteData.items = {};// hide autocomplete list
 
             var dataSource = this.getDataSource(dataSourceKey);
             dataSource.$field.val(dataSourceValue).change();

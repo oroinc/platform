@@ -89,11 +89,9 @@ define(function(require) {
 
         _getFieldApplicableConditions: function(field, entity) {
             return _.extend({
-                    entity: entity,
-                    field: field.name
-                },
-                _.pick(field, ['type', 'identifier'])
-            );
+                entity: entity,
+                field: field.name
+            }, _.pick(field, ['type', 'identifier']));
         },
 
         _buildSelectContent: function(fields) {

@@ -38,7 +38,7 @@ define([
 
             var self = this;
             config.ajax.results = function(data) {
-                return {results: self._processResultData.call(self, data)};
+                return {results: self._processResultData(data)};
             };
 
             /**
@@ -108,25 +108,25 @@ define([
         * Extracts contexts and organizations from data
         */
         _processData: function(data) {
-           if (typeof data === 'undefined' || this.disposed) {
-               return;
-           }
+            if (typeof data === 'undefined' || this.disposed) {
+                return;
+            }
 
-           var contexts = this.$el.data('contexts');
-           var organizations = this.$el.data('organizations');
+            var contexts = this.$el.data('contexts');
+            var organizations = this.$el.data('organizations');
 
-           var parsedItem = JSON.parse(data);
-           if (parsedItem.contextText) {
-               contexts[parsedItem.key] = {};
-               contexts[parsedItem.key] = {
-                   id: JSON.stringify(parsedItem.contextValue),
-                   text: parsedItem.contextText
-               };
-               if (parsedItem.organization) {
-                   organizations[parsedItem.key] = parsedItem.organization;
-               }
-           }
-       }
+            var parsedItem = JSON.parse(data);
+            if (parsedItem.contextText) {
+                contexts[parsedItem.key] = {};
+                contexts[parsedItem.key] = {
+                    id: JSON.stringify(parsedItem.contextValue),
+                    text: parsedItem.contextText
+                };
+                if (parsedItem.organization) {
+                    organizations[parsedItem.key] = parsedItem.organization;
+                }
+            }
+        }
     });
 
     return Select2EmailRecipientsComponent;

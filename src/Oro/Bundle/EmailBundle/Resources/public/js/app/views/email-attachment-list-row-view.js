@@ -16,7 +16,7 @@ define(function(require) {
         },
 
         listen: {
-            'change:visible model':         'visibilityChange'
+            'change:visible model': 'visibilityChange'
         },
 
         render: function() {
@@ -25,7 +25,7 @@ define(function(require) {
             this.$el.attr('data-type', this.model.get('type'));
             this.$el.find('[data-toggle="popover"]').popover({
                 html: true,
-                delay: {show: 300, hide: 100} //delay for image loading
+                delay: {show: 300, hide: 100} // delay for image loading
             });
         },
 

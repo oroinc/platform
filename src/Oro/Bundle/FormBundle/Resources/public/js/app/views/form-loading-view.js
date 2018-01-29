@@ -13,7 +13,7 @@ define(function(require) {
 
         initialize: function() {
             var self = this;
-            //TODO: uncomment when scrol to section will be fixed
+            // TODO: uncomment when scrol to section will be fixed
             // var index = this.$(window.location.hash).parents('.responsive-section').index();
             //
             // index = index !== -1 ? index : 0;
