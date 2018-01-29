@@ -71,7 +71,7 @@ class ImportStrategyListener
         $data = $event->getContext()->getValue('itemData');
         if ($organization
             && $data
-            && !array_key_exists($organizationField, $event->getContext()->getValue('itemData'))
+            && !array_key_exists($organizationField, $data)
         ) {
             return;
         }
