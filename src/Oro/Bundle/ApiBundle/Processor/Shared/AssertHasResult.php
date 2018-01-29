@@ -9,9 +9,9 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\ErrorStatusCodesWithoutContentTrait;
 
 /**
- * Makes sure that the result exists.
+ * Makes sure that the result exists in the Context.
  */
-class ValidateResultExists implements ProcessorInterface
+class AssertHasResult implements ProcessorInterface
 {
     use ErrorStatusCodesWithoutContentTrait;
 
