@@ -37,13 +37,17 @@ class MessageTransformer implements MessageTransformerInterface
                 throw new \LogicException("You cant reindex entity '$class' with null id");
             }
 
+            if (!isset($buffer[$class])) {
+                $buffer[$class] = [];
+            }
+
             $buffer[$class][self::MESSAGE_FIELD_ENTITY_CLASS] = $class;
             $buffer[$class][self::MESSAGE_FIELD_ENTITY_IDS][$id] = $id;
 
             $entityIds = $buffer[$class][self::MESSAGE_FIELD_ENTITY_IDS];
             if (count($entityIds) >= self::CHUNK_SIZE) {
                 $messages[] = $buffer[$class];
-                $buffer[$class] = [];
+                unset($buffer[$class]);
             }
         }
 

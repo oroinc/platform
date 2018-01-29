@@ -101,6 +101,31 @@ class MessageTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(4, $messages);
         $this->assertCount(MessageTransformer::CHUNK_SIZE, $messages[0]['entityIds']);
         $this->assertCount(10, $messages[3]['entityIds']);
+
+        foreach ($messages as $message) {
+            $this->assertNotEmpty($message);
+        }
+    }
+
+    public function testTransformChunkStrictly()
+    {
+        $entitiesCount = MessageTransformer::CHUNK_SIZE;
+        $entities = array_fill(0, $entitiesCount, new \stdClass());
+
+        $this->doctrineHelper->expects($this->exactly($entitiesCount))
+            ->method('getEntityClass')
+            ->willReturn('stdClass');
+
+        $this->doctrineHelper->expects($this->exactly($entitiesCount))
+            ->method('getSingleEntityIdentifier')
+            ->will($this->returnCallback(function () {
+                static $id = 0;
+                return $id++;
+            }));
+
+        $messages = $this->transformer->transform($entities);
+        $this->assertCount(1, $messages);
+        $this->assertCount(MessageTransformer::CHUNK_SIZE, $messages[0]['entityIds']);
     }
 
     public function testTransformEmpty()
