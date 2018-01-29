@@ -6,7 +6,6 @@ define(function(require) {
     var UserResetPasswordView = require('orouser/js/app/views/user-reset-password-view');
 
     describe('User Reset Password View', function() {
-
         function createUserResetPasswordView() {
             return new UserResetPasswordView({
                 el: '#form',
