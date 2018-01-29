@@ -41,6 +41,7 @@ class OrmManyRelationBuilder implements ManyRelationBuilderInterface
         $filterName,
         $inverse = false
     ) {
+        QueryBuilderUtil::checkIdentifier($parameterName);
         list($entity, $alias, $field) = $this->getFilterParts($ds, $fieldName);
 
         $rootAlias = sprintf('filter_%s', $ds->generateParameterName($filterName));
@@ -63,6 +64,7 @@ class OrmManyRelationBuilder implements ManyRelationBuilderInterface
         $filterName,
         $inverse = false
     ) {
+        QueryBuilderUtil::checkIdentifier($filterName);
         list($entity, $alias, $field) = $this->getFilterParts($ds, $fieldName);
 
         $rootAlias = sprintf('null_filter_%s', $filterName);
@@ -167,6 +169,7 @@ class OrmManyRelationBuilder implements ManyRelationBuilderInterface
         $relJoinType
     ) {
         QueryBuilderUtil::checkIdentifier($relAlias);
+        QueryBuilderUtil::checkIdentifier($rootAlias);
 
         $qb = $ds->createQueryBuilder()
             ->select($rootAlias)
