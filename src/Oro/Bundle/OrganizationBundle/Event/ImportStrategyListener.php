@@ -68,7 +68,11 @@ class ImportStrategyListener
          * Do nothing in case if entity already have organization field value but this value was absent in item data
          * (the value of organization field was set to the entity before the import).
          */
-        if ($organization && !array_key_exists($organizationField, $event->getContext()->getValue('itemData'))) {
+        $data = $event->getContext()->getValue('itemData');
+        if ($organization
+            && $data
+            && !array_key_exists($organizationField, $event->getContext()->getValue('itemData'))
+        ) {
             return;
         }
 
