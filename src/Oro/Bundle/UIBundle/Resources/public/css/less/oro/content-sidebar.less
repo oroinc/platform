@@ -3,21 +3,55 @@
 @sidebarWidth: 320px;
 @sidebarMinimizedWidth: 33px;
 @sidebarBorderColor: #f2f2f2;
+@sidebaResizableAreaColor: #ddd;
 @sidebarMinHeight: 90vh;
 
 @sidebarContentMinWidth: 288px;
 
 .content-with-sidebar {
     &--sidebar {
-        position: absolute;
+        position: relative;
         border: 1px solid @sidebarBorderColor;
         width: @sidebarWidth;
-        overflow: auto;
         background: #fff;
+        flex-shrink: 0;
 
         &.content-sidebar-minimized {
             padding-left: 0;
             width: @sidebarMinimizedWidth;
+        }
+
+        .resizable-area {
+            position: absolute;
+            top: 0;
+            right: 0px;
+
+            width: 10px;
+            height: 100%;
+
+            border-right: 3px solid @sidebaResizableAreaColor;
+
+            touch-action: none;
+
+            cursor: ew-resize;
+
+            opacity: 0;
+
+            transition: opacity 150ms linear;
+
+            visibility: hidden;
+        }
+
+        &:hover {
+            .resizable-area {
+                opacity: 1;
+            }
+        }
+
+        &.resizable-enable {
+            .resizable-area {
+                visibility: visible;
+            }
         }
     }
 
@@ -33,6 +67,10 @@
         height: @sidebarHeaderHeight;
         padding: 5px @sidebarHorizontalPadding 4px;
         margin-bottom: @sidebarHorizontalPadding;
+
+        .content-sidebar-minimized & {
+            padding: 5px 8px 4px;
+        }
     }
 
     &--controls {
@@ -54,10 +92,10 @@
     }
 
     &--minimize {
-        display: none;
+        display: block;
 
-        .content-sidebar-maximized & {
-            display: block;
+        .content-sidebar-minimized & {
+            display: none;
         }
     }
 
@@ -69,14 +107,18 @@
         }
     }
 
+    &--container {
+        display: flex;
+    }
+
     &--content {
-        margin-left: @sidebarWidth;
-        min-width: @sidebarContentMinWidth;
+        width: calc(100% ~"-" @sidebarWidth);
+        flex: 1 1 auto;
 
         .forScreen(992px, width, calc(100% ~"-" @sidebarMinimizedWidth));
 
         &.content-sidebar-minimized {
-            margin-left: @sidebarMinimizedWidth;
+            width: calc(100% ~"-" @sidebarMinimizedWidth);
         }
 
         .placeholder {
