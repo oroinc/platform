@@ -62,19 +62,33 @@ class ImportStrategyListener
             return;
         }
 
+        $organization = $this->getPropertyAccessor()->getValue($entity, $organizationField);
+
+        /**
+         * Do nothing in case if entity already have organization field value but this value was absent in item data
+         * (the value of organization field was set to the entity before the import).
+         */
+        if ($organization && !array_key_exists($organizationField, $event->getContext()->getValue('itemData'))) {
+            return;
+        }
+
+        $tokenOrganization = $this->tokenAccessor->getOrganization();
+
         /**
          * We should allow to set organization for entity only in case of console import.
          * If import process was executed from UI (grid's import), current organization for entities should be set.
          */
-        $organization = $this->getPropertyAccessor()->getValue($entity, $organizationField);
         if ($organization
-            && $this->tokenAccessor->getOrganization()
-            && $organization->getId() == $this->tokenAccessor->getOrganizationId()
+            && (!$tokenOrganization
+                || ($tokenOrganization
+                    && $organization->getId() == $this->tokenAccessor->getOrganizationId()
+                )
+            )
         ) {
             return;
         }
 
-        $organization = $this->tokenAccessor->getOrganization();
+        $organization = $tokenOrganization;
 
         if (!$organization) {
             $organization = $this->getDefaultOrganization();
