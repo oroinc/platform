@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ReminderBundle\Entity\Manager;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 use Oro\Bundle\ReminderBundle\Entity\Collection\RemindersPersistentCollection;
@@ -44,14 +45,7 @@ class ReminderManager
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
 
         $em = $this->doctrineHelper->getEntityManager('OroReminderBundle:Reminder');
-
-        $empty = function ($element) {
-            if ($element instanceof Collection) {
-                return $element->isEmpty();
-            }
-            return empty($element);
-        };
-
+        
         $persist = true;
         if ($reminders instanceof RemindersPersistentCollection) {
             if ($reminders->isDirty()) {
@@ -64,9 +58,13 @@ class ReminderManager
             }
             $persist = false;
         }
+        
+        if(is_array($reminders)) {
+            $reminders = new ArrayCollection($reminders);
+        }
 
         if (is_array($reminders) || $reminders instanceof Collection) {
-            if (!$empty($reminders)) {
+            if (!$reminders->isEmpty()) {
                 $reminderData = $entity->getReminderData();
                 foreach ($reminders as $reminder) {
                     $this->syncEntityReminder($reminder, $reminderData, $entityClass, $entityId);
