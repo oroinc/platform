@@ -68,8 +68,6 @@ class EntityFieldStateChecker
 
         foreach ($newData as $code => $newValue) {
             $oldValue = $oldData[$code] ?? null;
-//        $this->configManager->calculateConfigChangeSet($fieldConfig);
-//        foreach ($this->configManager->getConfigChangeSet($fieldConfig) as $code => list($oldValue, $newValue)) {
             $schemaUpdateRequiredCallback = $this->getSchemaUpdateRequiredCallback($code, $configId, $propertyConfig);
 
             if ($schemaUpdateRequiredCallback && $schemaUpdateRequiredCallback($newValue, $oldValue)) {
