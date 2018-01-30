@@ -225,7 +225,7 @@ class ConfigTypeSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with(self::SCOPE)
             ->willReturn($extendConfigProvider);
 
-        $configManger->expects($this->exactly(2))->method('persist')->withConsecutive($extendConfig, $fieldConfigId);
+        $configManger->expects($this->once())->method('persist')->withConsecutive($fieldConfigId);
         $event = new FormEvent($form, []);
         $subscriber->postSubmit($event);
     }

@@ -4,9 +4,13 @@ oro_behat_extension:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
         - OroDataGridBundle::GridContext
-        - OroFormBundle::FormContext
+        - OroEmailBundle::EmailContext
         - OroEntityExtendBundle::EntityExtendContext
+        - OroFormBundle::FormContext
         - OroSecurityBundle::ACLContext
+        - OroImportExportBundle::ImportExportContext:
+            - '@oro_entity.entity_alias_resolver'
+            - '@oro_importexport.processor.registry'
       paths:
         - '@OroEntityExtendBundle/Tests/Behat/Features'
   elements:
