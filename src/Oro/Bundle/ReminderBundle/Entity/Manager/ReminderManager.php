@@ -63,7 +63,7 @@ class ReminderManager
             $reminders = new ArrayCollection($reminders);
         }
 
-        if (is_array($reminders) || $reminders instanceof Collection) {
+        if ($reminders instanceof Collection) {
             if (!$reminders->isEmpty()) {
                 $reminderData = $entity->getReminderData();
                 foreach ($reminders as $reminder) {
