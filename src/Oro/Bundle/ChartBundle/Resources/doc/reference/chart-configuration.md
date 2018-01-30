@@ -1,6 +1,6 @@
-# Configuration#
+# Configuration
 
-### Table of Contents ###
+### Table of Contents
 
 - [Getting Started](./getting-started.md)
 - Configuration

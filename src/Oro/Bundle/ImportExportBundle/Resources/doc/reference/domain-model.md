@@ -355,7 +355,7 @@ RegistryDelegateProcessor uses the registry processor and configuration options 
 * **delegateType** - delegates a type (import, import_validation, export, export_template);
 * **processorAlias** - an alias of a processor in Processor Registry.
 
-##Writer
+## Writer
 
 ### Writer Interface
 

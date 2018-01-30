@@ -10,7 +10,7 @@ session_handler: ~
 installed: ~
 ```
 
-## Usage ##
+## Usage
 If you are using distribution package, you will be redirected to installer page automatically.
 
 Otherwise, following installation instructions offered:
@@ -22,7 +22,7 @@ $ php composer.phar install
 $ php app/console oro:install
 ```
 
-## Events ##
+## Events
 To add additional actions to the installation process you may use event listeners.
 Currently only "onFinish" installer event dispatched.
 
@@ -51,10 +51,10 @@ class MyListener
 
 ```
 
-## Sample data ##
+## Sample data
 To provide demo fixtures for your bundle just place them in "YourBundle\Data\Demo" directory.
 
-## Additional install files in bundles and packages ##
+## Additional install files in bundles and packages
 
 To add additional install scripts during install process you can use install.php files in your bundles and packages.
 This install files will be run before last clear cache during installation.
@@ -79,7 +79,7 @@ The following variables are available in installer script:
 
 All outputs from installer script will be logged in oro_install.log file or will be shown in console in you use console installer.
 
-## Launching plain PHP script in ORO Platform context ##
+## Launching plain PHP script in ORO Platform context
 In some cases you may need to launch PHP scripts in context of ORO Platform. It means that you need an access to Symfony DI container. Examples of such cases may be some installation or maintenance sctipts. To achieve this you can use `oro:platform:run-script` command.
 Each script file must be started with `@OroScript` annotation. For example:
 ``` php
@@ -97,7 +97,7 @@ The following variables are available in a script:
  - `$container` - Symfony2 DI container
  - `$commandExecutor` - An instance of [CommandExecutor](./CommandExecutor.php) class. You can use it to execute Symfony console commands
 
-## Notes ##
+## Notes
 If you have multiple PHP versions installed, you need to configure `PHP_PATH` variable with PHP binary path used
 by web server
 
