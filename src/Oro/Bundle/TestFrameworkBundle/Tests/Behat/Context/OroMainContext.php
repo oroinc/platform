@@ -1469,19 +1469,40 @@ class OroMainContext extends MinkContext implements
         ]);
         $webDriverSession->buttondown();
 
-        $dropZone = $this->createElement($dropZoneName);
-        $destination = $webDriverSession->element('xpath', $dropZone->getXpath());
+        $moveToOptions = ['element' => null];
 
-        $moveToOptions = ['element' => $destination->getID()];
+        if ($dropZoneName) {
+            $dropZone = $this->createElement($dropZoneName);
+            $destination = $webDriverSession->element('xpath', $dropZone->getXpath());
+
+            $moveToOptions['element'] = $destination->getID();
+        }
+
         if (!is_null($xOffset)) {
             $moveToOptions['xoffset'] = $xOffset;
         }
         if (!is_null($yOffset)) {
-            $moveToOptions['yoffset'] = $xOffset;
+            $moveToOptions['yoffset'] = $yOffset;
         }
         $this->waitForAjax();
         $webDriverSession->moveto($moveToOptions);
         $webDriverSession->buttonup();
+    }
+
+    /**
+     * @Given /^I check element "(?P<elementName>[\w\s]+)" has width "(?P<width>[\w\s]+)"$/
+     */
+    public function checkElementWidth($elementName, $width = 0)
+    {
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $xpath = $this->createElement($elementName)->getXpath();
+        $javascipt = <<<JS
+return jQuery(
+    document.evaluate("{$xpath}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue
+).outerWidth();
+JS;
+        self::assertEquals($width, $driver->evaluateScript($javascipt));
     }
 
     /**
