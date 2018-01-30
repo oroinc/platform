@@ -9,11 +9,13 @@ system_configuration:
         oro_notification.email_notification_sender_email:
             data_type: string
             type: email
+            search_type: text
             options:
                 label: oro.notification.system_configuration.email_notification_sender_email
         oro_notification.email_notification_sender_name:
             data_type: string
             type: text
+            search_type: text
             options:
                 label: oro.notification.system_configuration.email_notification_sender_name
         oro_notification.mass_notification_template:
@@ -27,6 +29,7 @@ system_configuration:
         oro_notification.mass_notification_recipients:
             data_type: string
             type: textarea
+            search_type: text
             priority: 10
             options:
                 required: false

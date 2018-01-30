@@ -1,7 +1,9 @@
 <?php
+
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
 use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
@@ -31,7 +33,7 @@ class PreCliImportMessageProcessor extends PreImportMessageProcessorAbstract
             'options' => []
         ], $body);
 
-        $body['options']['batch_size'] = $this->batchSize;
+        $body['options'][Context::OPTION_BATCH_SIZE] = $this->batchSize;
 
         return $body;
     }
@@ -41,12 +43,16 @@ class PreCliImportMessageProcessor extends PreImportMessageProcessorAbstract
      */
     protected function processJob($parentMessageId, $body, $files)
     {
+        $uniqueJobSlug = $body['notifyEmail'];
+        if (isset($body['options']['unique_job_slug'])) {
+            $uniqueJobSlug = $body['options']['unique_job_slug'];
+        }
         $jobName = sprintf(
-            'oro_cli:%s:%s:%s:%s',
+            'oro:%s:%s:%s:%s',
             $body['process'],
             $body['processorAlias'],
             $body['jobName'],
-            $body['notifyEmail']
+            $uniqueJobSlug
         );
 
         $result = $this->jobRunner->runUnique(

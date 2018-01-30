@@ -17,6 +17,7 @@ services:
             - "%websocket_backend_path%"
         calls:
             - ['setLogger', ['@logger']]
+            - ['setTicketProvider', ['@oro_sync.authentication.ticket_provider']]
         tags:
             - { name: monolog.logger, channel: oro_wamp }
 
@@ -35,8 +36,8 @@ services:
     oro_wamp.client.ping:
         class: Oro\Bundle\SyncBundle\Wamp\ClientPing
         arguments:
-            - "@oro_wamp.publisher"
-            - "@logger"
+            - '@oro_sync.authentication.topic_handler'
+            - '@logger'
 
     oro_wamp.twig.sync_extension:
         class: Oro\Bundle\SyncBundle\Twig\OroSyncExtension
@@ -105,3 +106,39 @@ services:
             - '@oro_sync.content.tag_generator_chain.link'
             - '@security.token_storage'
             - '@logger'
+
+    oro_sync.authentication.ticket_provider:
+        class: Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider
+        arguments:
+            - '@security.token_storage'
+            - '@oro_sync.authentication.ticket_storage_cache'
+            - '@oro_user.security.provider'
+            - '@logger'
+            - '%secret%'
+
+    oro_sync.authentication.topic_handler:
+        class: Oro\Bundle\SyncBundle\Authentication\AuthenticationTopicHandler
+        decorates: jdare_clank.clank_handler_topic
+        arguments:
+            - '@oro_sync.authentication.topic_handler.inner'
+            - '@logger'
+
+    oro_sync.authentication.listener:
+        class: Oro\Bundle\SyncBundle\EventListener\AuthenticateEventListener
+        arguments:
+            - '@oro_sync.authentication.ticket_provider'
+            - '@logger'
+        tags:
+            - { name: kernel.event_listener, event: clank.client.connected, method: onClientConnect }
+
+    oro_sync.authentication.ticket_storage_cache:
+        class: Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestStorage\CacheTicketDigestStorage
+        public: false
+        arguments:
+            - '@oro_sync.authentication.ticket_storage_cache.impl'
+
+    oro_sync.authentication.ticket_storage_cache.impl:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_sync_auth_tickets' ]]

@@ -1,9 +1,0 @@
-services:
-    oro_entity.api.processor.normalize_input.entity_fallback_validator:
-        class: Oro\Bundle\EntityBundle\Api\Processor\EntityFallbackValidateProcessor
-        arguments:
-            - '@oro_entity.fallback.resolver.entity_fallback_resolver'
-            - '@oro_api.value_normalizer'
-        tags:
-            - { name: oro.api.processor, action: create, group: normalize_input, priority: -32 }
-            - { name: oro.api.processor, action: update, group: normalize_input, priority: -32 }

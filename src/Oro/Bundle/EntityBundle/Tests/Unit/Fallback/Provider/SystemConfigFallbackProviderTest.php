@@ -64,6 +64,11 @@ class SystemConfigFallbackProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedValue, $result);
     }
 
+    public function testGetFallbackEntityClass()
+    {
+        $this->assertNull($this->systemConfigFallbackProvider->getFallbackEntityClass());
+    }
+
     protected function setUpFallbackConfig($entityConfig)
     {
         $this->configProvider->expects($this->once())

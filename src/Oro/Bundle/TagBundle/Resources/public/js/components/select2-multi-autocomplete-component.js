@@ -20,8 +20,8 @@ define(function(require) {
 
             config.createSearchChoice = function(term, data) {
                 var match = _.find(data, function(item) {
-                        return item.name.toLowerCase().localeCompare(term.toLowerCase()) === 0;
-                    });
+                    return item.name.toLowerCase().localeCompare(term.toLowerCase()) === 0;
+                });
                 if (typeof match === 'undefined' && self.oroTagCreateGranted) {
                     return {
                         id: JSON.stringify({

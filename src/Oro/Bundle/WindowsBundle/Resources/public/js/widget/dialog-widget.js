@@ -83,8 +83,12 @@ define(function(require) {
                 options.dialogOptions.limitTo = 'body';
             }
 
-            // it's possible to track state only for not modal dialogs
-            options.stateEnabled = options.stateEnabled && !dialogOptions.modal;
+            if (dialogOptions.modal) {
+                // it's possible to track state and minimize only for not modal dialogs
+                options.stateEnabled = false;
+                dialogOptions.allowMinimize = false;
+            }
+
             if (options.stateEnabled) {
                 this._initModel();
             }

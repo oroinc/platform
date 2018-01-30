@@ -37,13 +37,19 @@ define(function(require) {
                 if (templateString) {
                     this.options.fieldChoice = _.extend({}, this.options.fieldChoice, {
                         select2: _.extend({}, select2Opts, {
-                            formatSelectionTemplate: this.compileSelectionTpl(templateString)
+                            formatSelectionTemplate: this._compileSelectionTpl(templateString)
                         })
                     });
                 }
             }
 
             AggregatedFieldConditionView.__super__.render.call(this);
+
+            return this;
+        },
+
+        onChoiceInputReady: function(choiceInputView) {
+            AggregatedFieldConditionView.__super__.onChoiceInputReady.call(this, choiceInputView);
 
             this.listenTo(this.options.columnsCollection, {
                 'remove': function(model) {
@@ -57,7 +63,6 @@ define(function(require) {
                     }
                 }
             });
-            return this;
         },
 
         _onRelatedColumnRemoved: function() {
@@ -66,7 +71,7 @@ define(function(require) {
             }.bind(this));
         },
 
-        compileSelectionTpl: function(template) {
+        _compileSelectionTpl: function(template) {
             var compiledTemplate = _.template(template);
             return _.bind(function(data) {
                 var result = compiledTemplate(data);
@@ -115,7 +120,7 @@ define(function(require) {
         },
 
         _getColumnLabel: function() {
-            return _.result(this.$choiceInput.inputWidget('data'), 'text');
+            return _.result(this.subview('choice-input').getData(), 'text');
         },
 
         _getCurrentFunc: function() {
@@ -140,9 +145,9 @@ define(function(require) {
         _getFilterCriterion: function() {
             var criterion = AggregatedFieldConditionView.__super__._getFilterCriterion.call(this);
             $.extend(true, criterion, {
-                'data': {
-                    'params': {
-                        'filter_by_having': true
+                data: {
+                    params: {
+                        filter_by_having: true
                     }
                 }
             });

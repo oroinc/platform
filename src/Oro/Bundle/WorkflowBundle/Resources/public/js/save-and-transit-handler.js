@@ -32,11 +32,11 @@ define([
                     var containerEl = $('<div class="hidden invisible"/>');
                     $('body').append(containerEl);
                     var transitionsWidget = new ButtonsWidget({
-                        'el': containerEl,
-                        'elementFirst': false,
-                        'url': routing.generate('oro_workflow_widget_buttons', {
-                            'entityId': elementIdMatch[1],
-                            'entityClass': saveBtn.data('entity-class')
+                        el: containerEl,
+                        elementFirst: false,
+                        url: routing.generate('oro_workflow_widget_buttons', {
+                            entityId: elementIdMatch[1],
+                            entityClass: saveBtn.data('entity-class')
                         })
                     });
                     transitionsWidget.on('renderComplete', function(el) {

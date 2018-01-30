@@ -638,13 +638,6 @@ services:
             - { name: doctrine.event_listener, event: preClose }
             - { name: doctrine.event_listener, event: onClear }
 
-    oro_security.listener.console_context_listener:
-        class: Oro\Bundle\SecurityBundle\EventListener\ConsoleContextListener
-        arguments:
-            - '@service_container'
-        tags:
-            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 250 }
-
     oro_security.form.extension.aclprotected_type:
         class: %oro_security.form.extension.aclprotected_type.class%
         arguments:
@@ -838,3 +831,10 @@ services:
            - '@oro_security.token_accessor'
            - '@oro_security.ownership_tree_provider'
            - '@?security.acl.voter.basic_permissions'
+
+    oro_security.provider.console.console_context_global_options_provider:
+        class: Oro\Bundle\SecurityBundle\Provider\Console\ConsoleContextGlobalOptionsProvider
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: oro_platform.console.global_options_provider }

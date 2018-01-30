@@ -11,28 +11,32 @@ define(function(require) {
         options: {
             listElBodyEl: 'tbody',
             template: null,
-            'fields_selector_el': null,
+            fieldsChoiceView: null,
             workflow: null,
+            entityFieldsProvider: null,
             items: [],
-            'entity_field_template': null
+            entity_field_template: null
         },
 
+        requiredOptions: ['fieldsChoiceView', 'workflow', 'entityFieldsProvider'],
+
         initialize: function(options) {
-            this.options = _.defaults(options || {}, this.options);
+            options = options || {};
+            var requiredMissed = this.requiredOptions.filter(function(option) {
+                return _.isUndefined(options[option]);
+            });
+            if (requiredMissed.length) {
+                throw new TypeError('Missing required option(s): ' + requiredMissed.join(', '));
+            }
+            this.options = _.defaults(options, this.options);
             var template = this.options.template || $('#attribute-form-option-list-template').html();
             this.template = _.template(template);
             this.rowViews = {};
-            this.rowViewsByAttribute = {};
             this.$listElBody = null;
 
             this.entityFieldTemplate = _.template(
                 this.options.entity_field_template || $('#entity-column-chain-template').html()
             );
-
-            this.listenTo(this.options.workflow, 'pathMappingInit', this.render);
-            if (this.options.workflow.entityFieldsInitialized) {
-                this.render();
-            }
         },
 
         addAllItems: function(items) {
@@ -48,19 +52,17 @@ define(function(require) {
         },
 
         addItem: function(data) {
-            if (_.indexOf(this.getCollection(), data) === -1) {
-                this.getCollection().push(data);
-            }
-            var fieldId = this.options.workflow.getFieldIdByPropertyPath(data.property_path);
-            var $fieldChoice = this.options.fields_selector_el;
-            var hasEntityField = this.options.workflow.hasEntityField(fieldId);
+            var collection = this.getCollection();
+            var fieldId = this.options.entityFieldsProvider.getPathByPropertyPathSafely(data.property_path);
+            var fieldChoiceView = this.options.fieldsChoiceView;
+            var hasEntityField = this.options.entityFieldsProvider.validatePath(fieldId);
             data.isSystemLabel = !data.label;
 
             if (fieldId && hasEntityField) {
                 if (!data.label) {
-                    data.label = _.last($fieldChoice.fieldChoice('splitFieldId', fieldId)).field.label;
+                    data.label = _.result(_.last(fieldChoiceView.splitFieldId(fieldId)).field, 'label');
                 }
-                data.entityField = $fieldChoice.fieldChoice('formatChoice', fieldId, this.entityFieldTemplate);
+                data.entityField = fieldChoiceView.formatChoice(fieldId, this.entityFieldTemplate);
             } else {
                 if (!data.label && data.attribute_name) {
                     var attribute = this.options.workflow.getAttributeByName(data.attribute_name);
@@ -75,14 +77,19 @@ define(function(require) {
                 }
             }
 
-            var viewId = data.view_id ||
-                (this.rowViewsByAttribute.hasOwnProperty(data.attribute_name) ?
-                    this.rowViewsByAttribute[data.attribute_name]
-                    : null);
-            if (!viewId) {
-                var rowView = new AttributeFormOptionRowView({
-                    data: data,
-                    workflow: this.options.workflow
+            var collectionItem = data.itemId ? _.findWhere(collection, {itemId: data.itemId}) : null;
+            if (collectionItem) {
+                _.extend(collectionItem, data);
+            } else {
+                data.itemId = _.uniqueId();
+                collection.push(data);
+            }
+            var rowView = this.subview('row:' + data.itemId);
+            if (rowView) {
+                rowView.update(data);
+            } else {
+                rowView = new AttributeFormOptionRowView({
+                    data: data
                 });
 
                 rowView.on('editFormOption', function(data) {
@@ -91,29 +98,14 @@ define(function(require) {
 
                 rowView.on('removeFormOption', function(data) {
                     var collection = this.getCollection();
-                    var i = collection.length - 1;
-                    while (i >= 0) {
-                        if (collection[i].attribute_name === data.attribute_name) {
-                            if (this.rowViewsByAttribute.hasOwnProperty(data.attribute_name)) {
-                                delete this.rowViewsByAttribute[data.attribute_name];
-                            }
-                            collection.splice(i, 1);
-                        }
-                        i--;
-                    }
-                    if (!this.getCollection().length) {
-                        this.render();
-                    }
-                    this.trigger('removeFormOption', data);
+                    var item = _.findWhere(collection, {itemId: data.itemId});
+                    collection.splice(collection.indexOf(item), 1);
+                    this.removeSubview('row:' + data.itemId);
                 }, this);
 
-                this.rowViews[rowView.cid] = rowView;
-                this.rowViewsByAttribute[data.attribute_name] = rowView.cid;
+                this.subview('row:' + data.itemId, rowView);
                 this.initList();
                 this.$listElBody.append(rowView.render().$el);
-            } else {
-                this.rowViews[viewId].options.data = data;
-                this.rowViews[viewId].render();
             }
         },
 

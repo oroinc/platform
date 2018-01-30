@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Reference;
 
 class EntityRepositoryCompilerPass implements CompilerPassInterface
 {
@@ -42,7 +43,7 @@ class EntityRepositoryCompilerPass implements CompilerPassInterface
 
         // use entity repository factory instead of default one
         $doctrineConfiguration = $container->getDefinition(static::ORM_CONFIGURATION);
-        $doctrineConfiguration->addMethodCall('setRepositoryFactory', [$repositoryFactory]);
+        $doctrineConfiguration->addMethodCall('setRepositoryFactory', [new Reference(static::REPOSITORY_FACTORY)]);
     }
 
     /**

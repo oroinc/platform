@@ -62,17 +62,17 @@ define(function(require) {
 
         getPopoverConfig: function() {
             return _.extend({
-                placement: {
+                'placement': {
                     placement: 'left',
                     collision: 'flip'
                 },
-                hideOnScroll: false,
-                container: 'body',
-                animation: false,
-                html: true,
-                closeButton: true,
-                class: 'map-popover',
-                content: this.$mapContainerFrame
+                'hideOnScroll': false,
+                'container': 'body',
+                'animation': false,
+                'html': true,
+                'closeButton': true,
+                'class': 'map-popover',
+                'content': this.$mapContainerFrame
             }, this.popoverTpl ? {template: this.popoverTpl} : {});
         },
 

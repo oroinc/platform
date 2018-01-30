@@ -1,12 +1,11 @@
 <?php
+
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
-use Oro\Bundle\ImportExportBundle\File\FileManager;
+use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotifcationTopics;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Job\Job;
@@ -50,7 +49,7 @@ class PreHttpImportMessageProcessor extends PreImportMessageProcessorAbstract
             'options' => [],
         ], $body);
 
-        $body['options']['batch_size'] = $this->batchSize;
+        $body['options'][Context::OPTION_BATCH_SIZE] = $this->batchSize;
 
         return $body;
     }
@@ -60,12 +59,16 @@ class PreHttpImportMessageProcessor extends PreImportMessageProcessorAbstract
      */
     protected function processJob($parentMessageId, $body, $files)
     {
+        $uniqueJobSlug = $body['userId'];
+        if (isset($body['options']['unique_job_slug'])) {
+            $uniqueJobSlug = $body['options']['unique_job_slug'];
+        }
         $jobName = sprintf(
             'oro:%s:%s:%s:%s',
             $body['process'],
             $body['processorAlias'],
             $body['jobName'],
-            $body['userId']
+            $uniqueJobSlug
         );
 
         $result = $this->jobRunner->runUnique(

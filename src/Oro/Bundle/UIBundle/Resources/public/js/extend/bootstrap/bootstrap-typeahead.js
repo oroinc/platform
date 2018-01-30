@@ -45,7 +45,7 @@ define(function(require) {
             return offset;
         },
         keypress: function() {
-            //do nothing;
+            // do nothing;
         }
     };
 

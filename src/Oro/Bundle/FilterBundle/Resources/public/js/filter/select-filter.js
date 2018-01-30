@@ -12,7 +12,7 @@ define(function(require) {
 
     var config = _.extend({
         populateDefault: true
-    },  module.config());
+    }, module.config());
 
     /**
      * Select filter: filter value as select option
@@ -267,6 +267,7 @@ define(function(require) {
                     noneSelectedText: this.placeholder,
                     showCheckAll: false,
                     showUncheckAll: false,
+                    outerTrigger: this.$(this.buttonSelector),
                     selectedText: _.bind(function(numChecked, numTotal, checkedItems) {
                         return this._getSelectedText(checkedItems);
                     }, this),
@@ -297,11 +298,9 @@ define(function(require) {
                     }, this),
                     close: _.bind(function() {
                         this._setButtonPressed(this.$(this.containerSelector), false);
-                        setTimeout(_.bind(function() {
-                            if (!this.disposed) {
-                                this.selectDropdownOpened = false;
-                            }
-                        }, this), 100);
+                        if (!this.disposed) {
+                            this.selectDropdownOpened = false;
+                        }
                     }, this),
                     appendTo: this._setDropdownContainer(),
                     refreshNotOpened: this.templateTheme !== ''
@@ -396,13 +395,9 @@ define(function(require) {
          */
         _onClickFilterArea: function(e) {
             if (!this.selectDropdownOpened) {
-                setTimeout(_.bind(function() {
-                    this.selectWidget.multiselect('open');
-                }, this), 50);
+                this.selectWidget.multiselect('open');
             } else {
-                setTimeout(_.bind(function() {
-                    this.selectWidget.multiselect('close');
-                }, this), 50);
+                this.selectWidget.multiselect('close');
             }
 
             e.stopPropagation();

@@ -47,12 +47,19 @@ define(function(require) {
                 var routeParams = self.options.params.grid_query || {params: {}};
                 routeParams.params.class_name = model.get('className');
                 routeParams.gridName = model.get('gridName');
+                if (!_.isUndefined(self.options.params.routeParams)) {
+                    routeParams = _.extend(
+                        {},
+                        routeParams,
+                        {params: self.options.params.routeParams}
+                    );
+                }
 
                 var gridUrl = routing.generate('oro_datagrid_widget', routeParams);
 
                 var view = self.template({
-                        entity: model
-                    });
+                    entity: model
+                });
                 var $view = $(view);
 
                 if (model.attributes.first) {

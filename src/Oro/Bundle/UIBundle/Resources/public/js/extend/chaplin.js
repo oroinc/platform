@@ -2,7 +2,8 @@ define([
     'jquery',
     'underscore',
     'oroui/js/tools',
-    'chaplin'
+    'chaplin',
+    'oroui/js/extend/backbone' // it is a circular dependency, required just to make sure that backbone is extended
 ], function($, _, tools, Chaplin) {
     'use strict';
 
@@ -48,6 +49,9 @@ define([
         this.trigger('dispose', this);
         original.viewDispose.call(this);
     };
+
+    // keep this flag falsy, but different from the `false`, to distinguish it was set intentionally
+    Chaplin.View.prototype.keepElement = null;
 
     /**
      * Detach all item view elements before render of collection to preserve DOM event handlers bound
@@ -157,7 +161,6 @@ define([
      *  - process links with redirect options
      * @override
      */
-    // jshint -W071
     Chaplin.Layout.prototype.openLink = _.wrap(Chaplin.Layout.prototype.openLink, function(func, event) {
         var href;
         var options;
@@ -188,6 +191,11 @@ define([
 
         payload = {prevented: false, target: el};
 
+        /* original Chaplin's openLink code: start */
+        if (utils.modifierKeyPressed(event)) {
+            return;
+        }
+
         // jshint -W107
         // not link to same page and not javascript code link
         if (href && !Chaplin.mediator.execute('compareUrl', href) && href.substr(0, 11) !== 'javascript:') {
@@ -199,10 +207,6 @@ define([
             return;
         }
 
-        /* original Chaplin's openLink code: start */
-        if (utils.modifierKeyPressed(event)) {
-            return;
-        }
         el = $ ? event.currentTarget : event.delegateTarget;
         isAnchor = el.nodeName === 'A';
         href = el.getAttribute('href') || el.getAttribute('data-href') || null;
@@ -261,6 +265,50 @@ define([
             func.apply(this, _.rest(arguments));
         }
     });
+
+    /**
+     * Extends original Chaplin.SyncMachine with extra methods
+     *
+     * @mixin
+     */
+    Chaplin.SyncMachine = _.extend(/** @lends Chaplin.SyncMachine */{
+        UNSYNCED: 'unsynced',
+        SYNCING: 'syncing',
+        SYNCED: 'synced',
+        STATE_CHANGE: 'syncStateChange',
+        markAsSynced: function() {
+            if (this._syncState !== Chaplin.SyncMachine.SYNCED) {
+                this._previousSync = this._syncState;
+                this._syncState = Chaplin.SyncMachine.SYNCED;
+                this.trigger(this._syncState, this, this._syncState);
+                this.trigger(Chaplin.SyncMachine.STATE_CHANGE, this, this._syncState);
+            }
+        },
+        /**
+         * Returns promise that was resolved with fetched instance
+         * when sync will be finished and starts fetch it's needed
+         * @return {Promise.<Object>}
+         */
+        ensureSync: function() {
+            var deferred = $.Deferred();
+            switch (this.syncState()) {
+                case 'unsynced':
+                    this.fetch().then(function() {
+                        deferred.resolve(this);
+                    }.bind(this));
+                    break;
+                case 'syncing':
+                    this.once('synced', function() {
+                        deferred.resolve(this);
+                    }.bind(this));
+                    break;
+                case 'synced':
+                    deferred.resolve(this);
+                    break;
+            }
+            return deferred.promise();
+        }
+    }, Chaplin.SyncMachine);
 
     return Chaplin;
 });

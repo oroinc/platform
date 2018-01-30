@@ -64,7 +64,7 @@ define(function(require) {
                 },
                 save_api_accessor: {
                     'class': 'oroui/js/tools/api-accessor',
-                    http_method: 'PATCH'
+                    'http_method': 'PATCH'
                 }
             };
         },
@@ -139,7 +139,7 @@ define(function(require) {
                         return editorView;
                     }));
                 } else {
-                    promises.push(tools.loadModule(editor.view)
+                    promises.push(tools.loadModules(editor.view)
                         .then(function(editorView) {
                             editor.view = editorView;
                             if (_.isFunction(editorView.processMetadata)) {
@@ -150,7 +150,7 @@ define(function(require) {
                 }
 
                 if (_.isString(editor.component)) {
-                    promises.push(tools.loadModule(editor.component)
+                    promises.push(tools.loadModules(editor.component)
                         .then(function(editorComponent) {
                             editor.component = editorComponent;
                             if (_.isFunction(editorComponent.processMetadata)) {

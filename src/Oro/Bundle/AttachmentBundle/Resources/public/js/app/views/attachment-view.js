@@ -5,7 +5,7 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
 
     AttachmentView = BaseView.extend({
-        optionNames:  BaseView.prototype.optionNames.concat(['inputSelector']),
+        optionNames: BaseView.prototype.optionNames.concat(['inputSelector']),
 
         events: {
             'click [data-role="remove"]': 'onRemoveAttachment'

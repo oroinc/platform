@@ -11,10 +11,12 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\ORM\ExtendMetadataBuilder;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\MultiEnumManager;
 use Oro\Bundle\EntityExtendBundle\Annotation\ORM\DiscriminatorValue;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class DoctrineListener
 {
@@ -35,16 +37,25 @@ class DoctrineListener
     /** @var Reader */
     protected $annotationReader;
 
+    /** @var ConfigProvider */
+    protected $extendConfigProvider;
+
     /**
      * @param ServiceLink      $metadataBuilderLink The link to ExtendMetadataBuilder
      * @param MultiEnumManager $multiEnumManager
      * @param Reader           $reader
+     * @param ConfigProvider   $extendConfigProvider
      */
-    public function __construct(ServiceLink $metadataBuilderLink, MultiEnumManager $multiEnumManager, Reader $reader)
-    {
+    public function __construct(
+        ServiceLink $metadataBuilderLink,
+        MultiEnumManager $multiEnumManager,
+        Reader $reader,
+        ConfigProvider $extendConfigProvider
+    ) {
         $this->metadataBuilderServiceLink = $metadataBuilderLink;
         $this->multiEnumManager           = $multiEnumManager;
         $this->annotationReader           = $reader;
+        $this->extendConfigProvider       = $extendConfigProvider;
     }
 
     /**
@@ -66,6 +77,7 @@ class DoctrineListener
         }
 
         $this->processDiscriminatorValues($classMetadata, $event->getObjectManager());
+        $this->processFieldMappings($classMetadata);
     }
 
     /**
@@ -149,5 +161,35 @@ class DoctrineListener
         }
 
         return $this->collectedValues[$entityFQCN];
+    }
+
+    /**
+     * @param ClassMetadata $classMetadata
+     */
+    protected function processFieldMappings(ClassMetadata $classMetadata)
+    {
+        $className = $classMetadata->getName();
+
+        foreach ($classMetadata->fieldMappings as $fieldName => $mapping) {
+            if (!$this->extendConfigProvider->hasConfig($className, $fieldName)) {
+                continue;
+            }
+
+            $fieldConfig = $this->extendConfigProvider->getConfig($className, $fieldName);
+
+            if (!$fieldConfig->has('default') || $fieldConfig->get('default') === null) {
+                continue;
+            }
+
+            $classMetadata->setAttributeOverride(
+                $fieldName,
+                array_merge(
+                    $mapping,
+                    [
+                        'default' => $fieldConfig->get('default')
+                    ]
+                )
+            );
+        }
     }
 }

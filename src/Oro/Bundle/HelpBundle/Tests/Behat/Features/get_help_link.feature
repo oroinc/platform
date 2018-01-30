@@ -8,4 +8,4 @@ Feature: Get help link
   Scenario: Click help link
     Given I login as administrator
     When I click on "Help Icon"
-    Then the documentation "https://oroinc.com/doc/orocrm/index" will opened
+    Then the documentation "https://oroinc.com/doc/orocrm/current" will opened

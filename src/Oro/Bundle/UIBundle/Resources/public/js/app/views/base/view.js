@@ -10,10 +10,10 @@ define([
 
     /**
      * @export  oroui/js/app/views/base/view
-     * @class   oroui.app.views.BaseView
+     * @class   BaseView
      * @extends Chaplin.View
      */
-    BaseView = Chaplin.View.extend({
+    BaseView = Chaplin.View.extend(/** @lends BaseView.prototype */{
         getTemplateFunction: function(templateKey) {
             templateKey = templateKey || 'template';
             var template = this[templateKey];

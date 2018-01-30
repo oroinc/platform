@@ -1,4 +1,3 @@
-/** @lends RelatedIdSelectEditorView */
 define(function(require) {
     'use strict';
 
@@ -82,7 +81,7 @@ define(function(require) {
     var SelectEditorView = require('./select-editor-view');
     require('jquery.select2');
 
-    RelatedIdSelectEditorView = SelectEditorView.extend(/** @exports RelatedIdSelectEditorView.prototype */{
+    RelatedIdSelectEditorView = SelectEditorView.extend(/** @lends RelatedIdSelectEditorView.prototype */{
 
         initialize: function(options) {
             RelatedIdSelectEditorView.__super__.initialize.apply(this, arguments);

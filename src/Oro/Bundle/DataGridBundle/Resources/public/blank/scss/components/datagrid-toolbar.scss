@@ -61,6 +61,8 @@
 
     .page-size {
         flex-grow: 0;
+        display: flex;
+        align-items: center;
 
         .select2-container {
             min-width: 64px;
@@ -69,6 +71,10 @@
         .select {
             min-width: 64px;
         }
+    }
+
+    .action-selectbox-custom-in-pager {
+        display: inline-block;
     }
 }
 
@@ -184,7 +190,7 @@
     .grid-toolbar {
         justify-content: space-between;
 
-        .action-selectbox_custom_in-pager {
+        .action-selectbox-custom-in-pager {
             margin-right: $offset-x-s;
         }
     }

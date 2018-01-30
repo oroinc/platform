@@ -4,7 +4,7 @@
   /* FE */
   position: relative;
   margin: 0 0 -15px;
-  padding: 6px 20px 9px;
+  padding: 8px @contentPadding 8px;
   .actions-panel {
     margin-left: 5px;
   }
@@ -106,7 +106,7 @@
   .caret { margin-top:11px; }
 }
 .other-scroll-container {
-  margin: 10px 20px 20px 20px;
+  margin: @contentPadding;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
@@ -289,17 +289,25 @@
     text-shadow:0 1px 0 darken(#ffffff,5%);
   }
 }
-.table-hover tbody .grid-info:hover >  td {
-  background-color: #fff;
-}
 .grid-info-frame {
   margin: 0 0 20px;
 }
-.table-hover tbody tr > td {
-  background-color: #fff;
-}
-.table-hover tbody tr.row-selected > td {
-  background-color: inherit;
+.table-hover tbody {
+  .grid-info:hover >  td {
+    background-color: #fff;
+  }
+
+  tr:hover .renderable {
+    background-color: @cellLoadingBackground;
+  }
+
+  tr > td {
+    background-color: #fff;
+  }
+
+  tr.row-selected > td {
+    background-color: inherit;
+  }
 }
 .grid {
   .open-tr td {

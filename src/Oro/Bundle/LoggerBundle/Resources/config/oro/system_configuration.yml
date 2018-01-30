@@ -6,6 +6,7 @@ system_configuration:
         oro_logger.email_notification_recipients:
             data_type: string
             type: textarea
+            search_type: text
             priority: 10
             options:
                 required: false

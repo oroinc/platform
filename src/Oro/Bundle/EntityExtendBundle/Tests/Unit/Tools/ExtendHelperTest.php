@@ -189,7 +189,7 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
             ['test---123', 'test_123'],
             ['test---___123', 'test_123'],
             ['test- - - _ _ _ 123', 'test_123'],
-            ['test \/()[]~!@#$%^&*_+`', 'test_'],
+            ['test \/()[]~!@#$%^&*_+,.`', 'test_'],
         ];
     }
 
@@ -305,6 +305,7 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
             ['01234567890123456789012345678901', '01234567890123456789012345678901'],
             ['012345678901234567890123456789012', '012345678901234567890123_226f1a9'],
             ['sed do eiusmod tempor incididunt ut labore et dolore magna aliqua', 'sed_do_eiusmod_tempor_i_a5e72088'],
+            ['broken_value_nameºss', '5eff4cfd']
         ];
     }
 

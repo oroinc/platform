@@ -8,6 +8,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Oro\Bundle\ApiBundle\Exception\ExceptionInterface as ApiException;
+use Oro\Bundle\ApiBundle\Exception\ValidationExceptionInterface;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
@@ -47,6 +48,17 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
             || $underlyingException instanceof ForbiddenException
         ) {
             return Response::HTTP_FORBIDDEN;
+        }
+
+        /**
+         * check for ValidationExceptionInterface should be at the end,
+         * because some exceptions can implement several interfaces and
+         * ValidationExceptionInterface should have lowest priority
+         * e.g. an exception can implement both ValidationExceptionInterface and HttpExceptionInterface,
+         * but the status code for it should be retrieved from HttpExceptionInterface
+         */
+        if ($underlyingException instanceof ValidationExceptionInterface) {
+            return Response::HTTP_BAD_REQUEST;
         }
 
         return Response::HTTP_INTERNAL_SERVER_ERROR;

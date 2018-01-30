@@ -59,7 +59,6 @@ define([
             if (!data) {
                 // no data, it is initial auto render, skip rendering
                 return this;
-
             } else if (!_.isEmpty(data)) {
                 // data object is not empty, dispose old content and render new
                 this.disposePageComponents();

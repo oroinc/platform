@@ -8,7 +8,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Validates whether an access to the parent entity object is granted.
@@ -16,9 +15,6 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
  */
 class ParentEntityObjectSecurityCheck implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
@@ -26,16 +22,13 @@ class ParentEntityObjectSecurityCheck implements ProcessorInterface
     protected $permission;
 
     /**
-     * @param DoctrineHelper                $doctrineHelper
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param string                        $permission
      */
     public function __construct(
-        DoctrineHelper $doctrineHelper,
         AuthorizationCheckerInterface $authorizationChecker,
         $permission
     ) {
-        $this->doctrineHelper = $doctrineHelper;
         $this->authorizationChecker = $authorizationChecker;
         $this->permission = $permission;
     }
@@ -49,7 +42,7 @@ class ParentEntityObjectSecurityCheck implements ProcessorInterface
 
         $isGranted = true;
         $parentEntity = $context->getParentEntity();
-        if ($parentEntity && $this->doctrineHelper->isManageableEntityClass($context->getParentClassName())) {
+        if ($parentEntity) {
             $isGranted = $this->authorizationChecker->isGranted($this->permission, $parentEntity);
         }
 

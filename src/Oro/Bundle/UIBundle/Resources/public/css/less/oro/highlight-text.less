@@ -4,7 +4,7 @@
       text-decoration: underline;
       background-color: @highlightTextColor;
       font-family: inherit;
-      font-weight: 700;
+      font-weight: bold;
       font-size: inherit;
       line-height: inherit;
 
@@ -14,16 +14,30 @@
   }
 
   &-element {
+    &:first-letter {
+      text-transform: none;
+    }
+
     label& {
-      display: inline-block !important; //Need for rewrite deeper nested class
-      margin: 0;
+      span {
+        font-weight: normal;
+      }
     }
   }
 
   &-element[class^="fa-"],
   &-element[class*=" fa-"] {
     background-color: @highlightTextColor;
-    padding: 1px 2px
+    box-shadow: 0 -1px 0 0 @highlightTextColor,
+                2px 0 0 0 @highlightTextColor,
+                0 1px 0 0 @highlightTextColor,
+                -2px 0 0 0 @highlightTextColor;
+  }
+
+  &-element.selector,
+  input&-element,
+  textarea&-element{
+    background: @highlightTextColor;
   }
 
   &-not-found {

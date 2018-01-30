@@ -40,12 +40,14 @@ define(function(require) {
 
         dropdownClassName: config.dropdownClassName,
 
+        select2Config: {},
+
         /** @property */
         enabled: true,
 
-        hasSortingOrderButton:  config.hasSortingOrderButton,
+        hasSortingOrderButton: config.hasSortingOrderButton,
 
-        disableNotSelectedOption:  config.disableNotSelectedOption,
+        disableNotSelectedOption: config.disableNotSelectedOption,
 
         currentColumn: null,
 
@@ -208,7 +210,7 @@ define(function(require) {
                 columnName = value[0];
                 newDirection = value[1];
             }
-            column = this.columns.findWhere({'name': columnName});
+            column = this.columns.findWhere({name: columnName});
 
             if (column) {
                 if (newDirection) {
@@ -264,6 +266,16 @@ define(function(require) {
         },
 
         /**
+         * Init sorting subview
+         */
+        initSubview: function() {
+            this.subview('select2', new Select2View({
+                el: this.$('select'),
+                select2Config: this.select2Config
+            }));
+        },
+
+        /**
          * @returns {orodatagrid.datagrid.SortingDropdown}
          */
         render: function() {
@@ -273,23 +285,20 @@ define(function(require) {
             }
             SortingDropdown.__super__.render.call(this);
 
-            var select2Config = {
+            this.select2Config = {
                 dropdownCssClass: _.result(this, 'dropdownClassName'),
                 dropdownAutoWidth: true
             };
-            var searchCapabilityGate =  this.SEARCH_CAPABILITY_GATE;
+            var searchCapabilityGate = this.SEARCH_CAPABILITY_GATE;
             if (!this.hasSortingOrderButton) {
                 searchCapabilityGate = Math.floor(searchCapabilityGate / this.DIRECTIONS.length);
             }
 
             if (this.columns.where({sortable: true, renderable: true}).length < searchCapabilityGate) {
-                select2Config.minimumResultsForSearch = -1;
+                this.select2Config.minimumResultsForSearch = -1;
             }
 
-            this.subview('select2', new Select2View({
-                el: this.$('select'),
-                select2Config: select2Config
-            }));
+            this.initSubview();
 
             this._updateDisplayDirection();
 

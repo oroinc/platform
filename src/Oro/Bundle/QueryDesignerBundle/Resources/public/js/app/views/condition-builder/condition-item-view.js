@@ -19,13 +19,17 @@ define(function(require) {
             var view = this._createCriterionView();
             this.subview('criterion', view);
             this.listenTo(view, {
-                'close': this.closeCondition,
-                'change': this.onConditionChange
+                close: this.closeCondition,
+                change: this.onConditionChange
             });
             this.$content.append(view.$el);
             view.render();
             if (view.deferredRender) {
                 this._deferredRender();
+                this.$el.addClass('loading');
+                view.deferredRender.then(function() {
+                    this.$el.removeClass('loading');
+                }.bind(this));
                 // in fact deferredRender will be resolved once all subviews have resolved their deferredRender objects
                 this._resolveDeferredRender();
             }

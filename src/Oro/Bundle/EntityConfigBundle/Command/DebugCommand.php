@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Command;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -16,6 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -299,6 +301,13 @@ class DebugCommand extends ContainerAwareCommand
             $classNames = [$className => $className];
         }
 
+        $associationMapping = [
+            ClassMetadataInfo::ONE_TO_ONE   => RelationType::ONE_TO_ONE,
+            ClassMetadataInfo::MANY_TO_ONE  => RelationType::MANY_TO_ONE,
+            ClassMetadataInfo::ONE_TO_MANY  => RelationType::ONE_TO_MANY,
+            ClassMetadataInfo::MANY_TO_MANY => RelationType::MANY_TO_MANY,
+        ];
+
         foreach ($classNames as $className) {
             $classMetadata     = $em->getClassMetadata($className);
             $assocNames        = $classMetadata->getAssociationNames();
@@ -317,11 +326,20 @@ class DebugCommand extends ContainerAwareCommand
                         [$className, $assocName],
                         ['string', 'string']
                     );
+
+                    $assocType = '';
+                    if (isset($fieldInfo[0]['type'])) {
+                        $assocType = $fieldInfo[0]['type'];
+                    } elseif ($classMetadata->hasAssociation($assocName)) {
+                        $assocMapping = $classMetadata->getAssociationMapping($assocName);
+                        $assocType = $associationMapping[$assocMapping['type']];
+                    }
+
                     $output->writeln(
                         sprintf(
                             '  %s, %s, ref to %s',
                             $assocName,
-                            $fieldInfo[0]['type'],
+                            $assocType,
                             $targetClass
                         )
                     );

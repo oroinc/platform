@@ -14,6 +14,14 @@ Feature: Configuration Search in System, Personal and Organization configuration
     And I expand all on configuration sidebar
     Then I should see "Localization" in the "Configuration Sidebar Content" element
 
+  Scenario: Search should work in fuzzy mode if no result was found
+    When I type "Routin" in "Quick Search"
+    Then I should see "Routing" in the "Configuration Sidebar Content" element
+    And I should not see "Marketing" in the "Configuration Sidebar Content" element
+    When I type "RoutinW" in "Quick Search"
+    Then I should see "Routing" in the "Configuration Sidebar Content" element
+    And I should see "Marketing" in the "Configuration Sidebar Content" element
+
   Scenario: Search should show sections which contain found settings
     When I type "url" in "Quick Search"
     Then I should see "Routing" in the "Configuration Sidebar Content" element
@@ -25,6 +33,22 @@ Feature: Configuration Search in System, Personal and Organization configuration
   Scenario: Settings tooltips should be searchable
     When I type "permitted for upload" in "Quick Search"
     Then I should see "Upload Settings" in the "Configuration Sidebar Content" element
+    And I should not see "Localization" in the "Configuration Sidebar Content" element
+    When I click "Clear Sidebar Search"
+    And I expand all on configuration sidebar
+    Then I should see "Localization" in the "Configuration Sidebar Content" element
+
+  Scenario: Settings with search type text should be searchable
+    When I type "image/jpeg" in "Quick Search"
+    Then I should see "Upload Settings" in the "Configuration Sidebar Content" element
+    And I should not see "Localization" in the "Configuration Sidebar Content" element
+    When I click "Clear Sidebar Search"
+    And I expand all on configuration sidebar
+    Then I should see "Localization" in the "Configuration Sidebar Content" element
+
+  Scenario: Settings with search type choice should be searchable
+    When I type "Never" in "Quick Search"
+    Then I should see "Routing" in the "Configuration Sidebar Content" element
     And I should not see "Localization" in the "Configuration Sidebar Content" element
     When I click "Clear Sidebar Search"
     And I expand all on configuration sidebar

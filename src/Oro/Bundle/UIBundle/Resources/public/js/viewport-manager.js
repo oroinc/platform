@@ -2,41 +2,39 @@ define([
     'module',
     'oroui/js/mediator',
     'jquery',
-    'underscore'
-], function(module, mediator, $, _) {
+    'underscore',
+    'oroui/js/error'
+], function(module, mediator, $, _, error) {
     'use strict';
 
     var viewportManager;
-    var isMobile = _.isMobile();
 
-    var defaults = $.extend(true, {
-        screenMap: [
-            {
-                name: 'desktop',
-                max: Infinity
-            },
-            {
-                name: 'tablet',
-                max: 1099
-            },
-            {
-                name: 'tablet-small',
-                max: 992
-            },
-            {
-                name: 'mobile-landscape',
-                max: 640
-            },
-            {
-                name: 'mobile',
-                max: 414
-            }
-        ]
-    }, module.config());
+    var screenMap = [
+        {
+            name: 'desktop',
+            max: Infinity
+        },
+        {
+            name: 'tablet',
+            max: 1099
+        },
+        {
+            name: 'tablet-small',
+            max: 992
+        },
+        {
+            name: 'mobile-landscape',
+            max: 640
+        },
+        {
+            name: 'mobile',
+            max: 414
+        }
+    ];
 
     viewportManager = {
         options: {
-            screenMap: defaults.screenMap
+            screenMap: screenMap
         },
 
         screenByTypes: {},
@@ -44,22 +42,16 @@ define([
         viewport: null,
 
         initialize: function() {
-            var screenMap = this.options.screenMap = _.sortBy(this.options.screenMap, 'max');
-
-            _.each(screenMap, function(screen, i) {
-                var smallerScreen = screenMap[i - 1] || null;
-                screen.min = smallerScreen ? smallerScreen.max + 1 : 0;
-                this.screenByTypes[screen.name] = screen;
-            }, this);
+            this.screenByTypes = this._prepareScreenMaps();
 
             this.viewport = {
                 width: 0,
                 type: null,
-                isMobile: isMobile,
+                isMobile: _.isMobile(),
                 isApplicable: _.bind(this.isApplicable, this)
             };
 
-            mediator.on('layout:reposition',  _.debounce(this._onResize, 50), viewportManager);
+            mediator.on('layout:reposition', _.debounce(this._onResize, 50), viewportManager);
         },
 
         getViewport: function() {
@@ -84,6 +76,66 @@ define([
             return isApplicable;
         },
 
+        _prepareScreenMaps: function() {
+            var moduleScreenMap = this._getModuleScreenMaps();
+            var screenMap = this.options.screenMap;
+
+            if (this._isValidScreenMap(moduleScreenMap)) {
+                screenMap = _.filter(
+                    _.extend(
+                        {},
+                        _.indexBy(this.options.screenMap, 'name'),
+                        _.indexBy(moduleScreenMap, 'name')
+                    ), function(value) {
+                        return !value.skip;
+                    }
+                );
+            }
+
+            screenMap = _.chain(screenMap)
+                .sortBy('max')
+                .map(function(value, index, screenMap) {
+                    var smallerScreen = screenMap[index - 1] || null;
+                    value.min = smallerScreen ? smallerScreen.max + 1 : 0;
+                    return value;
+                })
+                .indexBy('name')
+                .value();
+
+            this.options.screenMap = _.values(screenMap);
+
+            return screenMap;
+        },
+
+        _getModuleScreenMaps: function() {
+            var arr = [];
+
+            if (!_.isUndefined(module.config().screenMap)) {
+                arr = module.config().screenMap;
+            }
+
+            return arr;
+        },
+
+        _getScreenByTypes: function(screenType) {
+            var defaultVal = null;
+
+            if (_.isNull(screenType)) {
+                return defaultVal;
+            }
+
+            if (_.has(this.screenByTypes, screenType)) {
+                return this.screenByTypes[screenType];
+            } else {
+                error.showErrorInConsole('The screen type "' + screenType + '" not defined ');
+                return defaultVal;
+            }
+        },
+
+        _isValidScreenMap: function(array) {
+            return _.isArray(array) && array.length;
+        },
+
         _onResize: function() {
             var oldViewportType = this.viewport.type;
             this._calcViewport();
@@ -102,6 +154,7 @@ define([
             var screen;
             for (var i = 0, stop = screenMap.length; i < stop; i++) {
                 screen = screenMap[i];
+
                 inRange = this._isInRange({
                     max: screen.max,
                     min: screen.min,
@@ -128,15 +181,25 @@ define([
         },
 
         _minScreenTypeChecker: function(minScreenType) {
-            var viewport = this.screenByTypes[this.viewport.type];
-            var minViewport = this.screenByTypes[minScreenType];
-            return minScreenType === 'any' || viewport.max >= minViewport.max;
+            var viewport = this._getScreenByTypes(this.viewport.type);
+            var minViewport = this._getScreenByTypes(minScreenType);
+
+            return minScreenType === 'any' || (
+                (_.isObject(viewport) && _.isObject(minViewport)) ?
+                    viewport.max >= minViewport.max :
+                    false
+            );
         },
 
         _maxScreenTypeChecker: function(maxScreenType) {
-            var viewport = this.screenByTypes[this.viewport.type];
-            var maxViewport = this.screenByTypes[maxScreenType];
-            return maxScreenType === 'any' || viewport.max <= maxViewport.max;
+            var viewport = this._getScreenByTypes(this.viewport.type);
+            var maxViewport = this._getScreenByTypes(maxScreenType);
+
+            return maxScreenType === 'any' || (
+                (_.isObject(viewport) && _.isObject(maxViewport)) ?
+                    viewport.max <= maxViewport.max :
+                    false
+            );
         },
 
         _widthChecker: function(width) {

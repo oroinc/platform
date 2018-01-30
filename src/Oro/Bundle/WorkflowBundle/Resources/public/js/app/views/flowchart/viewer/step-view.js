@@ -38,7 +38,7 @@ define(function(require) {
         },
 
         updateStepMinWidth: function() {
-            var STEP_MAX_WIDTH = 180; //that's taken from css .workflow-flowchart .workflow-step 'max-width' definition
+            var STEP_MAX_WIDTH = 180; // that's taken from css .workflow-flowchart .workflow-step 'max-width' definition
             var currentId = this.el.id;
             var connections = this.jsPlumbSource.getConnections();
             var count = _.countBy(connections, function(connection) {
@@ -84,7 +84,7 @@ define(function(require) {
                     onMaxConnections: function(info, e) {
                         mediator.execute(
                             'showErrorMessage',
-                            __('Maximum connections ({{ maxConnections }}) reached', info),
+                            __('oro.workflow.error.maxconnections', info),
                             e
                         );
                     }

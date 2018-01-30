@@ -38,8 +38,8 @@ define(function(require) {
         e.preventDefault();
 
         var confirm = new DeleteConfirmation({
-            title:   __(options.title),
-            okText:  __(options.okText),
+            title: __(options.title),
+            okText: __(options.okText),
             content: __(options.content)
         });
 

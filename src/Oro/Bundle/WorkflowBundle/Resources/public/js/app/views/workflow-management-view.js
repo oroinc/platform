@@ -8,7 +8,6 @@ define(function(require) {
     var Confirmation = require('oroui/js/delete-confirmation');
     var BaseView = require('oroui/js/app/views/base/view');
     var StepsListView = require('./step/step-list-view');
-    require('oroentity/js/fields-loader');
 
     /**
      * @export  oroworkflow/js/workflow-management
@@ -21,16 +20,17 @@ define(function(require) {
             'click .add-transition-btn': 'addNewTransition',
             'click .refresh-btn': 'refreshChart',
             'submit': 'onSubmit',
-            'click [type=submit]': 'setSubmitActor'
+            'click [type=submit]': 'setSubmitActor',
+            'change [name$="[related_entity]"]': 'onEntityChange'
         },
 
         options: {
             stepsEl: null,
             model: null,
             entities: [],
-            entityFields: {},
             templateTranslateLink: null,
-            selectorTranslateLinkContainer: '#workflow_translate_link_label'
+            selectorTranslateLinkContainer: '#workflow_translate_link_label',
+            entitySelectSelector: '[name$="[related_entity]"]'
         },
 
         initialize: function(options) {
@@ -44,13 +44,10 @@ define(function(require) {
                 workflow: this.model
             });
 
-            this.$entitySelectEl = this.$('[name$="[related_entity]"]');
-
             var template = this.options.templateTranslateLink || $('#workflow-translate-link-template').html();
             this.templateTranslateLink = _.template(template);
 
-            this.initEntityFieldsLoader(this.options.entityFields);
-            this.listenTo(this.model.get('steps'), 'destroy ', this.onStepRemove);
+            this.listenTo(this.model.get('steps'), 'destroy', this.onStepRemove);
         },
 
         render: function() {
@@ -85,8 +82,8 @@ define(function(require) {
                         (!query.term || query.term === stepLabel || _.indexOf(stepLabel, query.term) !== -1)
                     ) {
                         steps.push({
-                            'id': step.get('name'),
-                            'text': step.get('label')
+                            id: step.get('name'),
+                            text: step.get('label')
                         });
                     }
                 }, this);
@@ -97,10 +94,10 @@ define(function(require) {
             this.$startStepEl = this.$('[name="start_step"]');
 
             var select2Options = {
-                'allowClear': true,
-                'query': getSteps,
-                'placeholder': __('Choose step...'),
-                'initSelection': _.bind(function(element, callback) {
+                allowClear: true,
+                query: getSteps,
+                placeholder: __('Choose step...'),
+                initSelection: _.bind(function(element, callback) {
                     var startStep = this.model.getStepByName(element.val());
                     callback({
                         id: startStep.get('name'),
@@ -112,59 +109,41 @@ define(function(require) {
             this.$startStepEl.inputWidget('create', 'select2', {initializeOptions: select2Options});
         },
 
-        /**
-         * @param {Object} entityFields
-         */
-        initEntityFieldsLoader: function(entityFields) {
+        onEntityChange: function(e) {
+            var oldVal = _.result(e.removed, 'id') || null;
+            if (oldVal !== null && this._hasData()) {
+                this._confirm(this.applyEntitySelectValue.bind(this),
+                    function() {
+                        this.setEntitySelectValue(this.model.get('entity'));
+                    }.bind(this)
+                );
+            } else {
+                this.applyEntitySelectValue();
+            }
+        },
+
+        applyEntitySelectValue: function() {
+            this.model.set('entity', this.getEntitySelectValue());
+        },
+
+        _confirm: function(onConfirm, onCancel) {
             var confirm = new Confirmation({
                 title: __('Change Entity Confirmation'),
                 okText: __('Yes'),
                 content: __('oro.workflow.change_entity_confirmation')
             });
-            confirm.on('ok', _.bind(function() {
-                this.model.set('entity', this.$entitySelectEl.val());
-            }, this));
-            confirm.on('cancel', _.bind(function() {
-                this.$entitySelectEl.inputWidget('val', this.model.get('entity'));
-            }, this));
+            confirm.on('ok', onConfirm);
+            confirm.on('cancel', onCancel);
 
-            this.$entitySelectEl.fieldsLoader({
-                router: 'oro_api_workflow_entity_get',
-                routingParams: {},
-                confirm: confirm,
-                requireConfirm: _.bind(this._requireConfirm, this)
+            confirm.once('hidden', function() {
+                confirm.off('ok cancel');
             });
-            this.$entitySelectEl.fieldsLoader('setFieldsData', entityFields);
-
-            this.$entitySelectEl.on('change', _.bind(function() {
-                if (!this._requireConfirm()) {
-                    this.model.set('entity', this.$entitySelectEl.val());
-                }
-            }, this));
-
-            this.$entitySelectEl.on('fieldsloadercomplete', _.bind(function(e) {
-                this.initEntityFieldsData($(e.target).data('fields'));
-            }, this));
-
-            this._preloadEntityFieldsData();
+            confirm.open();
         },
 
-        _requireConfirm: function() {
-            return (this.model.get('steps').length +
-                this.model.get('transitions').length +
-                this.model.get('transition_definitions').length +
-                this.model.get('attributes').length) > 1;
-        },
-
-        _preloadEntityFieldsData: function() {
-            if (this.$entitySelectEl.val()) {
-                var fieldsData = this.$entitySelectEl.fieldsLoader('getFieldsData');
-                if (_.isEmpty(fieldsData)) {
-                    this.$entitySelectEl.fieldsLoader('loadFields');
-                } else {
-                    this.initEntityFieldsData(fieldsData);
-                }
-            }
+        _hasData: function() {
+            return this.model.get('steps').length > 0 || !this.model.get('transitions').isEmpty() ||
+                !this.model.get('transition_definitions').isEmpty() || this.model.get('attributes').isEmpty();
         },
 
         addNewTransition: function() {
@@ -179,23 +158,23 @@ define(function(require) {
             this.model.trigger('requestRefreshChart');
         },
 
-        initEntityFieldsData: function(fields) {
-            this.model.setEntityFieldsData(fields);
-        },
-
         onStepRemove: function(step) {
-            //Deselect start_step if it was removed
+            // Deselect start_step if it was removed
             if (this.$startStepEl.val() === step.get('name')) {
                 this.$startStepEl.inputWidget('val', '');
             }
         },
 
         isEntitySelected: function() {
-            return Boolean(this.$entitySelectEl.val());
+            return Boolean(this.getEntitySelectValue());
         },
 
-        getEntitySelect: function() {
-            return this.$entitySelectEl;
+        getEntitySelectValue: function() {
+            return this.$(this.options.entitySelectSelector).val();
+        },
+
+        setEntitySelectValue: function(value) {
+            this.$(this.options.entitySelectSelector).inputWidget('val', value);
         },
 
         valid: function() {

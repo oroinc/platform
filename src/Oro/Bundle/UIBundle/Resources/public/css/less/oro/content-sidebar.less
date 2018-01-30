@@ -1,24 +1,57 @@
 @sidebarHeaderHeight: 31px;
-@sidebarHorizontalPadding: 10px;
+@sidebarHorizontalPadding: 12px;
 @sidebarWidth: 320px;
 @sidebarMinimizedWidth: 33px;
 @sidebarBorderColor: #f2f2f2;
+@sidebaResizableAreaColor: #ddd;
 @sidebarMinHeight: 90vh;
 
 @sidebarContentMinWidth: 288px;
 
 .content-with-sidebar {
     &--sidebar {
-        position: absolute;
-        border-top: 1px solid @sidebarBorderColor;
-        border-right: 1px solid @sidebarBorderColor;
+        position: relative;
+        border: 1px solid @sidebarBorderColor;
         width: @sidebarWidth;
-        overflow: auto;
         background: #fff;
+        flex-shrink: 0;
 
         &.content-sidebar-minimized {
             padding-left: 0;
             width: @sidebarMinimizedWidth;
+        }
+
+        .resizable-area {
+            position: absolute;
+            top: 0;
+            right: 0px;
+
+            width: 10px;
+            height: 100%;
+
+            border-right: 3px solid @sidebaResizableAreaColor;
+
+            touch-action: none;
+
+            cursor: ew-resize;
+
+            opacity: 0;
+
+            transition: opacity 150ms linear;
+
+            visibility: hidden;
+        }
+
+        &:hover {
+            .resizable-area {
+                opacity: 1;
+            }
+        }
+
+        &.resizable-enable {
+            .resizable-area {
+                visibility: visible;
+            }
         }
     }
 
@@ -34,6 +67,10 @@
         height: @sidebarHeaderHeight;
         padding: 5px @sidebarHorizontalPadding 4px;
         margin-bottom: @sidebarHorizontalPadding;
+
+        .content-sidebar-minimized & {
+            padding: 5px 8px 4px;
+        }
     }
 
     &--controls {
@@ -49,16 +86,16 @@
 
         i {
             font-size: 8px;
-            margin: 6px 0 0 0;
+            padding: 6px 0 0 0;
             display: block;
         }
     }
 
     &--minimize {
-        display: none;
+        display: block;
 
-        .content-sidebar-maximized & {
-            display: block;
+        .content-sidebar-minimized & {
+            display: none;
         }
     }
 
@@ -70,36 +107,50 @@
         }
     }
 
+    &--container {
+        display: flex;
+    }
+
     &--content {
-        margin-left: @sidebarWidth;
-        min-width: @sidebarContentMinWidth;
+        width: calc(100% ~"-" @sidebarWidth);
+        flex: 1 1 auto;
+
+        .forScreen(992px, width, calc(100% ~"-" @sidebarMinimizedWidth));
 
         &.content-sidebar-minimized {
-            margin-left: @sidebarMinimizedWidth;
+            width: calc(100% ~"-" @sidebarMinimizedWidth);
         }
 
         .placeholder {
             background-color: #f1f1f1;
 
             .content {
-                padding: 15px 15px 0;
+                padding: @contentPadding @contentPadding 0;
             }
         }
 
         .responsive-section {
-            margin: 0 -20px;
-            padding-right: 20px;
+            margin: 0 -@contentPadding;
+            padding-right: @contentPadding;
 
             .form-horizontal {
                 padding: @contentPadding 0;
             }
         }
     }
+
+    &--sidebar {
+        .sidebar-items {
+            padding: 0 @sidebarHorizontalPadding;
+        }
+    }
+
 }
 
 .mobile-version .content-with-sidebar {
     &--container {
         margin-top: -10px;
+        .safe-area-padding(0);
 
         .scrollspy.container-fluid {
             margin-top: 0;

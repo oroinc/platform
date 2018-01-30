@@ -31,6 +31,7 @@ use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 use Symfony\Component\Stopwatch\Stopwatch;
 use WebDriver\Exception\NoAlertOpenError;
 use WebDriver\Exception\NoSuchElement;
+use WebDriver\Exception\UnknownError;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -154,7 +155,12 @@ class OroMainContext extends MinkContext implements
 
         /** @var OroSelenium2Driver $driver */
         $driver = $session->getDriver();
-        $url = $session->getCurrentUrl();
+        try {
+            $url = $session->getCurrentUrl();
+        } catch (\Exception $e) {
+            // there is some age cases when url is not reachable
+            return;
+        }
 
         if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
             return;
@@ -185,7 +191,12 @@ class OroMainContext extends MinkContext implements
 
         /** @var OroSelenium2Driver $driver */
         $driver = $session->getDriver();
-        $url = $session->getCurrentUrl();
+        try {
+            $url = $session->getCurrentUrl();
+        } catch (\Exception $e) {
+            // there is some age cases when url is not reachable
+            return;
+        }
 
         if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
             return;
@@ -401,6 +412,11 @@ class OroMainContext extends MinkContext implements
             try {
                 $session->accept_alert();
             } catch (NoAlertOpenError $exception) {
+                usleep(50000);
+            } catch (UnknownError $exception) {
+                /**
+                 * @see https://bugs.chromium.org/p/chromedriver/issues/detail?id=1500
+                 */
                 usleep(50000);
             }
         }
@@ -762,7 +778,7 @@ class OroMainContext extends MinkContext implements
             $attribute = $button->getAttribute($attributeName);
 
             self::assertNotNull($attribute, sprintf("Attribute with name '%s' not found", $attributeName));
-            self::assertEquals($expectedValue, $attribute);
+            self::assertContains($expectedValue, $attribute);
         }
     }
 
@@ -1453,19 +1469,40 @@ class OroMainContext extends MinkContext implements
         ]);
         $webDriverSession->buttondown();
 
-        $dropZone = $this->createElement($dropZoneName);
-        $destination = $webDriverSession->element('xpath', $dropZone->getXpath());
+        $moveToOptions = ['element' => null];
 
-        $moveToOptions = ['element' => $destination->getID()];
+        if ($dropZoneName) {
+            $dropZone = $this->createElement($dropZoneName);
+            $destination = $webDriverSession->element('xpath', $dropZone->getXpath());
+
+            $moveToOptions['element'] = $destination->getID();
+        }
+
         if (!is_null($xOffset)) {
             $moveToOptions['xoffset'] = $xOffset;
         }
         if (!is_null($yOffset)) {
-            $moveToOptions['yoffset'] = $xOffset;
+            $moveToOptions['yoffset'] = $yOffset;
         }
         $this->waitForAjax();
         $webDriverSession->moveto($moveToOptions);
         $webDriverSession->buttonup();
+    }
+
+    /**
+     * @Given /^I check element "(?P<elementName>[\w\s]+)" has width "(?P<width>[\w\s]+)"$/
+     */
+    public function checkElementWidth($elementName, $width = 0)
+    {
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $xpath = $this->createElement($elementName)->getXpath();
+        $javascipt = <<<JS
+return jQuery(
+    document.evaluate("{$xpath}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue
+).outerWidth();
+JS;
+        self::assertEquals($width, $driver->evaluateScript($javascipt));
     }
 
     /**

@@ -6,6 +6,7 @@ define(function(require) {
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var BaseView = require('oroui/js/app/views/base/view');
+    var FuzzySearch = require('oroui/js/fuzzy-search');
 
     HighlightTextView = BaseView.extend({
         /**
@@ -13,6 +14,7 @@ define(function(require) {
          */
         optionNames: BaseView.prototype.optionNames.concat([
             'text',
+            'fuzzySearch',
             'viewGroup',
             'highlightClass', 'elementHighlightClass', 'notFoundClass', 'foundClass',
             'highlightSelectors', 'toggleSelectors'
@@ -27,6 +29,11 @@ define(function(require) {
          * @property {RegExp|null}
          */
         findText: null,
+
+        /**
+         * @property {String}
+         */
+        fuzzySearch: false,
 
         /**
          * @property {String}
@@ -98,10 +105,19 @@ define(function(require) {
          * Refresh highlight using new text
          *
          * @param {String} text
+         * @param {Boolean|null} fuzzySearch
          */
-        update: function(text) {
+        update: function(text, fuzzySearch) {
+            if (fuzzySearch !== undefined) {
+                this.fuzzySearch = fuzzySearch;
+            }
             this.text = text;
-            this.findText = this.text.length ? new RegExp(this.text, 'gi') : null;
+            var regexp = this.text;
+            if (this.fuzzySearch) {
+                regexp = this.text.toLowerCase().replace(/\s/g, '').split('');
+                regexp = '[' + _.uniq(regexp).join('') + ']';
+            }
+            this.findText = this.text.length ? new RegExp(regexp, 'gi') : null;
 
             this.render();
         },
@@ -117,6 +133,7 @@ define(function(require) {
          * Toggle found/not-found class for all elements based on found highlighted elements
          */
         toggleElements: function() {
+            _.each(this.findElements(_.keys(this.toggleSelectors)), this.toggleElement, this);
             if (this.isElementHighlighted(this.$el)) {
                 _.each(this.findElements(_.keys(this.toggleSelectors)), this.toggleElement, this);
             }
@@ -222,7 +239,9 @@ define(function(require) {
                     $el.replaceWith($el.html());
                 });
 
-                this.setElementContent($el, $content);
+                if (!this._isFieldChoice($el)) {
+                    this.setElementContent($el, $content);
+                }
             }, this);
 
             this.$el.find(this.findNotFoundClass).removeClass(this.notFoundClass);
@@ -236,8 +255,16 @@ define(function(require) {
          * @return {jQuery}
          */
         getElementContent: function($el) {
+            var content;
+
             var isPopover = $el.data('popover');
-            var content = !isPopover ? $el.html() : $el.data('popover').getContent();
+            if (isPopover) {
+                content = $el.data('popover').getContent();
+            } else if (this._isField($el) && !this._isFieldChoice($el)) {
+                content = $el.val();
+            } else {
+                content = $el.html();
+            }
 
             return $('<div/>').html(content);
         },
@@ -252,6 +279,10 @@ define(function(require) {
             var isPopover = $el.data('popover');
             if (isPopover) {
                 $el.data('popover').updateContent($content.html());
+                $el.toggleClass(this.elementHighlightClass, this.isElementContentHighlighted($content, false));
+            } else if (this._isFieldChoice($el)) {
+                $el.parent().toggleClass(this.elementHighlightClass, this.isElementContentHighlighted($content, false));
+            } else if (this._isField($el)) {
                 $el.toggleClass(this.elementHighlightClass, this.isElementContentHighlighted($content, false));
             } else {
                 $el.html($content.html());
@@ -268,12 +299,45 @@ define(function(require) {
             _.each($content.contents(), function(children) {
                 var $children = $(children);
                 if (children.nodeName === '#text') {
-                    var text = $children.text().replace(this.findText, this.replaceBy);
-                    $children.replaceWith(text);
+                    var text = $children.text();
+                    if (!this.fuzzySearch || FuzzySearch.isMatched(_.trim(text), this.text)) {
+                        text = text.replace(this.findText, this.replaceBy);
+                        $children.replaceWith(text);
+                    }
                 } else {
                     this.highlightElementContent($children);
                 }
             }, this);
+        },
+
+        /**
+         * Check if given element is field
+         *
+         * @param {jQuery} $element
+         */
+        _isFieldChoice: function($element) {
+            var $child;
+            var isFieldChoice = this._isField($element) && $element.is('select');
+            if (!isFieldChoice) {
+                $child = $element.children('select');
+                if ($child.length) {
+                    return true;
+                }
+            }
+
+            return isFieldChoice;
+        },
+
+        /**
+         * Check if given element is field
+         *
+         * @param {jQuery} $element
+         */
+        _isField: function($element) {
+            var elementName = $element.data('name');
+            var fieldName = 'field__value';
+
+            return elementName === fieldName;
         }
     });
 

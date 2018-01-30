@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Resizer;
 
 use Liip\ImagineBundle\Binary\BinaryInterface;
+use Imagine\Exception\RuntimeException;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Resizer\ImageResizer;
@@ -71,6 +72,41 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
         $this->fileManager
             ->method('getContent')
             ->with($image)
+            ->willThrowException($exception);
+
+        $this->assertFalse($this->resizer->resizeImage($image, self::FILTER_NAME));
+    }
+
+    public function testImageIsBroken()
+    {
+        $exception = new RuntimeException();
+
+        $logger = $this->createLoggerMock();
+        $logger
+            ->method('warning')
+            ->with(
+                'Image (id: 1, filename: image.jpg) is broken. Skipped during resize.',
+                ['exception' => $exception]
+            );
+        $this->resizer->setLogger($logger);
+
+        $image = $this->createFileMock();
+        $image->method('getId')->willReturn(1);
+        $image->method('getFilename')->willReturn('image.jpg');
+
+        $this->fileManager
+            ->method('getContent')
+            ->with($image)
+            ->willReturn(self::CONTENT);
+        $binary = $this->createBinaryMock();
+        $this->imagineBinaryFactory
+            ->method('createImagineBinary')
+            ->with(self::CONTENT)
+            ->willReturn($binary);
+
+        $this->imagineBinaryFilter
+            ->method('applyFilter')
+            ->with($binary, self::FILTER_NAME)
             ->willThrowException($exception);
 
         $this->assertFalse($this->resizer->resizeImage($image, self::FILTER_NAME));

@@ -39,12 +39,12 @@ define(function(require) {
          * @property
          */
         criteriaValueSelectors: {
-            type: 'select',// to handle both type and part changes
+            type: 'select', // to handle both type and part changes
             date_type: 'select[name][name!=datetime_part]',
             date_part: 'select[name=datetime_part]',
             value: {
                 start: 'input[name="start"]',
-                end:   'input[name="end"]'
+                end: 'input[name="end"]'
             }
         },
 

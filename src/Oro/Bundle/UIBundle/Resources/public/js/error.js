@@ -11,7 +11,7 @@ define([
     var defaults = _.defaults(module.config(), {
         headerServerError: _.__('Server error'),
         headerUserError: _.__('User input error'),
-        message: _.__('oro.ui.error'),
+        message: _.__('oro.ui.error.performing'),
         loginRoute: 'oro_user_security_login'
     });
 
@@ -161,10 +161,10 @@ define([
         _processRedirect: function(response) {
             var hashUrl = '';
             // @TODO add extra parameter for redirect after login
-            /*if (Navigation.isEnabled()) {
+            /* if (Navigation.isEnabled()) {
                 var navigation = Navigation.getInstance();
                 hashUrl = '#url=' + navigation.getHashUrl();
-            }*/
+            } */
             window.location.href = response.redirectUrl || (routing.generate(defaults.loginRoute) + hashUrl);
         }
     };

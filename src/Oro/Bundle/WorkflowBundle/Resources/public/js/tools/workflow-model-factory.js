@@ -66,7 +66,6 @@ define(function(require) {
             configuration.applications = options.entity.applications;
 
             var workflowModel = new WorkflowModel(configuration);
-            workflowModel.setSystemEntities(options.system_entities);
             workflowModel.setAvailableDestinations(options.availableDestinations);
 
             workflowModel.url = options._sourceElement.attr('action');
@@ -82,7 +81,7 @@ define(function(require) {
          * @param {WorkflowModel} model
          */
         addStartingStep: function(model) {
-            //if start step doesn't exist in database, create it
+            // if start step doesn't exist in database, create it
             if (model.getStartStep().length === 0) {
                 model.get('steps').add(this._createStartingStep(model));
             }

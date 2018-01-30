@@ -221,7 +221,7 @@ define(function(require) {
         assignConditionSubview: function(conditionView) {
             this.subview('condition:' + conditionView.cid, conditionView);
             this.listenTo(conditionView, {
-                'change': this._checkValueChange
+                change: this._checkValueChange
             });
             this._checkValueChange();
         },
@@ -257,13 +257,24 @@ define(function(require) {
         },
 
         /**
-         * Enables/disables a criteria in the list of condition builder
+         * Enables/disables the criteria in the list of condition builder
          *
          * @param {string} criteriaName
          * @param {boolean} isEnabled
          */
         toggleCriteria: function(criteriaName, isEnabled) {
             this.$criteriaList.find('[data-criteria="' + criteriaName + '"]').toggleClass('disabled', !isEnabled);
+        },
+
+        /**
+         * Applies options update for the criteria in the list of condition builder
+         *
+         * @param {string} criteriaName
+         * @param {Object} optionsUpdate
+         */
+        updateCriteriaOptions: function(criteriaName, optionsUpdate) {
+            var $criteria = this.$criteriaList.find('[data-criteria="' + criteriaName + '"]');
+            _.extend($criteria.data('options'), optionsUpdate);
         },
 
         _initCriteriaList: function() {
@@ -323,7 +334,9 @@ define(function(require) {
             }
 
             var subviews = this._createConditionGroupSubviews(value);
-            var elements = _.map(subviews, function(view) { return view.el;});
+            var elements = _.map(subviews, function(view) {
+                return view.el;
+            });
             this.$content.append(elements);
             // all elements have to be added to DOM first before assigning subviews
             _.each(subviews, function(view) {
@@ -531,7 +544,7 @@ define(function(require) {
             }
 
             this.$content.find('.sortable-placeholder').css({
-                'height': this.currentDraggingElementHeight
+                height: this.currentDraggingElementHeight
             });
         },
 

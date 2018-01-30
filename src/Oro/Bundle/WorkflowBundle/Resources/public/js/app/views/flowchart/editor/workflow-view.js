@@ -78,9 +78,7 @@ define(function(require) {
                 mediator.execute(
                     'showFlashMessage',
                     'error',
-                    __(
-                        'Cannot set end step to <i>(Start)</i> step. Please select another one'
-                    )
+                    __('oro.workflow.error.cannot.set.step')
                 );
             }
             // never allow jsplumb just draw new connections, create connection model instead

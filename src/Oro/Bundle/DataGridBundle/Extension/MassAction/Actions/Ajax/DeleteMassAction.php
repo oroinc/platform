@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax;
 
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
+use Symfony\Component\HttpFoundation\Request;
 
 class DeleteMassAction extends AjaxMassAction
 {
@@ -23,5 +24,13 @@ class DeleteMassAction extends AjaxMassAction
         }
 
         return parent::setOptions($options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAllowedRequestTypes()
+    {
+        return [Request::METHOD_POST, Request::METHOD_DELETE];
     }
 }

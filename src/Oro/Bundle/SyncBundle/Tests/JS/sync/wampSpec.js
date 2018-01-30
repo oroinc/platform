@@ -1,5 +1,5 @@
 define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
-    ], function(Wamp, Backbone, requirejsExposure) {
+], function(Wamp, Backbone, requirejsExposure) {
     'use strict';
 
     var exposure = requirejsExposure.disclose('orosync/js/sync/wamp');
@@ -13,6 +13,7 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
             $ = jasmine.createSpy('$');
             $.on = jasmine.createSpy('$.on');
             $.and.returnValue({on: $.on});
+            $.ajax = jasmine.createSpy('$.ajax');
             session = jasmine.createSpyObj('session', ['subscribe', 'unsubscribe', 'close']);
             exposure.substitute('ab').by(ab);
             exposure.substitute('$').by($);
@@ -25,7 +26,7 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
             var wamp;
             var options;
             beforeEach(function() {
-                options = {host: '127.0.0.1'};
+                options = {host: '127.0.0.1', syncTicketUrl: 'test_url'};
             });
 
             it('required options', function() {
@@ -43,6 +44,9 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
             });
 
             it('connection open', function() {
+                $.ajax.and.callFake(function(url, params) {
+                    params.success({ticket: 'test_ticket'});
+                });
                 wamp = new Wamp(options);
                 expect(ab.connect).toHaveBeenCalledWith(
                     jasmine.any(String),
@@ -80,6 +84,9 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
                 var onConnect;
                 var onHangup;
                 beforeEach(function() {
+                    $.ajax.and.callFake(function(url, params) {
+                        params.success({ticket: 'test_ticket'});
+                    });
                     wamp = new Wamp(options);
                     spyOn(wamp, 'trigger').and.callThrough();
                     onConnect = ab.connect.calls.mostRecent().args[1];
@@ -116,7 +123,6 @@ define(['orosync/js/sync/wamp', 'backbone', 'requirejs-exposure'
                     wamp.session = session;
                     onHangup(0);
                     expect(wamp.session).toBeFalsy();
-                    expect(wamp.trigger).not.toHaveBeenCalled();
                 });
 
                 it('on hangup with error code', function() {

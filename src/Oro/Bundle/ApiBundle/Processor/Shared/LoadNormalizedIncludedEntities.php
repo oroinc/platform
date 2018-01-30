@@ -7,9 +7,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
-use Oro\Bundle\ApiBundle\Processor\RequestActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Processor\NormalizeResultActionProcessor;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 
 /**
@@ -90,7 +90,7 @@ class LoadNormalizedIncludedEntities implements ProcessorInterface
             $getContext->setResult($entity);
         }
         $getContext->skipGroup('security_check');
-        $getContext->skipGroup(RequestActionProcessor::NORMALIZE_RESULT_GROUP);
+        $getContext->skipGroup(NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
         $getContext->setSoftErrorsHandling(true);
 
         $getProcessor->process($getContext);

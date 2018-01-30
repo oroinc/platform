@@ -104,12 +104,22 @@ define(['underscore'], function(_) {
 
         it('Get component object data - scalar', function() {
             var shortcut = _.extend({}, testWidgetConfiguration, {scalarOption: 'height'});
-            var testPageComponentOptions =  _.extend({}, testWidgetConfiguration.options, {'height': 80});
+            var testPageComponentOptions = _.extend({}, testWidgetConfiguration.options, {height: 80});
 
             expect(componentShortcutsManager.getComponentData(shortcut, 80)).toEqual({
                 pageComponentModule: testWidgetConfiguration.moduleName,
                 pageComponentOptions: testPageComponentOptions
             });
+        });
+
+        it('Get component resolved shortcut data key/attr', function() {
+            componentShortcutsManager.add('test-shortcut-module', testWidgetConfiguration);
+
+            expect(componentShortcutsManager.getAll()['test-shortcut-module'].dataKey)
+                .toEqual('pageComponentTestShortcutModule');
+
+            expect(componentShortcutsManager.getAll()['test-shortcut-module'].dataAttr)
+                .toEqual('data-page-component-test-shortcut-module');
         });
     });
 });

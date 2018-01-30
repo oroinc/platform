@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Delete;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Delete\DeleteContext;
 use Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByDeleteHandler;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class DeleteDataByDeleteHandlerTest extends DeleteProcessorTestCase
 {
@@ -14,22 +17,18 @@ class DeleteDataByDeleteHandlerTest extends DeleteProcessorTestCase
     /** @var DeleteDataByDeleteHandler */
     protected $processor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
     protected $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\Container')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->container = $this->createMock(ContainerInterface::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->processor = new DeleteDataByDeleteHandler($this->doctrineHelper, $this->container);
     }

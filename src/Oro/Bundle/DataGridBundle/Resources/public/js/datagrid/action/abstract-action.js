@@ -104,6 +104,9 @@ define(function(require) {
             if (options.configuration) {
                 this.configuration = $.extend(true, {}, this.configuration, options.configuration);
             }
+            if (options.requestType) {
+                this.requestType = options.requestType;
+            }
             if (options.order) {
                 this.order = options.order;
             }
@@ -178,14 +181,14 @@ define(function(require) {
 
         executeConfiguredAction: function() {
             switch (this.frontend_handle) {
-            case 'ajax':
-                this._handleAjax();
-                break;
-            case 'redirect':
-                this._handleRedirect();
-                break;
-            default:
-                this._handleWidget();
+                case 'ajax':
+                    this._handleAjax();
+                    break;
+                case 'redirect':
+                    this._handleRedirect();
+                    break;
+                default:
+                    this._handleWidget();
             }
         },
 

@@ -48,7 +48,7 @@ define(function(require) {
 
             if (_.isString(self.GridViewsView)) {
                 self.buildViews = _.wrap(self.buildViews, function(buildViews, grid) {
-                    tools.loadModule(this.GridViewsView)
+                    tools.loadModules(this.GridViewsView)
                         .then(_.bind(function(GridViewsView) {
                             this.GridViewsView = GridViewsView;
                             buildViews.call(this, grid);
@@ -59,7 +59,7 @@ define(function(require) {
             options.gridPromise.done(function(grid) {
                 if (_.contains(options.builders, 'orofilter/js/datafilter-builder')) {
                     if (self.$gridEl.find('.filter-box').length) {
-                        self.buildViews.call(self, grid);
+                        self.buildViews(grid);
                     } else {
                         var _buildViews = function(collection, $gridEl) {
                             if (!$gridEl.is('#' + this.$gridEl.attr('id'))) {
@@ -73,7 +73,7 @@ define(function(require) {
                         mediator.on('datagrid_filters:rendered', _buildViews, self);
                     }
                 } else {
-                    self.buildViews.call(self, grid);
+                    self.buildViews(grid);
                 }
             }).fail(function() {
                 deferred.reject();

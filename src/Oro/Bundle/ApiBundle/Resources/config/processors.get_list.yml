@@ -29,15 +29,6 @@ services:
     # security_check
     #
 
-    oro_api.get_list.entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@security.authorization_checker'
-            - VIEW
-        tags:
-            - { name: oro.api.processor, action: get_list, group: security_check, priority: 10 }
-
     #
     # build_query
     #
@@ -66,8 +57,8 @@ services:
     # finalize
     #
 
-    oro_api.get_list.validate_result:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\ValidateResult
+    oro_api.get_list.assert_has_result:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\AssertHasResult
         tags:
             - { name: oro.api.processor, action: get_list, group: finalize, priority: -250 }
 

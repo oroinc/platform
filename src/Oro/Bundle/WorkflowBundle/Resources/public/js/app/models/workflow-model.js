@@ -14,19 +14,18 @@ define(function(require) {
     var TransitionModel = require('./transition-model');
     var TransitionDefinitionModel = require('./transition-definition-model');
     var AttributeModel = require('./attribute-model');
-    var EntityFieldsUtil = require('oroentity/js/entity-fields-util');
 
     WorkflowModel = StatefulModel.extend({
         defaults: {
             name: '',
             label: '',
             entity: '',
-            'entity_attribute': 'entity',
-            'start_step': null,
-            'steps_display_ordered': false,
+            entity_attribute: 'entity',
+            start_step: null,
+            steps_display_ordered: false,
             steps: null,
             transitions: null,
-            'transition_definitions': null,
+            transition_definitions: null,
             attributes: null,
             translateLinkLabel: null,
             priority: 0,
@@ -38,9 +37,6 @@ define(function(require) {
         MAX_HISTORY_LENGTH: 50,
 
         observedAttributes: ['steps', 'transitions'],
-        entityFieldUtil: null,
-        entityFields: null,
-        entityFieldsInitialized: false,
         availableDestinations: {},
 
         positionIncrementPx: 35,
@@ -67,6 +63,12 @@ define(function(require) {
             this.listenTo(steps, 'reset', this.setWorkflowToCollection);
             this.listenTo(transitions, 'reset', this.setWorkflowToCollection);
             WorkflowModel.__super__.initialize.apply(this, arguments);
+
+            // Add an initial state to history for an already created workflow
+            var startStep = this.getStartStep();
+            if (startStep.length) {
+                this.onStateChange();
+            }
         },
 
         setWorkflow: function(item) {
@@ -159,44 +161,6 @@ define(function(require) {
             return cloned;
         },
 
-        setEntityFieldsData: function(fields) {
-            this.entityFieldsInitialized = true;
-            this.entityFieldUtil = new EntityFieldsUtil(this.get('entity'), fields);
-            this.entityFields = fields[this.get('entity')];
-            this.trigger('entityFieldsInitialize');
-        },
-
-        getFieldIdByPropertyPath: function(propertyPath) {
-            var pathData = propertyPath.split('.');
-
-            if (pathData.length > 1 && pathData[0] === this.get('entity_attribute')) {
-                pathData.splice(0, 1);
-                return this.entityFieldUtil.getPathByPropertyPath(pathData);
-            } else {
-                return null;
-            }
-        },
-
-        /**
-         * @param {string} propertyPath
-         * @returns {boolean}
-         */
-        hasEntityField: function(propertyPath) {
-            return typeof this.entityFields.fieldsIndex[propertyPath] !== 'undefined';
-        },
-
-        getPropertyPathByFieldId: function(fieldId) {
-            return this.get('entity_attribute') + '.' + this.entityFieldUtil.getPropertyPathByPath(fieldId);
-        },
-
-        getSystemEntities: function() {
-            return this.systemEntities;
-        },
-
-        setSystemEntities: function(entities) {
-            this.systemEntities = entities;
-        },
-
         getAvailableDestinations: function() {
             return this.availableDestinations;
         },
@@ -205,25 +169,26 @@ define(function(require) {
             this.availableDestinations = destinations;
         },
 
-        getEntityRoutes: function() {
-            return this.entityFieldUtil.getEntityRoutes();
+        getAttributeByPropertyPath: function(propertyPath) {
+            var fullPropertyPath = this.get('entity_attribute') + '.' + propertyPath;
+            return this.get('attributes').findWhere({property_path: fullPropertyPath});
         },
 
-        getOrAddAttributeByPropertyPath: function(propertyPath) {
-            var attribute = _.first(this.get('attributes').where({'property_path': propertyPath}));
+        ensureAttributeByPropertyPath: function(propertyPath) {
+            var fullPropertyPath = this.get('entity_attribute') + '.' + propertyPath;
+            var attribute = this.get('attributes').findWhere({property_path: fullPropertyPath});
             if (!attribute) {
                 attribute = new AttributeModel({
-                    'name': propertyPath.replace(/\./g, '_'),
-                    'property_path': propertyPath
+                    name: this.generateAttributeName(propertyPath),
+                    property_path: fullPropertyPath
                 });
                 this.get('attributes').add(attribute);
             }
-
-            return attribute;
         },
 
-        getAttributeByPropertyPath: function(propertyPath) {
-            return _.first(this.get('attributes').where({'property_path': propertyPath}));
+        generateAttributeName: function(propertyPath) {
+            var fullPropertyPath = this.get('entity_attribute') + '.' + propertyPath;
+            return fullPropertyPath.replace(/\./g, '_');
         },
 
         getAttributeByName: function(name) {
@@ -235,7 +200,7 @@ define(function(require) {
         },
 
         getStartStep: function() {
-            return this.get('steps').where({'_is_start': true});
+            return this.get('steps').where({_is_start: true});
         },
 
         getTransitionByName: function(name) {
@@ -247,11 +212,11 @@ define(function(require) {
         },
 
         getStartTransitions: function() {
-            return this.get('transitions').where({'is_start': true});
+            return this.get('transitions').where({is_start: true});
         },
 
         _getByName: function(item, name) {
-            return _.first(this.get(item).where({'name': name}));
+            return this.get(item).findWhere({name: name});
         },
 
         getState: function() {

@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\ImportExportBundle\Context\Context;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -172,11 +173,25 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $writerChain = new WriterChain();
         $writerChain->addWriter($writer, 'csv');
 
+        $options = [
+            Context::OPTION_ENCLOSURE => '|',
+            Context::OPTION_DELIMITER => ';',
+        ];
+
         $handler = $this->createHttpImportHandlerMock();
         $handler
             ->expects($this->once())
             ->method('setImportingFileName')
             ->with('12345.csv')
+        ;
+        $handler
+            ->expects($this->once())
+            ->method('setConfigurationOptions')
+            ->with([
+                Context::OPTION_ENCLOSURE => '|',
+                Context::OPTION_DELIMITER => ';',
+                Context::OPTION_BATCH_SIZE => 100,
+            ])
         ;
         $handler
             ->expects($this->once())
@@ -207,7 +222,91 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
                 'jobName' => 'test',
                 'processorAlias' => 'test',
                 'process' => 'import',
-                'options' => [],
+                'options' => $options,
+            ]))
+        ;
+
+        $message
+            ->expects($this->once())
+            ->method('getMessageId')
+            ->willReturn(1);
+
+        $result = $processor->process($message, $this->createSessionMock());
+        $this->assertEquals(MessageProcessorInterface::ACK, $result);
+    }
+
+    public function testUniqueJobWithCustomName()
+    {
+        $jobRunner = $this->createJobRunnerMock();
+        $jobRunner
+            ->expects($this->once())
+            ->method('runUnique')
+            ->with(1, 'oro:import:test:test:0')
+            ->willReturn(true)
+            ;
+        $fileManager = $this->createFileManagerMock();
+        $fileManager
+            ->expects($this->once())
+            ->method('writeToTmpLocalStorage')
+            ->with('123435.csv')
+            ->willReturn('12345.csv');
+
+        $writer = $this->createWriterMock();
+        $writerChain = new WriterChain();
+        $writerChain->addWriter($writer, 'csv');
+
+        $options = [
+            Context::OPTION_ENCLOSURE => '|',
+            Context::OPTION_DELIMITER => ';',
+            'unique_job_slug' => 0,
+        ];
+
+        $handler = $this->createHttpImportHandlerMock();
+        $handler
+            ->expects($this->once())
+            ->method('setImportingFileName')
+            ->with('12345.csv')
+        ;
+        $handler
+            ->expects($this->once())
+            ->method('setConfigurationOptions')
+            ->with([
+                Context::OPTION_ENCLOSURE => '|',
+                Context::OPTION_DELIMITER => ';',
+                Context::OPTION_BATCH_SIZE => 100,
+                'unique_job_slug' => 0,
+            ])
+        ;
+        $handler
+            ->expects($this->once())
+            ->method('splitImportFile')
+            ->with('test', 'import', $writer)
+            ->willReturn(['import_1.csv'])
+        ;
+
+        $processor = new PreHttpImportMessageProcessor(
+            $jobRunner,
+            $this->createMessageProducerInterfaceMock(),
+            $this->createLoggerInterfaceMock(),
+            $this->createDependentJobMock(),
+            $fileManager,
+            $handler,
+            $writerChain,
+            100
+        );
+
+        $message = $this->createMessageMock();
+        $message
+            ->expects($this->once())
+            ->method('getBody')
+            ->willReturn(json_encode([
+                'fileName' => '123435.csv',
+                'originFileName' => 'test.csv',
+                'userId' => '1',
+                'jobName' => 'test',
+                'processorAlias' => 'test',
+                'process' => 'import',
+                'options' => $options,
             ]))
         ;
 

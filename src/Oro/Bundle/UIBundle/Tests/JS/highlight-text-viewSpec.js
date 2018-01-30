@@ -5,8 +5,7 @@ define(function(require) {
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var HighlightTextView = require('oroui/js/app/views/highlight-text-view');
-
-    //fixtures
+    // fixtures
     var html = require('text!./Fixture/highlight-text-view.html');
 
     var createView = function(options) {
@@ -60,6 +59,17 @@ define(function(require) {
 
                 mediator.trigger(':highlight-text:update', '');
                 expect(this.view.isElementContentHighlighted(this.view.$el)).toBeFalsy();
+            });
+
+            it('check highlight with not found text and fuzzy search', function() {
+                this.view = createView({
+                    text: 'Grp',
+                    highlightSelectors: ['.group']
+                });
+                expect(this.view.isElementContentHighlighted(this.view.$el)).toBeFalsy();
+
+                mediator.trigger(':highlight-text:update', 'Grp', true);
+                expect(this.view.isElementContentHighlighted(this.view.$el)).toBeTruthy();
             });
         });
 

@@ -1,4 +1,4 @@
-// @theme: blank
+// @theme: blank;
 
 .input {
     @include base-ui-element($use-base-style-for-input,
@@ -47,6 +47,11 @@
         &::-webkit-inner-spin-button {
             display: none;
         }
+    }
+
+    &[type="number"] {
+        // fix FireFox platform styles
+        box-shadow: $input-number-box-shadow;
     }
 
     &--short {

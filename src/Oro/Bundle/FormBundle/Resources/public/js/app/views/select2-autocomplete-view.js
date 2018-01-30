@@ -8,7 +8,7 @@ define([
     var Select2AutocompleteView;
     Select2AutocompleteView = Select2View.extend({
         events: {
-            'change': function(e) {
+            change: function(e) {
                 if (this.$el.data('select2').opts.multiple) {
                     var selectedData = this.$el.data('selected-data') || [];
                     if (e.added) {

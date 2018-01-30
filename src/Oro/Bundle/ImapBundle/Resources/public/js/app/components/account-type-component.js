@@ -51,8 +51,8 @@ define(function(require) {
                 url: this.getUrl(),
                 method: 'POST',
                 data: {
-                    'type': value,
-                    'formParentName': this.formParentName
+                    type: value,
+                    formParentName: this.formParentName
                 },
                 success: _.bind(this.templateLoaded, this)
             });
@@ -64,8 +64,8 @@ define(function(require) {
                 url: this.getUrl(),
                 method: 'POST',
                 data: {
-                    'type': value.type,
-                    'token': value.token
+                    type: value.type,
+                    token: value.token
                 },
                 success: _.bind(this.templateLoaded, this)
             });

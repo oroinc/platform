@@ -1,0 +1,297 @@
+// @theme: blank;
+
+.select2-container {
+    display: inline-block;
+    width: 100%;
+
+    background: get-color('additional', 'ultra');
+
+    font-size: $base-font-size;
+    line-height: 1;
+
+    border: 1px solid get-color(additional, 'light');
+    border-radius: $select2-container-border-radius;
+
+    outline: none;
+
+    vertical-align: middle;
+
+    &.input {
+        padding: 0;
+    }
+
+    .form-horizontal & {
+        width: auto;
+    }
+
+    .select2-choice {
+        position: relative;
+
+        display: block;
+        padding: $select2-container-size-l;
+
+        text-decoration: none;
+
+        color: get-color('additional', 'dark');
+
+        white-space: nowrap;
+
+        overflow: hidden;
+
+        user-select: none;
+
+        .select2-arrow {
+            position: absolute;
+            top: 50%;
+            right: 8px;
+
+            height: $select2-container-arrow-height;
+            width: $select2-container-arrow-size * 2;
+
+            margin-top: -($select2-container-arrow-height / 2);
+
+            overflow: inherit;
+
+            transition: transform .2s linear;
+
+            &:before {
+                top: 50%;
+
+                margin-top: -($select2-container-arrow-size - 2);
+
+                border-top: ($select2-container-arrow-size + 1) solid get-color('additional', 'dark');
+                border-left: $select2-container-arrow-size solid transparent;
+                border-right: $select2-container-arrow-size solid transparent;
+
+                @include after();
+            }
+        }
+
+        span {
+            display: block;
+
+            overflow: hidden;
+
+            white-space: nowrap;
+
+            text-overflow: ellipsis;
+        }
+    }
+
+    .select2-chosen {
+        max-width: inherit;
+        margin-right: 8px;
+        padding-right: $offset-x-s;
+    }
+
+    .select2-choices {
+        min-height: 18px;
+    }
+
+    .select2-search-choice {
+        margin: 3px 5px 3px 5px;
+    }
+
+    .select2-search-choice-close {
+        display: none;
+    }
+
+    &.error {
+        border-color: get-color('ui', 'error-dark');;
+
+        color: get-color('additional', 'dark');
+    }
+
+    // Open select
+    &.select2-container-active {
+        border: 1px solid get-color(additional, 'light');
+        box-shadow: 0 1px 5px rgba(0, 0, 0,.15);
+    }
+
+    &.select2-dropdown-open {
+        .select2-arrow {
+            transform: rotate(180deg);
+        }
+    }
+}
+
+.select2-drop {
+    position: absolute;
+    z-index: z('popup') + 100;
+
+    width: auto;
+    margin-top: -4px;
+
+    font-size: 13px;
+
+    border: 1px solid get-color('additional', 'light');
+    border-top-color: transparent;
+    background-color: get-color('additional', 'ultra');
+    border-radius: $select2-drop-border-radius;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, .15);
+
+    .select2-highlighted,
+    .select2-result.active {
+        background-color: get-color('ui', 'focus');
+        color: get-color('additional', 'ultra');
+    }
+
+    &.select2-drop-auto-width {
+        width: auto;
+    }
+
+    &.select2-drop-above {
+        border-top-color: get-color(additional, 'light');
+        border-bottom-color: transparent;
+        border-radius: $select2-drop-above-border-radius;
+        box-shadow: $select2-container-drop-above-box-shadow;
+    }
+}
+
+.select2-search {
+    position: relative;
+
+    display: inline-block;
+    width: 100%;
+    min-height: 26px;
+    margin-bottom: $offset-y-m /2;
+    padding: 0 $offset-x-m  ($offset-y-m / 2);
+
+    border-bottom: 1px solid get-color('additional', 'light');
+
+    white-space: nowrap;
+}
+
+.select2-input {
+    width: 100%;
+
+    font-size: $base-font-size;
+    line-height: 1;
+
+    border: $select2-container-input-border;
+    border-radius: $select2-container-border-radius;
+
+    margin: 0;
+    padding: $select2-container-input-inner-offset;
+
+    @include element-state('focus') {
+        border: $select2-container-input-focus-border;
+        box-shadow: $select2-container-input-focus-box-shadow;
+
+        outline: 0;
+    }
+
+    @include element-state('error') {
+        border: $select2-container-input-error-border;
+        box-shadow: $select2-container-input-error-box-shadow;
+    }
+
+    @include element-state('warning') {
+        border: $select2-container-input-warning-border;
+        box-shadow: $select2-container-input-warning-box-shadow;
+    }
+
+    @include element-state('success') {
+        border: 1px solid get-color('secondary', 'light');
+    }
+}
+
+.select2-no-results,
+.select2-searching {
+    padding: 0 10px 4px;
+}
+
+.select2-result-label {
+    display: block;
+    padding: 5px 14px;
+
+    text-decoration: none;
+    line-height: 24px;
+
+    color: inherit;
+
+    white-space: nowrap;
+
+    @include element-state('hover') {
+        text-decoration: none;
+        color: inherit;
+    }
+}
+
+.select2-drop-undermask,
+.select2-drop-mask {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: z('popup') + 99;
+}
+
+.select2-results {
+    max-height: 300px;
+
+    color: get-color('additional', 'dark');
+
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.select2-more-results {
+    background: get-color('additional', 'base');
+}
+
+.select2-offscreen,
+.select2-offscreen:focus {
+    position: absolute !important;
+    left: 0;
+
+    width: 1px !important;
+    height: 1px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: 0;
+
+    border: none;
+
+    overflow: hidden;
+
+    outline: 0;
+
+    clip: rect(0 0 0 0);
+}
+
+.select2-display-none {
+    display: none;
+}
+
+.oro-select2 {
+    padding: 0;
+
+    &--size {
+        &-m {
+            .select2-choice {
+                padding: $select2-container-size-m;
+
+                .select2-arrow {
+                    right: $select2-container-size-m;
+                }
+            }
+        }
+
+        &-s {
+            .select2-choice {
+                padding: $select2-container-size-s;
+
+                .select2-arrow {
+                    right: $select2-container-size-s;
+                }
+            }
+        }
+    }
+}
+
+@include breakpoint('mobile') {
+    .select2-result-label {
+        white-space: normal;
+    }
+}

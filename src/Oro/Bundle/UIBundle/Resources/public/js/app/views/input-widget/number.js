@@ -11,9 +11,9 @@ define(function(require) {
 
     NumberInputWidget = AbstractInputWidget.extend({
         events: {
-            'input': '_normalizeNumberFieldValue',
-            'change': '_normalizeNumberFieldValue',
-            'keypress': '_addFraction'
+            input: '_normalizeNumberFieldValue',
+            change: '_normalizeNumberFieldValue',
+            keypress: '_addFraction'
         },
 
         precision: null,
@@ -74,7 +74,7 @@ define(function(require) {
             var field = this.el;
             var originalValue = field.value;
 
-            //set fixed length start
+            // set fixed length start
             var keyName = event.key || String.fromCharCode(event.which);
             if (this.precision > 0 && decimalSeparator === keyName &&
                 field.value.length && field.selectionStart === field.value.length) {
@@ -95,7 +95,7 @@ define(function(require) {
                 event.preventDefault();
                 return false;
             }
-            //set fixed length end
+            // set fixed length end
         },
 
         _normalizeNumberFieldValue: function(event) {
@@ -109,19 +109,19 @@ define(function(require) {
                 return;
             }
 
-            //filter value start
+            // filter value start
             if (this.precision === 0) {
                 field.value = field.value.replace(/^0*/g, '');
             }
 
-            field.value = field.value.replace(/(?!\.)[?:\D+]/g, '');//clear not allowed symbols
+            field.value = field.value.replace(/(?!\.)[?:\D+]/g, '');// clear not allowed symbols
 
             if (field.value[0] === decimalSeparator && this.precision > 0) {
                 field.value = '0' + field.value;
             }
-            //filter value end
+            // filter value end
 
-            //validate value start
+            // validate value start
             var regExpString = '^([0-9]*)';
             if (this.precision > 0) {
                 regExpString += '(\\' + decimalSeparator + '{1})?([0-9]{1,' + this.precision + '})?';
@@ -139,7 +139,7 @@ define(function(require) {
             } else {
                 this._triggerEventOnValueChange(event, originalValue);
             }
-            //validate value end
+            // validate value end
         },
 
         _triggerEventOnValueChange: function(event, value) {

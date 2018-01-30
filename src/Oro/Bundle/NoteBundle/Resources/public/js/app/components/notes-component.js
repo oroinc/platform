@@ -52,7 +52,7 @@ define(function(require) {
             // map item routes to action url function
             _.each(options.notesOptions.routes, function(route, name) {
                 options.notesOptions.urls[name + 'Item'] = function(model) {
-                    return routing.generate(route, {'id': model.get('id')});
+                    return routing.generate(route, {id: model.get('id')});
                 };
             });
 

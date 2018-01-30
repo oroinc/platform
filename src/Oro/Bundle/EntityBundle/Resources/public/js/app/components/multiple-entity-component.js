@@ -67,15 +67,15 @@ define(function(require) {
                 if (!_.isUndefined(this.extraData)) {
                     for (var j = 0; j < this.extraData.length; j++) {
                         extraData.push({
-                            'label': this.extraData[j].label,
-                            'value': model.get(this.extraData[j].value)
+                            label: this.extraData[j].label,
+                            value: model.get(this.extraData[j].value)
                         });
                     }
                 }
 
                 this.addedModels[id] = new MultipleEntityModel({
-                    'id': model.get('id'),
-                    'link': routing.generate(
+                    id: model.get('id'),
+                    link: routing.generate(
                         'oro_entity_detailed',
                         {
                             id: model.get('id'),
@@ -83,8 +83,8 @@ define(function(require) {
                             fieldName: this.field_name
                         }
                     ),
-                    'label': label,
-                    'extraData': extraData
+                    label: label,
+                    extraData: extraData
                 });
             } else if (this.addedModels.hasOwnProperty(id)) {
                 delete this.addedModels[id];

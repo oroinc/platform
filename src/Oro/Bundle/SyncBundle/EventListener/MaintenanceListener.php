@@ -53,7 +53,10 @@ class MaintenanceListener
         try {
             $this->publisher->send('oro/maintenance', array('isOn' => (bool)$isOn, 'userId' => $userId));
         } catch (\Exception $e) {
-            $this->logger->error($e->getMessage());
+            $this->logger->error(
+                'Failed to send a message to the topic "oro/maintenance"',
+                ['exception' => $e]
+            );
         }
     }
 }

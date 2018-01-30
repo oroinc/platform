@@ -5,6 +5,14 @@ namespace Oro\Bundle\ImportExportBundle\Context;
 
 class Context implements ContextInterface, BatchContextInterface
 {
+    const OPTION_FILE_PATH = 'filePath';
+    const OPTION_DELIMITER = 'delimiter';
+    const OPTION_ENCLOSURE = 'enclosure';
+    const OPTION_ESCAPE = 'escape';
+    const OPTION_FIRST_LINE_IS_HEADER = 'firstLineIsHeader';
+    const OPTION_HEADER = 'header';
+    const OPTION_BATCH_SIZE = 'batch_size';
+
     /**
      * @var array
      */
@@ -298,7 +306,7 @@ class Context implements ContextInterface, BatchContextInterface
      */
     public function getBatchSize()
     {
-        return $this->getValue('batch_size');
+        return $this->getValue(self::OPTION_BATCH_SIZE);
     }
 
     /**

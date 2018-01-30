@@ -11,7 +11,7 @@ define(function(require) {
         },
 
         listen: {
-            'commentCountChanged': 'updateCommentsQuantity'
+            commentCountChanged: 'updateCommentsQuantity'
         },
 
         /**

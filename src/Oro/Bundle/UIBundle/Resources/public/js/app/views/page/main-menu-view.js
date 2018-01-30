@@ -32,7 +32,7 @@ define([
         delegateEvents: function(events) {
             PageMainMenuView.__super__.delegateEvents.call(this, events);
 
-            //can't use event delegation, in some cases bubbling will be break
+            // can't use event delegation, in some cases bubbling will be break
             this.$('a').on('click' + this.eventNamespace(), _.bind(this._onMenuItemClick, this));
         },
 
@@ -79,7 +79,7 @@ define([
          */
         hideDropdownScroll: function($link) {
             var $scrollable = $link.closest('.dropdown-menu-wrapper__scrollable');
-            if (!$scrollable.length) {
+            if (!$scrollable.length || $scrollable.parent().hasClass('accordion')) {
                 return;
             }
             $scrollable.addClass('hidden');
@@ -95,7 +95,7 @@ define([
 
             var $scrollableParent = $scrollable.parent();
 
-            //reset styles to recalc it
+            // reset styles to recalc it
             var scrollableHeight = $scrollable.children(':first').outerHeight();
             $scrollable.css('max-height', scrollableHeight + 'px');
             $scrollableParent.css('margin-top', 0);
@@ -108,13 +108,13 @@ define([
             var availableHeight = window.innerHeight - scrollableTop;
 
             if (scrollableParentHeight <= availableHeight) {
-                //scroll are not required
+                // scroll are not required
                 return;
             }
 
             var maxHeight = availableHeight - this.maxHeightModifier;
             if (scrollableTop > availableHeight) {
-                //change dropdown direction if necessary
+                // change dropdown direction if necessary
                 scrollableHeightModifier = scrollableParentHeight - scrollableHeight;
 
                 if (scrollableParentHeight > scrollableTop) {
@@ -135,7 +135,7 @@ define([
                 return;
             }
 
-            //reset styles to recalc it
+            // reset styles to recalc it
             $child.css({
                 'margin-left': 0,
                 'margin-top': 0
@@ -153,7 +153,7 @@ define([
                 'margin-top': marginTop + 'px'
             });
 
-            //change dropdown direction if necessary
+            // change dropdown direction if necessary
             var childHeight = $child.outerHeight();
             var childTop = $child.get(0).getBoundingClientRect().top;
             if (childHeight + childTop > window.innerHeight) {
@@ -265,6 +265,7 @@ define([
                     .removeClass('active');
                 item.addClass('active');
                 item.parents('.dropdown').addClass('active');
+                item.parents('.accordion-group').addClass('active');
             }
         },
 

@@ -3,6 +3,9 @@
     {%- set userName = app.user.username -%}
 {%- endif -%}
 require({
+    paths: {
+        'oroui/js/app': 'oroui/js/app' {# fix for requirejs-build-logger-exclude-list #}
+    },
     config: {
         'oroui/js/app': {
             baseUrl: {{ app.request.getSchemeAndHttpHost()|json_encode|raw }},

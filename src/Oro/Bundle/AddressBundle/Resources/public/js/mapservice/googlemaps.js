@@ -1,4 +1,4 @@
-/*global google*/
+/* global google */
 define(function(require) {
     'use strict';
 
@@ -154,8 +154,8 @@ define(function(require) {
 
                 this.mapsLoadExecuted = true;
                 this.requestedLocation = {
-                    'address': address,
-                    'label': label
+                    address: address,
+                    label: label
                 };
                 this.loadGoogleMaps();
                 return;
@@ -167,11 +167,11 @@ define(function(require) {
                 if (this.isEmptyFunction(this.getGeocoder().geocode)) {
                     return this.checkRenderMap();
                 }
-                this.getGeocoder().geocode({'address': address}, _.bind(function(results, status) {
+                this.getGeocoder().geocode({address: address}, _.bind(function(results, status) {
                     clearTimeout(timeoutId);
                     if (status === google.maps.GeocoderStatus.OK) {
                         this.mapLocationCache[address] = results[0].geometry.location;
-                        //Move location marker and map center to new coordinates
+                        // Move location marker and map center to new coordinates
                         this.updateMapLocation(results[0].geometry.location, label);
                     } else {
                         this.mapLocationUnknown();

@@ -53,7 +53,7 @@ define(function(require) {
          */
         _updateDOMValue: function() {
             return this._writeDOMValue(this._formatRawValue(this.getValue()));
-        },
+        }
     });
 
     return WidgetConfigDateTimeRangeFilter;

@@ -20,9 +20,6 @@
     {%- endfor %}
 
     {% if visibleTabsOptions is not empty %}
-        {% set attr = layout_attr_defaults(attr, {
-            '~class': ' product-view__attributes-container'
-        }) %}
         <div {{ block('block_attributes') }}>
             <div {{ UI.renderPageComponentAttributes({
                 module: 'oroentityconfig/js/attribute-group-tabs-component',
@@ -105,7 +102,7 @@
 {% endblock %}
 
 {% block attribute_localized_fallback_widget %}
-    {{ translated_value|raw }}
+    {{ translated_value|oro_html_sanitize }}
 {% endblock %}
 
 {% block attribute_group_rest_attribute_widget %}

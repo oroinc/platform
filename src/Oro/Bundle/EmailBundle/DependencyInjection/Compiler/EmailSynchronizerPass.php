@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class EmailSynchronizerPass implements CompilerPassInterface
 {
@@ -21,15 +22,19 @@ class EmailSynchronizerPass implements CompilerPassInterface
             return;
         }
 
-        $tokenStorsgeDef = $container->getDefinition(self::SERVICE_TOKEN_STORAGE);
+        $tokenStorageRef = new Reference(self::SERVICE_TOKEN_STORAGE);
 
         $selectorDef    = $container->getDefinition(self::SERVICE_KEY);
         $taggedServices = $container->findTaggedServiceIds(self::TAG);
         foreach ($taggedServices as $synchronizerServiceId => $tagAttributes) {
-            $selectorDef->addMethodCall('addSynchronizer', array($synchronizerServiceId));
+            /**
+             * We use the service id instead of the reference object
+             * because of the service definition has scope "prototype"
+             */
+            $selectorDef->addMethodCall('addSynchronizer', [$synchronizerServiceId]);
 
             $synchronizerDef = $container->getDefinition($synchronizerServiceId);
-            $synchronizerDef->addMethodCall('setTokenStorage', [$tokenStorsgeDef]);
+            $synchronizerDef->addMethodCall('setTokenStorage', [$tokenStorageRef]);
         }
     }
 }

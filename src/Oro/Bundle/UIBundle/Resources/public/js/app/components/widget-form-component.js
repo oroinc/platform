@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define(
     ['oroui/js/widget-manager', 'oroui/js/messenger', 'oroui/js/mediator', 'orotranslation/js/translator'],
     function(widgetManager, messenger, mediator, __) {

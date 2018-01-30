@@ -52,7 +52,7 @@ define(function(require) {
             };
             var nvp = query.split('&');
             var data = {};
-            for (var i = 0 ; i < nvp.length ; i++) {
+            for (var i = 0; i < nvp.length; i++) {
                 var pair = nvp[i].split('=');
                 if (pair.length < 2) {
                     continue;
@@ -63,10 +63,10 @@ define(function(require) {
                 var path = name.match(/(^[^\[]+)(\[.*\]$)?/);
                 var first = path[1];
                 if (path[2]) {
-                    //case of 'array[level1]' || 'array[level1][level2]'
+                    // case of 'array[level1]' || 'array[level1][level2]'
                     path = path[2].match(/(?=\[(.*)\]$)/)[1].split('][');
                 } else {
-                    //case of 'name'
+                    // case of 'name'
                     path = [];
                 }
                 path.unshift(first);
@@ -155,8 +155,7 @@ define(function(require) {
                 }
                 return false;
             } else {
-                // jshint -W116
-                return value1 == value2;
+                return value1 == value2; // eslint-disable-line eqeqeq
             }
         },
 
@@ -187,7 +186,7 @@ define(function(require) {
         /**
          * Are we have touch screen
          */
-        isTouchDevice: function()  {
+        isTouchDevice: function() {
             return ('ontouchstart' in window && window.ontouchstart) ||
                 ('DocumentTouch' in window && document instanceof window.DocumentTouch);
         },
@@ -206,55 +205,62 @@ define(function(require) {
          *  - Object: where keys are formal module names and values are actual
          *  - Array: module names,
          *  - string: single module name
-         * @param {function(Object)} callback
+         * @param {function(Object)=} callback
          * @param {Object=} context
+         * @return {JQueryPromise}
          */
         loadModules: function(modules, callback, context) {
             var requirements;
-            var onLoadHandler;
-            if (_.isObject(modules)) {
+            var processModules;
+
+            if (_.isObject(modules) && !_.isArray(modules)) {
                 // if modules is an object of {formal_name: module_name}
                 requirements = _.values(modules);
-                onLoadHandler = function() {
+                processModules = function(loadedModules) {
                     // maps loaded modules into original object
-                    _.each(modules, _.bind(function(value, key) {
-                        modules[key] = this[value];
-                    }, _.object(requirements, _.toArray(arguments))));
-                    callback.call(context || null, modules);
+                    _.each(modules, _.partial(function(map, value, key) {
+                        modules[key] = map[value];
+                    }, _.object(requirements, loadedModules)));
+                    return [modules];
                 };
             } else {
                 // if modules is an array of module_names or single module_name
                 requirements = !_.isArray(modules) ? [modules] : modules;
-                onLoadHandler = function() {
-                    callback.apply(context || null, arguments);
+                processModules = function(loadedModules) {
+                    return loadedModules;
                 };
             }
-            // loads requirements and execute onLoadHandler handler
-            require(requirements, onLoadHandler);
-        },
 
-        /**
-         * Loads single module through requireJS and returns promise
-         *
-         * @param {string} module name
-         * @return ($.Promise}
-         */
-        loadModule: function(module) {
             var deferred = $.Deferred();
-            require([module], function(moduleRealization) {
-                deferred.resolve(moduleRealization);
-            }, function(e) {
+            require(requirements, _.partial(function(processor) {
+                var modules = processor(_.rest(arguments));
+                if (callback) {
+                    callback.apply(context || null, modules);
+                }
+                deferred.resolve.apply(deferred, modules);
+            }, processModules), function(e) {
                 deferred.reject(e);
             });
             return deferred.promise();
         },
 
         /**
+         * Loads single module through requireJS and returns promise
+         *
+         * @deprecated
+         * @param {string} module name
+         * @return {JQueryPromise}
+         */
+        loadModule: function(module) {
+            return tools.loadModules(module);
+        },
+
+        /**
          * Loads single module through requireJS and replaces the property
          *
          * @param {Object} container where to replace property
-         * @param {string} property name to replace module ref to concrete realization
-         * @return ($.Promise}
+         * @param {string} moduleProperty name to replace module ref to concrete realization
+         * @return {JQueryPromise}
          */
         loadModuleAndReplace: function(container, moduleProperty) {
             if (_.isFunction(container[moduleProperty])) {
@@ -262,7 +268,7 @@ define(function(require) {
                 deferred.resolve(container[moduleProperty]);
                 return deferred.promise();
             }
-            return this.loadModule(container[moduleProperty]).then(function(realization) {
+            return this.loadModules(container[moduleProperty]).then(function(realization) {
                 container[moduleProperty] = realization;
                 return realization;
             });
@@ -295,10 +301,8 @@ define(function(require) {
          */
         createRandomUUID: function() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                // jshint -W016
                 var r = Math.random() * 16 | 0;
                 var v = c === 'x' ? r : (r & 0x3 | 0x8);
-                // jshint +W016
                 return v.toString(16);
             });
         },
@@ -345,7 +349,7 @@ define(function(require) {
                 return '//' + tagName + '[@id="' + element.id + '"]';
             } else {
                 // Use nodeName (instead of localName) so namespace prefix is included (if any).
-                for (; element && element.nodeType === 1; element = element.parentNode)  {
+                for (; element && element.nodeType === 1; element = element.parentNode) {
                     var index = 0;
                     tagName = element.nodeName.toLowerCase();
                     // EXTRA TEST FOR ELEMENT.ID

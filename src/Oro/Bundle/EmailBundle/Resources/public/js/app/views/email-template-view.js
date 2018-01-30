@@ -14,7 +14,7 @@ define(function(require) {
         optionNames: BaseView.prototype.optionNames.concat(['collectionOptions', 'targetSelector', 'target']),
 
         events: {
-            'change': 'selectionChanged'
+            change: 'selectionChanged'
         },
 
         initialize: function() {

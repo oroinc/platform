@@ -97,6 +97,9 @@ EOF
             }
         }
 
-        $io->success('API documentation cache was successfully cleared.');
+        $io->success(sprintf(
+            'API documentation cache was successfully cleared for "%s" environment.',
+            $this->getContainer()->get('kernel')->getEnvironment()
+        ));
     }
 }

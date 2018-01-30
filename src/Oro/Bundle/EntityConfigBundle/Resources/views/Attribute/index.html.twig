@@ -23,3 +23,8 @@
         </div>
     {% endif %}
 {% endblock %}
+
+{% block content %}
+    {{ parent() }}
+    {% placeholder attributes_content_after with {entityAlias: entityAlias} %}
+{% endblock %}

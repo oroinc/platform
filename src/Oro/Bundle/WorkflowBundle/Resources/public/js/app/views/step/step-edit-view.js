@@ -76,22 +76,21 @@ define(function(require) {
         },
 
         renderWidget: function() {
-            var widget;
             if (!this.widget) {
                 var title = this.model.get('name') ? __('Edit step') : __('Add new step');
                 if (this.model.get('_is_clone')) {
                     title = __('Clone step');
                 }
 
-                this.widget = widget = new DialogWidget({
-                    'title': title,
-                    'el': this.$el,
-                    'stateEnabled': false,
-                    'incrementalPosition': false,
-                    'dialogOptions': {
-                        'close': _.bind(this.onCancel, this),
-                        'width': 800,
-                        'modal': true
+                this.widget = new DialogWidget({
+                    title: title,
+                    el: this.$el,
+                    stateEnabled: false,
+                    incrementalPosition: false,
+                    dialogOptions: {
+                        close: _.bind(this.onCancel, this),
+                        width: 800,
+                        modal: true
                     }
                 });
                 this.widget.render();
@@ -102,9 +101,9 @@ define(function(require) {
             // Disable widget submit handler and set our own instead
             this.widget.form.off('submit');
             this.widget.form.validate({
-                'submitHandler': _.bind(this.onStepAdd, this),
-                'ignore': '[type="hidden"]',
-                'highlight': function(element) {
+                submitHandler: _.bind(this.onStepAdd, this),
+                ignore: '[type="hidden"]',
+                highlight: function(element) {
                     var tabContent = $(element).closest('.tab-pane');
                     if (tabContent.is(':hidden')) {
                         tabContent

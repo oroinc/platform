@@ -5,7 +5,6 @@ namespace Oro\Bundle\InstallerBundle\Command;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 
-use Symfony\Component\Console\Helper\Table as TableHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -117,13 +116,19 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $output->writeln('<info>Installing Oro Application.</info>');
         $output->writeln('');
 
+        $exitCode = $this->checkRequirements($commandExecutor);
+        if ($exitCode > 0) {
+            return $exitCode;
+        }
+
         try {
             $this
-                ->checkStep($input, $output)
                 ->prepareStep($input, $output)
                 ->loadDataStep($commandExecutor, $output)
                 ->finalStep($commandExecutor, $output, $input, $skipAssets);
         } catch (\Exception $exception) {
+            $output->writeln(sprintf('<error>%s</error>', $exception->getMessage()));
+
             return $commandExecutor->getLastCommandExitCode();
         }
 
@@ -147,10 +152,11 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             );
         }
         $output->writeln(
-            '<info>Make sure that consumer command was running <comment>oro:message-queue:consume</comment>. ' .
-            'More info you can find here: <comment>'.
-            'https://oroinc.com/doc/orocrm/current/book/installation#activating-background-tasks' .
-            '</comment></info>.'
+            '<info>Ensure that at least one consumer service is running. ' .
+            'Use the <comment>oro:message-queue:consume</comment> ' .
+            'command to launch a consumer service instance. See ' .
+            '<comment>https://oroinc.com/doc/orocrm/current/book/installation#activating-background-tasks</comment> ' .
+            'for more information.</info>.'
         );
 
         return 0;
@@ -161,7 +167,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function validate(InputInterface $input)
+    protected function validate(InputInterface $input)
     {
         $requiredParams = ['user-email', 'user-firstname', 'user-lastname', 'user-password'];
         $emptyParams    = [];
@@ -183,36 +189,18 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return InstallCommand
+     * @param CommandExecutor $commandExecutor
+     *
+     * @return int
      */
-    protected function checkStep(InputInterface $input, OutputInterface $output)
+    protected function checkRequirements(CommandExecutor $commandExecutor)
     {
-        $output->writeln('<info>Oro requirements check:</info>');
+        $commandExecutor->runCommand(
+            'oro:check-requirements',
+            ['--ignore-errors' => true, '--verbose' => 2]
+        );
 
-        if (!class_exists('OroRequirements')) {
-            require_once $this->getContainer()->getParameter('kernel.root_dir')
-                . DIRECTORY_SEPARATOR
-                . 'OroRequirements.php';
-        }
-
-        $collection = new \OroRequirements($input->getOption('env'));
-
-        $this->renderTable($collection->getMandatoryRequirements(), 'Mandatory requirements', $output);
-        $this->renderTable($collection->getPhpIniRequirements(), 'PHP settings', $output);
-        $this->renderTable($collection->getOroRequirements(), 'Oro specific requirements', $output);
-        $this->renderTable($collection->getRecommendations(), 'Optional recommendations', $output);
-
-        if (count($collection->getFailedRequirements())) {
-            throw new \RuntimeException(
-                'Some system requirements are not fulfilled. Please check output messages and fix them.'
-            );
-        }
-
-        $output->writeln('');
-
-        return $this;
+        return $commandExecutor->getLastCommandExitCode();
     }
 
     /**
@@ -548,12 +536,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                     ]
                 )
                 ->runCommand(
-                    'oro:translation:dump',
-                    [
-                        '--process-isolation' => true,
-                    ]
-                )
-                ->runCommand(
                     'oro:requirejs:build',
                     [
                         '--ignore-errors' => true,
@@ -575,6 +557,18 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $cacheClearOptions['--env'] = $input->getOption('env');
         }
         $commandExecutor->runCommand('cache:clear', $cacheClearOptions);
+
+        if (!$skipAssets) {
+            /**
+             * @todo Place this launch of command after the launch of 'assetic-dump' in BAP-16333
+             */
+            $commandExecutor->runCommand(
+                'oro:translation:dump',
+                [
+                    '--process-isolation' => true,
+                ]
+            );
+        }
 
         $output->writeln('');
 
@@ -619,39 +613,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 $scriptExecutor->runScript($scriptFile);
             }
         }
-    }
-
-    /**
-     * Render requirements table
-     *
-     * @param array           $collection
-     * @param string          $header
-     * @param OutputInterface $output
-     */
-    protected function renderTable(array $collection, $header, OutputInterface $output)
-    {
-        /** @var TableHelper $table */
-        $table = $this->getHelperSet()->get('table');
-
-        $table
-            ->setHeaders(['Check  ', $header])
-            ->setRows([]);
-
-        /** @var \Requirement $requirement */
-        foreach ($collection as $requirement) {
-            if ($requirement->isFulfilled()) {
-                $table->addRow(['OK', $requirement->getTestMessage()]);
-            } else {
-                $table->addRow(
-                    [
-                        $requirement->isOptional() ? 'WARNING' : 'ERROR',
-                        $requirement->getHelpText()
-                    ]
-                );
-            }
-        }
-
-        $table->render($output);
     }
 
     /**

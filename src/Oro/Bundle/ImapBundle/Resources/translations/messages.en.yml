@@ -5,10 +5,10 @@ oro.imap:
         fields:
             enable_google_imap:
                 label: Enable
-                tooltip: 'Please make sure that Gmail API is enabled in <a href="https://console.developers.google.com/apis/api/gmail/overview/" target="_blank">Google Developers Console</a>.'
-                error.label: Error during Authorizing
+                tooltip: 'Please make sure that Gmail API is enabled in the <a href="https://console.developers.google.com/apis/api/gmail/overview/" target="_blank">Google Developers Console</a>.'
+                error.label: Error during Authorization
                 success.label: Authorization was successfull
-                warning.label: If you disable this option, all users' mailboxes, configured with Gmail OAuth 2.0, will be unavailable for synchronization.
+                warning.label: If you disable this option, all users' mailboxes configured with Gmail OAuth 2.0, will become unavailable for synchronization.
 
     configuration:
         account_type:
@@ -24,15 +24,23 @@ oro.imap:
         smtp_encryption.label: Encryption
         use_imap:
             label: Enable IMAP
-            tooltip: Enable imap sync with your mailbox to receive emails on OroCRM. If you don't know your imap credentials, contact your administrator.
+            tooltip: Enable IMAP sync with your mailbox to receive emails in OroCRM. If you do not know your IMAP credentials, please, contact your administrator.
         use_smtp:
             label: Enable SMTP
-            tooltip: Enable smtp sync to synchronize emails sent from OroCRM to your mailbox so you can see them in other email clients.
+            tooltip: Enable SMTP sync to synchronize emails sent from OroCRM with your mailbox on the server, so you can see them in other email clients.
         user.label: User
         password.label: Password
         connect: Connect
         connect_and_retrieve_folders: Check connection/Retrieve folders
-        tooltip: If the value is changed, new mailbox will be registered. All data from this mailbox will be lost
+        tooltip: If the value has changed, a new mailbox will be registered and all data from the currently configured mailbox will be lost.
         reset_email.label: Connected Account
         disconnect.label: Disconnect
 
+    sync:
+        flash_message:
+            user_box_failed: Synchronization with your mailbox (username "%username%" hosted at "%host%") has failed. Please, check the connection credentials on the email configuraton page.
+            system_box_failed: Synchronization of the system mailbox (username "%username%" hosted at "%host%") has failed. Please, check the connection credentials on the email configuraton page.
+        acl:
+            credential_system_notifications:
+                label: Receive notification messages for the system mailboxes that were configured incorrectly
+                description: If the sync of the system mailbox was not successful due to the incorrect credentials, the user receives a message about this via the system mailbox.

@@ -26,9 +26,9 @@ define(function(require) {
 
         render: function() {
             this.element.html(this.options.template({
-                    title: this.options.title,
-                    items: this.options.items
-                }));
+                title: this.options.title,
+                items: this.options.items
+            }));
         }
     });
 });

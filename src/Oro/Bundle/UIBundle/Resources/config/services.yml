@@ -135,6 +135,13 @@ services:
             - '@oro_form.provider.html_tag_provider'
             - %kernel.cache_dir%
 
+    oro_ui.flash_message_helper:
+        class: 'Oro\Bundle\UIBundle\Tools\FlashMessageHelper'
+        arguments:
+            - '@session'
+            - '@translator'
+            - '@oro_ui.html_tag_helper'
+
     oro_ui.user_agent_provider:
         class: %oro_ui.user_agent_provider.class%
         arguments:

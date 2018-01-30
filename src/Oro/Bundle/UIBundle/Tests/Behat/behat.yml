@@ -1,13 +1,49 @@
 oro_behat_extension:
+  suites:
+    OroUIBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroUIBundle::DragAndDropContext
+        - OroFormBundle::FormContext
+        - OroDataGridBundle::GridContext
+      paths:
+        - '@OroUIBundle/Tests/Behat/Features'
+
   elements:
+    Sidebar:
+      selector: '.content-with-sidebar--sidebar'
+
+    Closed Sidebar:
+      selector: '.content-sidebar-minimized'
+
+    Sidebar Drag Handler:
+      selector: '.ui-resizable-handle.ui-resizable-e.resizable-area'
+
+    Not Resizable Sidebar:
+     selector: '.content-with-sidebar--sidebar.ui-resizable-disabled'
+
+    Close Sidebar Trigger:
+      selector: 'div[data-role="sidebar-minimize"]'
+
+    Open Sidebar Trigger:
+      selector: 'div[data-role="sidebar-maximize"]'
+
     Page:
       selector:
         type: xpath
         locator: '//html'
+
     Entity Status:
       selector: '.badge'
       class: Oro\Bundle\UIBundle\Tests\Behat\Element\EntityStatus
 
+    Breadcrumb Container:
+      selector: 'div.navigation'
+      class: Oro\Bundle\UIBundle\Tests\Behat\Element\BreadcrumbContainerElement
+
+    Breadcrumb:
+      selector: 'a'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Entity Edit Button:
       selector: 'a.edit-button'

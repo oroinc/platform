@@ -318,8 +318,8 @@ This section describes fields by which the result data can be filtered. It conta
     * **description** (*string*) - A human-readable description of the filter or a link to the [documentation resource](./documentation.md). Used in auto-generated documentation only.
     * **property_path** *string*) - The property path to the field value. See the description of the property in the **fields** configuration section.
     * **data_type** (*string*) - The data type of the filter value. Can be `boolean`, `integer`, `string`, etc.
-    * **allow_array** (*boolean*) - Indicates whether the filter can contains several values. By default, `false`.
-    * **allow_range** (*boolean*) - Indicates whether the filter can contains a pair of "from" and "to" values. By default, `false`.
+    * **allow_array** (*boolean*) - Indicates whether the filter can contains several values. By default, `false` for `string`, `boolean`, `datetime`, `date`, `time` fields. and `true` for other fields.
+    * **allow_range** (*boolean*) - Indicates whether the filter can contains a pair of "from" and "to" values. By default, `false` for `string`, `boolean`, `guid`, `currency` fields. and `true` for other fields.
     * **type** (*string*) - The filter type. By default, the filter type is equal to the **data_type** property value.
     * **options** (*array*) - The filter options.
     * **operators** (*array*) - A list of operators supported by the filter. By default, the list of operators depends on the filter type. For example a string filter supports **=** and **!=** operators, a number filter supports **=**, **!=**, **<**, **<=**, **>**, and **>=** operators, etc. Use this parameter when you need to limit a list of supported operators.

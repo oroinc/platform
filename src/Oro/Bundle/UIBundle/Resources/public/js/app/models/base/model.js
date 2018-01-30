@@ -5,7 +5,11 @@ define([
 
     var BaseModel;
 
-    BaseModel = Chaplin.Model.extend({
+    /**
+     * @class BaseModel
+     * @extends Chaplin.Model
+     */
+    BaseModel = Chaplin.Model.extend(/** @lends BaseModel.prototype */{
 
     });
 

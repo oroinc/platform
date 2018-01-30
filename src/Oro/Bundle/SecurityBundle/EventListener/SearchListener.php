@@ -115,14 +115,7 @@ class SearchListener
     {
         $organizationId = self::EMPTY_ORGANIZATION_ID;
 
-        $organizationField = null;
-        if ($metadata->getOrganizationFieldName()) {
-            $organizationField = $metadata->getOrganizationFieldName();
-        }
-
-        if ($metadata->isOrganizationOwned()) {
-            $organizationField = $metadata->getOwnerFieldName();
-        }
+        $organizationField = $this->getOrganizationField($metadata);
 
         if ($organizationField) {
             /** @var Organization $organization */
@@ -155,5 +148,25 @@ class SearchListener
         }
 
         return $this->propertyAccessor;
+    }
+
+    /**
+     * @param OwnershipMetadataInterface $metadata
+     *
+     * @return null|string
+     */
+    protected function getOrganizationField(OwnershipMetadataInterface $metadata)
+    {
+        $organizationField = null;
+
+        if ($metadata->getOrganizationFieldName()) {
+            $organizationField = $metadata->getOrganizationFieldName();
+        }
+
+        if ($metadata->isOrganizationOwned()) {
+            $organizationField = $metadata->getOwnerFieldName();
+        }
+
+        return $organizationField;
     }
 }

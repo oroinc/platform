@@ -12,14 +12,12 @@
 }
 .container-fluid.page-title {
   margin-bottom: 10px;
+  .safe-area-padding(0);
 }
 .navbar-extra {
   & > .row > [class^=span] {
     margin: 0;
     width: auto;
-  }
-  .customer-info, .customer-simple {
-    padding: 0;
   }
   .user-info-state {
     display: none;
@@ -115,8 +113,8 @@
     font-size: @fontSizeLarge;
     line-height: @fontSizeLarge * 2;
     height: 34px;
-    padding-left: 14px;
-    padding-right: 14px;
+    padding-left: 10px;
+    padding-right: 10px;
     .caret {
       border-top-color: #666;
       margin-top: 16px;

@@ -149,6 +149,7 @@ class OrmPagerExtensionTest extends \PHPUnit_Framework_TestCase
 
         $dataSource
             ->method('getQueryBuilder')->withAnyParameters()->willReturn($queryBuilder);
+        $dataSource->method('getCountQueryHints')->willReturn([]);
 
         $this->extension->setParameters(new ParameterBag());
         $this->extension->visitDatasource($configObject, $dataSource);
@@ -181,12 +182,36 @@ class OrmPagerExtensionTest extends \PHPUnit_Framework_TestCase
 
         $dataSource
             ->method('getQueryBuilder')->withAnyParameters()->willReturn($queryBuilder);
-
+        $dataSource->method('getCountQueryHints')->willReturn([]);
         $configObject = DatagridConfiguration::create([]);
         $parameters = [];
         if (null !== $count) {
             $parameters[PagerInterface::PAGER_ROOT_PARAM] = [PagerInterface::ADJUSTED_COUNT => $count];
         }
+        $this->extension->setParameters(new ParameterBag($parameters));
+        $this->extension->visitDatasource($configObject, $dataSource);
+    }
+
+    public function testHintCount()
+    {
+        $hints = ['HINT'];
+        $this->pager->expects($this->once())
+            ->method('setCountQueryHints')
+            ->with($hints);
+
+        /** @var DatasourceInterface|\PHPUnit_Framework_MockObject_MockObject $dataSource */
+        $dataSource = $this->getMockBuilder(OrmDatasource::class)
+            ->disableOriginalConstructor()->getMock();
+
+        $queryBuilder = $this->getMockBuilder(QueryBuilder::class)
+            ->disableOriginalConstructor()->getMock();
+
+        $dataSource
+            ->method('getQueryBuilder')->withAnyParameters()->willReturn($queryBuilder);
+        $dataSource->method('getCountQueryHints')->willReturn($hints);
+        $configObject = DatagridConfiguration::create([]);
+        $parameters = [];
+
         $this->extension->setParameters(new ParameterBag($parameters));
         $this->extension->visitDatasource($configObject, $dataSource);
     }

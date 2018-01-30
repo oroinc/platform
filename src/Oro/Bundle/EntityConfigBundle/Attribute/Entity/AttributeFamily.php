@@ -357,7 +357,7 @@ class AttributeFamily extends ExtendAttributeFamily implements
      */
     public function __toString()
     {
-        return $this->getDefaultLabel()->getString();
+        return (string)$this->getDefaultLabel()->getString();
     }
 
     /**

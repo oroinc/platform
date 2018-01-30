@@ -31,11 +31,6 @@ class SegmentController extends Controller
                     [],
                     ['_format' => 'json']
                 )->getContent()),
-                'entitySelector' => sprintf('[data-ftid=%s]', $params['entity_choice_id']),
-                'fieldsLoaderSelector' =>  sprintf(
-                    '[data-ftid=%soro_api_querydesigner_fields_entity]',
-                    $params['entity_choice_id']
-                ),
                 'fieldChoice' => [
                     'select2' => [
                         'placeholder' => $this->getTranslator()->trans(

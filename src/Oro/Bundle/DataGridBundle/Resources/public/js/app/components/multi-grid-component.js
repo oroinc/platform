@@ -33,10 +33,20 @@ define(function(require) {
         },
 
         initView: function() {
+            var params = this.options.params || {};
+            var routeParams = {};
+
+            widgetManager.getWidgetInstanceByAlias(this.options.dialogWidgetName, function(widget) {
+                routeParams = widget.options.routeParams || {};
+            });
+            if (!_.isEmpty(routeParams)) {
+                params = _.extend({}, params, {routeParams: routeParams});
+            }
+
             this.contextView = new MultiGridView({
                 items: this.options.items || [],
                 el: this.options._sourceElement,
-                params: this.options.params || [],
+                params: params,
                 dialogWidgetName: this.options.dialogWidgetName,
                 gridWidgetName: this.options.gridWidgetName
             });
@@ -71,7 +81,7 @@ define(function(require) {
 
             mediator.trigger(
                 dialogWidgetName + ':select',
-                JSON.stringify({'entityClass': targetClass,  'entityId': id})
+                JSON.stringify({entityClass: targetClass, entityId: id})
             );
 
             widgetManager.getWidgetInstanceByAlias(dialogWidgetName, function(dialogWidget) {

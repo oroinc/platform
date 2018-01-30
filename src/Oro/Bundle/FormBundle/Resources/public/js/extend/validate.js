@@ -113,7 +113,7 @@ define(function(require) {
         var validation = $el.data('validation');
 
         if (!$el.is(':input')) {
-            //remove NotNull/NotBlank from not :input
+            // remove NotNull/NotBlank from not :input
             delete validation.NotNull;
             delete validation.NotBlank;
         }
@@ -122,10 +122,14 @@ define(function(require) {
     }
 
     // turn off adding rules from attributes
-    $.validator.attributeRules = function() { return {}; };
+    $.validator.attributeRules = function() {
+        return {};
+    };
 
     // turn off adding rules from class
-    $.validator.classRules = function() { return {}; };
+    $.validator.classRules = function() {
+        return {};
+    };
 
     // substitute data rules reader
     $.validator.dataRules = function(element) {
@@ -163,7 +167,9 @@ define(function(require) {
             // remove temporary elements names in case valid form, before form submit
             $(this.currentForm)
                 .find('[name^="temp-validation-name-"]')
-                .each(function() {$(this).removeAttr('name');});
+                .each(function() {
+                    $(this).removeAttr('name');
+                });
         }
         return isValid;
     });
@@ -368,8 +374,8 @@ define(function(require) {
      * @param {string|Array.<string>} module name of AMD module or list of modules
      */
     $.validator.loadMethod = function(module) {
-        tools.loadModules($.makeArray(module), function(validators) {
-            _.each(validators, function(args) {
+        tools.loadModules($.makeArray(module), function() {
+            _.each(arguments, function(args) {
                 $.validator.addMethod.apply($.validator, args);
             });
         });
@@ -394,7 +400,6 @@ define(function(require) {
             }
         },
         highlight: function(element) {
-            this.settings.unhighlight.call(this, element);
             var $el = getErrorTarget(element);
             $el.addClass('error')
                 .closest('.controls').addClass('validation-error');
@@ -404,8 +409,7 @@ define(function(require) {
             var $el = $(element);
             $el.removeClass('error')
                 .closest('.controls')
-                .removeClass('validation-error')
-                .find('.error').removeClass('error');
+                .removeClass('validation-error');
             $el.closest('.control-group').find('.control-label').removeClass('validation-error');
         },
         // ignore all invisible elements except input type=hidden
@@ -492,7 +496,6 @@ define(function(require) {
                                 isInvalidFound = true;
                             }
                         }
-
                     });
 
                     return isValidFound && isInvalidFound;
@@ -557,7 +560,7 @@ define(function(require) {
      * @returns {Object} filtered validation rules
      */
     $.validator.filterUnsupportedValidators = function(validationRules) {
-        var validationRulesCopy = $.extend(true,  {}, validationRules);
+        var validationRulesCopy = $.extend(true, {}, validationRules);
         for (var ruleName in validationRulesCopy) {
             if (validationRulesCopy.hasOwnProperty(ruleName)) {
                 if (!_.isFunction($.validator.methods[ruleName])) {

@@ -17,7 +17,6 @@
                 startStep: entity.startStep.name | default(null),
                 stepsDisplayOrdered: entity.stepsDisplayOrdered,
             },
-            system_entities: system_entities,
             chartOptions: {
                 Endpoint: ['Blank', {}]
             },
@@ -198,7 +197,7 @@
     <div class="widget-content">
         <div class="row-fluid form-horizontal">
             <div class="responsive-block">
-                {{ UI.renderHtmlProperty('oro.workflow.workflowdefinition.label.label'|trans, entity.label ~ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.label) ) }}
+                {{ UI.renderHtmlProperty('oro.workflow.workflowdefinition.label.label'|trans, entity.label|e ~ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.label) ) }}
 
                 {{ UI.renderProperty(
                     'oro.workflow.workflowdefinition.related_entity.label'|trans,

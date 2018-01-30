@@ -91,7 +91,7 @@ class CommandRunnerMessageProcessorTest extends \PHPUnit_Framework_TestCase
     public function testShouldSendDelayedJobMessage()
     {
         $testCommandName = 'oro:cron:test';
-        $testArguments = ['--a1' => 'v1', 'a2'];
+        $testArguments = ['a1' => ['v1', 'v2'], 'a2', 'a3' => 'vv1'];
         $messageId = 'x.123';
         $message = new NullMessage();
         $body    = [
@@ -109,7 +109,7 @@ class CommandRunnerMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects(self::once())
             ->method('send')
             ->with(Topics::RUN_COMMAND_DELAYED, array_merge($body, ['jobId' => $jobId]));
-        $jobName = sprintf('oro:cron:run_command:%s-%s', $testCommandName, implode('-', $testArguments));
+        $jobName = sprintf('oro:cron:run_command:%s-%s', $testCommandName, 'a1=v1,v2-0=a2-a3=vv1');
         $jobRunner = $this->createJobRunnerMock();
         $jobRunner
             ->expects(self::once())

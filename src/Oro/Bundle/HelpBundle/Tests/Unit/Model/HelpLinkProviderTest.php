@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\HelpBundle\Unit\Model;
 
+use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\HelpBundle\Annotation\Help;
 use Oro\Bundle\HelpBundle\Model\HelpLinkProvider;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,6 +66,30 @@ class HelpLinkProviderTest extends \PHPUnit_Framework_TestCase
         );
         $this->provider->setRequest($request);
 
+        $this->assertEquals($expectedLink, $this->provider->getHelpLinkUrl());
+    }
+
+    public function testGetHelpLinkWithoutRoute()
+    {
+        $expectedLink = 'http://example.com/';
+
+        $cache = $this->getMockBuilder(CacheProvider::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['save', 'contains', 'fetch'])
+            ->getMockForAbstractClass();
+
+        $cache->expects($this->never())
+            ->method('contains');
+        $cache->expects($this->never())
+            ->method('fetch');
+        $cache->expects($this->never())
+            ->method('save');
+
+        $this->provider->setConfiguration([
+            'defaults' => [
+                'link' => 'http://example.com/',
+            ]
+        ]);
         $this->assertEquals($expectedLink, $this->provider->getHelpLinkUrl());
     }
     

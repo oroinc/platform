@@ -30,53 +30,61 @@ define(function(require) {
             template: null,
             workflow: null,
             step_from: null,
-            entity_select_el: null,
             button_example_template: '<button type="button" class="btn <%- button_color %>" ' +
                 'title="<%- button_title %>">' +
                 '<% if (transition_prototype_icon) { %><i class="<%- transition_prototype_icon %>"/> <% } %>' +
                 '<%- button_label %></button>',
             allowed_button_styles: [
                 {
-                    'label': __('Gray button'),
-                    'name': ''
+                    label: __('Gray button'),
+                    name: ''
                 },
                 {
-                    'label': __('Navy blue button'),
-                    'name': 'btn-primary'
+                    label: __('Navy blue button'),
+                    name: 'btn-primary'
                 },
                 {
-                    'label': __('Blue button'),
-                    'name': 'btn-info'
+                    label: __('Blue button'),
+                    name: 'btn-info'
                 },
                 {
-                    'label': __('Green button'),
-                    'name': 'btn-success'
+                    label: __('Green button'),
+                    name: 'btn-success'
                 },
                 {
-                    'label': __('Yellow button'),
-                    'name': 'btn-warning'
+                    label: __('Yellow button'),
+                    name: 'btn-warning'
                 },
                 {
-                    'label': __('Red button'),
-                    'name': 'btn-danger'
+                    label: __('Red button'),
+                    name: 'btn-danger'
                 },
                 {
-                    'label': __('Black button'),
-                    'name': 'btn-inverse'
+                    label: __('Black button'),
+                    name: 'btn-inverse'
                 },
                 {
-                    'label': __('Link'),
-                    'name': 'btn-link'
+                    label: __('Link'),
+                    name: 'btn-link'
                 }
             ]
         },
+
+        requiredOptions: ['workflow', 'entityFieldsProvider'],
 
         listen: {
             'destroy model': 'remove'
         },
 
         initialize: function(options) {
-            this.options = _.defaults(options || {}, this.options);
+            options = options || {};
+            var requiredMissed = this.requiredOptions.filter(function(option) {
+                return _.isUndefined(options[option]);
+            });
+            if (requiredMissed.length) {
+                throw new TypeError('Missing required option(s): ' + requiredMissed.join(', '));
+            }
+            this.options = _.defaults(options, this.options);
 
             var template = this.options.template || $('#transition-form-template').html();
             this.template = _.template(template);
@@ -86,7 +94,7 @@ define(function(require) {
 
         initDestinationPageView: function(form) {
             var availableDestinations = this.options.workflow.getAvailableDestinations();
-            var entityRoutes = _.keys(this.options.workflow.getEntityRoutes());
+            var entityRoutes = _.keys(this.options.entityFieldsProvider.getEntityRoutes());
             entityRoutes.push('');
 
             var enabledRedirects = _.intersection(availableDestinations, entityRoutes);
@@ -119,24 +127,45 @@ define(function(require) {
 
         onTransitionAdd: function() {
             var formData = helper.getFormData(this.widget.form);
+            var modelUpdateData = _.pick(formData,
+                'label', 'button_label', 'button_title', 'step_to', 'display_type', 'destination_page', 'message');
             if (!this.model.get('name')) {
-                this.model.set('name', helper.getNameByString(formData.label, 'transition_'));
+                modelUpdateData.name = helper.getNameByString(formData.label, 'transition_');
             }
-            this.model.set('label', formData.label);
-            this.model.set('button_label', formData.button_label);
-            this.model.set('button_title', formData.button_title);
-            this.model.set('step_to', formData.step_to);
-            this.model.set('display_type', formData.display_type);
-            this.model.set('destination_page', formData.destination_page);
-            this.model.set('message', formData.message);
-
             var frontendOptions = this.model.get('frontend_options');
-            frontendOptions = _.extend({}, frontendOptions, {
+            modelUpdateData.frontend_options = _.extend({}, frontendOptions, {
                 'icon': formData.transition_prototype_icon,
                 'class': formData.button_color
             });
-            this.model.set('frontend_options', frontendOptions);
-            this.model.set('_is_clone', false);
+            modelUpdateData._is_clone = false;
+            var attributeFields = {};
+            _.each(this.subview('attributes-list-view').getCollection(), function(item) {
+                this.options.workflow.ensureAttributeByPropertyPath(item.property_path);
+                var attribute = this.options.workflow.getAttributeByPropertyPath(item.property_path);
+                var attributeName = attribute.get('name');
+                var formOptionsData = _.pick(item, 'options');
+                if (item.required) {
+                    formOptionsData.options = _.extend({}, formOptionsData.options, {required: true});
+                } else if (formOptionsData.options) {
+                    delete formOptionsData.options.required;
+                    delete formOptionsData.options.constraints;
+                }
+
+                if (item.label && item.isLabelUpdated) {
+                    formOptionsData.label = item.label;
+                    if (formOptionsData.options) {
+                        delete formOptionsData.options.label;
+                    }
+                }
+
+                attributeFields[attributeName] = formOptionsData;
+            }, this);
+
+            modelUpdateData.form_options = {
+                attribute_fields: attributeFields
+            };
+
+            this.model.set(modelUpdateData);
 
             var stepFrom = formData.step_from ? formData.step_from : this.options.step_from;
             this.trigger('transitionAdd', this.model, stepFrom);
@@ -153,71 +182,66 @@ define(function(require) {
         },
 
         renderAddAttributeForm: function(el) {
-            this.attributesFormView = new AttributeFormOptionEditView({
-                'el': el.find('.transition-attributes-form-container'),
-                'workflow': this.options.workflow,
-                'entity_select_el': this.options.entity_select_el
+            var attributesFormView = new AttributeFormOptionEditView({
+                autoRender: true,
+                el: el.find('.transition-attributes-form-container'),
+                workflow: this.options.workflow,
+                entityFieldsProvider: this.options.entityFieldsProvider,
+                entity: this.options.entity,
+                filterPreset: 'workflow'
             });
 
-            this.attributesFormView.on('formOptionAdd', this.addFormOption, this);
-            this.attributesFormView.render();
+            this.listenTo(attributesFormView, 'formOptionAdd', this.addFormOption);
+            this.subview('attributes-form-view', attributesFormView);
+            return attributesFormView;
         },
 
         addFormOption: function(data) {
-            var attribute = this.options.workflow.getOrAddAttributeByPropertyPath(data.property_path);
-            var attributeName = attribute.get('name');
-            var formOptions = this.model.get('form_options');
-
-            formOptions.attribute_fields = formOptions.attribute_fields || {};
-
-            var formOptionsData = formOptions.attribute_fields.hasOwnProperty(attributeName) ?
-                formOptions.attribute_fields[attributeName]
-                : {};
-            if (!formOptionsData && (data.required || data.label)) {
-                formOptionsData = {};
-            }
-
-            if (data.required) {
-                formOptionsData = _.extend({}, {options: {required: true}});
+            var attributeName;
+            var attribute = this.options.workflow.getAttributeByPropertyPath(data.property_path);
+            if (attribute) {
+                attributeName = attribute.get('name');
+            } else {
+                attributeName = this.options.workflow.generateAttributeName(data.property_path);
             }
             if (data.label) {
-                formOptionsData.label = data.label;
+                data.isLabelUpdated = true;
             }
-
-            formOptions.attribute_fields[attributeName] = formOptionsData;
-
             data.attribute_name = attributeName;
             data.is_entity_attribute = true;
 
-            this.attributesList.addItem(data);
+            this.subview('attributes-list-view').addItem(data);
         },
 
         renderAttributesList: function(el) {
-            this.attributesList = new AttributeFormOptionListView({
+            var attributesList = new AttributeFormOptionListView({
+                autoRender: true,
                 el: el.find('.transition-attributes-list-container'),
                 items: this.getFormOptions(),
-                fields_selector_el: this.attributesFormView.getFieldSelector(),
-                workflow: this.options.workflow
+                fieldsChoiceView: this.subview('attributes-form-view').getFieldChoiceView(),
+                workflow: this.options.workflow,
+                entityFieldsProvider: this.options.entityFieldsProvider
             });
 
-            this.listenTo(this.attributesList, 'removeFormOption', this.removeFormOption);
-            this.listenTo(this.attributesList, 'editFormOption', this.editFormOption);
+            this.listenTo(attributesList, 'editFormOption', this.editFormOption);
+            this.subview('attributes-list-view', attributesList);
         },
 
         editFormOption: function(data) {
-            this.attributesFormView.editRow(data);
-        },
-
-        removeFormOption: function(data) {
-            delete this.model.get('form_options').attribute_fields[data.attribute_name];
+            this.subview('attributes-form-view').editRow(data);
         },
 
         getFormOptions: function() {
-            var result = [];
+            var results = [];
+            var entityPropertyPathPrefix = this.options.workflow.get('entity_attribute') + '.';
             _.each(this.model.get('form_options').attribute_fields, function(formOption, attributeName) {
                 formOption = formOption || {};
                 var attribute = this.options.workflow.getAttributeByName(attributeName);
-                var propertyPath = attribute.get('property_path') || attributeName;
+                var propertyPath = attribute.get('property_path');
+                var isEntityAttribute = Boolean(propertyPath);
+                if (isEntityAttribute && propertyPath.indexOf(entityPropertyPathPrefix) === 0) {
+                    propertyPath = propertyPath.substr(entityPropertyPathPrefix.length);
+                }
                 var options = formOption.hasOwnProperty('options') ? formOption.options : {};
                 var isRequired = options.hasOwnProperty('required') ? options.required : false;
 
@@ -225,18 +249,23 @@ define(function(require) {
                 if (!label && options.hasOwnProperty('label')) {
                     label = options.label;
                 }
-
-                result.push({
-                    'is_entity_attribute': attribute.get('property_path'),
-                    'attribute_name': attributeName,
-                    'property_path': propertyPath,
-                    'required': isRequired,
-                    'label': label,
-                    'translateLinks': attribute.attributes.translateLinks[this.model.get('name')]
-                });
+                var result = {
+                    itemId: _.uniqueId(),
+                    is_entity_attribute: isEntityAttribute,
+                    attribute_name: attributeName,
+                    property_path: propertyPath || attributeName,
+                    required: isRequired,
+                    label: label,
+                    isLabelUpdated: false,
+                    translateLinks: attribute.attributes.translateLinks[this.model.get('name')]
+                };
+                if ('options' in formOption) {
+                    result.options = _.clone(formOption.options);
+                }
+                results.push(result);
             }, this);
 
-            return result;
+            return results;
         },
 
         onCancel: function() {
@@ -248,31 +277,26 @@ define(function(require) {
         },
 
         remove: function() {
-            if (this.attributesFormView) {
-                this.attributesFormView.remove();
-            }
-            if (this.attributesList) {
-                this.attributesList.remove();
-            }
+            this.removeSubview('attributes-form-view');
+            this.removeSubview('attributes-list-view');
             TransitionEditView.__super__.remove.call(this);
         },
 
         renderWidget: function() {
-            var widget = this;
             if (!this.widget) {
                 var title = this.model.get('name') ? __('Edit transition') : __('Add new transition');
                 if (this.model.get('_is_clone')) {
                     title = __('Clone transition');
                 }
-                this.widget = widget = new DialogWidget({
-                    'title': title,
-                    'el': this.$el,
-                    'stateEnabled': false,
-                    'incrementalPosition': false,
-                    'dialogOptions': {
-                        'close': _.bind(this.onCancel, this),
-                        'width': 800,
-                        'modal': true
+                this.widget = new DialogWidget({
+                    title: title,
+                    el: this.$el,
+                    stateEnabled: false,
+                    incrementalPosition: false,
+                    dialogOptions: {
+                        close: _.bind(this.onCancel, this),
+                        width: 800,
+                        modal: true
                     }
                 });
                 this.widget.render();
@@ -283,9 +307,9 @@ define(function(require) {
             // Disable widget submit handler and set our own instead
             this.widget.form.off('submit');
             this.widget.form.validate({
-                'submitHandler': _.bind(this.onTransitionAdd, this),
-                'ignore': '[type="hidden"]',
-                'highlight': function(element) {
+                submitHandler: _.bind(this.onTransitionAdd, this),
+                ignore: '[type="hidden"]',
+                highlight: function(element) {
                     var tabContent = $(element).closest('.tab-pane');
                     if (tabContent.is(':hidden')) {
                         tabContent
@@ -298,6 +322,7 @@ define(function(require) {
         },
 
         render: function() {
+            this._deferredRender();
             var data = this.model.toJSON();
             var steps = this.options.workflow.get('steps').models;
             data.stepFrom = this.options.step_from;
@@ -313,23 +338,19 @@ define(function(require) {
             var form = $(this.template(data));
 
             this.initDestinationPageView(form);
-            this.renderAddAttributeForm(form);
-            if (this.options.workflow.entityFieldsInitialized) {
+            var attributesFormView = this.renderAddAttributeForm(form);
+            $.when(attributesFormView.getDeferredRenderPromise()).then(function() {
                 this.renderAttributesList(form);
-            } else {
-                this.listenTo(this.options.workflow, 'entityFieldsInitialize', _.bind(function() {
-                    this.renderAttributesList(form);
-                }, this));
-            }
+                this.$el.append(form);
 
-            this.$el.append(form);
+                this.renderWidget();
 
-            this.renderWidget();
-
-            this.$exampleContainer = this.$('.transition-example-container');
-            this.$exampleBtnContainer = this.$exampleContainer.find('.transition-btn-example');
-            this.updateExampleView();
-            this.updateDestinationPageView();
+                this.$exampleContainer = this.$('.transition-example-container');
+                this.$exampleBtnContainer = this.$exampleContainer.find('.transition-btn-example');
+                this.updateExampleView();
+                this.updateDestinationPageView();
+                this._resolveDeferredRender();
+            }.bind(this));
 
             return this;
         }

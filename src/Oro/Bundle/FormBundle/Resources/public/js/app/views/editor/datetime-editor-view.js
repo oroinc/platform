@@ -1,4 +1,3 @@
-/** @lends DatetimeEditorView */
 define(function(require) {
     'use strict';
 
@@ -77,16 +76,16 @@ define(function(require) {
     var DateEditorView = require('./date-editor-view');
     var DatetimepickerView = require('oroui/js/app/views/datepicker/datetimepicker-view');
 
-    DatetimeEditorView = DateEditorView.extend(/** @exports DatetimeEditorView.prototype */{
+    DatetimeEditorView = DateEditorView.extend(/** @lends DatetimeEditorView.prototype */{
         className: 'datetime-editor',
         inputType: 'hidden',
         view: DatetimepickerView,
 
         DEFAULT_OPTIONS: {
             dateInputAttrs: {
-                placeholder: __('oro.form.choose_date'),
-                name: 'date',
-                autocomplete: 'off',
+                'placeholder': __('oro.form.choose_date'),
+                'name': 'date',
+                'autocomplete': 'off',
                 'data-validation': JSON.stringify({Date: {}})
             },
             datePickerOptions: {
@@ -97,9 +96,9 @@ define(function(require) {
                 showButtonPanel: true
             },
             timeInputAttrs: {
-                placeholder: __('oro.form.choose_time'),
-                name: 'time',
-                autocomplete: 'off',
+                'placeholder': __('oro.form.choose_time'),
+                'name': 'time',
+                'autocomplete': 'off',
                 'class': 'input-small timepicker-input',
                 'data-validation': JSON.stringify({Time: {}})
             },
