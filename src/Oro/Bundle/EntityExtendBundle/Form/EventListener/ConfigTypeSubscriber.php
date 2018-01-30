@@ -65,7 +65,7 @@ class ConfigTypeSubscriber implements EventSubscriberInterface
             $oldVal = $config->get($form->getName());
             if (call_user_func($this->schemaUpdateRequired, $newVal, $oldVal)) {
                 $extendConfigProvider = $this->configManager->getProvider('extend');
-                $extendConfig         = $extendConfigProvider->getConfig($configId->getClassName());
+                $extendConfig         = $extendConfigProvider->getConfigById($configId);
 
                 if ($configId instanceof EntityConfigId) {
                     $pendingChanges = $extendConfig->get('pending_changes', false, []);
@@ -74,22 +74,21 @@ class ConfigTypeSubscriber implements EventSubscriberInterface
                         $newVal,
                     ];
                     $extendConfig->set('pending_changes', $pendingChanges);
+
+                    if ($extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
+                        $extendConfig->set('state', ExtendScope::STATE_UPDATE);
+                    }
+
+                    $this->configManager->persist($extendConfig);
                 }
 
                 if ($configId instanceof FieldConfigId &&
-                    $configId->getScope() === 'extend' &&
-                    $config->is('owner', ExtendScope::OWNER_CUSTOM) &&
-                    $config->is('state', ExtendScope::STATE_ACTIVE)
+                    $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM) &&
+                    $extendConfig->is('state', ExtendScope::STATE_ACTIVE)
                 ) {
-                    $config->set('state', ExtendScope::STATE_UPDATE);
-                    $this->configManager->persist($config);
-                }
-
-                if ($extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
                     $extendConfig->set('state', ExtendScope::STATE_UPDATE);
+                    $this->configManager->persist($extendConfig);
                 }
-
-                $this->configManager->persist($extendConfig);
             }
         }
     }

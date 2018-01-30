@@ -52,7 +52,7 @@ services:
             - '%oro_message_queue.consumption.interrupt_filepath%'
             - '@oro_message_queue.consumption.cache_state'
         tags:
-            - { name: 'oro_message_queue.consumption.extension' }
+            - { name: 'oro_message_queue.consumption.extension', persistent: true }
 
     oro_message_queue.consumption.consumer_heartbeat_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ConsumerHeartbeatExtension'

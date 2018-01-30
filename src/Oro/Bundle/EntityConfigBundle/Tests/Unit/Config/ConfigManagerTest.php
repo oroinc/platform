@@ -1715,6 +1715,28 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([$expectedConfig], $toBePersistedConfigs);
     }
 
+    public function testCreateFieldConfigByModel()
+    {
+        $scope = 'someScope';
+        $entityClass = 'entityClass';
+        $fieldName = 'someField';
+        $fieldType = 'someType';
+        $data = ['some' => 'data'];
+
+        $entityConfigModel = new EntityConfigModel();
+        $entityConfigModel->setClassName($entityClass);
+
+        $fieldConfigModel = new FieldConfigModel($fieldName, $fieldType);
+        $fieldConfigModel->setEntity($entityConfigModel);
+        $fieldConfigModel->fromArray($scope, $data);
+
+        $fieldConfig = $this->configManager->createFieldConfigByModel($fieldConfigModel, $scope);
+        $expectedFieldConfig = new FieldConfigId($scope, $entityClass, $fieldName, $fieldType);
+
+        $this->assertEquals($expectedFieldConfig, $fieldConfig->getId());
+        $this->assertEquals($data, $fieldConfig->getValues());
+    }
+
     protected function createEntityConfigModel(
         $className,
         $mode = ConfigModel::MODE_DEFAULT

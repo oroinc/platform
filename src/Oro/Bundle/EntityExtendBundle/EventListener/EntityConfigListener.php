@@ -32,7 +32,6 @@ class EntityConfigListener
             if ($entityConfig->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_DELETE])) {
                 $entityConfig->set('state', ExtendScope::STATE_UPDATE);
                 $configManager->persist($entityConfig);
-                $configManager->calculateConfigChangeSet($entityConfig);
             }
         }
     }
