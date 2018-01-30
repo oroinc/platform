@@ -1,5 +1,5 @@
 @ticket-BAP-16397
-Feature: Extend fields import
+Feature: Import extend entity fields
   In order to effectively manage extend fields for entities
   As an Administrator
   I need to be able to import extend fields

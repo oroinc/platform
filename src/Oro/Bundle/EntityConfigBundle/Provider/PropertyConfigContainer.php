@@ -433,11 +433,6 @@ class PropertyConfigContainer
             && $this->config[$type]['items'][$code]['options']['require_schema_update'] === true;
     }
 
-    public function getSchemaUpdateRequiredCallback($code)
-    {
-
-    }
-
     /**
      * Gets a string represents a type of a config
      *
