@@ -3,8 +3,8 @@ define(function() {
 
     /**
      * @param {string} name  The function name
-     * @param {Object} compiler  An object that exists a compile method to compile the function
-     * @param {Object} evaluator  An object that exists an evaluate method to evaluate the function
+     * @param {Function} compiler  A callback to compile the function
+     * @param {Function} evaluator  A callback to evaluate the function
      */
     function ExpressionFunction(name, compiler, evaluator) {
         this.name = name;

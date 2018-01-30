@@ -79,7 +79,7 @@ define(function(require) {
                     property = this.nodes[1].attrs.value;
                     if (typeof context[property] !== 'function') {
                         throw new TypeError('Unable to call method "' + property + '" of object' +
-                            (context.constructor ? '"' + context.constructor.name + '"' : '') + '.');
+                            (context.constructor ? ' "' + context.constructor.name + '"' : '') + '.');
                     }
                     return context[property].apply(context, this.nodes[2].evaluate(functions, values));
 

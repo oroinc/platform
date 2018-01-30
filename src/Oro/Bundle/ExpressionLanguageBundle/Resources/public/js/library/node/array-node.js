@@ -34,7 +34,7 @@ define(function(require) {
          */
         compile: function(compiler) {
             compiler.raw('{');
-            this._compileArguments(compiler);
+            this.compileArguments(compiler);
             compiler.raw('}');
         },
 
@@ -43,7 +43,7 @@ define(function(require) {
          */
         evaluate: function(functions, values) {
             var result = {};
-            var pairs = this._getKeyValuePairs();
+            var pairs = this.getKeyValuePairs();
             pairs.forEach(function(pair) {
                 var key = pair.key.evaluate(functions, values);
                 result[key] = pair.value.evaluate(functions, values);
@@ -55,7 +55,7 @@ define(function(require) {
          * @return {Array.<{key: string, value: *}>}
          * @protected
          */
-        _getKeyValuePairs: function() {
+        getKeyValuePairs: function() {
             var pairs = [];
             this.nodes.forEach(function(node, i) {
                 if (i % 2) {
@@ -72,11 +72,11 @@ define(function(require) {
          * @param {boolean} [withKeys]
          * @protected
          */
-        _compileArguments: function(compiler, withKeys) {
+        compileArguments: function(compiler, withKeys) {
             if (withKeys === void 0) {
                 withKeys = true;
             }
-            var pairs = this._getKeyValuePairs();
+            var pairs = this.getKeyValuePairs();
             pairs.forEach(function(pair, i) {
                 if (i !== 0) {
                     compiler.raw(', ');

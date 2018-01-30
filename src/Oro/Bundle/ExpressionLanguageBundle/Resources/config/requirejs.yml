@@ -21,6 +21,7 @@ config:
         'oroexpressionlanguage/js/library/compiler': 'bundles/oroexpressionlanguage/js/library/compiler.js'
         'oroexpressionlanguage/js/library/expression-function': 'bundles/oroexpressionlanguage/js/library/expression-function.js'
         'oroexpressionlanguage/js/library/expression-function-provider-interface': 'bundles/oroexpressionlanguage/js/library/expression-function-provider-interface.js'
+        'oroexpressionlanguage/js/library/expression-language': 'bundles/oroexpressionlanguage/js/library/expression-language.js'
         'oroexpressionlanguage/js/library/expression-syntax-error': 'bundles/oroexpressionlanguage/js/library/expression-syntax-error.js'
         'oroexpressionlanguage/js/library/expression': 'bundles/oroexpressionlanguage/js/library/expression.js'
         'oroexpressionlanguage/js/library/interface': 'bundles/oroexpressionlanguage/js/library/interface.js'

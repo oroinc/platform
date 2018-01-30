@@ -17,7 +17,7 @@ define(function(require) {
          * @inheritDoc
          */
         compile: function(compiler) {
-            this._compileArguments(compiler, false);
+            this.compileArguments(compiler, false);
         }
     });
 
