@@ -170,7 +170,7 @@ class BusinessUnitManager
             return true;
         } elseif (AccessLevel::LOCAL_LEVEL === $accessLevel) {
             $businessUnits =  $treeProvider->getTree()->getUserBusinessUnitIds(
-                $this->$currentUser->getId(),
+                $currentUser->getId(),
                 $organization
             );
         } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
