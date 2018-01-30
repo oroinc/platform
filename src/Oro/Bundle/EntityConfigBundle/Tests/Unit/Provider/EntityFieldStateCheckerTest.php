@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -67,6 +67,7 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getProviders')
             ->willReturn([$this->configureProvider(self::SCOPE_EXTEND, $extendPropertyConfig)]);
 
+        /** @var ConfigIdInterface $extendConfigId */
         $extendConfigId = $this->createMock(ConfigIdInterface::class);
         $this->configManager
             ->expects($this->once())
@@ -74,19 +75,19 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->with($fieldConfigModel, self::SCOPE_EXTEND)
             ->willReturn($extendConfigId);
 
-        $this->configureChangeSet([]);
-        $extendFieldConfig = $this->createMock(ConfigInterface::class);
+        $newFieldConfig = new Config($extendConfigId, []);
+        $this->configManager
+            ->expects($this->once())
+            ->method('getConfig')
+            ->with($extendConfigId)
+            ->willReturn($newFieldConfig);
+
+        $oldFieldConfig = new Config($extendConfigId, []);
         $this->configManager
             ->expects($this->once())
             ->method('createFieldConfigByModel')
             ->with($fieldConfigModel, self::SCOPE_EXTEND)
-            ->willReturn($extendFieldConfig);
-
-        $this->configManager
-            ->expects($this->once())
-            ->method('getConfigChangeSet')
-            ->with($extendFieldConfig)
-            ->willReturn([]);
+            ->willReturn($oldFieldConfig);
 
         $this->assertFalse($this->entityFieldStateChecker->isSchemaUpdateNeeded($fieldConfigModel));
     }
@@ -109,6 +110,7 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getProviders')
             ->willReturn([$this->configureProvider(self::SCOPE_EXTEND, $extendPropertyConfig)]);
 
+        /** @var ConfigIdInterface $extendConfigId */
         $extendConfigId = $this->createMock(ConfigIdInterface::class);
         $this->configManager
             ->expects($this->once())
@@ -116,18 +118,19 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->with($fieldConfigModel, self::SCOPE_EXTEND)
             ->willReturn($extendConfigId);
 
-        $extendFieldConfig = $this->createMock(ConfigInterface::class);
+        $oldFieldConfig = new Config($extendConfigId, [self::CODE_EXTEND_FIRST => 1]);
+        $this->configManager
+            ->expects($this->once())
+            ->method('getConfig')
+            ->with($extendConfigId)
+            ->willReturn($oldFieldConfig);
+
+        $newFieldConfig = new Config($extendConfigId, [self::CODE_EXTEND_FIRST => 2]);
         $this->configManager
             ->expects($this->once())
             ->method('createFieldConfigByModel')
             ->with($fieldConfigModel, self::SCOPE_EXTEND)
-            ->willReturn($extendFieldConfig);
-
-        $this->configManager
-            ->expects($this->once())
-            ->method('getConfigChangeSet')
-            ->with($extendFieldConfig)
-            ->willReturn([self::CODE_EXTEND_FIRST => [1, 2]]);
+            ->willReturn($newFieldConfig);
 
         $this->assertFalse($this->entityFieldStateChecker->isSchemaUpdateNeeded($fieldConfigModel));
     }
@@ -156,6 +159,7 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getProviders')
             ->willReturn([$this->configureProvider(self::SCOPE_EXTEND, $extendPropertyConfig)]);
 
+        /** @var ConfigIdInterface $extendConfigId */
         $extendConfigId = $this->createMock(ConfigIdInterface::class);
         $this->configManager
             ->expects($this->once())
@@ -163,18 +167,19 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->with($fieldConfigModel, self::SCOPE_EXTEND)
             ->willReturn($extendConfigId);
 
-        $extendFieldConfig = $this->createMock(ConfigInterface::class);
+        $oldFieldConfig = new Config($extendConfigId, [self::CODE_EXTEND_FIRST => 1]);
+        $this->configManager
+            ->expects($this->once())
+            ->method('getConfig')
+            ->with($extendConfigId)
+            ->willReturn($oldFieldConfig);
+
+        $newFieldConfig = new Config($extendConfigId, [self::CODE_EXTEND_FIRST => 2]);
         $this->configManager
             ->expects($this->once())
             ->method('createFieldConfigByModel')
             ->with($fieldConfigModel, self::SCOPE_EXTEND)
-            ->willReturn($extendFieldConfig);
-
-        $this->configManager
-            ->expects($this->once())
-            ->method('getConfigChangeSet')
-            ->with($extendFieldConfig)
-            ->willReturn([self::CODE_EXTEND_FIRST => [1, 2]]);
+            ->willReturn($newFieldConfig);
 
         $this->assertFalse($this->entityFieldStateChecker->isSchemaUpdateNeeded($fieldConfigModel));
     }
@@ -208,6 +213,7 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getProviders')
             ->willReturn([$this->configureProvider(self::SCOPE_EXTEND, $extendPropertyConfig)]);
 
+        /** @var ConfigIdInterface $extendConfigId */
         $extendConfigId = $this->createMock(ConfigIdInterface::class);
         $this->configManager
             ->expects($this->once())
@@ -215,18 +221,19 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->with($fieldConfigModel, self::SCOPE_EXTEND)
             ->willReturn($extendConfigId);
 
-        $extendFieldConfig = $this->createMock(ConfigInterface::class);
+        $oldFieldConfig = new Config($extendConfigId, [self::CODE_EXTEND_FIRST => 1]);
+        $this->configManager
+            ->expects($this->once())
+            ->method('getConfig')
+            ->with($extendConfigId)
+            ->willReturn($oldFieldConfig);
+
+        $newFieldConfig = new Config($extendConfigId, [self::CODE_EXTEND_FIRST => 2]);
         $this->configManager
             ->expects($this->once())
             ->method('createFieldConfigByModel')
             ->with($fieldConfigModel, self::SCOPE_EXTEND)
-            ->willReturn($extendFieldConfig);
-
-        $this->configManager
-            ->expects($this->once())
-            ->method('getConfigChangeSet')
-            ->with($extendFieldConfig)
-            ->willReturn([self::CODE_EXTEND_FIRST => [1, 2]]);
+            ->willReturn($newFieldConfig);
 
         $formConfig = $this->createMock(FormConfigInterface::class);
         $formConfig
@@ -281,6 +288,7 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getProviders')
             ->willReturn([$this->configureProvider(self::SCOPE_EXTEND, $extendPropertyConfig)]);
 
+        /** @var ConfigIdInterface $extendConfigId */
         $extendConfigId = $this->createMock(ConfigIdInterface::class);
         $this->configManager
             ->expects($this->once())
@@ -288,18 +296,19 @@ class EntityFieldStateCheckerTest extends \PHPUnit_Framework_TestCase
             ->with($fieldConfigModel, self::SCOPE_EXTEND)
             ->willReturn($extendConfigId);
 
-        $extendFieldConfig = $this->createMock(ConfigInterface::class);
+        $oldFieldConfig = new Config($extendConfigId, [self::CODE_EXTEND_FIRST => 1]);
+        $this->configManager
+            ->expects($this->once())
+            ->method('getConfig')
+            ->with($extendConfigId)
+            ->willReturn($oldFieldConfig);
+
+        $newFieldConfig = new Config($extendConfigId, [self::CODE_EXTEND_FIRST => 2]);
         $this->configManager
             ->expects($this->once())
             ->method('createFieldConfigByModel')
             ->with($fieldConfigModel, self::SCOPE_EXTEND)
-            ->willReturn($extendFieldConfig);
-
-        $this->configManager
-            ->expects($this->once())
-            ->method('getConfigChangeSet')
-            ->with($extendFieldConfig)
-            ->willReturn([self::CODE_EXTEND_FIRST => [1, 2]]);
+            ->willReturn($newFieldConfig);
 
         $formConfig = $this->createMock(FormConfigInterface::class);
         $formConfig
