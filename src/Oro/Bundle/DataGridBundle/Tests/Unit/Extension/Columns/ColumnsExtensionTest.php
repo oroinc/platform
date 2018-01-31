@@ -42,6 +42,8 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
             $this->aclHelper,
             $this->columnsHelper
         );
+
+        $this->extension->setParameters(new ParameterBag());
     }
 
     /**

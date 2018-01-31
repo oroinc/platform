@@ -29,6 +29,10 @@ class FormatterExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
+        if (!parent::isApplicable($config)) {
+            return false;
+        }
+
         $columns    = $config->offsetGetOr(Configuration::COLUMNS_KEY, []);
         $properties = $config->offsetGetOr(Configuration::PROPERTIES_KEY, []);
         $applicable = $columns || $properties;

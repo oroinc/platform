@@ -43,6 +43,7 @@ class AppearanceExtensionTest extends \PHPUnit_Framework_TestCase
             $configuration,
             $this->translator
         );
+        $this->extension->setParameters(new ParameterBag());
     }
 
     public function testIsApplicable()
