@@ -32,18 +32,15 @@ class EntityFieldWriter implements ItemWriterInterface
      * @param ConfigManager $configManager
      * @param ConfigTranslationHelper $translationHelper
      * @param EnumSynchronizer $enumSynchronizer
-     * @param EntityFieldStateChecker $entityFieldStateChecker
      */
     public function __construct(
         ConfigManager $configManager,
         ConfigTranslationHelper $translationHelper,
-        EnumSynchronizer $enumSynchronizer,
-        EntityFieldStateChecker $entityFieldStateChecker
+        EnumSynchronizer $enumSynchronizer
     ) {
         $this->configManager = $configManager;
         $this->translationHelper = $translationHelper;
         $this->enumSynchronizer = $enumSynchronizer;
-        $this->stateChecker = $entityFieldStateChecker;
     }
 
     /**
@@ -62,6 +59,14 @@ class EntityFieldWriter implements ItemWriterInterface
     }
 
     /**
+     * @param EntityFieldStateChecker $entityFieldStateChecker
+     */
+    public function setEntityFieldStateChecker(EntityFieldStateChecker $entityFieldStateChecker)
+    {
+        $this->stateChecker = $entityFieldStateChecker;
+    }
+
+    /**
      * @param FieldConfigModel $configModel
      * @return array
      */
@@ -76,7 +81,9 @@ class EntityFieldWriter implements ItemWriterInterface
             $state = ExtendScope::STATE_NEW;
         }
 
-        if ($state === ExtendScope::STATE_ACTIVE && $this->stateChecker->isSchemaUpdateNeeded($configModel)) {
+        if ($state === ExtendScope::STATE_ACTIVE
+            && $this->getEntityFieldStateChecker()->isSchemaUpdateNeeded($configModel)
+        ) {
             $state = ExtendScope::STATE_UPDATE;
         }
 
@@ -216,5 +223,17 @@ class EntityFieldWriter implements ItemWriterInterface
         }
 
         $this->configManager->persist($config);
+    }
+
+    /**
+     * @return EntityFieldStateChecker
+     */
+    protected function getEntityFieldStateChecker()
+    {
+        if (!$this->stateChecker) {
+            throw new \LogicException('No state checker set for the class');
+        }
+
+        return $this->stateChecker;
     }
 }
