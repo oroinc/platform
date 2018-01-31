@@ -10,11 +10,11 @@ define(function(require) {
      */
     function ConditionalNode(expr1, expr2, expr3) {
         var nodes = [expr1, expr2, expr3];
-        ConditionalNode.__super__.call(this, nodes);
+        ConditionalNode.__super__.constructor.call(this, nodes);
     }
 
     ConditionalNode.prototype = Object.create(Node.prototype);
-    ConditionalNode.__super__ = Node;
+    ConditionalNode.__super__ = Node.prototype;
 
     Object.assign(ConditionalNode.prototype, {
         constructor: ConditionalNode,

@@ -11,11 +11,11 @@ define(function(require) {
      * @param {Node} right
      */
     function BinaryNode(operator, left, right) {
-        BinaryNode.__super__.call(this, [left, right], {operator: operator});
+        BinaryNode.__super__.constructor.call(this, [left, right], {operator: operator});
     }
 
     BinaryNode.prototype = Object.create(Node.prototype);
-    BinaryNode.__super__ = Node;
+    BinaryNode.__super__ = Node.prototype;
 
     var REGEXP = /^\/([\w\W]+)\/([a-z]+)?$/i;
     // minified code of range method

@@ -4,6 +4,11 @@ config:
         'oroexpressionlanguage/lib/php-to-js/range': 'bundles/oroexpressionlanguage/lib/php-to-js/range.js'
         'oroexpressionlanguage/lib/php-to-js/stripcslashes': 'bundles/oroexpressionlanguage/lib/php-to-js/stripcslashes.js'
 
+        'oroexpressionlanguage/js/extend/node/binary-node': 'bundles/oroexpressionlanguage/js/extend/node/binary-node.js'
+        'oroexpressionlanguage/js/extend/expression-language': 'bundles/oroexpressionlanguage/js/extend/expression-language.js'
+        'oroexpressionlanguage/js/extend/lexer': 'bundles/oroexpressionlanguage/js/extend/lexer.js'
+        'oroexpressionlanguage/js/extend/parser': 'bundles/oroexpressionlanguage/js/extend/parser.js'
+
         'oroexpressionlanguage/js/library/node/arguments-node': 'bundles/oroexpressionlanguage/js/library/node/arguments-node.js'
         'oroexpressionlanguage/js/library/node/array-node': 'bundles/oroexpressionlanguage/js/library/node/array-node.js'
         'oroexpressionlanguage/js/library/node/binary-node': 'bundles/oroexpressionlanguage/js/library/node/binary-node.js'

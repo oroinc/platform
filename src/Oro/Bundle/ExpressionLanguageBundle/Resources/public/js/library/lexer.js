@@ -6,14 +6,16 @@ define(function(require) {
     var ExpressionSyntaxError = require('oroexpressionlanguage/js/library/expression-syntax-error');
     var stripcslashes = require('oroexpressionlanguage/lib/php-to-js/stripcslashes');
 
-    var NUMBER_REGEXP = /^[0-9]+(?:.[0-9]+)?/;
-    var STRING_REGEXP = /^"([^"\\]*(?:\\.[^"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)'/;
-    var NAME_REGEXP = /^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/;
-    var OPERATION_REGEXP = /^(not in(?=[\s(])|!==|not(?=[\s(])|and(?=[\s(])|===|>=|or(?=[\s(])|<=|\*\*|\.\.|in(?=[\s(])|&&|\|\||matches|==|!=|\*|~|%|\/|>|\||!|\^|&|\+|<|-)/; // jscs:disable
-
     function Lexer() {}
 
-    Lexer.prototype = {
+    Object.defineProperties(Lexer.prototype, {
+        NUMBER_REGEXP: {value: /^[0-9]+(?:.[0-9]+)?/},
+        STRING_REGEXP: {value: /^"([^"\\]*(?:\\.[^"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)'/},
+        NAME_REGEXP: {value: /^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/},
+        OPERATION_REGEXP: {value: /^(not in(?=[\s(])|!==|not(?=[\s(])|and(?=[\s(])|===|>=|or(?=[\s(])|<=|\*\*|\.\.|in(?=[\s(])|&&|\|\||matches|==|!=|\*|~|%|\/|>|\||!|\^|&|\+|<|-)/}
+    });
+
+    Object.assign(Lexer.prototype, {
         constructor: Lexer,
 
         /**
@@ -43,9 +45,9 @@ define(function(require) {
 
                 expressionPart = expression.substr(cursor);
 
-                if (NUMBER_REGEXP.test(expressionPart)) {
+                if (this.NUMBER_REGEXP.test(expressionPart)) {
                     // numbers
-                    match = expressionPart.match(NUMBER_REGEXP);
+                    match = expressionPart.match(this.NUMBER_REGEXP);
                     var number = parseFloat(match[0]); // floats
                     if (match[0].match(/^[0-9]+/) && number <= Number.MAX_SAFE_INTEGER) {
                         number = parseInt(match[0], 10); // integers lower than the maximum
@@ -73,24 +75,24 @@ define(function(require) {
 
                     tokens.push(new Token(Token.PUNCTUATION_TYPE, expression[cursor], cursor + 1));
                     ++cursor;
-                } else if (STRING_REGEXP.test(expressionPart)) {
+                } else if (this.STRING_REGEXP.test(expressionPart)) {
                     // strings
-                    match = expressionPart.match(STRING_REGEXP);
+                    match = expressionPart.match(this.STRING_REGEXP);
                     var string = match[0].substring(1, match[0].length - 1); // strip quotes
                     tokens.push(new Token(Token.STRING_TYPE, stripcslashes(string), cursor + 1));
                     cursor += match[0].length;
-                } else if (OPERATION_REGEXP.test(expressionPart)) {
+                } else if (this.OPERATION_REGEXP.test(expressionPart)) {
                     // operators
-                    match = expressionPart.match(OPERATION_REGEXP);
+                    match = expressionPart.match(this.OPERATION_REGEXP);
                     tokens.push(new Token(Token.OPERATOR_TYPE, match[0], cursor + 1));
                     cursor += match[0].length;
                 } else if ('.,?:'.indexOf(expression[cursor]) !== -1) {
                     // punctuation
                     tokens.push(new Token(Token.PUNCTUATION_TYPE, expression[cursor], cursor + 1));
                     ++cursor;
-                } else if (NAME_REGEXP.test(expressionPart)) {
+                } else if (this.NAME_REGEXP.test(expressionPart)) {
                     // names
-                    match = expressionPart.match(NAME_REGEXP);
+                    match = expressionPart.match(this.NAME_REGEXP);
                     tokens.push(new Token(Token.NAME_TYPE, match[0], cursor + 1));
                     cursor += match[0].length;
                 } else {
@@ -110,7 +112,7 @@ define(function(require) {
 
             return new TokenStream(tokens, expression);
         }
-    };
+    });
 
     return Lexer;
 });

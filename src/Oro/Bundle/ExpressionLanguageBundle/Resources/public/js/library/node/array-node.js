@@ -6,11 +6,11 @@ define(function(require) {
 
     function ArrayNode() {
         this.index = -1;
-        ArrayNode.__super__.call(this);
+        ArrayNode.__super__.constructor.call(this);
     }
 
     ArrayNode.prototype = Object.create(Node.prototype);
-    ArrayNode.__super__ = Node;
+    ArrayNode.__super__ = Node.prototype;
 
     Object.assign(ArrayNode.prototype, {
         constructor: ArrayNode,

@@ -9,11 +9,11 @@ define(function(require) {
      * @constructor
      */
     function FunctionNode(name, args) {
-        FunctionNode.__super__.call(this, [args], {name: name});
+        FunctionNode.__super__.constructor.call(this, [args], {name: name});
     }
 
     FunctionNode.prototype = Object.create(Node.prototype);
-    FunctionNode.__super__ = Node;
+    FunctionNode.__super__ = Node.prototype;
 
     Object.assign(FunctionNode.prototype, {
         constructor: FunctionNode,

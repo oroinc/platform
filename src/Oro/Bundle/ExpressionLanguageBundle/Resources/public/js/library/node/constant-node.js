@@ -7,11 +7,11 @@ define(function(require) {
      * @param {*} value a constant value
      */
     function ConstantNode(value) {
-        ConstantNode.__super__.call(this, [], {value: value});
+        ConstantNode.__super__.constructor.call(this, [], {value: value});
     }
 
     ConstantNode.prototype = Object.create(Node.prototype);
-    ConstantNode.__super__ = Node;
+    ConstantNode.__super__ = Node.prototype;
 
     Object.assign(ConstantNode.prototype, {
         constructor: ConstantNode,

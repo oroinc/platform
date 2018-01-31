@@ -8,12 +8,12 @@ define(function(require) {
      * @param {Node} nodes  A Node representing the expression
      */
     function ParsedExpression(expression, nodes) {
-        ParsedExpression.__super__.call(this, expression);
+        ParsedExpression.__super__.constructor.call(this, expression);
         this.nodes = nodes;
     }
 
     ParsedExpression.prototype = Object.create(Expression.prototype);
-    ParsedExpression.__super__ = Expression;
+    ParsedExpression.__super__ = Expression.prototype;
 
     Object.assign(ParsedExpression.prototype, {
         constructor: ParsedExpression,

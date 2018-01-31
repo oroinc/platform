@@ -10,11 +10,12 @@ define(function(require) {
      * @param {number} type
      */
     function GetAttrNode(node, attr, args, type) {
-        GetAttrNode.__super__.call(this, [node, attr, args], {type: type});
+        GetAttrNode.__super__.constructor.call(this, [node, attr, args], {type: type});
     }
 
     GetAttrNode.prototype = Object.create(Node.prototype);
-    GetAttrNode.__super__ = Node;
+    GetAttrNode.__super__ = Node.prototype;
+
     Object.defineProperties(GetAttrNode, {
         PROPERTY_CALL: {value: 1},
         METHOD_CALL: {value: 2},

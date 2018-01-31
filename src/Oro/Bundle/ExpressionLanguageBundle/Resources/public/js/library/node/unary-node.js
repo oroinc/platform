@@ -8,11 +8,11 @@ define(function(require) {
      * @param {Node} node
      */
     function UnaryNode(operator, node) {
-        UnaryNode.__super__.call(this, [node], {operator: operator});
+        UnaryNode.__super__.constructor.call(this, [node], {operator: operator});
     }
 
     UnaryNode.prototype = Object.create(Node.prototype);
-    UnaryNode.__super__ = Node;
+    UnaryNode.__super__ = Node.prototype;
     UnaryNode.OPERATORS = {
         '!': '!',
         'not': '!',

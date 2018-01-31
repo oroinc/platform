@@ -7,11 +7,11 @@ define(function(require) {
      * @param {string} name a name of variable
      */
     function NameNode(name) {
-        NameNode.__super__.call(this, [], {name: name});
+        NameNode.__super__.constructor.call(this, [], {name: name});
     }
 
     NameNode.prototype = Object.create(Node.prototype);
-    NameNode.__super__ = Node;
+    NameNode.__super__ = Node.prototype;
 
     Object.assign(NameNode.prototype, {
         constructor: NameNode,

@@ -14,9 +14,6 @@ define(function(require) {
     var ExpressionSyntaxError = require('oroexpressionlanguage/js/library/expression-syntax-error');
     var Token = require('oroexpressionlanguage/js/library/token');
 
-    var OPERATOR_LEFT = 1;
-    var OPERATOR_RIGHT = 2;
-
     /**
      * @param {Object.<string, ExpressionFunction>} functions an list of declared functions
      */
@@ -24,7 +21,12 @@ define(function(require) {
         this.functions = functions;
     }
 
-    Parser.prototype = {
+    Object.defineProperties(Parser.prototype, {
+        OPERATOR_LEFT: {value: 1},
+        OPERATOR_RIGHT: {value: 2}
+    });
+
+    Object.assign(Parser.prototype, {
         constructor: Parser,
 
         unaryOperators: {
@@ -35,32 +37,32 @@ define(function(require) {
         },
 
         binaryOperators: {
-            'or': {precedence: 10, associativity: OPERATOR_LEFT},
-            '||': {precedence: 10, associativity: OPERATOR_LEFT},
-            'and': {precedence: 15, associativity: OPERATOR_LEFT},
-            '&&': {precedence: 15, associativity: OPERATOR_LEFT},
-            '|': {precedence: 16, associativity: OPERATOR_LEFT},
-            '^': {precedence: 17, associativity: OPERATOR_LEFT},
-            '&': {precedence: 18, associativity: OPERATOR_LEFT},
-            '==': {precedence: 20, associativity: OPERATOR_LEFT},
-            '===': {precedence: 20, associativity: OPERATOR_LEFT},
-            '!=': {precedence: 20, associativity: OPERATOR_LEFT},
-            '!==': {precedence: 20, associativity: OPERATOR_LEFT},
-            '<': {precedence: 20, associativity: OPERATOR_LEFT},
-            '>': {precedence: 20, associativity: OPERATOR_LEFT},
-            '>=': {precedence: 20, associativity: OPERATOR_LEFT},
-            '<=': {precedence: 20, associativity: OPERATOR_LEFT},
-            'not in': {precedence: 20, associativity: OPERATOR_LEFT},
-            'in': {precedence: 20, associativity: OPERATOR_LEFT},
-            'matches': {precedence: 20, associativity: OPERATOR_LEFT},
-            '..': {precedence: 25, associativity: OPERATOR_LEFT},
-            '+': {precedence: 30, associativity: OPERATOR_LEFT},
-            '-': {precedence: 30, associativity: OPERATOR_LEFT},
-            '~': {precedence: 40, associativity: OPERATOR_LEFT},
-            '*': {precedence: 60, associativity: OPERATOR_LEFT},
-            '/': {precedence: 60, associativity: OPERATOR_LEFT},
-            '%': {precedence: 60, associativity: OPERATOR_LEFT},
-            '**': {precedence: 200, associativity: OPERATOR_RIGHT}
+            'or': {precedence: 10, associativity: Parser.prototype.OPERATOR_LEFT},
+            '||': {precedence: 10, associativity: Parser.prototype.OPERATOR_LEFT},
+            'and': {precedence: 15, associativity: Parser.prototype.OPERATOR_LEFT},
+            '&&': {precedence: 15, associativity: Parser.prototype.OPERATOR_LEFT},
+            '|': {precedence: 16, associativity: Parser.prototype.OPERATOR_LEFT},
+            '^': {precedence: 17, associativity: Parser.prototype.OPERATOR_LEFT},
+            '&': {precedence: 18, associativity: Parser.prototype.OPERATOR_LEFT},
+            '==': {precedence: 20, associativity: Parser.prototype.OPERATOR_LEFT},
+            '===': {precedence: 20, associativity: Parser.prototype.OPERATOR_LEFT},
+            '!=': {precedence: 20, associativity: Parser.prototype.OPERATOR_LEFT},
+            '!==': {precedence: 20, associativity: Parser.prototype.OPERATOR_LEFT},
+            '<': {precedence: 20, associativity: Parser.prototype.OPERATOR_LEFT},
+            '>': {precedence: 20, associativity: Parser.prototype.OPERATOR_LEFT},
+            '>=': {precedence: 20, associativity: Parser.prototype.OPERATOR_LEFT},
+            '<=': {precedence: 20, associativity: Parser.prototype.OPERATOR_LEFT},
+            'not in': {precedence: 20, associativity: Parser.prototype.OPERATOR_LEFT},
+            'in': {precedence: 20, associativity: Parser.prototype.OPERATOR_LEFT},
+            'matches': {precedence: 20, associativity: Parser.prototype.OPERATOR_LEFT},
+            '..': {precedence: 25, associativity: Parser.prototype.OPERATOR_LEFT},
+            '+': {precedence: 30, associativity: Parser.prototype.OPERATOR_LEFT},
+            '-': {precedence: 30, associativity: Parser.prototype.OPERATOR_LEFT},
+            '~': {precedence: 40, associativity: Parser.prototype.OPERATOR_LEFT},
+            '*': {precedence: 60, associativity: Parser.prototype.OPERATOR_LEFT},
+            '/': {precedence: 60, associativity: Parser.prototype.OPERATOR_LEFT},
+            '%': {precedence: 60, associativity: Parser.prototype.OPERATOR_LEFT},
+            '**': {precedence: 200, associativity: Parser.prototype.OPERATOR_RIGHT}
         },
 
         /**
@@ -112,7 +114,7 @@ define(function(require) {
             ) {
                 var operator = this.binaryOperators[token.value];
                 this.stream.next();
-                var precedence1 = OPERATOR_LEFT === operator.associativity ?
+                var precedence1 = this.OPERATOR_LEFT === operator.associativity ?
                     operator.precedence + 1 : operator.precedence;
                 var expr1 = this.parseExpression(precedence1);
                 expr = new BinaryNode(token.value, expr, expr1);
@@ -420,7 +422,7 @@ define(function(require) {
 
             return new Node(args);
         }
-    };
+    });
 
     return Parser;
 });
