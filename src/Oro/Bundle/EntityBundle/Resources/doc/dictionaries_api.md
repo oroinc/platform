@@ -1,4 +1,4 @@
-## Automatic creation of REST API for dictionaries ##
+## Automatic creation of REST API for dictionaries
 
 Dictionary entities are responsible for storing a predefined set of values of a certain type and their translations. They values within a dictionary can have a priority or some other data.
 Nevertheless, there is an automatic tool that creates a REST API resource for viewing dictionary values, which is accessible by the following URL:

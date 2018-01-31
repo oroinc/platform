@@ -4,7 +4,7 @@ OroPlatformBundle
 The Oro Platform version holder, maintenance mode support, lazy services functionality and provide easy way to add application configuration settings from any bundle.
 
 
-## Table of Contents ##
+## Table of Contents
  - [Maintenance mode](#maintenance-mode)
  - [Lazy services](#lazy-services)
  - [Add application configuration settings from any bundle](#add-application-configuration-settings-from-any-bundle)
@@ -12,7 +12,7 @@ The Oro Platform version holder, maintenance mode support, lazy services functio
  - [Lazy Doctrine listeners](#lazy-doctrine-listeners)
 
 
-## Maintenance mode ##
+## Maintenance mode
 To use maintenance mode functionality bundle provides `oro_platform.maintenance` service.
 
 ``` php
@@ -54,7 +54,7 @@ In maintenance mode all cron jobs disabled for execution.
 Other documentation could be found [here](https://github.com/lexik/LexikMaintenanceBundle/blob/master/Resources/doc/index.md).
 
 
-## Lazy services ##
+## Lazy services
 
 Lazy service - it's a service that will be used all over the system wrapped inside lazy loading proxy. It allows to
 initialize such services not during injecting, but when it will be requested in the first time. Symfony provide
@@ -84,7 +84,7 @@ lazy_services:
 ```
 
 
-## Add application configuration settings from any bundle ##
+## Add application configuration settings from any bundle
 
 Sometime you need to add some settings to the application configuration from your bundle. For instance a bundle can implement new data type for Doctrine. The more native way to register it is to change _app/config.yml_. But it is the better way to achieve the same result if your bundle is used in ORO Platform. In this case you just need to add _app.yml_ in _Resources/config/oro_ directory of your bundle and the platform will add all setting from this file to the application configuration. The format of _app.yml_ is the same as _app/config.yml_.
 The following example shows how `money` data type can be registered:
@@ -99,7 +99,7 @@ doctrine:
 Please note that setting added through _app.yml_ can be overwrote in _app/config.yml_. So, you can consider settings in _app.yml_ as default ones.
 
 
-## Optional listeners ##
+## Optional listeners
 
 Doctrine and some Kernel listeners can be a very slow processes. And during console command execution, you can disable this listeners.
 
@@ -117,7 +117,7 @@ See the list of optional listeners you can by run command `oro:platform:optional
 
 To mark your listener as optional, your listener must implement `Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface` interface and set skips in your code if $enabled = false.
 
-## Lazy Doctrine listeners ##
+## Lazy Doctrine listeners
 
 Doctrine [Event Listeners](https://symfony.com/doc/current/doctrine/event_listeners_subscribers.html)
 and [Entity Listeners](https://symfony.com/doc/current/bundles/DoctrineBundle/entity-listeners.html)

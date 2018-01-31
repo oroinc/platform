@@ -1,6 +1,6 @@
-# Configuration  #
+# Configuration
 
-### Table of Contents ###
+### Table of Contents
 
 - [Getting Started](./getting-started.md)
 	- [What is Entity Merge](./getting-started.md#what-is-entity-merge "What is Entity Merge")
@@ -12,7 +12,7 @@
 	- [Mass action configuration](#mass-action-configuration)
 	- [Other configurations](#other-configurations)
 
-## Entity configuration ##
+## Entity configuration
 
 Entity can be configure on entity level and on fields level
 
@@ -137,7 +137,7 @@ class Account
 ```
 
 
-## Mass action configuration ##
+## Mass action configuration
 
 Example of merge mass action:
 
@@ -152,7 +152,7 @@ datagrids:
 ```
 
 
-## Other configurations ##
+## Other configurations
 
 You can define your own "Strategy", "Steps", "Accessor" in DI by using tags with names "oro_entity_merge.strategy",
 "oro_entity_merge.step", "oro_entity_merge.accessor".

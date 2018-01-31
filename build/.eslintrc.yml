@@ -1,5 +1,6 @@
 extends:
   - google
+  - "plugin:oro/recommended"
 parserOptions:
   ecmaVersion: 5
 env:
@@ -45,7 +46,6 @@ rules:
       keywords: true,
       numbers: true
     }
-  func-name-matching: "error"
   valid-jsdoc: 'off' # has to be turned on in a future
   no-useless-escape: 'off' # has to be turned on in a future
   require-jsdoc: 'off' # has to be turned on in a future
