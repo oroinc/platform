@@ -45,7 +45,7 @@ class ExportExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        if (!$this->isGranted()) {
+        if (!parent::isApplicable($config) || !$this->isGranted()) {
             return false;
         }
 

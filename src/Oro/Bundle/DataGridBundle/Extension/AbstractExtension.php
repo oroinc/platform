@@ -19,6 +19,22 @@ abstract class AbstractExtension implements ExtensionVisitorInterface
     protected $parameters;
 
     /**
+     * Full list of datagrid modes
+     * @see \Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider
+     *
+     * @var array of modes that are not supported by this extension
+     */
+    protected $excludedModes = [];
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isApplicable(DatagridConfiguration $config)
+    {
+        return $this->isExtensionSupportedDatagridModes();
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function processConfigs(DatagridConfiguration $config)
@@ -90,5 +106,20 @@ abstract class AbstractExtension implements ExtensionVisitorInterface
     public function setParameters(ParameterBag $parameters)
     {
         $this->parameters = $parameters;
+    }
+
+    /**
+     * Checking that extension is supported all datagrid modes.
+     *
+     * @return bool
+     */
+    private function isExtensionSupportedDatagridModes()
+    {
+        $datagridModes = $this->getParameters()->get(ParameterBag::DATAGRID_MODES_PARAMETER, []);
+        if ([] === $datagridModes || [] === $this->excludedModes) {
+            return true;
+        }
+
+        return empty(array_intersect($this->excludedModes, $datagridModes));
     }
 }

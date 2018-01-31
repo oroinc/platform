@@ -15,6 +15,7 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
 
@@ -25,8 +26,6 @@ class ActionExtension extends AbstractExtension
 
     const ACTION_KEY               = 'actions';
     const ACTION_CONFIGURATION_KEY = 'action_configuration';
-
-    const ENABLE_ACTIONS_PARAMETER = '_enable_actions';
 
     /** @var ActionFactory */
     protected $actionFactory;
@@ -45,6 +44,11 @@ class ActionExtension extends AbstractExtension
 
     /** @var bool */
     protected $isMetadataVisited = false;
+
+    /** {@inheritdoc} */
+    protected $excludedModes = [
+        DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
+    ];
 
     /**
      * @var array [entity alias => [
@@ -84,14 +88,6 @@ class ActionExtension extends AbstractExtension
     public function addActionProvider(DatagridActionProviderInterface $actionsProvider)
     {
         $this->actionsProviders[] = $actionsProvider;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isApplicable(DatagridConfiguration $config)
-    {
-        return $this->getParameters()->get(self::ENABLE_ACTIONS_PARAMETER, true);
     }
 
     /**

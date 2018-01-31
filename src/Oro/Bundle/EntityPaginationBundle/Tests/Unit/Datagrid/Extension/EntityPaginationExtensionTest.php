@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Datagrid\Extension;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
 
 class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
@@ -15,6 +16,7 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->extension  = new EntityPaginationExtension();
+        $this->extension->setParameters(new ParameterBag());
     }
 
     /**

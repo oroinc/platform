@@ -31,7 +31,9 @@ class ArrayPagerExtension extends AbstractPagerExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $config->getDatasourceType() === ArrayDatasource::TYPE;
+        return
+            parent::isApplicable($config)
+            && $config->getDatasourceType() === ArrayDatasource::TYPE;
     }
 
     /**
