@@ -96,6 +96,13 @@ services:
         tags:
             - { name: 'oro_importexport.job.context.aggregator' }
 
+    oro_importexport.event_listener.export_join_listener:
+        class: Oro\Bundle\ImportExportBundle\EventListener\ExportJoinListener
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: kernel.event_listener, event: oro.import_export.after_entity_page_loaded, method: onAfterEntityPageLoaded }
+
     oro_importexport.configuration.registry:
         class: 'Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistry'
 
