@@ -150,10 +150,10 @@ define(function(require) {
             }
 
             var filterListeners = {
-                'update': this._onFilterUpdated,
-                'change': this._onFilterChanged,
-                'disable': this._onFilterDisabled,
-                'showCriteria': this._onFilterShowCriteria
+                update: this._onFilterUpdated,
+                change: this._onFilterChanged,
+                disable: this._onFilterDisabled,
+                showCriteria: this._onFilterShowCriteria
             };
 
             if (tools.isMobile()) {
@@ -470,7 +470,6 @@ define(function(require) {
                 filter.render();
                 $filterItems.append(filter.$el);
                 filter.rendered();
-
             }, this);
 
             this.trigger('rendered');
@@ -524,10 +523,11 @@ define(function(require) {
          */
         _calculateSelectedFilters: function() {
             return _.reduce(this.filters, function(memo, filter) {
-                var num = (filter.enabled &&
-                           !filter.isEmptyValue() &&
-                           !_.isEqual(filter.emptyValue, filter.value)
-                          ) ? 1 : 0;
+                var num = (
+                    filter.enabled &&
+                    !filter.isEmptyValue() &&
+                    !_.isEqual(filter.emptyValue, filter.value)
+                ) ? 1 : 0;
 
                 return memo + num;
             }, 0);

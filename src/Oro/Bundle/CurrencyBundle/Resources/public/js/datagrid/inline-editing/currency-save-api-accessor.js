@@ -1,4 +1,3 @@
-/** @lends CurrencyApiAccessor */
 define(function(require) {
     'use strict';
 
@@ -7,7 +6,7 @@ define(function(require) {
     var _ = require('underscore');
     var ApiAccessor = require('oroui/js/tools/api-accessor');
 
-    CurrencyApiAccessor = ApiAccessor.extend(/** @exports CurrencyApiAccessor.prototype */{
+    CurrencyApiAccessor = ApiAccessor.extend(/** @lends CurrencyApiAccessor.prototype */{
         /**
          * Prepares the request body.
          *

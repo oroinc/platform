@@ -81,7 +81,7 @@ define(function(require) {
          * @param {WorkflowModel} model
          */
         addStartingStep: function(model) {
-            //if start step doesn't exist in database, create it
+            // if start step doesn't exist in database, create it
             if (model.getStartStep().length === 0) {
                 model.get('steps').add(this._createStartingStep(model));
             }

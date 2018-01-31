@@ -18,10 +18,10 @@ define(function(require) {
         options: {
             template: null,
             data: {
-                'label': '',
-                'property_path': '',
-                'property_path_text': '',
-                'required': false
+                label: '',
+                property_path: '',
+                property_path_text: '',
+                required: false
             },
             entity_field_template: null,
             entity: null,
@@ -99,9 +99,11 @@ define(function(require) {
             this._deferredRender();
             this.form = $(this.template(this.options.data)).filter('form');
             this.form.validate({
-                'submitHandler': _.bind(this.onAdd, this)
+                submitHandler: _.bind(this.onAdd, this)
             });
-            this.form.on('submit', function(e) {e.preventDefault();});
+            this.form.on('submit', function(e) {
+                e.preventDefault();
+            });
             this.initFieldChoiceView(this.form);
 
             this.submitBtn = this.form.find('[type=submit]');

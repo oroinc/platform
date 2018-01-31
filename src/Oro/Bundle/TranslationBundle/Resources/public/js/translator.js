@@ -1,5 +1,5 @@
-define(['underscore', 'translator', 'module', 'json'],
-function(_, Translator, module) {
+define(['underscore', 'translator', 'module', 'json'
+], function(_, Translator, module) {
     'use strict';
 
     window.Translator = Translator; // add global variable for translations JSONP-loader Translator.fromJSON({...})

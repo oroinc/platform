@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define(function(require) {
     'use strict';
 
@@ -36,7 +34,7 @@ define(function(require) {
             WorkflowActivateBtnView.__super__.delegateEvents.apply(this, arguments);
             this.$el.on('click' + this.eventNamespace(), this.options.selectors.button, $.proxy(this.onClick, this));
             this.$el.on({
-                'activation_success': this.onActivationSuccess
+                activation_success: this.onActivationSuccess
             }, this.options.selectors.button);
         },
 

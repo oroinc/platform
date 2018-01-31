@@ -1,4 +1,3 @@
-/** @lends NumberEditorView */
 define(function(require) {
     'use strict';
 
@@ -63,7 +62,7 @@ define(function(require) {
     var _ = require('underscore');
     var NumberFormatter = require('orofilter/js/formatter/number-formatter');
 
-    NumberEditorView = TextEditorView.extend(/** @exports NumberEditorView.prototype */{
+    NumberEditorView = TextEditorView.extend(/** @lends NumberEditorView.prototype */{
         className: 'number-editor',
 
         initialize: function(options) {

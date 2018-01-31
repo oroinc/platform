@@ -41,9 +41,8 @@ define(function(require) {
 
         getData: function() {
             var entity = this.data[this.entity];
-            var field = _.findWhere(entity.fields, {'name': this.value});
-            return {'id': this.value, 'text': field.label};
-
+            var field = _.findWhere(entity.fields, {name: this.value});
+            return {id: this.value, text: field.label};
         },
 
         getApplicableConditions: function(fieldId) {
@@ -53,7 +52,7 @@ define(function(require) {
                 return signature;
             }
 
-            var field = _.findWhere(entity.fields, {'name': fieldId});
+            var field = _.findWhere(entity.fields, {name: fieldId});
             if (field) {
                 signature = _.pick(field, 'type', 'relationType', 'identifier');
                 signature.field = field.name;

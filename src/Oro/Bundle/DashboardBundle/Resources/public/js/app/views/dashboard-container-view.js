@@ -57,7 +57,7 @@ define(function(require) {
             mediator.off('dashboard:widget:add', this.addToDashboard, this);
             mediator.on('dashboard:widget:add', this.addToDashboard, this);
 
-            this.widgets = {};//reset widgets state before add
+            this.widgets = {};// reset widgets state before add
             _.each(this.options.widgetIds, function(wid) {
                 widgetManager.getWidgetInstance(
                     wid,
@@ -138,23 +138,23 @@ define(function(require) {
             var column = data.layout_position[0] ? data.layout_position[0] : 0;
             $('#dashboard-column-' + column).prepend($('<div id="' + containerId + '"></div>'));
             var state = {
-                'id': data.id,
-                'expanded': data.expanded,
-                'layoutPosition': data.layout_position
+                id: data.id,
+                expanded: data.expanded,
+                layoutPosition: data.layout_position
             };
             var widgetParams = {
-                'widgetType': 'dashboard-item',
-                'wid': wid,
-                'url': routing.generate(data.config.route, _.extend(data.config.route_parameters, {
-                    '_widgetId': state.id
+                widgetType: 'dashboard-item',
+                wid: wid,
+                url: routing.generate(data.config.route, _.extend(data.config.route_parameters, {
+                    _widgetId: state.id
                 })),
-                'state': state,
-                'loadingMaskEnabled': false,
-                'container': '#' + containerId,
-                'allowEdit': this.options.allowEdit,
-                'showConfig': this.options.allowEdit && !_.isEmpty(data.config.configuration),
-                'widgetName': data.name,
-                'configurationDialogOptions': data.config.configuration_dialog_options
+                state: state,
+                loadingMaskEnabled: false,
+                container: '#' + containerId,
+                allowEdit: this.options.allowEdit,
+                showConfig: this.options.allowEdit && !_.isEmpty(data.config.configuration),
+                widgetName: data.name,
+                configurationDialogOptions: data.config.configuration_dialog_options
             };
             var widget = new DashboardItemWidget(widgetParams);
             widget.render();

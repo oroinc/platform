@@ -9,7 +9,7 @@ define(function(require) {
         component: null,
 
         listen: {
-            'refresh': 'onRefresh'
+            refresh: 'onRefresh'
         },
 
         render: function() {

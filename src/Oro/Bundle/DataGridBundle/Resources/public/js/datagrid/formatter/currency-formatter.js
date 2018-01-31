@@ -26,7 +26,7 @@ define(function(require) {
             if (isNaN(value)) {
                 return __('oro.datagrid.not_number');
             }
-            return this.formatter.call(this, value, currency);
+            return this.formatter(value, currency);
         }
     });
 

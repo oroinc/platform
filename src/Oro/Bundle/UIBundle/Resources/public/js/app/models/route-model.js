@@ -1,4 +1,3 @@
-/** @lends RouteModel */
 define(function(require) {
     'use strict';
 
@@ -36,7 +35,7 @@ define(function(require) {
     var routing = require('routing');
     var BaseModel = require('./base/model');
 
-    RouteModel = BaseModel.extend(/** @exports RouteModel.prototype */{
+    RouteModel = BaseModel.extend(/** @lends RouteModel.prototype */{
         /**
          * Route name cache prepared for
          *

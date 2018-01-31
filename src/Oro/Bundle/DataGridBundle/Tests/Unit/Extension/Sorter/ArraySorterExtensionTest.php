@@ -48,6 +48,7 @@ class ArraySorterExtensionTest extends \PHPUnit_Framework_TestCase
         $this->arrayDatasource = new ArrayDatasource();
         $this->arrayDatasource->setArraySource($this->arraySource);
         $this->arraySorterExtension = new ArraySorterExtension();
+        $this->arraySorterExtension->setParameters(new ParameterBag());
     }
 
     public function testIsApplicableWithArrayDatasource()

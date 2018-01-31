@@ -1,5 +1,5 @@
-define(['./../base/page-region-view'],
-function(PageRegionView) {
+define(['./../base/page-region-view'
+], function(PageRegionView) {
     'use strict';
 
     var PageBeforeContentAdditionView;

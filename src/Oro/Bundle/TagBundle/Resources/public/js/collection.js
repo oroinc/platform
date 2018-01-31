@@ -1,5 +1,5 @@
 define(['backbone', './model'
-    ], function(Backbone, TagModel) {
+], function(Backbone, TagModel) {
     'use strict';
 
     /**
@@ -55,7 +55,7 @@ define(['backbone', './model'
          * @param {string} filterState
          */
         removeItem: function(id, filterState) {
-            var model = this.where({'id': id});
+            var model = this.where({id: id});
             if (model.length) {
                 model = model[0];
                 if (filterState === 'owner' && model.get('owner') === true && model.get('moreOwners') === true) {

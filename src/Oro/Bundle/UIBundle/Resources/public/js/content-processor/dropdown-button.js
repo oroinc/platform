@@ -124,10 +124,9 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
          */
         _dropdownMenu: function($buttons) {
             return $('<ul></ul>', {
-                    'class': 'dropdown-menu',
-                    'data-options': '{"align": "right", "attachToParent": "true"}'
-                })
-                .append(this._prepareButtons($buttons));
+                'class': 'dropdown-menu',
+                'data-options': '{"align": "right", "attachToParent": "true"}'
+            }).append(this._prepareButtons($buttons));
         },
 
         _prepareMainButton: function($main) {

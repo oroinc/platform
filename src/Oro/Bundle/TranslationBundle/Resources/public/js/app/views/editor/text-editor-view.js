@@ -10,7 +10,7 @@ define(function(require) {
         events: {
             'change [name=value]': 'onChange',
             'keyup [name=value]': 'onChange',
-            'keydown [name=value]': 'onGenericKeydown',
+            'keydown [name=value]': 'onGenericKeydown'
         },
 
         /**

@@ -49,7 +49,7 @@ define(function(require) {
         initialize: function(options) {
             AutocompleteComponent.__super__.initialize.apply(this, arguments);
 
-            //add debounce to search method
+            // add debounce to search method
             this._searchForResults = _.debounce(this._searchForResults.bind(this), this.debounceWait);
 
             var thisOptions = {
@@ -142,7 +142,7 @@ define(function(require) {
          * @returns {Boolean}
          */
         matcher: function(item) {
-            return true;//matched on server
+            return true;// matched on server
         },
 
         /**
@@ -158,7 +158,7 @@ define(function(require) {
          * @returns {Array}
          */
         sorter: function(items) {
-            return items;//sorted on server
+            return items;// sorted on server
         },
 
         show: function() {

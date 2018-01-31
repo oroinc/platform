@@ -1,4 +1,3 @@
-/** @lends EntitySelectSearchApiAccessor */
 define(function(require) {
     'use strict';
 
@@ -17,7 +16,7 @@ define(function(require) {
     var EntitySelectSearchApiAccessor;
     var SearchApiAccessor = require('oroui/js/tools/search-api-accessor');
 
-    EntitySelectSearchApiAccessor = SearchApiAccessor.extend(/** @exports EntitySelectSearchApiAccessor.prototype */{
+    EntitySelectSearchApiAccessor = SearchApiAccessor.extend(/** @lends EntitySelectSearchApiAccessor.prototype */{
         initialize: function(options) {
             if (!options) {
                 options = {};

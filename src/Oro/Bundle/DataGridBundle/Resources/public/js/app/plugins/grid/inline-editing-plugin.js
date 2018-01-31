@@ -128,7 +128,6 @@ define(function(require) {
             } else {
                 this.removeActiveEditorComponents();
             }
-
         },
 
         beforeRedirectTo: function(queue) {

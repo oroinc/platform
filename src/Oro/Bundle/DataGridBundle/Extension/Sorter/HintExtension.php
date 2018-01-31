@@ -41,7 +41,7 @@ class HintExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $config->isOrmDatasource();
+        return parent::isApplicable($config) && $config->isOrmDatasource();
     }
 
     /**

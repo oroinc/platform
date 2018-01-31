@@ -40,7 +40,7 @@ define(function(require) {
             var routeName = _.result(this.urlParts.grid, 'gridWidgetView') || this.urlParts.grid.route;
             var routeParams = this.buildRouteParams('grid');
             this.dialogWidget = new DialogWidget({
-                title: __('Select {{ entity }}', {'entity': this.entityLabel}),
+                title: __('Select {{ entity }}', {entity: this.entityLabel}),
                 url: routing.generate(routeName, routeParams),
                 stateEnabled: false,
                 incrementalPosition: true,
@@ -83,7 +83,7 @@ define(function(require) {
             var routeName = this.urlParts.create.route;
             var routeParams = this.buildRouteParams('create');
             this.dialogWidget = new DialogWidget({
-                title: __('Create {{ entity }}', {'entity': this.entityLabel}),
+                title: __('Create {{ entity }}', {entity: this.entityLabel}),
                 url: routing.generate(routeName, routeParams),
                 stateEnabled: false,
                 incrementalPosition: true,

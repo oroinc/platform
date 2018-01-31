@@ -1,11 +1,13 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Tests\Functional\EventListener;
+
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * @group search
@@ -32,15 +34,10 @@ class IndexListenerTest extends WebTestCase
         $em->persist($item);
         $em->flush();
 
-        self::assertMessageSent(
-            Topics::INDEX_ENTITIES,
-            [
-                [
-                    'class' => Item::class,
-                    'id' => $item->getId(),
-                ]
-            ]
-        );
+        self::assertMessageSent(Topics::INDEX_ENTITIES, [
+            'class' => Item::class,
+            'entityIds' => [$item->getId() => $item->getId()],
+        ]);
     }
 
     public function testShouldUpdateSearchIndexForEntityIfItWasUpdated()
@@ -56,15 +53,10 @@ class IndexListenerTest extends WebTestCase
         $item->stringValue = 'value';
         $em->flush();
 
-        self::assertMessageSent(
-            Topics::INDEX_ENTITIES,
-            [
-                [
-                    'class' => Item::class,
-                    'id' => $item->getId(),
-                ]
-            ]
-        );
+        self::assertMessageSent(Topics::INDEX_ENTITIES, [
+            'class' => Item::class,
+            'entityIds' => [$item->getId() => $item->getId()],
+        ]);
     }
 
     public function testShouldDeleteSearchIndexForEntityIfItWasDeleted()
@@ -84,15 +76,10 @@ class IndexListenerTest extends WebTestCase
         $em->remove($item);
         $em->flush();
 
-        self::assertMessageSent(
-            Topics::INDEX_ENTITIES,
-            [
-                [
-                    'class' => Item::class,
-                    'id' => $itemId,
-                ]
-            ]
-        );
+        self::assertMessageSent(Topics::INDEX_ENTITIES, [
+            'class' => Item::class,
+            'entityIds' => [$itemId => $itemId],
+        ]);
     }
 
     /**

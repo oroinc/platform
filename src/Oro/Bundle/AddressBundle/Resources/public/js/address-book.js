@@ -33,19 +33,19 @@ define([
         isEmpty: false,
 
         options: {
-            'mapOptions': {
+            mapOptions: {
                 zoom: 12
             },
-            'template': null,
-            'addressListUrl': null,
-            'addressCreateUrl': null,
-            'addressUpdateUrl': null,
-            'addressDeleteUrl': null,
-            'mapView': Googlemaps,
-            'addressMapOptions': {},
-            'allowToRemovePrimary': false,
-            'confirmRemove': true,
-            'confirmRemoveComponent': deleteConfirmation,
+            template: null,
+            addressListUrl: null,
+            addressCreateUrl: null,
+            addressUpdateUrl: null,
+            addressDeleteUrl: null,
+            mapView: Googlemaps,
+            addressMapOptions: {},
+            allowToRemovePrimary: false,
+            confirmRemove: true,
+            confirmRemoveComponent: deleteConfirmation,
             showMap: true
         },
         noDataMessage: __('Empty Address Book'),
@@ -83,8 +83,8 @@ define([
             this.$mapContainerFrame.toggle(!this.isEmpty);
 
             this.mapView = new this.options.mapView({
-                'mapOptions': this.options.mapOptions,
-                'el': this.$mapContainerFrame
+                mapOptions: this.options.mapOptions,
+                el: this.$mapContainerFrame
             });
 
             var activeAddress = this.getCollection().find({active: true});
@@ -216,16 +216,16 @@ define([
         _openAddressEditForm: function(title, url) {
             if (!this.addressEditDialog) {
                 this.addressEditDialog = new DialogWidget({
-                    'url': url,
-                    'title': title,
-                    'regionEnabled': false,
-                    'incrementalPosition': false,
-                    'dialogOptions': {
-                        'modal': true,
-                        'resizable': false,
-                        'width': 475,
-                        'autoResize': true,
-                        'close': _.bind(function() {
+                    url: url,
+                    title: title,
+                    regionEnabled: false,
+                    incrementalPosition: false,
+                    dialogOptions: {
+                        modal: true,
+                        resizable: false,
+                        width: 475,
+                        autoResize: true,
+                        close: _.bind(function() {
                             delete this.addressEditDialog;
                         }, this)
                     }

@@ -73,7 +73,7 @@
             </div>
         </div>
 
-        <div class="clearfix">
+        <div class="sidebar-container clearfix">
             {% block content_data %}
                 {% set treeOptions = {
                     'data' : tree,
@@ -88,7 +88,9 @@
                     'successMessage': movedMessage|default('oro.navigation.menuupdate.moved_success_message')
                 } %}
 
-                {% embed "OroUIBundle::content_sidebar.html.twig" %}
+                {% embed "OroUIBundle::content_sidebar.html.twig" with {options: {
+                    scrollbar: '[data-role="jstree-container"]'
+                }} %}
                     {% block sidebar %}
                         {{ UI.renderJsTree(
                             {

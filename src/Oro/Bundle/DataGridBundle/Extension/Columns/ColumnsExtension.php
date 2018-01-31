@@ -68,6 +68,10 @@ class ColumnsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
+        if (!parent::isApplicable($config)) {
+            return false;
+        }
+
         $columns = $config->offsetGetOr(self::COLUMNS_PATH, []);
         $this->processConfigs($config);
 

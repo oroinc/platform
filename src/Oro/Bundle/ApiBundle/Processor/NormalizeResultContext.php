@@ -32,9 +32,11 @@ class NormalizeResultContext extends ApiContext
      */
     public function getErrors()
     {
-        return null !== $this->errors
-            ? $this->errors
-            : [];
+        if (null === $this->errors) {
+            return [];
+        }
+
+        return $this->errors;
     }
 
     /**

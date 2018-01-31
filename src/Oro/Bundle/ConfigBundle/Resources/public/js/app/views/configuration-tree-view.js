@@ -26,7 +26,7 @@ define(function(require) {
                 routeParams[this.viewGroup] = state;
             }
             var url = routing.generate(this.onSelectRoute, routeParams);
-            //simulate click on real link to check page state
+            // simulate click on real link to check page state
             var $link = $('<a>').attr('href', url);
             this.$tree.before($link);
             $link.click().remove();

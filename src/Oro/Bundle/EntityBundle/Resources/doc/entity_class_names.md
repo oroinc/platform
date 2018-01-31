@@ -1,4 +1,4 @@
-## Entity class name provider ##
+## Entity class name provider
 
 The goal of this service is to provide human-readable representation in **English** of an entity class name. This may be helpful if you need to generate some kind of documentation for a functionality that generated automatically. For example, the ORO platform uses this provider to generate a description of REST API resources that is generated on the fly. See [DictionaryEntityApiDocHandler](./../../Routing/DictionaryEntityApiDocHandler.php) for details.
 

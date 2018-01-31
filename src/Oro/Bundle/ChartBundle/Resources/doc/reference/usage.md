@@ -6,7 +6,7 @@
 - [Configuration](./chart-configuration.md)
 - Basic usage
 
-## Controller example##
+## Controller example
 
 ```php
 
@@ -29,7 +29,7 @@
 
 Configurations list you can see ([here](./chart-configuration.md))
 
-## View Example##
+## View Example
 
 ```
     {{ chartView.render()|raw }}

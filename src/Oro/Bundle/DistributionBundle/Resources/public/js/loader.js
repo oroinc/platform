@@ -1,4 +1,4 @@
-/*jshint -W098*/
+// eslint-disable-next-line no-unused-vars
 function Loader(element) {
     'use strict';
 

@@ -71,8 +71,8 @@ define(function(require) {
         var model = this.model;
         var columnName = this.column.get('name');
         $el.text(this.formatter.fromRaw(model.get(columnName), model));
-        //$el.addClass(columnName);
-        //this.updateStateClassesMaybe();
+        // $el.addClass(columnName);
+        // this.updateStateClassesMaybe();
         this.delegateEvents();
         return this;
     };

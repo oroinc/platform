@@ -434,7 +434,7 @@ The main processor class: [CustomizeLoadedDataProcessor](../../Processor/Customi
 
 As example of a processor used to modify the loaded data: [ComputePrimaryField](../../Processor/CustomizeLoadedData/ComputePrimaryField.php). Run `php app/console oro:api:debug customize_loaded_data` to display other processors registered in this action.
 
-##  customize_form_data Action
+## customize_form_data Action
 
 This action makes modifications of the submitted form data for the [create](#create-action) and [update](#update-action) actions.
 

@@ -2,9 +2,11 @@
 namespace Oro\Component\Testing;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Event\ConnectionEventArgs;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
+use Oro\Component\Testing\Doctrine\Events;
 
 trait DbIsolationExtension
 {
@@ -49,8 +51,14 @@ trait DbIsolationExtension
     protected static function rollbackTransaction()
     {
         foreach (self::$dbIsolationConnections as $name => $connection) {
+            $rolledBack = false;
             while ($connection->isConnected() && $connection->isTransactionActive()) {
                 $connection->rollBack();
+                $rolledBack = true;
+            }
+            if ($rolledBack) {
+                $args = new ConnectionEventArgs($connection);
+                $connection->getEventManager()->dispatchEvent(Events::ON_AFTER_TEST_TRANSACTION_ROLLBACK, $args);
             }
         }
 

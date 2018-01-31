@@ -3,16 +3,18 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
+use Oro\Bundle\ApiBundle\Processor\CollectResourcesProcessor;
+use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|CollectResourcesProcessor */
     protected $processor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesCache */
     protected $resourcesCache;
 
     /** @var ResourcesProvider */
@@ -20,12 +22,8 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->processor = $this->getMockBuilder('Oro\Bundle\ApiBundle\Processor\CollectResourcesProcessor')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->resourcesCache = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ResourcesCache')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->processor = $this->createMock(CollectResourcesProcessor::class);
+        $this->resourcesCache = $this->createMock(ResourcesCache::class);
 
         $this->resourcesProvider = new ResourcesProvider($this->processor, $this->resourcesCache);
     }
@@ -429,6 +427,44 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(
             ['delete'],
             $this->resourcesProvider->getResourceExcludeActions('Test\Entity3', $version, $requestType)
+        );
+    }
+
+    public function testClearCache()
+    {
+        $version = '1.2.3';
+        $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
+
+        $this->resourcesCache->expects(self::exactly(2))
+            ->method('getAccessibleResources')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn(['Test\Entity1' => true]);
+        $this->resourcesCache->expects(self::exactly(2))
+            ->method('getExcludedActions')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn(['Test\Entity1' => ['update']]);
+        $this->resourcesCache->expects(self::once())
+            ->method('clear');
+
+        // warmup the local cache
+        self::assertTrue(
+            $this->resourcesProvider->isResourceAccessible('Test\Entity1', $version, $requestType)
+        );
+        self::assertEquals(
+            ['update'],
+            $this->resourcesProvider->getResourceExcludeActions('Test\Entity1', $version, $requestType)
+        );
+
+        // do cache clear, including the local cache
+        $this->resourcesProvider->clearCache();
+
+        // check that clearCache method clears the local cache
+        self::assertTrue(
+            $this->resourcesProvider->isResourceAccessible('Test\Entity1', $version, $requestType)
+        );
+        self::assertEquals(
+            ['update'],
+            $this->resourcesProvider->getResourceExcludeActions('Test\Entity1', $version, $requestType)
         );
     }
 }

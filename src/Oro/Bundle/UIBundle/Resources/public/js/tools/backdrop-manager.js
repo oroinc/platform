@@ -4,10 +4,10 @@ define(function(require) {
     var MultiUseResourceManager = require('./multi-use-resource-manager');
     var backdropManager = new MultiUseResourceManager({
         listen: {
-            'constructResource': function() {
+            constructResource: function() {
                 $(document.body).addClass('backdrop');
             },
-            'disposeResource': function() {
+            disposeResource: function() {
                 $(document.body).removeClass('backdrop');
             }
         }

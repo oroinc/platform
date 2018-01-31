@@ -9,9 +9,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class ActionNotAllowedException extends HttpException
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct()
     {
         parent::__construct(405, 'The action is not allowed.');

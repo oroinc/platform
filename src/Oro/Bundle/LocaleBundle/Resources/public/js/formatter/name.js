@@ -1,5 +1,5 @@
 define(['../locale-settings'
-    ], function(localeSettings) {
+], function(localeSettings) {
     'use strict';
 
     /**

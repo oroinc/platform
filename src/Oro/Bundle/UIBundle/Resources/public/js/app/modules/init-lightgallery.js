@@ -8,7 +8,7 @@ define(['jquery', 'underscore', 'lightgallery', 'lightgallery.print'], function(
      */
     $(document).on('click.gallery', function(e) {
         var $target = $(e.target);
-        if ($target.is('.thumbnail')) { //if click was done on thumbnail image, use parent element as a target
+        if ($target.is('.thumbnail')) { // if click was done on thumbnail image, use parent element as a target
             $target = $target.parent();
         }
         if ($target.data('gallery')) {
@@ -54,7 +54,7 @@ define(['jquery', 'underscore', 'lightgallery', 'lightgallery.print'], function(
                 var $el = $(this);
                 var lightGallery = $el.data('lightGallery');
                 if (lightGallery) {
-                    lightGallery.destroy(true); //fully destroy gallery on close
+                    lightGallery.destroy(true); // fully destroy gallery on close
                 }
                 $el.off('onCloseAfter.lg');
             });

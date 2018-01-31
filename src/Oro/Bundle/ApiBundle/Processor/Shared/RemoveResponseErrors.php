@@ -2,17 +2,19 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\ErrorStatusCodesWithoutContentTrait;
 
 /**
- * Removes errors from the response for some predefined HTTP status codes.
+ * Removes errors from the response for some predefined HTTP status codes,
+ * e.g. for 405 (Method Not Allowed).
  */
 class RemoveResponseErrors implements ProcessorInterface
 {
+    use ErrorStatusCodesWithoutContentTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -21,22 +23,11 @@ class RemoveResponseErrors implements ProcessorInterface
         /** @var Context $context */
 
         $responseStatusCode = $context->getResponseStatusCode();
-        if (null === $responseStatusCode || !$context->hasErrors()) {
-            // the status code is not set or the response does not contain any error
-            return;
-        }
-        if (in_array($responseStatusCode, $this->getStatusCodesWithoutBody(), true)) {
+        if (null !== $responseStatusCode
+            && $context->hasErrors()
+            && $this->isResponseWithoutContent($responseStatusCode)
+        ) {
             $context->resetErrors();
         }
-    }
-
-    /**
-     * @return int[]
-     */
-    protected function getStatusCodesWithoutBody()
-    {
-        return [
-            Response::HTTP_METHOD_NOT_ALLOWED
-        ];
     }
 }

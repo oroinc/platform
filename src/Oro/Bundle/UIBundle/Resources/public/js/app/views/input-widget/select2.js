@@ -37,7 +37,7 @@ define(function(require) {
         destroyOptions: 'destroy',
 
         initialize: function(options) {
-            //fix select2.each2 bug, when empty string is FALSE
+            // fix select2.each2 bug, when empty string is FALSE
             this.$el.attr('class', $.trim(this.$el.attr('class')));
             Select2InputWidget.__super__.initialize.apply(this, arguments);
 
