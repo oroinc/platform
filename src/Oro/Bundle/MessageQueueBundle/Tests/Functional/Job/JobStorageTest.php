@@ -445,13 +445,23 @@ class JobStorageTest extends WebTestCase
         $job = $this->getJobReference(LoadJobData::JOB_5);
 
         $expectedResult = [
-            $this->getJobReference(LoadJobData::JOB_9)->getId(),
             $this->getJobReference(LoadJobData::JOB_6)->getId(),
+            $this->getJobReference(LoadJobData::JOB_9)->getId()
         ];
 
+        /**
+         * Result work of this function depends on engine
+         * In PGSQL it returns array of ids in desc order, every id has integer type,
+         * But in mysql it will be array of ids in asc order, every id has string type
+         */
         $result = $this->jobStorage->getChildJobIdsByRootJobAndStatus($job, Job::STATUS_NEW);
-        rsort($result);
 
-        $this->assertSame($expectedResult, $result);
+        /**
+         * Make result independent on db engine
+         */
+        sort($result);
+        $preparedResult = array_map('intval', $result);
+
+        $this->assertSame($expectedResult, $preparedResult);
     }
 }
