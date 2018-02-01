@@ -1,4 +1,3 @@
-/** @lends RouteModel */
 define(function(require) {
     'use strict';
 
@@ -20,7 +19,7 @@ define(function(require) {
         ];
     }
 
-    ZoomStateModel = BaseModel.extend(/** @exports RouteModel.prototype */{
+    ZoomStateModel = BaseModel.extend(/** @lends ZoomStateModel.prototype */{
         /**
          * @inheritDoc
          * @member {Object}
@@ -110,7 +109,9 @@ define(function(require) {
                         .replace('matrix(', '')
                         .replace(')', '')
                         .split(' ')
-                        .map(function(str) {return str.trim();})
+                        .map(function(str) {
+                            return str.trim();
+                        })
                         .map(parseFloat);
                     var transformOrigin = style.transformOrigin
                         .split(' ')
@@ -192,8 +193,8 @@ define(function(require) {
 
             this.set({
                 zoom: zoomLevel,
-                dx: -currentCenter.x, //zeroPoint.x + currentCenter.x,
-                dy: -currentCenter.y + this.get('autoZoomPadding') * (1 - zoomLevel) //zeroPoint.y + currentCenter.y
+                dx: -currentCenter.x, // zeroPoint.x + currentCenter.x,
+                dy: -currentCenter.y + this.get('autoZoomPadding') * (1 - zoomLevel) // zeroPoint.y + currentCenter.y
             });
         },
 

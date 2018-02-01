@@ -99,7 +99,7 @@ define(function(require) {
                 $tab.data('dropdownOuterWidth', $tab.outerWidth(true));
 
                 $tab.on('shown.bs.tab', function(e) {
-                    //fix bug, 'active' class doesn't removed from dropdown tabs
+                    // fix bug, 'active' class doesn't removed from dropdown tabs
                     $(e.relatedTarget).closest('li').removeClass('active');
                     self.dropdownUpdateLabel();
                 });

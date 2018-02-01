@@ -1,4 +1,3 @@
-/*global define*/
 define([
     'backbone',
     'underscore',
@@ -21,7 +20,7 @@ define([
         },
 
         selectTplSelector: '#widget-items-item-select-template',
-        itemTplSelector:   '#widget-items-item-template',
+        itemTplSelector: '#widget-items-item-template',
 
         requiredOptions: [
             'itemsData',
@@ -92,8 +91,8 @@ define([
 
         _initializeItemGrid: function(items) {
             var $itemContainer = this.$('.item-container');
-            var showedItems    = items.where({show: true});
-            var filteredItems = this.filteredItems  = new ItemCollection(showedItems, {comparator: 'order'});
+            var showedItems = items.where({show: true});
+            var filteredItems = this.filteredItems = new ItemCollection(showedItems, {comparator: 'order'});
 
             $itemContainer.itemsManagerTable({
                 itemTemplate: Backbone.$(this.itemTplSelector).html(),
@@ -135,7 +134,7 @@ define([
         },
 
         _onAddClick: function() {
-            var item  = this.itemSelect.inputWidget('val');
+            var item = this.itemSelect.inputWidget('val');
             var model = this.items.get(item);
 
             model.set('show', true);

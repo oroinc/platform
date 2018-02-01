@@ -87,7 +87,7 @@ class GridViewsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return !$this->isDisabled();
+        return parent::isApplicable($config) && !$this->isDisabled();
     }
 
     /**

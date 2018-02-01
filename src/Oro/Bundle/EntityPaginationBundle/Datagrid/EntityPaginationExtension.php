@@ -16,7 +16,8 @@ class EntityPaginationExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
-            $config->isOrmDatasource()
+            parent::isApplicable($config)
+            && $config->isOrmDatasource()
             && null !== $config->offsetGetByPath(self::ENTITY_PAGINATION_PATH);
     }
 

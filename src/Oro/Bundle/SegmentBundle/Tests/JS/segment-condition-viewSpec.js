@@ -13,7 +13,6 @@ define(function(require) {
     var exposure = requirejsExposure.disclose('orosegment/js/app/views/segment-condition-view');
 
     describe('orosegment/js/app/views/segment-condition-view', function() {
-
         var segmentConditionView;
 
         describe('without initial value', function() {
@@ -65,7 +64,7 @@ define(function(require) {
                     expect(SegmentChoiceMock.lastCreatedInstance.setValue).toHaveBeenCalledWith('id');
                     expect(segmentConditionView.getChoiceInputValue()).toBe('segment_2');
                     done();
-                }.bind(this));
+                });
             });
         });
 
@@ -80,7 +79,7 @@ define(function(require) {
                     }
                 }
             };
-            var filter = _.findWhere(filters, {'name': initialValue.criterion.filter});
+            var filter = _.findWhere(filters, {name: initialValue.criterion.filter});
             var filterChoice = filter.choices[initialValue.criterion.data.value];
             var initialChoiceInputValue = 'segment_' + _.result(filterChoice, 'value');
 

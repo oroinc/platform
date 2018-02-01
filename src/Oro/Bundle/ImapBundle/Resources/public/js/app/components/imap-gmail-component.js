@@ -1,4 +1,4 @@
-/*global gapi */
+/* global gapi */
 define(function(require) {
     'use strict';
 
@@ -75,15 +75,17 @@ define(function(require) {
                 this.view.render();
             } else {
                 this._wrapFirstWindowOpen(args);
-                args.deferred = gapi.auth.authorize({
-                        'client_id': data.clientId,
-                        'scope': this.scopes.join(' '),
-                        'immediate': false,
-                        'login_hint': emailAddress,
-                        'access_type': 'offline',
-                        'response_type': 'code',
-                        'approval_prompt': 'force'
-                    }, _.bind(this.handleResponseGoogleAuthCode, this)
+                args.deferred = gapi.auth.authorize(
+                    {
+                        client_id: data.clientId,
+                        scope: this.scopes.join(' '),
+                        immediate: false,
+                        login_hint: emailAddress,
+                        access_type: 'offline',
+                        response_type: 'code',
+                        approval_prompt: 'force'
+                    },
+                    _.bind(this.handleResponseGoogleAuthCode, this)
                 ).then(
                     null,
                     function(reason) {
@@ -127,7 +129,7 @@ define(function(require) {
                 data: {code: code},
                 success: _.bind(this.prepareAuthorization, this),
                 errorHandlerMessage: false,
-                error:  _.bind(this.requestError, this)
+                error: _.bind(this.requestError, this)
             });
         },
 
@@ -213,7 +215,7 @@ define(function(require) {
                 data: data,
                 success: _.bind(this.renderFormGetFolder, this),
                 errorHandlerMessage: false,
-                error:  _.bind(this.requestError, this)
+                error: _.bind(this.requestError, this)
             });
         },
 

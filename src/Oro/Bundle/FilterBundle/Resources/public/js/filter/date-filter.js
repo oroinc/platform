@@ -59,12 +59,12 @@ define(function(require) {
          * @property
          */
         criteriaValueSelectors: {
-            type: 'select',// to handle both type and part changes
+            type: 'select', // to handle both type and part changes
             date_type: 'select[name][name!=date_part]',
             date_part: 'select[name=date_part]',
             value: {
                 start: 'input[name="start"]',
-                end:   'input[name="end"]'
+                end: 'input[name="end"]'
             }
         },
 
@@ -88,11 +88,11 @@ define(function(require) {
          */
         dateWidgetOptions: {
             changeMonth: true,
-            changeYear:  true,
-            yearRange:  '-80:+1',
+            changeYear: true,
+            yearRange: '-80:+1',
             dateFormat: localeSettings.getVendorDateTimeFormat('jquery_ui', 'date', 'mm/dd/yy'),
-            altFormat:  'yy-mm-dd',
-            className:  'date-filter-widget',
+            altFormat: 'yy-mm-dd',
+            className: 'date-filter-widget',
             showButtonPanel: true
         },
 
@@ -124,24 +124,24 @@ define(function(require) {
          * @property
          */
         typeValues: {
-            between:    1,
+            between: 1,
             notBetween: 2,
-            moreThan:   3,
-            lessThan:   4,
-            equal:      5,
-            notEqual:   6
+            moreThan: 3,
+            lessThan: 4,
+            equal: 5,
+            notEqual: 6
         },
 
         /**
          * @property
          */
         typeDefinedValues: {
-            today:        7,
-            this_week:    8,
-            this_month:   9,
+            today: 7,
+            this_week: 8,
+            this_month: 9,
             this_quarter: 10,
-            this_year:    11,
-            all_time:     12
+            this_year: 11,
+            all_time: 12
         },
 
         /**
@@ -159,7 +159,7 @@ define(function(require) {
             day: 'oro.filter.date.part.day.tooltip',
             quarter: 'oro.filter.date.part.quarter.tooltip',
             dayofyear: 'oro.filter.date.part.dayofyear.tooltip',
-            year:  'oro.filter.date.part.year.tooltip'
+            year: 'oro.filter.date.part.year.tooltip'
         },
 
         hasPartsElement: false,
@@ -193,7 +193,7 @@ define(function(require) {
             this.dateVariableHelper = new DateVariableHelper(this.dateWidgetOptions.dateVars);
             this.dateValueHelper = new DateValueHelper(this.dayFormats.slice());
 
-            //parts rendered only if theme exist
+            // parts rendered only if theme exist
             this.hasPartsElement = (this.templateTheme !== '');
 
             // init empty value object if it was not initialized so far
@@ -282,7 +282,7 @@ define(function(require) {
                     this.typeDefinedValues.this_month,
                     this.typeDefinedValues.this_quarter,
                     this.typeDefinedValues.this_year,
-                    this.typeDefinedValues.all_time,
+                    this.typeDefinedValues.all_time
                 ];
                 if (typeDefinedValues.indexOf(type) > -1) {
                     this.$(startSeparatorEndSelector).hide();
@@ -550,10 +550,10 @@ define(function(require) {
             if (value.value &&
                 (type === this.typeValues.between || type === this.typeValues.notBetween)) {
                 if (value.value.start && value.value.end) {
-                    //if both dates are filled
+                    // if both dates are filled
                     if (!this.dateVariableHelper.isDateVariable(value.value.end) &&
                         !this.dateVariableHelper.isDateVariable(value.value.start)) {
-                        //swap end/start date if no variables are used and end date is behind start date
+                        // swap end/start date if no variables are used and end date is behind start date
                         var end = datetimeFormatter.getMomentForFrontendDateTime(value.value.end);
                         var start = datetimeFormatter.getMomentForFrontendDateTime(value.value.start);
                         if (end < start) {
@@ -564,17 +564,17 @@ define(function(require) {
                     }
                 } else {
                     if (value.value.start || value.value.end) {
-                        //if only one date is filled replace filter type to less than or more than
+                        // if only one date is filled replace filter type to less than or more than
                         if (type === this.typeValues.between) {
                             value.type = value.value.end ? this.typeValues.lessThan : this.typeValues.moreThan;
                         } else if (type === this.typeValues.notBetween) {
                             if (!value.value.end) {
-                                //less than type expects end date
+                                // less than type expects end date
                                 value.type = this.typeValues.lessThan;
                                 value.value.end = value.value.start;
                                 value.value.start = '';
                             } else {
-                                //more than type expects start date
+                                // more than type expects start date
                                 value.type = this.typeValues.moreThan;
                                 value.value.start = value.value.end;
                                 value.value.end = '';
@@ -583,7 +583,7 @@ define(function(require) {
                     }
                 }
                 if (!tools.isEqualsLoosely(value, oldValue)) {
-                    //apply new values and filter type
+                    // apply new values and filter type
                     this.value = tools.deepClone(value);
                     if (updateDom) {
                         this._writeDOMValue(value);
@@ -672,11 +672,11 @@ define(function(require) {
 
             return {
                 type: this._getInputValue(this.criteriaValueSelectors.date_type),
-                //empty default parts value if parts not exist
+                // empty default parts value if parts not exist
                 part: this.hasPartsElement ? this._getInputValue(this.criteriaValueSelectors.date_part) : 'value',
                 value: {
                     start: this._getInputValue(this.criteriaValueSelectors.value.start),
-                    end:   this._getInputValue(this.criteriaValueSelectors.value.end)
+                    end: this._getInputValue(this.criteriaValueSelectors.value.end)
                 }
             };
         },

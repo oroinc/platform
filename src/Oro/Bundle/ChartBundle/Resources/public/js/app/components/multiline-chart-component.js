@@ -157,7 +157,7 @@ define(function(require) {
                             return getXLabel(x);
                         },
                         title: this.narrowScreen ? ' ' : options.data_schema.label.label,
-                        mode:    options.xaxis.mode,
+                        mode: options.xaxis.mode,
                         noTicks: options.xaxis.noTicks,
                         labelsAngle: this.narrowScreen ? 90 : 0,
                         margin: true

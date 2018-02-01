@@ -1,5 +1,5 @@
 define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
-    ], function(_, __, messenger) {
+], function(_, __, messenger) {
     'use strict';
 
     /**

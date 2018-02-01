@@ -1,4 +1,3 @@
-/** @lends ApiAccessor */
 define(function(require) {
     'use strict';
 
@@ -61,7 +60,7 @@ define(function(require) {
     var RouteModel = require('../app/models/route-model');
     var apiAccessorUnloadMessagesGroup = require('./api-accessor-unload-messages-group');
 
-    ApiAccessor = BaseClass.extend(/** @exports ApiAccessor.prototype */{
+    ApiAccessor = BaseClass.extend(/** @lends ApiAccessor.prototype */{
         DEFAULT_HEADERS: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'

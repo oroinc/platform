@@ -221,8 +221,8 @@ define(function(require) {
 
             // create and render
             this.activityTypeFilter = new MultiSelectFilter({
-                'label': __('oro.activitylist.widget.filter.activity.title'),
-                'choices': activityTypeChoices || {}
+                label: __('oro.activitylist.widget.filter.activity.title'),
+                choices: activityTypeChoices || {}
             });
 
             this.activityTypeFilter.render();
@@ -236,7 +236,7 @@ define(function(require) {
             // create instance
             DateRangeFilterWithMeta = DatetimeFilter.extend(this.options.activityListOptions.dateRangeFilterMetadata);
             this.dateRangeFilter = new DateRangeFilterWithMeta({
-                'label': __('oro.activitylist.widget.filter.date_picker.title')
+                label: __('oro.activitylist.widget.filter.date_picker.title')
             });
             // tell that it should be rendered with dropdown
             _.extend(this.dateRangeFilter, dataFilterWrapper);

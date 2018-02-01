@@ -43,7 +43,9 @@ abstract class AbstractSorterExtension extends AbstractExtension
     {
         $columns = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
 
-        return is_array($columns);
+        return
+            parent::isApplicable($config)
+            && is_array($columns);
     }
 
     /**

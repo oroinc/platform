@@ -1,5 +1,5 @@
 define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-view', 'oroui/js/tools/color-util'
-    ], function($, _, BaseSimpleColorPickerView, colorUtil) {
+], function($, _, BaseSimpleColorPickerView, colorUtil) {
     'use strict';
 
     var ColorTableView = BaseSimpleColorPickerView.extend({

@@ -13,7 +13,7 @@ define(function(require) {
         var $parent;
         if (!selector) {
             selector = $this.attr('href');
-            selector = selector && /#/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, ''); //strip for ie7
+            selector = selector && /#/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, ''); // strip for ie7
         }
         if (selector === '#') {
             // new Sizzle does not support empty id selector '#'
@@ -181,7 +181,7 @@ define(function(require) {
         if (typeof obj !== 'object') {
             return false;
         }
-        var $parent =  obj.$placeholder.parent();
+        var $parent = obj.$placeholder.parent();
         var $dropdownMenu = obj.$dropdownMenu;
         var dropdownMenuOriginalPosition = obj.originalPosition.dropdownMenu;
         var parentOriginalPosition = obj.originalPosition.parent;

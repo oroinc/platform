@@ -10,9 +10,9 @@ define(function(require) {
 
     EmailTemplateEditorView = BaseView.extend({
         options: {
-            typeSwitcher: 'input[name*="type"]', //type (Html or Plain) switcher selector
-            hasWysiwyg: false, //is wysiwyg editor enabled in System->Configuration
-            isWysiwygEnabled: false, //true if 'type' is set to 'Html'
+            typeSwitcher: 'input[name*="type"]', // type (Html or Plain) switcher selector
+            hasWysiwyg: false, // is wysiwyg editor enabled in System->Configuration
+            isWysiwygEnabled: false, // true if 'type' is set to 'Html'
             emailVariableView: {} // link to app/views/email-variable-view
         },
         listen: {
@@ -71,12 +71,12 @@ define(function(require) {
                 }
                 var confirmModal = new DialogWidget({
                     title: __('Preview'),
-                    'dialogOptions': {
-                        'modal': true,
-                        'resizable': true,
-                        'width': '85%',
-                        'height': '70%',
-                        'autoResize': true
+                    dialogOptions: {
+                        modal: true,
+                        resizable: true,
+                        width: '85%',
+                        height: '70%',
+                        autoResize: true
                     }
                 });
                 confirmModal.render();
@@ -158,7 +158,6 @@ define(function(require) {
                     this.listenToOnce(view, 'TinyMCE:initialized', this._onEditorBlur.bind(this));
                 }
             });
-
         }
     });
 

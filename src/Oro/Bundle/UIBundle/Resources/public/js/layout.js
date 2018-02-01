@@ -90,6 +90,7 @@ define(function(require) {
             var $container;
 
             $container = $(container);
+
             this.styleForm($container);
 
             scrollspy.init($container);
@@ -97,6 +98,8 @@ define(function(require) {
             $container.find('[data-toggle="tooltip"]').tooltip();
 
             this.initPopover($container);
+
+            mediator.trigger('layoutInit', $container);
         },
 
         initPopover: function(container, options) {
@@ -122,7 +125,7 @@ define(function(require) {
             }
 
             $items.not('[data-close="false"]').each(function(i, el) {
-                //append close link
+                // append close link
                 var content = $(el).data('content');
                 content += '<i class="fa-close popover-close"></i>';
                 $(el).data('content', content);
@@ -141,8 +144,8 @@ define(function(require) {
                 .on('click.popover-hide', function(e) {
                     var $target = $(e.target);
                     $items.each(function() {
-                        //the 'is' for buttons that trigger popups
-                        //the 'has' for icons within a button that triggers a popup
+                        // the 'is' for buttons that trigger popups
+                        // the 'has' for icons within a button that triggers a popup
                         if (
                             !$(this).is($target) &&
                                 $(this).has($target).length === 0 &&

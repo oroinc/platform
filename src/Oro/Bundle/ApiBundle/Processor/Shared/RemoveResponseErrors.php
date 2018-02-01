@@ -8,7 +8,8 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\ErrorStatusCodesWithoutContentTrait;
 
 /**
- * Removes errors from the response for some predefined HTTP status codes.
+ * Removes errors from the response for some predefined HTTP status codes,
+ * e.g. for 405 (Method Not Allowed).
  */
 class RemoveResponseErrors implements ProcessorInterface
 {

@@ -143,7 +143,7 @@ define(function(require) {
             var str = '';
 
             if (this.icon) {
-                str = this.iconHideText ? 'icon-only'  : 'icon-text';
+                str = this.iconHideText ? 'icon-only' : 'icon-text';
             } else {
                 str = 'text-only';
             }

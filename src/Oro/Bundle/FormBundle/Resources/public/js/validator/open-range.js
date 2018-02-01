@@ -1,5 +1,5 @@
 define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/number'
-    ], function(_, __, numberFormatter) {
+], function(_, __, numberFormatter) {
     'use strict';
 
     var defaultParam = {

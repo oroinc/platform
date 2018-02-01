@@ -62,10 +62,10 @@ define(['jquery', 'underscore', './number'], function($, _, numberValidator) {
     }
 
     function getCount(validator, element) {
-        //Example: collectionName = 'form[additional]'
+        // Example: collectionName = 'form[additional]'
         var collectionName = $(element).data('collectionName');
         if (!collectionName) {
-            //use old logic if data-collection-name not found
+            // use old logic if data-collection-name not found
             return getCheckboxCount(validator.findByName(element.name));
         }
 
@@ -74,7 +74,7 @@ define(['jquery', 'underscore', './number'], function($, _, numberValidator) {
             return $fields.length;
         }
 
-        //if all $fields is a checkbox/radio fields
+        // if all $fields is a checkbox/radio fields
         var $choicesFields = $fields.filter(':checkbox, :radio');
         if ($choicesFields.length === $fields.length) {
             return getCheckboxCount($choicesFields);

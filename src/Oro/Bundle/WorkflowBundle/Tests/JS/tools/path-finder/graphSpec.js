@@ -9,7 +9,7 @@ define(function(require) {
     describe('oroworkflow/js/tools/path-finder/graph', function() {
         beforeEach(function prepareGraph() {
             var graph = new Graph();
-            graph.outerRect = new Rectangle (0, 0, 500, 500);
+            graph.outerRect = new Rectangle(0, 0, 500, 500);
             graph.rectangles.push(new Rectangle(100, 100, 100, 100));
             this.graph = graph;
         });
@@ -26,10 +26,18 @@ define(function(require) {
             var firstRect = graph.rectangles[0];
             graph.buildCornerAxises();
             expect(graph.baseAxises.length).toBe(4);
-            expect(_.any(graph.baseAxises, function(axis) {return axis.a.x === firstRect.top;})).toBeTruthy();
-            expect(_.any(graph.baseAxises, function(axis) {return axis.a.x === firstRect.bottom;})).toBeTruthy();
-            expect(_.any(graph.baseAxises, function(axis) {return axis.a.y === firstRect.left;})).toBeTruthy();
-            expect(_.any(graph.baseAxises, function(axis) {return axis.a.y === firstRect.right;})).toBeTruthy();
+            expect(_.any(graph.baseAxises, function(axis) {
+                return axis.a.x === firstRect.top;
+            })).toBeTruthy();
+            expect(_.any(graph.baseAxises, function(axis) {
+                return axis.a.x === firstRect.bottom;
+            })).toBeTruthy();
+            expect(_.any(graph.baseAxises, function(axis) {
+                return axis.a.y === firstRect.left;
+            })).toBeTruthy();
+            expect(_.any(graph.baseAxises, function(axis) {
+                return axis.a.y === firstRect.right;
+            })).toBeTruthy();
         });
 
         it('should add axises out from block center', function() {
@@ -38,8 +46,12 @@ define(function(require) {
             var rectCenter = firstRect.center;
             graph.buildCenterAxises();
 
-            var vX = _.countBy(graph.baseAxises, function(axis) {return axis.a.x;});
-            var vY = _.countBy(graph.baseAxises, function(axis) {return axis.a.y;});
+            var vX = _.countBy(graph.baseAxises, function(axis) {
+                return axis.a.x;
+            });
+            var vY = _.countBy(graph.baseAxises, function(axis) {
+                return axis.a.y;
+            });
 
             expect(graph.baseAxises.length).toBe(8);
 
@@ -57,7 +69,9 @@ define(function(require) {
             graph.rectangles.push(new Rectangle(300, 300, 100, 100));
             graph.buildCenterLinesBetweenNodes();
             expect(graph.baseAxises.length).toBe(2);
-            expect(_.every(graph.baseAxises, function(ax) {return ax.a.x === 250 || ax.a.y === 250;})).toBeTruthy();
+            expect(_.every(graph.baseAxises, function(ax) {
+                return ax.a.x === 250 || ax.a.y === 250;
+            })).toBeTruthy();
         });
 
         it('should finalize (setup connections) correctly', function() {

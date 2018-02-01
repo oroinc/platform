@@ -12,8 +12,8 @@ define(function(require) {
 
     BaseTreeManageView = BaseTreeView.extend({
         treeEvents: {
-            'move_node.jstree':  'onMove',
-            'select-subtree-item:change':  'onSelectSubtreeChange'
+            'move_node.jstree': 'onMove',
+            'select-subtree-item:change': 'onSelectSubtreeChange'
         },
 
         /**
@@ -66,7 +66,7 @@ define(function(require) {
             if (options.updateAllowed) {
                 config.plugins.push('dnd');
                 config.dnd = {
-                    'copy': false
+                    copy: false
                 };
             }
             return config;

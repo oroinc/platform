@@ -1,5 +1,5 @@
-define(['jquery', 'underscore', 'oroui/js/widget-manager', 'routing'],
-function($, _, widgetManager, routing) {
+define(['jquery', 'underscore', 'oroui/js/widget-manager', 'routing'
+], function($, _, widgetManager, routing) {
     'use strict';
 
     /**
@@ -60,7 +60,7 @@ function($, _, widgetManager, routing) {
         var $createBtn = $btnContainer.find('.entity-create-btn');
         var $cancelBtn = $btnContainer.find('.entity-cancel-btn');
 
-        var drawGrid =  function() {
+        var drawGrid = function() {
             widgetManager.getWidgetInstanceByAlias(gridWidgetAlias, function(widget) {
                 if (widget.firstRun) {
                     widget.render();
