@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define(function(require) {
     'use strict';
 
@@ -62,7 +60,6 @@ define(function(require) {
                 $(this.invalidateNow).val(1);
                 $(this.$elem).find('tr>td:gt(1)').hide();
                 $(this.removeInvalidationButton).hide();
-
             } else if (value === 'scheduled') {
                 $(this.invalidateNow).val('');
                 $(this.$elem).find('tr>td:gt(1)').show();

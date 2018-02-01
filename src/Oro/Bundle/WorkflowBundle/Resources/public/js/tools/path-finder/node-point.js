@@ -1,5 +1,5 @@
-define(['./extends', './point2d', './directions', './connection'],
-function(__extends, Point2d, directions, Connection) {
+define(['./extends', './point2d', './directions', './connection'
+], function(__extends, Point2d, directions, Connection) {
     'use strict';
 
     var directionIds = [
@@ -86,11 +86,9 @@ function(__extends, Point2d, directions, Connection) {
         if (this.connections[direction.id]) {
             this.connections[direction.id].remove();
         }
-        /* jshint ignore:start */
         if (node) {
             new Connection(this, node, direction);
         }
-        /* jshint ignore:end */
     };
 
     /**

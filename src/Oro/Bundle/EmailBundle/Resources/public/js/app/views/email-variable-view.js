@@ -15,16 +15,16 @@ define(function(require) {
      */
     EmailVariableView = BaseView.extend({
         options: {
-            templateSelector:        null,
+            templateSelector: null,
             sectionTemplateSelector: null,
-            sectionContentSelector:  null,
-            sectionTabSelector:      null,
-            fieldsSelectors:         ['input[name*="subject"]', 'textarea[name*="content"]'],
-            defaultFieldIndex:       1 // index in fieldsSelectors
+            sectionContentSelector: null,
+            sectionTabSelector: null,
+            fieldsSelectors: ['input[name*="subject"]', 'textarea[name*="content"]'],
+            defaultFieldIndex: 1 // index in fieldsSelectors
         },
 
         events: {
-            'click a.variable':  '_handleVariableClick',
+            'click a.variable': '_handleVariableClick',
             'click a.reference': '_handleReferenceClick'
         },
 

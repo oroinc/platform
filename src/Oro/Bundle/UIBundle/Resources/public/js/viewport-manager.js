@@ -51,7 +51,7 @@ define([
                 isApplicable: _.bind(this.isApplicable, this)
             };
 
-            mediator.on('layout:reposition',  _.debounce(this._onResize, 50), viewportManager);
+            mediator.on('layout:reposition', _.debounce(this._onResize, 50), viewportManager);
         },
 
         getViewport: function() {
@@ -186,8 +186,8 @@ define([
 
             return minScreenType === 'any' || (
                 (_.isObject(viewport) && _.isObject(minViewport)) ?
-                viewport.max >= minViewport.max :
-                false
+                    viewport.max >= minViewport.max :
+                    false
             );
         },
 
@@ -197,8 +197,8 @@ define([
 
             return maxScreenType === 'any' || (
                 (_.isObject(viewport) && _.isObject(maxViewport)) ?
-                viewport.max <= maxViewport.max :
-                false
+                    viewport.max <= maxViewport.max :
+                    false
             );
         },
 

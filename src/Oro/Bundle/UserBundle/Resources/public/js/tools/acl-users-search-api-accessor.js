@@ -1,4 +1,3 @@
-/** @lends AclUsersSearchApiAccessor */
 define(function(require) {
     'use strict';
 
@@ -17,7 +16,7 @@ define(function(require) {
     var AclUsersSearchApiAccessor;
     var SearchApiAccessor = require('oroui/js/tools/search-api-accessor');
 
-    AclUsersSearchApiAccessor = SearchApiAccessor.extend(/** @exports AclUsersSearchApiAccessor.prototype */{
+    AclUsersSearchApiAccessor = SearchApiAccessor.extend(/** @lends AclUsersSearchApiAccessor.prototype */{
         /**
          * @constructor
          */

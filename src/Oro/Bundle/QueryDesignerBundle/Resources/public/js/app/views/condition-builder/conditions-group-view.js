@@ -53,7 +53,7 @@ define(function(require) {
         assignConditionSubview: function(conditionView) {
             this.subview('condition:' + conditionView.cid, conditionView);
             this.listenTo(conditionView, {
-                'change': this._checkValueChange
+                change: this._checkValueChange
             });
             this._checkValueChange();
         },

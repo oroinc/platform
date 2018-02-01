@@ -16,6 +16,7 @@ class GridParamsExtensionTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->extension  = new GridParamsExtension();
+        $this->extension->setParameters(new ParameterBag());
     }
 
     /**

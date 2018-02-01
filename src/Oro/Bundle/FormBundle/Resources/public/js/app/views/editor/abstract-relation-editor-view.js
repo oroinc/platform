@@ -1,4 +1,3 @@
-/** @lends AbstractRelationEditorView */
 define(function(require) {
     'use strict';
 
@@ -36,7 +35,7 @@ define(function(require) {
     var tools = require('oroui/js/tools');
     require('jquery.select2');
 
-    AbstractRelationEditorView = SelectEditorView.extend(/** @exports AbstractRelationEditorView.prototype */{
+    AbstractRelationEditorView = SelectEditorView.extend(/** @lends AbstractRelationEditorView.prototype */{
         input_delay: 250,
         currentTerm: '',
         DEFAULT_PER_PAGE: 20,

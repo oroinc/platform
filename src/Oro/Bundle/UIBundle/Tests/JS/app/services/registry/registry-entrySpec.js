@@ -5,7 +5,6 @@ define(function(require) {
     var RegistryEntry = require('oroui/js/app/services/registry/registry-entry');
 
     describe('oroui/js/app/services/registry/registry-entry', function() {
-
         it('implements Backbone.Events', function() {
             expect(Object.getPrototypeOf(RegistryEntry.prototype)).toBe(Backbone.Events);
         });

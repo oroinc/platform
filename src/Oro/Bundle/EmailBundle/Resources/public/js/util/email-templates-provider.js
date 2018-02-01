@@ -9,7 +9,7 @@ define(function(require) {
         create: function(templateId, relatedEntityId) {
             var url = routing.generate(
                 'oro_api_get_emailtemplate_compiled',
-                {'id': templateId, 'entityId': relatedEntityId}
+                {id: templateId, entityId: relatedEntityId}
             );
 
             return $.ajax({

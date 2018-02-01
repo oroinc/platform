@@ -29,8 +29,8 @@ define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_
             format_address_by_address_country: true,
             apiKey: null,
             unit: {
-                'temperature': 'fahrenheit',
-                'wind_speed':  'miles_per_hour'
+                temperature: 'fahrenheit',
+                wind_speed: 'miles_per_hour'
             },
             locale_data: {
                 US: {
@@ -119,7 +119,7 @@ define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_
             },
             calendar: {
                 dow: {
-                    wide: {
+                    'wide': {
                         1: 'Sunday',
                         2: 'Monday',
                         3: 'Tuesday',
@@ -128,35 +128,35 @@ define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_
                         6: 'Friday',
                         7: 'Saturday'
                     },
-                    abbreviated: {1: 'Sun', 2: 'Mon', 3: 'Tue', 4: 'Wed', 5: 'Thu', 6: 'Fri', 7: 'Sat'},
-                    short:       {1: 'Su',  2: 'Mo',  3: 'Tu',  4: 'We',  5: 'Th',  6: 'Fr',  7: 'Sa'},
-                    narrow:      {1: 'S',   2: 'M',   3: 'T',   4: 'W',   5: 'T',   6: 'F',   7: 'S'}
+                    'abbreviated': {1: 'Sun', 2: 'Mon', 3: 'Tue', 4: 'Wed', 5: 'Thu', 6: 'Fri', 7: 'Sat'},
+                    'short': {1: 'Su', 2: 'Mo', 3: 'Tu', 4: 'We', 5: 'Th', 6: 'Fr', 7: 'Sa'},
+                    'narrow': {1: 'S', 2: 'M', 3: 'T', 4: 'W', 5: 'T', 6: 'F', 7: 'S'}
                 },
                 months: {
                     wide: {
-                        1:  'January',
-                        2:  'February',
-                        3:  'March',
-                        4:  'April',
-                        5:  'May',
-                        6:  'June',
-                        7:  'July',
-                        8:  'August',
-                        9:  'September',
+                        1: 'January',
+                        2: 'February',
+                        3: 'March',
+                        4: 'April',
+                        5: 'May',
+                        6: 'June',
+                        7: 'July',
+                        8: 'August',
+                        9: 'September',
                         10: 'October',
                         11: 'November',
                         12: 'December'
                     },
                     abbreviated: {
-                        1:  'Jan',
-                        2:  'Feb',
-                        3:  'Mar',
-                        4:  'Apr',
-                        5:  'May',
-                        6:  'Jun',
-                        7:  'Jul',
-                        8:  'Aug',
-                        9:  'Sep',
+                        1: 'Jan',
+                        2: 'Feb',
+                        3: 'Mar',
+                        4: 'Apr',
+                        5: 'May',
+                        6: 'Jun',
+                        7: 'Jul',
+                        8: 'Aug',
+                        9: 'Sep',
                         10: 'Oct',
                         11: 'Nov',
                         12: 'Dec'
@@ -322,7 +322,9 @@ define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_
             width = (width && this.settings.calendar.months.hasOwnProperty(width)) ? width : 'wide';
             var result = this.settings.calendar.months[width];
             if (asArray) {
-                result = _.map(result, function(v) { return v; });
+                result = _.map(result, function(v) {
+                    return v;
+                });
             }
             return result;
         },

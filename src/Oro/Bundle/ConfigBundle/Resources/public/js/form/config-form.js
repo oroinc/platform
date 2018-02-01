@@ -74,12 +74,12 @@ define(function(require) {
         resetHandler: function(event) {
             var $checkboxes = this.$el.find('.parent-scope-checkbox input');
             var confirm = new Modal({
-                    title: __('Confirmation'),
-                    okText: __('OK'),
-                    cancelText: __('Cancel'),
-                    content: __('Settings will be restored to saved values. Please confirm you want to continue.'),
-                    className: 'modal modal-primary'
-                });
+                title: __('Confirmation'),
+                okText: __('OK'),
+                cancelText: __('Cancel'),
+                content: __('Settings will be restored to saved values. Please confirm you want to continue.'),
+                className: 'modal modal-primary'
+            });
 
             confirm.on('ok', _.bind(function() {
                 this.$el.get(0).reset();

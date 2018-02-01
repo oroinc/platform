@@ -7,9 +7,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 
 /**
- * Validates that loaded entity was deleted.
+ * Makes sure that the Context does not contain the result.
  */
-class ValidateResultNotExists implements ProcessorInterface
+class AssertNotHasResult implements ProcessorInterface
 {
     /**
      * {@inheritdoc}

@@ -41,7 +41,7 @@ define(function(require) {
         getCssHeightCalcExpression: function() {
             var documentHeight = scrollHelper.documentHeight();
             var availableHeight = mediator.execute('layout:getAvailableHeight',
-                    this.main.$grid.parents('.grid-scrollable-container:first'));
+                this.main.$grid.parents('.grid-scrollable-container:first'));
             return 'calc(100vh - ' + (documentHeight - availableHeight) + 'px)';
         },
 

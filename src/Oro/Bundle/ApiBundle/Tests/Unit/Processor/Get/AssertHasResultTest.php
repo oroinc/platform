@@ -2,18 +2,24 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get;
 
-use Oro\Bundle\ApiBundle\Processor\Get\ValidateResult;
+use Oro\Bundle\ApiBundle\Processor\Get\AssertHasResult;
 
-class ValidateResultTest extends GetProcessorTestCase
+class AssertHasResultTest extends GetProcessorTestCase
 {
-    /** @var ValidateResult */
+    /** @var AssertHasResult */
     protected $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->processor = new ValidateResult();
+        $this->processor = new AssertHasResult();
+    }
+
+    public function testProcessOnExpectedResult()
+    {
+        $this->context->setResult(['key' => 'value']);
+        $this->processor->process($this->context);
     }
 
     /**

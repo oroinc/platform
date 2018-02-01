@@ -311,7 +311,7 @@ define(function(require) {
             view.hideAllWidgetHovers();
 
             widget.snapshotState();
-            widget.set({'state': constants.WIDGET_MAXIMIZED_HOVER}, {silent: true});
+            widget.set({state: constants.WIDGET_MAXIMIZED_HOVER}, {silent: true});
             widget.save();
 
             if (!view.hoverViews.hasOwnProperty(cid)) {

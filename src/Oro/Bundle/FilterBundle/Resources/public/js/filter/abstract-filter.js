@@ -398,7 +398,6 @@ define([
                     break;
                 default:
                     result = $input.val();
-
             }
             return result;
         },
@@ -427,7 +426,6 @@ define([
                     break;
                 default:
                     $input.val(value);
-
             }
             return this;
         },
@@ -472,8 +470,8 @@ define([
          */
         _writeDOMValue: function(value) {
             throw new Error('Method _writeDOMValue is abstract and must be implemented');
-            //this._setInputValue(inputValueSelector, value.value);
-            //return this
+            // this._setInputValue(inputValueSelector, value.value);
+            // return this
         },
 
         /**
@@ -484,7 +482,7 @@ define([
          */
         _readDOMValue: function() {
             throw new Error('Method _readDOMValue is abstract and must be implemented');
-            //return { value: this._getInputValue(this.inputValueSelector) }
+            // return { value: this._getInputValue(this.inputValueSelector) }
         },
 
         /**

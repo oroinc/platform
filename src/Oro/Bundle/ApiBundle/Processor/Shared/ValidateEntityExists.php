@@ -8,9 +8,9 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Checks whether an entity is loaded.
+ * Makes sure that an entity is loaded.
  */
-class ValidateLoadedEntity implements ProcessorInterface
+class ValidateEntityExists implements ProcessorInterface
 {
     /**
      * {@inheritdoc}

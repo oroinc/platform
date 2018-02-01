@@ -29,7 +29,7 @@ define([
 
         if (!_.isUndefined(target)) {
             $(target).attr({
-                tabindex: 0,
+                'tabindex': 0,
                 'data-scroll-focus': ''
             }).one('blur', function() {
                 $(this).removeAttr('data-scroll-focus tabindex');

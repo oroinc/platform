@@ -77,11 +77,11 @@ define(function(require) {
         clear: function() {
             // set model data to default
             this.model.set({
-                'host': '',
-                'port': null,
-                'encryption': null,
-                'username': '',
-                'password': ''
+                host: '',
+                port: null,
+                encryption: null,
+                username: '',
+                password: ''
             });
         }
     });

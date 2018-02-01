@@ -25,7 +25,7 @@ define(function(require) {
         }
         el.selectionStart = el.selectionEnd = el.value.length;
 
-        //simulate all events during user input
+        // simulate all events during user input
         var e;
         e = $.Event('keydown', {key: enteredKey});
         $el.trigger(e);

@@ -40,7 +40,7 @@ define(function(require) {
                     if (optionPrefix && option.indexOf(optionPrefix) === 0) {
                         delete themeOptions[option];
                         option = option.replace(optionPrefix, '');
-                        option = option.charAt(0).toLowerCase() + option.slice(1);//transform: SomeOption > someOption
+                        option = option.charAt(0).toLowerCase() + option.slice(1);// transform: SomeOption > someOption
                         themeOptions[option] = value;
                     }
                 });

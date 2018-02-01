@@ -1,5 +1,5 @@
 define(['jquery', '../locale-settings', './name'
-    ], function($, localeSettings, nameFormatter) {
+], function($, localeSettings, nameFormatter) {
     'use strict';
 
     /**

@@ -161,10 +161,10 @@ define([
         _processRedirect: function(response) {
             var hashUrl = '';
             // @TODO add extra parameter for redirect after login
-            /*if (Navigation.isEnabled()) {
+            /* if (Navigation.isEnabled()) {
                 var navigation = Navigation.getInstance();
                 hashUrl = '#url=' + navigation.getHashUrl();
-            }*/
+            } */
             window.location.href = response.redirectUrl || (routing.generate(defaults.loginRoute) + hashUrl);
         }
     };

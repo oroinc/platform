@@ -1,4 +1,4 @@
-## Entity aliases ##
+## Entity aliases
 
 [Entity aliases](./../../Model/EntityAlias.php) were introduced to provide a simple and elegant way of referring to entities.
 
