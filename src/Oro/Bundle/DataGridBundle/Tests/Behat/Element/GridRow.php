@@ -172,9 +172,11 @@ class GridRow extends TableRow
     {
         if ($showMoreLink = $this->find('named', ['link', '...'])) {
             $showMoreLink->mouseOver();
-            $link = $this->elementFactory
-                ->createElement('GridFloatingMenu')
-                ->find('named', ['link', ucfirst($action)]);
+            $link = $this->waitFor(5, function () use ($action) {
+                return $this->elementFactory
+                    ->createElement('GridFloatingMenu')
+                    ->find('named', ['link', ucfirst($action)]);
+            });
         } else {
             $link = $this->find('named', ['link', ucfirst($action)]);
         }
