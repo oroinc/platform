@@ -41,7 +41,8 @@ class StoreSqlExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
-            $config->isOrmDatasource()
+            parent::isApplicable($config)
+            && $config->isOrmDatasource()
             && $this->getParameters()->get(self::DISPLAY_SQL_QUERY, false)
             && $this->tokenAccessor->hasUser()
             && $this->authorizationChecker->isGranted('oro_report_view_sql');
