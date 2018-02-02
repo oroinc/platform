@@ -62,29 +62,44 @@ class ImportStrategyListener
             return;
         }
 
-        /**
-         * We should allow to set organization for entity only in case of console import.
-         * If import process was executed from UI (grid's import), current organization for entities should be set.
-         */
-        $organization = $this->getPropertyAccessor()->getValue($entity, $organizationField);
-        if ($organization
-            && $this->tokenAccessor->getOrganization()
-            && $organization->getId() == $this->tokenAccessor->getOrganizationId()
-        ) {
+        $entityOrganization = $this->getPropertyAccessor()->getValue($entity, $organizationField);
+        $tokenOrganization = $this->tokenAccessor->getOrganization();
+
+        if ($entityOrganization) {
+            /**
+             * Do nothing in case if entity already have organization field value but this value was absent in item data
+             * (the value of organization field was set to the entity before the import).
+             */
+            $data = $event->getContext()->getValue('itemData');
+            if ($data && !array_key_exists($organizationField, $data)) {
+                return;
+            }
+
+            /**
+             * We should allow to set organization for entity only in anonymous mode then the token has no organization
+             * (for example, console import).
+             * If import process was executed not in anonymous mode (for example, grid's import),
+             * current organization for entities should be set.
+             */
+            if (!$tokenOrganization
+                || ($tokenOrganization && $entityOrganization->getId() == $this->tokenAccessor->getOrganizationId())
+            ) {
+                return;
+            }
+        }
+
+        // By default, the token organization should be set as entity organization.
+        $entityOrganization = $tokenOrganization;
+
+        if (!$entityOrganization) {
+            $entityOrganization = $this->getDefaultOrganization();
+        }
+
+        if (!$entityOrganization) {
             return;
         }
 
-        $organization = $this->tokenAccessor->getOrganization();
-
-        if (!$organization) {
-            $organization = $this->getDefaultOrganization();
-        }
-
-        if (!$organization) {
-            return;
-        }
-
-        $this->getPropertyAccessor()->setValue($entity, $organizationField, $organization);
+        $this->getPropertyAccessor()->setValue($entity, $organizationField, $entityOrganization);
     }
 
     /**
