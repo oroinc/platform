@@ -231,6 +231,11 @@ services:
         arguments:
             - '@oro_message_queue.client.message_producer'
             - '@monolog.logger'
+        calls:
+            - [setIndexer,  ['@oro_search.search.engine.indexer']]
+            - [setJobRunner,  ['@oro_message_queue.job.runner']]
+            - [setDoctrineHelper,  ['@oro_entity.doctrine_helper']]
+            - [setPropertyAccessor,  ['@property_accessor']]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -269,6 +274,8 @@ services:
         arguments:
             - '@oro_message_queue.client.message_producer'
             - '@oro_entity.doctrine_helper'
+        calls:
+            - [setMessageTransformer,  ['@oro_search.transformer.message']]
 
     oro_search.extension.search_filter:
         class: %oro_search.extension.search_filter.class%
@@ -303,13 +310,10 @@ services:
             - { name: form.type, alias: oro_search_type_entity_filter }
 
     oro_search.migration.demo_data_fixtures_listener.reindex:
-        parent: oro_platform.event_listener.demo_data_fixtures_listener.abstract
         class: Oro\Bundle\SearchBundle\EventListener\ReindexDemoDataFixturesListener
         arguments:
+            - '@oro_platform.optional_listeners.manager'
             - '@oro_search.search.engine.indexer'
-        calls:
-            # this listener is disabled to prevent a lot of reindex messages
-            - [disableListener, ['oro_search.index_listener']]
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad, priority: -100 }
@@ -318,3 +322,9 @@ services:
        class: Oro\Bundle\SearchBundle\Utils\SearchAllText
        arguments:
             - '@translator'
+
+    oro_search.transformer.message:
+        class: Oro\Bundle\SearchBundle\Transformer\MessageTransformer
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        public: false
