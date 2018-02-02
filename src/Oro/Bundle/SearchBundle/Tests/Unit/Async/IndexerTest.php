@@ -1,13 +1,17 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\SearchBundle\Async\Indexer;
 use Oro\Bundle\SearchBundle\Async\Topics;
+use Oro\Bundle\SearchBundle\Transformer\MessageTransformer;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class IndexerTest extends \PHPUnit_Framework_TestCase
 {
     use MessageQueueExtension;
@@ -47,6 +51,8 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $indexer = new Indexer(self::getMessageProducer(), $doctrineHelper);
+        $indexer
+            ->setMessageTransformer(new MessageTransformer($this->createDoctrineHelperMock()));
         $result = $indexer->save(null);
 
         $this->assertFalse($result);
@@ -62,6 +68,8 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $indexer = new Indexer(self::getMessageProducer(), $doctrineHelper);
+        $indexer
+            ->setMessageTransformer(new MessageTransformer($this->createDoctrineHelperMock()));
         $result = $indexer->delete(null);
 
         $this->assertFalse($result);
@@ -77,24 +85,24 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue('identity'))
+            ->will($this->returnValue(35))
         ;
         $doctrineHelper
             ->expects($this->once())
-            ->method('getEntityMetadata')
+            ->method('getEntityClass')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue(new ClassMetadata('entity-name')))
+            ->will($this->returnValue('entity-name'))
         ;
 
         $indexer = new Indexer(self::getMessageProducer(), $doctrineHelper);
+        $indexer
+            ->setMessageTransformer(new MessageTransformer($doctrineHelper));
         $result = $indexer->save($entity);
 
         $this->assertTrue($result);
         self::assertMessageSent(
             Topics::INDEX_ENTITIES,
-            [
-                ['class' => 'entity-name', 'id' => 'identity']
-            ]
+            ['class' => 'entity-name', 'entityIds' => [35 => 35]]
         );
     }
 
@@ -107,24 +115,24 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($entities[0]))
-            ->will($this->returnValue('identity'))
+            ->will($this->returnValue(35))
         ;
         $doctrineHelper
             ->expects($this->once())
-            ->method('getEntityMetadata')
+            ->method('getEntityClass')
             ->with($this->identicalTo($entities[0]))
-            ->will($this->returnValue(new ClassMetadata('entity-name')))
+            ->will($this->returnValue('entity-name'))
         ;
 
         $indexer = new Indexer(self::getMessageProducer(), $doctrineHelper);
+        $indexer
+            ->setMessageTransformer(new MessageTransformer($doctrineHelper));
         $result = $indexer->save($entities);
 
         $this->assertTrue($result);
         self::assertMessageSent(
             Topics::INDEX_ENTITIES,
-            [
-                ['class' => 'entity-name', 'id' => 'identity']
-            ]
+            ['class' => 'entity-name', 'entityIds' => [35 => 35]]
         );
     }
 
@@ -137,24 +145,24 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue('identity'))
+            ->will($this->returnValue(35))
         ;
         $doctrineHelper
             ->expects($this->once())
-            ->method('getEntityMetadata')
+            ->method('getEntityClass')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue(new ClassMetadata('entity-name')))
+            ->will($this->returnValue('entity-name'))
         ;
 
         $indexer = new Indexer(self::getMessageProducer(), $doctrineHelper);
+        $indexer
+            ->setMessageTransformer(new MessageTransformer($doctrineHelper));
         $result = $indexer->delete($entity);
 
         $this->assertTrue($result);
         self::assertMessageSent(
             Topics::INDEX_ENTITIES,
-            [
-                ['class' => 'entity-name', 'id' => 'identity']
-            ]
+            ['class' => 'entity-name', 'entityIds' => [35 => 35]]
         );
     }
 
@@ -167,25 +175,25 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($entities[0]))
-            ->will($this->returnValue('identity'))
+            ->will($this->returnValue(35))
         ;
         $doctrineHelper
             ->expects($this->once())
-            ->method('getEntityMetadata')
+            ->method('getEntityClass')
             ->with($this->identicalTo($entities[0]))
-            ->will($this->returnValue(new ClassMetadata('entity-name')))
+            ->will($this->returnValue('entity-name'))
         ;
 
 
         $indexer = new Indexer(self::getMessageProducer(), $doctrineHelper);
+        $indexer
+            ->setMessageTransformer(new MessageTransformer($doctrineHelper));
         $result = $indexer->delete($entities);
 
         $this->assertTrue($result);
         self::assertMessageSent(
             Topics::INDEX_ENTITIES,
-            [
-                ['class' => 'entity-name', 'id' => 'identity']
-            ]
+            ['class' => 'entity-name', 'entityIds' => [35 => 35]]
         );
     }
 

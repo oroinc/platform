@@ -5,9 +5,11 @@ use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\SearchBundle\Async\IndexEntitiesByIdMessageProcessor;
 use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -48,55 +50,27 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
         self::assertMessagesEmpty(Topics::INDEX_ENTITY);
     }
 
-    public function testShouldLogErrorIfClassWasNotFound()
+    public function testShouldLogErrorIfNotEnoughDataToBuildJobName()
     {
         $message = new NullMessage();
-        $message->setBody(json_encode(
-            [[]]
-        ));
+        $message->setBody(json_encode(['class' => 'class-name']));
 
         $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('error')
-            ->with('Message is invalid. Class was not found.')
+            ->with('Expected array with keys "class" and "context" but given: "class"')
         ;
 
         $processor = new IndexEntitiesByIdMessageProcessor(self::getMessageProducer(), $logger);
+        $processor->setPropertyAccessor(new PropertyAccessor());
 
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
-        self::assertMessagesEmpty(Topics::INDEX_ENTITY);
+        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldLogErrorIfIdWasNotFound()
-    {
-        $message = new NullMessage();
-        $message->setBody(json_encode(
-            [
-                [
-                    'class' => 'class-name',
-                ],
-            ]
-        ));
-
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
-            ->method('error')
-            ->with('Message is invalid. Id was not found.')
-        ;
-
-        $processor = new IndexEntitiesByIdMessageProcessor(self::getMessageProducer(), $logger);
-
-        $result = $processor->process($message, $this->createMock(SessionInterface::class));
-
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
-        self::assertMessagesEmpty(Topics::INDEX_ENTITY);
-    }
-
-    public function testShouldPublishMessageToProducer()
+    public function testBuildJobNameForMessage()
     {
         $logger = $this->createLoggerMock();
         $logger
@@ -104,25 +78,23 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('error')
         ;
 
+        $jobRunner = $this->createMock(JobRunner::class);
+        $jobRunner->expects($this->once())
+            ->method('runUnique')
+            ->willReturn(true)
+            ->with('message id', 'search_reindex|d0d06767b38da968e7118c69f821bc1e');
+
         $processor = new IndexEntitiesByIdMessageProcessor(self::getMessageProducer(), $logger);
+        $processor->setJobRunner($jobRunner);
+        $processor->setPropertyAccessor(new PropertyAccessor());
 
         $message = new NullMessage();
-        $message->setBody(json_encode(
-            [
-                [
-                    'class' => 'class-name',
-                    'id' => 'id',
-                ],
-            ]
-        ));
+        $message->setMessageId('message id');
+        $message->setBody(json_encode(['class' => 'class-name', 'entityIds' => ['id']]));
 
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
-        self::assertMessageSent(
-            Topics::INDEX_ENTITY,
-            ['class' => 'class-name', 'id' => 'id']
-        );
     }
 
     /**
