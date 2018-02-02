@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-16397
 Feature: Import extend entity fields
   In order to effectively manage extend fields for entities
