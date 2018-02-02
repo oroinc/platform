@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -58,12 +59,16 @@ class PreHttpImportMessageProcessor extends PreImportMessageProcessorAbstract
      */
     protected function processJob($parentMessageId, $body, $files)
     {
+        $uniqueJobSlug = $body['userId'];
+        if (isset($body['options']['unique_job_slug'])) {
+            $uniqueJobSlug = $body['options']['unique_job_slug'];
+        }
         $jobName = sprintf(
             'oro:%s:%s:%s:%s',
             $body['process'],
             $body['processorAlias'],
             $body['jobName'],
-            $body['userId']
+            $uniqueJobSlug
         );
 
         $result = $this->jobRunner->runUnique(

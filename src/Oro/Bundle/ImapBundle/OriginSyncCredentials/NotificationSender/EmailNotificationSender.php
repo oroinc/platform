@@ -59,7 +59,7 @@ class EmailNotificationSender implements NotificationSenderInterface
             $sendTo = $emailOrigin->getOwner()->getEmail();
         } else {
             $templateName = 'sync_wrong_credentials_system_box';
-            $sendTo = $senderEmail;
+            $sendTo = $emailOrigin->getMailbox()->getEmail();
         }
 
         $template = $this->doctrine

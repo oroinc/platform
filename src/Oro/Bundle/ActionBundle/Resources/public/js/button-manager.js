@@ -243,22 +243,22 @@ define(function(require) {
          * @param {function} callback
          */
         showConfirmDialog: function(callback) {
-            var messages = {};
+            var options = {};
             if (!_.isEmpty(this.options.confirmation)) {
                 var placeholders = this.options.confirmation.message_parameters || {};
 
-                messages = {
-                    title: (this.options.confirmation.title || this.messages.confirm_title),
+                options = _.defaults(_.omit(this.options.confirmation, 'component', 'message'), {
+                    title: this.messages.confirm_title,
                     content: (this.options.confirmation.message || this.messages.confirm_content),
-                    okText: (this.options.confirmation.okText || this.messages.confirm_ok),
-                    cancelText: (this.options.confirmation.cancelText || this.messages.confirm_cancel)
-                };
+                    okText: this.messages.confirm_ok,
+                    cancelText: this.messages.confirm_cancel
+                });
 
-                _.each(messages, function(item, key, list) {
-                    list[key] = __(item, $.extend({}, placeholders));
+                _.each(options, function(item, key, list) {
+                    list[key] = _.isString(item) ? __(item, $.extend({}, placeholders)) : item;
                 });
             } else {
-                messages = {
+                options = {
                     content: this.options.message.content || __(this.messages.confirm_content),
                     title: this.options.message.title || __(this.messages.confirm_title),
                     okText: this.options.message.okText || __(this.messages.confirm_ok),
@@ -266,7 +266,7 @@ define(function(require) {
                 };
             }
 
-            this.confirmModal = (new this.confirmModalConstructor(messages));
+            this.confirmModal = (new this.confirmModalConstructor(options));
             Backbone.listenTo(this.confirmModal, 'ok', callback);
 
             this.confirmModal.open();

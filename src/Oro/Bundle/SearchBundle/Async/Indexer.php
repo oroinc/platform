@@ -1,8 +1,10 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Async;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
+use Oro\Bundle\SearchBundle\Transformer\MessageTransformerInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class Indexer implements IndexerInterface
@@ -13,18 +15,33 @@ class Indexer implements IndexerInterface
     protected $doctrineHelper;
 
     /**
+     * @var MessageTransformerInterface
+     */
+    private $transformer;
+
+    /**
      * @var MessageProducerInterface
      */
     protected $producer;
 
     /**
      * @param MessageProducerInterface $producer
-     * @param DoctrineHelper           $doctrineHelper
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(MessageProducerInterface $producer, DoctrineHelper $doctrineHelper)
-    {
+    public function __construct(
+        MessageProducerInterface $producer,
+        DoctrineHelper $doctrineHelper
+    ) {
         $this->producer = $producer;
         $this->doctrineHelper = $doctrineHelper;
+    }
+
+    /**
+     * @param MessageTransformerInterface $transformer
+     */
+    public function setMessageTransformer(MessageTransformerInterface $transformer)
+    {
+        $this->transformer = $transformer;
     }
 
     /**
@@ -85,21 +102,16 @@ class Indexer implements IndexerInterface
      */
     protected function doIndex($entity)
     {
-        if (false == $entity) {
+        if (!$entity) {
             return false;
         }
 
         $entities = is_array($entity) ? $entity : [$entity];
 
-        $body = [];
-        foreach ($entities as $entity) {
-            $body[] = [
-                'class' => $this->doctrineHelper->getEntityMetadata($entity)->getName(),
-                'id' => $this->doctrineHelper->getSingleEntityIdentifier($entity),
-            ];
+        $messages = $this->transformer->transform($entities);
+        foreach ($messages as $message) {
+            $this->producer->send(Topics::INDEX_ENTITIES, $message);
         }
-
-        $this->producer->send(Topics::INDEX_ENTITIES, $body);
 
         return true;
     }

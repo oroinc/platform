@@ -9,15 +9,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-
 use Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimiter;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimitResult;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
-use Oro\Bundle\SearchBundle\Async\Topics;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class DeleteMassActionHandler implements MassActionHandlerInterface
 {
@@ -102,18 +100,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
      */
     protected function finishBatch(EntityManager $manager, $entityName, array $deletedIds)
     {
-        $body = [];
-        foreach ($deletedIds as $deletedId) {
-            $body [] = [
-                'class' => $entityName,
-                'id' => $deletedId
-            ];
-        }
-
         $manager->flush();
-
-        $this->producer->send(Topics::INDEX_ENTITIES, $body);
-
         $manager->clear();
     }
 
@@ -227,10 +214,9 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         $queryBuilder = $args->getResults()->getSource();
         $results      = new DeletionIterableResult($queryBuilder);
         $results->setBufferSize(self::FLUSH_BATCH_SIZE);
-        $this->listenerManager->disableListeners(['oro_search.index_listener']);
         // if huge amount data must be deleted
         set_time_limit(0);
-        $deletedIds            = [];
+        $deletedIds = [];
         $entityIdentifiedField = $this->getEntityIdentifierField($args);
         /** @var EntityManager $manager */
         $manager = $this->registry->getManagerForClass($entityName);

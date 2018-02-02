@@ -22,10 +22,27 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext, Fi
      */
     public function iHaveCompleteCalendarDateTable($fromYear, $toYear)
     {
+        $this->clearCalendarDateTable();
+
         $startDate = new \DateTime(sprintf('first day of January %d midnight', $fromYear), new \DateTimeZone('UTC'));
         $endDate = new \DateTime(sprintf('first day of January %d noon', $toYear), new \DateTimeZone('UTC'));
 
         $this->fillDatesFrom($startDate, $endDate);
+    }
+
+    protected function clearCalendarDateTable()
+    {
+        $em = $this->getContainer()
+            ->get('doctrine')
+            ->getManagerForClass(CalendarDate::class);
+
+        $repository = $em->getRepository(CalendarDate::class);
+
+        foreach ($repository->findAll() as $calendarDate) {
+            $em->remove($calendarDate);
+        }
+
+        $em->flush();
     }
 
     /**
