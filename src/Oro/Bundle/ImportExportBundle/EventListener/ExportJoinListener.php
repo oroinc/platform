@@ -53,7 +53,7 @@ class ExportJoinListener
      * @param string $entityName
      * @return array
      */
-    private function getEntityIds(array $rows, $entityName)
+    private function getEntityIds(array $rows, string $entityName)
     {
         $identifier = $this->getEntityIdentifier($entityName);
 
@@ -69,7 +69,7 @@ class ExportJoinListener
      * @param string $entityName
      * @return string
      */
-    private function getEntityIdentifier($entityName)
+    private function getEntityIdentifier(string $entityName)
     {
         /** @var EntityManager $entityManager */
         $entityManager = $this->registry->getManagerForClass($entityName);
@@ -79,11 +79,11 @@ class ExportJoinListener
     }
 
     /**
-     * @param $entityName
+     * @param string $entityName
      * @param array $ids
      * @return array
      */
-    private function getModifiedRows($entityName, array $ids)
+    private function getModifiedRows(string $entityName, array $ids)
     {
         $queryBuilder = $this->createSourceEntityQueryBuilderWithAssociations($entityName, $ids);
 
@@ -91,12 +91,12 @@ class ExportJoinListener
     }
 
     /**
-     * @param $entityName
+     * @param string $entityName
      * @param array $ids
      *
      * @return QueryBuilder
      */
-    private function createSourceEntityQueryBuilderWithAssociations($entityName, array $ids)
+    private function createSourceEntityQueryBuilderWithAssociations(string $entityName, array $ids)
     {
         /** @var EntityManager $entityManager */
         $entityManager = $this->registry->getManagerForClass($entityName);
