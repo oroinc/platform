@@ -141,14 +141,6 @@ class EntityFieldWriter implements ItemWriterInterface
     }
 
     /**
-     * @param string $className
-     * @deprecated EntityConfig state should be updated automatically based on FieldConfig state
-     */
-    protected function updateEntityState($className)
-    {
-    }
-
-    /**
      * @param array $data
      * @param string $className
      * @param string $fieldName
