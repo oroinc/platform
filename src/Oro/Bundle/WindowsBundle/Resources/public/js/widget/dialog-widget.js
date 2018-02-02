@@ -604,7 +604,7 @@ define(function(require) {
             });
             this.widget.on('dialogstatechange', function(event, data) {
                 if (data.state !== data.oldState) {
-                    mediator.trigger('widget_dialog:stateChange', self);
+                    mediator.trigger('widget_dialog:stateChange', self, data);
                 }
             });
             this.widget.on({
@@ -633,6 +633,7 @@ define(function(require) {
                 component.trigger('parentResizeStop', event, this);
             });
         },
+
         widgetIsResizable: function() {
             return this.options.dialogOptions.resizable;
         }
