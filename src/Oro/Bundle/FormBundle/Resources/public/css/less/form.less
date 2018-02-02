@@ -37,8 +37,54 @@
 
 .mce-bdesk {
   font-size: 14px !important;
-  padding: 25px 30px 0 !important;
+  padding: 35px 30px 0 !important;
   line-height: inherit !important;
+
+  & &-image {
+    line-height: inherit;
+  }
+}
+
+.mce-window-head {
+  .mce-ico {
+    display: inline-block;
+    border-right: 1px solid #272e36;
+    width: 24px;
+    height: 22px;
+    color: #fff;
+    font: 14px 'FontAwesome';
+    text-align: center;
+    line-height: 22px;
+    text-shadow: 0 1px 0 #45505c;
+  }
+
+  .mce-i-remove {
+    &:before {
+      content: "\f00d";
+    }
+  }
+}
+
+.mce-window {
+  .mce-btn:not(.mce-menubtn) {
+    button {
+      line-height: normal;
+    }
+  }
+}
+
+.mce-window {
+  .mce-primary:not(.mce-menubtn) {
+    .mce-txt {
+      color: #fff;
+    }
+  }
+}
+
+.mce-window {
+  .mce-default:not(.mce-menubtn) {
+    width: 61px;
+  }
 }
 
 .entities.list-group {
