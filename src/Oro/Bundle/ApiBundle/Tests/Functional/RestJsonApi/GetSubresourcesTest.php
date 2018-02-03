@@ -36,10 +36,7 @@ class GetSubresourcesTest extends RestJsonApiTestCase
         if ($subresource->isCollection()) {
             $parameters['page[size]'] = 1;
         }
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_get_subresource', $parameters)
-        );
+        $response = $this->getSubresource($parameters, [], [], false);
         self::assertApiResponseStatusCodeEquals(
             $response,
             [200, 404],

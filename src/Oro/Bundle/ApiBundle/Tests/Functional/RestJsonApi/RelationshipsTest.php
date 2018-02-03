@@ -95,10 +95,7 @@ class RelationshipsTest extends RestJsonApiTestCase
         if ($subresource->isCollection()) {
             $parameters['page[size]'] = 1;
         }
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_get_relationship', $parameters)
-        );
+        $response = $this->getRelationship($parameters, [], [], false);
 
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
         self::assertApiResponseStatusCodeEquals($response, [200, 404, 405], $resourceKey, 'get relationship');
@@ -153,18 +150,12 @@ class RelationshipsTest extends RestJsonApiTestCase
             return;
         }
 
-        $parameters = [
-            'entity'      => $entityType,
-            'id'          => $entityId,
-            'association' => $associationName
-        ];
-        $data = $subresource->isCollection()
-            ? [$resourceObjectId]
-            : $resourceObjectId;
-        $response = $this->request(
-            'PATCH',
-            $this->getUrl('oro_rest_api_patch_relationship', $parameters),
-            ['data' => $data]
+        $data = ['data' => $subresource->isCollection() ? [$resourceObjectId] : $resourceObjectId];
+        $response = $this->patchRelationship(
+            ['entity' => $entityType, 'id' => $entityId, 'association' => $associationName],
+            $data,
+            [],
+            false
         );
 
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
@@ -173,7 +164,7 @@ class RelationshipsTest extends RestJsonApiTestCase
             [204, 404, 405],
             $resourceKey,
             'update relationship',
-            ['data' => $data]
+            $data
         );
     }
 
@@ -198,16 +189,12 @@ class RelationshipsTest extends RestJsonApiTestCase
             return;
         }
 
-        $parameters = [
-            'entity'      => $entityType,
-            'id'          => $entityId,
-            'association' => $associationName
-        ];
-        $data = [$resourceObjectId];
-        $response = $this->request(
-            'POST',
-            $this->getUrl('oro_rest_api_post_relationship', $parameters),
-            ['data' => $data]
+        $data = ['data' => [$resourceObjectId]];
+        $response = $this->postRelationship(
+            ['entity' => $entityType, 'id' => $entityId, 'association' => $associationName],
+            $data,
+            [],
+            false
         );
 
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
@@ -216,7 +203,7 @@ class RelationshipsTest extends RestJsonApiTestCase
             [204, 404, 405],
             $resourceKey,
             'add relationship',
-            ['data' => $data]
+            $data
         );
     }
 
@@ -241,16 +228,11 @@ class RelationshipsTest extends RestJsonApiTestCase
             return;
         }
 
-        $parameters = [
-            'entity'      => $entityType,
-            'id'          => $entityId,
-            'association' => $associationName
-        ];
-        $data = [$resourceObjectId];
-        $response = $this->request(
-            'DELETE',
-            $this->getUrl('oro_rest_api_delete_relationship', $parameters),
-            ['data' => $data]
+        $response = $this->deleteRelationship(
+            ['entity' => $entityType, 'id' => $entityId, 'association' => $associationName],
+            ['data' => [$resourceObjectId]],
+            [],
+            false
         );
 
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);

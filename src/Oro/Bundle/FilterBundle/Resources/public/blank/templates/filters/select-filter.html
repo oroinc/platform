@@ -1,5 +1,5 @@
 <div class="filter-item" data-select-filter-template>
-    <div class="filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
+    <div class="filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
         <% if (showLabel) { %><%- label %><% } %><span class="filter-item-hint"></span>
         <select data-skip-input-widgets>
             <% _.each(options, function (option) { %>
