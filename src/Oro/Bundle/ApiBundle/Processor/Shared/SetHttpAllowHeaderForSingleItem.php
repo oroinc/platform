@@ -17,7 +17,6 @@ class SetHttpAllowHeaderForSingleItem extends SetHttpAllowHeader
     {
         return [
             self::METHOD_GET    => ApiActions::GET,
-            self::METHOD_POST   => ApiActions::CREATE,
             self::METHOD_PATCH  => ApiActions::UPDATE,
             self::METHOD_DELETE => ApiActions::DELETE
         ];

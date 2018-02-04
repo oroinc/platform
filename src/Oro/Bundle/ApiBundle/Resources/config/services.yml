@@ -388,6 +388,18 @@ services:
         arguments:
             - '@service_container'
 
+    oro_api.rest.request_handler:
+        class: Oro\Bundle\ApiBundle\Request\Rest\RequestHandler
+        arguments:
+            - '@oro_api.rest.request_action_handler'
+
+    oro_api.rest.request_action_handler:
+        class: Oro\Bundle\ApiBundle\Request\Rest\RequestActionHandler
+        public: false
+        arguments:
+            - '@oro_api.action_processor_bag'
+            - '@fos_rest.view_handler'
+
     oro_api.entity_id_transformer_registry:
         class: Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry
         public: false
@@ -471,6 +483,15 @@ services:
         tags:
             - { name: oro.api.error_completer, requestType: json_api }
 
+    oro_api.rest.action_mapper:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestActionMapper
+        public: false
+        arguments:
+            - 'oro_rest_api_item'
+            - 'oro_rest_api_list'
+            - 'oro_rest_api_subresource'
+            - 'oro_rest_api_relationship'
+
     oro_api.rest.routing_options_resolver.default:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestRouteOptionsResolver
         public: false
@@ -479,6 +500,7 @@ services:
             - '@oro_api.resources_provider'
             - '@oro_api.subresources_provider'
             - '@oro_api.value_normalizer'
+            - '@oro_api.rest.action_mapper'
         tags:
             - { name: oro_api.routing_options_resolver }
 

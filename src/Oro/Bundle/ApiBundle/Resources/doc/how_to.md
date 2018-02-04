@@ -13,6 +13,7 @@
  - [Configure an Extended Many-To-Many Association](#configure-an-extended-many-to-many-association)
  - [Configure an Extended Multiple Many-To-One Association](#configure-an-extended-multiple-many-to-one-association)
  - [Add a Custom Controller](#add-a-custom-controller)
+ - [Add a Custom Route](#add-a-custom-route)
  - [Using a Non-primary Key to Identify an Entity](#using-a-non-primary-key-to-identify-an-entity)
 
 
@@ -341,18 +342,18 @@ api:
 
 After applying the configuration, the `targets` relationship becomes available in scope of the following actions:
  
-- [get_list](./actions.md#get_list-action), 
-- [get](./actions.md#get-action), 
-- [create](./actions.md#create-action) and 
-- [update](./actions.md#update-action) actions. 
+- [get_list](./actions.md#get_list-action)
+- [get](./actions.md#get-action)
+- [create](./actions.md#create-action)
+- [update](./actions.md#update-action)
 
 The `targets` relationship also becomes  available as a subresource and thus, it is possible to perform the following actions:
 
-- [get_subresource](./actions.md#get_subresource-action), 
-- [get_relationship](./actions.md#get_relationship-action), 
-- [add_relationship](./actions.md#add_relationship-action),
-- [update_relationship](./actions.md#update_relationship-action) and.
-- [delete_relationship](./actions.md#delete_relationship-action) actions.
+- [get_subresource](./actions.md#get_subresource-action)
+- [get_relationship](./actions.md#get_relationship-action)
+- [add_relationship](./actions.md#add_relationship-action)
+- [update_relationship](./actions.md#update_relationship-action)
+- [delete_relationship](./actions.md#delete_relationship-action)
 
 The `data_type` parameter has format: `association:relationType:associationKind`, where:
 
@@ -361,13 +362,21 @@ The `data_type` parameter has format: `association:relationType:associationKind`
 
 ## Add a Custom Controller
 
-By default, all REST API resources are handled by the following controllers:
+By default, all REST API resources are handled by [RestApiController](../../Controller/RestApiController.php) that handles the following actions:
 
- - [RestApiController](../../Controller/RestApiController.php) - handles the [get_list](./actions.md#get_list-action), [get](./actions.md#get-action), [delete](./actions.md#delete-action), [delete_list](./actions.md#delete_list-action), [create](./actions.md#create-action), and [update](./actions.md#update-action) actions.
- - [RestApiSubresourceController](../../Controller/RestApiSubresourceController.php) - handles the [get_subresource](./actions.md#get_subresource-action) action.
- - [RestApiRelationshipController](../../Controller/RestApiRelationshipController.php) - handles the [get_relationship](./actions.md#get_relationship-action), [update_relationship](./actions.md#update_relationship-action), [add_relationship](./actions.md#add_relationship-action), and [delete_relationship](./actions.md#delete_relationship-action) actions.
+ - [get_list](./actions.md#get_list-action)
+ - [get](./actions.md#get-action)
+ - [delete](./actions.md#delete-action)
+ - [delete_list](./actions.md#delete_list-action)
+ - [create](./actions.md#create-action)
+ - [update](./actions.md#update-action)
+ - [get_subresource](./actions.md#get_subresource-action)
+ - [get_relationship](./actions.md#get_relationship-action)
+ - [update_relationship](./actions.md#update_relationship-action)
+ - [add_relationship](./actions.md#add_relationship-action)
+ - [delete_relationship](./actions.md#delete_relationship-action)
 
-If any of these controllers cannot handle the implementation of your REST API resources, you can register a custom controller. Please note that this is not recommended and should be used only in very special cases. Having a custom controller implies that a lot of logic is to be implemented from scratch, including:
+If this controller cannot handle the implementation of your REST API resources, you can register a custom controller. Please note that this is not recommended and should be used only in very special cases. Having a custom controller implies that a lot of logic is to be implemented from scratch, including:
 
  - extracting and validation of the input data
  - building and formatting the output document
@@ -463,6 +472,31 @@ For information about the `ApiDoc` annotation, see [Symfony documentation](https
 To learn about all possible properties of the `fields` option, see [AbstractFormatter class in NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle/blob/2.x/Formatter/AbstractFormatter.php). Please note that the `fields` option can be used inside the `input` and `output` options.
 
 Use the [oro:api:doc:cache:clear](./commands.md#oroapidoccacheclear) command to apply changes in the `ApiDoc` annotation to [API Sandbox](https://www.oroinc.com/doc/orocrm/current/book/data-api#api-sandbox).
+
+## Add a Custom Route
+
+As desctibed in [Add a Custom Controller](#add-a-custom-controller), [RestApiController](../../Controller/RestApiController.php) handles all registered REST API resources, and in the most cases you do not need to change this.
+But sometimes you need to change default mapping between URI and an action of this controller for some
+REST API resources.
+For example, imagine REST API resource for a profile of the logged in user. Let's imagine that URI of this
+resource should be `/api/userprofile`. If you take a look at [routing.yml](../../Resources/config/oro/routing.yml)
+you will see that this URI is matched by `/api/{entity}` pattern, but the action that handles this
+pattern works with a list of entities, not with a single entity. The challenge is to map `/api/userprofile` to
+`OroApiBundle:RestApi:item` action that works with a single entity and to remove handling of
+`/api/userprofile/{id}`. This can be achieved using own route definition with `override_path` option.
+
+Here is an example of the `Resources/oro/routing.yml` configuration file:
+
+```yaml
+acme_rest_api_user_profile:
+    path: /api/userprofile
+    defaults:
+        _controller: OroApiBundle:RestApi:item
+        entity: userprofile
+    options:
+        group: rest_api
+        override_path: /api/userprofile/{id}
+```
 
 ## Using a Non-primary Key to Identify an Entity
 

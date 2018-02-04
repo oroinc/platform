@@ -128,8 +128,8 @@ class CachingApiDocExtractor extends BaseExtractor implements
             // So, to avoid collisions, we need to clone routes because they may be changed by option resolvers.
             $clonedRoutes = [];
             $routes = parent::getRoutes();
-            foreach ($routes as $route) {
-                $clonedRoutes[] = clone $route;
+            foreach ($routes as $name => $route) {
+                $clonedRoutes[$name] = clone $route;
             }
             $this->routes = $this->processRoutes($clonedRoutes);
             $this->all($view);
