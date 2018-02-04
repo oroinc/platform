@@ -54,7 +54,7 @@ class SetHttpAllowHeaderForSingleItemTest extends GetProcessorTestCase
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn([ApiActions::CREATE, ApiActions::DELETE]);
+            ->willReturn([ApiActions::DELETE]);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setClassName('Test\Class');
@@ -68,7 +68,7 @@ class SetHttpAllowHeaderForSingleItemTest extends GetProcessorTestCase
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn([ApiActions::GET, ApiActions::CREATE, ApiActions::UPDATE, ApiActions::DELETE]);
+            ->willReturn([ApiActions::GET, ApiActions::UPDATE, ApiActions::DELETE]);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setClassName('Test\Class');

@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
 
 /**
@@ -14,12 +15,12 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 class SetHttpResponseStatusCode implements ProcessorInterface
 {
     /** @var int */
-    protected $defaultSuccessStatusCode;
+    private $defaultSuccessStatusCode;
 
     /**
      * @param int $defaultSuccessStatusCode
      */
-    public function __construct($defaultSuccessStatusCode = Response::HTTP_OK)
+    public function __construct(int $defaultSuccessStatusCode = Response::HTTP_OK)
     {
         $this->defaultSuccessStatusCode = $defaultSuccessStatusCode;
     }
@@ -38,29 +39,39 @@ class SetHttpResponseStatusCode implements ProcessorInterface
 
         $statusCode = $this->defaultSuccessStatusCode;
         if ($context->hasErrors()) {
-            $groupedCodes = [];
-            foreach ($context->getErrors() as $error) {
-                $code      = $error->getStatusCode() ?: Response::HTTP_INTERNAL_SERVER_ERROR;
-                $groupCode = (int)floor($code / 100) * 100;
+            $statusCode = $this->computeErrorStatusCode($context->getErrors());
+        }
+        $context->setResponseStatusCode($statusCode);
+    }
 
-                if (!array_key_exists($groupCode, $groupedCodes)
-                    || !in_array($code, $groupedCodes[$groupCode], true)
-                ) {
-                    $groupedCodes[$groupCode][] = $code;
-                }
-            }
+    /**
+     * @param Error[] $errors
+     *
+     * @return int
+     */
+    private function computeErrorStatusCode(array $errors)
+    {
+        $groupedCodes = [];
+        foreach ($errors as $error) {
+            $code = $error->getStatusCode() ?: Response::HTTP_INTERNAL_SERVER_ERROR;
+            $groupCode = (int)floor($code / 100) * 100;
 
-            if (!empty($groupedCodes)) {
-                $maxGroup   = max(array_keys($groupedCodes));
-                $statusCode = $maxGroup;
-                if (count($groupedCodes[$maxGroup]) === 1) {
-                    $statusCode = array_pop($groupedCodes[$maxGroup]);
-                }
-            } else {
-                $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+            if (!array_key_exists($groupCode, $groupedCodes)
+                || !in_array($code, $groupedCodes[$groupCode], true)
+            ) {
+                $groupedCodes[$groupCode][] = $code;
             }
         }
 
-        $context->setResponseStatusCode($statusCode);
+        $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+        if (!empty($groupedCodes)) {
+            $maxGroup = max(array_keys($groupedCodes));
+            $statusCode = $maxGroup;
+            if (count($groupedCodes[$maxGroup]) === 1) {
+                $statusCode = array_pop($groupedCodes[$maxGroup]);
+            }
+        }
+
+        return $statusCode;
     }
 }

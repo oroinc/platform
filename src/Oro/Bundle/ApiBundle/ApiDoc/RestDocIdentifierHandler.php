@@ -16,13 +16,13 @@ class RestDocIdentifierHandler
     const ID_ATTRIBUTE = 'id';
 
     /** @var RestDocViewDetector */
-    protected $docViewDetector;
+    private $docViewDetector;
 
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /** @var ApiDocDataTypeConverter */
-    protected $dataTypeConverter;
+    private $dataTypeConverter;
 
     /**
      * @param RestDocViewDetector     $docViewDetector
@@ -79,7 +79,7 @@ class RestDocIdentifierHandler
      *
      * @return string
      */
-    protected function getIdRequirement(EntityMetadata $metadata)
+    private function getIdRequirement(EntityMetadata $metadata)
     {
         $idFields = $metadata->getIdentifierFieldNames();
         $idFieldCount = count($idFields);
@@ -102,7 +102,7 @@ class RestDocIdentifierHandler
      *
      * @return string
      */
-    protected function getIdFieldRequirement($fieldType)
+    private function getIdFieldRequirement($fieldType)
     {
         $result = $this->valueNormalizer->getRequirement(
             $fieldType,
