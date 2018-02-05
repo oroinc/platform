@@ -25,7 +25,30 @@ expression-editor-component.js
 #### WorkflowBundle
 * Removed cache provider `oro_workflow.cache.provider.workflow_definition`. Doctrine result cache is used instead of.
 
+### Changed
+#### ApiBundle
+* The HTTP method depended routes and controllers were replaced with more general ones. The full list of changes:
+
+    | Removed Route | Removed Controller | New Route | New Controller |
+    | --- | --- | --- | --- |
+    | oro_rest_api_get | OroApiBundle:RestApi:get | oro_rest_api_item | OroApiBundle:RestApi:item |
+    | oro_rest_api_delete | OroApiBundle:RestApi:delete | oro_rest_api_item | OroApiBundle:RestApi:item |
+    | oro_rest_api_patch | OroApiBundle:RestApi:patch | oro_rest_api_item | OroApiBundle:RestApi:item |
+    | oro_rest_api_post | OroApiBundle:RestApi:post | oro_rest_api_list | OroApiBundle:RestApi:list |
+    | oro_rest_api_cget | OroApiBundle:RestApi:cget | oro_rest_api_list | OroApiBundle:RestApi:list |
+    | oro_rest_api_cdelete | OroApiBundle:RestApi:cdelete | oro_rest_api_list | OroApiBundle:RestApi:list |
+    | oro_rest_api_get_subresource | OroApiBundle:RestApiSubresource:get | oro_rest_api_subresource | OroApiBundle:RestApi:subresource |
+    | oro_rest_api_get_relationship | OroApiBundle:RestApiRelationship:get | oro_rest_api_relationship | OroApiBundle:RestApi:relationship |
+    | oro_rest_api_patch_relationship | OroApiBundle:RestApiRelationship:patch | oro_rest_api_relationship | OroApiBundle:RestApi:relationship |
+    | oro_rest_api_post_relationship | OroApiBundle:RestApiRelationship:post | oro_rest_api_relationship | OroApiBundle:RestApi:relationship |
+    | oro_rest_api_delete_relationship | OroApiBundle:RestApiRelationship:delete | oro_rest_api_relationship | OroApiBundle:RestApi:relationship |
+
+#### UserBundle
+* The `oro_rest_api_get_user_profile` route was removed, use `oro_rest_api_user_profile` route instead.
+* The `Oro\Bundle\UserBundle\Api\Routing\UserProfileRestRouteOptionsResolver` and `Oro\Bundle\UserBundle\Api\ApiDoc\UserProfileRestRouteOptionsResolver` route option resolvers were removed in favor of [routing.yml](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#add-a-custom-route).
+
 ## 2.6.0 (Unreleased)
+[Show detailed list of changes](incompatibilities-2-6.md)
 
 ### Added
 #### ConfigBundle

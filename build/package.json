@@ -9,6 +9,7 @@
   "devDependencies": {
     "eslint": "^4.13.1",
     "eslint-config-google": "^0.9.1",
+    "eslint-plugin-oro": "git://github.com/laboro/eslint-plugin-oro#master",
     "jasmine-core": "2.8.0",
     "karma": "2.0.0",
     "karma-chrome-launcher": "2.2.0",

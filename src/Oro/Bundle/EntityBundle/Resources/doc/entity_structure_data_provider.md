@@ -1,4 +1,4 @@
-## Entity structure data provider ##
+## Entity structure data provider
 
 Namespace: `Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider`
 

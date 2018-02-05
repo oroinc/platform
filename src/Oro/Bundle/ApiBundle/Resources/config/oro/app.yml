@@ -398,3 +398,11 @@ oro_api:
                     priority: -70
                 normalize_result:
                     priority: -80
+        not_allowed:
+            processing_groups:
+                initialize:
+                    priority: -10
+                build_response:
+                    priority: -20
+                normalize_result:
+                    priority: -30

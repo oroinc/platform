@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource;
 
-use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
+use Oro\Bundle\ApiBundle\Processor\NormalizeResultContext;
 use Oro\Bundle\ApiBundle\Processor\RequestActionProcessor;
 
 class SubresourceProcessor extends RequestActionProcessor
@@ -10,7 +10,7 @@ class SubresourceProcessor extends RequestActionProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getLogContext(ComponentContextInterface $context)
+    protected function getLogContext(NormalizeResultContext $context): array
     {
         /** @var SubresourceContext $context */
 

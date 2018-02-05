@@ -23,10 +23,11 @@ class DefaultAndNullTestCase extends RestJsonApiTestCase
 
         $data['data']['type'] = $entityType;
 
-        $response = $this->request(
-            'POST',
-            $this->getUrl('oro_rest_api_post', ['entity' => $entityType]),
-            $data
+        $response = $this->post(
+            ['entity' => $entityType],
+            $data,
+            [],
+            false
         );
 
         self::assertResponseStatusCodeEquals($response, $expectedStatusCode);
@@ -48,10 +49,11 @@ class DefaultAndNullTestCase extends RestJsonApiTestCase
         $data['data']['type'] = $entityType;
         $data['data']['id'] = (string)$entityId;
 
-        $response = $this->request(
-            'PATCH',
-            $this->getUrl('oro_rest_api_patch', ['entity' => $entityType, 'id' => (string)$entityId]),
-            $data
+        $response = $this->patch(
+            ['entity' => $entityType, 'id' => (string)$entityId],
+            $data,
+            [],
+            false
         );
 
         self::assertResponseStatusCodeEquals($response, $expectedStatusCode);

@@ -26,11 +26,7 @@ class GetAndDeleteTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType($entityClass);
 
         // test "get list" request
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType, 'page[size]' => 1])
-        );
-        self::assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
+        $response = $this->cget(['entity' => $entityType, 'page[size]' => 1]);
 
         $id = $this->getGetEntityId(self::jsonToArray($response->getContent()));
         if (null !== $id) {
@@ -59,10 +55,7 @@ class GetAndDeleteTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType($entityClass);
 
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType, 'page[size]' => 1])
-        );
+        $response = $this->cget(['entity' => $entityType], ['page[size]' => 1], [], false);
         if ($response->getStatusCode() === 200) {
             $id = [];
             $content = self::jsonToArray($response->getContent());
@@ -70,12 +63,11 @@ class GetAndDeleteTest extends RestJsonApiTestCase
                 foreach ($content['data'] as $item) {
                     $id[] = $item['id'];
                 }
-                $response = $this->request(
-                    'DELETE',
-                    $this->getUrl(
-                        'oro_rest_api_cdelete',
-                        ['entity' => $entityType, 'filter[id]' => implode(',', $id)]
-                    )
+                $response = $this->cdelete(
+                    ['entity' => $entityType],
+                    ['filter[id]' => implode(',', $id)],
+                    [],
+                    false
                 );
                 // @todo: remove 400 and 403 status coded here
                 self::assertApiResponseStatusCodeEquals($response, [204, 400, 403], $entityType, 'delete_list');
@@ -90,10 +82,7 @@ class GetAndDeleteTest extends RestJsonApiTestCase
      */
     protected function checkDeleteRequest($entityType, $id, $excludedActions)
     {
-        $response = $this->request(
-            'DELETE',
-            $this->getUrl('oro_rest_api_delete', ['entity' => $entityType, 'id' => $id])
-        );
+        $response = $this->delete(['entity' => $entityType, 'id' => $id], [], [], false);
         if ($response->getStatusCode() !== 204) {
             // process delete errors
             self::assertEquals(403, $response->getStatusCode());
@@ -110,10 +99,7 @@ class GetAndDeleteTest extends RestJsonApiTestCase
      */
     protected function checkGetRequest($entityType, $id, $expectedStatus)
     {
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_get', ['entity' => $entityType, 'id' => $id])
-        );
+        $response = $this->get(['entity' => $entityType, 'id' => $id], [], [], false);
         self::assertApiResponseStatusCodeEquals($response, $expectedStatus, $entityType, 'get');
     }
 

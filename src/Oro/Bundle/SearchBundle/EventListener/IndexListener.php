@@ -284,6 +284,12 @@ class IndexListener implements OptionalListenerInterface
      */
     protected function indexEntities()
     {
+        foreach ($this->deletedEntities as $hash => $entity) {
+            if (array_key_exists($hash, $this->savedEntities)) {
+                unset($this->savedEntities[$hash]);
+            }
+        }
+
         if ($this->savedEntities) {
             $this->searchIndexer->save($this->savedEntities);
 

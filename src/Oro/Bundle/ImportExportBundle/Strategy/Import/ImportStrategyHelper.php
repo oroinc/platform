@@ -142,14 +142,9 @@ class ImportStrategyHelper
             throw new InvalidArgumentException('Basic and imported entities must be instances of the same class');
         }
 
-        $entityMetadata = $this->getEntityManager($basicEntityClass)->getClassMetadata($basicEntityClass);
-        $importedEntityProperties = array_diff(
-            array_merge(
-                $entityMetadata->getFieldNames(),
-                $entityMetadata->getAssociationNames()
-            ),
-            $excludedProperties
-        );
+        $entityProperties = $this->getEntityPropertiesByClassName($basicEntityClass);
+        $importedEntityProperties = array_diff($entityProperties, $excludedProperties);
+
         foreach ($importedEntityProperties as $propertyName) {
             // we should not overwrite deleted fields
             if ($this->isDeletedField($basicEntityClass, $propertyName)) {
@@ -247,5 +242,36 @@ class ImportStrategyHelper
         }
 
         return false;
+    }
+
+    /**
+     * @param string $entityClassName
+     *
+     * @return array
+     */
+    private function getEntityPropertiesByClassName($entityClassName)
+    {
+        /**
+         * In case if we work with configured entities then we should use fieldHelper
+         * to getting fields because it won't returns any hidden fields (f.e snapshot fields)
+         * that mustn't be changed by import/export
+         */
+        if ($this->extendConfigProvider->hasConfig($entityClassName)) {
+            $properties = $this->fieldHelper->getFields(
+                $entityClassName,
+                true
+            );
+
+            return array_column($properties, 'name');
+        }
+
+        $entityMetadata = $this
+            ->getEntityManager($entityClassName)
+            ->getClassMetadata($entityClassName);
+
+        return array_merge(
+            $entityMetadata->getFieldNames(),
+            $entityMetadata->getAssociationNames()
+        );
     }
 }

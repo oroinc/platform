@@ -90,6 +90,7 @@ define(function(require) {
             var $container;
 
             $container = $(container);
+
             this.styleForm($container);
 
             scrollspy.init($container);
@@ -97,6 +98,8 @@ define(function(require) {
             $container.find('[data-toggle="tooltip"]').tooltip();
 
             this.initPopover($container);
+
+            mediator.trigger('layoutInit', $container);
         },
 
         initPopover: function(container, options) {

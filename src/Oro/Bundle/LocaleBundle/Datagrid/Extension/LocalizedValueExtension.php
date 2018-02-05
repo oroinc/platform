@@ -71,7 +71,8 @@ class LocalizedValueExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
-            $config->isOrmDatasource()
+            parent::isApplicable($config)
+            && $config->isOrmDatasource()
             && count($this->getProperties($config)) > 0;
     }
 

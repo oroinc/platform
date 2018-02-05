@@ -39,7 +39,8 @@ class OrmDatasourceExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
-            $config->isOrmDatasource()
+            parent::isApplicable($config)
+            && $config->isOrmDatasource()
             && $config->offsetGetByPath(QueryDesignerQueryConfiguration::FILTERS);
     }
 
