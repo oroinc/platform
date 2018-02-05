@@ -16,17 +16,33 @@ services:
             - '@oro_scope.entity_storage'
             - '@oro_entity.entity_field_provider.link'
 
+    oro_scope.scope_repository.cache:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_scope_repository' ] ]
+
+    oro_scope.repository.country:
+        class: Oro\Bundle\ScopeBundle\Entity\Repository\ScopeRepository
+        parent: oro_entity.abstract_repository
+        arguments:
+            - '%oro_scope.entity.scope.class%'
+        calls:
+            - [ setScopeRepositoryCache, [ '@oro_scope.scope_repository.cache' ] ]
+
     oro_scope.migration.extension.scope:
         class: 'Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtension'
         tags:
             - { name: oro_migration.extension, extension_name: scope }
 
-    oro_scope.event_listener.soctrine_event_listener:
+    oro_scope.event_listener.doctrine_event_listener:
         class: Oro\Bundle\ScopeBundle\EventListener\DoctrineEventListener
         arguments:
             - '@oro_scope.entity_storage'
+        calls:
+            - [ setScopeRepositoryCache, [ '@oro_scope.scope_repository.cache' ] ]
         tags:
             - { name: doctrine.event_listener, event: preFlush }
+            - { name: doctrine.event_listener, event: postFlush }
             - { name: doctrine.event_listener, event: onClear }
 
     oro_scope.context_normalizer:
