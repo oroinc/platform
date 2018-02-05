@@ -13,13 +13,13 @@
 	- [Other configurations](./merge-configuration.md#other-configurations)
 
 
-## What is Entity Merge ##
+## What is Entity Merge
 
 Entity merge is a complex solution that allows user to merge different entities into one. Usually entities merge is
 used to remove copies of entity. Entity merge bundle provides functionality to select multiple entities from grid and
 merging them in wizard.
 
-## Main Entities ##
+## Main Entities
 
 Entity merge consists of several related entities.
 
@@ -33,7 +33,7 @@ Entity merge consists of several related entities.
 - **Step** - one of merge steps. By defaul there are three steps: **ValidateStep**, **MergeFieldsStep** and **RemoveEntitiesStep**
 - **Accessor** - provide access (get value/set value) for merge fields
 
-## How it works ##
+## How it works
 
 1. Entity has [merge configuration](./merge-configuration.md) and grid with "Merge" mass action
 2. User selects records to merge on the grid and click "Merge" mass action

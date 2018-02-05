@@ -7,6 +7,10 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
         name: TestDepartment2
         organization: '@organization'
         owner: '@TestBusinessUnit1'
+    TestDepartment{3..21}:
+        name: TestDepartment<current()>
+        organization: '@organization'
+        owner: '@business_unit'
 Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee:
     TestEmployee1:
         name: TestEmployee1

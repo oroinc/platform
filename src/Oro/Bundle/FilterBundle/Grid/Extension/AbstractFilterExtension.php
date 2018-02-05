@@ -43,12 +43,6 @@ abstract class AbstractFilterExtension extends AbstractExtension
     }
 
     /**
-     * @param DatagridConfiguration $config
-     * @return bool
-     */
-    abstract public function isApplicable(DatagridConfiguration $config);
-
-    /**
      * {@inheritDoc}
      */
     public function processConfigs(DatagridConfiguration $config)

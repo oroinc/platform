@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\CacheBundle\Provider;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\ChainCache;
 
 class MemoryCacheChain extends ChainCache

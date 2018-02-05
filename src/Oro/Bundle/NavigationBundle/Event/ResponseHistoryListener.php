@@ -78,12 +78,11 @@ class ResponseHistoryListener
             return null;
         }
 
-        /** @var EntityManager $em */
-        $em       = $this->registry->getManagerForClass($this->historyItemFQCN);
-        $request  = $event->getRequest();
+        $request = $event->getRequest();
         $response = $event->getResponse();
-        $token    = $this->tokenStorage->getToken();
-        $user     = $organization = null;
+        $token = $this->tokenStorage->getToken();
+
+        $user = null;
         if ($token instanceof TokenInterface) {
             $user = $token->getUser();
         }
@@ -93,6 +92,7 @@ class ResponseHistoryListener
             return false;
         }
 
+        $organization = null;
         if ($token instanceof OrganizationContextTokenInterface) {
             $organization = $token->getOrganizationContext();
         }
@@ -103,7 +103,9 @@ class ResponseHistoryListener
             'organization' => $organization
         ];
 
-        /** @var $historyItem  NavigationHistoryItem */
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass($this->historyItemFQCN);
+        /** @var NavigationHistoryItem $historyItem */
         $historyItem = $em->getRepository($this->historyItemFQCN)->findOneBy($postArray);
 
         if (!$historyItem) {
@@ -121,7 +123,6 @@ class ResponseHistoryListener
             $postArray['routeParameters'] = $routeParameters;
             $postArray['entityId']        = $entityId;
 
-            /** @var $historyItem \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
             $historyItem = $this->navItemFactory->createItem(
                 $this->navigationHistoryItemType,
                 $postArray

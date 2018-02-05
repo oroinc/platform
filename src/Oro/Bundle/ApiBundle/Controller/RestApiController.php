@@ -4,168 +4,91 @@ namespace Oro\Bundle\ApiBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
-use Oro\Bundle\ApiBundle\Processor\Delete\DeleteContext;
-use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListContext;
-use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
-use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
-use Oro\Bundle\ApiBundle\Processor\Update\UpdateContext;
-use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Request\Rest\RequestHandler;
 
-class RestApiController extends AbstractRestApiController
+class RestApiController extends Controller
 {
     /**
-     * Get a list of entities
+     * Handle an entity
      *
      * @param Request $request
      *
      * @ApiDoc(
-     *     description="Get entities",
+     *     description="Handle an entity",
      *     resource=true,
      *     views={"rest_plain", "rest_json_api"}
      * )
      *
      * @return Response
      */
-    public function cgetAction(Request $request)
+    public function itemAction(Request $request): Response
     {
-        $processor = $this->getProcessor($request);
-        /** @var GetListContext $context */
-        $context = $this->getContext($processor, $request);
-        $context->setFilterValues(new RestFilterValueAccessor($request));
-
-        $processor->process($context);
-
-        return $this->buildResponse($context);
+        return $this->getHandler()->handleItem($request);
     }
 
     /**
-     * Get an entity
+     * Handle a list of entities
      *
      * @param Request $request
      *
      * @ApiDoc(
-     *     description="Get an entity",
+     *     description="Handle a list of entities",
      *     resource=true,
      *     views={"rest_plain", "rest_json_api"}
      * )
      *
      * @return Response
      */
-    public function getAction(Request $request)
+    public function listAction(Request $request): Response
     {
-        $processor = $this->getProcessor($request);
-        /** @var GetContext $context */
-        $context = $this->getContext($processor, $request);
-        $context->setId($request->attributes->get('id'));
-        $context->setFilterValues(new RestFilterValueAccessor($request));
-
-        $processor->process($context);
-
-        return $this->buildResponse($context);
+        return $this->getHandler()->handleList($request);
     }
 
     /**
-     * Delete an entity
+     * Handle a subresource
      *
      * @param Request $request
      *
      * @ApiDoc(
-     *     description="Delete an entity",
+     *     description="Handle a subresource",
      *     resource=true,
      *     views={"rest_plain", "rest_json_api"}
      * )
      *
      * @return Response
      */
-    public function deleteAction(Request $request)
+    public function subresourceAction(Request $request): Response
     {
-        $processor = $this->getProcessor($request);
-        /** @var DeleteContext $context */
-        $context = $this->getContext($processor, $request);
-        $context->setId($request->attributes->get('id'));
-
-        $processor->process($context);
-
-        return $this->buildResponse($context);
+        return $this->getHandler()->handleSubresource($request);
     }
 
     /**
-     * Delete a list of entities
+     * Handle a relationship
      *
      * @param Request $request
      *
      * @ApiDoc(
-     *     description="Delete entities",
+     *     description="Handle a relationship",
      *     resource=true,
      *     views={"rest_plain", "rest_json_api"}
      * )
      *
      * @return Response
      */
-    public function cdeleteAction(Request $request)
+    public function relationshipAction(Request $request): Response
     {
-        $processor = $this->getProcessor($request);
-        /** @var DeleteListContext $context */
-        $context = $this->getContext($processor, $request);
-        $context->setFilterValues(new RestFilterValueAccessor($request));
-
-        $processor->process($context);
-
-        return $this->buildResponse($context);
+        return $this->getHandler()->handleRelationship($request);
     }
 
     /**
-     * Update an entity
-     *
-     * @param Request $request
-     *
-     * @ApiDoc(
-     *     description="Update an entity",
-     *     resource=true,
-     *     views={"rest_plain", "rest_json_api"}
-     * )
-     *
-     * @return Response
+     * @return RequestHandler
      */
-    public function patchAction(Request $request)
+    private function getHandler(): RequestHandler
     {
-        $processor = $this->getProcessor($request);
-        /** @var UpdateContext $context */
-        $context = $this->getContext($processor, $request);
-        $context->setId($request->attributes->get('id'));
-        $context->setRequestData($request->request->all());
-
-        $processor->process($context);
-
-        return $this->buildResponse($context);
-    }
-
-    /**
-     * Create an entity
-     *
-     * @param Request $request
-     *
-     * @ApiDoc(
-     *     description="Create an entity",
-     *     resource=true,
-     *     views={"rest_plain", "rest_json_api"}
-     * )
-     *
-     * @return Response
-     */
-    public function postAction(Request $request)
-    {
-        $processor = $this->getProcessor($request);
-        /** @var CreateContext $context */
-        $context = $this->getContext($processor, $request);
-        $context->setRequestData($request->request->all());
-
-        $processor->process($context);
-
-        return $this->buildResponse($context);
+        return $this->get('oro_api.rest.request_handler');
     }
 }

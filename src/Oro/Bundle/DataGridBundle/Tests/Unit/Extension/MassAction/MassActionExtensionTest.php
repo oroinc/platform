@@ -6,12 +6,14 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionFactory;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionMetadataFactory;
+use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -49,11 +51,24 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             $this->authorizationChecker,
             $this->tokenManager
         );
+        $this->extension->setParameters(new ParameterBag());
     }
 
     public function testIsApplicable()
     {
         self::assertTrue($this->extension->isApplicable(DatagridConfiguration::create([])));
+    }
+
+    public function testIsNotApplicableInImportExportMode()
+    {
+        $params = new ParameterBag();
+        $params->set(
+            ParameterBag::DATAGRID_MODES_PARAMETER,
+            [DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE]
+        );
+        $config = DatagridConfiguration::create([]);
+        $this->extension->setParameters($params);
+        self::assertFalse($this->extension->isApplicable($config));
     }
 
     public function testVisitMetadataWithoutMassActions()

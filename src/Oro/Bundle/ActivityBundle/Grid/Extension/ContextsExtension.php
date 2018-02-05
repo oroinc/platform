@@ -97,7 +97,8 @@ class ContextsExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
-            $config->isOrmDatasource()
+            parent::isApplicable($config)
+            && $config->isOrmDatasource()
             && $config->offsetGetByPath(self::CONTEXTS_ENABLED_PATH)
             && in_array($this->getEntityClassName($config), $this->activityManager->getActivityTypes(), true);
     }

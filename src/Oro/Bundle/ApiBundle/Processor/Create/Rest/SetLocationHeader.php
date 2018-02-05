@@ -62,7 +62,7 @@ class SetLocationHeader implements ProcessorInterface
         );
         $entityId = $this->entityIdTransformer->transform($context->getId(), $context->getMetadata());
         $location = $this->router->generate(
-            'oro_rest_api_get',
+            'oro_rest_api_item',
             ['entity' => $entityType, 'id' => $entityId],
             UrlGeneratorInterface::ABSOLUTE_URL
         );

@@ -94,7 +94,7 @@ server {
  }
 ```
 
-## Usage ##
+## Usage
 You should be able to run this from the root of your symfony installation:
 
 ``` bash
@@ -110,7 +110,7 @@ Launching Ratchet WS Server on: 127.0.0.1:8080
 
 This means the websocket server is now up and running!
 
-## Content Outdating ##
+## Content Outdating
 
 * [Content Outdating Notifications](./Resources/doc/content_outdating.md)
 * [Mediator Handlers](./Resources/doc/mediator-handlers.md)
