@@ -397,6 +397,7 @@ services:
         class: Oro\Bundle\ApiBundle\Request\Rest\RequestActionHandler
         public: false
         arguments:
+            - ['rest']
             - '@oro_api.action_processor_bag'
             - '@fos_rest.view_handler'
 
