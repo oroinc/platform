@@ -87,7 +87,7 @@ class DictionaryFilter extends BaseMultiChoiceFilter
         try {
             $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
             list($joinAlias) = explode('.', $fieldName);
-            if ($join = QueryBuilderUtil::findJoinByAlias($ds->getQueryBuilder(), $joinAlias)) {
+            if ($join = QueryBuilderUtil::findJoinByAlias($ds->getQueryBuilder(), $joinAlias) && $this->isToOne($ds)) {
                 return $join->getJoin();
             }
 
