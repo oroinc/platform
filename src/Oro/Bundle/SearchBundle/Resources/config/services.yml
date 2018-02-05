@@ -310,10 +310,13 @@ services:
             - { name: form.type, alias: oro_search_type_entity_filter }
 
     oro_search.migration.demo_data_fixtures_listener.reindex:
+        parent: oro_platform.event_listener.demo_data_fixtures_listener.abstract
         class: Oro\Bundle\SearchBundle\EventListener\ReindexDemoDataFixturesListener
         arguments:
-            - '@oro_platform.optional_listeners.manager'
             - '@oro_search.search.engine.indexer'
+        calls:
+            # this listener is disabled to prevent a lot of reindex messages
+            - [disableListener, ['oro_search.index_listener']]
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad, priority: -100 }
