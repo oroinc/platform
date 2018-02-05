@@ -24,19 +24,19 @@ class RestDocHandler implements HandlerInterface
     const ID_PLACEHOLDER = '{id}';
 
     /** @var RestDocViewDetector */
-    protected $docViewDetector;
+    private $docViewDetector;
 
     /** @var ActionProcessorBagInterface */
-    protected $processorBag;
+    private $processorBag;
 
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /** @var RestDocIdentifierHandler */
-    protected $identifierHandler;
+    private $identifierHandler;
 
     /** @var RestDocFiltersHandler */
-    protected $filtersHandler;
+    private $filtersHandler;
 
     /**
      * @param RestDocViewDetector         $docViewDetector
@@ -64,16 +64,16 @@ class RestDocHandler implements HandlerInterface
      */
     public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method)
     {
-        if ($route->getOption('group') !== RestRouteOptionsResolver::ROUTE_GROUP
+        if (RestRouteOptionsResolver::ROUTE_GROUP !== $route->getOption(RestRouteOptionsResolver::GROUP_OPTION)
             || $this->docViewDetector->getRequestType()->isEmpty()
         ) {
             return;
         }
-        $action = $route->getDefault('_action');
+        $action = $route->getDefault(RestRouteOptionsResolver::ACTION_ATTRIBUTE);
         if (!$action) {
             return;
         }
-        $entityType = $this->extractEntityTypeFromRoute($route);
+        $entityType = $route->getDefault(RestRouteOptionsResolver::ENTITY_ATTRIBUTE);
         if (!$entityType) {
             return;
         }
@@ -101,16 +101,6 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
-     * @param Route $route
-     *
-     * @return string|null
-     */
-    protected function extractEntityTypeFromRoute(Route $route)
-    {
-        return $route->getDefault(RestRouteOptionsResolver::ENTITY_ATTRIBUTE);
-    }
-
-    /**
      * Checks if a route has the given placeholder in a path.
      *
      * @param Route  $route
@@ -118,7 +108,7 @@ class RestDocHandler implements HandlerInterface
      *
      * @return bool
      */
-    protected function hasAttribute(Route $route, $placeholder)
+    private function hasAttribute(Route $route, $placeholder)
     {
         return false !== strpos($route->getPath(), $placeholder);
     }
@@ -128,7 +118,7 @@ class RestDocHandler implements HandlerInterface
      *
      * @return string
      */
-    protected function getEntityClass($entityType)
+    private function getEntityClass($entityType)
     {
         return ValueNormalizerUtil::convertToEntityClass(
             $this->valueNormalizer,
@@ -144,7 +134,7 @@ class RestDocHandler implements HandlerInterface
      *
      * @return Context|SubresourceContext
      */
-    protected function getContext($action, $entityClass, $associationName = null)
+    private function getContext($action, $entityClass, $associationName = null)
     {
         $processor = $this->processorBag->getProcessor($action);
         /** @var Context $context */
@@ -172,7 +162,7 @@ class RestDocHandler implements HandlerInterface
      * @param ApiDoc                 $annotation
      * @param EntityDefinitionConfig $config
      */
-    protected function setDescription(ApiDoc $annotation, EntityDefinitionConfig $config)
+    private function setDescription(ApiDoc $annotation, EntityDefinitionConfig $config)
     {
         $description = $config->getDescription();
         if ($description) {
@@ -184,7 +174,7 @@ class RestDocHandler implements HandlerInterface
      * @param ApiDoc                 $annotation
      * @param EntityDefinitionConfig $config
      */
-    protected function setDocumentation(ApiDoc $annotation, EntityDefinitionConfig $config)
+    private function setDocumentation(ApiDoc $annotation, EntityDefinitionConfig $config)
     {
         $documentation = $config->getDocumentation();
         if ($documentation) {
@@ -198,7 +188,7 @@ class RestDocHandler implements HandlerInterface
      * @param EntityDefinitionConfig $config
      * @param EntityMetadata         $metadata
      */
-    protected function setInputMetadata(
+    private function setInputMetadata(
         ApiDoc $annotation,
         $action,
         EntityDefinitionConfig $config,
@@ -217,7 +207,7 @@ class RestDocHandler implements HandlerInterface
      * @param EntityMetadata         $metadata
      * @param string|null            $associationName
      */
-    protected function setOutputMetadata(
+    private function setOutputMetadata(
         ApiDoc $annotation,
         $entityClass,
         $action,
@@ -246,7 +236,7 @@ class RestDocHandler implements HandlerInterface
      *
      * @return array
      */
-    protected function getDirectionValue($action, EntityDefinitionConfig $config, EntityMetadata $metadata)
+    private function getDirectionValue($action, EntityDefinitionConfig $config, EntityMetadata $metadata)
     {
         return [
             'class'   => null,
@@ -266,7 +256,7 @@ class RestDocHandler implements HandlerInterface
      * @param string $direction
      * @param array  $value
      */
-    protected function setDirectionValue(ApiDoc $annotation, $direction, array $value)
+    private function setDirectionValue(ApiDoc $annotation, $direction, array $value)
     {
         // unfortunately there is no other way to update "input" and "output" parameters
         // except to use the reflection
@@ -279,7 +269,7 @@ class RestDocHandler implements HandlerInterface
      * @param ApiDoc                 $annotation
      * @param EntityDefinitionConfig $config
      */
-    public function setStatusCodes(ApiDoc $annotation, EntityDefinitionConfig $config)
+    private function setStatusCodes(ApiDoc $annotation, EntityDefinitionConfig $config)
     {
         $statusCodes = $config->getStatusCodes();
         if (null !== $statusCodes) {
@@ -293,7 +283,6 @@ class RestDocHandler implements HandlerInterface
         }
     }
 
-
     /**
      * Returns true in case if the given action receives resource data.
      *
@@ -301,7 +290,7 @@ class RestDocHandler implements HandlerInterface
      *
      * @return bool
      */
-    protected function isActionWithInput($action)
+    private function isActionWithInput($action)
     {
         return in_array(
             $action,
@@ -317,7 +306,7 @@ class RestDocHandler implements HandlerInterface
      *
      * @return bool
      */
-    protected function isActionWithOutput($action)
+    private function isActionWithOutput($action)
     {
         return !in_array(
             $action,
@@ -333,7 +322,7 @@ class RestDocHandler implements HandlerInterface
      *
      * @return string
      */
-    protected function getOutputAction($action)
+    private function getOutputAction($action)
     {
         if (in_array($action, [ApiActions::CREATE, ApiActions::UPDATE], true)) {
             return ApiActions::GET;

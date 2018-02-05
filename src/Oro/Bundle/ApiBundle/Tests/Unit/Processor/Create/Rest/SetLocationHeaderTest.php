@@ -75,7 +75,7 @@ class SetLocationHeaderTest extends FormProcessorTestCase
         $this->router->expects($this->once())
             ->method('generate')
             ->with(
-                'oro_rest_api_get',
+                'oro_rest_api_item',
                 ['entity' => $entityType, 'id' => $transformedEntityId],
                 UrlGeneratorInterface::ABSOLUTE_URL
             )
