@@ -8,6 +8,7 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 
 class ToolbarExtension extends AbstractExtension
 {
@@ -28,6 +29,11 @@ class ToolbarExtension extends AbstractExtension
     /** @var ConfigManager */
     private $cm;
 
+    /** {@inheritdoc} */
+    protected $excludedModes = [
+        DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
+    ];
+
     /**
      * @param ConfigManager $cm
      */
@@ -41,7 +47,7 @@ class ToolbarExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return true;
+        return parent::isApplicable($config);
     }
 
     /**

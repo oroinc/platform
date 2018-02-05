@@ -49,7 +49,9 @@ class TagSearchResultsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $config->offsetGetByPath(self::TYPE_PATH) === self::TYPE_VALUE;
+        return
+            parent::isApplicable($config)
+            && $config->offsetGetByPath(self::TYPE_PATH) === self::TYPE_VALUE;
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\FieldAcl;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\DataGridBundle\Extension\FieldAcl\FieldAclExtension;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
 
@@ -33,6 +34,8 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
             $this->configManager,
             $this->ownershipQueryHelper
         );
+
+        $this->extension->setParameters(new ParameterBag());
     }
 
     public function testIsApplicableOnValidConfig()

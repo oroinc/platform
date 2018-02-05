@@ -43,7 +43,7 @@ class DeleteMassActionExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        if (!$config->isOrmDatasource()) {
+        if (!$config->isOrmDatasource() || !parent::isApplicable($config)) {
             return false;
         }
 
