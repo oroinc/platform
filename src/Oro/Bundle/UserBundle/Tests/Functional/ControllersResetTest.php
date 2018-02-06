@@ -35,7 +35,6 @@ class ControllersResetTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $content = $result->getContent();
-        $this->assertContains('oro.user.suggest_password.label', $content);
         $this->assertContains('oro_set_password_form[password]', $content);
 
         $form = $crawler->selectButton('Save')->form();
@@ -45,7 +44,7 @@ class ControllersResetTest extends WebTestCase
         $this->client->submit($form);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('oro.user.change_password.flash.success', $result->getContent());
+        $this->assertContains('"triggerSuccess":true', $result->getContent());
 
         $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->find($user->getId());
 

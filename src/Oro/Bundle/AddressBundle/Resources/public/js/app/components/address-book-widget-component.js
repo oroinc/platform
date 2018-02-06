@@ -1,41 +1,29 @@
 define(function(require) {
     'use strict';
 
-    var AddressBookWidgetView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var AddressBook = require('oroaddress/js/address-book');
+    var AddressBookWidgetComponent;
+    var AddressBookComponent = require('oroaddress/js/app/components/address-book-component');
     var widgetManager = require('oroui/js/widget-manager');
     var routing = require('routing');
     var _ = require('underscore');
 
-    AddressBookWidgetView = BaseView.extend({
-        optionNames: BaseView.prototype.optionNames.concat([
-            'addressListUrl', 'addressCreateUrl', 'addressUpdateRoute', 'addressDeleteRoute', 'addresses', 'wid'
+    AddressBookWidgetComponent = AddressBookComponent.extend({
+        optionNames: AddressBookComponent.prototype.optionNames.concat([
+            'wid', 'addressCreateUrl', 'addressUpdateRoute', 'addressDeleteRoute'
         ]),
 
         initialize: function() {
-            this.addressBook = this._initializeAddressBook();
-
-            this.addressBook
-                .getCollection()
-                .reset(JSON.parse(this.addresses));
+            AddressBookWidgetComponent.__super__.initialize.call(this, arguments);
 
             widgetManager.getWidgetInstance(this.wid, this._onWidgetLoad.bind(this));
         },
 
-        _onWidgetLoad: function(widget) {
-            widget.getAction('add_address', 'adopted', function(action) {
-                var addressBook = this.addressBook;
-                action.on('click', _.bind(addressBook.createAddress, addressBook));
-            }.bind(this));
-        },
-
-        _initializeAddressBook: function() {
+        _getAddressBookViewOptions: function() {
             var addressDeleteRoute = this.addressDeleteRoute;
             var addressUpdateRoute = this.addressUpdateRoute;
 
-            return new AddressBook({
-                el: '#address-book',
+            return {
+                el: this.addressBookSelector,
                 addressListUrl: this.addressListUrl,
                 addressCreateUrl: this.addressCreateUrl,
                 addressUpdateUrl: function() {
@@ -54,9 +42,16 @@ define(function(require) {
                         _.extend({addressId: address.get('id')}, addressDeleteRoute.params)
                     );
                 }
-            });
+            };
+        },
+
+        _onWidgetLoad: function(widget) {
+            widget.getAction('add_address', 'adopted', function(action) {
+                var addressBookView = this.view;
+                action.on('click', _.bind(addressBookView.createAddress, addressBookView));
+            }.bind(this));
         }
     });
 
-    return AddressBookWidgetView;
+    return AddressBookWidgetComponent;
 });
