@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\EntityFieldStateChecker;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
@@ -23,6 +24,9 @@ class EntityFieldWriter implements ItemWriterInterface
 
     /** @var EnumSynchronizer */
     protected $enumSynchronizer;
+
+    /** @var EntityFieldStateChecker */
+    private $stateChecker;
 
     /**
      * @param ConfigManager $configManager
@@ -55,6 +59,14 @@ class EntityFieldWriter implements ItemWriterInterface
     }
 
     /**
+     * @param EntityFieldStateChecker $entityFieldStateChecker
+     */
+    public function setEntityFieldStateChecker(EntityFieldStateChecker $entityFieldStateChecker)
+    {
+        $this->stateChecker = $entityFieldStateChecker;
+    }
+
+    /**
      * @param FieldConfigModel $configModel
      * @return array
      */
@@ -62,11 +74,17 @@ class EntityFieldWriter implements ItemWriterInterface
     {
         $className = $configModel->getEntity()->getClassName();
         $fieldName = $configModel->getFieldName();
-        $state = ExtendScope::STATE_UPDATE;
+        $state = ExtendScope::STATE_ACTIVE;
 
         if (!$this->configManager->hasConfig($className, $fieldName)) {
             $this->configManager->createConfigFieldModel($className, $fieldName, $configModel->getType());
             $state = ExtendScope::STATE_NEW;
+        }
+
+        if ($state === ExtendScope::STATE_ACTIVE
+            && $this->getEntityFieldStateChecker()->isSchemaUpdateNeeded($configModel)
+        ) {
+            $state = ExtendScope::STATE_UPDATE;
         }
 
         $translations = [];
@@ -85,9 +103,8 @@ class EntityFieldWriter implements ItemWriterInterface
         }
 
         $this->setExtendData($configModel, $state);
-        $this->updateEntityState($className);
 
-        if ($state === ExtendScope::STATE_UPDATE && in_array($configModel->getType(), ['enum', 'multiEnum'], true)) {
+        if ($state !== ExtendScope::STATE_NEW && in_array($configModel->getType(), ['enum', 'multiEnum'], true)) {
             $this->setEnumData($configModel->toArray('enum'), $className, $fieldName);
         }
 
@@ -132,19 +149,10 @@ class EntityFieldWriter implements ItemWriterInterface
 
     /**
      * @param string $className
+     * @deprecated EntityConfig state should be updated automatically based on FieldConfig state
      */
     protected function updateEntityState($className)
     {
-        $provider = $this->configManager->getProvider('extend');
-        if (!$provider) {
-            return;
-        }
-
-        $entityConfig = $provider->getConfig($className);
-        if (!$entityConfig->is('state', ExtendScope::STATE_UPDATE)) {
-            $entityConfig->set('state', ExtendScope::STATE_UPDATE);
-            $this->configManager->persist($entityConfig);
-        }
     }
 
     /**
@@ -207,7 +215,7 @@ class EntityFieldWriter implements ItemWriterInterface
             'origin' => ExtendScope::ORIGIN_CUSTOM,
             'is_extend' => true,
             'is_deleted' => false,
-            'is_serialized' => false
+            'is_serialized' => $config->get('is_serialized', false, false)
         ];
 
         foreach ($data as $code => $value) {
@@ -215,5 +223,17 @@ class EntityFieldWriter implements ItemWriterInterface
         }
 
         $this->configManager->persist($config);
+    }
+
+    /**
+     * @return EntityFieldStateChecker
+     */
+    protected function getEntityFieldStateChecker()
+    {
+        if (!$this->stateChecker) {
+            throw new \LogicException('No state checker set for the class');
+        }
+
+        return $this->stateChecker;
     }
 }

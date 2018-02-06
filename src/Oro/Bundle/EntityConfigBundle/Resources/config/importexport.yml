@@ -79,6 +79,8 @@ services:
             - '@oro_entity_config.config_manager'
             - '@oro_entity_config.translation.helper'
             - '@oro_entity_extend.enum_synchronizer'
+        calls:
+            - [setEntityFieldStateChecker, ['@oro_entity_config.provider.entity_field_state_checker']]
 
     oro_entity_config.importexport.writer.attribute:
         class: 'Oro\Bundle\EntityConfigBundle\ImportExport\Writer\AttributeWriter'
