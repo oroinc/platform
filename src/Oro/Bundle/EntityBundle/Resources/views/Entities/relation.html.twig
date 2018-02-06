@@ -33,14 +33,18 @@
     {% endfor %}
 
     <div {{ UI.renderPageComponentAttributes({
-        module: 'oroentity/js/app/components/multiple-entity-component',
+        module: 'oroform/js/multiple-entity/component',
         options: {
             wid: app.request.get('_wid'),
             gridName: gridName,
+            addedVal: '#appendRelation',
+            removedVal: '#removeRelation',
+            columnName: 'assigned',
             fieldTitles: relation.get('target_title'),
             entityName: entity_class|replace('\\', '_'),
             fieldName: field_name,
-            extraData: extraData
+            extraData: extraData,
+            link: 'oro_entity_detailed'
         }
     }) }}></div>
 

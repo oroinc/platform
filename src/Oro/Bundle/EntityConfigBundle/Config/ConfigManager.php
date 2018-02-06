@@ -259,6 +259,24 @@ class ConfigManager
     }
 
     /**
+     * @param FieldConfigModel $fieldConfigModel
+     * @param string $scope
+     * @return ConfigInterface
+     */
+    public function createFieldConfigByModel(FieldConfigModel $fieldConfigModel, string $scope)
+    {
+        return new Config(
+            new FieldConfigId(
+                $scope,
+                $fieldConfigModel->getEntity()->getClassName(),
+                $fieldConfigModel->getFieldName(),
+                $fieldConfigModel->getType()
+            ),
+            $fieldConfigModel->toArray($scope)
+        );
+    }
+
+    /**
      * @param string $scope
      * @param string $className
      *
