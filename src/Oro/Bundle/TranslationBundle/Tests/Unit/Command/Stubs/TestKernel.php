@@ -24,6 +24,7 @@ class TestKernel extends Kernel
 
     public function registerBundles()
     {
+        // Run unit test
         $loader = new UniversalClassLoader();
 
         $loader->registerNamespace('SomeProject\\', array(__DIR__));
