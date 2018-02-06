@@ -11,7 +11,6 @@ use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
-
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Event\AfterEntityPageLoadedEvent;
