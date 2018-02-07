@@ -1197,18 +1197,6 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Given /^I restart message consumer$/
-     *
-     * @todo remove step from scenario and step implementation in scope of BAP-14637
-     */
-    public function iRestartMessageConsumer()
-    {
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
-        $this->messageQueueIsolator->stopMessageQueue();
-        $this->messageQueueIsolator->startMessageQueue();
-    }
-
-    /**
      * @Then /^"([^"]*)" button is disabled$/
      */
     public function buttonIsDisabled($button)
