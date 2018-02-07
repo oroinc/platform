@@ -6,7 +6,7 @@ use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
 use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
-use Symfony\Component\Serializer\Exception\Exception;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 use Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProvider;
 use Oro\Bundle\SSOBundle\Tests\Unit\Stub\TestingUser;
@@ -110,7 +110,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException ExceptionInterface
      * @expectedExceptionMessage SSO is not enabled
      */
     public function testLoadUserByOAuthUserResponseShouldThrowExceptionIfSSOIsDisabled()
