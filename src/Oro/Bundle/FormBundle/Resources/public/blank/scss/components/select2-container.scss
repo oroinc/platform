@@ -240,6 +240,12 @@
 
     overflow-x: hidden;
     overflow-y: auto;
+
+    .select2-disabled {
+        background: get-color('additional', 'base');
+        display: list-item;
+        cursor: default;
+    }
 }
 
 .select2-more-results {
