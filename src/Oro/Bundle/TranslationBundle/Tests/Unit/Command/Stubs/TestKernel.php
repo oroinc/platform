@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Command\Stubs;
 
-use Symfony\Component\ClassLoader\ClassLoader;
-use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\ClassLoader\UniversalClassLoader;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Config\Loader\LoaderInterface;
 
 class TestKernel extends Kernel
 {
@@ -24,10 +24,10 @@ class TestKernel extends Kernel
 
     public function registerBundles()
     {
-        $loader = new ClassLoader();
+        $loader = new UniversalClassLoader();
 
-        $loader->addPrefix('SomeProject\\', array(__DIR__));
-        $loader->addPrefix('SomeAnotherProject\\', array(__DIR__));
+        $loader->registerNamespace('SomeProject\\', array(__DIR__));
+        $loader->registerNamespace('SomeAnotherProject\\', array(__DIR__));
         $loader->register();
 
         return array(
