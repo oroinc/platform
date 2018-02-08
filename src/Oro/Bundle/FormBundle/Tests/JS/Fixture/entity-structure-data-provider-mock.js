@@ -41,14 +41,14 @@ define(function(require) {
     }
 
     function EntityStructureDataProviderMock(entitiesData) {
-        this._entitiesData = $.extend(true, {}, entitiesData);
-        _prepareNode(this._entitiesData);
+        this.entityTree = $.extend(true, {}, entitiesData);
+        _prepareNode(this.entityTree);
     }
 
     EntityStructureDataProviderMock.prototype = {
         getEntityTreeNodeByPropertyPath: function(propertyPath) {
             var parts = propertyPath.split('.');
-            var node = this._entitiesData[parts[0]];
+            var node = this.entityTree[parts[0]];
             for (var i = 1; node && i < parts.length; i++) {
                 node = node[parts[i]];
             }

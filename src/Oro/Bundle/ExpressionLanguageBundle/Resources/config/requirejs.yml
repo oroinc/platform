@@ -35,3 +35,4 @@ config:
         'oroexpressionlanguage/js/library/parser': 'bundles/oroexpressionlanguage/js/library/parser.js'
         'oroexpressionlanguage/js/library/token': 'bundles/oroexpressionlanguage/js/library/token.js'
         'oroexpressionlanguage/js/library/token-stream': 'bundles/oroexpressionlanguage/js/library/token-stream.js'
+        'oroexpressionlanguage/js/ast-node-wrapper': 'bundles/oroexpressionlanguage/js/ast-node-wrapper.js'

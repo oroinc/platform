@@ -14,6 +14,11 @@ define(function(require) {
         // added '='
         // removed '===', '!=='
         OPERATION_REGEXP: {value: /^(not in(?=[\s(])|not(?=[\s(])|and(?=[\s(])|>=|or(?=[\s(])|<=|\*\*|\.\.|in(?=[\s(])|&&|\|\||matches|==|=|!=|\*|~|%|\/|>|\||!|\^|&|\+|<|-)/}
+
+    });
+
+    Object.assign(Lexer.prototype, {
+        constructor: Lexer
     });
 
     return Lexer;

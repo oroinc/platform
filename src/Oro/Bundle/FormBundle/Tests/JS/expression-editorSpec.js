@@ -71,7 +71,7 @@ define(function(require) {
                 'product.id in [1, 2, 3, 4, 5]': true,
                 'product.status matches test': false,
                 'product.status matches "test"': true,
-                'product.id matches "test"': false,
+                'product.id matches "test"': true,
                 'product.id not in [1, 2, 3, 4, 5]': true,
                 'product.id == product.id': true,
                 'product.id != product.id': true,

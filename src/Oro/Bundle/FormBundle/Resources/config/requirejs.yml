@@ -85,6 +85,7 @@ config:
         'oroform/js/app/views/week-day-picker-view': 'bundles/oroform/js/app/views/week-day-picker-view.js'
 
         'oroform/js/expression-editor-util': 'bundles/oroform/js/expression-editor-util.js'
+        'oroform/js/expression-operand-type-validator': 'bundles/oroform/js/expression-operand-type-validator.js'
         'oroform/js/app/views/expression-editor-view': 'bundles/oroform/js/app/views/expression-editor-view.js'
 build:
     paths:

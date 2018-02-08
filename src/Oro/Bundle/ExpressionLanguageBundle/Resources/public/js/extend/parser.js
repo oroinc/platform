@@ -13,6 +13,8 @@ define(function(require) {
     Parser.__super__ = OriginalParser.prototype;
 
     Object.assign(Parser.prototype, {
+        constructor: Parser,
+
         parseExpression: function(precedence) {
             precedence = precedence || 0;
             var expr = this.getPrimary();
