@@ -18,13 +18,13 @@ use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 class RestDocFiltersHandler
 {
     /** @var RestDocViewDetector */
-    protected $docViewDetector;
+    private $docViewDetector;
 
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /** @var ApiDocDataTypeConverter */
-    protected $dataTypeConverter;
+    private $dataTypeConverter;
 
     /**
      * @param RestDocViewDetector     $docViewDetector
@@ -59,7 +59,7 @@ class RestDocFiltersHandler
      * @param FilterCollection $filters
      * @param EntityMetadata   $metadata
      */
-    protected function addFilters(ApiDoc $annotation, FilterCollection $filters, EntityMetadata $metadata)
+    private function addFilters(ApiDoc $annotation, FilterCollection $filters, EntityMetadata $metadata)
     {
         foreach ($filters as $key => $filter) {
             if ($filter instanceof StandaloneFilter) {
@@ -74,7 +74,7 @@ class RestDocFiltersHandler
     /**
      * @param ApiDoc $annotation
      */
-    protected function sortFilters(ApiDoc $annotation)
+    private function sortFilters(ApiDoc $annotation)
     {
         $filters = $annotation->getFilters();
         if (!empty($filters)) {
@@ -92,7 +92,7 @@ class RestDocFiltersHandler
      *
      * @return array
      */
-    protected function getFilterOptions(StandaloneFilter $filter, EntityMetadata $metadata)
+    private function getFilterOptions(StandaloneFilter $filter, EntityMetadata $metadata)
     {
         $dataType = $filter->getDataType();
         $isArrayAllowed = $filter->isArrayAllowed();
@@ -139,7 +139,7 @@ class RestDocFiltersHandler
      *
      * @return string
      */
-    protected function getFilterDescription($description)
+    private function getFilterDescription($description)
     {
         return $description ?? '';
     }
@@ -151,7 +151,7 @@ class RestDocFiltersHandler
      *
      * @return string
      */
-    protected function getFilterType($dataType, $isArrayAllowed, $isRangeAllowed)
+    private function getFilterType($dataType, $isArrayAllowed, $isRangeAllowed)
     {
         $dataType = $this->dataTypeConverter->convertDataType($dataType);
 
@@ -171,7 +171,7 @@ class RestDocFiltersHandler
      *
      * @return string[]
      */
-    protected function getFilterTargetEntityTypes($targetClassNames)
+    private function getFilterTargetEntityTypes($targetClassNames)
     {
         $targetEntityTypes = [];
         foreach ($targetClassNames as $targetClassName) {
@@ -189,7 +189,7 @@ class RestDocFiltersHandler
      *
      * @return string|null
      */
-    protected function getEntityType($entityClass)
+    private function getEntityType($entityClass)
     {
         return ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,

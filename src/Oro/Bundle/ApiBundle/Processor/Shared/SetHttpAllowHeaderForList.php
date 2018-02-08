@@ -17,6 +17,7 @@ class SetHttpAllowHeaderForList extends SetHttpAllowHeader
     {
         return [
             self::METHOD_GET    => ApiActions::GET_LIST,
+            self::METHOD_POST   => ApiActions::CREATE,
             self::METHOD_DELETE => ApiActions::DELETE_LIST
         ];
     }

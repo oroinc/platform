@@ -4,8 +4,16 @@ namespace Oro\Bundle\DataGridBundle\Datagrid;
 
 class ParameterBag
 {
-    const ADDITIONAL_PARAMETERS = '_parameters';
-    const MINIFIED_PARAMETERS   = '_minified';
+    const ADDITIONAL_PARAMETERS   = '_parameters';
+    const MINIFIED_PARAMETERS     = '_minified';
+
+    /**
+     * Contain modes that datagrid work on.
+     *
+     * Full list of datagrid modes
+     * @see \Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider
+     */
+    const DATAGRID_MODES_PARAMETER = '_datagrid_modes';
 
     /**
      * Parameter storage.

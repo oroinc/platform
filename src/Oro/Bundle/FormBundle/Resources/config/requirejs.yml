@@ -59,6 +59,7 @@ config:
         'oroform/js/multiple-entity/view': 'bundles/oroform/js/multiple-entity/view.js'
         'oroform/js/multiple-entity/model': 'bundles/oroform/js/multiple-entity/model.js'
         'oroform/js/multiple-entity/collection': 'bundles/oroform/js/multiple-entity/collection.js'
+        'oroform/js/multiple-entity/component': 'bundles/oroform/js/multiple-entity/component.js'
 
         'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view': 'bundles/oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view.js'
         'oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view': 'bundles/oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view.js'

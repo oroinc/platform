@@ -1149,7 +1149,7 @@ This should render into the following HTML:
 ## Working with Forms
 
 
-### Non Page Specific Form ###
+### Non Page Specific Form
 
 Let us implement a simple search form by means of the layout engine.
 
@@ -1270,7 +1270,7 @@ You should get the result similar to the following code:
 </div>
 ```
 
-### Page Specific Form ###
+### Page Specific Form
 
 For the case when the form is page specific, we need a layout data provider that returns form and form view.
 In our layout updates and templates we use FormView class, and in the controller we use the FormInterface from the same form.

@@ -75,6 +75,8 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
         $listener = new EntityConfigListener();
         $listener->preFlush($event);
 
+        $this->configManager->calculateConfigChangeSet($entityConfig);
+
         $this->assertEquals(
             ['state' => [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]],
             $this->configManager->getConfigChangeSet($entityConfig)

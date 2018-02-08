@@ -4,7 +4,7 @@ OroNotificationBundle
 Email notifications for system entity triggers (like entity update, delete, create).
 
 
-## Console commands ##
+## Console commands
 
 `oro:maintenance-notification`
 
@@ -20,7 +20,7 @@ Parameters are:
 
 To send notifications on production servers --env=prod option should be added to use production email settings.
 
-## Notification Rule creation ##
+## Notification Rule creation
 
 System > Emails > Notification Rules > Create Notification Rule
 

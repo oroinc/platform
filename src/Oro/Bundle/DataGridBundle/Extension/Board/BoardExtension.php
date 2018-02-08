@@ -14,6 +14,7 @@ use Oro\Bundle\DataGridBundle\Exception\NotFoundBoardProcessorException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
 use Oro\Bundle\DataGridBundle\Extension\Board\Processor\BoardProcessorInterface;
+use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
@@ -58,6 +59,11 @@ class BoardExtension extends AbstractExtension
 
     /** @var EntityClassResolver */
     protected $entityClassResolver;
+
+    /** {@inheritdoc} */
+    protected $excludedModes = [
+        DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
+    ];
 
     /**
      * @param AuthorizationCheckerInterface $authorizationChecker
@@ -107,6 +113,10 @@ class BoardExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
+        if (!parent::isApplicable($config)) {
+            return false;
+        }
+
         if (!$config->isOrmDatasource()) {
             return false;
         }
