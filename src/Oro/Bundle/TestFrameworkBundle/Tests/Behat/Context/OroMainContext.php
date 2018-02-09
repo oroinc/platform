@@ -31,6 +31,7 @@ use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 use Symfony\Component\Stopwatch\Stopwatch;
 use WebDriver\Exception\NoAlertOpenError;
 use WebDriver\Exception\NoSuchElement;
+use WebDriver\Exception\StaleElementReference;
 use WebDriver\Exception\UnknownError;
 
 /**
@@ -791,15 +792,23 @@ class OroMainContext extends MinkContext implements
      */
     public function pressButton($button)
     {
-        try {
-            parent::pressButton($button);
-        } catch (ElementNotFoundException $e) {
-            if ($this->getSession()->getPage()->hasLink($button)) {
-                $this->clickLink($button);
-            } elseif ($this->elementFactory->hasElement($button)) {
-                $this->elementFactory->createElement($button)->click();
-            } else {
+        for ($i = 0; $i < 2; $i++) {
+            try {
+                parent::pressButton($button);
+                break;
+            } catch (ElementNotFoundException $e) {
+                if ($this->getSession()->getPage()->hasLink($button)) {
+                    $this->clickLink($button);
+                    break;
+                }
+
+                if ($this->elementFactory->hasElement($button)) {
+                    $this->elementFactory->createElement($button)->click();
+                    break;
+                }
+
                 throw $e;
+            } catch (StaleElementReference $e) {
             }
         }
     }
