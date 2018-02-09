@@ -6,3 +6,5 @@ OroTestFrameworkBundle
 (see [JavaScript UnitTests](./Resources/doc/reference/js_unittests.md))
 3. Provides Behat extension
 (see [Oro Behat Extension documentation](./Behat/README.md))
+4. Adds some additional Doctrine DBAL events
+(see [Additional Doctrine events](./Resources/doc/reference/doctrine_events.md))
