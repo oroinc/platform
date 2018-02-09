@@ -1,6 +1,9 @@
 // @theme: blank;
 
 body.loading {
+    // @TODO: Remove this fix when Apple fix caret placement bug
+    top: 0 !important;
+
     > .loader-mask {
         position: fixed;
         z-index: z('fixed');
