@@ -1556,7 +1556,7 @@ JS;
      * Example: When I focus on "Some" field and press Enter key
      * Example: And I focus on "Some" field and press Enter key
      *
-     * @When /^(?:|I )focus on "(?P<fieldName>[\w\s]*)" field and press Enter key$/
+     * @When /^(?:|I )focus on "(?P<fieldName>[^"]*)" field and press Enter key$/
      * @param string $fieldName
      */
     public function focusOnFieldAndPressEnterKey($fieldName)
