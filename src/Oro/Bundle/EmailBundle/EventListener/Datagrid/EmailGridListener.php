@@ -247,7 +247,7 @@ class EmailGridListener
      */
     protected function removeJoinByRootAndAliases(QueryBuilder $qb, array $rootAndAliases)
     {
-        $joins    = $qb->getDQLPart('join');
+        $joins = $qb->getDQLPart('join');
 
         /** @var Join $join */
         foreach ($joins as $root => $rJoins) {

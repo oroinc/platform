@@ -5,6 +5,7 @@ namespace Oro\Component\Action\Action;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Component\Action\Exception\InvalidParameterException;
@@ -142,6 +143,7 @@ class RequestEntity extends AbstractAction
         // apply where condition
         $counter = 0;
         foreach ($where as $field => $value) {
+            QueryBuilderUtil::checkIdentifier($field);
             $parameter = 'parameter_' . $counter;
             $field = 'e.' . $field;
             if ($this->isCaseInsensitive()) {
@@ -153,8 +155,9 @@ class RequestEntity extends AbstractAction
 
         // apply sorting
         foreach ($orderBy as $field => $direction) {
+            QueryBuilderUtil::checkIdentifier($field);
             $field = 'e.' . $field;
-            $queryBuilder->orderBy($field, $direction);
+            $queryBuilder->orderBy($field, QueryBuilderUtil::getSortOrder($direction));
         }
         // should be one result
         $queryBuilder->setMaxResults(1);

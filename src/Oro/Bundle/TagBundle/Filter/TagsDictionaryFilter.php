@@ -7,9 +7,8 @@ use Doctrine\ORM\Query\Expr\Func;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\DictionaryFilter;
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
-use Oro\Bundle\TagBundle\Form\Type\Filter\TagsReportFilterType;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * This class implements logic for tags filter, based on choice-tree filter.
@@ -53,6 +52,7 @@ class TagsDictionaryFilter extends DictionaryFilter
      */
     protected function buildFilterExpr(OrmFilterDatasourceAdapter $ds, array $data, $entityClassParam, $comparisonType)
     {
+        QueryBuilderUtil::checkIdentifier($entityClassParam);
         $expr = false;
 
         if (empty($data['value'])) {
@@ -60,7 +60,7 @@ class TagsDictionaryFilter extends DictionaryFilter
         }
 
         $qb            = $ds->getQueryBuilder();
-        $entityIdAlias = $this->get(FilterUtility::DATA_NAME_KEY);
+        $entityIdAlias = $this->getDataFieldName();
 
         $taggingAlias = $ds->generateParameterName('tagging');
         $tagAlias     = $ds->generateParameterName('tag');

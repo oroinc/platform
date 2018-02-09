@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Provider;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class AttributeValueProvider implements AttributeValueProviderInterface
 {
@@ -36,7 +37,7 @@ class AttributeValueProvider implements AttributeValueProviderInterface
             ->setParameter('null', null);
 
         foreach ($names as $name) {
-            $queryBuilder->set('entity.' . $name, ':null');
+            $queryBuilder->set(QueryBuilderUtil::getField('entity', $name), ':null');
         }
 
         $queryBuilder->getQuery()->execute();

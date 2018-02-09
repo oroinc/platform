@@ -54,14 +54,15 @@ class NotificationManager
      * Process events with handlers
      *
      * @param NotificationEvent $event
+     * @param string $eventName
      * @return NotificationEvent
      */
-    public function process(NotificationEvent $event)
+    public function process(NotificationEvent $event, $eventName)
     {
         $entity = $event->getEntity();
 
         // select rules by entity name and event name
-        $notificationRules = $this->getRulesByCriteria(ClassUtils::getClass($entity), $event->getName());
+        $notificationRules = $this->getRulesByCriteria(ClassUtils::getClass($entity), $eventName);
 
         if (!$notificationRules->isEmpty()) {
             /** @var EventHandlerInterface $handler */
