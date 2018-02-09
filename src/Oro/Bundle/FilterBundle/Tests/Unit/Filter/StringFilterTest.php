@@ -23,17 +23,17 @@ class StringFilterTest extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    protected $filterName = 'filter-name';
+    protected $filterName = 'filter_name';
 
     /**
      * @var string
      */
-    protected $dataName = 'field-name';
+    protected $dataName = 'field_name';
 
     /**
      * @var string
      */
-    protected $parameterName = 'parameter-name';
+    protected $parameterName = 'parameter_name';
 
     /**
      * {@inheritdoc}
@@ -83,7 +83,7 @@ class StringFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name IS NULL OR field-name = \'\'',
+                    'where' => 'field_name IS NULL OR field_name = \'\'',
                 ],
             ],
             'NOT_EMPTY' => [
@@ -94,7 +94,7 @@ class StringFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name IS NOT NULL AND field-name <> \'\'',
+                    'where' => 'field_name IS NOT NULL AND field_name <> \'\'',
                 ],
             ],
             'CONTAINS_EMPTY_STRING' => [
@@ -116,7 +116,7 @@ class StringFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name LIKE %test%',
+                    'where' => 'field_name LIKE %test%',
                 ],
             ],
             'CONTAINS_STRING_0' => [
@@ -127,7 +127,7 @@ class StringFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name LIKE %0%',
+                    'where' => 'field_name LIKE %0%',
                 ],
             ],
         ];

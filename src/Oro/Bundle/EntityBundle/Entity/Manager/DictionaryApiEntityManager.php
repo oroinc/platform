@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
@@ -86,6 +87,7 @@ class DictionaryApiEntityManager extends ApiEntityManager
                 $qb->setFirstResult($this->getOffset($page, $limit));
             }
             if ($orderBy) {
+                QueryBuilderUtil::checkField($orderBy);
                 $qb->orderBy($orderBy);
             }
         } elseif (null !== $qb) {
