@@ -4,6 +4,7 @@ define(function(require) {
     var UserResetPasswordView;
     var BaseView = require('oroui/js/app/views/base/view');
     var __ = require('orotranslation/js/translator');
+    var _ = require('underscore');
 
     UserResetPasswordView = BaseView.extend({
         autoRender: true,
@@ -73,7 +74,7 @@ define(function(require) {
             // make sure we have at least one symbol for each rule, shuffle them later
             rules.forEach(function(rule) {
                 if (this.charsets.hasOwnProperty(rule)) {
-                    pass += this.charsets[rule].charAt(this._getRnd(this.charsets[rule].length));
+                    pass += this.charsets[rule].charAt(_.random(this.charsets[rule].length));
                 }
             }.bind(this));
 
@@ -82,7 +83,7 @@ define(function(require) {
 
             // fill up to the minLength with random symbols
             for (var i = pass.length; i < length; ++i) {
-                pass = pass + charset.charAt(this._getRnd(charset.length));
+                pass = pass + charset.charAt(_.random(charset.length));
             }
 
             // shuffle the password
@@ -91,10 +92,6 @@ define(function(require) {
             }).join('');
 
             return pass;
-        },
-
-        _getRnd: function(n) {
-            return Math.floor(Math.random() * n);
         },
 
         _getPasswordInput: function() {
