@@ -31,6 +31,13 @@ define(function(require) {
             special_chars: ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function UserResetPasswordView(options) {
+            UserResetPasswordView.__super__.constructor.call(this, options);
+        },
+
         render: function() {
             var $passwordInput = this._getPasswordInput();
 
@@ -74,7 +81,7 @@ define(function(require) {
             // make sure we have at least one symbol for each rule, shuffle them later
             rules.forEach(function(rule) {
                 if (this.charsets.hasOwnProperty(rule)) {
-                    pass += this.charsets[rule].charAt(_.random(this.charsets[rule].length));
+                    pass += this.charsets[rule].charAt(_.random(this.charsets[rule].length - 1));
                 }
             }.bind(this));
 
@@ -83,7 +90,7 @@ define(function(require) {
 
             // fill up to the minLength with random symbols
             for (var i = pass.length; i < length; ++i) {
-                pass = pass + charset.charAt(_.random(charset.length));
+                pass = pass + charset.charAt(_.random(charset.length - 1));
             }
 
             // shuffle the password
