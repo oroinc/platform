@@ -45,15 +45,14 @@ class ReindexDemoDataFixturesListenerTest extends \PHPUnit_Framework_TestCase
     public function testOnPostLoad()
     {
         $event = $this->createMock(MigrationDataFixturesEvent::class);
+        $event->expects(self::never())
+            ->method('log');
 
-        $event->expects(self::once())
-            ->method('log')
-            ->with('running full reindexation of search index');
         $this->listenerManager->expects(self::once())
             ->method('enableListeners')
             ->with(self::LISTENERS);
-        $this->searchIndexer->expects(self::once())
-            ->method('reindex');
+        $this->searchIndexer->expects(self::never())
+            ->method($this->anything());
 
         $this->listener->onPostLoad($event);
     }

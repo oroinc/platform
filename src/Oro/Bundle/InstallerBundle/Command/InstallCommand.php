@@ -8,10 +8,13 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
+use Oro\Bundle\InstallerBundle\InstallerEvent;
+use Oro\Bundle\InstallerBundle\InstallerEvents;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
@@ -24,6 +27,8 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
  */
 class InstallCommand extends AbstractCommand implements InstallCommandInterface
 {
+    const NAME = 'oro:install';
+
     /** @var InputOptionProvider */
     protected $inputOptionProvider;
 
@@ -33,7 +38,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     protected function configure()
     {
         $this
-            ->setName('oro:install')
+            ->setName(self::NAME)
             ->setDescription('Oro Application Installer.')
             ->addOption('application-url', null, InputOption::VALUE_OPTIONAL, 'Application URL')
             ->addOption('organization-name', null, InputOption::VALUE_OPTIONAL, 'Organization name')
@@ -121,11 +126,17 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             return $exitCode;
         }
 
+        $eventDispatcher = $this->getEventDispatcher();
+        $event = new InstallerEvent($this, $input, $output, $commandExecutor);
+
         try {
-            $this
-                ->prepareStep($input, $output)
-                ->loadDataStep($commandExecutor, $output)
-                ->finalStep($commandExecutor, $output, $input, $skipAssets);
+            $this->prepareStep($input, $output);
+
+            $eventDispatcher->dispatch(InstallerEvents::INSTALLER_BEFORE_DATABASE_PREPARATION, $event);
+            $this->loadDataStep($commandExecutor, $output);
+            $eventDispatcher->dispatch(InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION, $event);
+
+            $this->finalStep($commandExecutor, $output, $input, $skipAssets);
         } catch (\Exception $exception) {
             $output->writeln(sprintf('<error>%s</error>', $exception->getMessage()));
 
@@ -640,5 +651,13 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $commandExecutor
                 ->runCommand('oro:translation:load', ['--process-isolation' => true, '--rebuild-cache' => true]);
         }
+    }
+
+    /**
+     * @return EventDispatcherInterface
+     */
+    private function getEventDispatcher()
+    {
+        return $this->getContainer()->get('event_dispatcher');
     }
 }

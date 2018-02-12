@@ -12,6 +12,10 @@ use Oro\Bundle\InstallerBundle\ScriptExecutor;
 
 class InstallationStep extends AbstractStep
 {
+    /**
+     * @param ProcessContextInterface $context
+     * @return mixed
+     */
     public function displayAction(ProcessContextInterface $context)
     {
         set_time_limit(900);
@@ -19,7 +23,12 @@ class InstallationStep extends AbstractStep
         $action = $this->getRequest()->query->get('action');
         switch ($action) {
             case 'fixtures':
-                return $this->handleAjaxAction('oro:migration:data:load', array('--fixtures-type' => 'demo'));
+                return $this->handleAjaxAction('oro:migration:data:load', ['--fixtures-type' => 'demo']);
+            case 'after-database':
+                return $this->handleAjaxAction(
+                    self::TRIGGER_EVENT,
+                    ['name' => InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION]
+                );
             case 'translation-load':
                 //Load all translations from bundled YML files
                 $translationsLoadResult = $this->handleAjaxAction('oro:translation:load');
@@ -33,14 +42,14 @@ class InstallationStep extends AbstractStep
             case 'assets':
                 return $this->handleAjaxAction(
                     'oro:assets:install',
-                    array('target' => './', '--exclude' => ['OroInstallerBundle'])
+                    ['target' => './', '--exclude' => ['OroInstallerBundle']]
                 );
             case 'assetic':
                 return $this->handleAjaxAction('assetic:dump');
             case 'translation':
                 return $this->handleAjaxAction('oro:translation:dump');
             case 'requirejs':
-                return $this->handleAjaxAction('oro:requirejs:build', array('--ignore-errors' => true));
+                return $this->handleAjaxAction('oro:requirejs:build', ['--ignore-errors' => true]);
             case 'finish':
                 $this->get('event_dispatcher')->dispatch(InstallerEvents::FINISH);
                 // everything was fine - update installed flag in parameters.yml
@@ -72,18 +81,18 @@ class InstallationStep extends AbstractStep
             );
             $scriptExecutor->runScript($scriptFile);
 
-            return new JsonResponse(array('result' => true));
+            return new JsonResponse(['result' => true]);
         }
 
         return $this->render(
             'OroInstallerBundle:Process/Step:installation.html.twig',
-            array(
+            [
                 'loadFixtures' => $context->getStorage()->get('loadFixtures'),
                 'installerScripts' => $this
                         ->container
                         ->get('oro_installer.script_manager')
                         ->getScriptLabels(),
-            )
+            ]
         );
     }
 }

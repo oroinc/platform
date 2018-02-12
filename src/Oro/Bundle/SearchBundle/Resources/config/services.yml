@@ -309,6 +309,26 @@ services:
         tags:
             - { name: form.type, alias: oro_search_type_entity_filter }
 
+    oro_search.provider.console.optional_listeners_global_options_provider:
+        class: Oro\Bundle\SearchBundle\Provider\Console\SearchReindexationGlobalOptionsProvider
+        tags:
+            - { name: oro_platform.console.global_options_provider }
+
+    oro_search.event_listener.install_command:
+        class: Oro\Bundle\SearchBundle\EventListener\Command\InstallCommandListener
+        arguments:
+            - '@request_stack'
+            - 'oro:search:reindex'
+        tags:
+            - { name: kernel.event_listener, event: installer.database_preparation.after, method: onAfterDatabasePreparation }
+
+    oro_search.event_listener.platform_update_command:
+        class: Oro\Bundle\SearchBundle\EventListener\Command\PlatformUpdateCommandListener
+        arguments:
+            - 'oro:search:reindex'
+        tags:
+            - { name: kernel.event_listener, event: installer.database_preparation.after, method: onAfterDatabasePreparation }
+
     oro_search.migration.demo_data_fixtures_listener.reindex:
         parent: oro_platform.event_listener.demo_data_fixtures_listener.abstract
         class: Oro\Bundle\SearchBundle\EventListener\ReindexDemoDataFixturesListener

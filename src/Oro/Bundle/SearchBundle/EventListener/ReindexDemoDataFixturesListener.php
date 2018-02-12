@@ -8,8 +8,7 @@ use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface as SearchIndexerInterface;
 
 /**
- * Disables search index listener during loading of demo data
- * and triggers full reindexation of search index after demo data are loaded.
+ * Disables search index listener during loading of main and demo data
  */
 class ReindexDemoDataFixturesListener extends AbstractDemoDataFixturesListener
 {
@@ -52,8 +51,5 @@ class ReindexDemoDataFixturesListener extends AbstractDemoDataFixturesListener
      */
     protected function afterEnableListeners(MigrationDataFixturesEvent $event)
     {
-        $event->log('running full reindexation of search index');
-
-        $this->searchIndexer->reindex();
     }
 }
