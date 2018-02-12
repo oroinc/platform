@@ -380,7 +380,7 @@ class ACLContext extends OroFeatureContext implements
 
         $filterItem->open();
         $filterItem->selectType('is equal to');
-        $filterItem->setFilterValue($role);
+        $filterItem->setFilterValue($role->__toString());
         $filterItem->submit();
         $this->waitForAjax();
 
