@@ -80,7 +80,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'type',
-            'genemu_jqueryselect2_choice',
+            'oro_select2_choice',
             [
                 'choices'     => $this->getFieldTypeChoices($reverseRelationTypes),
                 'choice_attr' => function ($choiceKey) {

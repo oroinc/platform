@@ -1,6 +1,7 @@
 {% extends 'OroUIBundle:Form:fields.html.twig' %}
 
-{% block genemu_jqueryselect2_widget %}
+{% block oro_select2_widget %}
+    11111111111111111111111
     {% if configs.grid is defined and configs.grid.name is defined %}
         {% set url = path('oro_datagrid_index', {'gridName': configs.grid.name}) %}
     {% elseif configs.route_name is defined and configs.route_name %}
@@ -40,8 +41,12 @@
     } }) }}
 {% endblock %}
 
-{% block genemu_jqueryselect2_javascript %}
-    {% block genemu_jqueryselect2_javascript_prototype %}{% endblock %}
+{% block oro_select2_javascript %}
+    {% block oro_select2_javascript_prototype %}{% endblock %}
+{% endblock %}
+
+{% block oro_select2_hidden_row %}
+    {{ block('form_row') }}
 {% endblock %}
 
 {% block oro_ticker_symbol_widget %}

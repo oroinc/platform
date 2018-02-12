@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupCollectionType;
@@ -50,7 +50,10 @@ class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
                 AttributeGroupType::NAME => new AttributeGroupType(),
                 LocalizedFallbackValueCollectionType::NAME => new LocalizedFallbackValueCollectionTypeStub(),
                 AttributeMultiSelectType::NAME => new AttributeMultiSelectType($attributeManagerMock),
-                'genemu_jqueryselect2_choice' => new Select2Type('choice'),
+                'oro_select2_choice' => new Select2Type(
+                    'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+                    'oro_select2_choice'
+                ),
             ], []),
 
         ];

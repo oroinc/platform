@@ -76,6 +76,6 @@ class BusinessUnitSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'genemu_jqueryselect2_entity';
+        return 'oro_select2_entity';
     }
 }

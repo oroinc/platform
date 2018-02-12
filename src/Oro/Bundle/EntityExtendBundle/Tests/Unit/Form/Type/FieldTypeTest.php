@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
@@ -163,7 +163,10 @@ class FieldTypeTest extends TypeTestCase
             new DefaultTranslator()
         );
 
-        $select2ChoiceType = new Select2Type('choice');
+        $select2ChoiceType = new Select2Type(
+            'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+            'oro_select2_choice'
+        );
 
         return [
             new PreloadedExtension(

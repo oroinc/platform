@@ -54,7 +54,7 @@ class IntegrationSelectTypeTest extends OrmTestCase
 
     public function testParent()
     {
-        $this->assertSame('genemu_jqueryselect2_choice', $this->type->getParent());
+        $this->assertSame('oro_select2_choice', $this->type->getParent());
     }
 
     public function testFinishView()

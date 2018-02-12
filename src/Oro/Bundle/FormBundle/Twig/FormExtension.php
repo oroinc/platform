@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Twig;
 
+use Symfony\Bridge\Twig\Form\TwigRendererInterface;
 use Symfony\Component\Form\FormView;
 
 use Oro\Bundle\FormBundle\Form\Twig\DataBlockRenderer;
@@ -10,6 +11,11 @@ class FormExtension extends \Twig_Extension
 {
     const DEFAULT_TEMPLATE = 'OroFormBundle:Form:fields.html.twig';
     const BLOCK_NAME       = 'oro_form_js_validation';
+
+    /**
+     * @var TwigRendererInterface
+     */
+    public $renderer;
 
     /**
      * @var string
@@ -22,11 +28,16 @@ class FormExtension extends \Twig_Extension
     protected $defaultOptions;
 
     /**
+     * @param TwigRendererInterface $renderer
      * @param string $templateName
-     * @param array  $defaultOptions
+     * @param array $defaultOptions
      */
-    public function __construct($templateName = self::DEFAULT_TEMPLATE, $defaultOptions = [])
-    {
+    public function __construct(
+        TwigRendererInterface $renderer,
+        $templateName = self::DEFAULT_TEMPLATE,
+        $defaultOptions = []
+    ) {
+        $this->renderer = $renderer;
         $this->templateName = $templateName;
         $this->defaultOptions = $defaultOptions;
     }
@@ -39,6 +50,9 @@ class FormExtension extends \Twig_Extension
         return new DataBlockRenderer();
     }
 
+    /**
+     * @return array
+     */
     public function getFunctions()
     {
         return [
@@ -52,6 +66,11 @@ class FormExtension extends \Twig_Extension
                 [$this, 'renderFormJsValidationBlock'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
             ),
+            new \Twig_SimpleFunction(
+                'form_javascript',
+                [$this, 'renderJavascript'],
+                ['is_safe' => ['html']]
+            )
         ];
     }
 
@@ -98,6 +117,21 @@ class FormExtension extends \Twig_Extension
                 'js_options' => $this->filterJsOptions($options)
             ]
         );
+    }
+
+    /**
+     * Render Function Form Javascript
+     *
+     * @param FormView $view
+     * @param bool $prototype
+     *
+     * @return string
+     */
+    public function renderJavascript(FormView $view, $prototype = false)
+    {
+        $block = $prototype ? 'javascript_prototype' : 'javascript';
+
+        return $this->renderer->searchAndRenderBlock($view, $block);
     }
 
     /**

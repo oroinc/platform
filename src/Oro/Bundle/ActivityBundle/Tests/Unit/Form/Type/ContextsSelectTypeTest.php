@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Form\Type;
 
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
@@ -55,7 +55,10 @@ class ContextsSelectTypeTest extends TypeTestCase
         return [
             new PreloadedExtension(
                 [
-                    'genemu_jqueryselect2_hidden' => new Select2Type('hidden')
+                    'oro_select2_hidden' => new Select2Type(
+                        'Symfony\Component\Form\Extension\Core\Type\HiddenType',
+                        'oro_select2_hidden'
+                    )
                 ],
                 []
             )
@@ -119,7 +122,7 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->entityTitleResolver,
             $this->createMock(FeatureChecker::class)
         );
-        $this->assertEquals('genemu_jqueryselect2_hidden', $type->getParent());
+        $this->assertEquals('oro_select2_hidden', $type->getParent());
     }
 
     public function testGetName()
