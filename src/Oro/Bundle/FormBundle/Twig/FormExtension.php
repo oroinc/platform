@@ -70,6 +70,14 @@ class FormExtension extends \Twig_Extension
                 'form_javascript',
                 [$this, 'renderJavascript'],
                 ['is_safe' => ['html']]
+            ),
+            new \Twig_SimpleFunction(
+                'form_stylesheet',
+                null,
+                [
+                    'is_safe' => ['html'],
+                    'node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode',
+                ]
             )
         ];
     }
