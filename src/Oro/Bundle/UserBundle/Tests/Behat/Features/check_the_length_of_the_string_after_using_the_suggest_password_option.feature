@@ -29,4 +29,3 @@ Feature: Check the length of the string after using the "Suggest password" optio
     And I click "Save"
     #   And I should see "The password has been changed" flash message
     #   this step blocked by BAP-16561  - "The password has been changed" flash message shown very quickly
-
