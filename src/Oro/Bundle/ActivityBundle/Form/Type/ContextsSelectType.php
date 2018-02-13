@@ -4,7 +4,12 @@ namespace Oro\Bundle\ActivityBundle\Form\Type;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
+use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -12,17 +17,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
-use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class ContextsSelectType extends AbstractType
 {
-    const SEPARATOR = '-|-';
     const NAME = 'oro_activity_contexts_select';
 
     /** @var EntityManager */
@@ -77,6 +74,7 @@ class ContextsSelectType extends AbstractType
             $this->entityManager,
             $options['collectionModel']
         );
+        $contextsToViewTransformer->setSeparator($options['configs']['separator']);
         $builder->addViewTransformer($contextsToViewTransformer);
     }
 
@@ -173,7 +171,7 @@ class ContextsSelectType extends AbstractType
             'placeholder'        => 'oro.activity.contexts.placeholder',
             'allowClear'         => true,
             'multiple'           => true,
-            'separator'          => self::SEPARATOR,
+            'separator'          => ContextsToViewTransformer::SEPARATOR,
             'forceSelectedData'  => true,
             'minimumInputLength' => 0,
         ];
