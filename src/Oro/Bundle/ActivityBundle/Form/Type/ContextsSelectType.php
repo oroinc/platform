@@ -22,6 +22,7 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class ContextsSelectType extends AbstractType
 {
+    const SEPARATOR = '-|-';
     const NAME = 'oro_activity_contexts_select';
 
     /** @var EntityManager */
@@ -84,15 +85,16 @@ class ContextsSelectType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['attr']['data-selected-data'] = $this->getSelectedData($form);
+        $view->vars['attr']['data-selected-data'] = $this->getSelectedData($form, $options['configs']['separator']);
     }
 
     /**
      * @param FormInterface $form
+     * @param string $separator
      *
      * @return string
      */
-    protected function getSelectedData(FormInterface $form)
+    protected function getSelectedData(FormInterface $form, $separator)
     {
         $targetEntities = $form->getData();
         if (!$targetEntities) {
@@ -117,7 +119,7 @@ class ContextsSelectType extends AbstractType
             $result[] = json_encode($this->getResult($item['title'], $target));
         }
 
-        return implode(';', $result);
+        return implode($separator, $result);
     }
 
     /**
@@ -171,7 +173,7 @@ class ContextsSelectType extends AbstractType
             'placeholder'        => 'oro.activity.contexts.placeholder',
             'allowClear'         => true,
             'multiple'           => true,
-            'separator'          => ';',
+            'separator'          => self::SEPARATOR,
             'forceSelectedData'  => true,
             'minimumInputLength' => 0,
         ];

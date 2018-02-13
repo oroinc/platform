@@ -91,7 +91,7 @@ class ContextsSelectTypeTest extends TypeTestCase
                         'placeholder'        => 'oro.activity.contexts.placeholder',
                         'allowClear'         => true,
                         'multiple'           => true,
-                        'separator'          => ';',
+                        'separator'          => ContextsSelectType::SEPARATOR,
                         'forceSelectedData'  => true,
                         'minimumInputLength' => 0,
                     ]
