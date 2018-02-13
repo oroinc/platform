@@ -47,13 +47,6 @@ class EntitiesToIdsTransformer extends EntityToIdTransformer
             throw new UnexpectedTypeException($value, 'array');
         }
 
-        $value = array_filter(
-            $value,
-            function ($val) {
-                return $val !== '';
-            }
-        );
-
         $entities = $this->loadEntitiesByIds($value);
 
         return $entities;
