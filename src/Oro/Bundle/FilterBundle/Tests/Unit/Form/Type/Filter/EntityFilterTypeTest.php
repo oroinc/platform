@@ -62,7 +62,7 @@ class EntityFilterTypeTest extends AbstractTypeTestCase
         return array(
             array(
                 'defaultOptions' => array(
-                    'field_type' => 'entity',
+                    'field_type' => EntityType::class,
                     'field_options' => array(),
                     'translatable'  => false,
                 )

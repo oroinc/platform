@@ -6,6 +6,8 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\Common\Annotations\AnnotationReader;
 
+use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
+use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
@@ -38,8 +40,15 @@ class IntegrationSelectTypeTest extends OrmTestCase
         $this->em          = $this->getTestEntityManager();
         $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()->getMock();
+        $choiceListFactory = $this->createMock(ChoiceListFactoryInterface::class);
 
-        $this->type = new IntegrationSelectType($this->em, $this->registry, $this->assetHelper, $aclHelper);
+        $this->type = new IntegrationSelectType(
+            $this->em,
+            $this->registry,
+            $this->assetHelper,
+            $aclHelper,
+            $choiceListFactory
+        );
     }
 
     public function tearDown()
@@ -127,6 +136,6 @@ class IntegrationSelectTypeTest extends OrmTestCase
                 'allowed_types' => ['testType']
             ]
         );
-        $this->assertInstanceOf('Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList', $resolved['choice_list']);
+        $this->assertInstanceOf(ChoiceLoaderInterface::class, $resolved['choice_loader']);
     }
 }

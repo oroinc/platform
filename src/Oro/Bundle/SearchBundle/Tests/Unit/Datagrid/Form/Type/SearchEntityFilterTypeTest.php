@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Form\Type;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType;
@@ -9,8 +12,8 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchEntityFilterType;
-use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -99,7 +102,7 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
             ->with($entity, null, $localization)
             ->willReturn('resolved-label');
 
-        $form = $this->factory->create($this->type, [], []);
+        $form = $this->factory->create($this->type, [], ['choices' => []]);
         $formOptions = $form->getConfig()->getOptions();
         $this->assertEquals(
             'resolved-label',
@@ -129,13 +132,25 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
     {
         $translator = $this->createMock(TranslatorInterface::class);
 
+        $entityManger = $this->createMock(ObjectManager::class);
+        $entityManger
+            ->expects($this->any())
+            ->method('getClassMetadata')
+            ->willReturn(new ClassMetadata('a'));
+
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry
+            ->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($entityManger);
+
         return [
             new PreloadedExtension(
                 [
                     new EntityFilterType($translator),
                     new ChoiceFilterType($translator),
                     new FilterType($translator),
-                    new EntityType([]),
+                    new EntityType($managerRegistry)
                 ],
                 []
             ),
