@@ -90,7 +90,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
             $arr = array(
                 'label'     => 'oro.user.groups.label',
                 'class'     => 'OroUserBundle:Group',
-                'property'  => 'name',
+                'choice_label' => 'name',
                 'multiple'  => true,
                 'expanded'  => true,
                 'required'  => false,

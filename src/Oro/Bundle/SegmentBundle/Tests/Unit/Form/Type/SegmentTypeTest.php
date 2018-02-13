@@ -47,7 +47,7 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
                 'entity',
                 [
                     'class'       => 'OroSegmentBundle:SegmentType',
-                    'property'    => 'label',
+                    'choice_label' => 'label',
                     'required'    => true,
                     'empty_value' => 'oro.segment.form.choose_segment_type',
                     'tooltip'     => 'oro.segment.type.tooltip_text'

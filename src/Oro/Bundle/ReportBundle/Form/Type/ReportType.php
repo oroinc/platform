@@ -23,7 +23,7 @@ class ReportType extends AbstractQueryDesignerType
                 'entity',
                 array(
                     'class'       => 'OroReportBundle:ReportType',
-                    'property'    => 'label',
+                    'choice_label'    => 'label',
                     'required'    => true,
                     'empty_value' => 'oro.report.form.choose_report_type'
                 )

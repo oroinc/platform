@@ -122,7 +122,7 @@ class SegmentFilter extends EntityFilter
                     'csrf_protection' => false,
                     'field_options'   => [
                         'class'         => 'OroSegmentBundle:Segment',
-                        'property'      => 'name',
+                        'choice_label'  => 'name',
                         'required'      => true,
                         'query_builder' => function (EntityRepository $repo) use ($entityName) {
                             $qb = $repo->createQueryBuilder('s');

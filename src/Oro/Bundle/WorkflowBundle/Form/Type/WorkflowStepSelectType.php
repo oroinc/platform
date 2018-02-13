@@ -52,7 +52,7 @@ class WorkflowStepSelectType extends AbstractType
         $resolver->setDefaults(
             [
                 'class' => 'OroWorkflowBundle:WorkflowStep',
-                'property' => 'label'
+                'choice_label' => 'label'
             ]
         );
 

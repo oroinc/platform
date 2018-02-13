@@ -40,7 +40,7 @@ class DashboardSelectType extends AbstractType
         $resolver->setDefaults(
             array(
                 'class' => 'OroDashboardBundle:Dashboard',
-                'property' => 'label',
+                'choice_label' => 'label',
                 'choices' => $this->getChoices(),
                 'empty_value' => 'oro.dashboard.start_dashboard.empty_value',
             )

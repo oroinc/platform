@@ -43,7 +43,7 @@ class WorkflowDefinitionSelectType extends AbstractType
         $resolver->setDefaults(
             [
                 'class' => 'OroWorkflowBundle:WorkflowDefinition',
-                'property' => 'label'
+                'choice_label' => 'label'
             ]
         );
 

@@ -160,7 +160,7 @@ class OrganizationsSelectType extends AbstractType
             'entity',
             [
                 'class'    => 'OroOrganizationBundle:Organization',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'multiple' => true
             ]
         );

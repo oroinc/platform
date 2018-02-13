@@ -31,7 +31,7 @@ class RecipientListType extends AbstractType
             [
                 'label'       => 'oro.user.group.entity_plural_label',
                 'class'       => 'OroUserBundle:Group',
-                'property'      => 'name',
+                'choice_label'      => 'name',
                 'multiple'      => true,
                 'expanded'      => true,
                 'empty_value'   => '',

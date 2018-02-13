@@ -75,7 +75,7 @@ class UserType extends AbstractType
                     'property_path' => 'rolesCollection',
                     'label'         => 'oro.user.roles.label',
                     'class'         => 'OroUserBundle:Role',
-                    'property'      => 'label',
+                    'choice_label'      => 'label',
                     'query_builder' => function (EntityRepository $er) {
                         return $er->createQueryBuilder('r')
                             ->where('r.role <> :anon')
@@ -98,7 +98,7 @@ class UserType extends AbstractType
                 [
                     'label'     => 'oro.user.groups.label',
                     'class'     => 'OroUserBundle:Group',
-                    'property'  => 'name',
+                    'choice_label'  => 'name',
                     'multiple'  => true,
                     'expanded'  => true,
                     'required'  => false,
