@@ -1,10 +1,13 @@
 <?php
+
 namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
@@ -28,6 +31,16 @@ class UserMultiSelectType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) {
+                $value = $event->getData();
+                if (empty($value)) {
+                    $event->setData([]);
+                }
+            }
+        );
+
         $builder->addModelTransformer(
             new EntitiesToIdsTransformer($this->entityManager, $options['entity_class'])
         );
