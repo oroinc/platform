@@ -5,6 +5,7 @@ namespace Oro\Bundle\TagBundle\Security;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider as SearchSecurityProvider;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class SecurityProvider
 {
@@ -36,7 +37,11 @@ class SecurityProvider
 
         if (count($allowedEntities) != count($taggableEntities)) {
             if ($allowedEntities) {
-                $queryBuilder->andWhere($tableAlias . '.entityName IN(:allowedEntities)')
+                $queryBuilder
+                    ->andWhere(
+                        $queryBuilder->expr()
+                            ->in(QueryBuilderUtil::getField($tableAlias, 'entityName'), ':allowedEntities')
+                    )
                     ->setParameter('allowedEntities', $allowedEntities);
             } else {
                 // Do not show any result if all entities are prohibited

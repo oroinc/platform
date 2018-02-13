@@ -131,6 +131,7 @@ class QueryBuilderUtil
         $qb->distinct(true);
         $rootAlias = self::getSingleRootAlias($qb);
         foreach ($joins as $key => $val) {
+            self::checkIdentifier($key);
             if (empty($val)) {
                 $qb->leftJoin($rootAlias . '.' . $key, $key);
             } elseif (is_array($val)) {
@@ -153,6 +154,7 @@ class QueryBuilderUtil
                 }
                 $qb->leftJoin($join, $key, $conditionType, $condition);
             } else {
+                self::checkIdentifier($val);
                 $qb->leftJoin($rootAlias . '.' . $val, $val);
             }
         }
@@ -165,14 +167,15 @@ class QueryBuilderUtil
      */
     public static function applyOptimizedIn(QueryBuilder $qb, $field, array $values)
     {
-        $expressions     = [];
+        self::checkField($field);
+        $expressions     = $qb->expr()->orX();
         $optimizedValues = self::optimizeIntegerValues($values);
 
         if ($optimizedValues[self::IN]) {
             $param = self::generateParameterName($field);
 
             $qb->setParameter($param, $optimizedValues[self::IN]);
-            $expressions[] = $qb->expr()->in($field, sprintf(':%s', $param));
+            $expressions->add($qb->expr()->in($field, sprintf(':%s', $param)));
         }
 
         foreach ($optimizedValues[self::IN_BETWEEN] as $range) {
@@ -183,15 +186,11 @@ class QueryBuilderUtil
             $qb->setParameter($minParam, $min);
             $qb->setParameter($maxParam, $max);
 
-            $expressions[] = $qb->expr()->between(
-                $field,
-                sprintf(':%s', $minParam),
-                sprintf(':%s', $maxParam)
-            );
+            $expressions->add($qb->expr()->between($field, sprintf(':%s', $minParam), sprintf(':%s', $maxParam)));
         }
 
-        if ($expressions) {
-            $qb->andWhere(call_user_func_array([$qb->expr(), 'orX'], $expressions));
+        if (count($expressions->getParts()) > 0) {
+            $qb->andWhere($expressions);
         }
     }
 
@@ -233,6 +232,7 @@ class QueryBuilderUtil
      */
     public static function generateParameterName($prefix)
     {
+        self::checkField($prefix);
         static $n = 0;
         $n++;
 
@@ -358,6 +358,79 @@ class QueryBuilderUtil
     }
 
     /**
+     * Query safe replacement for sprintf
+     *
+     * @param string $format
+     * @param array ...$args
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public static function sprintf($format, ...$args): string
+    {
+        foreach ($args as $arg) {
+            self::checkField($arg);
+        }
+
+        return sprintf($format, ...$args);
+    }
+
+    /**
+     * Check that passed identifier is safe for usage in dynamic DQL
+     *
+     * @param string $str
+     * @throws \InvalidArgumentException
+     */
+    public static function checkIdentifier($str)
+    {
+        if (preg_match('/[\W]+/', $str)) {
+            throw new \InvalidArgumentException(sprintf('Unsafe value passed %s', $str));
+        }
+    }
+
+    /**
+     * Check that passed field is safe for usage in dynamic DQL. Field may be in format (?alias.)field
+     *
+     * @param string $str
+     * @throws \InvalidArgumentException
+     */
+    public static function checkField($str)
+    {
+        if (strpos($str, '.') !== false) {
+            list($alias, $field) = explode('.', $str, 2);
+            self::checkIdentifier($alias);
+            self::checkIdentifier($field);
+        } else {
+            self::checkIdentifier($str);
+        }
+    }
+
+    /**
+     * Check that passed parameter is safe for usage in dynamic DQL
+     *
+     * @param string $str
+     * @throws \InvalidArgumentException
+     */
+    public static function checkParameter($str)
+    {
+        if (strpos($str, ':') === 0) {
+            self::checkIdentifier(substr($str, 1));
+        }
+    }
+
+    /**
+     * Construct safe identifier field name based table alias and field name.
+     *
+     * @param string $alias
+     * @param string $field
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public static function getField($alias, $field): string
+    {
+        return self::sprintf('%s.%s', $alias, $field);
+    }
+
+    /**
      * @param QueryBuilder $qb
      * @param string $alias
      *
@@ -377,5 +450,21 @@ class QueryBuilderUtil
         }
 
         return null;
+    }
+
+    /**
+     * @param string $sortOrder
+     * @return string
+     */
+    public static function getSortOrder($sortOrder)
+    {
+        if (\strtolower($sortOrder) === 'asc') {
+            return 'ASC';
+        }
+        if (\strtolower($sortOrder) === 'desc') {
+            return 'DESC';
+        }
+
+        throw new \InvalidArgumentException(sprintf('Unsafe value passed %s', $sortOrder));
     }
 }

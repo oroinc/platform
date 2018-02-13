@@ -90,21 +90,22 @@
                                 <div class="flash-messages-holder"></div>
                             </div>
                             <script type="text/javascript">
-                                require(['jquery', 'oroui/js/messenger'],
-                                        function($, messenger, template) {
-                                            messenger.setup({
-                                                container: '#flash-messages .flash-messages-holder'
-                                            });
-                                            {% if app.session.flashbag.peekAll|length > 0 %}
-                                            $(function() {
-                                                {% for type, messages in app.session.flashbag.all %}
-                                                {% for message in messages %}
-                                                messenger.notificationFlashMessage({{ type|json_encode|raw }}, {{ message|trans|json_encode|raw }});
-                                                {% endfor %}
-                                                {% endfor %}
-                                            });
-                                            {% endif %}
+                                require(['jquery', 'oroui/js/messenger', 'tpl!oroui/templates/message-item.html'],
+                                    function($, messenger, template) {
+                                        messenger.setup({
+                                            container: '#flash-messages .flash-messages-holder',
+                                            template: template
                                         });
+                                        {% if app.session.flashbag.peekAll|length > 0 %}
+                                        $(function() {
+                                            {% for type, messages in app.session.flashbag.all %}
+                                            {% for message in messages %}
+                                            messenger.notificationFlashMessage({{ type|json_encode|raw }}, {{ message|trans|json_encode|raw }});
+                                            {% endfor %}
+                                            {% endfor %}
+                                        });
+                                        {% endif %}
+                                    });
                             </script>
                         {% endblock messages %}
                     </div>

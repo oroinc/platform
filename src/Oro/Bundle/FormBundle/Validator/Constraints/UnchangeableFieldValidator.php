@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FormBundle\Validator\Constraints;
 
 use Doctrine\ORM\Query;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -70,6 +71,7 @@ class UnchangeableFieldValidator extends ConstraintValidator
 
 
         foreach ($identifier as $name => $identifierValue) {
+            QueryBuilderUtil::checkIdentifier($name);
             $qb->andWhere(sprintf('%s.%s = :%s', self::OBJECT_ALIAS, $name, $name));
         }
 

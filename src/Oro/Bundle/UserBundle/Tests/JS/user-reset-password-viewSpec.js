@@ -14,15 +14,11 @@ define(function(require) {
         }
 
         beforeEach(function() {
-            /* eslint-disable indent */
-            var html = [
-                '<form id="form">',
-                    '<input class="password-field"/>',
+            window.setFixtures(
+                '<form id="form">' +
+                    '<input class="password-field"/>' +
                 '</form>'
-            ].join('');
-            /* eslint-enable */
-
-            window.setFixtures(html);
+            );
         });
 
         it('_getPasswordInput - when selector is passed', function() {

@@ -4,6 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Helper;
 
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
@@ -180,6 +181,7 @@ class DateHelper
         QueryBuilder $qb,
         $entityField
     ) {
+        QueryBuilderUtil::checkField($entityField);
         switch ($this->getFormatStrings($start, $end)['viewType']) {
             case 'year':
                 $qb->addSelect(sprintf(
