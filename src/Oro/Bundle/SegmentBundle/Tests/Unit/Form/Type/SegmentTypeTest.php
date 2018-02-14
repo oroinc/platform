@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\SegmentBundle\Form\Type\SegmentType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 class SegmentTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -44,7 +45,7 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'type',
-                'entity',
+                EntityType::class,
                 [
                     'class'       => 'OroSegmentBundle:SegmentType',
                     'choice_label' => 'label',

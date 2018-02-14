@@ -6,10 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -35,8 +35,9 @@ use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
 
 use Oro\Component\Testing\Unit\EntityTrait;
-use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
+use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType as EntityTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 
 class EmailNotificationTypeTest extends FormIntegrationTestCase
 {
@@ -201,19 +202,19 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        $select2EntityType = new EntityType(
+        $select2EntityType = new EntityTypeStub(
             [100 => new Event('test')],
             'genemu_jqueryselect2_entity',
             ['configs' => [], 'property' => null]
         );
 
-        $select2TranslatableEntityType = new EntityType(
+        $select2TranslatableEntityType = new EntityTypeStub(
             [200 => new EmailTemplate('test')],
             'genemu_jqueryselect2_translatable_entity',
             ['configs' => []]
         );
 
-        $entityType = new EntityType([1 => new Group()], 'entity', ['property' => null]);
+        $entityType = new EntityTypeStub([1 => new Group()], 'entity', ['property' => null]);
 
         /** @var TranslatableEntityType $translatableEntityType */
         $translatableEntityType = $this->getMockBuilder(TranslatableEntityType::class)
@@ -223,21 +224,21 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
 
         $recipientListType = new RecipientListType();
 
-        $userOrganizationType = new EntityType(
+        $userOrganizationType = new EntityTypeStub(
             [null => new ArrayCollection(), 3 => new ArrayCollection([$this->getUser()])],
             'oro_user_organization_acl_multiselect'
         );
         return [
             new PreloadedExtension(
                 [
-                    EmailNotificationEntityChoiceType::NAME => new EntityType(
+                    EmailNotificationEntityChoiceType::NAME => new EntityTypeStub(
                         ['user' => User::class, 'stdClass' => \stdClass::class],
                         EmailNotificationEntityChoiceType::NAME,
                         ['configs' => []]
                     ),
                     $select2EntityType->getName() => $select2EntityType,
                     $select2TranslatableEntityType->getName() => $select2TranslatableEntityType,
-                    $entityType->getName() => $entityType,
+                    EntityType::class => $entityType,
                     $translatableEntityType->getName() => $translatableEntityType,
                     $recipientListType->getName() => $recipientListType,
                     $userOrganizationType->getName() => $userOrganizationType

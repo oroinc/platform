@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Form\Type;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -27,7 +28,7 @@ class RecipientListType extends AbstractType
         // groups
         $builder->add(
             'groups',
-            'entity',
+            EntityType::class,
             [
                 'label'       => 'oro.user.group.entity_plural_label',
                 'class'       => 'OroUserBundle:Group',

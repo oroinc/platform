@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityMergeBundle\Form\Type;
 
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -41,7 +42,7 @@ class MergeFieldType extends AbstractType
 
         $builder->add(
             'sourceEntity',
-            'entity',
+            EntityType::class,
             array(
                 'class'                   => $metadata->getEntityMetadata()->getClassName(),
                 'choices'                 => $options['entities'],

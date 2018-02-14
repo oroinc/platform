@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityMergeBundle\Form\Type;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -23,7 +24,7 @@ class MergeType extends AbstractType
 
         $builder->add(
             'masterEntity',
-            'entity',
+            EntityType::class,
             array(
                 'label'                   => 'oro.entity_merge.form.master_record',
                 'class'                   => $metadata->getClassName(),

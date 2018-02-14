@@ -5,6 +5,7 @@ namespace Oro\Bundle\OrganizationBundle\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\PersistentCollection;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -157,7 +158,7 @@ class OrganizationsSelectType extends AbstractType
     {
         $builder->add(
             'organizations',
-            'entity',
+            EntityType::class,
             [
                 'class'    => 'OroOrganizationBundle:Organization',
                 'choice_label' => 'name',

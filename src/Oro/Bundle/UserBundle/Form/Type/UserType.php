@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -70,7 +71,7 @@ class UserType extends AbstractType
         if ($this->authorizationChecker->isGranted('oro_user_role_view')) {
             $builder->add(
                 'roles',
-                'entity',
+                EntityType::class,
                 [
                     'property_path' => 'rolesCollection',
                     'label'         => 'oro.user.roles.label',
@@ -94,7 +95,7 @@ class UserType extends AbstractType
         if ($this->authorizationChecker->isGranted('oro_user_group_view')) {
             $builder->add(
                 'groups',
-                'entity',
+                EntityType::class,
                 [
                     'label'     => 'oro.user.groups.label',
                     'class'     => 'OroUserBundle:Group',

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Form\Type;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -36,7 +37,7 @@ class GridViewType extends AbstractType
             ])
             ->add(
                 'appearanceType',
-                'entity',
+                EntityType::class,
                 [
                     'class' => 'OroDataGridBundle:AppearanceType',
                     'property_path' => 'appearanceType',

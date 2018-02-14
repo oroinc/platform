@@ -6,10 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Translation\MessageCatalogueInterface;
 
@@ -19,6 +19,7 @@ use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 
 class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 {
@@ -90,7 +91,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             ->getMock();
         $mockEntityType->expects($this->any())->method('getName')->willReturn('entity');
 
-        return [new PreloadedExtension([$mockEntityType->getName() => $mockEntityType], [])];
+        return [new PreloadedExtension([EntityType::class => $mockEntityType], [])];
     }
 
     public function testGetName()
@@ -100,7 +101,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('entity', $this->type->getParent());
+        $this->assertEquals(EntityType::class, $this->type->getParent());
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Form\Type;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -19,7 +20,7 @@ class SegmentType extends AbstractQueryDesignerType
             ->add('entity', 'oro_segment_entity_choice', ['required' => true])
             ->add(
                 'type',
-                'entity',
+                EntityType::class,
                 [
                     'class'       => 'OroSegmentBundle:SegmentType',
                     'choice_label'    => 'label',

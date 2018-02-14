@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ReportBundle\Form\Type;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -20,7 +21,7 @@ class ReportType extends AbstractQueryDesignerType
             ->add('entity', 'oro_report_entity_choice', array('required' => true))
             ->add(
                 'type',
-                'entity',
+                EntityType::class,
                 array(
                     'class'       => 'OroReportBundle:ReportType',
                     'choice_label'    => 'label',

@@ -2,6 +2,10 @@
 
 namespace Oro\Component\Testing\Unit;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\SchemaTool;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase as BaseTestCase;
 use Symfony\Component\Form\FormInterface;
@@ -227,5 +231,49 @@ class FormIntegrationTestCase extends BaseTestCase
         }
 
         return $path;
+    }
+
+    /**
+     * @param string $name
+     * @param EntityManager $em
+     * @return Registry|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createRegistryMock($name, $em)
+    {
+        $registry = $this->createMock(ManagerRegistry::class);
+
+        $registry->expects($this->any())
+            ->method('getManager')
+            ->with($name)
+            ->willReturn($em);
+
+        $registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->will($this->returnValue($em));
+
+        return $registry;
+    }
+
+    /**
+     * @param array $classes
+     * @param EntityManager $entityManager
+     */
+    protected function createSchemaForClasses(array $classes, EntityManager $entityManager)
+    {
+        $classesMetadata = [];
+        foreach ($classes as $class) {
+            $classesMetadata[] = $entityManager->getClassMetadata($class);
+        }
+
+        $schemaTool = new SchemaTool($entityManager);
+        try {
+            $schemaTool->dropSchema($classesMetadata);
+        } catch (\Exception $e) {
+        }
+
+        try {
+            $schemaTool->createSchema($classesMetadata);
+        } catch (\Exception $e) {
+        }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -83,7 +84,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
         if ($permissions[self::RULE_ROLE]) {
             $builder->expects($this->at(++$order))
                 ->method('add')
-                ->with('roles', 'entity')
+                ->with('roles', EntityType::class)
                 ->will($this->returnValue($builder));
         }
         if ($permissions[self::RULE_GROUP]) {
@@ -100,7 +101,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
             );
             $builder->expects($this->at(++$order))
                 ->method('add')
-                ->with('groups', 'entity', $arr)
+                ->with('groups', EntityType::class, $arr)
                 ->will($this->returnValue($builder));
         }
         if ($permissions[self::RULE_BUSINESS_UNIT] && $permissions[self::RULE_ORGANIZATION]) {

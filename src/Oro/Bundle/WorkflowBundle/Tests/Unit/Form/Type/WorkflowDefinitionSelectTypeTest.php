@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -16,7 +16,8 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 use Oro\Component\Testing\Unit\EntityTrait;
-use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
+use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType as EntityTypeStub;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 
 class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
 {
@@ -124,7 +125,7 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('entity', $this->type->getParent());
+        $this->assertEquals(EntityType::class, $this->type->getParent());
     }
 
     /**
@@ -163,9 +164,9 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        $entityType = new EntityType($this->getDefinitions());
+        $entityType = new EntityTypeStub($this->getDefinitions());
 
-        return [new PreloadedExtension([$entityType->getName() => $entityType], [])];
+        return [new PreloadedExtension([EntityType::class => $entityType], [])];
     }
 
     /**
