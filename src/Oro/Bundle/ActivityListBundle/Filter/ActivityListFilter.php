@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Component\DependencyInjection\ServiceLink;
@@ -150,6 +151,7 @@ class ActivityListFilter extends EntityFilter
         array $data,
         $entityIdField
     ) {
+        QueryBuilderUtil::checkIdentifier($entityIdField);
         $entityClass = $data['entityClassName'];
 
         $joinField = sprintf(
@@ -356,6 +358,7 @@ class ActivityListFilter extends EntityFilter
     protected function getEntityAlias()
     {
         list($alias) = explode('.', $this->getOr(FilterUtility::DATA_NAME_KEY));
+        QueryBuilderUtil::checkIdentifier($alias);
 
         return $alias;
     }

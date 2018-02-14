@@ -31,6 +31,7 @@ use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 use Symfony\Component\Stopwatch\Stopwatch;
 use WebDriver\Exception\NoAlertOpenError;
 use WebDriver\Exception\NoSuchElement;
+use WebDriver\Exception\StaleElementReference;
 use WebDriver\Exception\UnknownError;
 
 /**
@@ -791,15 +792,23 @@ class OroMainContext extends MinkContext implements
      */
     public function pressButton($button)
     {
-        try {
-            parent::pressButton($button);
-        } catch (ElementNotFoundException $e) {
-            if ($this->getSession()->getPage()->hasLink($button)) {
-                $this->clickLink($button);
-            } elseif ($this->elementFactory->hasElement($button)) {
-                $this->elementFactory->createElement($button)->click();
-            } else {
+        for ($i = 0; $i < 2; $i++) {
+            try {
+                parent::pressButton($button);
+                break;
+            } catch (ElementNotFoundException $e) {
+                if ($this->getSession()->getPage()->hasLink($button)) {
+                    $this->clickLink($button);
+                    break;
+                }
+
+                if ($this->elementFactory->hasElement($button)) {
+                    $this->elementFactory->createElement($button)->click();
+                    break;
+                }
+
                 throw $e;
+            } catch (StaleElementReference $e) {
             }
         }
     }
@@ -1197,18 +1206,6 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Given /^I restart message consumer$/
-     *
-     * @todo remove step from scenario and step implementation in scope of BAP-14637
-     */
-    public function iRestartMessageConsumer()
-    {
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
-        $this->messageQueueIsolator->stopMessageQueue();
-        $this->messageQueueIsolator->startMessageQueue();
-    }
-
-    /**
      * @Then /^"([^"]*)" button is disabled$/
      */
     public function buttonIsDisabled($button)
@@ -1568,7 +1565,7 @@ JS;
      * Example: When I focus on "Some" field and press Enter key
      * Example: And I focus on "Some" field and press Enter key
      *
-     * @When /^(?:|I )focus on "(?P<fieldName>[\w\s]*)" field and press Enter key$/
+     * @When /^(?:|I )focus on "(?P<fieldName>[^"]*)" field and press Enter key$/
      * @param string $fieldName
      */
     public function focusOnFieldAndPressEnterKey($fieldName)
@@ -1821,5 +1818,51 @@ JS;
         }, 10);
 
         parent::assertPageAddress($page);
+    }
+
+    /**
+     * Returns the name of the current and the last browser tab as an array.
+     *
+     * @return array [$currentTab, $lastTab]
+     */
+    public function getCurrentAndLastTabNames()
+    {
+        $currentTab = $this->getSession()->getWindowName();
+        $windowNames = $this->getSession()->getWindowNames();
+        $lastTab = end($windowNames);
+        return [$currentTab, $lastTab];
+    }
+
+    /**
+     * Check if the browser opened a new tab.
+     *
+     * It is based on the assumption that the current window was the last tab before a new tab was opened.
+     *
+     * Example: Then a new browser tab is opened
+     * @Then /^a new browser tab is opened$/
+     */
+    public function newBrowserTabIsOpened()
+    {
+        list($currentTab, $lastTab) = $this->getCurrentAndLastTabNames();
+        if ($lastTab === $currentTab) {
+            self::fail('No new browser tabs detected after the current one');
+        }
+    }
+
+    /**
+     * Check if the browser opened a new tab, and switch to this tab if it is.
+     *
+     * It is based on the assumption that the current window was the last tab before a new tab was opened.
+     *
+     * Example: Then a new browser tab is opened and I switch to it
+     * @Then /^a new browser tab is opened and I switch to it$/
+     */
+    public function newBrowserTabIsOpenedAndISwitchToIt()
+    {
+        list($currentTab, $lastTab) = $this->getCurrentAndLastTabNames();
+        if ($lastTab === $currentTab) {
+            self::fail('No new browser tabs detected after the current one');
+        }
+        $this->getSession()->switchToWindow($lastTab);
     }
 }
