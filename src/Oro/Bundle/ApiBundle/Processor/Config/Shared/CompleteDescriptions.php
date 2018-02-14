@@ -149,25 +149,48 @@ class CompleteDescriptions implements ProcessorInterface
         $parentEntityClass
     ) {
         $entityDescription = false;
-        $processInheritDoc = !$associationName;
-
         if ($definition->hasDescription()) {
             $description = $definition->getDescription();
             if ($description instanceof Label) {
                 $definition->setDescription($this->trans($description));
             }
+        } elseif ($associationName) {
+            $entityDescription = $this->getAssociationDescription($associationName);
+            $this->setDescriptionForSubresource($definition, $entityDescription, $targetAction, $isCollection);
         } else {
-            if ($associationName) {
-                $entityDescription = $this->getAssociationDescription($associationName);
-                $this->setDescriptionForSubresource($definition, $entityDescription, $targetAction, $isCollection);
-            } else {
-                $entityDescription = $this->getEntityDescription($entityClass, $isCollection);
-                if ($entityDescription) {
-                    $this->setDescriptionForResource($definition, $targetAction, $entityDescription);
-                }
-            }
+            $entityDescription = $this->getEntityDescription($entityClass, $isCollection);
+            $this->setDescriptionForResource($definition, $targetAction, $entityDescription);
         }
 
+        $this->setDocumentationForEntity(
+            $definition,
+            $entityClass,
+            $targetAction,
+            $isCollection,
+            $associationName,
+            $parentEntityClass,
+            $entityDescription
+        );
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $entityClass
+     * @param string                 $targetAction
+     * @param bool                   $isCollection
+     * @param string                 $associationName
+     * @param string                 $parentEntityClass
+     * @param string|bool|null       $entityDescription
+     */
+    protected function setDocumentationForEntity(
+        EntityDefinitionConfig $definition,
+        $entityClass,
+        $targetAction,
+        $isCollection,
+        $associationName,
+        $parentEntityClass,
+        $entityDescription
+    ) {
         $this->registerDocumentationResources($definition);
         $this->loadDocumentationForEntity(
             $definition,
@@ -176,6 +199,7 @@ class CompleteDescriptions implements ProcessorInterface
             $associationName,
             $parentEntityClass
         );
+        $processInheritDoc = !$associationName;
         if (!$definition->hasDocumentation()) {
             if ($associationName) {
                 if (false === $entityDescription) {
@@ -263,16 +287,18 @@ class CompleteDescriptions implements ProcessorInterface
     /**
      * @param EntityDefinitionConfig $definition
      * @param string                 $targetAction
-     * @param string                 $entityDescription
+     * @param string|null            $entityDescription
      */
     protected function setDescriptionForResource(
         EntityDefinitionConfig $definition,
         $targetAction,
         $entityDescription
     ) {
-        $description = $this->resourceDocProvider->getResourceDescription($targetAction, $entityDescription);
-        if ($description) {
-            $definition->setDescription($description);
+        if ($entityDescription) {
+            $description = $this->resourceDocProvider->getResourceDescription($targetAction, $entityDescription);
+            if ($description) {
+                $definition->setDescription($description);
+            }
         }
     }
 
@@ -383,12 +409,7 @@ class CompleteDescriptions implements ProcessorInterface
             }
         }
 
-        $this->setDescriptionForCreatedAtField($definition);
-        $this->setDescriptionForUpdatedAtField($definition);
-        $this->setDescriptionsForOwnershipFields($definition, $entityClass);
-        if (is_a($entityClass, AbstractEnumValue::class, true)) {
-            $this->setDescriptionsForEnumFields($definition);
-        }
+        $this->setDescriptionsForSpecialFields($definition, $entityClass);
     }
 
     /**
@@ -570,6 +591,20 @@ class CompleteDescriptions implements ProcessorInterface
             reset($identifierFieldNames),
             self::ID_DESCRIPTION
         );
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $entityClass
+     */
+    protected function setDescriptionsForSpecialFields(EntityDefinitionConfig $definition, $entityClass)
+    {
+        $this->setDescriptionForCreatedAtField($definition);
+        $this->setDescriptionForUpdatedAtField($definition);
+        $this->setDescriptionsForOwnershipFields($definition, $entityClass);
+        if (is_a($entityClass, AbstractEnumValue::class, true)) {
+            $this->setDescriptionsForEnumFields($definition);
+        }
     }
 
     /**
