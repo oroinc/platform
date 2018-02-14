@@ -9,6 +9,7 @@ use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
@@ -145,6 +146,9 @@ class DateGroupingFilter extends ChoiceFilter
      */
     public function applyOrderBy(OrmDatasource $datasource, String $sortKey, String $direction)
     {
+        QueryBuilderUtil::checkField($sortKey);
+        $direction = QueryBuilderUtil::getSortOrder($direction);
+
         /* @var OrmDatasource $datasource */
         $qb = $datasource->getQueryBuilder();
         $added = false;
@@ -191,7 +195,10 @@ class DateGroupingFilter extends ChoiceFilter
      */
     private function getSelectAlias($postfix)
     {
-        return $this->get(self::COLUMN_NAME) . ucfirst($postfix);
+        $selectAlias = $this->get(self::COLUMN_NAME) . ucfirst($postfix);
+        QueryBuilderUtil::checkField($selectAlias);
+
+        return $selectAlias;
     }
 
     /**
@@ -200,7 +207,7 @@ class DateGroupingFilter extends ChoiceFilter
      */
     private function getSelectClause($groupBy)
     {
-        return sprintf('%s(%s)', $groupBy, $this->get(FilterUtility::DATA_NAME_KEY));
+        return sprintf('%s(%s)', $groupBy, $this->getDataFieldName());
     }
 
     /**
@@ -210,6 +217,7 @@ class DateGroupingFilter extends ChoiceFilter
      */
     protected function addSelect(QueryBuilder $qb, array $parts, $columnName)
     {
+        QueryBuilderUtil::checkIdentifier($columnName);
         $select = implode(', \'-\', ', $parts);
 
         $qb->addSelect(sprintf('CONCAT(%s) as %s', $select, $columnName));
@@ -230,7 +238,7 @@ class DateGroupingFilter extends ChoiceFilter
 
     /**
      * @param QueryBuilder $qb
-     * @param $filterType
+     * @param string $filterType
      */
     protected function addWhereClause(QueryBuilder $qb, $filterType)
     {
@@ -254,6 +262,10 @@ class DateGroupingFilter extends ChoiceFilter
             return;
         }
 
+        $dataFieldName = $this->getDataFieldName();
+        $notNullableField = $this->get(self::NOT_NULLABLE_FIELD);
+        QueryBuilderUtil::checkField($notNullableField);
+
         $qb->andWhere(
             $qb->expr()->orX(
                 $qb->expr()->andX(
@@ -261,9 +273,9 @@ class DateGroupingFilter extends ChoiceFilter
                         sprintf(
                             "CONCAT(%s(%s), '-', %s(%s))",
                             $filterType,
-                            $this->get(FilterUtility::DATA_NAME_KEY),
+                            $dataFieldName,
                             self::TYPE_YEAR,
-                            $this->get(FilterUtility::DATA_NAME_KEY)
+                            $dataFieldName
                         ),
                         $usedDates
                     )
@@ -273,24 +285,24 @@ class DateGroupingFilter extends ChoiceFilter
                         sprintf(
                             "CONCAT(%s(%s), '-', %s(%s))",
                             $filterType,
-                            $this->get(FilterUtility::DATA_NAME_KEY),
+                            $dataFieldName,
                             self::TYPE_YEAR,
-                            $this->get(FilterUtility::DATA_NAME_KEY)
+                            $dataFieldName
                         ),
                         $usedDates
                     ),
-                    $qb->expr()->isNotNull($this->get(self::NOT_NULLABLE_FIELD))
+                    $qb->expr()->isNotNull($notNullableField)
                 )
             )
         );
     }
 
     /**
-     * @param $filterType
-     * @param $calendarTableForGrouping
-     * @param $calendarColumnForGrouping
-     * @param $joinedTable
-     * @param $joinedColumn
+     * @param string $filterType
+     * @param string $calendarTableForGrouping
+     * @param string $calendarColumnForGrouping
+     * @param string $joinedTable
+     * @param string $joinedColumn
      * @param $extraWhereClauses
      * @param $extraWhereParameters
      * @return array|bool
@@ -304,12 +316,17 @@ class DateGroupingFilter extends ChoiceFilter
         $extraWhereClauses,
         $extraWhereParameters
     ) {
+        QueryBuilderUtil::checkIdentifier($calendarTableForGrouping);
+        QueryBuilderUtil::checkIdentifier($calendarColumnForGrouping);
+        QueryBuilderUtil::checkIdentifier($joinedTable);
+        QueryBuilderUtil::checkIdentifier($joinedColumn);
+
         /** @var EntityManager $manager */
         $manager = $this->registry->getManagerForClass(CalendarDate::class);
 
         $subQueryBuilder = $manager->createQueryBuilder();
         $extraWhereClauses = str_replace(
-            $this->get(FilterUtility::DATA_NAME_KEY),
+            $this->getDataFieldName(),
             sprintf('%s.%s', $calendarTableForGrouping, $calendarColumnForGrouping),
             $extraWhereClauses
         );
@@ -326,8 +343,8 @@ class DateGroupingFilter extends ChoiceFilter
                     $calendarColumnForGrouping
                 )
             )
-            ->from($this->get(self::CALENDAR_ENTITY), $calendarTableForGrouping)
-            ->innerJoin($this->get(self::TARGET_ENTITY), $joinedTable)
+            ->from($this->getCalendarEntity(), $calendarTableForGrouping)
+            ->innerJoin($this->getTargetEntity(), $joinedTable)
             ->where(
                 sprintf(
                     '(CAST(%s.%s as %s) = CAST(%s.%s as %s) %s)',
@@ -358,7 +375,7 @@ class DateGroupingFilter extends ChoiceFilter
     {
         $extraWhereClauses = '';
         foreach ($whereClauseParts as $whereClausePart) {
-            if (strpos($whereClausePart, $this->get(FilterUtility::DATA_NAME_KEY)) !== false) {
+            if (strpos($whereClausePart, $this->getDataFieldName()) !== false) {
                 $extraWhereClauses = sprintf('%s AND ( %s )', $extraWhereClauses, $whereClausePart);
             }
         }
@@ -383,5 +400,21 @@ class DateGroupingFilter extends ChoiceFilter
         }
 
         return $extraParameters;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCalendarEntity()
+    {
+        return $this->get(self::CALENDAR_ENTITY);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getTargetEntity()
+    {
+        return $this->get(self::TARGET_ENTITY);
     }
 }

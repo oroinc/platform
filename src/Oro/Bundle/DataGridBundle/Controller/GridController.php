@@ -14,6 +14,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\DataGridBundle\Async\Topics;
+use Oro\Bundle\DataGridBundle\Extension\Export\Configuration;
+use Oro\Bundle\DataGridBundle\Extension\Export\ExportExtension;
+use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
@@ -137,14 +140,21 @@ class GridController extends Controller
         $format = $request->query->get('format');
         $formatType = $request->query->get('format_type', 'excel');
         $gridParameters = $this->getRequestParametersFactory()->fetchParameters($gridName);
+        $parameters = [
+            'gridName' => $gridName,
+            'gridParameters' => $gridParameters,
+            FormatterProvider::FORMAT_TYPE => $formatType,
+        ];
+
+        $gridConfiguration = $this->getGridManager()->getConfigurationForGrid($gridName);
+        $exportOptions = $gridConfiguration->offsetGetByPath(ExportExtension::EXPORT_OPTION_PATH);
+        if (isset($exportOptions[$format][Configuration::OPTION_PAGE_SIZE])) {
+            $parameters['pageSize'] = (int)$exportOptions[$format][Configuration::OPTION_PAGE_SIZE];
+        }
 
         $this->getMessageProducer()->send(Topics::PRE_EXPORT, [
             'format' => $format,
-            'parameters' => [
-                'gridName' => $gridName,
-                'gridParameters' => $gridParameters,
-                FormatterProvider::FORMAT_TYPE => $formatType,
-            ]
+            'parameters' => $parameters,
         ]);
 
         return new JsonResponse([
@@ -232,5 +242,13 @@ class GridController extends Controller
     protected function getRequestParametersFactory()
     {
         return $this->get('oro_datagrid.datagrid.request_parameters_factory');
+    }
+
+    /**
+     * @return Manager
+     */
+    protected function getGridManager()
+    {
+        return $this->get('oro_datagrid.datagrid.manager');
     }
 }

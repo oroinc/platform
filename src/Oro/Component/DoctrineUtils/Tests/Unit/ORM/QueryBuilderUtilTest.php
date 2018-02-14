@@ -12,6 +12,9 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class QueryBuilderUtilTest extends OrmTestCase
 {
     /** @var EntityManager */
@@ -448,5 +451,62 @@ class QueryBuilderUtilTest extends OrmTestCase
         $this->assertFalse(QueryBuilderUtil::isToOne($qb, 'bi'));
         $this->assertFalse(QueryBuilderUtil::isToOne($qb, 'persons'));
         $this->assertFalse(QueryBuilderUtil::isToOne($qb, 'nonExistingAlias'));
+    }
+
+    public function testSprintfValid()
+    {
+        $this->assertEquals('tesT.One_1 > :param', QueryBuilderUtil::sprintf('%s.%s > :param', 'tesT', 'One_1'));
+    }
+
+    /**
+     * @dataProvider invalidDataProvider
+     * @param string $invalid
+     */
+    public function testSprintfInvalid($invalid)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        QueryBuilderUtil::sprintf('%s.%s > 0', $invalid, 'id');
+    }
+
+    public function testCheckIdentifierValid()
+    {
+        QueryBuilderUtil::checkIdentifier('tEs_T_01a');
+    }
+
+    /**
+     * @dataProvider invalidDataProvider
+     * @param string $invalid
+     */
+    public function testCheckStringInvalid($invalid)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        QueryBuilderUtil::checkIdentifier($invalid);
+    }
+
+    public function testGetFieldValid()
+    {
+        $this->assertEquals('a0_.Field0', QueryBuilderUtil::getField('a0_', 'Field0'));
+    }
+
+    /**
+     * @dataProvider invalidDataProvider
+     * @param string $invalid
+     */
+    public function testGetFieldInvalid($invalid)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->assertEquals('a0_.Field0', QueryBuilderUtil::getField('a0_', $invalid));
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidDataProvider(): array
+    {
+        return [
+            ['test OR u.id < 0'],
+            ['test" and '],
+            ['0_some//']
+        ];
     }
 }

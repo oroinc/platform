@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityBundle\Fallback;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -475,7 +476,7 @@ class EntityFallbackResolver
     {
         $qb = $repo->createQueryBuilder('e');
         $qb->select('1')
-            ->innerJoin(sprintf('e.%s', $objectFieldName), 'fallbackValue')
+            ->innerJoin(QueryBuilderUtil::getField('e', $objectFieldName), 'fallbackValue')
             ->where($qb->expr()->eq('fallbackValue.scalarValue', ':value'))
             ->setParameter('value', $value, Type::STRING)
             ->setMaxResults(1);

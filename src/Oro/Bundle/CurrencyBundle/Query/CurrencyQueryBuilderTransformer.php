@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CurrencyBundle\Query;
 
 use Doctrine\ORM\QueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class CurrencyQueryBuilderTransformer implements CurrencyQueryBuilderTransformerInterface
 {
@@ -16,16 +17,18 @@ class CurrencyQueryBuilderTransformer implements CurrencyQueryBuilderTransformer
         $newFieldName = null
     ) {
         if (!$originalFieldName) {
-            throw new \Exception('You must specify original field name for base currency query');
+            throw new \InvalidArgumentException('You must specify original field name for base currency query');
         }
+        if (!$qb && !$rootAlias) {
+            throw new \InvalidArgumentException('You must specify query builder or rootAlias for base currency query');
+        }
+
         if (!$rootAlias) {
             $rootAliases = $qb->getRootAliases();
             $rootAlias = array_shift($rootAliases);
         }
 
-        $query = sprintf('%s.%sValue', $rootAlias, $originalFieldName);
-
-        return $query;
+        return QueryBuilderUtil::sprintf('%s.%sValue', $rootAlias, $originalFieldName);
     }
 
     /**

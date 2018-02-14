@@ -79,7 +79,7 @@ class DatabasePersister
                         );
                     } else {
                         $sqlData[] = sprintf(
-                            '(%d, %d, %s, %s)',
+                            '(%d, %d, %s, %d)',
                             $translationKeys[$domain][$key],
                             $language->getId(),
                             $connection->quote($value),

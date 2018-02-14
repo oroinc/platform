@@ -119,22 +119,38 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     private function resolveOverrideRoute(Route $route, RouteCollectionAccessor $routes, $overridePath)
     {
-        $this->overrides[$this->getCacheKey()][$overridePath] = true;
-        $methods = $route->getMethods();
-        if (!empty($methods)) {
-            return;
+        if (0 !== strpos($overridePath, '/')) {
+            $overridePath = '/' . $overridePath;
         }
+        $this->overrides[$this->getCacheKey()][$overridePath] = true;
         $entityType = $route->getDefault(self::ENTITY_ATTRIBUTE);
-        if (!$entityType) {
-            return;
+        $methods = $route->getMethods();
+        if (!$entityType || !empty($methods)) {
+            throw new \LogicException(sprintf(
+                'The route "%s" with option "%s" must have "%s" default value and do not have "methods" property.',
+                $routes->getName($route),
+                self::OVERRIDE_PATH_OPTION,
+                self::ENTITY_ATTRIBUTE
+            ));
         }
         $resource = $this->getResource($entityType);
         if (null === $resource) {
-            return;
+            throw new \LogicException(sprintf(
+                'The route "%s" has default value "%s" equals to "%s" that is unknown entity type.',
+                $routes->getName($route),
+                self::ENTITY_ATTRIBUTE,
+                $entityType
+            ));
         }
         $actions = $this->getOverrideRouteActions($routes, $overridePath, $entityType);
         if (empty($actions)) {
-            return;
+            throw new \LogicException(sprintf(
+                'The route "%s" has option "%s" equals to "%s",'
+                . ' but a list of allowed API actions for this path is empty.',
+                $routes->getName($route),
+                self::OVERRIDE_PATH_OPTION,
+                $overridePath
+            ));
         }
 
         $this->adjustRoutes($routes->getName($route), $route, $routes, [$entityType => $resource], $actions);

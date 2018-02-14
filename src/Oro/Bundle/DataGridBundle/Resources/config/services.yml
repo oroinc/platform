@@ -1,6 +1,4 @@
 parameters:
-    oro_datagrid.export.size_of_batch: 200
-
     oro_datagrid.datagrid.base.class:                             Oro\Bundle\DataGridBundle\Datagrid\Datagrid
     oro_datagrid.extension.acceptor.class:                        Oro\Bundle\DataGridBundle\Extension\Acceptor
 

@@ -18,15 +18,15 @@ define(['underscore'], function(_) {
         }
     };
 
-    beforeEach(function(done) {
-        requirejs.undef('oroui/js/component-shortcuts-manager');
-        require(['oroui/js/component-shortcuts-manager'], function(m) {
-            componentShortcutsManager = m;
-            done();
-        });
-    });
-
     describe('Component Shortcuts Manager', function() {
+        beforeEach(function(done) {
+            requirejs.undef('oroui/js/component-shortcuts-manager');
+            require(['oroui/js/component-shortcuts-manager'], function(m) {
+                componentShortcutsManager = m;
+                done();
+            });
+        });
+
         it('Initialize manager with custom module config', function() {
             expect(componentShortcutsManager.reservedKeys).toEqual(['options', 'testOption']);
         });

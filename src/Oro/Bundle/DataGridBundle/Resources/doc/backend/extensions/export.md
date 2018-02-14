@@ -30,3 +30,15 @@ datagrids:
 
 Also you need to implement and register a writer for new export format. To register a writer in dependency container you should use the following naming convention: `oro_importexport.writer.echo.[format]`. So, a writer for PDF should be registerd as `oro_importexport.writer.echo.pdf`.
 You can use [existing CSV writer](../../../../../ImportExportBundle/Writer/CsvEchoWriter.php) as an example for your writer.
+
+There is also the ability to influence performance by changing the value of the grid export page size in the configuration. This will allow you to change the number of queries to the database. But keep in mind that increasing the size of the batch - increases memory consumption.
+``` yaml
+datagrids:
+    my-grid:
+        ...
+        options:
+            export:
+                csv:
+                    label: oro.grid.export.csv
+                    page_size: 500
+```

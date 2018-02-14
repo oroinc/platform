@@ -98,8 +98,8 @@ class AbstractConfigTypeTestCase extends TypeTestCase
         $extendConfig->set('state', $state);
         $extendConfigProvider = $this->getConfigProviderMock();
         $extendConfigProvider->expects($this->any())
-            ->method('getConfig')
-            ->with('Test\Entity')
+            ->method('getConfigById')
+            ->with($config->getId())
             ->will($this->returnValue($extendConfig));
         $this->configManager->expects($this->any())
             ->method('getConfig')

@@ -38,12 +38,8 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->entityStorage = $this->getMockBuilder(ScopeEntityStorage::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityFieldProvider = $this->getMockBuilder(EntityFieldProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityStorage = $this->createMock(ScopeEntityStorage::class);
+        $this->entityFieldProvider = $this->createMock(EntityFieldProvider::class);
 
         $serviceLink = new ServiceLink($this->entityFieldProvider);
         $this->manager = new ScopeManager($this->entityStorage, $serviceLink);
@@ -470,6 +466,9 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedResult, $result);
     }
 
+    /**
+     * @return array
+     */
     public function isScopeMatchCriteriaDataProvider()
     {
         return [

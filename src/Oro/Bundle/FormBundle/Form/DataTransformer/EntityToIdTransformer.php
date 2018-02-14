@@ -155,6 +155,6 @@ class EntityToIdTransformer implements DataTransformerInterface
 
     protected function createPropertyAccessor()
     {
-        $this->propertyAccessor = PropertyAccess::getPropertyAccessor();
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 }
