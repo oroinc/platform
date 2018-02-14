@@ -15,6 +15,7 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\InheritDocUtil;
 use Oro\Bundle\ApiBundle\Util\RequestDependedTextProcessor;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -35,8 +36,6 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
  */
 class CompleteDescriptions implements ProcessorInterface
 {
-    const PLACEHOLDER_INHERIT_DOC = '{@inheritdoc}';
-
     const ID_DESCRIPTION           = 'The unique identifier of a resource.';
     const CREATED_AT_DESCRIPTION   = 'The date and time of resource record creation.';
     const UPDATED_AT_DESCRIPTION   = 'The date and time of the last update of the resource record.';
@@ -149,25 +148,48 @@ class CompleteDescriptions implements ProcessorInterface
         $parentEntityClass
     ) {
         $entityDescription = false;
-        $processInheritDoc = !$associationName;
-
         if ($definition->hasDescription()) {
             $description = $definition->getDescription();
             if ($description instanceof Label) {
                 $definition->setDescription($this->trans($description));
             }
+        } elseif ($associationName) {
+            $entityDescription = $this->getAssociationDescription($associationName);
+            $this->setDescriptionForSubresource($definition, $entityDescription, $targetAction, $isCollection);
         } else {
-            if ($associationName) {
-                $entityDescription = $this->getAssociationDescription($associationName);
-                $this->setDescriptionForSubresource($definition, $entityDescription, $targetAction, $isCollection);
-            } else {
-                $entityDescription = $this->getEntityDescription($entityClass, $isCollection);
-                if ($entityDescription) {
-                    $this->setDescriptionForResource($definition, $targetAction, $entityDescription);
-                }
-            }
+            $entityDescription = $this->getEntityDescription($entityClass, $isCollection);
+            $this->setDescriptionForResource($definition, $targetAction, $entityDescription);
         }
 
+        $this->setDocumentationForEntity(
+            $definition,
+            $entityClass,
+            $targetAction,
+            $isCollection,
+            $associationName,
+            $parentEntityClass,
+            $entityDescription
+        );
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $entityClass
+     * @param string                 $targetAction
+     * @param bool                   $isCollection
+     * @param string                 $associationName
+     * @param string                 $parentEntityClass
+     * @param string|bool|null       $entityDescription
+     */
+    protected function setDocumentationForEntity(
+        EntityDefinitionConfig $definition,
+        $entityClass,
+        $targetAction,
+        $isCollection,
+        $associationName,
+        $parentEntityClass,
+        $entityDescription
+    ) {
         $this->registerDocumentationResources($definition);
         $this->loadDocumentationForEntity(
             $definition,
@@ -176,6 +198,7 @@ class CompleteDescriptions implements ProcessorInterface
             $associationName,
             $parentEntityClass
         );
+        $processInheritDoc = !$associationName;
         if (!$definition->hasDocumentation()) {
             if ($associationName) {
                 if (false === $entityDescription) {
@@ -222,11 +245,9 @@ class CompleteDescriptions implements ProcessorInterface
     protected function processInheritDocForEntity(EntityDefinitionConfig $definition, $entityClass)
     {
         $documentation = $definition->getDocumentation();
-        if ($documentation && false !== strpos($documentation, self::PLACEHOLDER_INHERIT_DOC)) {
+        if (InheritDocUtil::hasInheritDoc($documentation)) {
             $entityDocumentation = $this->entityDocProvider->getEntityDocumentation($entityClass);
-            $definition->setDocumentation(
-                str_replace(self::PLACEHOLDER_INHERIT_DOC, $entityDocumentation, $documentation)
-            );
+            $definition->setDocumentation(InheritDocUtil::replaceInheritDoc($documentation, $entityDocumentation));
         }
     }
 
@@ -263,16 +284,18 @@ class CompleteDescriptions implements ProcessorInterface
     /**
      * @param EntityDefinitionConfig $definition
      * @param string                 $targetAction
-     * @param string                 $entityDescription
+     * @param string|null            $entityDescription
      */
     protected function setDescriptionForResource(
         EntityDefinitionConfig $definition,
         $targetAction,
         $entityDescription
     ) {
-        $description = $this->resourceDocProvider->getResourceDescription($targetAction, $entityDescription);
-        if ($description) {
-            $definition->setDescription($description);
+        if ($entityDescription) {
+            $description = $this->resourceDocProvider->getResourceDescription($targetAction, $entityDescription);
+            if ($description) {
+                $definition->setDescription($description);
+            }
         }
     }
 
@@ -358,11 +381,10 @@ class CompleteDescriptions implements ProcessorInterface
                 $description = $field->getDescription();
                 if ($description instanceof Label) {
                     $field->setDescription($this->trans($description));
-                } elseif (false !== strpos($description, self::PLACEHOLDER_INHERIT_DOC)) {
-                    $field->setDescription(str_replace(
-                        self::PLACEHOLDER_INHERIT_DOC,
-                        $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix),
-                        $description
+                } elseif (InheritDocUtil::hasInheritDoc($description)) {
+                    $field->setDescription(InheritDocUtil::replaceInheritDoc(
+                        $description,
+                        $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix)
                     ));
                 }
             }
@@ -383,12 +405,7 @@ class CompleteDescriptions implements ProcessorInterface
             }
         }
 
-        $this->setDescriptionForCreatedAtField($definition);
-        $this->setDescriptionForUpdatedAtField($definition);
-        $this->setDescriptionsForOwnershipFields($definition, $entityClass);
-        if (is_a($entityClass, AbstractEnumValue::class, true)) {
-            $this->setDescriptionsForEnumFields($definition);
-        }
+        $this->setDescriptionsForSpecialFields($definition, $entityClass);
     }
 
     /**
@@ -407,29 +424,27 @@ class CompleteDescriptions implements ProcessorInterface
     ) {
         $description = $this->apiDocParser->getFieldDocumentation($entityClass, $fieldName, $targetAction);
         if ($description) {
-            if (false !== strpos($description, self::PLACEHOLDER_INHERIT_DOC)) {
+            if (InheritDocUtil::hasInheritDoc($description)) {
                 $commonDescription = $this->apiDocParser->getFieldDocumentation($entityClass, $fieldName);
                 if ($commonDescription) {
-                    if (false !== strpos($commonDescription, self::PLACEHOLDER_INHERIT_DOC)) {
-                        $commonDescription = str_replace(
-                            self::PLACEHOLDER_INHERIT_DOC,
-                            $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix),
-                            $commonDescription
+                    if (InheritDocUtil::hasInheritDoc($commonDescription)) {
+                        $commonDescription = InheritDocUtil::replaceInheritDoc(
+                            $commonDescription,
+                            $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix)
                         );
                     }
                 } else {
                     $commonDescription = $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix);
                 }
-                $description = str_replace(self::PLACEHOLDER_INHERIT_DOC, $commonDescription, $description);
+                $description = InheritDocUtil::replaceInheritDoc($description, $commonDescription);
             }
         } else {
             $description = $this->apiDocParser->getFieldDocumentation($entityClass, $fieldName);
             if ($description) {
-                if (false !== strpos($description, self::PLACEHOLDER_INHERIT_DOC)) {
-                    $description = str_replace(
-                        self::PLACEHOLDER_INHERIT_DOC,
-                        $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix),
-                        $description
+                if (InheritDocUtil::hasInheritDoc($description)) {
+                    $description = InheritDocUtil::replaceInheritDoc(
+                        $description,
+                        $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix)
                     );
                 }
             } else {
@@ -570,6 +585,20 @@ class CompleteDescriptions implements ProcessorInterface
             reset($identifierFieldNames),
             self::ID_DESCRIPTION
         );
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $entityClass
+     */
+    protected function setDescriptionsForSpecialFields(EntityDefinitionConfig $definition, $entityClass)
+    {
+        $this->setDescriptionForCreatedAtField($definition);
+        $this->setDescriptionForUpdatedAtField($definition);
+        $this->setDescriptionsForOwnershipFields($definition, $entityClass);
+        if (is_a($entityClass, AbstractEnumValue::class, true)) {
+            $this->setDescriptionsForEnumFields($definition);
+        }
     }
 
     /**
