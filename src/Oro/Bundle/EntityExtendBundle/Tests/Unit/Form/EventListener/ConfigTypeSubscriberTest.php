@@ -154,7 +154,12 @@ class ConfigTypeSubscriberTest extends \PHPUnit_Framework_TestCase
         $extendConfig = new Config($this->entityConfigId, ['state' => ExtendScope::STATE_ACTIVE]);
 
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
-        $extendConfigProvider->expects($this->once())->method('getConfig')->with('stdClass')->willReturn($extendConfig);
+        $extendConfigProvider
+            ->expects($this->once())
+            ->method('getConfigById')
+            ->with($this->entityConfigId)
+            ->willReturn($extendConfig);
+
         $this->configManger->expects($this->at(2))->method('getProvider')
             ->with(self::SCOPE)
             ->willReturn($extendConfigProvider);
@@ -217,15 +222,19 @@ class ConfigTypeSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
 
-        $extendConfig = new Config($this->entityConfigId);
-        $extendConfigProvider->expects($this->once())->method('getConfig')
+        $extendConfig = new Config($this->entityConfigId, [
+            'owner' => ExtendScope::OWNER_CUSTOM,
+            'state' => ExtendScope::STATE_ACTIVE
+        ]);
+        $extendConfigProvider->expects($this->once())->method('getConfigById')
+            ->with($fieldConfigId)
             ->willReturn($extendConfig);
 
         $configManger->expects($this->at(2))->method('getProvider')
             ->with(self::SCOPE)
             ->willReturn($extendConfigProvider);
 
-        $configManger->expects($this->exactly(2))->method('persist')->withConsecutive($extendConfig, $fieldConfigId);
+        $configManger->expects($this->once())->method('persist')->with($extendConfig);
         $event = new FormEvent($form, []);
         $subscriber->postSubmit($event);
     }

@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\EntitySerializer\Filter\EntityAwareFilterInterface;
 
 /**
@@ -743,7 +744,7 @@ class EntitySerializer
 
         $orderBy = $config->getOrderBy();
         foreach ($orderBy as $field => $direction) {
-            $qb->addOrderBy(sprintf('r.%s', $field), $direction);
+            $qb->addOrderBy(QueryBuilderUtil::getField('r', $field), QueryBuilderUtil::getSortOrder($direction));
         }
 
         $result = [];
@@ -771,7 +772,7 @@ class EntitySerializer
         } else {
             $fields = $this->fieldAccessor->getFieldsToSelect($entityClass, $config);
             foreach ($fields as $field) {
-                $qb->addSelect(sprintf('r.%s', $field));
+                $qb->addSelect(QueryBuilderUtil::getField('r', $field));
             }
             $items = $this->queryFactory->getQuery($qb, $config)->getArrayResult();
             $postSerializeHandler = $config->getPostSerializeHandler();

@@ -2,7 +2,21 @@
 
 {% set importProcessorAliasesToConfirmMessage = [] %}
 
-<div class="widget-content import-widget-content">
+{% for configWithForm in configsWithForm %}
+    {% set config = configWithForm.configuration %}
+    {% set importProcessorAliasesToConfirmMessage = importProcessorAliasesToConfirmMessage|merge(config.importProcessorsToConfirmationMessage) %}
+{% endfor %}
+
+{% set ImportValidateViewOptions = {
+    view: 'oroimportexport/js/app/views/import-validate-view',
+        options: {
+            importProcessorAliasesToConfirmMessages: importProcessorAliasesToConfirmMessage,
+            wid: app.request.get('_wid')
+        },
+    }
+%}
+
+<div class="widget-content import-widget-content" {{ UI.renderPageComponentAttributes(ImportValidateViewOptions) }}>
     {% if configsWithForm|length > 1 %}
 
         <ul class="nav nav-tabs">
@@ -36,7 +50,6 @@
             {% set shortEntityName = config.entityClass|basename %}
             {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
             {% set strategyTooltip = config.importStrategyTooltip ? config.importStrategyTooltip : 'oro.importexport.import.strategy.tooltip' %}
-            {% set importProcessorAliasesToConfirmMessage = importProcessorAliasesToConfirmMessage|merge(config.importProcessorsToConfirmationMessage) %}
 
             <div id="importExport{{ shortEntityName }}" class="tab-pane fade in {% if isActiveEntity %} active {% endif %}">
                 <div class="alert alert-info import-notice">
@@ -148,107 +161,7 @@
 
     <div class="widget-actions">
         <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
-        <button class="btn btn-primary" type="button" id="validate_import_button">{{ 'oro.importexport.import.validation_label'|trans }}</button>
-        <button class="btn btn-success" type="button" id="import_button">{{ 'oro.importexport.import.label'|trans }}</button>
+        <button class="btn btn-primary" type="button" data-action-name="validate_import" id="validate_import_button">{{ 'oro.importexport.import.validation_label'|trans }}</button>
+        <button class="btn btn-success" type="button" data-action-name="import" id="import_button">{{ 'oro.importexport.import.label'|trans }}</button>
     </div>
-
-    <script type="text/javascript">
-        require(['underscore', 'orotranslation/js/translator', 'oroui/js/widget-manager', 'oroui/js/messenger', 'oroui/js/standart-confirmation'],
-            function(_, __, WidgetManager, Messenger, DeleteConfirmation) {
-                var importProcessorsToConfirmationMessages = {{ importProcessorAliasesToConfirmMessage|json_encode|raw }};
-
-                var resetWidgetFormToActiveTabForm = function(widget) {
-                    var $tabContent = getCurrentlyActiveTabContent();
-
-                    widget.form = $tabContent.find('form');
-                };
-
-                var getCurrentlyActiveTabContent = function(){
-                    return $('.tab-pane.active');
-                };
-
-                var getCurrentlyChosenProcessorAlias = function() {
-                    var form = getCurrentlyActiveTabContent().find('form');
-
-                    return form.find("select[name='oro_importexport_import[processorAlias]']").val();
-                };
-
-                // this needs to be done because select2 does not work well with hidden selects in mobile version
-                var refreshActiveInputWidgets = function(){
-                    getCurrentlyActiveTabContent().find('select').each(function(){
-                        if (this.isRefreshed) {
-                            return;
-                        }
-
-                        $(this).inputWidget('refresh');
-                        this.isRefreshed = true; // so that each select is not refreshed every time
-                    });
-                };
-
-                refreshActiveInputWidgets();
-
-                $('#import_button').click(function(){
-                    var $form = getCurrentlyActiveTabContent().find('form');
-
-                    $form.find('input[name=isValidateJob]').val(false);
-
-                    var currentlyChosenProcessorAlias = getCurrentlyChosenProcessorAlias();
-
-                    if (importProcessorsToConfirmationMessages[currentlyChosenProcessorAlias] !== undefined) {
-                        var confirm = new DeleteConfirmation({
-                            content: importProcessorsToConfirmationMessages[currentlyChosenProcessorAlias]
-                        });
-
-                        confirm.on('ok', function () {
-                            $form.submit();
-                        });
-
-                        confirm.open();
-                    } else {
-                        $form.submit();
-                    }
-                });
-
-                $('#validate_import_button').click(function(){
-                    var $form = getCurrentlyActiveTabContent().find('form');
-                    $form.find('input[name=isValidateJob]').val(true);
-
-                    $form.submit();
-                });
-
-                WidgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
-                    resetWidgetFormToActiveTabForm(widget);
-
-                    $('.nav-tabs a').on('shown .bs.tab', function() {
-                        resetWidgetFormToActiveTabForm(widget);
-                        refreshActiveInputWidgets();
-                    });
-
-                    widget._onContentLoad = function (content) {
-                        if (_.has(content, 'success')) {
-                            if(content.success) {
-                                var message = _.has(content, 'message') ?
-                                    content.message :
-                                    __('oro.importexport.import.success.message');
-                                Messenger.notificationFlashMessage('success', message);
-                            } else {
-                                Messenger.notificationFlashMessage('error', __('oro.importexport.import.form_fail.message'));
-                            }
-                            this.remove();
-                        } else {
-                            delete this.loading;
-                            this.disposePageComponents();
-                            this.setContent(content, true);
-                            this._triggerContentLoadEvents();
-                        }
-                    };
-
-                    widget._onContentLoadFail = function() {
-                        Messenger.notificationFlashMessage('error', __('oro.importexport.import.fail.message'));
-                        this.remove();
-                    }
-                });
-
-            });
-    </script>
 </div>

@@ -5,6 +5,7 @@ namespace Oro\Bundle\ScopeBundle\Model;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class ScopeCriteria implements \IteratorAggregate
 {
@@ -39,7 +40,9 @@ class ScopeCriteria implements \IteratorAggregate
      */
     public function applyWhereWithPriority(QueryBuilder $qb, $alias, array $ignoreFields = [])
     {
+        QueryBuilderUtil::checkIdentifier($alias);
         foreach ($this->context as $field => $value) {
+            QueryBuilderUtil::checkIdentifier($field);
             if (in_array($field, $ignoreFields, true)) {
                 continue;
             }
@@ -65,7 +68,9 @@ class ScopeCriteria implements \IteratorAggregate
      */
     public function applyWhere(QueryBuilder $qb, $alias, array $ignoreFields = [])
     {
+        QueryBuilderUtil::checkIdentifier($alias);
         foreach ($this->context as $field => $value) {
+            QueryBuilderUtil::checkIdentifier($field);
             if (in_array($field, $ignoreFields, true)) {
                 continue;
             }
@@ -118,6 +123,7 @@ class ScopeCriteria implements \IteratorAggregate
      */
     protected function reapplyJoins(QueryBuilder $qb, array $joins, $alias, array $ignoreFields, $withPriority = false)
     {
+        QueryBuilderUtil::checkIdentifier($alias);
         foreach ($joins as $join) {
             if (is_array($join)) {
                 $this->reapplyJoins($qb, $join, $alias, $ignoreFields, $withPriority);
@@ -154,6 +160,7 @@ class ScopeCriteria implements \IteratorAggregate
             if (!empty($additionalJoins)) {
                 $additionalJoins = array_filter($additionalJoins);
                 foreach ($additionalJoins as $field => $condition) {
+                    QueryBuilderUtil::checkIdentifier($field);
                     $localAlias = $alias.'_'.$field;
                     $qb->leftJoin($alias.'.'.$field, $localAlias, Join::WITH, $condition);
                     if (!$withPriority) {
@@ -174,6 +181,9 @@ class ScopeCriteria implements \IteratorAggregate
      */
     protected function resolveBasicCondition(QueryBuilder $qb, $alias, $field, $value, $withPriority)
     {
+        QueryBuilderUtil::checkIdentifier($alias);
+        QueryBuilderUtil::checkIdentifier($field);
+
         $aliasedField = $alias . '.' . $field;
         if ($value === null) {
             $part = $qb->expr()->isNull($aliasedField);

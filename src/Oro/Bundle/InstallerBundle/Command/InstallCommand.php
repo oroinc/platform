@@ -156,7 +156,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             'Use the <comment>oro:message-queue:consume</comment> ' .
             'command to launch a consumer service instance. See ' .
             '<comment>https://oroinc.com/doc/orocrm/current/book/installation#activating-background-tasks</comment> ' .
-            'for more information.</info>.'
+            'for more information.</info>'
         );
 
         return 0;

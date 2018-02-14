@@ -25,4 +25,17 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('aprefix.adefaultqueuename', $config->getDefaultQueueName());
     }
+
+    public function testShouldReturnDefaultTopicNameSetInConstructor()
+    {
+        $config = new Config(
+            'aPrefix',
+            'aRouterMessageProcessorName',
+            'aRouterQueueName',
+            'aDefaultQueueName',
+            'aDefaultTopicName'
+        );
+
+        $this->assertEquals('aprefix.adefaulttopicname', $config->getDefaultTopicName());
+    }
 }

@@ -74,3 +74,12 @@ class AppBundle extends Bundle
     }
 }
 ```
+
+QueryBuilderUtil class
+----------------------
+
+Constructing DQL queries dynamically may make them vulnerable for injections. To be sure that data, passed ans field name
+or table alias is safe `QueryBuilderUtil` contains a set of methods:
+ `sprintf` - should be as query safe replacement instead of sprintf
+ `checkIdentifier` - when there is a need to safely pass variable into query as part of identifier
+ `getField` - is a shortcut for QueryBuilderUtil::sprintf('%s.%s', $alias, $field)

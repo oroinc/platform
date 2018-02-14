@@ -89,8 +89,6 @@ class NotificationManagerTest extends \PHPUnit_Framework_TestCase
         );
         $notificationEventMock->expects($this->once())->method('getEntity')
             ->will($this->returnValue($this->entity));
-        $notificationEventMock->expects($this->once())->method('getName')
-            ->will($this->returnValue(self::TEST_EVENT_NAME));
         $notificationEventMock->expects($this->once())->method('isPropagationStopped')
             ->will($this->returnValue($eventPropagationStopped));
 
@@ -113,7 +111,7 @@ class NotificationManagerTest extends \PHPUnit_Framework_TestCase
         $this->rules->add($rule);
         $this->rules->add($rule);
 
-        $this->manager->process($notificationEventMock);
+        $this->manager->process($notificationEventMock, self::TEST_EVENT_NAME);
     }
 
     /**

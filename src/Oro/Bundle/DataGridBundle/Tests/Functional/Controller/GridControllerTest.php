@@ -17,12 +17,37 @@ class GridControllerTest extends WebTestCase
         $this->initClient([], $this->generateBasicAuthHeader());
     }
 
+    public function testShouldSendExportMessageWithPageSizeParameter()
+    {
+        $this->client->request('GET', $this->getUrl('oro_datagrid_export_action', [
+            'gridName' => 'items-grid-with-export-page-size',
+            'format' => 'csv',
+            'items-grid' => [],
+        ]));
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertNotEmpty($result);
+        $this->assertCount(1, $result);
+        $this->assertTrue($result['successful']);
+
+        $this->assertMessageSent(Topics::PRE_EXPORT, [
+            'format' => 'csv',
+            'parameters' => [
+                'gridName' => 'items-grid-with-export-page-size',
+                'gridParameters' => [],
+                FormatterProvider::FORMAT_TYPE => 'excel',
+                'pageSize' => 499
+            ],
+        ]);
+    }
+
     public function testShouldSendExportMessage()
     {
         $this->client->request('GET', $this->getUrl('oro_datagrid_export_action', [
-            'gridName' => 'accounts-grid',
+            'gridName' => 'audit-grid',
             'format' => 'csv',
-            'accounts-grid' => [
+            'audit-grid' => [
                 '_pager' => [
                     '_page' => 1,
                     '_per_page' => 25,
@@ -30,7 +55,7 @@ class GridControllerTest extends WebTestCase
                 '_parameters' => ['view' => '__all__'],
                 '_appearance' => ['_type' => 'grid'],
                 '_sort_by' => ['name' => 'ASC'],
-                '_columns' => 'name1.contactName1.contactEmail1.contactPhone1.ownerName1.createdAt1.updatedAt1.tags1',
+                '_columns' => 'organization1.fields1.audit1.user1.impersonation1',
             ],
         ]));
 
@@ -43,7 +68,7 @@ class GridControllerTest extends WebTestCase
         $this->assertMessageSent(Topics::PRE_EXPORT, [
             'format' => 'csv',
             'parameters' => [
-                'gridName' => 'accounts-grid',
+                'gridName' => 'audit-grid',
                 'gridParameters' => [
                     '_pager' => [
                         '_page' => '1',
@@ -52,11 +77,10 @@ class GridControllerTest extends WebTestCase
                     '_parameters' => ['view' => '__all__'],
                     '_appearance' => ['_type' => 'grid'],
                     '_sort_by' => ['name' => 'ASC'],
-                    '_columns' => 'name1.contactName1.contactEmail1.'
-                        .'contactPhone1.ownerName1.createdAt1.updatedAt1.tags1',
+                    '_columns' => 'organization1.fields1.audit1.user1.impersonation1',
 
                 ],
-                FormatterProvider::FORMAT_TYPE => 'excel',
+                FormatterProvider::FORMAT_TYPE => 'excel'
             ],
         ]);
     }

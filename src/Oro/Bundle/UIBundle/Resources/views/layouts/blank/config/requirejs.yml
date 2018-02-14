@@ -148,6 +148,11 @@ config:
         'jquery.datepair': 'bundles/bowerassets/datepair/dist/jquery.datepair.js'
         'datepair': 'bundles/bowerassets/datepair/dist/datepair.js'
         'cryptojs/core': 'bundles/bowerassets/crypto-js/core.js'
+        'cryptojs/enc-base64': 'bundles/bowerassets/crypto-js/enc-base64.js'
+        'cryptojs/pbkdf2': 'bundles/bowerassets/crypto-js/pbkdf2.js'
+        'cryptojs/hmac-sha256': 'bundles/bowerassets/crypto-js/hmac-sha256.js'
+        'cryptojs/sha1': 'bundles/bowerassets/crypto-js/sha1.js'
+        'cryptojs/hmac': 'bundles/bowerassets/crypto-js/hmac.js'
         'cryptojs/sha256': 'bundles/bowerassets/crypto-js/sha256.js'
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
@@ -171,6 +176,7 @@ config:
         'oroui/js/app/views/datepicker/datetimepicker-view': 'bundles/oroui/js/app/views/datepicker/datetimepicker-view.js'
         'oroui/js/app/views/datepicker/datepicker-view': 'bundles/oroui/js/app/views/datepicker/datepicker-view.js'
         'oroui/js/app/views/tab-collection-view': 'bundles/oroui/js/app/views/tab-collection-view.js'
+        'oroui/js/app/views/flash-message-view': 'bundles/oroui/js/app/views/flash-message-view.js'
 
         'oroui/js/viewport-manager': 'bundles/oroui/js/viewport-manager.js'
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
@@ -179,8 +185,12 @@ config:
         'oroui/js/layout': 'bundles/oroui/js/layout.js'
         'oroui/js/loading-mask': 'bundles/oroui/js/loading-mask.js'
         'oroui/js/mediator': 'bundles/oroui/js/mediator.js'
+        'oroui/js/tools': 'bundles/oroui/js/tools.js'
         'oroui/js/messenger': 'bundles/oroui/js/messenger.js'
         'oroui/js/modal': 'bundles/oroui/js/modal.js'
+
+        'oroui/js/extend/jquery': 'bundles/oroui/js/extend/jquery.js'
+        'oroui/js/extend/underscore': 'bundles/oroui/js/extend/underscore.js'
 
         'oroui/js/app/components/ajax-button': 'bundles/oroui/js/app/components/ajax-button.js'
         'oroui/js/app/components/jquery-widget-component': 'bundles/oroui/js/app/components/jquery-widget-component.js'

@@ -6,6 +6,7 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
@@ -80,6 +81,7 @@ class EmailQueryFactory
          * see https://github.com/doctrine/doctrine2/issues/5801
          * as result we have to use NULLIF(0, 0) and NULLIF('', '') instead of NULL
          */
+        QueryBuilderUtil::checkIdentifier($emailAddressTableAlias);
         $providers = $this->emailOwnerProviderStorage->getProviders();
         if (empty($providers)) {
             $qb->addSelect('NULLIF(\'\', \'\') AS fromEmailAddressOwnerClass');
@@ -140,14 +142,13 @@ class EmailQueryFactory
      */
     public function applyAcl(QueryBuilder $qb)
     {
-        $exprs = [$qb->expr()->eq('eu.owner', ':owner')];
+        $uoCheck = $qb->expr()->andX($qb->expr()->eq('eu.owner', ':owner'));
 
         $organization = $this->getOrganization();
         if ($organization) {
-            $exprs[] = $qb->expr()->eq('eu.organization ', ':organization');
+            $uoCheck->add($qb->expr()->eq('eu.organization ', ':organization'));
             $qb->setParameter('organization', $organization->getId());
         }
-        $uoCheck = call_user_func_array([$qb->expr(), 'andX'], $exprs);
 
         $mailboxIds = $this->getAvailableMailboxIds();
         if (!empty($mailboxIds)) {
@@ -208,10 +209,10 @@ class EmailQueryFactory
             )
             ->groupBy('m.thread');
 
-        $exprs = [
+        $expression = $qb->expr()->andX(
             $qb->expr()->isNull('e.thread'),
             $qb->expr()->eq('e.head', 'TRUE')
-        ];
+        );
 
         $threadedExpressions = null;
         $threadedExpressionsParameters = null;
@@ -224,7 +225,8 @@ class EmailQueryFactory
 
         if ($threadedExpressions) {
             $filterQb = $qb->getEntityManager()->createQueryBuilder();
-            $filterExpressions = call_user_func_array([$filterQb->expr(), 'andX'], $threadedExpressions);
+            $filterExpressions = $filterQb->expr()->andX();
+            $filterExpressions->addMultiple($threadedExpressions);
             $filterQb
                 ->select('IDENTITY(mm.thread)')
                 ->from('OroEmailBundle:EmailUser', 'uu')
@@ -236,10 +238,7 @@ class EmailQueryFactory
                 $notThreadedExpressionsParameters
             ) = $this->prepareSearchFilters($datagrid, $filters, 'e');
 
-            $expression = call_user_func_array(
-                [$qb->expr(), 'andX'],
-                array_merge($exprs, $notThreadedExpressions)
-            );
+            $expression->addMultiple($notThreadedExpressions);
 
             $qb->andWhere(
                 $qb->expr()->orX(
@@ -257,7 +256,6 @@ class EmailQueryFactory
                 $qb->setParameter($param->getName(), $param->getValue(), $param->getType());
             }
         } else {
-            $expression = call_user_func_array([$qb->expr(), 'andX'], $exprs);
             $qb->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->in('eu.id', $innerQb->getDQL()),
@@ -346,7 +344,7 @@ class EmailQueryFactory
             foreach ($searchFilters as $columnName => $filterData) {
                 $filterConfig = $filterTypes[$columnName];
                 $filterConfig['data_name'] = $alias
-                    ? sprintf('%s.%s', $alias, $filterColumnsMap[$columnName])
+                    ? QueryBuilderUtil::getField($alias, $filterColumnsMap[$columnName])
                     : $filterConfig['data_name'];
 
                 $datasourceAdapter = new OrmFilterDatasourceAdapter($queryBuilder);

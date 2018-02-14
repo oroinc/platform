@@ -158,8 +158,9 @@ class ImportExportContext extends OroFeatureContext implements
 
     /**
      * @param string $processor
+     * @param array $options
      */
-    public function downloadTemplateFileByProcessor($processor)
+    public function downloadTemplateFileByProcessor($processor, $options = [])
     {
         $this->openImportModalAndReturnImportSubmitButton();
 
@@ -168,7 +169,10 @@ class ImportExportContext extends OroFeatureContext implements
 
         $url = $this->locatePath($this->getContainer()->get('router')->generate(
             'oro_importexport_export_template',
-            ['processorAlias' => $processor]
+            [
+                'processorAlias' => $processor,
+                'options' => $options
+            ]
         ));
         $this->template = tempnam(
             $this->getKernel()->getRootDir().DIRECTORY_SEPARATOR.'import_export',

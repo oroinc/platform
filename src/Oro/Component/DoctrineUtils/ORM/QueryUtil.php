@@ -2,16 +2,9 @@
 
 namespace Oro\Component\DoctrineUtils\ORM;
 
-use Doctrine\Common\Collections\Criteria;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\SQLParserUtils;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\QueryException;
-use Doctrine\ORM\Query\ResultSetMapping;
-use Doctrine\ORM\QueryBuilder;
-use Oro\Component\PhpUtils\ArrayUtil;
 
 class QueryUtil
 {

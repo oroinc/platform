@@ -6,6 +6,7 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 trait WorkflowQueryTrait
 {
@@ -16,6 +17,7 @@ trait WorkflowQueryTrait
      */
     public function joinWorkflowItem(QueryBuilder $queryBuilder, $workflowItemAlias = 'workflowItem')
     {
+        QueryBuilderUtil::checkIdentifier($workflowItemAlias);
         $queryBuilder->leftJoin(
             WorkflowItem::class,
             $workflowItemAlias,
@@ -37,6 +39,8 @@ trait WorkflowQueryTrait
         $workflowStepAlias = 'workflowStep',
         $workflowItemAlias = 'workflowItem'
     ) {
+        QueryBuilderUtil::checkIdentifier($workflowItemAlias);
+        QueryBuilderUtil::checkIdentifier($workflowStepAlias);
         if (false === in_array($workflowItemAlias, $queryBuilder->getAllAliases(), true)) {
             $this->joinWorkflowItem($queryBuilder, $workflowItemAlias);
         }

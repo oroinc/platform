@@ -12,6 +12,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison as SearchComparison;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class OrmExpressionVisitor extends ExpressionVisitor
 {
@@ -43,9 +44,12 @@ class OrmExpressionVisitor extends ExpressionVisitor
     {
         $value = $comparison->getValue()->getValue();
         list($type, $field) = $this->explodeCombinedFieldString($comparison->getField());
+        QueryBuilderUtil::checkIdentifier($type);
         $condition = Criteria::getSearchOperatorByComparisonOperator($comparison->getOperator());
 
         list($joinAlias, $index) = $this->driver->getJoinAttributes($field, $type, $this->qb->getAllAliases());
+        QueryBuilderUtil::checkIdentifier($joinAlias);
+        QueryBuilderUtil::checkIdentifier($index);
         $joinField = $this->driver->getJoinField($type);
 
         $searchCondition = [

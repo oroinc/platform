@@ -7,6 +7,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -188,6 +189,7 @@ class EmailRecipientsHelper
         $alias,
         $entityClass
     ) {
+        QueryBuilderUtil::checkIdentifier($alias);
         $searchRecipients = $this->search->simpleSearch(
             $args->getQuery(),
             0,
