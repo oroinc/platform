@@ -7,7 +7,11 @@ use Michelf\MarkdownExtra;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Util\InheritDocUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class MarkdownApiDocParser
 {
     /**
@@ -123,13 +127,58 @@ class MarkdownApiDocParser
 
         $filePath = $this->fileLocator->locate(substr($resource, 0, $pos + 3));
         if (!isset($this->parsedFiles[$filePath])) {
+            $existingData = $this->loadedData;
+            $this->loadedData = [];
             $this->parseDocumentation(file_get_contents($filePath));
+            if (!empty($existingData)) {
+                $newData = $this->loadedData;
+                $this->loadedData = $existingData;
+                if (!empty($newData)) {
+                    $this->merge($newData);
+                }
+            }
 
             // store parsed documentations file paths to avoid unnecessary parsing
             $this->parsedFiles[$filePath] = true;
         }
 
         return true;
+    }
+
+    /**
+     * @param array $newData
+     */
+    protected function merge(array $newData)
+    {
+        foreach ($newData as $className => $classData) {
+            foreach ($classData as $section => $sectionData) {
+                foreach ($sectionData as $element => $elementData) {
+                    if (!$this->hasSubElements($section)) {
+                        if (isset($this->loadedData[$className][$section][$element])
+                            && InheritDocUtil::hasInheritDoc($elementData)
+                        ) {
+                            $elementData = InheritDocUtil::replaceInheritDoc(
+                                $elementData,
+                                $this->loadedData[$className][$section][$element]
+                            );
+                        }
+                        $this->loadedData[$className][$section][$element] = $elementData;
+                    } else {
+                        foreach ($elementData as $subElement => $subElementData) {
+                            if (isset($this->loadedData[$className][$section][$element][$subElement])
+                                && InheritDocUtil::hasInheritDoc($subElementData)
+                            ) {
+                                $subElementData = InheritDocUtil::replaceInheritDoc(
+                                    $subElementData,
+                                    $this->loadedData[$className][$section][$element][$subElement]
+                                );
+                            }
+                            $this->loadedData[$className][$section][$element][$subElement] = $subElementData;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -160,9 +209,7 @@ class MarkdownApiDocParser
                 } elseif ('h3' === $node->tagName && $state->hasSection()) {
                     $state->setElement(strtolower($node->nodeValue));
                     $section = $state->getSection();
-                    $state->setHasSubElements(
-                        ConfigUtil::FIELDS === $section || ConfigUtil::SUBRESOURCES === $section
-                    );
+                    $state->setHasSubElements($this->hasSubElements($section));
                 } elseif ($state->hasElement()) {
                     if ('h4' === $node->tagName && $state->hasSubElements()) {
                         $state->setSubElement(strtolower($node->nodeValue));
@@ -173,6 +220,16 @@ class MarkdownApiDocParser
             }
         }
         $this->normalizeLoadedData();
+    }
+
+    /**
+     * @param string $section
+     *
+     * @return bool
+     */
+    protected function hasSubElements($section)
+    {
+        return ConfigUtil::FIELDS === $section || ConfigUtil::SUBRESOURCES === $section;
     }
 
     protected function normalizeLoadedData()
