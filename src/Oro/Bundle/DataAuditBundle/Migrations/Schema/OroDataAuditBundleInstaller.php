@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\DataAuditBundle\Migrations\Schema\v1_9\AddImpersonationColumn;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -41,7 +42,11 @@ class OroDataAuditBundleInstaller implements Installation
         $auditTable->addColumn('logged_at', 'datetime', ['notnull' => false]);
         $auditTable->addColumn('object_id', 'integer', ['notnull' => false]);
         $auditTable->addColumn('object_class', 'string', ['length' => 255]);
-        $auditTable->addColumn('object_name', 'string', ['length' => 255, 'notnull' => false]);
+        $auditTable->addColumn(
+            'object_name',
+            'string',
+            ['length' => AbstractAudit::OBJECT_NAME_MAX_LENGTH, 'notnull' => false]
+        );
         $auditTable->addColumn('version', 'integer', ['notnull' => false]);
         $auditTable->addColumn('organization_id', 'integer', ['notnull' => false]);
         $auditTable->addColumn('type', 'string', ['length' => 255]);

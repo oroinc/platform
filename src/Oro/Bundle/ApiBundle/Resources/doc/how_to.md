@@ -389,7 +389,7 @@ If this controller cannot handle the implementation of your REST API resources, 
 If you know about these disadvantages and still want to proceed, to register a custom controller, perform the following steps:
 
  1. Create a controller.
- 2. Register the created controller using the `Resources/oro/routing.yml` configuration file.
+ 2. Register the created controller using the `Resources/config/oro/routing.yml` configuration file.
 
 Here is an example of the controller:
 
@@ -456,7 +456,7 @@ class MyResourceController extends Controller
 }
 ```
 
-An example of the `Resources/oro/routing.yml` configuration file:
+An example of the `Resources/config/oro/routing.yml` configuration file:
 
 ```yaml
 acme_api_get_my_resource:
@@ -468,7 +468,7 @@ acme_api_get_my_resource:
         group: rest_api
 ```
 
-For information about the `ApiDoc` annotation, see [Symfony documentation](https://symfony.com/doc/current/bundles/NelmioApiDocBundle/the-apidoc-annotation.html). 
+For information about the `ApiDoc` annotation, see [Symfony documentation](https://symfony.com/doc/2.x/bundles/NelmioApiDocBundle/the-apidoc-annotation.html). 
 To learn about all possible properties of the `fields` option, see [AbstractFormatter class in NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle/blob/2.x/Formatter/AbstractFormatter.php). Please note that the `fields` option can be used inside the `input` and `output` options.
 
 Use the [oro:api:doc:cache:clear](./commands.md#oroapidoccacheclear) command to apply changes in the `ApiDoc` annotation to [API Sandbox](https://www.oroinc.com/doc/orocrm/current/book/data-api#api-sandbox).
@@ -485,7 +485,7 @@ pattern works with a list of entities, not with a single entity. The challenge i
 `OroApiBundle:RestApi:item` action that works with a single entity and to remove handling of
 `/api/userprofile/{id}`. This can be achieved using own route definition with `override_path` option.
 
-Here is an example of the `Resources/oro/routing.yml` configuration file:
+Here is an example of the `Resources/config/oro/routing.yml` configuration file:
 
 ```yaml
 acme_rest_api_user_profile:

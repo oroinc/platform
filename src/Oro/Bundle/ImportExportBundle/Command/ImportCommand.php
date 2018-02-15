@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
@@ -135,18 +136,21 @@ class ImportCommand extends ContainerAwareCommand
 
         $processorNames = array_keys($processors);
         if (!$input->getOption('no-interaction')) {
-            $selected = $this->getHelper('dialog')->select(
-                $output,
-                sprintf('<question>Choose %s: </question>', $label),
-                $processorNames
-            );
+            $question = new ChoiceQuestion(sprintf('<question>Choose %s: </question>', $label), $processorNames);
+            $selectedProcessorName = $this->getHelper('question')->ask($input, $output, $question);
 
-            return $processorNames[$selected];
+            return $selectedProcessorName;
         }
 
         throw new \InvalidArgumentException(sprintf('Missing %s', $label));
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @param string $type
+     * @return string
+     */
     private function handleJobName(
         InputInterface $input,
         OutputInterface $output,
@@ -158,13 +162,10 @@ class ImportCommand extends ContainerAwareCommand
             return $jobName;
         }
         if (!$input->getOption('no-interaction')) {
-            $selected = $this->getHelper('dialog')->select(
-                $output,
-                sprintf('<question>Choose Job: </question>'),
-                $jobNames
-            );
+            $question = new ChoiceQuestion('<question>Choose Job: </question>', $jobNames);
+            $selectedJobName = $this->getHelper('question')->ask($input, $output, $question);
 
-            return $jobNames[$selected];
+            return $selectedJobName;
         }
 
         throw new \InvalidArgumentException('Missing "jobName" option.');
