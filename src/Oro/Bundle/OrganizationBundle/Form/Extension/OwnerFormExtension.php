@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Extension;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilder;
@@ -439,7 +440,7 @@ class OwnerFormExtension extends AbstractTypeExtension
             if (count($businessUnits)) {
                 $builder->add(
                     $this->fieldName,
-                    'entity',
+                    EntityType::class,
                     array_merge(
                         [
                             'class'                => 'OroOrganizationBundle:BusinessUnit',

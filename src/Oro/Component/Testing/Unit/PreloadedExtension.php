@@ -34,7 +34,6 @@ class PreloadedExtension extends BasePreloadExtension
     {
         if (isset($this->types[$name])) {
             return $this->types[$name];
-
         }
 
         return parent::getType($name);

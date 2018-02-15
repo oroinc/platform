@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NoteBundle\Form\EventListener;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -60,7 +61,7 @@ class NoteSubscriber implements EventSubscriberInterface
 
                 $form->add(
                     $fieldConfigId->getFieldName(),
-                    'entity',
+                    EntityType::class,
                     [
                         'required' => false,
                         'class'    => $fieldExtendConfig->get('target_entity'),
