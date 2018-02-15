@@ -7,6 +7,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
@@ -74,7 +75,7 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->once())
             ->method('create')
-            ->with('variableName', 'entity', ['label' => 'testLabel'])
+            ->with('variableName', EntityType::class, ['label' => 'testLabel'])
             ->willReturn($field);
         $builder->expects($this->once())->method('add')->with($field);
 
