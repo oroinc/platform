@@ -270,7 +270,6 @@ define(function(require) {
                 multiple: true,
                 containerCssClass: 'dictionary-filter',
                 dropdownAutoWidth: true,
-                escapeMarkup: function(markup) { return markup; }, // let our custom formatter work
                 minimumInputLength: 0,
                 placeholder: __('Choose values')
             };

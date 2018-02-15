@@ -113,9 +113,12 @@ define(function(require) {
             }
             this.text = text;
             var regexp = this.text;
+
             if (this.fuzzySearch) {
                 regexp = this.text.toLowerCase().replace(/\s/g, '').split('');
-                regexp = '[' + _.uniq(regexp).join('') + ']';
+                regexp = '[' + this._escape(_.uniq(regexp).join('')) + ']';
+            } else {
+                regexp = this._escape(regexp);
             }
             this.findText = this.text.length ? new RegExp(regexp, 'gi') : null;
 
@@ -338,6 +341,16 @@ define(function(require) {
             var fieldName = 'field__value';
 
             return elementName === fieldName;
+        },
+
+        /**
+         * Escaping special characters for regexp expression
+         *
+         * @param str
+         * @private
+         */
+        _escape: function(str) {
+            return str.replace(/[-[\]{}()*+?.,\\^$|#]/g, '\\$&');
         }
     });
 

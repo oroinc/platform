@@ -8,6 +8,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
 use Oro\Bundle\DataGridBundle\Extension\Board\BoardExtension;
 use Oro\Bundle\DataGridBundle\Extension\Board\Configuration;
@@ -76,6 +77,18 @@ class BoardExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(false));
         $this->assertFalse($this->extension->isApplicable($config));
         $this->assertArrayNotHasKey('board', $config->offsetGet(AppearanceExtension::APPEARANCE_CONFIG_PATH));
+    }
+
+    public function testIsNotApplicableInImportExportMode()
+    {
+        $params = new ParameterBag();
+        $params->set(
+            ParameterBag::DATAGRID_MODES_PARAMETER,
+            [DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE]
+        );
+        $config = DatagridConfiguration::create([]);
+        $this->extension->setParameters($params);
+        self::assertFalse($this->extension->isApplicable($config));
     }
 
     public function testVisitMetadata()

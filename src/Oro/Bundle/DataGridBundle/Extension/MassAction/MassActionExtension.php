@@ -9,6 +9,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
+use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
@@ -34,6 +35,11 @@ class MassActionExtension extends AbstractExtension
     /** @var bool */
     protected $isMetadataVisited = false;
 
+    /** {@inheritdoc} */
+    protected $excludedModes = [
+        DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
+    ];
+
     /**
      * @param MassActionFactory             $actionFactory
      * @param MassActionMetadataFactory     $actionMetadataFactory
@@ -57,8 +63,7 @@ class MassActionExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        // Applicable due to the possibility of dynamically add mass action
-        return true;
+        return parent::isApplicable($config);
     }
 
     /**

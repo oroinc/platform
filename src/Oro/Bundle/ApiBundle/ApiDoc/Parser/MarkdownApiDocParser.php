@@ -8,8 +8,13 @@ use Symfony\Component\HttpKernel\Config\FileLocator;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class MarkdownApiDocParser
 {
+    private const PLACEHOLDER_INHERIT_DOC = '{@inheritdoc}';
+
     /**
      * @var array
      *
@@ -123,13 +128,58 @@ class MarkdownApiDocParser
 
         $filePath = $this->fileLocator->locate(substr($resource, 0, $pos + 3));
         if (!isset($this->parsedFiles[$filePath])) {
+            $existingData = $this->loadedData;
+            $this->loadedData = [];
             $this->parseDocumentation(file_get_contents($filePath));
+            if (!empty($existingData)) {
+                $newData = $this->loadedData;
+                $this->loadedData = $existingData;
+                if (!empty($newData)) {
+                    $this->merge($newData);
+                }
+            }
 
             // store parsed documentations file paths to avoid unnecessary parsing
             $this->parsedFiles[$filePath] = true;
         }
 
         return true;
+    }
+
+    /**
+     * @param array $newData
+     */
+    protected function merge(array $newData)
+    {
+        foreach ($newData as $className => $classData) {
+            foreach ($classData as $section => $sectionData) {
+                foreach ($sectionData as $element => $elementData) {
+                    if (!$this->hasSubElements($section)) {
+                        if (isset($this->loadedData[$className][$section][$element])
+                            && $this->hasInheritDoc($elementData)
+                        ) {
+                            $elementData = $this->replaceInheritDoc(
+                                $elementData,
+                                $this->loadedData[$className][$section][$element]
+                            );
+                        }
+                        $this->loadedData[$className][$section][$element] = $elementData;
+                    } else {
+                        foreach ($elementData as $subElement => $subElementData) {
+                            if (isset($this->loadedData[$className][$section][$element][$subElement])
+                                && $this->hasInheritDoc($subElementData)
+                            ) {
+                                $subElementData = $this->replaceInheritDoc(
+                                    $subElementData,
+                                    $this->loadedData[$className][$section][$element][$subElement]
+                                );
+                            }
+                            $this->loadedData[$className][$section][$element][$subElement] = $subElementData;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -160,9 +210,7 @@ class MarkdownApiDocParser
                 } elseif ('h3' === $node->tagName && $state->hasSection()) {
                     $state->setElement(strtolower($node->nodeValue));
                     $section = $state->getSection();
-                    $state->setHasSubElements(
-                        ConfigUtil::FIELDS === $section || ConfigUtil::SUBRESOURCES === $section
-                    );
+                    $state->setHasSubElements($this->hasSubElements($section));
                 } elseif ($state->hasElement()) {
                     if ('h4' === $node->tagName && $state->hasSubElements()) {
                         $state->setSubElement(strtolower($node->nodeValue));
@@ -173,6 +221,43 @@ class MarkdownApiDocParser
             }
         }
         $this->normalizeLoadedData();
+    }
+
+    /**
+     * @param string $section
+     *
+     * @return bool
+     */
+    protected function hasSubElements($section)
+    {
+        return ConfigUtil::FIELDS === $section || ConfigUtil::SUBRESOURCES === $section;
+    }
+
+    /**
+     * @param string $text
+     *
+     * @return bool
+     */
+    protected function hasInheritDoc($text)
+    {
+        return $text && false !== strpos($text, self::PLACEHOLDER_INHERIT_DOC);
+    }
+
+    /**
+     * @param string $text
+     * @param string $existingText
+     *
+     * @return string
+     */
+    protected function replaceInheritDoc($text, $existingText)
+    {
+        // try avoid paragraph tag inside another paragraph tag, like "<p><p>inherited text</p></p>"
+        $placeholder = '<p>' . self::PLACEHOLDER_INHERIT_DOC . '</p>';
+        if (false !== strpos($text, $placeholder)) {
+            return str_replace($placeholder, $existingText, $text);
+        }
+
+        return str_replace(self::PLACEHOLDER_INHERIT_DOC, $existingText, $text);
     }
 
     protected function normalizeLoadedData()

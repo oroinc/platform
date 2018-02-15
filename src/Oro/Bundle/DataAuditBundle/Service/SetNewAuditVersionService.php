@@ -47,11 +47,18 @@ class SetNewAuditVersionService
         }
 
         $tableName = $this->entityManager->getClassMetadata(ClassUtils::getClass($audit))->getTableName();
+
+        /**
+         * limit 1 in subquery was added to avoid possible MySQL exception
+         * "You can't specify target table 'oro_audit' for update in FROM clause"
+         *
+         * @link https://dev.mysql.com/doc/relnotes/mysql/5.7/en/news-5-7-6.html#mysqld-5-7-6-optimizer
+         */
         $statement = $this->entityManager->getConnection()->prepare(
             "UPDATE $tableName SET version = (
                 SELECT v FROM (
                     SELECT COALESCE(MAX(version) + 1, 1) AS v FROM $tableName
-                    WHERE object_id = :objectId AND object_class = :objectClass
+                    WHERE object_id = :objectId AND object_class = :objectClass limit 1
                 ) AS x
             ) WHERE id = :auditId"
         );

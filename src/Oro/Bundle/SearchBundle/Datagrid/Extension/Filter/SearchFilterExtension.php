@@ -17,7 +17,8 @@ class SearchFilterExtension extends AbstractFilterExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
-            SearchDatasource::TYPE === $config->getDatasourceType()
+            parent::isApplicable($config)
+            && SearchDatasource::TYPE === $config->getDatasourceType()
             && null !== $config->offsetGetByPath(Configuration::COLUMNS_PATH);
     }
 
