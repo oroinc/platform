@@ -8,19 +8,26 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException;
 
+use Oro\Bundle\FormBundle\Form\Type\OroDateTimeType;
+use Oro\Bundle\FormBundle\Form\Type\OroDateType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 
 class FormBuilder
 {
     protected $fieldTypeMap = [
-        'string' => 'text',
-        'datetime' => 'oro_datetime',
-        'date' => 'oro_date',
-        'boolean' => 'checkbox',
-        'float' => 'number',
-        'decimal' => 'number',
-        'money_value' => 'number'
+        'string' => TextType::class,
+        'datetime' => OroDateTimeType::class,
+        'date' => OroDateType::class,
+        'boolean' => CheckboxType::class,
+        'float' => NumberType::class,
+        'decimal' => NumberType::class,
+        'money_value' => NumberType::class,
+        'entity' => EntityType::class
     ];
 
     /** @var FormFactory */

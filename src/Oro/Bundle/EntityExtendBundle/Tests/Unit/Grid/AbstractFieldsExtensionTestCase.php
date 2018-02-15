@@ -9,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension;
 use Oro\Bundle\EntityExtendBundle\Grid\FieldsHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -470,7 +471,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                                 'enabled' => true,
                                 'translatable' => true,
                                 'options' => [
-                                    'field_type' => 'entity',
+                                    'field_type' => EntityType::class,
                                     'field_options' => [
                                         'class' => null,
                                         'property' => 'name',

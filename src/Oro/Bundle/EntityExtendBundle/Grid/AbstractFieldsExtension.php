@@ -17,6 +17,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration as FilterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\FieldAcl\Configuration as FieldAclConfiguration;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 abstract class AbstractFieldsExtension extends AbstractExtension
 {
@@ -262,7 +263,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                             'type' => 'entity',
                             'translatable' => true,
                             'options' => [
-                                'field_type' => 'entity',
+                                'field_type' => EntityType::class,
                                 'field_options' => [
                                     'class' => $extendFieldConfig->get('target_entity'),
                                     'property' => $extendFieldConfig->get('target_field'),
