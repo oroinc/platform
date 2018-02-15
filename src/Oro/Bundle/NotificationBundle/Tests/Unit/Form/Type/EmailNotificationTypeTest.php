@@ -203,13 +203,13 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
     {
         $select2EntityType = new EntityType(
             [100 => new Event('test')],
-            'genemu_jqueryselect2_entity',
+            'oro_select2_entity',
             ['configs' => [], 'property' => null]
         );
 
         $select2TranslatableEntityType = new EntityType(
             [200 => new EmailTemplate('test')],
-            'genemu_jqueryselect2_translatable_entity',
+            'oro_select2_translatable_entity',
             ['configs' => []]
         );
 

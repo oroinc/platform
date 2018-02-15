@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
@@ -162,8 +162,14 @@ class EmailTypeTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $select2ChoiceType = new Select2Type(TranslatableEntityType::NAME);
-        $genemuChoiceType  = new Select2Type('choice');
+        $select2TranslatableEntityType = new Select2Type(
+            'translatable_entity',
+            'oro_select2_translatable_entity'
+        );
+        $select2ChoiceType  = new Select2Type(
+            'choice',
+            'oro_select2_choice'
+        );
         $emailTemplateList = new EmailTemplateSelectType();
         $attachmentsType   = new EmailAttachmentsType();
 
@@ -249,15 +255,18 @@ class EmailTypeTest extends TypeTestCase
             new PreloadedExtension(
                 [
                     TranslatableEntityType::NAME      => $translatableType,
-                    $select2ChoiceType->getName()     => $select2ChoiceType,
+                    $select2TranslatableEntityType->getName() => $select2TranslatableEntityType,
                     $emailTemplateList->getName()     => $emailTemplateList,
                     $emailAddressType->getName()      => $emailAddressType,
                     $richTextType->getName()          => $richTextType,
                     $resizableRichTextType->getName() => $resizableRichTextType,
                     $attachmentsType->getName()       => $attachmentsType,
                     ContextsSelectType::NAME          => $contextsSelectType,
-                    'genemu_jqueryselect2_hidden'     => new Select2Type('hidden'),
-                     $genemuChoiceType->getName()     => $genemuChoiceType,
+                    'oro_select2_hidden' => new Select2Type(
+                        'hidden',
+                        'oro_select2_hidden'
+                    ),
+                    $select2ChoiceType->getName()     => $select2ChoiceType,
                     $emailAddressFromType->getName()       => $emailAddressFromType,
                     $emailAddressRecipientsType->getName() => $emailAddressRecipientsType,
                     $emailOriginFromType->getName() => $emailOriginFromType

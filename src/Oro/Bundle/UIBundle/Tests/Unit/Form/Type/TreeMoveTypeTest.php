@@ -3,9 +3,6 @@
 namespace Oro\Bundle\ShoppingListBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 
 use Oro\Bundle\FormBundle\Form\Extension\AdditionalAttrExtension;
 use Oro\Bundle\UIBundle\Form\Type\TreeMoveType;

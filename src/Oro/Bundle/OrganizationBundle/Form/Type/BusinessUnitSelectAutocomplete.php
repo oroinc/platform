@@ -59,7 +59,7 @@ class BusinessUnitSelectAutocomplete extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (isset($options['config']['multiple']) &&  $options['config']['multiple'] === true) {
+        if (isset($options['configs']['multiple']) &&  $options['configs']['multiple'] === true) {
             $builder->addModelTransformer(
                 new EntitiesToIdsTransformer($this->entityManager, $this->entityClass)
             );

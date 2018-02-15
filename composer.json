@@ -45,7 +45,6 @@
         "escapestudios/wsse-authentication-bundle": "1.0.2",
         "liip/imagine-bundle": "1.7.*",
         "leafo/lessphp": "0.4.0",
-        "genemu/form-bundle": "2.3.0",
         "zendframework/zend-mail": "2.4.0",
         "a2lix/translation-form-bundle": "1.x-dev",
         "mtdowling/cron-expression": "1.1.0",

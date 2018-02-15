@@ -189,6 +189,34 @@ services:
         tags:
             - { name: form.type, alias: oro_entity_changeset }
 
+    oro_form.type.select2:
+        class: Oro\Bundle\FormBundle\Form\Type\Select2Type
+        abstract: true
+
+    oro_form.type.select2_hidden:
+        parent: oro_form.type.select2
+        arguments:
+            - 'Symfony\Component\Form\Extension\Core\Type\HiddenType'
+            - 'oro_select2_hidden'
+        tags:
+            - { name: form.type, alias: oro_select2_hidden }
+
+    oro_form.type.oro_select2_choice:
+        parent: oro_form.type.select2
+        arguments:
+            - 'Symfony\Component\Form\Extension\Core\Type\ChoiceType'
+            - 'oro_select2_choice'
+        tags:
+            - { name: form.type, alias: oro_select2_choice }
+
+    oro_form.type.oro_select2_entity:
+        parent: oro_form.type.select2
+        arguments:
+            - 'Symfony\Bridge\Doctrine\Form\Type\EntityType'
+            - 'oro_select2_entity'
+        tags:
+            - { name: form.type, alias: oro_select2_entity }
+
     # Form extensions
     oro_form.extension.data_block:
         class: %oro_form.extension.data_block.class%
