@@ -15,7 +15,7 @@ define(function(require) {
         ]),
 
         /**
-         * {Object} ExpressionEditorUtil
+         * @type {ExpressionEditorUtil}
          */
         util: null,
 
@@ -25,7 +25,7 @@ define(function(require) {
         typeahead: null,
 
         /**
-         * {Object} Autocomplete data provided by ExpressionEditorUtil.getAutocompleteData
+         * @type {AutocompleteData} Autocomplete data provided by ExpressionEditorUtil.getAutocompleteData
          */
         autocompleteData: null,
 
@@ -40,7 +40,7 @@ define(function(require) {
         dataSourceInstances: null,
 
         /**
-         * {Integer} Validation and autocomplete delay in milliseconds
+         * @type {number} Validation and autocomplete delay in milliseconds
          */
         delay: 50,
 
@@ -54,7 +54,7 @@ define(function(require) {
             paste: 'debouncedValidate'
         },
 
-        constructor: function(options) {
+        constructor: function ExpressionEditorView(options) {
             this.debouncedAutocomplete = _.debounce(function(e) {
                 if (!this.disposed) {
                     this.autocomplete(e);
@@ -148,7 +148,7 @@ define(function(require) {
 
             this.autocompleteData = this.util.getAutocompleteData(expression, position);
             this._toggleDataSource();
-            this.typeahead.query = this.autocompleteData.itemLastChild;
+            this.typeahead.query = this.autocompleteData.query;
 
             return _.sortBy(_.keys(this.autocompleteData.items));
         },
@@ -260,13 +260,17 @@ define(function(require) {
             this._hideDataSources();
 
             var dataSourceKey = this.autocompleteData.dataSourceKey;
-            var dataSourceValue = this.autocompleteData.dataSourceValue;
 
-            if (_.isEmpty(dataSourceKey) || !_.has(this.dataSource, dataSourceKey)) {
+            if (
+                this.autocompleteData.itemsType !== 'datasource' || _.isEmpty(dataSourceKey) ||
+                !_.has(this.dataSource, dataSourceKey)
+            ) {
                 return;
             }
 
-            this.autocompleteData.items = {};// hide autocomplete list
+            var dataSourceValue = this.autocompleteData.dataSourceValue;
+
+            this.autocompleteData.items = {}; // hide autocomplete list
 
             var dataSource = this.getDataSource(dataSourceKey);
             dataSource.$field.val(dataSourceValue).change();

@@ -4,19 +4,34 @@ define(function(require) {
     var ExpressionEditorUtil;
     var _ = require('underscore');
     var BaseClass = require('oroui/js/base-class');
+    var Token = require('oroexpressionlanguage/js/extend/token');
     var ExpressionLanguage = require('oroexpressionlanguage/js/extend/expression-language');
     var ExpressionOperandTypeValidator = require('oroform/js/expression-operand-type-validator');
 
-    ExpressionEditorUtil = BaseClass.extend({
-        /**
-         * RegEx, used for expression analyze, autocomplete and validate
-         */
-        regex: {
-            itemPartBeforeCursor: /^.*[ ]/g, // 1 == prod|uct.id and ... => prod
-            itemPartAfterCursor: /[ ].*$/g, // 1 == prod|uct.id and ... => uct.id
-            cutDataSourceId: /\[(.*?)\]/g // dataSource[1] => "1", dataSource[] => ""
-        },
+    /**
+     * @typedef {Object} AutocompleteData
+     * @poperty {string} expression - full expression
+     * @poperty {number} position - cursor position
+     * @poperty {number} replaceFrom - start part of expression that will be replaced by selected item,
+     * @poperty {number} replaceTo - end part of expression that will be replaced by selected item,
+     * @poperty {string} query - part of expression before cursor that recognized like part of an autocomplete item
+     * @poperty {string} itemsType - one of: `entities`, `operations`, `datasource`
+     * @poperty {Object} items - list of items for autocomplete
+     * @poperty {string} dataSourceKey -  key of data source if item is data source
+     * @poperty {string} dataSourceValue - value of data source if item is data source
+     */
 
+    /**
+     * @typedef {Object} FieldChain
+     * @poperty {Token} entity - Token with name type that contains entity name
+     * @poperty {Token} [dataSourceOpenBracket] - Token with punctuation type, is presented when entity has a datasource
+     * @poperty {Token} [dataSourceValue] - Token with constant type
+     * @poperty {Token} [dataSourceCloseBracket] - Token with punctuation type
+     * @poperty {Array.<Token>} fields
+     * @poperty {Token} lastToken
+     */
+
+    ExpressionEditorUtil = BaseClass.extend({
         /**
          * Constants, used for expression build
          */
@@ -127,30 +142,173 @@ define(function(require) {
          * Build autocomplete data by expression and cursor position
          *
          * @param {string} expression
-         * @param {integer} position
-         * @return {Object}
+         * @param {number} position
+         * @return {AutocompleteData}
          */
         getAutocompleteData: function(expression, position) {
-            return this._prepareAutocompleteData(expression, position);
+            var autocompleteData = {
+                expression: expression,
+                position: position,
+                replaceFrom: position,
+                replaceTo: position,
+                query: '',
+                items: {},
+                itemsType: '',
+                dataSourceKey: '',
+                dataSourceValue: ''
+            };
+
+            var tokens = this.expressionLanguage.getLexer().tokenizeForce(expression).tokens;
+            var currentTokenIndex = this._findCurrentTokenIndex(tokens, position);
+            if (currentTokenIndex === -1) {
+                this._fillRootEntitiesOptions(autocompleteData);
+                return autocompleteData;
+            }
+            var fieldChain = this._findFieldChain(tokens, currentTokenIndex, this.options.rootEntities);
+            var currentToken = tokens[currentTokenIndex];
+            if (fieldChain) {
+                if (this.dataSourceNames.indexOf(fieldChain.entity.value) !== -1) {
+                    var entityWithDataSource = _.values(_.pick(fieldChain, 'entity', 'dataSourceOpenBracket',
+                        'dataSourceValue', 'dataSourceCloseBracket'));
+                    if (entityWithDataSource.length >= 3 && entityWithDataSource.indexOf(currentToken) !== -1) {
+                        this._fillDataSourceOptions(autocompleteData, fieldChain);
+                        return autocompleteData;
+                    }
+                }
+                this._fillEntityFieldOptions(autocompleteData, fieldChain);
+            } else if (currentToken.test(Token.OPERATOR_TYPE)) {
+                this._fillOperatorsOptions(autocompleteData, currentToken);
+            } else if (currentToken.test(Token.NAME_TYPE)) {
+                this._fillRootEntitiesOptions(autocompleteData, currentToken);
+            } else if (currentToken.test(Token.EOF_TYPE)) {
+                var prevToken = currentTokenIndex === 0 ? null : tokens[currentTokenIndex - 1];
+                if (!prevToken || prevToken.test(Token.OPERATOR_TYPE) || prevToken.test(Token.PUNCTUATION_TYPE, '(')) {
+                    this._fillRootEntitiesOptions(autocompleteData, currentToken);
+                } else {
+                    this._fillOperatorsOptions(autocompleteData);
+                }
+            }
+
+            return autocompleteData;
+        },
+
+        /**
+         * Fill autocomplete data with root entities items
+         *
+         * @param {AutocompleteData} autocompleteData
+         * @param {Token} [currentToken]
+         * @private
+         */
+        _fillRootEntitiesOptions: function(autocompleteData, currentToken) {
+            autocompleteData.itemsType = 'entities';
+            autocompleteData.items = {};
+            _.each(this.options.rootEntities, function(alias) {
+                autocompleteData.items[alias] = {
+                    item: alias,
+                    hasChildren: true
+                };
+            }, this);
+            if (currentToken && currentToken.test(Token.NAME_TYPE)) {
+                autocompleteData.query = currentToken.value;
+                autocompleteData.replaceFrom = currentToken.cursor - 1;
+                autocompleteData.replaceTo = currentToken.cursor + currentToken.length;
+            }
+        },
+
+        /**
+         * Fill autocomplete data with data source options
+         *
+         * @param {AutocompleteData} autocompleteData
+         * @param {FieldChain} fieldChain
+         * @private
+         */
+        _fillDataSourceOptions: function(autocompleteData, fieldChain) {
+            autocompleteData.itemsType = 'datasource';
+            autocompleteData.dataSourceKey = fieldChain.entity.value;
+            if (fieldChain.dataSourceValue) {
+                autocompleteData.dataSourceValue = fieldChain.dataSourceValue.value;
+                autocompleteData.replaceFrom = fieldChain.dataSourceValue.cursor - 1;
+                autocompleteData.replaceTo =
+                    autocompleteData.replaceFrom + fieldChain.dataSourceValue.length;
+            } else {
+                autocompleteData.replaceFrom =
+                    autocompleteData.replaceTo = fieldChain.dataSourceCloseBracket.cursor - 1;
+            }
+            autocompleteData.position = fieldChain.lastToken.cursor - 1 + fieldChain.lastToken.length;
+        },
+
+        /**
+         * Fill autocomplete data with entity fields items
+         *
+         * @param {AutocompleteData} autocompleteData
+         * @param {FieldChain} fieldChain
+         * @private
+         */
+        _fillEntityFieldOptions: function(autocompleteData, fieldChain) {
+            autocompleteData.itemsType = 'entities';
+            if (fieldChain.lastToken.test(Token.PUNCTUATION_TYPE, '.')) {
+                autocompleteData.replaceFrom = fieldChain.lastToken.cursor - 1 + fieldChain.lastToken.length;
+                autocompleteData.replaceTo = autocompleteData.replaceFrom;
+            } else {
+                var lastToken = fieldChain.fields.pop();
+                autocompleteData.query = lastToken.value;
+                autocompleteData.replaceFrom = fieldChain.lastToken.cursor - 1;
+                autocompleteData.replaceTo = autocompleteData.replaceFrom + fieldChain.lastToken.length;
+            }
+            var parts = _.pluck(fieldChain.fields, 'value');
+            parts.unshift(fieldChain.entity.value);
+            var omitRelationFields = this.options.itemLevelLimit <= parts.length + 1;
+            var levelLimit = this.options.itemLevelLimit - parts.length;
+            var treeNode = this.entityDataProvider
+                .getEntityTreeNodeByPropertyPath(parts.join(this.strings.childSeparator));
+            if (treeNode && treeNode.__isEntity) {
+                _.each(treeNode, function(node) {
+                    var isEntity = node.__isEntity;
+                    if (isEntity && (omitRelationFields || !node.__hasScalarFieldsInSubtree(levelLimit))) {
+                        return;
+                    }
+                    var item = _.extend(_.pick(node.__field, 'label', 'type', 'name'), {
+                        hasChildren: isEntity
+                    });
+                    autocompleteData.items[item.name] = item;
+                }, this);
+            }
+        },
+
+        /**
+         * Fill autocomplete data with operations items
+         *
+         * @param {AutocompleteData} autocompleteData
+         * @param {Token} [currentToken]
+         * @private
+         */
+        _fillOperatorsOptions: function(autocompleteData, currentToken) {
+            autocompleteData.itemsType = 'operations';
+            autocompleteData.items = this.operationsItems;
+            if (currentToken !== void 0) {
+                autocompleteData.query = currentToken.value;
+                autocompleteData.replaceFrom = currentToken.cursor - 1;
+                autocompleteData.replaceTo = currentToken.cursor + currentToken.length;
+            }
         },
 
         /**
          * Update autocomplete expression by item parts
          *
-         * @param {Object} autocompleteData
+         * @param {AutocompleteData} autocompleteData
+         * @param {string} value - string that is selected in autocomplete widget
          * @private
          */
-        _updateAutocompleteExpression: function(autocompleteData) {
-            autocompleteData.expression = autocompleteData.beforeItem +
-                autocompleteData.itemChild.join(this.strings.childSeparator) +
-                autocompleteData.afterItem;
+        _updateAutocompleteExpression: function(autocompleteData, value) {
+            autocompleteData.expression = autocompleteData.expression.substr(0, autocompleteData.replaceFrom) +
+                value + autocompleteData.expression.substr(autocompleteData.replaceTo);
         },
 
         /**
          * Insert into autocomplete data new item
          *
-         * @param {Object} autocompleteData
-         * @param {string} item
+         * @param {AutocompleteData} autocompleteData
+         * @param {string} item - selected value in autocomplete widget
          */
         updateAutocompleteItem: function(autocompleteData, item) {
             var positionModifier = 0;
@@ -166,27 +324,21 @@ define(function(require) {
                 item += this.strings.itemSeparator;
             }
 
-            autocompleteData.itemChild[autocompleteData.itemLastChildIndex] = item;
+            this._updateAutocompleteExpression(autocompleteData, item);
 
-            this._updateAutocompleteExpression(autocompleteData);
-
-            autocompleteData.position = autocompleteData.expression.length - autocompleteData.afterItem.length +
-                positionModifier;
+            autocompleteData.position = autocompleteData.replaceFrom + item.length + positionModifier;
         },
 
         /**
          * Set new data source value into autocomplete data
          *
-         * @param {Object} autocompleteData
-         * @param {string} dataSourceValue
+         * @param {AutocompleteData} autocompleteData
+         * @param {string} dataSourceValue - selected value in datasource widget
          */
         updateDataSourceValue: function(autocompleteData, dataSourceValue) {
-            autocompleteData.itemChild[autocompleteData.itemCursorIndex] = autocompleteData
-                .itemCursorChild.replace(this.regex.cutDataSourceId, '[' + dataSourceValue + ']');
-
-            this._updateAutocompleteExpression(autocompleteData);
-
-            autocompleteData.position = autocompleteData.expression.length - autocompleteData.afterItem.length;
+            var diff = autocompleteData.replaceTo - autocompleteData.replaceFrom - dataSourceValue.length;
+            this._updateAutocompleteExpression(autocompleteData, dataSourceValue);
+            autocompleteData.position -= diff;
         },
 
         /**
@@ -207,144 +359,82 @@ define(function(require) {
         },
 
         /**
-         * Create autocomplete data object
+         * Finds index of token that corresponds to current cursor position.
          *
-         * @param {String} expression
-         * @param {Integer} position
-         * @return {Object}
-         */
-        _prepareAutocompleteData: function(expression, position) {
-            var autocompleteData = {
-                expression: expression, // full expression
-                position: position, // cursor position
-                item: '', // item under cursor or just "item"
-                beforeItem: '', // part of expression before item
-                afterItem: '', // part of expression after item
-                itemChild: [], // child of item
-                itemLastChildIndex: 0, // index of last child of item
-                itemLastChild: '', // last child of item
-                itemCursorIndex: 0, // index of an item child under cursor
-                itemCursorChild: '', // item child under cursor
-                itemsType: '', // `entities` or `operations`
-                items: {}, // list of items for autocomplete
-                dataSourceKey: '', // key of data source if item is data source
-                dataSourceValue: ''// value of data source if item is data source
-            };
-
-            this._setAutocompleteItem(autocompleteData);
-            this._setAutocompleteItemsType(autocompleteData);
-            this._setAutocompleteItems(autocompleteData);
-            this._setAutocompleteDataSource(autocompleteData);
-
-            return autocompleteData;
-        },
-
-        /**
-         * Set item info into autocomplete data
-         *
-         * @param {Object} autocompleteData
+         * @param {Array.<Token>} tokens
+         * @param {number} position
+         * @return {number} - if token is not found returns -1
          * @private
          */
-        _setAutocompleteItem: function(autocompleteData) {
-            var beforeCaret = autocompleteData.expression.slice(0, autocompleteData.position);
-            var afterCaret = autocompleteData.expression.slice(autocompleteData.position);
-
-            var itemBeforeCursor = beforeCaret.replace(this.regex.itemPartBeforeCursor, '');
-            var itemAfterCursor = afterCaret.replace(this.regex.itemPartAfterCursor, '');
-
-            autocompleteData.beforeItem = beforeCaret.slice(0, beforeCaret.length - itemBeforeCursor.length);
-            autocompleteData.afterItem = afterCaret.slice(itemAfterCursor.length);
-
-            autocompleteData.item = itemBeforeCursor + itemAfterCursor;
-            autocompleteData.itemChild = autocompleteData.item.split(this.strings.childSeparator);
-            autocompleteData.itemLastChildIndex = autocompleteData.itemChild.length - 1;
-            autocompleteData.itemLastChild = autocompleteData.itemChild[autocompleteData.itemLastChildIndex];
-            autocompleteData.itemCursorIndex = itemBeforeCursor.split(this.strings.childSeparator).length - 1;
-            autocompleteData.itemCursorChild = itemBeforeCursor.split(this.strings.childSeparator).pop() +
-                itemAfterCursor.split(this.strings.childSeparator).shift();
-        },
-
-        /**
-         * Set group info into autocomplete data
-         *
-         * @param {Object} autocompleteData
-         * @private
-         */
-        _setAutocompleteItemsType: function(autocompleteData) {
-            var prevItem = _.trim(autocompleteData.beforeItem).split(this.strings.itemSeparator).pop();
-
-            if (!prevItem || prevItem === '(' || prevItem in this.operationsItems) {
-                autocompleteData.itemsType = 'entities';
-            } else {
-                autocompleteData.itemsType = 'operations';
-            }
-        },
-
-        /**
-         * Set autocomplete items into autocomplete data
-         *
-         * @param {Object} autocompleteData
-         * @private
-         */
-        _setAutocompleteItems: function(autocompleteData) {
-            if (autocompleteData.itemsType === 'entities') {
-                autocompleteData.items = {};
-                if (autocompleteData.itemChild.length > 1) {
-                    var parts = autocompleteData.itemChild.map(function(item) {
-                        return item.replace(this.regex.cutDataSourceId, '');
-                    }.bind(this));
-                    if (this.options.rootEntities.indexOf(parts[0]) === -1) {
-                        return;
-                    }
-                    var omitRelationFields = this.options.itemLevelLimit <= parts.length;
-                    parts.pop();
-                    var levelLimit = this.options.itemLevelLimit - parts.length - 1;
-                    var treeNode = this.entityDataProvider
-                        .getEntityTreeNodeByPropertyPath(parts.join(this.strings.childSeparator));
-                    if (treeNode && treeNode.__isEntity) {
-                        _.each(treeNode, function(node) {
-                            var isEntity = node.__isEntity;
-                            if (isEntity && (omitRelationFields || !node.__hasScalarFieldsInSubtree(levelLimit))) {
-                                return;
-                            }
-                            var item = _.extend(_.pick(node.__field, 'label', 'type', 'name'), {
-                                hasChildren: isEntity
-                            });
-                            autocompleteData.items[item.name] = item;
-                        }, this);
-                    }
-                } else {
-                    _.each(this.options.rootEntities, function(alias) {
-                        autocompleteData.items[alias] = {
-                            item: alias,
-                            hasChildren: true
-                        };
-                    }, this);
+        _findCurrentTokenIndex: function(tokens, position) {
+            for (var i = 0; i < tokens.length; i++) {
+                if (tokens[i].cursor -1 <= position && tokens[i].cursor + tokens[i].length > position) {
+                    return i;
                 }
-            } else {
-                autocompleteData.items = this.operationsItems;
             }
+            return -1;
         },
 
         /**
-         * Set data source info into autocomplete data
+         * Creates field chain that current token is contained in.
          *
-         * @param {Object} autocompleteData
+         * @param {Array.<Token>} tokens
+         * @param {number} currentTokenIndex
+         * @param {Array.<string>} names - names that can be used as start of a chain
+         * @return {FieldChain|null}
          * @private
          */
-        _setAutocompleteDataSource: function(autocompleteData) {
-            var dataSourceKey = autocompleteData.itemCursorChild.replace(this.regex.cutDataSourceId, '');
-            var dataSourceValue = '';
+        _findFieldChain: function(tokens, currentTokenIndex, names) {
+            var chain = null;
+            var i = 0;
+            while (i < tokens.length && i <= currentTokenIndex) {
+                // looking for start of field chain
+                if (!tokens[i].test(Token.NAME_TYPE) || names.indexOf(tokens[i].value) === -1) {
+                    i++;
+                    continue;
+                }
+                chain = {
+                    entity: tokens[i],
+                    fields: []
+                };
+                i++;
+                if (tokens[i].test(Token.PUNCTUATION_TYPE, '[')) {
+                    chain.dataSourceOpenBracket = tokens[i];
+                    i++;
+                    if (tokens[i].test(Token.NUMBER_TYPE)) {
+                        chain.dataSourceValue = tokens[i];
+                        i++;
+                    }
+                    if (tokens[i].test(Token.PUNCTUATION_TYPE, ']')) {
+                        chain.dataSourceCloseBracket = tokens[i];
+                        i++;
+                    } else {
+                        chain = null;
+                        continue;
+                    }
+                }
 
-            if (dataSourceKey === autocompleteData.itemCursorChild) {
-                dataSourceKey = '';
-            } else {
-                dataSourceValue = this.regex.cutDataSourceId.exec(autocompleteData.itemCursorChild);
-                dataSourceValue = dataSourceValue ? dataSourceValue[1] : '';
+                // collect separators and field names that should alternate one after another
+                while (tokens[i].test(Token.PUNCTUATION_TYPE, '.')) {
+                    i++;
+                    if (tokens[i].test(Token.NAME_TYPE)) {
+                        chain.fields.push(tokens[i]);
+                        i++;
+                    } else {
+                        break;
+                    }
+                }
+
+                // if last chain member located before current token in the token array then try to find another chain
+                if (i <= currentTokenIndex) {
+                    chain = null;
+                } else {
+                    chain.lastToken = tokens[i - 1];
+                }
+                i++;
             }
 
-            autocompleteData.dataSourceKey = dataSourceKey;
-            autocompleteData.dataSourceValue = dataSourceValue;
+            return chain;
         }
     });
 

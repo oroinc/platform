@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     var Lexer = require('oroexpressionlanguage/js/extend/lexer');
-    var Token = require('oroexpressionlanguage/js/library/token');
+    var Token = require('oroexpressionlanguage/js/extend/token');
     var TokenStream = require('oroexpressionlanguage/js/library/token-stream');
 
     describe('oroexpressionlanguage/js/extend/lexer', function() {
@@ -21,7 +21,7 @@ define(function(require) {
                 ]],
                 ['3 == 5', [
                     new Token(Token.NUMBER_TYPE, 3, 1),
-                    new Token(Token.OPERATOR_TYPE, '==', 3),
+                    new Token(Token.OPERATOR_TYPE, '==', 3, 2),
                     new Token(Token.NUMBER_TYPE, 5, 6)
                 ]]
             ];
