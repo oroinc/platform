@@ -102,7 +102,7 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
             ->willReturn($isSystem);
 
         $resolver = new OptionsResolver();
-        $this->formType->setDefaultOptions($resolver);
+        $this->formType->configureOptions($resolver);
         $result = $resolver->resolve([]);
 
         $locked = call_user_func($result['choice_attr'], 777);

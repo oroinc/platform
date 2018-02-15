@@ -50,6 +50,9 @@ class ContextsSelectTypeTest extends TypeTestCase
             ->getMock();
     }
 
+    /**
+     * @return array
+     */
     protected function getExtensions()
     {
         return [
@@ -78,7 +81,7 @@ class ContextsSelectTypeTest extends TypeTestCase
         $type->buildForm($builder, ['collectionModel' => false]);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
@@ -106,7 +109,7 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->entityTitleResolver,
             $this->createMock(FeatureChecker::class)
         );
-        $type->setDefaultOptions($resolver);
+        $type->configureOptions($resolver);
     }
 
     public function testGetParent()

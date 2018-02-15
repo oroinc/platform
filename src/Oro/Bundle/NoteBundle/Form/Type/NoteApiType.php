@@ -3,7 +3,7 @@
 namespace Oro\Bundle\NoteBundle\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NoteBundle\Entity\Note;
@@ -15,6 +15,9 @@ class NoteApiType extends NoteType
     /** @var  ConfigManager $configManager */
     protected $configManager;
 
+    /**
+     * @param ConfigManager $configManager
+     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -42,7 +45,7 @@ class NoteApiType extends NoteType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [

@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\Asset\Packages as AssetHelper;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\IntegrationBundle\Form\Choice\Loader;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
@@ -49,7 +49,7 @@ class IntegrationSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $em             = $this->em;
         $defaultConfigs = [

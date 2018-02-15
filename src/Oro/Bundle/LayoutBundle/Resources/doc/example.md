@@ -926,7 +926,7 @@ Currently, every time we want to wrap content into a `<div>` element, we have to
 ```php
 namespace Acme\Bundle\LayoutBundle\Layout\Block\Extension;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\BlockInterface;
@@ -939,7 +939,7 @@ class ContainerExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setOptional(['type']);
     }
@@ -1555,7 +1555,7 @@ First, let's create the block type file itself and place it in the `Acme/Bundle/
 ```php
 namespace Acme\Bundle\LayoutBundle\Layout\Block\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\BlockInterface;
@@ -1568,7 +1568,7 @@ class ImageType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
             ->setRequired(['path'])

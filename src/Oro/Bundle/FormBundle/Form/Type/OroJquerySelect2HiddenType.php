@@ -12,7 +12,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
@@ -56,7 +56,7 @@ class OroJquerySelect2HiddenType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $defaultConfig = [
             'placeholder'        => 'oro.form.choose_value',
@@ -120,9 +120,9 @@ class OroJquerySelect2HiddenType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    protected function setConverterNormalizer(OptionsResolverInterface $resolver)
+    protected function setConverterNormalizer(OptionsResolver $resolver)
     {
         $resolver->setNormalizers(
             [
@@ -149,10 +149,10 @@ class OroJquerySelect2HiddenType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      * @param array                    $defaultConfig
      */
-    protected function setConfigsNormalizer(OptionsResolverInterface $resolver, array $defaultConfig)
+    protected function setConfigsNormalizer(OptionsResolver $resolver, array $defaultConfig)
     {
         $resolver->setNormalizers(
             [

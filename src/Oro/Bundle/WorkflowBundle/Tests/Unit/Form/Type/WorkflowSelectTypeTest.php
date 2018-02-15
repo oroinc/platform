@@ -52,9 +52,9 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     /**
      * @param array $inputOptions
      * @param array $expectedOptions
-     * @dataProvider setDefaultOptionsDataProvider
+     * @dataProvider configureOptionsDataProvider
      */
-    public function testSetDefaultOptions(array $inputOptions, array $expectedOptions)
+    public function testConfigureOptions(array $inputOptions, array $expectedOptions)
     {
         $testWorkflowDefinition = new WorkflowDefinition();
         $testWorkflowDefinition->setName(self::TEST_WORKFLOW_NAME)
@@ -85,7 +85,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     /**
      * @return array
      */
-    public function setDefaultOptionsDataProvider()
+    public function configureOptionsDataProvider()
     {
         return [
             'no additional data' => [

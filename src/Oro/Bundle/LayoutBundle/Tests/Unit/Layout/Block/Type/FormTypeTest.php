@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormView;
 
 class FormTypeTest extends BlockTypeTestCase
 {
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $form = $this->createMock(FormView::class);
 

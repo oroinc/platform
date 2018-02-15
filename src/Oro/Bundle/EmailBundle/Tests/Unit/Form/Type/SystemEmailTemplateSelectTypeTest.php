@@ -60,7 +60,7 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
         unset($this->entityRepository);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $this->entityRepository->expects($this->any())
             ->method('getSystemTemplatesQueryBuilder')
@@ -70,7 +70,7 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->will($this->returnValue($this->entityRepository));
 
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
@@ -78,7 +78,7 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
                 'class'         => 'OroEmailBundle:EmailTemplate',
                 'choice_value'  => 'name'
             ]);
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
     }
     
     public function testBuildForm()

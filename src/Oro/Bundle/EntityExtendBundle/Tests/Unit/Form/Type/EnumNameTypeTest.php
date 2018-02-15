@@ -36,14 +36,19 @@ class EnumNameTypeTest extends TypeTestCase
     }
 
     /**
-     * @dataProvider setDefaultOptionsProvider
+     * @dataProvider configureOptionsProvider
+     * @param ConfigIdInterface $configId
+     * @param boolean $isNewConfig
+     * @param boolean $hasEnumCode
+     * @param array $options
+     * @param array $expectedOptions
      */
-    public function testSetDefaultOptions(
+    public function testConfigureOptions(
         ConfigIdInterface $configId,
         $isNewConfig,
         $hasEnumCode,
-        $options,
-        $expectedOptions
+        array $options,
+        array $expectedOptions
     ) {
         $fieldName = $configId instanceof FieldConfigId ? $configId->getFieldName() : null;
 
@@ -53,7 +58,7 @@ class EnumNameTypeTest extends TypeTestCase
             ->will($this->returnValue($hasEnumCode));
 
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
 
         $options['config_id']     = $configId;
         $options['config_is_new'] = $isNewConfig;
@@ -92,7 +97,7 @@ class EnumNameTypeTest extends TypeTestCase
         return $resolver;
     }
 
-    public function setDefaultOptionsProvider()
+    public function configureOptionsProvider()
     {
         return [
             [
@@ -160,7 +165,7 @@ class EnumNameTypeTest extends TypeTestCase
             ->will($this->returnValue(true));
 
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
 
         $resolvedOptions = $resolver->resolve(['config_id' => $configId]);
 
@@ -186,7 +191,7 @@ class EnumNameTypeTest extends TypeTestCase
             ->will($this->returnValue(false));
 
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
 
         $resolvedOptions = $resolver->resolve(['config_id' => $configId]);
 

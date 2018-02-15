@@ -217,7 +217,7 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
 
         /** @var TranslatableEntityType $translatableEntityType */
         $translatableEntityType = $this->getMockBuilder(TranslatableEntityType::class)
-            ->setMethods(['setDefaultOptions', 'buildForm'])
+            ->setMethods(['configureOptions', 'buildForm'])
             ->disableOriginalConstructor()
             ->getMock();
 

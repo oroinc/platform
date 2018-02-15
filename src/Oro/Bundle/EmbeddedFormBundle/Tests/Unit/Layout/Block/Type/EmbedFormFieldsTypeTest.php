@@ -20,7 +20,7 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
      * @param array $options
      * @param array $expected
      */
-    public function testSetDefaultOptions($options, $expected)
+    public function testConfigureOptions($options, $expected)
     {
         $resolvedOptions = $this->resolveOptions(EmbedFormFieldsType::NAME, $options);
         $this->assertEquals($expected, $resolvedOptions);

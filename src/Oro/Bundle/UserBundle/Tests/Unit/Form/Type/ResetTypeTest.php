@@ -65,7 +65,7 @@ class ResetTypeTest extends FormIntegrationTestCase
         $this->type->buildForm($builder, []);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|OptionsResolver $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
@@ -78,7 +78,7 @@ class ResetTypeTest extends FormIntegrationTestCase
                 'dynamic_fields_disabled' => true
             ]);
 
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
     }
 
     public function testName()
