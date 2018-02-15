@@ -19,7 +19,7 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
     public function testGetParent()
     {
         $this->assertEquals(
-            'genemu_jqueryselect2_translatable_entity',
+            'oro_select2_translatable_entity',
             $this->type->getParent()
         );
     }

@@ -250,7 +250,7 @@ class RelationType extends AbstractType
                 'data' => $this->getArrayValue($data, 'bidirectional')
             ];
 
-            $form->add('bidirectional', 'genemu_jqueryselect2_choice', $options);
+            $form->add('bidirectional', 'oro_select2_choice', $options);
         }
     }
 }

@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupType;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeMultiSelectType;
@@ -93,7 +93,10 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
                         $this->registry
                     ),
                     AttributeMultiSelectType::NAME => new AttributeMultiSelectType($this->attributeManager),
-                    'genemu_jqueryselect2_choice' => new Select2Type('choice'),
+                    'oro_select2_choice' => new Select2Type(
+                        'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+                        'oro_select2_choice'
+                    ),
                     LocalizedPropertyType::NAME => new LocalizedPropertyType(),
                     LocalizationCollectionTypeStub::NAME => new LocalizationCollectionTypeStub(
                         [

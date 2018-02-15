@@ -32,7 +32,7 @@ class RendererTest extends LayoutTestCase
         $context->set('body_class', 'test-body');
 
         // revert TWIG form renderer to Symfony's default theme
-        $this->getContainer()->get('twig.form.renderer')->setTheme(
+        $this->getContainer()->get('twig.form.renderer.alias')->setTheme(
             $context->data()->get('form'),
             'form_div_layout.html.twig'
         );
@@ -77,7 +77,7 @@ class RendererTest extends LayoutTestCase
         $context->data()->set('form', $form->createView());
 
         // revert TWIG form renderer to Symfony's default theme
-        $this->getContainer()->get('twig.form.renderer')->setTheme(
+        $this->getContainer()->get('twig.form.renderer.alias')->setTheme(
             $context->data()->get('form'),
             'form_div_layout.html.twig'
         );
@@ -106,7 +106,7 @@ class RendererTest extends LayoutTestCase
         $context->data()->set('form', $form->createView());
 
         // revert TWIG form renderer to Symfony's default theme
-        $this->getContainer()->get('twig.form.renderer')->setTheme(
+        $this->getContainer()->get('twig.form.renderer.alias')->setTheme(
             $context->data()->get('form'),
             'form_div_layout.html.twig'
         );

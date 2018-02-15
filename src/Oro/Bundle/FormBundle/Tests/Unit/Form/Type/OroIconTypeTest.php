@@ -19,7 +19,7 @@ class OroIconTypeTest extends FormIntegrationTestCase
 
     public function testParameters()
     {
-        $this->assertEquals('genemu_jqueryselect2_choice', $this->type->getParent());
+        $this->assertEquals('oro_select2_choice', $this->type->getParent());
         $this->assertEquals('oro_icon_select', $this->type->getName());
     }
 }

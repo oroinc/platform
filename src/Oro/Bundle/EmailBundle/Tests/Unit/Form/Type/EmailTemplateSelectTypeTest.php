@@ -37,7 +37,7 @@ class EmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('genemu_jqueryselect2_translatable_entity', $this->type->getParent());
+        $this->assertEquals('oro_select2_translatable_entity', $this->type->getParent());
     }
 
     public function testGetName()

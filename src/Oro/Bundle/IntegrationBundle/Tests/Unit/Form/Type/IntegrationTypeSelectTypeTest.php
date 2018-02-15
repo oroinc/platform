@@ -95,7 +95,7 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('genemu_jqueryselect2_choice', $this->type->getParent());
+        $this->assertEquals('oro_select2_choice', $this->type->getParent());
     }
 
     public function testGetName()

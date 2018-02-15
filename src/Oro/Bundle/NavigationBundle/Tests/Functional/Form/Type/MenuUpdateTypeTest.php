@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Functional\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 
 use Knp\Menu\ItemInterface;
 
@@ -46,7 +46,10 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
                     new LocalizedPropertyType(),
                     new LocalizationCollectionTypeStub(),
                     new OroIconTypeStub($kernel),
-                    new Select2Type('choice'),
+                    new Select2Type(
+                        'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+                        'oro_select2_choice'
+                    ),
                 ],
                 []
             ),

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -66,7 +66,10 @@ class EmailAddressFromTypeTest extends TypeTestCase
 
     protected function getExtensions()
     {
-        $select2Choice = new Select2Type('choice');
+        $select2Choice = new Select2Type(
+            'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+            'oro_select2_choice'
+        );
 
         return [
             new PreloadedExtension(

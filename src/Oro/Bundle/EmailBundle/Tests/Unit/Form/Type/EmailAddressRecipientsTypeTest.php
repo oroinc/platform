@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -45,7 +45,10 @@ class EmailAddressRecipientsTypeTest extends TypeTestCase
             ->getMock();
 
         $emailAddressRecipients = new EmailAddressRecipientsType($configManager);
-        $select2Hidden = new Select2Type('hidden');
+        $select2Hidden = new Select2Type(
+            'Symfony\Component\Form\Extension\Core\Type\HiddenType',
+            'oro_select2_hidden'
+        );
 
         return [
             new PreloadedExtension(
