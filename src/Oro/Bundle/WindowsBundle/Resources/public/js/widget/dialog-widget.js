@@ -525,7 +525,8 @@ define(function(require) {
                     dialog.css('min-width', containerEl.clientWidth - left);
                 }
             } else {
-                if (!this.widgetIsResizable() && !this.options.dialogOptions.autoResize) {
+                if (this.getState() !== 'maximized' &&
+                    (!this.widgetIsResizable() && !this.options.dialogOptions.autoResize)) {
                     dialog.css('width', this.options.dialogOptions.width);
                 }
             }
@@ -535,7 +536,7 @@ define(function(require) {
             // containerEl.offsetTop will only work if offsetParent is document.body
 
             // Set auto height for dialog before calc
-            if (!this.widgetIsResizable()) {
+            if (this.getState() !== 'maximized' && !this.widgetIsResizable()) {
                 dialog.css('height', 'auto');
             }
 
