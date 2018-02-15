@@ -6,7 +6,7 @@ This bundle provide ability to manage system features. Feature is as a set of gr
 How to define new feature
 -------------------------
 
-Features are defined with configuration files place in Resources/oro/features.yml.
+Features are defined with configuration files place in `Resources/config/oro/features.yml`.
 Each feature consists of one required option - the label. Out of the box feature may be configured with next sections:
  - label - feature title
  - description - feature description

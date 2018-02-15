@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Provider;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
 class EntityNameProvider
@@ -37,7 +38,7 @@ class EntityNameProvider
     {
         $entity = $this->doctrine->getManagerForClass($entityClass)->find($entityClass, $entityId);
         if ($entity) {
-            return substr($this->entityNameResolver->getName($entity), 0, 255);
+            return substr($this->entityNameResolver->getName($entity), 0, AbstractAudit::OBJECT_NAME_MAX_LENGTH);
         }
 
         $lastObjectName = $this->findObjectNameFromLastAuditEntry($auditEntryClass, $entityClass, $entityId);

@@ -71,6 +71,9 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
             ->getMock();
     }
 
+    /**
+     * @return array
+     */
     protected function getExtensions()
     {
         return array_merge(parent::getExtensions(), [new TestFormExtension()]);

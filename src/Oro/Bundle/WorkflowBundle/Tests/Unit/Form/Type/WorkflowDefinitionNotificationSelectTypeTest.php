@@ -74,7 +74,7 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
 
     public function testGetParent()
     {
-        $this->assertEquals('genemu_jqueryselect2_entity', $this->type->getParent());
+        $this->assertEquals('oro_select2_entity', $this->type->getParent());
     }
 
     /**
@@ -115,7 +115,7 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
      */
     protected function getExtensions()
     {
-        $entityType = new EntityType($this->getDefinitions(), 'genemu_jqueryselect2_entity');
+        $entityType = new EntityType($this->getDefinitions(), 'oro_select2_entity');
 
         return [
             new PreloadedExtension([$entityType->getName() => $entityType], [])

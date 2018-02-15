@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -23,7 +24,7 @@ class OroDataAuditBundle implements Migration
         $table->addColumn('logged_at', 'datetime', []);
         $table->addColumn('object_id', 'integer', ['notnull' => false]);
         $table->addColumn('object_class', 'string', ['length' => 255]);
-        $table->addColumn('object_name', 'string', ['length' => 255]);
+        $table->addColumn('object_name', 'string', ['length' => AbstractAudit::OBJECT_NAME_MAX_LENGTH]);
         $table->addColumn('version', 'integer', []);
         $table->addColumn('data', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
