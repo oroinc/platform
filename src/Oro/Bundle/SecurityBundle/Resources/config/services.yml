@@ -624,8 +624,7 @@ services:
           arguments:
               - '@oro_security.request_authorization_checker'
               - '@oro_security.acl_helper'
-          calls:
-              - [setRequest, ["@?request="]]
+              - '@request_stack'
           tags:
               - { name: kernel.event_listener, event: oro_api.request.find.after, method: onFindAfter }
 

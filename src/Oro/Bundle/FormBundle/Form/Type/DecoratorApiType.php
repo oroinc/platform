@@ -5,7 +5,7 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormTypeInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
@@ -58,9 +58,9 @@ class DecoratorApiType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $this->parentType->setDefaultOptions($resolver);
+        $this->parentType->configureOptions($resolver);
 
         $resolver->setDefaults(
             [

@@ -80,7 +80,7 @@ class EmailNotificationType extends AbstractType
 
         $builder->add(
             'event',
-            'genemu_jqueryselect2_entity',
+            'oro_select2_entity',
             [
                 'label'         => 'oro.notification.emailnotification.event.label',
                 'class'         => 'OroNotificationBundle:Event',
@@ -102,7 +102,7 @@ class EmailNotificationType extends AbstractType
 
         $builder->add(
             'template',
-            'genemu_jqueryselect2_translatable_entity',
+            'oro_select2_translatable_entity',
             [
                 'label' => 'oro.notification.emailnotification.template.label',
                 'class' => 'OroEmailBundle:EmailTemplate',

@@ -7,7 +7,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\CallbackTransformer;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 
@@ -29,7 +29,7 @@ class SystemEmailTemplateSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'query_builder' => $this->getRepository()->getSystemTemplatesQueryBuilder(),
@@ -79,7 +79,7 @@ class SystemEmailTemplateSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'genemu_jqueryselect2_translatable_entity';
+        return 'oro_select2_translatable_entity';
     }
 
     /**

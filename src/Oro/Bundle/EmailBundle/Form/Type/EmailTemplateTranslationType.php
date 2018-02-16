@@ -6,7 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
@@ -38,7 +38,7 @@ class EmailTemplateTranslationType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $isWysiwygEnabled = $this->configManager->get('oro_form.wysiwyg_enabled');
 
@@ -77,6 +77,9 @@ class EmailTemplateTranslationType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
         return 'a2lix_translations_gedmo';

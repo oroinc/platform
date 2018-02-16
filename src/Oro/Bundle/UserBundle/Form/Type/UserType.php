@@ -8,7 +8,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -35,19 +35,19 @@ class UserType extends AbstractType
     /**
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param TokenAccessorInterface        $tokenAccessor
-     * @param Request                       $request
+     * @param RequestStack                  $requestStack
      * @param PasswordFieldOptionsProvider  $optionsProvider
      */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
-        Request $request,
+        RequestStack $requestStack,
         PasswordFieldOptionsProvider $optionsProvider
     ) {
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
 
-        $this->isMyProfilePage = $request->attributes->get('_route') === 'oro_user_profile_update';
+        $this->isMyProfilePage = $requestStack->getCurrentRequest()->get('_route') === 'oro_user_profile_update';
         $this->optionsProvider = $optionsProvider;
     }
 

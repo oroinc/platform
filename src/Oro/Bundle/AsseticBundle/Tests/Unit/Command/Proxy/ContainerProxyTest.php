@@ -81,17 +81,12 @@ class ContainerProxyTest extends \PHPUnit_Framework_TestCase
     public function methodProvider()
     {
         return [
-            ['set', ['id', new \stdClass(), ContainerInterface::SCOPE_PROTOTYPE], null],
+            ['set', ['id', new \stdClass(), ContainerInterface::SCOPE_CONTAINER], null],
             ['get', ['id', ContainerInterface::IGNORE_ON_INVALID_REFERENCE], new \stdClass()],
             ['has', ['id'], true],
             ['getParameter', ['name'], 'test'],
             ['hasParameter', ['name'], true],
             ['setParameter', ['name', 'test'], null],
-            ['enterScope', ['name'], null],
-            ['leaveScope', ['name'], null],
-            ['addScope', [$this->createMock('Symfony\Component\DependencyInjection\ScopeInterface')], null],
-            ['hasScope', ['name'], true],
-            ['isScopeActive', ['name'], true],
         ];
     }
 }

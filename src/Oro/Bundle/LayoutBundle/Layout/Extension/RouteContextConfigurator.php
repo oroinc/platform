@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Extension;
 
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Component\Layout\ContextInterface;
@@ -10,17 +10,15 @@ use Oro\Component\Layout\ContextConfiguratorInterface;
 
 class RouteContextConfigurator implements ContextConfiguratorInterface
 {
-    /** @var Request|null */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /**
-     * Synchronized DI method call, sets current request for further usage
-     *
-     * @param Request $request
+     * @param RequestStack $requestStack
      */
-    public function setRequest(Request $request = null)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -34,10 +32,11 @@ class RouteContextConfigurator implements ContextConfiguratorInterface
             ->setDefaults(
                 [
                     'route_name' => function (Options $options, $value) {
-                        if (null === $value && $this->request) {
-                            $value = $this->request->attributes->get('_route');
+                        $request = $this->requestStack->getCurrentRequest();
+                        if (null === $value && $request) {
+                            $value = $request->attributes->get('_route');
                             if (null === $value) {
-                                $value = $this->request->attributes->get('_master_request_route');
+                                $value = $request->attributes->get('_master_request_route');
                             }
                         }
 

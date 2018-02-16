@@ -189,7 +189,7 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->registry->findDataProvider('foo'));
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $name     = 'test';
         /** @var OptionsResolver $resolver */

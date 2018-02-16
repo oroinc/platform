@@ -110,8 +110,6 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_entity.doctrine_helper'
-        calls:
-            - [setRequest, ["@?request="]]
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.entity-relation-grid, method: onBuildBefore }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.entity-relation-grid, method: onBuildAfter }
@@ -412,7 +410,6 @@ services:
 
     oro_entity.manager.entity_field_manager:
         class: %oro_entity.manager.entity_field_manager.class%
-        scope: request
         arguments:
             - '@doctrine'
             - '@oro_entity.form.entity_field.form_builder'
@@ -429,7 +426,6 @@ services:
 
     oro_entity.form.entity_field.handler.base_handler:
         class: %oro_entity.form.entity_field.handler.base_handler.class%
-        scope: request
         arguments:
             - '@doctrine'
             - '@oro_entity.form.entity_field.handler.processor.handler_processor'
@@ -439,7 +435,6 @@ services:
 
     oro_entity.manager.api.entity_data_api_manager:
         class: %oro_entity.manager.api.entity_data_api_manager.class%
-        scope: request
         arguments:
             - '@oro_entity.manager.entity_field_manager'
             - '@security.authorization_checker'

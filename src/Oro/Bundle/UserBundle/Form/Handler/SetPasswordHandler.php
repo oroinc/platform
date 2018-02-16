@@ -6,7 +6,7 @@ use Psr\Log\LoggerInterface;
 
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -26,8 +26,8 @@ class SetPasswordHandler
     /** @var LoggerInterface */
     protected $logger;
 
-    /** @var Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /** @var TranslatorInterface */
     protected $translator;
@@ -46,7 +46,7 @@ class SetPasswordHandler
 
     /**
      * @param LoggerInterface $logger
-     * @param Request $request
+     * @param RequestStack $requestStack
      * @param TranslatorInterface $translator
      * @param FormInterface $form
      * @param Processor $mailerProcessor
@@ -55,7 +55,7 @@ class SetPasswordHandler
      */
     public function __construct(
         LoggerInterface $logger,
-        Request         $request,
+        RequestStack    $requestStack,
         TranslatorInterface $translator,
         FormInterface   $form,
         Processor       $mailerProcessor,
@@ -63,7 +63,7 @@ class SetPasswordHandler
         ValidatorInterface $validator
     ) {
         $this->logger          = $logger;
-        $this->request         = $request;
+        $this->requestStack    = $requestStack;
         $this->translator      = $translator;
         $this->form            = $form;
         $this->mailerProcessor = $mailerProcessor;
@@ -80,8 +80,9 @@ class SetPasswordHandler
      */
     public function process(User $entity)
     {
-        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
-            $this->form->submit($this->request);
+        $request = $this->requestStack->getCurrentRequest();
+        if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
+            $this->form->submit($request);
             if ($this->form->isValid()) {
                 $entity->setPlainPassword($this->form->get('password')->getData());
                 $entity->setPasswordChangedAt(new \DateTime());

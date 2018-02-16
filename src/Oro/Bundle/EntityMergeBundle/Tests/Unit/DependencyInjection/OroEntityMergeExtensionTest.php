@@ -53,8 +53,13 @@ class OroEntityMergeExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider loadServiceDataProvider
+     *
+     * @param string $service
+     * @param string $class
+     * @param array $arguments
+     * @param array $tags
      */
-    public function testLoadServices($service, $class, array $arguments, array $tags, $scope)
+    public function testLoadServices($service, $class, array $arguments, array $tags)
     {
         $this->extension->load(array(), $this->container);
         $definition = $this->container->getDefinition($service);
@@ -64,7 +69,6 @@ class OroEntityMergeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($arguments, $definition->getArguments());
         $this->assertEquals($tags, $definition->getTags());
-        $this->assertEquals($scope, $definition->getScope());
     }
 
     public function loadServiceDataProvider()
@@ -75,7 +79,6 @@ class OroEntityMergeExtensionTest extends \PHPUnit_Framework_TestCase
                 'class'     => '%oro_entity_merge.metadata.factory.class%',
                 'arguments' => array(),
                 'tags'      => array(),
-                'scope'     => 'container'
             ),
             'oro_entity_merge.mass_action.merge' => array(
                 'service'   => 'oro_entity_merge.mass_action.merge',
@@ -89,7 +92,6 @@ class OroEntityMergeExtensionTest extends \PHPUnit_Framework_TestCase
                         array('type' => 'merge')
                     )
                 ),
-                'scope'     => 'prototype'
             ),
         );
     }

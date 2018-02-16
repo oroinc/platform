@@ -92,8 +92,8 @@ define(function(require) {
             it('convert collection to JSON', function() {
                 expect(collection.toJSON()).toEqual({
                     data: [
-                        {type: 'users', id: '1'},
-                        {type: 'users', id: '2'}
+                        {type: 'users', id: '1', attributes: {name: 'John'}},
+                        {type: 'users', id: '2', attributes: {name: 'Jack'}}
                     ]
                 });
             });

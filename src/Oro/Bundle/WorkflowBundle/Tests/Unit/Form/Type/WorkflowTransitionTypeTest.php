@@ -2,13 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -84,7 +81,7 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $this->type->buildForm($builder, $options);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $resolver = new OptionsResolver();
         $resolver->setDefaults(['constraints' => null]);
@@ -92,7 +89,7 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $workflowItem = new WorkflowItem();
         $transitionName = 'TransitionName';
 
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
         $result = $resolver->resolve(
             [
                 'workflow_item' => $workflowItem,

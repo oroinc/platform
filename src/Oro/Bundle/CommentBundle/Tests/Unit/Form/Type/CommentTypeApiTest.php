@@ -3,7 +3,7 @@
 namespace Oro\Bundle\CommentBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -62,10 +62,10 @@ class CommentTypeApiTest extends \PHPUnit_Framework_TestCase
         $formType->buildForm($builder, []);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject | OptionsResolverInterface $resolver */
-        $resolver = $this->createMock('\Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        /** @var \PHPUnit_Framework_MockObject_MockObject | OptionsResolver $resolver */
+        $resolver = $this->createMock('\Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
@@ -75,7 +75,7 @@ class CommentTypeApiTest extends \PHPUnit_Framework_TestCase
             ]);
 
         $formType = new CommentTypeApi($this->configManager);
-        $formType->setDefaultOptions($resolver);
+        $formType->configureOptions($resolver);
     }
 
     public function testReturnFormName()

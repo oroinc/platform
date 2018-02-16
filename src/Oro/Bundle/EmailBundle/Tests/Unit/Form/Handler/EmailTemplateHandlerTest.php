@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Form\Handler\EmailTemplateHandler;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class EmailTemplateHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,6 +46,8 @@ class EmailTemplateHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->request = new Request();
+        $requestStack = new RequestStack();
+        $requestStack->push($this->request);
         $this->manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -53,7 +56,7 @@ class EmailTemplateHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->entity  = new EmailTemplate();
-        $this->handler = new EmailTemplateHandler($this->form, $this->request, $this->manager, $this->translator);
+        $this->handler = new EmailTemplateHandler($this->form, $requestStack, $this->manager, $this->translator);
     }
 
     public function testProcessUnsupportedRequest()

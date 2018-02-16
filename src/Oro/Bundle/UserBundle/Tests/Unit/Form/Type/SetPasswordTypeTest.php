@@ -68,7 +68,7 @@ class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('text', $this->formType->getParent());
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->disableOriginalConstructor()

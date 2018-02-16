@@ -9,7 +9,7 @@ use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 
 class InputTypeTest extends BlockTypeTestCase
 {
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $this->assertEquals(
             [

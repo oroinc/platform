@@ -3,6 +3,8 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\EventListener;
 
 use Knp\Menu\ItemInterface;
+use Knp\Menu\MenuFactory;
+use Knp\Menu\MenuItem;
 
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -96,5 +98,99 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
                 'isGranted' => false,
             ],
         ];
+    }
+
+    public function testOnNavigationConfigureWithoutToken()
+    {
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->willReturn(false);
+
+        $this->authorizationChecker->expects($this->never())
+            ->method('isGranted');
+
+        $factory = new MenuFactory();
+        $menu  = new MenuItem('parent_item', $factory);
+        $menuListItem = new MenuItem('menu_list_default', $factory);
+        $menu->addChild($menuListItem);
+
+        $this->navigationListener->onNavigationConfigure(new ConfigureMenuEvent($factory, $menu));
+
+        $this->assertTrue($menuListItem->isDisplayed());
+    }
+
+    public function testOnNavigationConfigureWhenOroConfigSystemIsNotGnanted()
+    {
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->willReturn(true);
+
+        $this->authorizationChecker->expects($this->any())
+            ->method('isGranted')
+            ->willReturnMap(
+                [
+                    ['oro_config_system', null, false],
+                    ['oro_navigation_manage_menus', null, true]
+                ]
+            );
+
+        $factory     = new MenuFactory();
+        $menu  = new MenuItem('parent_item', $factory);
+        $menuListItem = new MenuItem('menu_list_default', $factory);
+        $menu->addChild($menuListItem);
+
+        $this->navigationListener->onNavigationConfigure(new ConfigureMenuEvent($factory, $menu));
+
+        $this->assertFalse($menuListItem->isDisplayed());
+    }
+
+    public function testOnNavigationConfigureWhenOroNavigationManageMenusIsNotGranted()
+    {
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->willReturn(true);
+
+        $this->authorizationChecker->expects($this->any())
+            ->method('isGranted')
+            ->willReturnMap(
+                [
+                    ['oro_config_system', null, true],
+                    ['oro_navigation_manage_menus', null, false]
+                ]
+            );
+
+        $factory = new MenuFactory();
+        $menu  = new MenuItem('parent_item', $factory);
+        $menuListItem = new MenuItem('menu_list_default', $factory);
+        $menu->addChild($menuListItem);
+
+        $this->navigationListener->onNavigationConfigure(new ConfigureMenuEvent($factory, $menu));
+
+        $this->assertFalse($menuListItem->isDisplayed());
+    }
+
+    public function testOnNavigationConfigureWhenAccessIsGranted()
+    {
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->willReturn(true);
+
+        $this->authorizationChecker->expects($this->any())
+            ->method('isGranted')
+            ->willReturnMap(
+                [
+                    ['oro_config_system', null, true],
+                    ['oro_navigation_manage_menus', null, true]
+                ]
+            );
+
+        $factory = new MenuFactory();
+        $menu  = new MenuItem('parent_item', $factory);
+        $menuListItem = new MenuItem('menu_list_default', $factory);
+        $menu->addChild($menuListItem);
+
+        $this->navigationListener->onNavigationConfigure(new ConfigureMenuEvent($factory, $menu));
+
+        $this->assertTrue($menuListItem->isDisplayed());
     }
 }

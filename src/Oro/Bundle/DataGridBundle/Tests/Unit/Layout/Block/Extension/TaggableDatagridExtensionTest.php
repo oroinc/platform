@@ -29,7 +29,7 @@ class TaggableDatagridExtensionTest extends \PHPUnit_Framework_TestCase
      * @param array $options
      * @param array $expectedOptions
      */
-    public function testSetDefaultOptions(array $options, array $expectedOptions)
+    public function testConfigureOptions(array $options, array $expectedOptions)
     {
         $resolver = new OptionsResolver();
         $this->extension->configureOptions($resolver);

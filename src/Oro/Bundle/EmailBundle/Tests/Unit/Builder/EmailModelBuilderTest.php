@@ -15,6 +15,7 @@ use Oro\Bundle\EmailBundle\Form\Model\Factory;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -120,16 +121,17 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->factory = new Factory();
 
+        $requestStack = new RequestStack();
+        $requestStack->push($this->request);
         $this->emailModelBuilder = new EmailModelBuilder(
             $this->helper,
             $this->entityManager,
             $this->configManager,
             $this->activityListProvider,
             $this->emailAttachmentProvider,
-            $this->factory
+            $this->factory,
+            $requestStack
         );
-
-        $this->emailModelBuilder->setRequest($this->request);
     }
 
     /**
@@ -178,16 +180,17 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             $this->request->query->set('subject', $subject);
         }
 
+        $requestStack = new RequestStack();
+        $requestStack->push($this->request);
         $this->emailModelBuilder = new EmailModelBuilder(
             $this->helper,
             $this->entityManager,
             $this->configManager,
             $this->activityListProvider,
             $this->emailAttachmentProvider,
-            $this->factory
+            $this->factory,
+            $requestStack
         );
-
-        $this->emailModelBuilder->setRequest($this->request);
 
         $this->helper->expects($this->exactly($helperDecodeClassNameCalls))
             ->method('decodeClassName')

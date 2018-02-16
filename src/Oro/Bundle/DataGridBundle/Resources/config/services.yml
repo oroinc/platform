@@ -51,6 +51,8 @@ services:
 
     oro_datagrid.datagrid.name_strategy:
         class: %oro_datagrid.datagrid.name_strategy.class%
+        arguments:
+            - '@request_stack'
 
     oro_datagrid.datagrid.manager.link:
         tags:
@@ -72,8 +74,7 @@ services:
         class: %oro_datagrid.datagrid.request_parameters_factory.class%
         arguments:
             - %oro_datagrid.datagrid.parameters.class%
-        calls:
-            - [setRequest, ["@?request="]]
+            - '@request_stack'
 
     oro_datagrid.datagrid.guesser:
         class: %oro_datagrid.datagrid.guesser.class%
@@ -196,9 +197,8 @@ services:
             - '@oro_datagrid.grid_view.manager'
 
     oro_datagrid.form.grid_view.api:
-        class:                        Symfony\Component\Form\Form
-        factory_method:               createNamed
-        factory_service:              form.factory
+        class: Symfony\Component\Form\Form
+        factory: ['@form.factory', createNamed]
         arguments:
             - ~
             - oro_datagrid_grid_view
@@ -207,11 +207,10 @@ services:
         class: %oro_datagrid.grid_view.form.handler.api.class%
         arguments:
             - '@oro_datagrid.form.grid_view.api'
-            - '@request'
+            - '@request_stack'
             - '@doctrine'
             - '@oro_datagrid.grid_view.manager'
             - '@security.token_storage'
-        scope: request
 
     oro_datagrid.datagrid.inline_edit_column_options_guesser:
         class: %oro_datagrid.datagrid.inline_edit_column_options_guesser.class%

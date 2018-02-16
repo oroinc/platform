@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorChain;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 use Oro\Bundle\SyncBundle\Content\TopicSender;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class TopicSenderTest extends \PHPUnit_Framework_TestCase
 {

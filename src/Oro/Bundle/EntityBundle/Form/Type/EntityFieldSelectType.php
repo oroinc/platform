@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -49,7 +49,7 @@ class EntityFieldSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $that = $this;
 
@@ -209,7 +209,7 @@ class EntityFieldSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'genemu_jqueryselect2_hidden';
+        return 'oro_select2_hidden';
     }
 
     /**

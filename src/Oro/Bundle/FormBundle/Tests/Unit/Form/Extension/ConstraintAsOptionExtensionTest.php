@@ -25,7 +25,7 @@ class ConstraintAsOptionExtensionTest extends \PHPUnit_Framework_TestCase
         unset($this->extension);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $constraintOptions = array(
             new NotBlank(),
@@ -41,7 +41,7 @@ class ConstraintAsOptionExtensionTest extends \PHPUnit_Framework_TestCase
         $resolver = new OptionsResolver();
         $resolver->setDefaults(array('constraints' => array()));
 
-        $this->extension->setDefaultOptions($resolver);
+        $this->extension->configureOptions($resolver);
         $actualOptions = $resolver->resolve(array('constraints' => $constraintOptions));
 
         $this->assertArrayHasKey('constraints', $actualOptions);

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Extension;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\UIBundle\Layout\Extension\IsMobileContextConfigurator;
 use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
@@ -40,8 +40,8 @@ class IsMobileContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 
     public function testConfigureContext()
     {
-        /** @var OptionsResolverInterface|\PHPUnit_Framework_MockObject_MockObject $optionResolver */
-        $optionResolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $optionResolver */
+        $optionResolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $optionResolver->expects($this->once())
             ->method('setRequired')
             ->with(['is_mobile'])

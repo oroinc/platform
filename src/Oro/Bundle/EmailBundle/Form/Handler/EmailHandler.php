@@ -3,15 +3,11 @@
 namespace Oro\Bundle\EmailBundle\Form\Handler;
 
 use Psr\Log\LoggerInterface;
-
-use Doctrine\Bundle\DoctrineBundle\Registry;
-
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class EmailHandler
 {
@@ -21,9 +17,9 @@ class EmailHandler
     protected $form;
 
     /**
-     * @var Request
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * @var Processor
@@ -37,18 +33,18 @@ class EmailHandler
 
     /**
      * @param FormInterface   $form
-     * @param Request         $request
+     * @param RequestStack    $requestStack
      * @param Processor       $emailProcessor
      * @param LoggerInterface $logger
      */
     public function __construct(
         FormInterface $form,
-        Request $request,
+        RequestStack $requestStack,
         Processor $emailProcessor,
         LoggerInterface $logger
     ) {
         $this->form                = $form;
-        $this->request             = $request;
+        $this->requestStack        = $requestStack;
         $this->emailProcessor      = $emailProcessor;
         $this->logger              = $logger;
     }
@@ -63,8 +59,9 @@ class EmailHandler
     {
         $this->form->setData($model);
 
-        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
-            $this->form->submit($this->request);
+        $request = $this->requestStack->getCurrentRequest();
+        if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
+            $this->form->submit($request);
 
             if ($this->form->isValid()) {
                 try {
