@@ -24,8 +24,39 @@ $ php app/console oro:install
 
 ## Events ##
 To add additional actions to the installation process you may use event listeners.
-Currently only "onFinish" installer event dispatched.
+Currently, there are three events dispatched:
 
+#### `installer.database_preparation.before`
+#### `installer.database_preparation.after`
+Dispatched right before and after all database manipulation (creating table structure, executing migrations, loading demo-data (if set), etc.).
+This events can be used to modify database or execute some some service commands to prepare database for usage.
+Use next sample code to subscribe on this events:
+``` yaml
+services:
+    installer.listener.database_preparation.after.event:
+        class:  Acme\Bundle\MyBundle\EventListener\MyListener
+        tags:
+            - { name: kernel.event_listener, event: installer.database_preparation.after, method: onAfterDatabasePreparation }
+```
+
+``` php
+<?php
+
+namespace Acme\Bundle\MyBundle\EventListener;
+
+use Oro\Bundle\InstallerBundle\InstallerEvent
+
+class MyListener
+{
+    public function onAfterDatabasePreparation(InstallerEvent $event)
+    {
+        // do something
+    }
+}
+```
+
+#### `installer.finish`
+Dispatched when the installation is finished.
 Example:
 
 ``` yaml
