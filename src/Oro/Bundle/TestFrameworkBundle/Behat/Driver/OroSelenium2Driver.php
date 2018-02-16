@@ -69,12 +69,14 @@ class OroSelenium2Driver extends Selenium2Driver
             if ('text' === $element->attribute('type')) {
                 $this->setTextInputElement($element, $value);
                 $this->triggerEvent($xpath, 'keyup');
+                $this->triggerEvent($xpath, 'change');
 
                 return;
             }
         } elseif ('textarea' === $elementName && 'true' === $element->attribute('aria-hidden')) {
             $this->fillTinyMce($element, $value);
             $this->triggerEvent($xpath, 'keyup');
+            $this->triggerEvent($xpath, 'change');
 
             return;
         }
