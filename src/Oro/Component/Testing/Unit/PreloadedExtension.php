@@ -11,6 +11,9 @@ use Symfony\Component\Form\PreloadedExtension as BasePreloadExtension;
  */
 class PreloadedExtension extends BasePreloadExtension
 {
+    /**
+     * @var array
+     */
     private $types = [];
 
     /**
