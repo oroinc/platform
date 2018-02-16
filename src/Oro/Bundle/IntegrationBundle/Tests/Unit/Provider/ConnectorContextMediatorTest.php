@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class ConnectorContextMediatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,7 +41,7 @@ class ConnectorContextMediatorTest extends \PHPUnit_Framework_TestCase
         $registry = $this->createMock('Symfony\Bridge\Doctrine\RegistryInterface');
         $registry->expects($this->any())->method('getManager')
             ->will($this->returnValue($em));
-        $link =new ServiceLink($container, $proxiedServiceID);
+        $link = new ServiceLink($container, $proxiedServiceID);
 
         $this->contextMediator = new ConnectorContextMediator($link, $registry);
     }

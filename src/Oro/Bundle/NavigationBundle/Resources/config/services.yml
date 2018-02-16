@@ -333,10 +333,9 @@ services:
             - { name: translation.extractor, alias: navigation_translation_extractor }
 
     oro_navigation.form.pagestate:
-        class:                        Symfony\Component\Form\Form
-        factory_method:               createNamed
-        factory_service:              form.factory
-        arguments:                    ["pagestate", "pagestate", null]
+        class: Symfony\Component\Form\Form
+        factory: ['@form.factory', createNamed]
+        arguments: ["pagestate", "pagestate", null]
 
     oro_navigation.form.type.pagestate:
         class:                        %oro_navigation.form.type.pagestate.class%
@@ -355,10 +354,9 @@ services:
 
     oro_navigation.form.handler.pagestate:
         class: %oro_navigation.form.handler.pagestate.class%
-        scope: request
         arguments:
             - "@oro_navigation.form.pagestate"
-            - "@request"
+            - "@request_stack"
             - "@doctrine.orm.entity_manager"
             - "@security.token_storage"
 
@@ -493,7 +491,6 @@ services:
 
     oro_navigation.data_provider.title:
         class: Oro\Bundle\NavigationBundle\Layout\DataProvider\NavigationTitleProvider
-        scope: request
         arguments:
           - '@oro_navigation.title_service'
           - '@oro_config.user'

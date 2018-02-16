@@ -48,14 +48,6 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function setDefaultOptionsDataProvider()
-    {
-        $this->markTestSkipped('setDefaultOptions is deprecated.');
-    }
-
-    /**
      * @return OptionsResolver|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function createMockOptionsResolver()
@@ -64,24 +56,9 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
     }
 
     /**
-     * @dataProvider configureOptionsProvider
-     * @param array $defaultOptions
-     */
-    public function testConfigureOptions(array $defaultOptions)
-    {
-        $resolver = $this->createMockOptionsResolver();
-
-        if ($defaultOptions) {
-            $resolver->expects($this->once())->method('setDefaults')->with($defaultOptions)->will($this->returnSelf());
-        }
-
-        $this->getTestFormType()->configureOptions($resolver);
-    }
-
-    /**
      * @return array
      */
-    public function configureOptionsProvider()
+    public function configureOptionsDataProvider()
     {
         return [
             [

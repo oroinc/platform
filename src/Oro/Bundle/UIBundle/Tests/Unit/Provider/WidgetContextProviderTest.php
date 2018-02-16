@@ -5,15 +5,20 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\UIBundle\Provider\WidgetContextProvider;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class WidgetContextProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var WidgetContextProvider */
     protected $provider;
 
+    /** @var RequestStack */
+    protected $requestStack;
+
     protected function setUp()
     {
-        $this->provider = new WidgetContextProvider();
+        $this->requestStack = new RequestStack();
+        $this->provider = new WidgetContextProvider($this->requestStack);
     }
 
     protected function tearDown()
@@ -29,7 +34,9 @@ class WidgetContextProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsActive($expectedValue, Request $request = null)
     {
-        $this->provider->setRequest($request);
+        if ($request) {
+            $this->requestStack->push($request);
+        }
 
         $this->assertSame($expectedValue, $this->provider->isActive());
     }
@@ -63,7 +70,9 @@ class WidgetContextProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetWid($expectedValue, Request $request = null)
     {
-        $this->provider->setRequest($request);
+        if ($request) {
+            $this->requestStack->push($request);
+        }
 
         $this->assertSame($expectedValue, $this->provider->getWid());
     }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Provider;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class EntityNameResolver
 {
@@ -101,6 +102,7 @@ class EntityNameResolver
      */
     public function getNameDQL($className, $alias, $format = null, $locale = null)
     {
+        QueryBuilderUtil::checkIdentifier($alias);
         $result = null;
 
         $formats   = $this->getFormatConfig($format ?: $this->defaultFormat);

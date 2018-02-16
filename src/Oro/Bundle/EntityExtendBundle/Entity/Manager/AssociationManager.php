@@ -11,11 +11,11 @@ use Oro\Bundle\EntityBundle\ORM\UnionQueryBuilder;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class AssociationManager
@@ -257,22 +257,23 @@ class AssociationManager
         $targetFieldName
     ) {
         $targetAlias = 'target';
-
-        return $this->doctrineHelper->getEntityManagerForClass($associationOwnerClass)
+        $qb = $this->doctrineHelper->getEntityManagerForClass($associationOwnerClass)
             ->getRepository($associationOwnerClass)
-            ->createQueryBuilder('e')
-            ->select(
-                sprintf(
-                    'e.id AS id, target.%s AS entityId, \'%s\' AS entityClass, %s AS entityTitle',
-                    $this->doctrineHelper->getSingleEntityIdentifierFieldName($targetEntityClass),
-                    $targetEntityClass,
-                    $this->entityNameResolver->prepareNameDQL(
-                        $this->entityNameResolver->getNameDQL($targetEntityClass, $targetAlias),
-                        true
-                    )
-                )
-            )
-            ->innerJoin('e.' . $targetFieldName, $targetAlias);
+            ->createQueryBuilder('e');
+
+        return $qb->select(
+            'e.id AS id',
+            sprintf(
+                'target.%s AS entityId',
+                $this->doctrineHelper->getSingleEntityIdentifierFieldName($targetEntityClass)
+            ),
+            (string)$qb->expr()->literal($targetEntityClass) . ' AS entityClass',
+            $this->entityNameResolver->prepareNameDQL(
+                $this->entityNameResolver->getNameDQL($targetEntityClass, $targetAlias),
+                true
+            ) . '  AS entityTitle'
+        )
+        ->innerJoin(QueryBuilderUtil::getField('e', $targetFieldName), $targetAlias);
     }
 
     /**
@@ -382,21 +383,21 @@ class AssociationManager
         $ownerFieldName,
         $targetIdFieldName
     ) {
-        return $this->doctrineHelper->getEntityManagerForClass($associationOwnerClass)
+        $qb = $this->doctrineHelper->getEntityManagerForClass($associationOwnerClass)
             ->getRepository($associationOwnerClass)
-            ->createQueryBuilder('e')
+            ->createQueryBuilder('e');
+
+        return $qb
             ->select(
-                sprintf(
-                    'target.%s AS id, e.id AS entityId, \'%s\' AS entityClass, %s AS entityTitle',
-                    $targetIdFieldName,
-                    $associationOwnerClass,
-                    $this->entityNameResolver->prepareNameDQL(
-                        $this->entityNameResolver->getNameDQL($associationOwnerClass, 'e'),
-                        true
-                    )
-                )
+                QueryBuilderUtil::sprintf('target.%s AS id', $targetIdFieldName),
+                'e.id AS entityId',
+                (string)$qb->expr()->literal($associationOwnerClass) . ' AS entityClass',
+                $this->entityNameResolver->prepareNameDQL(
+                    $this->entityNameResolver->getNameDQL($associationOwnerClass, 'e'),
+                    true
+                ) . ' AS entityTitle'
             )
-            ->innerJoin('e.' . $ownerFieldName, 'target');
+            ->innerJoin(QueryBuilderUtil::getField('e', $ownerFieldName), 'target');
     }
 
     /**

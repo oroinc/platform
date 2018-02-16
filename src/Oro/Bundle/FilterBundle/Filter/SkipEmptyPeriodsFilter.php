@@ -34,7 +34,7 @@ class SkipEmptyPeriodsFilter extends ChoiceFilter
             $value = (bool)reset($data['value']);
         }
 
-        $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
+        $fieldName = $this->getDataFieldName();
 
         /** @var OrmFilterDatasourceAdapter $ds */
         if ($value) {

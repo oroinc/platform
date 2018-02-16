@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Query;
 
-use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 

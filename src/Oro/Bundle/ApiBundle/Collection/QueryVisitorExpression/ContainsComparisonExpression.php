@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression;
 use Doctrine\Common\Collections\Expr\Comparison;
 
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Represents LIKE comparison expression.
@@ -20,6 +21,9 @@ class ContainsComparisonExpression implements ComparisonExpressionInterface
         $fieldName,
         $parameterName
     ) {
+        QueryBuilderUtil::checkIdentifier($parameterName);
+        QueryBuilderUtil::checkField($fieldName);
+
         // set parameter
         $parameter = $visitor->createParameter($parameterName, $visitor->walkValue($comparison->getValue()));
         $parameter->setValue('%' . $parameter->getValue() . '%', $parameter->getType());

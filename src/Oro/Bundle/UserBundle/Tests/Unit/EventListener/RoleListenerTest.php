@@ -4,9 +4,9 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\EventListener\RoleListener;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class RoleListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,10 +22,7 @@ class RoleListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->serviceLink = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->serviceLink = $this->createMock(ServiceLink::class);
 
         $this->listener = new RoleListener($this->serviceLink);
     }

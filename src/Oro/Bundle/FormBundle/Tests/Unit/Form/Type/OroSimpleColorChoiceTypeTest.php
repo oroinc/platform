@@ -29,10 +29,10 @@ class OroSimpleColorChoiceTypeTest extends FormIntegrationTestCase
         $this->formType = new OroSimpleColorChoiceType($configManager);
     }
 
-    public function testSetDefaultOptionsWithCustomColorSchema()
+    public function testConfigureOptionsWithCustomColorSchema()
     {
         $resolver = $this->getOptionsResolver();
-        $this->formType->setDefaultOptions($resolver);
+        $this->formType->configureOptions($resolver);
 
         $options = [
             'color_schema'  => 'custom',
@@ -62,10 +62,10 @@ class OroSimpleColorChoiceTypeTest extends FormIntegrationTestCase
         );
     }
 
-    public function testSetDefaultOptionsWithStoredColorSchema()
+    public function testConfigureOptionsWithStoredColorSchema()
     {
         $resolver = $this->getOptionsResolver();
-        $this->formType->setDefaultOptions($resolver);
+        $this->formType->configureOptions($resolver);
 
         $options = [
             'color_schema' => 'stored',
@@ -93,8 +93,10 @@ class OroSimpleColorChoiceTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider buildViewDataProvider
+     * @param array $options
+     * @param array $expectedVars
      */
-    public function testBuildView($options, $expectedVars)
+    public function testBuildView(array $options, array $expectedVars)
     {
         $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $view = new FormView();
@@ -121,6 +123,9 @@ class OroSimpleColorChoiceTypeTest extends FormIntegrationTestCase
         $this->assertEquals('oro_simple_color_choice', $this->formType->getName());
     }
 
+    /**
+     * @return array
+     */
     public function buildViewDataProvider()
     {
         return [

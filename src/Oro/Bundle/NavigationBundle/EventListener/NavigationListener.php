@@ -38,7 +38,11 @@ class NavigationListener
         }
 
         $manageMenusItem = MenuUpdateUtils::findMenuItem($event->getMenu(), 'menu_list_default');
-        if (null !== $manageMenusItem && !$this->authorizationChecker->isGranted('oro_config_system')) {
+        if (null !== $manageMenusItem
+            && (!$this->authorizationChecker->isGranted('oro_config_system')
+                || !$this->authorizationChecker->isGranted('oro_navigation_manage_menus')
+            )
+        ) {
             $manageMenusItem->setDisplay(false);
         }
     }

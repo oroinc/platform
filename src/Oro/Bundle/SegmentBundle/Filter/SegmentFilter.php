@@ -174,7 +174,7 @@ class SegmentFilter extends EntityFilter
 
         /**@var OrmExpressionBuilder $expressionBuilder */
         $expressionBuilder = $ds->expr();
-        $expr = $expressionBuilder->in($this->get(FilterUtility::DATA_NAME_KEY), $subQuery);
+        $expr = $expressionBuilder->in($this->getDataFieldName(), $subQuery);
 
         $this->applyFilterToClause($ds, $expr);
 

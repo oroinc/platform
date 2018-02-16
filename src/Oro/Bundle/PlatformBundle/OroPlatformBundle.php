@@ -19,6 +19,7 @@ use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\OptionalListenersComp
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineConfigurationPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineEventHandlersPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UndoLazyEntityManagerPass;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class OroPlatformBundle extends Bundle
 {
@@ -32,11 +33,10 @@ class OroPlatformBundle extends Bundle
     {
         $container->addCompilerPass(new LazyServicesCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new OptionalListenersCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
-        // @todo: Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink is used to avoid BC break
         $container->addCompilerPass(
             new ServiceLinkCompilerPass(
                 'oro_service_link',
-                'Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink'
+                ServiceLink::class
             )
         );
         $container->addCompilerPass(new UpdateDoctrineConfigurationPass());

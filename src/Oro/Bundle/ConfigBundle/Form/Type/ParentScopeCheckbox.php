@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ConfigBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ParentScopeCheckbox extends AbstractType
 {
@@ -28,7 +28,7 @@ class ParentScopeCheckbox extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(['required' => false, 'label' => 'oro.config.system_configuration.use_default']);
     }

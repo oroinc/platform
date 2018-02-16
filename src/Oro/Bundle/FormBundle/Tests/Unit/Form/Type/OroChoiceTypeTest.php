@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
@@ -27,7 +27,7 @@ class OroChoiceTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('genemu_jqueryselect2_choice', $this->formType->getParent());
+        $this->assertEquals('oro_select2_choice', $this->formType->getParent());
     }
 
     /**
@@ -83,7 +83,10 @@ class OroChoiceTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    'genemu_jqueryselect2_choice' => new Select2Type('choice')
+                    'oro_select2_choice' => new Select2Type(
+                        'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+                        'oro_select2_choice'
+                    )
                 ],
                 []
             )

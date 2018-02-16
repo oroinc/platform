@@ -104,6 +104,9 @@ services:
     oro_datagrid.extension.mass_action.iterable_result_factory.alias:
         alias: oro_datagrid.extension.mass_action.iterable_result_factory
 
+    twig.form.renderer.alias:
+        alias: twig.form.renderer
+
     # Consumer services
     oro_test.async.change_config:
         class: 'Oro\Bundle\TestFrameworkBundle\Async\ChangeConfigProcessor'

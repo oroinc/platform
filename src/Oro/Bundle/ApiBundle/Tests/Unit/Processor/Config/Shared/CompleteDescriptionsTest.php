@@ -28,23 +28,23 @@ use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
  */
 class CompleteDescriptionsTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityDocProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityDescriptionProvider */
+    private $entityDocProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $resourceDocProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourceDocProviderInterface */
+    private $resourceDocProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $apiDocParser;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|MarkdownApiDocParser */
+    private $apiDocParser;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $translator;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    private $translator;
 
     /** @var ConfigProviderMock */
-    protected $ownershipConfigProvider;
+    private $ownershipConfigProvider;
 
     /** @var CompleteDescriptions */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -54,14 +54,10 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->resourceDocProvider = $this->createMock(ResourceDocProviderInterface::class);
-        $this->apiDocParser = $this->getMockBuilder(MarkdownApiDocParser::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->apiDocParser = $this->createMock(MarkdownApiDocParser::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
 
-        $configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
         $this->ownershipConfigProvider = new ConfigProviderMock($configManager, 'ownership');
 
         $this->processor = new CompleteDescriptions(
@@ -1447,10 +1443,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $this->context->setFilters($filters);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
-            'JSON API',
-            $filter1->getDescription()
-        );
+        self::assertEquals('JSON API', $filter1->getDescription());
     }
 
     public function testPrimaryResourceDescriptionWhenItExistsInConfig()
@@ -1927,5 +1920,94 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             ],
             $this->context->getResult()
         );
+    }
+
+    /**
+     * @dataProvider preventingDoubleParagraphTagWhenInheritDocPlaceholderIsReplacedWithInheritedTextProvider
+     */
+    public function testPreventingDoubleParagraphTagWhenInheritDocPlaceholderIsReplacedWithInheritedText(
+        $mainText,
+        $inheritDocText,
+        $expectedText
+    ) {
+        $entityClass = 'Test\Entity';
+        $config = [
+            'exclusion_policy' => 'all',
+            'documentation'    => $mainText
+        ];
+
+        $this->entityDocProvider->expects(self::once())
+            ->method('getEntityDocumentation')
+            ->with($entityClass)
+            ->willReturn($inheritDocText);
+
+        $this->context->setClassName($entityClass);
+        $this->context->setTargetAction('get_list');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'documentation'    => $expectedText
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function preventingDoubleParagraphTagWhenInheritDocPlaceholderIsReplacedWithInheritedTextProvider()
+    {
+        return [
+            'no paragraph tag'                                   => [
+                'pre {@inheritdoc} post',
+                'injection',
+                'pre injection post'
+            ],
+            'null in inheritdoc text'                            => [
+                'pre {@inheritdoc} post',
+                null,
+                'pre  post'
+            ],
+            'paragraph tag in main text'                         => [
+                '<p>pre</p><p>{@inheritdoc}</p><p>post</p>',
+                'injection',
+                '<p>pre</p><p>injection</p><p>post</p>'
+            ],
+            'paragraph tag in inheritdoc text'                   => [
+                'pre {@inheritdoc} post',
+                '<p>injection</p>',
+                'pre injection post'
+            ],
+            'paragraph tag in both main and inheritdoc texts'    => [
+                '<p>pre</p><p>{@inheritdoc}</p><p>post</p>',
+                '<p>injection</p>',
+                '<p>pre</p><p>injection</p><p>post</p>'
+            ],
+            'several paragraph tags in inheritdoc text'          => [
+                '<p>pre</p><p>{@inheritdoc}</p><p>post</p>',
+                '<p>injection</p><p>text</p>',
+                '<p>pre</p><p>injection</p><p>text</p><p>post</p>'
+            ],
+            'paragraph tag in begin of inheritdoc text'          => [
+                '<p>pre</p><p>{@inheritdoc}</p><p>post</p>',
+                '<p>injection</p><b>text</b>',
+                '<p>pre</p><p>injection</p><b>text</b><p>post</p>'
+            ],
+            'paragraph tag in end of inheritdoc text'            => [
+                '<p>pre</p><p>{@inheritdoc}</p><p>post</p>',
+                '<b>injection</b><p>text</p>',
+                '<p>pre</p><b>injection</b><p>text</p><p>post</p>'
+            ],
+            'paragraph tag in middle of inheritdoc text'         => [
+                '<p>pre</p><p>{@inheritdoc}</p><p>post</p>',
+                '<b>some</b><p>injection</p><b>text</b>',
+                '<p>pre</p><b>some</b><p>injection</p><b>text</b><p>post</p>'
+            ],
+            'paragraph tags in begin and end of inheritdoc text' => [
+                '<p>pre</p><p>{@inheritdoc}</p><p>post</p>',
+                '<p>some</p><b>injection</b><p>text</p>',
+                '<p>pre</p><p>some</p><b>injection</b><p>text</p><p>post</p>'
+            ],
+        ];
     }
 }

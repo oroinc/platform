@@ -3,15 +3,18 @@
 namespace Oro\Bundle\EntityConfigBundle\Form\Extension;
 
 use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 
 class ConfigExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
-    
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
     {
         // config_is_new is true if a new entity or field is created
         // note that this option is false if entity or field is edited even if its state is New

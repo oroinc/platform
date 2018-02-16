@@ -7,6 +7,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -24,19 +25,19 @@ class ActivityEntityApiHandler extends ApiFormHandler
 
     /**
      * @param FormInterface                 $form
-     * @param Request                       $request
+     * @param RequestStack                  $requestStack
      * @param ObjectManager                 $entityManager
      * @param ActivityManager               $activityManager
      * @param AuthorizationCheckerInterface $authorizationChecker
      */
     public function __construct(
         FormInterface $form,
-        Request $request,
+        RequestStack $requestStack,
         ObjectManager $entityManager,
         ActivityManager $activityManager,
         AuthorizationCheckerInterface $authorizationChecker
     ) {
-        parent::__construct($form, $request, $entityManager);
+        parent::__construct($form, $requestStack, $entityManager);
         $this->activityManager = $activityManager;
         $this->authorizationChecker = $authorizationChecker;
     }

@@ -17,7 +17,7 @@ services:
 
     oro_chart.view_builder:
         class: %oro_chart.view_builder.class%
-        scope: prototype
+        shared: false
         arguments:
             - '@oro_chart.config_provider'
             - '@oro_chart.data_transformer.factory'

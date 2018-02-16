@@ -49,12 +49,4 @@ class PrepareResultItemEvent extends Event
     {
         return $this->entityObject;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::EVENT_NAME;
-    }
 }

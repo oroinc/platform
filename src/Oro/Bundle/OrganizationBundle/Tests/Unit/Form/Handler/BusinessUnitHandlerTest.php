@@ -9,6 +9,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class BusinessUnitHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -43,12 +44,14 @@ class BusinessUnitHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->request = new Request();
+        $requestStack = new RequestStack();
+        $requestStack->push($this->request);
         $this->form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->entity  = new BusinessUnit();
-        $this->handler = new BusinessUnitHandler($this->form, $this->request, $this->manager);
+        $this->handler = new BusinessUnitHandler($this->form, $requestStack, $this->manager);
     }
 
     public function testProcessValidData()

@@ -42,6 +42,9 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         parent::setUp();
     }
 
+    /**
+     * @param AbstractEnumType $type
+     */
     public function doTestBuildForm(AbstractEnumType $type)
     {
         $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
@@ -53,6 +56,9 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $type->buildForm($builder, []);
     }
 
+    /**
+     * @param AbstractEnumType $type
+     */
     public function doTestPreSetDataForExistingEntity(AbstractEnumType $type)
     {
         $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
@@ -76,6 +82,9 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $type->preSetData($event);
     }
 
+    /**
+     * @param AbstractEnumType $type
+     */
     public function doTestPreSetDataForNullEntity(AbstractEnumType $type)
     {
         $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
@@ -97,6 +106,9 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $type->preSetData($event);
     }
 
+    /**
+     * @param AbstractEnumType $type
+     */
     public function doTestPreSetDataForFormWithoutDataClass(AbstractEnumType $type)
     {
         $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
@@ -117,6 +129,9 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $type->preSetData($event);
     }
 
+    /**
+     * @param AbstractEnumType $type
+     */
     public function doTestPreSetDataForNewEntityKeepExistingValue(AbstractEnumType $type)
     {
         $enumValueClassName = TestEnumValue::class;
@@ -160,6 +175,9 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $type->preSetData($event);
     }
 
+    /**
+     * @param AbstractEnumType $type
+     */
     public function doTestPreSetDataForNewEntity(AbstractEnumType $type)
     {
         $enumValueClassName = 'Test\EnumValue';
@@ -202,6 +220,9 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $type->preSetData($event);
     }
 
+    /**
+     * @param AbstractEnumType $type
+     */
     public function doTestPreSetDataForNewEntityWithMultiEnum(AbstractEnumType $type)
     {
         $enumValueClassName = 'Test\EnumValue';
@@ -250,7 +271,16 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $type->preSetData($event);
     }
 
-    protected function doTestSetDefaultOptions(
+    /**
+     * @param AbstractEnumType $type
+     * @param OptionsResolver $resolver
+     * @param $enumCode
+     * @param bool $multiple
+     * @param bool $expanded
+     * @param array $options
+     * @return array
+     */
+    protected function doTestConfigureOptions(
         AbstractEnumType $type,
         OptionsResolver $resolver,
         $enumCode,
@@ -276,7 +306,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
             ->with($enumValueClassName)
             ->will($this->returnValue($enumConfig));
 
-        $type->setDefaultOptions($resolver);
+        $type->configureOptions($resolver);
 
         $resolvedOptions = $resolver->resolve(
             array_merge(

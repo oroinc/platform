@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Command;
 
 use ProxyManager\Proxy\VirtualProxyInterface;
 
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,8 +13,10 @@ use Symfony\Component\Yaml\Yaml;
 
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Config\Config;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -42,7 +45,7 @@ class DumpConfigCommand extends AbstractDebugCommand
             ->setDescription('Dumps entity configuration used in Data API.')
             ->addArgument(
                 'entity',
-                InputArgument::REQUIRED,
+                InputArgument::OPTIONAL,
                 'The entity class name or alias'
             )
             // @todo: API version is not supported for now
@@ -78,6 +81,12 @@ class DumpConfigCommand extends AbstractDebugCommand
                 'The name of action for which the configuration should be displayed.' .
                 'Can be "get", "get_list", "create", "update", "delete", "delete_list", etc.',
                 'get'
+            )
+            ->addOption(
+                'documentation-resources',
+                null,
+                InputOption::VALUE_NONE,
+                'Shows the list of documentation resources'
             );
         parent::configure();
     }
@@ -98,27 +107,38 @@ class DumpConfigCommand extends AbstractDebugCommand
         $processorBag->addApplicableChecker(new Util\RequestTypeApplicableChecker());
 
         $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $version, $requestType);
-
-        switch ($input->getOption('section')) {
-            case 'entities':
+        $isDocumentationResourcesRequested = $input->getOption('documentation-resources');
+        if ($isDocumentationResourcesRequested && !$entityClass) {
+            $entityClasses = $this->getEntityClasses($version, $requestType);
+            foreach ($entityClasses as $entityClass) {
                 $config = $this->getConfig($entityClass, $version, $requestType, $extras);
-                break;
-            case 'relations':
-                $config = $this->getRelationConfig($entityClass, $version, $requestType, $extras);
-                break;
-            default:
-                throw new \InvalidArgumentException(
-                    'The section should be either "entities" or "relations".'
-                );
-        }
-
-        array_walk_recursive(
-            $config,
-            function (&$val) {
-                $val = $this->convertConfigValueToHumanReadableRepresentation($val);
+                $config = $this->getDocumentationResources($config);
+                $this->dumpConfig($output, $config);
             }
-        );
-        $output->write(Yaml::dump($config, 100, 4, true, true));
+        } else {
+            if (!$entityClass) {
+                throw new RuntimeException('The "entity" argument is missing.');
+            }
+
+            switch ($input->getOption('section')) {
+                case 'entities':
+                    $config = $this->getConfig($entityClass, $version, $requestType, $extras);
+                    break;
+                case 'relations':
+                    $config = $this->getRelationConfig($entityClass, $version, $requestType, $extras);
+                    break;
+                default:
+                    throw new \InvalidArgumentException(
+                        'The section should be either "entities" or "relations".'
+                    );
+            }
+
+            if ($isDocumentationResourcesRequested) {
+                $config = $this->getDocumentationResources($config);
+            }
+
+            $this->dumpConfig($output, $config);
+        }
     }
 
     /**
@@ -211,6 +231,26 @@ class DumpConfigCommand extends AbstractDebugCommand
     }
 
     /**
+     * @param string      $version
+     * @param RequestType $requestType
+     *
+     * @return array
+     */
+    protected function getEntityClasses($version, RequestType $requestType)
+    {
+        /** @var ResourcesProvider $resourcesProvider */
+        $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
+        $resources = $resourcesProvider->getResources($version, $requestType);
+        $entityClasses = [];
+        foreach ($resources as $resource) {
+            $entityClasses[] = $resource->getEntityClass();
+        }
+        sort($entityClasses);
+
+        return $entityClasses;
+    }
+
+    /**
      * @param Config $config
      *
      * @return array
@@ -277,5 +317,42 @@ class DumpConfigCommand extends AbstractDebugCommand
         }
 
         return $val;
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param array           $config
+     */
+    private function dumpConfig(OutputInterface $output, array $config)
+    {
+        array_walk_recursive(
+            $config,
+            function (&$val) {
+                $val = $this->convertConfigValueToHumanReadableRepresentation($val);
+            }
+        );
+        $output->write(Yaml::dump($config, 100, 4, true, true));
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return array
+     */
+    private function getDocumentationResources(array $config)
+    {
+        $keys = array_keys($config);
+        $entityClass = reset($keys);
+        $config = $config[$entityClass];
+        $documentationResource = [];
+        if (array_key_exists(EntityDefinitionConfig::DOCUMENTATION_RESOURCE, $config)) {
+            $documentationResource = $config[EntityDefinitionConfig::DOCUMENTATION_RESOURCE];
+        }
+
+        return [
+            $entityClass => [
+                EntityDefinitionConfig::DOCUMENTATION_RESOURCE => $documentationResource
+            ]
+        ];
     }
 }

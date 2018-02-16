@@ -12,7 +12,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -185,9 +184,9 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    protected function setConfigsNormalizer(OptionsResolverInterface $resolver)
+    protected function setConfigsNormalizer(OptionsResolver $resolver)
     {
         $resolver->setNormalizers(
             [

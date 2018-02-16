@@ -81,7 +81,6 @@ class KernerProxyTest extends \PHPUnit_Framework_TestCase
             ['boot', [], null],
             ['shutdown', [], null],
             ['getBundles', [], []],
-            ['isClassInActiveBundle', ['class'], true],
             ['getBundle', ['name', false], $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface')],
             ['locateResource', ['name', 'dir', false], 'test'],
             ['getName', [], 'test'],

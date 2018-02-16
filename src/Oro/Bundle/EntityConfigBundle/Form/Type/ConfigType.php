@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -119,7 +119,7 @@ class ConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(array('config_model'));
 
@@ -160,6 +160,9 @@ class ConfigType extends AbstractType
         return $result;
     }
 
+    /**
+     * @param array $config
+     */
     protected function applyFormBlockConfigTranslations(array &$config)
     {
         foreach ($config as $key => &$val) {

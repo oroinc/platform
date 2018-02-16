@@ -12,6 +12,7 @@ class DataBlockExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var  DataBlockExtension */
     private $formExtension;
 
+    /** @var array */
     private $options = array('block' => 1, 'subblock' => 1, 'block_config' => 1, 'tooltip' => 1);
 
     protected function setUp()
@@ -19,11 +20,11 @@ class DataBlockExtensionTest extends \PHPUnit_Framework_TestCase
         $this->formExtension = new DataBlockExtension();
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         /** @var OptionsResolver $resolver */
         $resolver = new OptionsResolver();
-        $this->formExtension->setDefaultOptions($resolver);
+        $this->formExtension->configureOptions($resolver);
 
         $this->assertEquals(
             [],

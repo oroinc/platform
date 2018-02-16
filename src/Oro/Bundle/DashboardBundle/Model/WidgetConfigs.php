@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DashboardBundle\Entity\Widget;
@@ -26,8 +27,8 @@ class WidgetConfigs
     /** @var EntityManagerInterface */
     protected $entityManager;
 
-    /** @var Request|null */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /** @var ConfigValueProvider */
     protected $valueProvider;
@@ -52,6 +53,7 @@ class WidgetConfigs
      * @param TranslatorInterface          $translator
      * @param EventDispatcherInterface     $eventDispatcher
      * @param WidgetConfigVisibilityFilter $visibilityFilter
+     * @param RequestStack                 $requestStack
      */
     public function __construct(
         ConfigProvider $configProvider,
@@ -60,7 +62,8 @@ class WidgetConfigs
         ConfigValueProvider $valueProvider,
         TranslatorInterface $translator,
         EventDispatcherInterface $eventDispatcher,
-        WidgetConfigVisibilityFilter $visibilityFilter
+        WidgetConfigVisibilityFilter $visibilityFilter,
+        RequestStack $requestStack
     ) {
         $this->configProvider = $configProvider;
         $this->resolver = $resolver;
@@ -69,14 +72,7 @@ class WidgetConfigs
         $this->translator = $translator;
         $this->eventDispatcher = $eventDispatcher;
         $this->visibilityFilter = $visibilityFilter;
-    }
-
-    /**
-     * @param Request $request
-     */
-    public function setRequest(Request $request = null)
-    {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -117,9 +113,10 @@ class WidgetConfigs
             $result[$attrName] = $val;
         }
 
+        $request = $this->requestStack->getCurrentRequest();
         // get grid params, if exists, this line is required
         // to not override params passed via request to controller
-        $gridParams = $this->request ? $this->request->get('params', []) : [];
+        $gridParams = $request ? $request->get('params', []) : [];
         if (!empty($gridParams)) {
             $result['params'] = $this->addGridConfigParams($gridParams);
         }
@@ -239,8 +236,9 @@ class WidgetConfigs
      */
     public function getWidgetOptions($widgetId = null)
     {
-        if (is_null($widgetId) && $this->request) {
-            $widgetId = $this->request->query->get('_widgetId', null);
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request && is_null($widgetId)) {
+            $widgetId = $request->query->get('_widgetId', null);
         }
 
         if (!$widgetId) {

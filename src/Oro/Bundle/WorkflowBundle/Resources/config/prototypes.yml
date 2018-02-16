@@ -7,25 +7,25 @@ parameters:
 services:
     oro_workflow.prototype.step_manager:
         class: %oro_workflow.prototype.step_manager.class%
-        scope: prototype
+        shared: false
 
     oro_workflow.prototype.attribute_manager:
         class: %oro_workflow.prototype.attribute_manager.class%
-        scope: prototype
+        shared: false
 
     oro_workflow.prototype.transition_manager:
         class: %oro_workflow.prototype.transition_manager.class%
-        scope: prototype
+        shared: false
 
     oro_workflow.prototype.variable_manager:
         class: 'Oro\Bundle\WorkflowBundle\Model\VariableManager'
-        scope: prototype
+        shared: false
         calls:
             - ['setVariableAssembler', ['@oro_workflow.variable_assembler']]
 
     oro_workflow.prototype.workflow:
         class: %oro_workflow.prototype.workflow.class%
-        scope: prototype
+        shared: false
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.security.acl.manager'

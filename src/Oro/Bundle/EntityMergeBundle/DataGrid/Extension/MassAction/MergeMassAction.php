@@ -50,7 +50,7 @@ class MergeMassAction extends AbstractMassAction
      */
     public function setOptions(ActionConfiguration $options)
     {
-        $this->setDefaultOptions($options);
+        $this->configureOptions($options);
 
         if (isset($options['entity_name'])) {
             $entityConfig = $this->entityConfigProvider->getConfig($options['entity_name']);
@@ -72,7 +72,7 @@ class MergeMassAction extends AbstractMassAction
     /**
      * @param ActionConfiguration $options
      */
-    protected function setDefaultOptions(ActionConfiguration $options)
+    protected function configureOptions(ActionConfiguration $options)
     {
         foreach ($this->defaultOptions as $name => $value) {
             if (!isset($options[$name])) {

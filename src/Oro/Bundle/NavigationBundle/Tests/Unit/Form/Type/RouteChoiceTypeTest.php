@@ -70,7 +70,7 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('genemu_jqueryselect2_choice', $this->formType->getParent());
+        $this->assertEquals('oro_select2_choice', $this->formType->getParent());
     }
 
     /**
