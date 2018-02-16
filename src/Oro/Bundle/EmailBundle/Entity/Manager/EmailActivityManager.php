@@ -11,8 +11,8 @@ use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class EmailActivityManager
 {
@@ -58,6 +58,9 @@ class EmailActivityManager
         $this->em                      = $em;
     }
 
+    /**
+     * @param array $createdEmails
+     */
     public function updateActivities(array $createdEmails)
     {
         foreach ($createdEmails as $email) {

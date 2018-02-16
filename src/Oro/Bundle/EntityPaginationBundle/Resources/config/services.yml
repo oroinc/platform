@@ -18,8 +18,7 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity_pagination.manager'
-        calls:
-            - [ setRequest, ["@?request="] ]
+            - '@request_stack'
 
     oro_entity_pagination.storage.data_collector:
         class: %oro_entity_pagination.storage.data_collector.class%

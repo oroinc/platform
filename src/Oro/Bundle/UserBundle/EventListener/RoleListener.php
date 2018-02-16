@@ -9,8 +9,8 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class RoleListener
 {

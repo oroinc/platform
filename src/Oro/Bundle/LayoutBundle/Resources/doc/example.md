@@ -1334,8 +1334,7 @@ We register the form in the container using the newly created form type:
 
     acme_product.form.product:
         class:                        Symfony\Component\Form\Form
-        factory_method:               createNamed
-        factory_service:              form.factory
+        factory:                      ['@form.factory', createNamed]
         arguments:
             - ~
             - 'acme_product_product'

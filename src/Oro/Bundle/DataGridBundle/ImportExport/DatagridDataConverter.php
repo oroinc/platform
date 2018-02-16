@@ -4,7 +4,6 @@ namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension;
@@ -16,6 +15,7 @@ use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
 {

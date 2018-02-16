@@ -17,14 +17,15 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Entity\NoteSoap;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class NoteApiHandler
 {
     /** @var FormInterface */
     protected $form;
 
-    /** @var Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /** @var ObjectManager */
     protected $manager;
@@ -34,18 +35,18 @@ class NoteApiHandler
 
     /**
      * @param FormInterface $form
-     * @param Request       $request
+     * @param RequestStack  $requestStack
      * @param ObjectManager $manager
      * @param ConfigManager $configManager
      */
     public function __construct(
         FormInterface $form,
-        Request $request,
+        RequestStack $requestStack,
         ObjectManager $manager,
         ConfigManager $configManager
     ) {
         $this->form          = $form;
-        $this->request       = $request;
+        $this->requestStack  = $requestStack;
         $this->manager       = $manager;
         $this->configManager = $configManager;
     }
@@ -60,8 +61,9 @@ class NoteApiHandler
     public function process(Note $entity)
     {
         $this->form->setData($entity);
-        if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $request = $this->processRequest($this->request);
+        $request = $this->requestStack->getCurrentRequest();
+        if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
+            $request = $this->processRequest($request);
             $this->form->submit($request);
             if ($this->form->isValid()) {
                 $this->onSuccess($entity);

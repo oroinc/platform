@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Form\Handler\TagHandler;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class TagHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -43,12 +44,14 @@ class TagHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->request = new Request();
+        $requestStack = new RequestStack();
+        $requestStack->push($this->request);
         $this->manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->entity  = new Tag();
-        $this->handler = new TagHandler($this->form, $this->request, $this->manager);
+        $this->handler = new TagHandler($this->form, $requestStack, $this->manager);
     }
 
     public function testProcessUnsupportedRequest()

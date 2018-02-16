@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Handler;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Form\Handler\AttachmentHandler;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class AttachmentHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,10 +37,12 @@ class AttachmentHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $this->form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $this->request = $this->createMock('Symfony\Component\HttpFoundation\Request');
+        $requestStack = new RequestStack();
+        $requestStack->push($this->request);
         $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
         $this->attachment = new Attachment();
 
-        $this->handler = new AttachmentHandler($this->request, $this->om);
+        $this->handler = new AttachmentHandler($requestStack, $this->om);
     }
 
     public function testNotValidForm()

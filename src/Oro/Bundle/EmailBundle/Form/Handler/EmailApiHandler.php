@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -24,6 +23,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -50,7 +50,7 @@ class EmailApiHandler extends ApiFormHandler
 
     /**
      * @param FormInterface            $form
-     * @param Request                  $request
+     * @param RequestStack             $requestStack
      * @param EntityManager            $entityManager
      * @param EmailEntityBuilder       $emailEntityBuilder
      * @param TokenAccessorInterface   $tokenAccessor
@@ -60,7 +60,7 @@ class EmailApiHandler extends ApiFormHandler
      */
     public function __construct(
         FormInterface $form,
-        Request $request,
+        RequestStack $requestStack,
         EntityManager $entityManager,
         EmailEntityBuilder $emailEntityBuilder,
         TokenAccessorInterface $tokenAccessor,
@@ -68,7 +68,7 @@ class EmailApiHandler extends ApiFormHandler
         DataTransformerInterface $emailImportanceTransformer,
         DataTransformerInterface $emailBodyTypeTransformer
     ) {
-        parent::__construct($form, $request, $entityManager);
+        parent::__construct($form, $requestStack, $entityManager);
 
         $this->emailEntityBuilder = $emailEntityBuilder;
         $this->tokenAccessor = $tokenAccessor;

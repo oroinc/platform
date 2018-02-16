@@ -11,6 +11,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -50,6 +51,8 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $this->form = $this->createMock(FormInterface::class);
         $this->request = $this->createMock(Request::class);
+        $requestStack = new RequestStack();
+        $requestStack->push($this->request);
         $this->manager = $this->createMock(UserManager::class);
         $this->userConfigManager = $this->createMock(ConfigManager::class);
         $this->templating = $this->createMock(DelegatingEngine::class);
@@ -60,7 +63,7 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->handler = new UserHandler(
             $this->form,
-            $this->request,
+            $requestStack,
             $this->manager,
             $this->userConfigManager,
             $this->templating,

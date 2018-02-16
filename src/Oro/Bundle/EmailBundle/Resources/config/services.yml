@@ -235,7 +235,7 @@ services:
 
     oro_email.email.entity.builder:
         class: %oro_email.email.entity.builder.class%
-        scope: prototype
+        shared: false
         arguments:
             - '@oro_email.email.entity.batch_processor'
             - '@oro_email.email.address.manager'
@@ -251,8 +251,7 @@ services:
             - '@oro_email.activity_list.provider'
             - '@oro_email.provider.email_attachment_provider'
             - '@oro_email.form.factory'
-        calls:
-            - [setRequest, ["@?request="]]
+            - '@request_stack'
 
     oro_email.email_websocket.processor:
         class: %oro_email.email_websocket.processor.class%
@@ -270,7 +269,7 @@ services:
     oro_email.email.entity.batch_processor:
         class: %oro_email.email.entity.batch_processor.class%
         public: false
-        scope: prototype
+        shared: false
         arguments:
             - '@oro_email.email.address.manager'
             - '@oro_email.email.owner.provider'
@@ -741,7 +740,7 @@ services:
     oro_email.known_email_address_checker_factory:
         class: %oro_email.known_email_address_checker_factory.class%
         public: false
-        scope: prototype
+        shared: false
         arguments:
             - '@doctrine'
             - '@oro_email.email.address.manager'

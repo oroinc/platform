@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -22,8 +22,8 @@ class ContextsExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
 
-    /** @var Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -42,25 +42,20 @@ class ContextsExtension extends AbstractTypeExtension
      * @param ActivityManager     $activityManager
      * @param EntityAliasResolver $entityAliasResolver
      * @param EntityRoutingHelper $entityRoutingHelper
+     * @param RequestStack        $requestStack
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ActivityManager $activityManager,
         EntityAliasResolver $entityAliasResolver,
-        EntityRoutingHelper $entityRoutingHelper
+        EntityRoutingHelper $entityRoutingHelper,
+        RequestStack $requestStack
     ) {
         $this->doctrineHelper      = $doctrineHelper;
         $this->activityManager     = $activityManager;
         $this->entityAliasResolver = $entityAliasResolver;
         $this->entityRoutingHelper = $entityRoutingHelper;
-    }
-
-    /**
-     * @param Request|null $request
-     */
-    public function setRequest(Request $request = null)
-    {
-        $this->request = $request;
+        $this->requestStack        = $requestStack;
     }
 
     /**
@@ -115,13 +110,14 @@ class ContextsExtension extends AbstractTypeExtension
         $form   = $event->getForm();
 
         if ($entity) {
-            $targetEntityClass = $this->entityRoutingHelper->getEntityClassName($this->request);
-            $targetEntityId    = $this->entityRoutingHelper->getEntityId($this->request);
+            $request = $this->requestStack->getCurrentRequest();
+            $targetEntityClass = $this->entityRoutingHelper->getEntityClassName($request);
+            $targetEntityId    = $this->entityRoutingHelper->getEntityId($request);
             $contexts          = [];
 
             if ($entity->getId()) {
                 $contexts = $entity->getActivityTargets();
-            } elseif ($targetEntityClass && $this->request->getMethod() === 'GET') {
+            } elseif ($targetEntityClass && $request->getMethod() === 'GET') {
                 $contexts[] = $this->entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
             }
 

@@ -2,20 +2,23 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Component\Layout\LayoutContext;
-
 use Oro\Bundle\LayoutBundle\Layout\Extension\RouteContextConfigurator;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class RouteContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
     /** @var RouteContextConfigurator */
     protected $configurator;
 
+    /** @var RequestStack */
+    protected $requestStack;
+
     protected function setUp()
     {
-        $this->configurator = new RouteContextConfigurator();
+        $this->requestStack = new RequestStack();
+        $this->configurator = new RouteContextConfigurator($this->requestStack);
     }
 
     protected function tearDown()
@@ -40,7 +43,7 @@ class RouteContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('');
         $request->attributes->set('_route', 'testRoteName');
 
-        $this->configurator->setRequest($request);
+        $this->requestStack->push($request);
         $this->configurator->configureContext($context);
 
         $context->resolve();
@@ -54,7 +57,7 @@ class RouteContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('');
         $request->attributes->set('_master_request_route', 'testRoteName');
 
-        $this->configurator->setRequest($request);
+        $this->requestStack->push($request);
         $this->configurator->configureContext($context);
 
         $context->resolve();
@@ -69,18 +72,10 @@ class RouteContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('');
         $request->attributes->set('_route', 'testRoteName');
 
-        $this->configurator->setRequest($request);
+        $this->requestStack->push($request);
         $this->configurator->configureContext($context);
 
         $context->resolve();
         $this->assertSame('routeShouldNotBeOverridden', $context->get('route_name'));
-    }
-
-    public function testRequestSetterSynchronized()
-    {
-        $request = Request::create('');
-
-        $this->configurator->setRequest($request);
-        $this->configurator->setRequest(null);
     }
 }

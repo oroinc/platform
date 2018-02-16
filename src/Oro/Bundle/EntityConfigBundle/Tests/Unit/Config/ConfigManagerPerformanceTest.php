@@ -19,6 +19,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Config\LockObject;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
  * Contains tests for a performance crucial parts of entity configs
@@ -399,9 +400,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $emLink   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emLink   = $this->createMock(ServiceLink::class);
         $emLink->expects($this->any())
             ->method('getService')
             ->will($this->returnValue($this->em));

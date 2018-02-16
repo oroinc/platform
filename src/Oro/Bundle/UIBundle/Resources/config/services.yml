@@ -126,8 +126,8 @@ services:
 
     oro_ui.provider.widget_context:
         class: %oro_ui.provider.widget_context.class%
-        calls:
-            - [setRequest, ["@?request="]]
+        arguments:
+            - '@request_stack'
 
     oro_ui.html_tag_helper:
         class: %oro_ui.html_tag_helper.class%
