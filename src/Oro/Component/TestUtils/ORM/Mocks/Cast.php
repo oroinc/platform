@@ -2,7 +2,7 @@
 /**
  * Declare custom SQL functions available in the Mock platform
  */
-namespace Oro\Component\TestUtils\ORM\Mocks;
+namespace Oro\ORM\Query\AST\Platform\Functions\Mock;
 
 use Oro\ORM\Query\AST\Platform\Functions\Mysql\Cast as BaseCast;
 
