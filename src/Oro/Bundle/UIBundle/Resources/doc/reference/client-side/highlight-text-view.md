@@ -11,6 +11,8 @@ Initialize in twig:
     //example from System Configuration page content
     <div data-page-component-view="{{ {
         view: 'oroui/js/app/views/highlight-text-view',
+        highlightSwitcherContainer: 'div.system-configuration-content-header',
+        highlightStateStorageKey: 'show-all-configuration-items-on-search',
         highlightSelectors: [
             'div.system-configuration-content-title',
             'h5.user-fieldset span',
@@ -42,6 +44,8 @@ Options
 
 - `text:string` - text to highlight
 - `viewGroup:string` - used as mediator event prefix
+- `highlightSwitcherContainer:string` 'class or attribute in which will render template of highlight switcher',
+- `highlightStateStorageKey:string` 'localStorage key which will contain state of visibility for not found/highlighted elements',
 - `highlightClass:string` - class used for text highlight
 - `notFoundClass:string` - class used for mark content without highlighted elements 
 - `foundClass:string` - class used for mark content with highlighted elements 

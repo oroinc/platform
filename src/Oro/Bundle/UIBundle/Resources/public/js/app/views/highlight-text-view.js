@@ -7,18 +7,44 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var BaseView = require('oroui/js/app/views/base/view');
     var FuzzySearch = require('oroui/js/fuzzy-search');
+    var persistentStorage = require('oroui/js/persistent-storage');
+    var highlightSwitcherTemplate = require('tpl!oroui/templates/highlight-switcher.html');
 
     HighlightTextView = BaseView.extend({
         /**
          * @inheritDoc
          */
         optionNames: BaseView.prototype.optionNames.concat([
-            'text',
-            'fuzzySearch',
-            'viewGroup',
-            'highlightClass', 'elementHighlightClass', 'notFoundClass', 'foundClass',
-            'highlightSelectors', 'toggleSelectors'
+            'text', 'toggleSelectors', 'viewGroup', 'notFoundClass',
+            'elementHighlightClass', 'foundClass', 'fuzzySearch',
+            'highlightClass', 'highlightSelectors', 'highlightStateStorageKey',
+            'highlightSwitcherContainer', 'highlightSwitcherElement',
+            'highlightSwitcherTemplate', 'showNotFoundItems'
         ]),
+
+        events: {
+            'click [data-role="highlight-switcher"]': 'changeHighlightSwitcherState'
+        },
+
+        /**
+         * @property {Function}
+         */
+        highlightSwitcherTemplate: highlightSwitcherTemplate,
+
+        /**
+         * @property {String}
+         */
+        highlightSwitcherElement: '[data-role="highlight-switcher"]',
+
+        /**
+         * @property {String}
+         */
+        highlightSwitcherContainer: null,
+
+        /**
+         * @property {String}
+         */
+        highlightStateStorageKey: null,
 
         /**
          * @property {String}
@@ -31,9 +57,14 @@ define(function(require) {
         findText: null,
 
         /**
-         * @property {String}
+         * @property {Boolean}
          */
         fuzzySearch: false,
+
+        /**
+         * @property {Boolean}
+         */
+        showNotFoundItems: false,
 
         /**
          * @property {String}
@@ -87,6 +118,7 @@ define(function(require) {
 
             HighlightTextView.__super__.initialize.apply(this, arguments);
 
+            this.renderHighlightSwitcher();
             this.update(this.text);
 
             mediator.on(this.viewGroup + ':highlight-text:update', this.update, this);
@@ -108,6 +140,7 @@ define(function(require) {
          * @param {Boolean|null} fuzzySearch
          */
         update: function(text, fuzzySearch) {
+            this.toggleHighlightSwitcher(text);
             if (fuzzySearch !== undefined) {
                 this.fuzzySearch = fuzzySearch;
             }
@@ -179,7 +212,7 @@ define(function(require) {
             }
 
             var $parent = $el.closest(this.toggleSelectors[element.selector]);
-            if (this.isElementHighlighted($parent)) {
+            if (this.isElementHighlighted($parent) && !this.showNotFoundItems) {
                 $el.addClass(this.notFoundClass);
             }
         },
@@ -311,6 +344,70 @@ define(function(require) {
                     this.highlightElementContent($children);
                 }
             }, this);
+        },
+
+        /**
+         * Render highlight switcher interface for changing visibility of notFoundItems
+         */
+        renderHighlightSwitcher: function() {
+            if (this.highlightSwitcherContainer) {
+                this.$el.find(this.highlightSwitcherContainer).append(this.highlightSwitcherTemplate());
+                this.checkHighlightSwitcherState();
+            }
+        },
+
+        /**
+         * Toggle visibility of highlight switcher view
+         *
+         * @param {boolean} state
+         */
+        toggleHighlightSwitcher: function(state) {
+            var state = state ? true : false;
+            this.$el.find(this.highlightSwitcherElement).toggleClass('hide', !state);
+        },
+
+        /**
+         * Check highlight switcher state and get value from localStorage
+         */
+        checkHighlightSwitcherState: function() {
+            var switcherState = persistentStorage.getItem(this.highlightStateStorageKey);
+            if (this.highlightStateStorageKey && switcherState) {
+                this.showNotFoundItems = switcherState === 'true' ? true : false;
+            }
+            this.toggleHighlightSwitcherItems(!this.showNotFoundItems);
+        },
+
+        /**
+         * Set highlight switcher state to localStorage
+         *
+         * @param {boolean} state
+         */
+        setHighlightSwitcherState: function(state) {
+            if (this.highlightStateStorageKey) {
+                persistentStorage.setItem(this.highlightStateStorageKey, state || !this.showNotFoundItems);
+            }
+        },
+
+        /**
+         * Change highlight switcher state
+         *
+         * @param {boolean} state
+         */
+        changeHighlightSwitcherState: function(state) {
+            var state = _.isBoolean(state) ? state : this.showNotFoundItems;
+            this.setHighlightSwitcherState();
+            this.toggleHighlightSwitcherItems(state);
+            this.showNotFoundItems = !state;
+            this.update(this.text);
+        },
+
+        /**
+         * Toggle visibility of highlight switcher items
+         *
+         * @param {boolean} state
+         */
+        toggleHighlightSwitcherItems: function(state) {
+            this.$el.find(this.highlightSwitcherElement).toggleClass('highlighted-only', !state);
         },
 
         /**

@@ -114,7 +114,9 @@ oro:
             load_more: "Loading more results..."
         widget_form_component:
             save_flash_success: Saved successfully
-
+        highlight_switcher:
+            show_all_items: "Show hidden items"
+            show_highlighted_items_only: "Show search result only"
         element_value:
             messages:
                 copied: Copied to clipboard
