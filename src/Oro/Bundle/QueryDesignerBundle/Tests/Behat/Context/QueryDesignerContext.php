@@ -20,17 +20,18 @@ class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAwa
     public function iAddTheFollowingColumns(TableNode $table)
     {
         foreach ($table->getRows() as $row) {
-            list($column) = $row;
-            $this->addColumns(explode('->', $column));
+            list($column, $functionName) = array_pad($row, 2, null);
+            $this->addColumns(explode('->', $column), $functionName);
         }
     }
 
     /**
      * Method implements column functionality
      *
-     * @param array $columns
+     * @param array  $columns
+     * @param string $functionName
      */
-    private function addColumns($columns)
+    private function addColumns($columns, $functionName)
     {
         $this->clickLinkInColumnDesigner('Choose a field');
         foreach ($columns as $key => $column) {
@@ -52,6 +53,9 @@ class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAwa
                 )
                 ->click();
         }
+        if ($functionName) {
+            $this->setFunctionValue($functionName);
+        }
         $this->clickLinkInColumnDesigner('Add');
     }
 
@@ -64,5 +68,16 @@ class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAwa
     {
         $columnDesigner = $this->createElement('Query Designer');
         $columnDesigner->clickLink($link);
+    }
+
+    /**
+     * @param string $value
+     *
+     * @throws \Behat\Mink\Exception\ElementNotFoundException
+     */
+    private function setFunctionValue($value)
+    {
+        $columnFunction = $this->createElement('Column Function');
+        $columnFunction->selectOption($value);
     }
 }
