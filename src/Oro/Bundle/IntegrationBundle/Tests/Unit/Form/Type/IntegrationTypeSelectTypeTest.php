@@ -32,7 +32,7 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
         unset($this->type, $this->registry, $this->assetHelper);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $resolver = new OptionsResolver();
         $this->registry->expects($this->once())->method('getAvailableIntegrationTypesDetailedData')
@@ -49,7 +49,7 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
             ->method('getUrl')
             ->will($this->returnArgument(0));
 
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
         $result = $resolver->resolve([]);
         $choiceAttr = [];
         foreach ($result['choices'] as $label => $choice) {

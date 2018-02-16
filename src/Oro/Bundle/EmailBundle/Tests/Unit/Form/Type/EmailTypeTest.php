@@ -320,9 +320,9 @@ class EmailTypeTest extends TypeTestCase
         $this->assertEquals($body, $result->getBody());
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(
@@ -334,7 +334,7 @@ class EmailTypeTest extends TypeTestCase
             );
 
         $type = $this->createEmailType();
-        $type->setDefaultOptions($resolver);
+        $type->configureOptions($resolver);
     }
 
     public function testGetName()

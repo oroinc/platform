@@ -22,13 +22,13 @@ class StripTagsExtensionTest extends \PHPUnit_Framework_TestCase
         $this->formExtension = new StripTagsExtension($this->htmlTagHelper);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefined')
             ->with(StripTagsExtension::OPTION_NAME);
-        $this->formExtension->setDefaultOptions($resolver);
+        $this->formExtension->configureOptions($resolver);
     }
 
     /**

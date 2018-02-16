@@ -219,7 +219,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->disableOriginalConstructor()

@@ -17,7 +17,7 @@ class ResetTranslationsMassActionTest extends \PHPUnit_Framework_TestCase
         $this->action = new ResetTranslationsMassAction();
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $this->action->setOptions(ActionConfiguration::create([
             ConfigObject::NAME_KEY => 'test-config',

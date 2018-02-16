@@ -273,11 +273,10 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $choiceListOptions
      * @param array $expectedChoices
-     * @param boolean $expectTranslation
      *
-     * @dataProvider setDefaultOptionsDataProvider
+     * @dataProvider configureOptionsDataProvider
      */
-    public function testSetDefaultOptions(array $choiceListOptions, array $expectedChoices, $expectTranslation = false)
+    public function testConfigureOptions(array $choiceListOptions, array $expectedChoices)
     {
         // prepare query builder option
         if (isset($choiceListOptions['query_builder'])) {
@@ -310,7 +309,7 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
 
 
         $resolver = new OptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
         $result = $resolver->resolve($choiceListOptions);
 
         $this->assertInstanceOf(
@@ -348,7 +347,7 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function setDefaultOptionsDataProvider()
+    public function configureOptionsDataProvider()
     {
         $testChoiceEntities = $this->getTestChoiceEntities($this->testChoices);
 

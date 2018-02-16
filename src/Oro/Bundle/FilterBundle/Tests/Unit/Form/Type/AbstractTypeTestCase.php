@@ -91,11 +91,11 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
     }
 
     /**
-     * @dataProvider setDefaultOptionsDataProvider
+     * @dataProvider configureOptionsDataProvider
      * @param array $defaultOptions
      * @param array $requiredOptions
      */
-    public function testSetDefaultOptions(array $defaultOptions, array $requiredOptions = array())
+    public function testConfigureOptions(array $defaultOptions, array $requiredOptions = [])
     {
         $resolver = $this->createMockOptionsResolver();
 
@@ -107,7 +107,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
             $resolver->expects($this->once())->method('setRequired')->with($requiredOptions)->will($this->returnSelf());
         }
 
-        $this->getTestFormType()->setDefaultOptions($resolver);
+        $this->getTestFormType()->configureOptions($resolver);
     }
 
     /**
@@ -115,7 +115,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
      *
      * @return array
      */
-    abstract public function setDefaultOptionsDataProvider();
+    abstract public function configureOptionsDataProvider();
 
     /**
      * @dataProvider bindDataProvider

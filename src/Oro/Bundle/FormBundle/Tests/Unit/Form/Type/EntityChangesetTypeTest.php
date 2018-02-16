@@ -54,14 +54,14 @@ class EntityChangesetTypeTest extends FormIntegrationTestCase
         $this->assertEquals(DataChangesetType::NAME, $this->type->getParent());
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver */
         $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setRequired')
             ->with(['class']);
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
     }
 
     /**

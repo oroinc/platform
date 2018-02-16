@@ -134,7 +134,7 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
         ];
     }
 
-    public function testSetDefaultOptionsWithEmptyOptions()
+    public function testConfigureOptionsWithEmptyOptions()
     {
         $this->assertEquals([
             'option_default' => 'value',
@@ -145,7 +145,7 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
         ], $this->resolveOptions(static::TYPE_NAME, ['option_required' => 'required_value']));
     }
 
-    public function testSetDefaultOptionsWithValidOptions()
+    public function testConfigureOptionsWithValidOptions()
     {
         $this->assertEquals([
             'option' => 'value',

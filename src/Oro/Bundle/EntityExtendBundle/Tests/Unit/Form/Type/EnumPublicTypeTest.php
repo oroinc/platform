@@ -31,9 +31,9 @@ class EnumPublicTypeTest extends TypeTestCase
     }
 
     /**
-     * @dataProvider setDefaultOptionsProvider
+     * @dataProvider configureOptionsProvider
      */
-    public function testSetDefaultOptions(
+    public function testConfigureOptions(
         ConfigIdInterface $configId,
         $isNewConfig,
         $enumCode,
@@ -64,7 +64,7 @@ class EnumPublicTypeTest extends TypeTestCase
             ->will($this->returnValue($hasOtherReferences));
 
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
 
         $options['config_id']     = $configId;
         $options['config_is_new'] = $isNewConfig;
@@ -97,7 +97,7 @@ class EnumPublicTypeTest extends TypeTestCase
         return $resolver;
     }
 
-    public function setDefaultOptionsProvider()
+    public function configureOptionsProvider()
     {
         return [
             [

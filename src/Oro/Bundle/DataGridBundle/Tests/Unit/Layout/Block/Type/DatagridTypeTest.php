@@ -274,7 +274,7 @@ class DatagridTypeTest extends BlockTypeTestCase
      * @param array $options
      * @param array $expectedOptions
      */
-    public function testSetDefaultOptions(array $options, array $expectedOptions)
+    public function testConfigureOptions(array $options, array $expectedOptions)
     {
         $datagridType = new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker);
         $resolver = new OptionsResolver();

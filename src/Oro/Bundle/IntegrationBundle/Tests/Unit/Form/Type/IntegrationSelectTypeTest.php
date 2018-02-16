@@ -103,7 +103,7 @@ class IntegrationSelectTypeTest extends OrmTestCase
         );
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $reader         = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(
@@ -119,7 +119,7 @@ class IntegrationSelectTypeTest extends OrmTestCase
         );
 
         $resolver = new OptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
 
         $resolved = $resolver->resolve(
             [

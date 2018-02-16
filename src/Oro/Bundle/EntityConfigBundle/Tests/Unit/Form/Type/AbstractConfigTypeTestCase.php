@@ -33,7 +33,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
      *
      * @return array
      */
-    protected function doTestSetDefaultOptions(
+    protected function doTestConfigureOptions(
         AbstractType $type,
         ConfigIdInterface $configId,
         $immutable,
@@ -43,7 +43,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
         $this->setIsReadOnlyExpectations($configId, $immutable);
 
         $resolver = $this->getOptionsResolver();
-        $type->setDefaultOptions($resolver);
+        $type->configureOptions($resolver);
 
         $options['config_id'] = $configId;
 
@@ -102,7 +102,10 @@ class AbstractConfigTypeTestCase extends TypeTestCase
         return $resolver;
     }
 
-    public function setDefaultOptionsProvider()
+    /**
+     * @return array
+     */
+    public function configureOptionsProvider()
     {
         return [
             [
