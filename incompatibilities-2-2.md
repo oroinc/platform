@@ -291,7 +291,7 @@ EmailBundle
 
 FormBundle
 ----------
-* The `OroEncodedPasswordType::configureOptions`<sup>[[?]](https://github.com/oroinc/platform/tree/2.1/src/Oro/Bundle/FormBundle/Form/Type/OroEncodedPasswordType.php#L65 "Oro\Bundle\FormBundle\Form\Type\OroEncodedPasswordType::configureOptions")</sup> method was removed.
+* The `OroEncodedPasswordType::setDefaultOptions`<sup>[[?]](https://github.com/oroinc/platform/tree/2.1/src/Oro/Bundle/FormBundle/Form/Type/OroEncodedPasswordType.php#L65 "Oro\Bundle\FormBundle\Form\Type\OroEncodedPasswordType::setDefaultOptions")</sup> method was removed.
 
 ImapBundle
 ----------

@@ -98,7 +98,7 @@ DataGridBundle
 
 EmailBundle
 -----------
-* The `AutoResponseRuleType::configureOptions`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/EmailBundle/Form/Type/AutoResponseRuleType.php#L65 "Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleType::configureOptions")</sup> method was removed.
+* The `AutoResponseRuleType::setDefaultOptions`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/EmailBundle/Form/Type/AutoResponseRuleType.php#L65 "Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleType::setDefaultOptions")</sup> method was removed.
 * The following methods in class `EmailAssociationsDemoDataFixturesListener`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/EmailBundle/EventListener/EmailAssociationsDemoDataFixturesListener.php#L42 "Oro\Bundle\EmailBundle\EventListener\EmailAssociationsDemoDataFixturesListener")</sup> were removed:
    - `onPreLoad`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/EmailBundle/EventListener/EmailAssociationsDemoDataFixturesListener.php#L42 "Oro\Bundle\EmailBundle\EventListener\EmailAssociationsDemoDataFixturesListener::onPreLoad")</sup>
    - `onPostLoad`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/EmailBundle/EventListener/EmailAssociationsDemoDataFixturesListener.php#L52 "Oro\Bundle\EmailBundle\EventListener\EmailAssociationsDemoDataFixturesListener::onPostLoad")</sup>
@@ -274,10 +274,10 @@ PlatformBundle
 
 QueryDesignerBundle
 -------------------
-* The `ColumnType::configureOptions`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/QueryDesignerBundle/Form/Type/ColumnType.php#L30 "Oro\Bundle\QueryDesignerBundle\Form\Type\ColumnType::configureOptions")</sup> method was removed.
+* The `ColumnType::setDefaultOptions`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/QueryDesignerBundle/Form/Type/ColumnType.php#L30 "Oro\Bundle\QueryDesignerBundle\Form\Type\ColumnType::setDefaultOptions")</sup> method was removed.
 * The `DateFieldChoiceType::buildView`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/QueryDesignerBundle/Form/Type/DateFieldChoiceType.php#L16 "Oro\Bundle\QueryDesignerBundle\Form\Type\DateFieldChoiceType::buildView")</sup> method was removed.
-* The `FieldChoiceType::configureOptions`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/QueryDesignerBundle/Form/Type/FieldChoiceType.php#L26 "Oro\Bundle\QueryDesignerBundle\Form\Type\FieldChoiceType::configureOptions")</sup> method was removed.
-* The `FunctionChoiceType::configureOptions`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/QueryDesignerBundle/Form/Type/FunctionChoiceType.php#L15 "Oro\Bundle\QueryDesignerBundle\Form\Type\FunctionChoiceType::configureOptions")</sup> method was removed.
+* The `FieldChoiceType::setDefaultOptions`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/QueryDesignerBundle/Form/Type/FieldChoiceType.php#L26 "Oro\Bundle\QueryDesignerBundle\Form\Type\FieldChoiceType::setDefaultOptions")</sup> method was removed.
+* The `FunctionChoiceType::setDefaultOptions`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/QueryDesignerBundle/Form/Type/FunctionChoiceType.php#L15 "Oro\Bundle\QueryDesignerBundle\Form\Type\FunctionChoiceType::setDefaultOptions")</sup> method was removed.
 
 ReportBundle
 ------------
@@ -285,7 +285,7 @@ ReportBundle
 * The `DatagridDateGroupingBuilder::__construct($calendarDateEntity, $joinIdHelper = null)`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/ReportBundle/Grid/DatagridDateGroupingBuilder.php#L43 "Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder")</sup> method was changed to `DatagridDateGroupingBuilder::__construct($calendarDateEntity, JoinIdentifierHelper $joinIdHelper = null)`<sup>[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/ReportBundle/Grid/DatagridDateGroupingBuilder.php#L47 "Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder")</sup>
 * The `ReportDatagridConfigurationProvider::__construct(ReportDatagridConfigurationBuilder $builder, ManagerRegistry $doctrine, Cache $reportCacheManager, $prefixCacheKey)`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/ReportBundle/Grid/ReportDatagridConfigurationProvider.php#L43 "Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider")</sup> method was changed to `ReportDatagridConfigurationProvider::__construct(ReportDatagridConfigurationBuilder $builder, ManagerRegistry $doctrine, Cache $reportCacheManager, SystemAwareResolver $resolver, $prefixCacheKey)`<sup>[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/ReportBundle/Grid/ReportDatagridConfigurationProvider.php#L50 "Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider")</sup>
 * The `ReportCacheCleanerListener::postUpdate(LifecycleEventArgs $args)`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/ReportBundle/EventListener/ReportCacheCleanerListener.php#L39 "Oro\Bundle\ReportBundle\EventListener\ReportCacheCleanerListener")</sup> method was changed to `ReportCacheCleanerListener::postUpdate(Report $entity, LifecycleEventArgs $args)`<sup>[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/ReportBundle/EventListener/ReportCacheCleanerListener.php#L43 "Oro\Bundle\ReportBundle\EventListener\ReportCacheCleanerListener")</sup>
-* The `ReportType::configureOptions`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/ReportBundle/Form/Type/ReportType.php#L53 "Oro\Bundle\ReportBundle\Form\Type\ReportType::configureOptions")</sup> method was removed.
+* The `ReportType::setDefaultOptions`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/ReportBundle/Form/Type/ReportType.php#L53 "Oro\Bundle\ReportBundle\Form\Type\ReportType::setDefaultOptions")</sup> method was removed.
 
 SSOBundle
 ---------
@@ -303,7 +303,7 @@ SecurityBundle
 
 SegmentBundle
 -------------
-* The `SegmentType::configureOptions`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/SegmentBundle/Form/Type/SegmentType.php#L53 "Oro\Bundle\SegmentBundle\Form\Type\SegmentType::configureOptions")</sup> method was removed.
+* The `SegmentType::setDefaultOptions`<sup>[[?]](https://github.com/oroinc/platform/tree/2.5.0/src/Oro/Bundle/SegmentBundle/Form/Type/SegmentType.php#L53 "Oro\Bundle\SegmentBundle\Form\Type\SegmentType::setDefaultOptions")</sup> method was removed.
 
 SidebarBundle
 -------------
