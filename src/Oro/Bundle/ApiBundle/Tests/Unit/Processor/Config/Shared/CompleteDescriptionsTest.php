@@ -28,23 +28,23 @@ use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
  */
 class CompleteDescriptionsTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityDocProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityDescriptionProvider */
+    private $entityDocProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $resourceDocProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourceDocProviderInterface */
+    private $resourceDocProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $apiDocParser;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|MarkdownApiDocParser */
+    private $apiDocParser;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $translator;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    private $translator;
 
     /** @var ConfigProviderMock */
-    protected $ownershipConfigProvider;
+    private $ownershipConfigProvider;
 
     /** @var CompleteDescriptions */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -54,14 +54,10 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->resourceDocProvider = $this->createMock(ResourceDocProviderInterface::class);
-        $this->apiDocParser = $this->getMockBuilder(MarkdownApiDocParser::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->apiDocParser = $this->createMock(MarkdownApiDocParser::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
 
-        $configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
         $this->ownershipConfigProvider = new ConfigProviderMock($configManager, 'ownership');
 
         $this->processor = new CompleteDescriptions(
@@ -1447,10 +1443,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $this->context->setFilters($filters);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
-            'JSON API',
-            $filter1->getDescription()
-        );
+        self::assertEquals('JSON API', $filter1->getDescription());
     }
 
     public function testPrimaryResourceDescriptionWhenItExistsInConfig()

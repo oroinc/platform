@@ -18,7 +18,7 @@
         "ext-zip": "*",
         "ext-openssl": "*",
         "ext-mcrypt": "*",
-        "symfony/symfony": "2.8.*, !=2.8.10, <=2.8.32",
+        "symfony/symfony": "2.8.*, !=2.8.10, <=2.8.33",
         "twig/twig": "1.35.*",
         "doctrine/orm": "2.5.5",
         "doctrine/doctrine-bundle": "1.6.5",
@@ -129,7 +129,7 @@
         "mybuilder/phpunit-accelerator": "1.2.*",
         "squizlabs/php_codesniffer": "2.8.*",
         "phpmd/phpmd": "2.6.*",
-        "sebastian/phpcpd": "dev-master#cff7f36c2ae89d59987de25d14fd41a72dd4a703 as 3.1.0",
+        "sebastian/phpcpd": "3.0.*",
         "phpunit/phpcov": "3.1.*",
         "symfony/phpunit-bridge": "3.2.*",
         "friendsofphp/php-cs-fixer": "2.1.*"

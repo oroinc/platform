@@ -1197,18 +1197,6 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Given /^I restart message consumer$/
-     *
-     * @todo remove step from scenario and step implementation in scope of BAP-14637
-     */
-    public function iRestartMessageConsumer()
-    {
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
-        $this->messageQueueIsolator->stopMessageQueue();
-        $this->messageQueueIsolator->startMessageQueue();
-    }
-
-    /**
      * @Then /^"([^"]*)" button is disabled$/
      */
     public function buttonIsDisabled($button)
@@ -1800,5 +1788,51 @@ class OroMainContext extends MinkContext implements
         }, 10);
 
         parent::assertPageAddress($page);
+    }
+
+    /**
+     * Returns the name of the current and the last browser tab as an array.
+     *
+     * @return array [$currentTab, $lastTab]
+     */
+    public function getCurrentAndLastTabNames()
+    {
+        $currentTab = $this->getSession()->getWindowName();
+        $windowNames = $this->getSession()->getWindowNames();
+        $lastTab = end($windowNames);
+        return [$currentTab, $lastTab];
+    }
+
+    /**
+     * Check if the browser opened a new tab.
+     *
+     * It is based on the assumption that the current window was the last tab before a new tab was opened.
+     *
+     * Example: Then a new browser tab is opened
+     * @Then /^a new browser tab is opened$/
+     */
+    public function newBrowserTabIsOpened()
+    {
+        list($currentTab, $lastTab) = $this->getCurrentAndLastTabNames();
+        if ($lastTab === $currentTab) {
+            self::fail('No new browser tabs detected after the current one');
+        }
+    }
+
+    /**
+     * Check if the browser opened a new tab, and switch to this tab if it is.
+     *
+     * It is based on the assumption that the current window was the last tab before a new tab was opened.
+     *
+     * Example: Then a new browser tab is opened and I switch to it
+     * @Then /^a new browser tab is opened and I switch to it$/
+     */
+    public function newBrowserTabIsOpenedAndISwitchToIt()
+    {
+        list($currentTab, $lastTab) = $this->getCurrentAndLastTabNames();
+        if ($lastTab === $currentTab) {
+            self::fail('No new browser tabs detected after the current one');
+        }
+        $this->getSession()->switchToWindow($lastTab);
     }
 }
