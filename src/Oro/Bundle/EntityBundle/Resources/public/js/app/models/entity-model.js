@@ -67,7 +67,7 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function(data, options) {
+        constructor: function EntityModel(data, options) {
             options = options || {};
             _.extend(this, _.pick(data && data.data || options, 'type', 'id'));
             if (!this.type) {
@@ -115,7 +115,7 @@ define(function(require) {
         /**
          * Converts model in to an object that is used for API requests
          *
-         * @param {Object?} options
+         * @param {Object} [options]
          * @return {{
          *  data: {
          *      id: string?,

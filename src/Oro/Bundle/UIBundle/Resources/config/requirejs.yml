@@ -194,6 +194,7 @@ config:
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/services/registry': 'bundles/oroui/js/app/services/registry.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
+        'oroui/js/app/models/sync-machine-proxy-cache': 'bundles/oroui/js/app/models/sync-machine-proxy-cache.js'
         'oroui/js/app/views/hidden-initialization-view': 'bundles/oroui/js/app/views/hidden-initialization-view.js'
         'oroui/js/app/views/page-center-title-view': 'bundles/oroui/js/app/views/page-center-title-view.js'
         'oroui/js/app/views/page/before-content-addition-view': 'bundles/oroui/js/app/views/page/before-content-addition-view.js'

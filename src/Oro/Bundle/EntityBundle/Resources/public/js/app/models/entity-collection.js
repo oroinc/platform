@@ -32,7 +32,7 @@ define(function(require) {
          */
         type: null,
 
-        constructor: function(data, options) {
+        constructor: function EntityCollection(data, options) {
             options = options || {};
             _.extend(this, _.pick(options, 'type'));
             if (!this.type) {
@@ -65,16 +65,16 @@ define(function(require) {
         },
 
         /**
-         * Converts model in to an object that is used for API requests
+         * Converts collection in to an object that is used for API requests
          *
-         * @param {Object?} options
-         * @return {Object<string, {data: Array<EntityModel.identifier>}>}
+         * @param {Object} [options]
+         * @return {Object<string, {data: Array<Object>}>}
          */
         toJSON: function(options) {
-            var identifiers = this.map(function(model) {
-                return model.identifier;
+            var data = this.map(function(model) {
+                return model.toJSON(options).data;
             });
-            return {data: identifiers};
+            return {data: data};
         },
 
         sync: function(method, model, options) {
