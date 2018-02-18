@@ -15,8 +15,8 @@ api:
             fields:
                 # this is a predefined field name that is used to provide
                 # the class name of the target entity
-                # @see Oro\Component\EntitySerializer\ConfigUtil::CLASS_NAME
-                # @see Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessorInterface::getClassName
+                # @see \Oro\Component\EntitySerializer\ConfigUtil::CLASS_NAME
+                # @see \Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessorInterface::getClassName
                 __class__:
                     meta_property: true
                     data_type: string
@@ -33,8 +33,8 @@ api:
             fields:
                 # this is a predefined field name that is used to provide
                 # the class name of the target entity
-                # @see Oro\Component\EntitySerializer\ConfigUtil::CLASS_NAME
-                # @see Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessorInterface::getClassName
+                # @see \Oro\Component\EntitySerializer\ConfigUtil::CLASS_NAME
+                # @see \Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessorInterface::getClassName
                 __class__:
                     meta_property: true
                     data_type: string

@@ -13,7 +13,7 @@ class NullErrorCompleter implements ErrorCompleterInterface
     /**
      * {@inheritdoc}
      */
-    public function complete(Error $error, EntityMetadata $metadata = null)
+    public function complete(Error $error, RequestType $requestType, EntityMetadata $metadata = null)
     {
     }
 }

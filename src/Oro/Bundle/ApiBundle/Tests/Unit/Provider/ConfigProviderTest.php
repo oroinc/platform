@@ -30,9 +30,9 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage $className must not be empty.
      */
-    public function testShouldThrowExceptionIfNoClassName()
+    public function testShouldThrowExceptionIfClassNameIsEmpty()
     {
-        $this->configProvider->getConfig(null, '1.2', new RequestType([]));
+        $this->configProvider->getConfig('', '1.2', new RequestType([]));
     }
 
     public function testShouldBuildConfig()

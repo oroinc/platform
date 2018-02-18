@@ -10,6 +10,9 @@ use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 
+/**
+ * A base class for different kind of error completers.
+ */
 abstract class AbstractErrorCompleter implements ErrorCompleterInterface
 {
     /** @var ExceptionTextExtractorInterface */

@@ -52,7 +52,7 @@ class SubmitForm implements ProcessorInterface
     {
         /**
          * as Symfony Form treats false as NULL due to checkboxes
-         * @see Symfony\Component\Form\Form::submit
+         * @see \Symfony\Component\Form\Form::submit
          * we have to convert false to its string representation here
          */
         array_walk(

@@ -10,6 +10,9 @@ use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
+/**
+ * A base class for CLI commands that shows a different kind of debug information about Data API configuration.
+ */
 abstract class AbstractDebugCommand extends ContainerAwareCommand
 {
     /**

@@ -109,7 +109,7 @@ abstract class ProcessIncludedEntities implements ProcessorInterface
             $actionMetadata = $actionContext->getMetadata();
             $errors = $actionContext->getErrors();
             foreach ($errors as $error) {
-                $errorCompleter->complete($error, $actionMetadata);
+                $errorCompleter->complete($error, $actionContext->getRequestType(), $actionMetadata);
                 $this->fixErrorPath($error, $entityData->getPath());
                 $context->addError($error);
             }

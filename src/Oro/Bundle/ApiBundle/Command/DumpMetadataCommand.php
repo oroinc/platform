@@ -16,6 +16,9 @@ use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
 
+/**
+ * The CLI command to show metadata of Data API resources.
+ */
 class DumpMetadataCommand extends AbstractDebugCommand
 {
     /**

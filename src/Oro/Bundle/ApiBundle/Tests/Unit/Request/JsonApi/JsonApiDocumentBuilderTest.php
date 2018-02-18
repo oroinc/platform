@@ -15,18 +15,24 @@ use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
 {
     /** @var JsonApiDocumentBuilder */
-    protected $documentBuilder;
+    private $documentBuilder;
+
+    /** @var RequestType */
+    private $requestType;
 
     protected function setUp()
     {
         $valueNormalizer = $this->createMock(ValueNormalizer::class);
-        $valueNormalizer->expects($this->any())
+        $valueNormalizer->expects(self::any())
             ->method('normalizeValue')
             ->willReturnCallback(
                 function ($value, $dataType, $requestType, $isArrayAllowed) {
-                    $this->assertEquals(DataType::ENTITY_TYPE, $dataType);
-                    $this->assertEquals(new RequestType([RequestType::JSON_API]), $requestType);
-                    $this->assertFalse($isArrayAllowed);
+                    self::assertEquals(DataType::ENTITY_TYPE, $dataType);
+                    self::assertEquals(
+                        new RequestType([RequestType::REST, RequestType::JSON_API]),
+                        $requestType
+                    );
+                    self::assertFalse($isArrayAllowed);
 
                     if (false !== strpos($value, 'WithoutAlias')) {
                         throw new EntityAliasNotFoundException();
@@ -37,13 +43,15 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             );
 
         $entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
-        $entityIdTransformer->expects($this->any())
+        $entityIdTransformer->expects(self::any())
             ->method('transform')
             ->willReturnCallback(
                 function ($id, EntityMetadata $metadata) {
                     return sprintf('%s::%s', $metadata->getClassName(), $id);
                 }
             );
+
+        $this->requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
         $this->documentBuilder = new JsonApiDocumentBuilder(
             $valueNormalizer,
@@ -62,7 +70,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             'name' => 'Name',
         ];
 
-        $this->documentBuilder->setDataObject($object);
+        $this->documentBuilder->setDataObject($object, $this->requestType);
     }
 
     /**
@@ -76,7 +84,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             'name' => 'Name',
         ];
 
-        $this->documentBuilder->setDataCollection([$object]);
+        $this->documentBuilder->setDataCollection([$object], $this->requestType);
     }
 
     /**
@@ -127,8 +135,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $metadata->addAssociation($this->createAssociationMetadata('missingToOne', 'Test\Class'));
         $metadata->addAssociation($this->createAssociationMetadata('missingToMany', 'Test\Class', true));
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'data'     => [
                     'type'          => 'test_entity',
@@ -269,8 +277,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $metadata->addAssociation($this->createAssociationMetadata('missingToOne', 'Test\Class'));
         $metadata->addAssociation($this->createAssociationMetadata('missingToMany', 'Test\Class', true));
 
-        $this->documentBuilder->setDataCollection([$object], $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataCollection([$object], $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'data'     => [
                     [
@@ -378,8 +386,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
         $metadata->getAssociation('categories')->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'data'     => [
                     'type'          => 'test_entity',
@@ -439,8 +447,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
         $metadata->getAssociation('categories')->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'data'     => [
                     'type'          => 'test_entity',
@@ -495,8 +503,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             $association->setDataType('array');
         }
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'data'     => [
                     'type'       => 'test_entity',
@@ -529,8 +537,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $association->setDataType('object');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'data'     => [
                     'type'       => 'test_entity',
@@ -582,8 +590,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $association->setDataType('array');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'data'     => [
                     'type'       => 'test_entity',
@@ -638,8 +646,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
         $association->setDataType('scalar');
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'data'     => [
                     'type'       => 'test_entity',
@@ -680,8 +688,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
         $association->setDataType('array');
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'data'     => [
                     'type'       => 'test_entity',
@@ -732,8 +740,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $association->getTargetMetadata()->removeField('id');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'data'     => [
                     'type'       => 'test_entity',
@@ -783,8 +791,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $association->getTargetMetadata()->removeField('id');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'data'     => [
                     'type'       => 'test_entity',
@@ -871,8 +879,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $associationMetadata->setTargetMetadata($targetMetadata);
         $associationMetadata->setDataType('array');
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'data'     => [
                     'type'       => 'test_entity',
@@ -913,7 +921,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $error->setDetail('some error details');
 
         $this->documentBuilder->setErrorObject($error);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'errors' => [
                     [
@@ -937,7 +945,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $error->setDetail('some error details');
 
         $this->documentBuilder->setErrorCollection([$error]);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'errors' => [
                     [
@@ -964,8 +972,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'))
             ->setResultName('resultMeta1');
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'data'     => [
                     'type' => 'test_entity',

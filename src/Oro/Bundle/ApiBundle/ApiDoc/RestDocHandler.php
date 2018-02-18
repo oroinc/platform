@@ -19,9 +19,15 @@ use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
+/**
+ * Populates ApiDoc annotation based on the confoguration of Data API resource.
+ */
 class RestDocHandler implements HandlerInterface
 {
-    const ID_PLACEHOLDER = '{id}';
+    private const ID_PLACEHOLDER = '{id}';
+
+    /** @var string The group of routes that should be processed by this handler */
+    private $routeGroup;
 
     /** @var RestDocViewDetector */
     private $docViewDetector;
@@ -39,6 +45,7 @@ class RestDocHandler implements HandlerInterface
     private $filtersHandler;
 
     /**
+     * @param string                      $routeGroup
      * @param RestDocViewDetector         $docViewDetector
      * @param ActionProcessorBagInterface $processorBag
      * @param ValueNormalizer             $valueNormalizer
@@ -46,12 +53,14 @@ class RestDocHandler implements HandlerInterface
      * @param RestDocFiltersHandler       $filtersHandler
      */
     public function __construct(
+        string $routeGroup,
         RestDocViewDetector $docViewDetector,
         ActionProcessorBagInterface $processorBag,
         ValueNormalizer $valueNormalizer,
         RestDocIdentifierHandler $identifierHandler,
         RestDocFiltersHandler $filtersHandler
     ) {
+        $this->routeGroup = $routeGroup;
         $this->docViewDetector = $docViewDetector;
         $this->processorBag = $processorBag;
         $this->valueNormalizer = $valueNormalizer;
@@ -64,7 +73,7 @@ class RestDocHandler implements HandlerInterface
      */
     public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method)
     {
-        if (RestRouteOptionsResolver::ROUTE_GROUP !== $route->getOption(RestRouteOptionsResolver::GROUP_OPTION)
+        if ($route->getOption(RestRouteOptionsResolver::GROUP_OPTION) !== $this->routeGroup
             || $this->docViewDetector->getRequestType()->isEmpty()
         ) {
             return;
@@ -139,7 +148,7 @@ class RestDocHandler implements HandlerInterface
         $processor = $this->processorBag->getProcessor($action);
         /** @var Context $context */
         $context = $processor->createContext();
-        $context->addConfigExtra(new DescriptionsConfigExtra($action));
+        $context->addConfigExtra(new DescriptionsConfigExtra());
         $context->getRequestType()->set($this->docViewDetector->getRequestType());
         $context->setLastGroup('initialize');
         if ($associationName) {
@@ -147,7 +156,7 @@ class RestDocHandler implements HandlerInterface
             $context->setParentClassName($entityClass);
             $context->setAssociationName($associationName);
             $parentConfigExtras = $context->getParentConfigExtras();
-            $parentConfigExtras[] = new DescriptionsConfigExtra($action);
+            $parentConfigExtras[] = new DescriptionsConfigExtra();
             $context->setParentConfigExtras($parentConfigExtras);
         } else {
             $context->setClassName($entityClass);

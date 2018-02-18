@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
+use Symfony\Component\HttpFoundation\Response;
+
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException;
@@ -71,7 +73,8 @@ class NormalizeParentEntityClass implements ProcessorInterface
             $context->addError(
                 Error::createValidationError(
                     Constraint::ENTITY_TYPE,
-                    sprintf('Unknown parent entity type: %s.', $parentEntityClass)
+                    sprintf('Unknown parent entity type: %s.', $parentEntityClass),
+                    Response::HTTP_NOT_FOUND
                 )
             );
         }

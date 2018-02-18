@@ -56,7 +56,7 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
 
         $documentBuilder->expects(self::once())
             ->method('setDataCollection')
-            ->with(null);
+            ->with(null, $this->context->getRequestType());
         $documentBuilder->expects(self::never())
             ->method('getDocument');
 
@@ -81,7 +81,7 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
 
         $documentBuilder->expects(self::once())
             ->method('setDataCollection')
-            ->with($result, $metadata);
+            ->with($result, $this->context->getRequestType(), $metadata);
         $documentBuilder->expects(self::never())
             ->method('getDocument');
 

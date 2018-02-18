@@ -10,6 +10,9 @@ use Symfony\Component\DependencyInjection\Reference;
 use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
 use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
 
+/**
+ * Configures Data API security firewalls.
+ */
 class SecurityFirewallCompilerPass implements CompilerPassInterface
 {
     /** @var array */

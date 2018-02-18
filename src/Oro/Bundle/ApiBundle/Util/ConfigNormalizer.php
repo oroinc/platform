@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 
 /**
  * This class should be synchronized with the config normalizer for ObjectNormalizer.
- * @see Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer
+ * @see \Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer
  */
 class ConfigNormalizer extends BaseConfigNormalizer
 {

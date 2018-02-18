@@ -59,6 +59,6 @@ class CompositeFormatter implements FormatterInterface
             return $this->formatters[$view];
         }
 
-        return $this->formatters[''];
+        throw new \LogicException(sprintf('Cannot find formatter for "%s" API view.', $view));
     }
 }

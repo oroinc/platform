@@ -274,9 +274,8 @@ services:
         arguments:
             - '@oro_entity.entity_alias_loader'
             - '@oro_entity.entity_alias_cache'
+            - '@logger'
             - %kernel.debug%
-        calls:
-            - [ setLogger, [ '@logger' ] ]
         lazy: true
 
     oro_entity.entity_alias_cache:
@@ -384,7 +383,7 @@ services:
             - '@oro_entity.entity_alias_resolver'
             - '@logger'
         tags:
-            - { name: oro_api.routing_options_resolver }
+            - { name: oro_api.routing_options_resolver, view: default }
 
     oro_entity.api_doc_handler.dictionary:
         class: Oro\Bundle\EntityBundle\Routing\DictionaryEntityApiDocHandler
