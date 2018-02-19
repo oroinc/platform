@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Form\Type;
 
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
+use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
@@ -50,6 +51,9 @@ class ContextsSelectTypeTest extends TypeTestCase
             ->getMock();
     }
 
+    /**
+     * @return array
+     */
     protected function getExtensions()
     {
         return [
@@ -75,7 +79,13 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->entityTitleResolver,
             $this->createMock(FeatureChecker::class)
         );
-        $type->buildForm($builder, ['collectionModel' => false]);
+        $type->buildForm(
+            $builder,
+            [
+                'collectionModel' => false,
+                'configs' => ['separator' => ContextsToViewTransformer::SEPARATOR]
+            ]
+        );
     }
 
     public function testSetDefaultOptions()
@@ -91,7 +101,7 @@ class ContextsSelectTypeTest extends TypeTestCase
                         'placeholder'        => 'oro.activity.contexts.placeholder',
                         'allowClear'         => true,
                         'multiple'           => true,
-                        'separator'          => ';',
+                        'separator'          => ContextsToViewTransformer::SEPARATOR,
                         'forceSelectedData'  => true,
                         'minimumInputLength' => 0,
                     ]

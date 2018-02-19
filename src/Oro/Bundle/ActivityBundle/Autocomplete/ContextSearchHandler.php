@@ -6,7 +6,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Doctrine\DBAL\Types\Type;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 
@@ -18,6 +17,7 @@ use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Event\SearchAliasesEvent;
+use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
@@ -224,7 +224,7 @@ class ContextSearchHandler implements ConverterInterface
      */
     protected function decodeTargets($targetsString)
     {
-        $targetsJsonArray = explode(';', $targetsString);
+        $targetsJsonArray = explode(ContextsToViewTransformer::SEPARATOR, $targetsString);
         $targetsArray = [];
 
         foreach ($targetsJsonArray as $targetJson) {
