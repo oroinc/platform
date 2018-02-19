@@ -1,0 +1,19 @@
+api:
+    entities:
+        Test\Entity1: ~
+        Test\Entity2:
+            fields:
+                field2:
+                    exclude: true
+        Test\Entity3:
+            exclude: false
+        Test\Entity4:
+            exclude: true
+        Test\Entity5:
+            exclude: true
+        Test\Entity6:
+            exclude: false
+        Test\Entity12:
+            exclude: false
+        Test\Entity13:
+            exclude: true

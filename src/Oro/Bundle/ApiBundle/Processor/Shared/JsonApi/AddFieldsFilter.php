@@ -54,7 +54,7 @@ class AddFieldsFilter implements ProcessorInterface
          * this filter has descriptive nature and it should be added to the list of filters
          * only if descriptions are requested
          * actually a filtering by this filter is performed by
-         * @see Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleFieldsFilter
+         * @see \Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleFieldsFilter
          */
         /*
         if (!$context->hasConfigExtra(DescriptionsConfigExtra::NAME)) {

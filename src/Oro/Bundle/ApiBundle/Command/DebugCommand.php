@@ -17,6 +17,9 @@ use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
+/**
+ * The CLI command to show different kind of debug information about Data API.
+ */
 class DebugCommand extends AbstractDebugCommand
 {
     /**

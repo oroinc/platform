@@ -41,10 +41,12 @@ class AddIncludedEntitiesToResultDocument implements ProcessorInterface
             return;
         }
 
+        $requestType = $context->getRequestType();
         foreach ($includedEntities as $entity) {
             $entityData = $includedEntities->getData($entity);
             $documentBuilder->addIncludedObject(
                 $entityData->getNormalizedData(),
+                $requestType,
                 $entityData->getMetadata()
             );
         }

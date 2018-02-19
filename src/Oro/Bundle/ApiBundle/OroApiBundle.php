@@ -12,6 +12,9 @@ use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPa
 use Oro\Component\ChainProcessor\DependencyInjection\LoadApplicableCheckersCompilerPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
+/**
+ * The ApiBundle bundle class.
+ */
 class OroApiBundle extends Bundle
 {
     /**
@@ -21,17 +24,20 @@ class OroApiBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new Compiler\ConfigurationCompilerPass());
-        $container->addCompilerPass(new Compiler\DataTransformerConfigurationCompilerPass());
-        $container->addCompilerPass(new Compiler\EntityIdTransformerConfigurationCompilerPass());
-        $container->addCompilerPass(new Compiler\EntityAliasesConfigurationCompilerPass());
-        $container->addCompilerPass(new Compiler\ExclusionProviderConfigurationCompilerPass());
-        $container->addCompilerPass(new Compiler\ExceptionTextExtractorConfigurationCompilerPass());
-        $container->addCompilerPass(new Compiler\ConstraintTextExtractorConfigurationCompilerPass());
+        $container->addCompilerPass(new Compiler\ProcessorBagCompilerPass());
+        $container->addCompilerPass(new Compiler\FilterFactoryCompilerPass());
+        $container->addCompilerPass(new Compiler\FormCompilerPass());
+        $container->addCompilerPass(new Compiler\DataTransformerCompilerPass());
+        $container->addCompilerPass(new Compiler\EntityIdTransformerCompilerPass());
+        $container->addCompilerPass(new Compiler\EntityAliasCompilerPass());
+        $container->addCompilerPass(new Compiler\ExclusionProviderCompilerPass());
+        $container->addCompilerPass(new Compiler\ExceptionTextExtractorCompilerPass());
+        $container->addCompilerPass(new Compiler\ConstraintTextExtractorCompilerPass());
         $container->addCompilerPass(new Compiler\QueryExpressionCompilerPass());
         $container->addCompilerPass(new Compiler\SecurityFirewallCompilerPass());
-        $container->addCompilerPass(new Compiler\DocumentBuilderConfigurationCompilerPass());
-        $container->addCompilerPass(new Compiler\ErrorCompleterConfigurationCompilerPass());
+        $container->addCompilerPass(new Compiler\DocumentBuilderCompilerPass());
+        $container->addCompilerPass(new Compiler\ErrorCompleterCompilerPass());
+        $container->addCompilerPass(new Compiler\ResourcesCacheWarmerCompilerPass());
         $container->addCompilerPass(
             new LoadApplicableCheckersCompilerPass('oro_api.processor_bag', 'oro.api.processor.applicable_checker')
         );
@@ -40,8 +46,12 @@ class OroApiBundle extends Bundle
             PassConfig::TYPE_BEFORE_REMOVING
         );
         $container->addCompilerPass(
-            new Compiler\ApiDocConfigurationCompilerPass(),
+            new Compiler\ApiDocCompilerPass(),
             PassConfig::TYPE_BEFORE_REMOVING
+        );
+        $container->addCompilerPass(
+            new Compiler\RemoveConfigParameterCompilerPass(),
+            PassConfig::TYPE_AFTER_REMOVING
         );
 
         if ('test' === $container->getParameter('kernel.environment')) {

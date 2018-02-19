@@ -91,7 +91,7 @@ class ErrorSource
     /**
      * Gets a pointer to a property in the request document caused the error.
      * For JSON documents the pointer conforms RFC 6901.
-     * @see https://tools.ietf.org/html/rfc6901
+     * @link https://tools.ietf.org/html/rfc6901
      * e.g. "/data" for a primary data object, or "/data/attributes/title" for a specific attribute
      *
      * @return string|null
@@ -104,7 +104,7 @@ class ErrorSource
     /**
      * Sets a pointer to a property in the request document caused the error.
      * For JSON documents the pointer must conform RFC 6901.
-     * @see https://tools.ietf.org/html/rfc6901
+     * @link https://tools.ietf.org/html/rfc6901
      * e.g. "/data" for a primary data object, or "/data/attributes/title" for a specific attribute
      *
      * @param string|null $pointer

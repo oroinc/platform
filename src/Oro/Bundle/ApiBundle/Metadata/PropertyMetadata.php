@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Metadata;
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * A base class for classes represents metadata for different kind of entity properties.
+ */
 abstract class PropertyMetadata extends ParameterBag
 {
     /** @var string */

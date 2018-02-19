@@ -30,9 +30,9 @@ class MetadataProviderTest extends \PHPUnit_Framework_TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage $className must not be empty.
      */
-    public function testShouldThrowExceptionIfNoClassName()
+    public function testShouldThrowExceptionIfClassNameIsEmpty()
     {
-        $this->metadataProvider->getMetadata(null, '1.2', new RequestType([]), new EntityDefinitionConfig());
+        $this->metadataProvider->getMetadata('', '1.2', new RequestType([]), new EntityDefinitionConfig());
     }
 
     public function testShouldBuildMetadata()

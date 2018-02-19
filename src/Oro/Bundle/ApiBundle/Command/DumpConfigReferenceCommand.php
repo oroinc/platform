@@ -12,6 +12,9 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
 
+/**
+ * The CLI command to show the structure of "Resources/config/oro/api.yml".
+ */
 class DumpConfigReferenceCommand extends ContainerAwareCommand
 {
     /**

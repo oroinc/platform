@@ -21,6 +21,9 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
+/**
+ * The CLI command to show resources accessible through Data API.
+ */
 class DumpCommand extends AbstractDebugCommand
 {
     /**

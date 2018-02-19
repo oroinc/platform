@@ -44,8 +44,10 @@ abstract class SetDefaultPaging implements ProcessorInterface
      */
     protected function addPageNumberFilter(FilterCollection $filters)
     {
-        // "page number" filter must be added after "page size" filter because it depends on this filter
-        // @see Oro\Bundle\ApiBundle\Filter\PageNumberFilter::apply
+        /**
+         * "page number" filter must be added after "page size" filter because it depends on this filter
+         * @see \Oro\Bundle\ApiBundle\Filter\PageNumberFilter::apply
+         */
         $pageNumberFilterKey = $this->getPageNumberFilterKey();
         if (!$filters->has($pageNumberFilterKey)) {
             $filters->add(

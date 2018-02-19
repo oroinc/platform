@@ -15,6 +15,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 
 use Oro\Component\Routing\Resolver\RouteOptionsResolverAwareInterface;
 
+/**
+ * The optimized and adapted version of Nelmio CachingApiDocExtractor.
+ */
 class CachingApiDocExtractor extends BaseExtractor implements
     RouteOptionsResolverAwareInterface,
     RestDocViewDetectorAwareInterface
@@ -89,9 +92,9 @@ class CachingApiDocExtractor extends BaseExtractor implements
          * disabling the garbage collector gives a significant performance gain (about 2 times)
          * because a lot of config and metadata objects with short lifetime are used
          * this happens because we work with clones of these objects
-         * @see Oro\Bundle\ApiBundle\Provider\ConfigProvider::getConfig
-         * @see Oro\Bundle\ApiBundle\Provider\RelationConfigProvider::getRelationConfig
-         * @see Oro\Bundle\ApiBundle\Provider\MetadataProvider::getMetadata
+         * @see \Oro\Bundle\ApiBundle\Provider\ConfigProvider::getConfig
+         * @see \Oro\Bundle\ApiBundle\Provider\RelationConfigProvider::getRelationConfig
+         * @see \Oro\Bundle\ApiBundle\Provider\MetadataProvider::getMetadata
          */
         gc_disable();
         $result = parent::all($this->resolveView($view));

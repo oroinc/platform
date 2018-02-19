@@ -9,6 +9,8 @@ use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
+ * The metadata for an entity.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntityMetadata implements ToArrayInterface

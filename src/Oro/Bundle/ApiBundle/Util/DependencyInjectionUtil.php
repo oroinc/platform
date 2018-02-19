@@ -2,19 +2,47 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
-use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\ApiBundle\DependencyInjection\Configuration;
 
 /**
  * Provides a set of methods to simplify working with the service container.
  */
 class DependencyInjectionUtil
 {
+    /**
+     * @internal never use this constant outside of ApiBundle,
+     *           to recive and update the configuration use getConfig and setConfig methods.
+     */
+    public const API_BUNDLE_CONFIG_PARAMETER_NAME = 'oro_api.bundle_config';
+
+    /**
+     * Returns the loaded and processed configuration of ApiBundle.
+     *
+     * @param ContainerBuilder $container
+     *
+     * @return array
+     */
+    public static function getConfig(ContainerBuilder $container): array
+    {
+        return $container->getParameter(self::API_BUNDLE_CONFIG_PARAMETER_NAME);
+    }
+
+    /**
+     * Updates the loaded and processed configuration of ApiBundle.
+     * IMPORTANT: all updates must be performed in extensions of bundles
+     * to be able to use updated configuration in compiler passes.
+     *
+     * @param ContainerBuilder $container
+     * @param array $config
+     */
+    public static function setConfig(ContainerBuilder $container, array $config)
+    {
+        $container->setParameter(self::API_BUNDLE_CONFIG_PARAMETER_NAME, $config);
+    }
+
     /**
      * Gets the specific service by its identifier or alias.
      *
@@ -31,23 +59,6 @@ class DependencyInjectionUtil
     }
 
     /**
-     * Gets configuration of ApiBundle.
-     *
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
-    public static function getConfig(ContainerBuilder $container)
-    {
-        $processor = new Processor();
-
-        return $processor->processConfiguration(
-            new Configuration(),
-            $container->getExtensionConfig('oro_api')
-        );
-    }
-
-    /**
      * Gets a value of the specific tag attribute.
      *
      * @param array  $attributes
@@ -60,6 +71,32 @@ class DependencyInjectionUtil
     {
         if (!array_key_exists($attributeName, $attributes)) {
             return $defaultValue;
+        }
+
+        return $attributes[$attributeName];
+    }
+
+    /**
+     * Gets a value of the specific mandatory tag attribute.
+     *
+     * @param array  $attributes
+     * @param string $attributeName
+     * @param string $serviceId
+     * @param string $tagName
+     *
+     * @return mixed
+     *
+     * @throws LogicException is the reuested attribute does not exist in $attributes array
+     */
+    public static function getRequiredAttribute(array $attributes, $attributeName, $serviceId, $tagName)
+    {
+        if (!array_key_exists($attributeName, $attributes)) {
+            throw new LogicException(sprintf(
+                'The attribute "%s" is mandatory for "%s" tag. Service: "%s".',
+                $attributeName,
+                $tagName,
+                $serviceId
+            ));
         }
 
         return $attributes[$attributeName];
@@ -133,30 +170,28 @@ class DependencyInjectionUtil
     }
 
     /**
-     * Replaces a regular service with the debug one.
+     * Disables the specific API processor for the given request type.
      *
      * @param ContainerBuilder $container
-     * @param string           $serviceId
-     * @param string           $debugServiceClassName
+     * @param string           $processorServiceId
+     * @param string           $requestType
      */
-    public static function registerDebugService(
+    public static function disableApiProcessor(
         ContainerBuilder $container,
-        $serviceId,
-        $debugServiceClassName = 'Oro\Component\ChainProcessor\Debug\TraceableActionProcessor'
+        string $processorServiceId,
+        string $requestType
     ) {
-        $definition = $container->findDefinition($serviceId);
-        $isPublic = $definition->isPublic();
-        $definition->setPublic(false);
-        $container->setDefinition($serviceId . '.debug.parent', $definition);
-        $debugDefinition = new Definition(
-            $debugServiceClassName,
-            [
-                new Reference($serviceId . '.debug.parent'),
-                new Reference('oro_api.profiler.logger')
-            ]
-        );
-        $debugDefinition->setPublic(false);
-        $container->setDefinition($serviceId . '.debug', $debugDefinition);
-        $container->setAlias($serviceId, new Alias($serviceId . '.debug', $isPublic));
+        $processorDef = $container->getDefinition($processorServiceId);
+        $tags = $processorDef->getTag('oro.api.processor');
+        $processorDef->clearTag('oro.api.processor');
+
+        foreach ($tags as $tag) {
+            if (empty($tag['requestType'])) {
+                $tag['requestType'] = '!' . $requestType;
+            } else {
+                $tag['requestType'] .= '&!' . $requestType;
+            }
+            $processorDef->addTag('oro.api.processor', $tag);
+        }
     }
 }

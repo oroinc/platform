@@ -8,6 +8,9 @@ use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
+/**
+ * Common functionality for ConfigProvider and RelationConfigProvider.
+ */
 abstract class AbstractConfigProvider
 {
     /**
@@ -19,11 +22,11 @@ abstract class AbstractConfigProvider
      */
     protected function initContext(
         ConfigContext $context,
-        $className,
-        $version,
+        string $className,
+        string $version,
         RequestType $requestType,
         array $extras
-    ) {
+    ): void {
         $context->setClassName($className);
         $context->setVersion($version);
         $context->getRequestType()->set($requestType);
@@ -40,8 +43,12 @@ abstract class AbstractConfigProvider
      *
      * @return string
      */
-    protected function buildCacheKey($className, $version, RequestType $requestType, array $extras)
-    {
+    protected function buildCacheKey(
+        string $className,
+        string $version,
+        RequestType $requestType,
+        array $extras
+    ): string {
         $cacheKey = (string)$requestType . '|' . $version . '|' . $className;
         foreach ($extras as $extra) {
             $part = $extra->getCacheKeyPart();
@@ -59,7 +66,7 @@ abstract class AbstractConfigProvider
      *
      * @return string
      */
-    protected function buildConfigKey($className, array $extras)
+    protected function buildConfigKey(string $className, array $extras): string
     {
         $configKey = $className;
         foreach ($extras as $extra) {
@@ -80,7 +87,7 @@ abstract class AbstractConfigProvider
      *
      * @return Config
      */
-    protected function buildResult(ConfigContext $context)
+    protected function buildResult(ConfigContext $context): Config
     {
         $config = new Config();
         if ($context->hasResult()) {

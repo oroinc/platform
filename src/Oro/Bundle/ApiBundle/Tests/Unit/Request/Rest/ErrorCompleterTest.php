@@ -5,12 +5,18 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\Rest;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Rest\ErrorCompleter;
 
 class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $exceptionTextExtractor;
+
+    /** @var RequestType */
+    protected $requestType;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $metadata;
@@ -20,12 +26,9 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->exceptionTextExtractor = $this
-            ->createMock('Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface');
-
-        $this->metadata = $this->getMockBuilder('Oro\Bundle\ApiBundle\Metadata\EntityMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->exceptionTextExtractor = $this->createMock(ExceptionTextExtractorInterface::class);
+        $this->metadata = $this->createMock(EntityMetadata::class);
+        $this->requestType = new RequestType([RequestType::REST]);
 
         $this->errorCompleter = new ErrorCompleter($this->exceptionTextExtractor);
     }
@@ -35,8 +38,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $error = new Error();
         $expectedError = new Error();
 
-        $this->errorCompleter->complete($error);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorWithInnerExceptionAndAlreadyCompletedProperties()
@@ -57,8 +60,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setDetail('test detail');
         $expectedError->setInnerException($exception);
 
-        $this->errorCompleter->complete($error);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorWithInnerExceptionAndExceptionTextExtractorReturnsNothing()
@@ -71,8 +74,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError = new Error();
         $expectedError->setInnerException($exception);
 
-        $this->errorCompleter->complete($error);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorWithInnerException()
@@ -106,8 +109,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($exception))
             ->willReturn($expectedError->getDetail());
 
-        $this->errorCompleter->complete($error);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorTitleByStatusCode()
@@ -119,8 +122,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setStatusCode(400);
         $expectedError->setTitle(Response::$statusTexts[400]);
 
-        $this->errorCompleter->complete($error);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorTitleByUnknownStatusCode()
@@ -131,7 +134,7 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError = new Error();
         $expectedError->setStatusCode(1000);
 
-        $this->errorCompleter->complete($error);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 }

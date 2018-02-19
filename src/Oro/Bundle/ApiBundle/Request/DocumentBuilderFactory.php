@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
  * The factory that creates the document builder for a specific request type.
  * The implementation of this factory assumes that all document builders
  * are declared in DIC as public non shared services.
- * @see \Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentBuilderConfigurationCompilerPass
+ * @see \Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentBuilderCompilerPass
  */
 class DocumentBuilderFactory
 {

@@ -7,6 +7,8 @@ use Oro\Component\EntitySerializer\FieldConfig;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
+ * Represents a configuration of an entity.
+ *
  * @method EntityDefinitionFieldConfig[] getFields()
  * @method EntityDefinitionFieldConfig|null getField($fieldName)
  */
@@ -80,9 +82,9 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      * This value is set by config providers and is used by a metadata provider
      * to build a metadata cache key. It allows to avoid loading the same metadata
      * several times and as result it improves a performance.
-     * @see Oro\Bundle\ApiBundle\Provider\MetadataProvider
-     * @see Oro\Bundle\ApiBundle\Provider\ConfigProvider
-     * @see Oro\Bundle\ApiBundle\Provider\RelationConfigProvider
+     * @see \Oro\Bundle\ApiBundle\Provider\MetadataProvider
+     * @see \Oro\Bundle\ApiBundle\Provider\ConfigProvider
+     * @see \Oro\Bundle\ApiBundle\Provider\RelationConfigProvider
      *
      * @var string|null
      */
@@ -101,7 +103,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     /**
      * Sets a string that unique identify this instance of entity definition config.
      * Do not set this value in your code.
-     * @see Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig::key
+     * @see \Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig::key
      *
      * @param string|null $key
      */

@@ -2,39 +2,51 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
+use Psr\Log\LoggerInterface;
+
+use Doctrine\Common\Cache\Cache;
+
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\EntityBundle\Provider\EntityAliasLoader;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 
 class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $loader;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityAliasLoader */
+    private $loader;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $cache;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|Cache */
+    private $cache;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|LoggerInterface */
+    private $logger;
 
     /** @var EntityAliasResolver */
-    protected $entityAliasResolver;
+    private $entityAliasResolver;
 
     protected function setUp()
     {
-        $this->loader = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityAliasLoader')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->cache = $this->createMock('Doctrine\Common\Cache\Cache');
+        $this->loader = $this->createMock(EntityAliasLoader::class);
+        $this->cache = $this->createMock(Cache::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->entityAliasResolver = new EntityAliasResolver($this->loader, $this->cache, true);
+        $this->entityAliasResolver = new EntityAliasResolver(
+            $this->loader,
+            $this->cache,
+            $this->logger,
+            true
+        );
     }
 
     protected function setLoadExpectations()
     {
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('fetch')
-            ->with(EntityAliasResolver::CACHE_KEY)
+            ->with('entity_aliases')
             ->willReturn(false);
 
-        $this->loader->expects($this->once())
+        $this->loader->expects(self::once())
             ->method('load')
             ->willReturnCallback(
                 function (EntityAliasStorage $storage) {
@@ -50,7 +62,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
     {
         $this->setLoadExpectations();
 
-        $this->assertFalse(
+        self::assertFalse(
             $this->entityAliasResolver->hasAlias('Test\UnknownEntity')
         );
     }
@@ -103,7 +115,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
     {
         $this->setLoadExpectations();
 
-        $this->assertTrue(
+        self::assertTrue(
             $this->entityAliasResolver->hasAlias('Test\Entity1')
         );
     }
@@ -112,7 +124,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
     {
         $this->setLoadExpectations();
 
-        $this->assertEquals(
+        self::assertEquals(
             'entity1_alias',
             $this->entityAliasResolver->getAlias('Test\Entity1')
         );
@@ -122,7 +134,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
     {
         $this->setLoadExpectations();
 
-        $this->assertEquals(
+        self::assertEquals(
             'entity1_plural_alias',
             $this->entityAliasResolver->getPluralAlias('Test\Entity1')
         );
@@ -132,7 +144,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
     {
         $this->setLoadExpectations();
 
-        $this->assertEquals(
+        self::assertEquals(
             'Test\Entity1',
             $this->entityAliasResolver->getClassByAlias('entity1_alias')
         );
@@ -142,7 +154,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
     {
         $this->setLoadExpectations();
 
-        $this->assertEquals(
+        self::assertEquals(
             'Test\Entity1',
             $this->entityAliasResolver->getClassByPluralAlias('entity1_plural_alias')
         );
@@ -152,7 +164,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
     {
         $this->setLoadExpectations();
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Entity1' => new EntityAlias('entity1_alias', 'entity1_plural_alias')],
             $this->entityAliasResolver->getAll()
         );
@@ -160,9 +172,9 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testWarmUpCache()
     {
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('delete')
-            ->with(EntityAliasResolver::CACHE_KEY);
+            ->with('entity_aliases');
 
         $this->setLoadExpectations();
 
@@ -171,9 +183,9 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testClearCache()
     {
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('delete')
-            ->with(EntityAliasResolver::CACHE_KEY);
+            ->with('entity_aliases');
 
         $this->entityAliasResolver->clearCache();
     }
@@ -183,15 +195,15 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
         $storage = new EntityAliasStorage();
         $storage->addEntityAlias('Test\Entity1', new EntityAlias('entity1_alias', 'entity1_plural_alias'));
 
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('fetch')
-            ->with(EntityAliasResolver::CACHE_KEY)
+            ->with('entity_aliases')
             ->willReturn($storage);
 
-        $this->loader->expects($this->never())
+        $this->loader->expects(self::never())
             ->method('load');
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Entity1' => new EntityAlias('entity1_alias', 'entity1_plural_alias')],
             $this->entityAliasResolver->getAll()
         );

@@ -1,0 +1,25 @@
+oro_api:
+    config_files:
+        test_new:
+            file_name: api_test_new.yml
+            request_type: ['test_new']
+        test_override:
+            file_name: [api_test_override.yml, api.yml]
+            request_type: ['test_override']
+        test_no_api_doc_view:
+            file_name: [api_test_no_api_doc_view.yml, api.yml]
+            request_type: ['test_no_api_doc_view']
+
+    api_doc_views:
+        test_new_rest_api:
+            label: Test API without default api.yml
+            headers:
+                Content-Type: application/vnd.api+json
+                X-Test-Request-Type: test_new
+            request_type: ['rest', 'json_api', 'test_new']
+        test_override_rest_api:
+            label: Test API with additional api.yml
+            headers:
+                Content-Type: application/vnd.api+json
+                X-Test-Request-Type: test_override
+            request_type: ['rest', 'json_api', 'test_override']
