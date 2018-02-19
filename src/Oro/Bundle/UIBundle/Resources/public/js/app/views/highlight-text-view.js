@@ -140,7 +140,6 @@ define(function(require) {
          * @param {Boolean|null} fuzzySearch
          */
         update: function(text, fuzzySearch) {
-            this.toggleHighlightSwitcher(text);
             if (fuzzySearch !== undefined) {
                 this.fuzzySearch = fuzzySearch;
             }
@@ -156,6 +155,7 @@ define(function(require) {
             this.findText = this.text.length ? new RegExp(regexp, 'gi') : null;
 
             this.render();
+            this.toggleHighlightSwitcher();
         },
 
         /**
@@ -262,6 +262,15 @@ define(function(require) {
         },
 
         /**
+         * Check highlighted items exists in the view
+         *
+         * @return {boolean}
+         */
+        isViewHasHighlightedItems: function() {
+            return this.$el.find(this.findHighlightClass).length ? true: false;
+        },
+
+        /**
          * Remove highlight from all elements
          */
         clear: function() {
@@ -362,7 +371,7 @@ define(function(require) {
          * @param {boolean} state
          */
         toggleHighlightSwitcher: function(state) {
-            var state = state ? true : false;
+            var state = state ? state : this.isViewHasHighlightedItems();
             this.$el.find(this.highlightSwitcherElement).toggleClass('hide', !state);
         },
 
