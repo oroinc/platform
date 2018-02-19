@@ -21,6 +21,9 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * The CLI command to show configuration of Data API resources.
+ */
 class DumpConfigCommand extends AbstractDebugCommand
 {
     /**

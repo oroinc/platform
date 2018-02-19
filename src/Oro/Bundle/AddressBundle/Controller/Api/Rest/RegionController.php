@@ -8,6 +8,7 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -30,11 +31,12 @@ class RegionController extends FOSRestController
      *         {"name"="id", "dataType"="string", "requirement"="\d+", "description"="region combined code"}
      *     }
      * )
+     * @param Request $request
      * @return Response
      */
-    public function getAction()
+    public function getAction(Request $request)
     {
-        $id = $this->getRequest()->get('id');
+        $id = $request->get('id');
         if (!$id) {
             return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
         }

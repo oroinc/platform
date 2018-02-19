@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\Status;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -27,8 +28,10 @@ class StatusController extends Controller
     /**
      * @Route("/create", name="oro_user_status_create")
      * @Template()
+     * @param Request $request
+     * @return array|Response
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
         $result = false;
 
@@ -36,7 +39,7 @@ class StatusController extends Controller
             $result = true;
         }
 
-        if ($this->getRequest()->isXmlHttpRequest()) {
+        if ($request->isXmlHttpRequest()) {
             if (!$result) {
                 return $this->render(
                     'OroUserBundle:Status:statusForm.html.twig',

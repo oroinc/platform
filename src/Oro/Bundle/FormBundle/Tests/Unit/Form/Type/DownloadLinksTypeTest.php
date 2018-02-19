@@ -38,17 +38,17 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
      * @expectedExceptionMessage The required option "source" is missing.
      */
-    public function testSetDefaultOptionsWithoutSource()
+    public function testConfigureOptionsWithoutSource()
     {
         $resolver = new OptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
         $resolver->resolve([]);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $resolver = new OptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
 
         $options         = ['source' => []];
         $resolvedOptions = $resolver->resolve($options);

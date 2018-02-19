@@ -11,6 +11,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Doctrine\ORM\Proxy\Proxy;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
@@ -45,13 +46,13 @@ class EmailActivityEntityController extends RestGetController
      *      description="Get entities associated with the email activity",
      *      resource=true
      * )
-     *
+     * @param Request $request
      * @return Response
      */
-    public function cgetAction($id)
+    public function cgetAction(Request $request, $id)
     {
-        $page  = (int)$this->getRequest()->get('page', 1);
-        $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $page  = (int)$request->get('page', 1);
+        $limit = (int)$request->get('limit', self::ITEMS_PER_PAGE);
 
         $criteria = $this->buildFilterCriteria(['id' => ['=', $id]]);
 

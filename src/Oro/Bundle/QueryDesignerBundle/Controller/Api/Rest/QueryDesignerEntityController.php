@@ -11,6 +11,7 @@ use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
@@ -38,14 +39,14 @@ class QueryDesignerEntityController extends FOSRestController implements ClassRe
      *      description="Get entities with fields",
      *      resource=true
      * )
-     *
+     * @param Request $request
      * @return Response
      */
-    public function fieldsAction()
+    public function fieldsAction(Request $request)
     {
         /** @var EntityWithFieldsProvider $provider */
         $provider = $this->get('oro_query_designer.entity_field_list_provider');
-        $withRelations = filter_var($this->getRequest()->get('with-relations', true), FILTER_VALIDATE_BOOLEAN);
+        $withRelations = filter_var($request->get('with-relations', true), FILTER_VALIDATE_BOOLEAN);
         $statusCode = Codes::HTTP_OK;
 
         try {

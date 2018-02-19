@@ -165,7 +165,11 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
             );
         $this->errorCompleter->expects(self::once())
             ->method('complete')
-            ->with(self::identicalTo($error), self::identicalTo($actionMetadata));
+            ->with(
+                self::identicalTo($error),
+                $expectedContext->getRequestType(),
+                self::identicalTo($actionMetadata)
+            );
 
         $this->context->setIncludedData($includedData);
         $this->context->setIncludedEntities($includedEntities);
@@ -277,7 +281,11 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
             );
         $this->errorCompleter->expects(self::once())
             ->method('complete')
-            ->with(self::identicalTo($error), self::identicalTo($actionMetadata));
+            ->with(
+                self::identicalTo($error),
+                $expectedContext->getRequestType(),
+                self::identicalTo($actionMetadata)
+            );
 
         $this->context->setIncludedData($includedData);
         $this->context->setIncludedEntities($includedEntities);

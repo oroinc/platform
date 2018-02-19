@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -204,10 +205,13 @@ class UserController extends Controller
     /**
      * @Route("/widget/info/{id}", name="oro_user_widget_info", requirements={"id"="\d+"})
      * @Template
+     * @param Request $request
+     * @param User $user
+     * @return array
      */
-    public function infoAction(User $user)
+    public function infoAction(Request $request, User $user)
     {
-        $isViewProfile = (bool)$this->getRequest()->query->get('viewProfile', false);
+        $isViewProfile = (bool)$request->query->get('viewProfile', false);
 
         if (!(($isViewProfile && $this->getUser()->getId() === $user->getId())
             || $this->isGranted('oro_user_user_view', $user))

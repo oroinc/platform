@@ -13,6 +13,7 @@ use Oro\Bundle\SearchBundle\Provider\ResultStatisticsProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
+use Symfony\Component\HttpFoundation\Response;
 
 class SearchController extends Controller
 {
@@ -26,13 +27,15 @@ class SearchController extends Controller
      *      group_name="",
      *      category="entity"
      * )
+     * @param Request $request
+     * @return Response
      */
-    public function ajaxAdvancedSearchAction()
+    public function ajaxAdvancedSearchAction(Request $request)
     {
-        return $this->getRequest()->isXmlHttpRequest()
+        return $request->isXmlHttpRequest()
             ? new JsonResponse(
                 $this->get('oro_search.index')->advancedSearch(
-                    $this->getRequest()->get('query')
+                    $request->get('query')
                 )->toSearchResultData()
             )
             : $this->forward('OroSearchBundle:Search:searchResults');
@@ -44,13 +47,15 @@ class SearchController extends Controller
      * @Route("/search-bar", name="oro_search_bar")
      * @Template("OroSearchBundle:Search:searchBar.html.twig")
      * @AclAncestor("oro_search")
+     * @param Request $request
+     * @return array
      */
-    public function searchBarAction()
+    public function searchBarAction(Request $request)
     {
         return array(
             'entities'     => $this->get('oro_search.index')->getAllowedEntitiesListAliases(),
-            'searchString' => $this->getRequest()->get('searchString'),
-            'fromString'   => $this->getRequest()->get('fromString'),
+            'searchString' => $request->get('searchString'),
+            'fromString'   => $request->get('fromString'),
         );
     }
 

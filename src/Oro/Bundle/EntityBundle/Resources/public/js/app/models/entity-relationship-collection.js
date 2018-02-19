@@ -39,13 +39,26 @@ define(function(require) {
          */
         association: null,
 
-        constructor: function(data, options) {
+        constructor: function EntityRelationshipCollection(data, options) {
             options = options || {};
             _.extend(this, _.pick(options, 'id', 'association'));
             if (!this.association) {
                 throw new TypeError('Association name is required for EntityRelationshipCollection');
             }
             EntityRelationshipCollection.__super__.constructor.call(this, data, options);
+        },
+
+        /**
+         * Converts relationship collection in to an object that is used for API requests
+         *
+         * @param {Object} [options]
+         * @return {Object<string, {data: Array<EntityModel.identifier>}>}
+         */
+        toJSON: function(options) {
+            var identifiers = this.map(function(model) {
+                return model.identifier;
+            });
+            return {data: identifiers};
         },
 
         url: function(method, params) {

@@ -4,10 +4,13 @@ namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\ApiBundle\Request\Version;
 
-class ConfigBag
+/**
+ * A storage for configuration of all registered Data API resources.
+ */
+class ConfigBag implements ConfigBagInterface
 {
     /** @var array */
-    protected $config;
+    private $config;
 
     /**
      * @param array $config
@@ -18,39 +21,25 @@ class ConfigBag
     }
 
     /**
-     * Gets a configuration for all entities for the given version
-     *
-     * @param string $version The version of a config
-     *
-     * @return array [entity class => config, ...]
+     * {@inheritdoc}
      */
-    public function getConfigs($version)
+    public function getClassNames(string $version): array
     {
-        return $this->findConfigs('entities', $version);
+        return array_keys($this->findConfigs('entities', $version));
     }
 
     /**
-     * Gets a configuration for the given version of a class
-     *
-     * @param string $className The FQCN of an entity
-     * @param string $version   The version of a config
-     *
-     * @return array|null
+     * {@inheritdoc}
      */
-    public function getConfig($className, $version)
+    public function getConfig(string $className, string $version): ?array
     {
         return $this->findConfig('entities', $className, $version);
     }
 
     /**
-     * Gets a relation configuration for the given version of a class
-     *
-     * @param string $className The FQCN of an entity
-     * @param string $version   The version of a config
-     *
-     * @return array|null
+     * {@inheritdoc}
      */
-    public function getRelationConfig($className, $version)
+    public function getRelationConfig(string $className, string $version): ?array
     {
         return $this->findConfig('relations', $className, $version);
     }
@@ -61,7 +50,7 @@ class ConfigBag
      *
      * @return array
      */
-    protected function findConfigs($section, $version)
+    private function findConfigs($section, $version)
     {
         if (!isset($this->config[$section])) {
             return [];
@@ -82,7 +71,7 @@ class ConfigBag
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    protected function findConfig($section, $className, $version)
+    private function findConfig($section, $className, $version)
     {
         if (!isset($this->config[$section][$className])) {
             // no config for the requested class

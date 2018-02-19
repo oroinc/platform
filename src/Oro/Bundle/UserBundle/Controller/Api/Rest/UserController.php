@@ -24,6 +24,7 @@ use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Email;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @NamePrefix("oro_api_")
@@ -52,6 +53,7 @@ class UserController extends RestController implements ClassResourceInterface
      *     description="Phone number."
      * )
      *
+     * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      * @ApiDoc(
      *      description="Get the list of users",
@@ -63,10 +65,10 @@ class UserController extends RestController implements ClassResourceInterface
      * )
      * @AclAncestor("oro_user_user_view")
      */
-    public function cgetAction()
+    public function cgetAction(Request $request)
     {
-        $page  = (int) $this->getRequest()->get('page', 1);
-        $limit = (int) $this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $page  = (int) $request->get('page', 1);
+        $limit = (int) $request->get('limit', self::ITEMS_PER_PAGE);
 
         $criteria = $this->getFilterCriteria($this->getSupportedQueryParameters(__FUNCTION__));
 
@@ -221,6 +223,7 @@ class UserController extends RestController implements ClassResourceInterface
      *      description="Username to filter"
      * )
      *
+     * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @ApiDoc(
@@ -233,10 +236,10 @@ class UserController extends RestController implements ClassResourceInterface
      * )
      * @AclAncestor("oro_user_user_view")
      */
-    public function getFilterAction()
+    public function getFilterAction(Request $request)
     {
         $params = array_intersect_key(
-            $this->getRequest()->query->all(),
+            $request->query->all(),
             array_flip($this->getSupportedQueryParameters(__FUNCTION__))
         );
 
@@ -342,7 +345,8 @@ class UserController extends RestController implements ClassResourceInterface
         //todo: Add user avatar to api
         /*$result['imagePath'] = null;
         if (isset($result['image'])) {
-            $result['imagePath'] = $this->getRequest()->getBasePath() . '/' . $entity->getImagePath();
+            $result['imagePath'] = $this->get('request_stack')
+                ->getCurrentRequest()->getBasePath() . '/' . $entity->getImagePath();
         }
         unset($result['image']);*/
 

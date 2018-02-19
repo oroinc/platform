@@ -2,15 +2,23 @@
 
 namespace Oro\Bundle\InstallerBundle\Process\Step;
 
+use Oro\Bundle\InstallerBundle\Command\InstallCommand;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
+use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Console\Output\StreamOutput;
 
 use Sylius\Bundle\FlowBundle\Process\Step\AbstractControllerStep;
 
+/**
+ * Abstract call for web installer steps
+ */
 abstract class AbstractStep extends AbstractControllerStep
 {
+    const TRIGGER_EVENT = 'trigger:event';
+
     /**
      * @var Application
      */
@@ -40,7 +48,7 @@ abstract class AbstractStep extends AbstractControllerStep
      */
     protected function getAjaxActionResponse($exitCode)
     {
-        return $this->getRequest()->isXmlHttpRequest()
+        return $this->get('request_stack')->getCurrentRequest()->isXmlHttpRequest()
             ? new JsonResponse(['result' => true, 'exitCode' => $exitCode])
             : $this->redirect(
                 $this->generateUrl(
@@ -80,8 +88,20 @@ abstract class AbstractStep extends AbstractControllerStep
 
         $result = null;
         try {
-            $commandExecutor->runCommand($command, $params);
-            $result = $commandExecutor->getLastCommandExitCode();
+            if ($command === self::TRIGGER_EVENT) {
+                $event = new InstallerEvent(
+                    $application->get(InstallCommand::NAME),
+                    new ArrayInput([]),
+                    $output,
+                    $commandExecutor
+                );
+
+                $this->get('event_dispatcher')->dispatch($params['name'], $event);
+                $result = 0;
+            } else {
+                $commandExecutor->runCommand($command, $params);
+                $result = $commandExecutor->getLastCommandExitCode();
+            }
         } catch (\RuntimeException $ex) {
             $result = $ex;
         }

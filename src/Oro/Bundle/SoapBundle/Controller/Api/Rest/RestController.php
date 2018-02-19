@@ -141,7 +141,7 @@ abstract class RestController extends RestGetController implements
      */
     protected function fixRequestAttributes($entity)
     {
-        $request  = $this->container->get('request');
+        $request  = $this->container->get('request_stack')->getCurrentRequest();
         $formName = $this->getForm()->getName();
         $data     = empty($formName)
             ? $request->request->all()

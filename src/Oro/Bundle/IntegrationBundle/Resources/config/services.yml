@@ -47,10 +47,9 @@ parameters:
 
 services:
     oro_integration.form.channel:
-        class:                        Symfony\Component\Form\Form
-        factory_method:               createNamed
-        factory_service:              form.factory
-        arguments:                    ["oro_integration_channel_form", "oro_integration_channel_form", null]
+        class: Symfony\Component\Form\Form
+        factory: ['@form.factory', createNamed]
+        arguments: ["oro_integration_channel_form", "oro_integration_channel_form", null]
 
     oro_integration.form.type.channel:
         class: %oro_integration.form.type.channel.class%
@@ -65,7 +64,6 @@ services:
         arguments:
             - '@oro_integration.manager.types_registry'
             - '@assets.packages'
-        scope: request
         tags:
             - { name: form.type, alias: oro_integration_type_select }
 
@@ -77,7 +75,6 @@ services:
             - '@assets.packages'
             - '@oro_security.acl_helper'
             - '@form.choice_list_factory.default'
-        scope: request
         tags:
             - { name: form.type, alias: oro_integration_select }
 
@@ -94,10 +91,9 @@ services:
             - '@oro_integration.manager.types_registry'
 
     oro_integration.form.handler.integration:
-        class:                        %oro_integration.form.handler.integration.class%
-        scope:                        request
+        class: %oro_integration.form.handler.integration.class%
         arguments:
-            - '@request'
+            - '@request_stack'
             - '@oro_integration.form.channel'
             - '@doctrine.orm.entity_manager'
             - '@event_dispatcher'

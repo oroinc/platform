@@ -34,15 +34,18 @@ class AutoResponseRuleController extends Controller
      *      permission="CREATE"
      * )
      * @Template("OroEmailBundle:AutoResponseRule:dialog/update.html.twig")
+     * @param Request $request
+     * @param Mailbox|null $mailbox
+     * @return array
      */
-    public function createAction(Mailbox $mailbox = null)
+    public function createAction(Request $request, Mailbox $mailbox = null)
     {
         $rule = new AutoResponseRule();
         if ($mailbox) {
             $rule->setMailbox($mailbox);
         }
 
-        return $this->update($rule);
+        return $this->update($request, $rule);
     }
 
     /**
@@ -54,6 +57,9 @@ class AutoResponseRuleController extends Controller
      *      permission="EDIT"
      * )
      * @Template("OroEmailBundle:AutoResponseRule:dialog/update.html.twig")
+     * @param AutoResponseRule $rule
+     * @param Request $request
+     * @return array
      */
     public function updateAction(AutoResponseRule $rule, Request $request)
     {
@@ -69,7 +75,7 @@ class AutoResponseRuleController extends Controller
             }
         }
 
-        return $this->update($rule);
+        return $this->update($request, $rule);
     }
 
     /**
@@ -87,14 +93,15 @@ class AutoResponseRuleController extends Controller
     }
 
     /**
+     * @param Request $request
      * @param AutoResponseRule $rule
      *
      * @return array
      */
-    protected function update(AutoResponseRule $rule)
+    protected function update(Request $request, AutoResponseRule $rule)
     {
         $form = $this->createForm(AutoResponseRuleType::NAME, $rule);
-        $form->handleRequest($this->getRequest());
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             $em = $this->getAutoResponseRuleManager();

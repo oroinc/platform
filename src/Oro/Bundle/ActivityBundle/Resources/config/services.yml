@@ -154,18 +154,16 @@ services:
 
     oro_activity.form.handler.activity_entity.api:
         class: %oro_activity.form.handler.activity_entity.api.class%
-        scope: request
         arguments:
             - '@oro_activity.form.activity_entity.api'
-            - '@request'
+            - '@request_stack'
             - '@doctrine.orm.entity_manager'
             - '@oro_activity.manager'
             - '@security.authorization_checker'
 
     oro_activity.form.activity_entity.api:
         class: Symfony\Component\Form\Form
-        factory_method: createNamed
-        factory_service: form.factory
+        factory: ['@form.factory', createNamed]
         arguments:
             - targets
             - 'oro_related_entity_standalone_collection_api'

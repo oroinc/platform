@@ -8,13 +8,16 @@ use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
+/**
+ * Provides the configuration for a specific Data API resource.
+ */
 class ConfigProvider extends AbstractConfigProvider
 {
     /** @var ActionProcessorInterface */
-    protected $processor;
+    private $processor;
 
     /** @var array */
-    protected $cache = [];
+    private $cache = [];
 
     /** @var array */
     private $processing = [];
@@ -37,8 +40,12 @@ class ConfigProvider extends AbstractConfigProvider
      *
      * @return Config
      */
-    public function getConfig($className, $version, RequestType $requestType, array $extras = [])
-    {
+    public function getConfig(
+        string $className,
+        string $version,
+        RequestType $requestType,
+        array $extras = []
+    ): Config {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty.');
         }
@@ -76,7 +83,7 @@ class ConfigProvider extends AbstractConfigProvider
     /**
      * Removes all already built configs from the internal cache.
      */
-    public function clearCache()
+    public function clearCache(): void
     {
         $this->cache = [];
     }

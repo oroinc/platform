@@ -348,7 +348,12 @@ abstract class ApiTestCase extends WebTestCase
      */
     protected function appendEntityConfig($entityClass, array $config, $affectResourcesCache = false)
     {
-        $this->getConfigRegistry()->appendEntityConfig($entityClass, $config, $affectResourcesCache);
+        $this->getConfigRegistry()->appendEntityConfig(
+            $this->getRequestType(),
+            $entityClass,
+            $config,
+            $affectResourcesCache
+        );
         // disable the kernel reboot to avoid loosing of changes in configs
         if (null !== $this->client && !$this->isKernelRebootDisabled) {
             $this->client->disableReboot();
@@ -363,7 +368,7 @@ abstract class ApiTestCase extends WebTestCase
      */
     protected function restoreConfigs()
     {
-        $this->getConfigRegistry()->restoreConfigs();
+        $this->getConfigRegistry()->restoreConfigs($this->getRequestType());
         // restore the kernel reboot if it was disabled in appendEntityConfig method
         if ($this->isKernelRebootDisabled) {
             $this->isKernelRebootDisabled = false;

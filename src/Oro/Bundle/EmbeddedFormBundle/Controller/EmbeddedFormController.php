@@ -138,7 +138,7 @@ class EmbeddedFormController extends Controller
         }
 
         $form = $this->createForm('embedded_form', $entity);
-        $form->handleRequest($this->get('request'));
+        $form->handleRequest($this->get('request_stack')->getCurrentRequest());
         /** @var EntityManager $em */
         $em = $this->get('doctrine.orm.entity_manager');
         if ($form->isValid()) {

@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue as Processor;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValueProcessor;
+use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -24,7 +25,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
@@ -36,15 +37,19 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
         $processorBag = new ProcessorBag($builder, $processorFactory);
 
         $entityAliasResolver = $this->createMock(EntityAliasResolver::class);
-        $entityAliasResolver->expects($this->any())
+        $entityAliasResolver->expects(self::any())
             ->method('getClassByAlias')
             ->willReturnMap([['test_entity', 'Test\Entity']]);
-        $entityAliasResolver->expects($this->any())
+        $entityAliasResolver->expects(self::any())
             ->method('getClassByPluralAlias')
             ->willReturnMap([['test_entities', 'Test\Entity']]);
-        $entityAliasResolver->expects($this->any())
+        $entityAliasResolver->expects(self::any())
             ->method('getPluralAlias')
             ->willReturnMap([['Test\Entity', 'test_entities']]);
+        $entityAliasResolverRegistry = $this->createMock(EntityAliasResolverRegistry::class);
+        $entityAliasResolverRegistry->expects(self::any())
+            ->method('getEntityAliasResolver')
+            ->willReturn($entityAliasResolver);
 
         $this->valueNormalizer = new ValueNormalizer(
             new NormalizeValueProcessor($processorBag, 'normalize_value')
@@ -101,11 +106,11 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 $this->addProcessor($builder, 'entityClass', DataType::ENTITY_CLASS),
-                new Processor\NormalizeEntityClass($entityAliasResolver)
+                new Processor\NormalizeEntityClass($entityAliasResolverRegistry)
             ],
             [
                 $this->addProcessor($builder, 'entityType', DataType::ENTITY_TYPE),
-                new Processor\NormalizeEntityType($entityAliasResolver)
+                new Processor\NormalizeEntityType($entityAliasResolverRegistry)
             ],
             [
                 $this->addProcessor($builder, 'rest.datetime', DataType::DATETIME, [RequestType::REST]),
@@ -122,7 +127,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [
                 $this->addProcessor($builder, 'rest.order_by', DataType::ORDER_BY, [RequestType::REST]),
                 new Processor\Rest\NormalizeOrderBy()
-            ],
+            ]
         ];
         foreach ($processorMap as $val) {
             if ($val[1] instanceof StandaloneFilter) {
@@ -130,7 +135,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 $val[1]->setRangeAllowed(true);
             }
         }
-        $processorFactory->expects($this->any())
+        $processorFactory->expects(self::any())
             ->method('getProcessor')
             ->willReturnMap($processorMap);
     }
@@ -141,7 +146,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testGetRequirement($expectedValue, $dataType, $requestType)
     {
         $result = $this->valueNormalizer->getRequirement($dataType, new RequestType($requestType));
-        $this->assertSame($expectedValue, $result);
+        self::assertSame($expectedValue, $result);
     }
 
     public function getRequirementProvider()
@@ -163,7 +168,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [Processor\Rest\NormalizeDateTime::REQUIREMENT, DataType::DATETIME, [RequestType::REST]],
             [Processor\Rest\NormalizeDate::REQUIREMENT, DataType::DATE, [RequestType::REST]],
             [Processor\Rest\NormalizeTime::REQUIREMENT, DataType::TIME, [RequestType::REST]],
-            [Processor\Rest\NormalizeOrderBy::REQUIREMENT, DataType::ORDER_BY, [RequestType::REST]],
+            [Processor\Rest\NormalizeOrderBy::REQUIREMENT, DataType::ORDER_BY, [RequestType::REST]]
         ];
     }
 
@@ -173,7 +178,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testGetArrayRequirement($expectedValue, $dataType, $requestType)
     {
         $result = $this->valueNormalizer->getRequirement($dataType, new RequestType($requestType), true);
-        $this->assertSame($expectedValue, $result);
+        self::assertSame($expectedValue, $result);
     }
 
     public function getArrayRequirementProvider()
@@ -263,7 +268,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 Processor\Rest\NormalizeOrderBy::REQUIREMENT,
                 DataType::ORDER_BY,
                 [RequestType::REST]
-            ],
+            ]
         ];
     }
 
@@ -278,7 +283,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testGetRangeRequirement($expectedValue, $dataType, $requestType)
     {
         $result = $this->valueNormalizer->getRequirement($dataType, new RequestType($requestType), false, true);
-        $this->assertSame($expectedValue, $result);
+        self::assertSame($expectedValue, $result);
     }
 
     public function getRangeRequirementProvider()
@@ -368,7 +373,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 Processor\Rest\NormalizeOrderBy::REQUIREMENT,
                 DataType::ORDER_BY,
                 [RequestType::REST]
-            ],
+            ]
         ];
     }
 
@@ -383,7 +388,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testGetArrayRangeRequirement($expectedValue, $dataType, $requestType)
     {
         $result = $this->valueNormalizer->getRequirement($dataType, new RequestType($requestType), true, true);
-        $this->assertSame($expectedValue, $result);
+        self::assertSame($expectedValue, $result);
     }
 
     public function getArrayRangeRequirementProvider()
@@ -473,7 +478,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 Processor\Rest\NormalizeOrderBy::REQUIREMENT,
                 DataType::ORDER_BY,
                 [RequestType::REST]
-            ],
+            ]
         ];
     }
 
@@ -714,11 +719,11 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [
                 [
                     new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC'))
                 ],
                 [
                     new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC'))
                 ],
                 DataType::DATETIME,
                 [RequestType::REST],
@@ -727,11 +732,11 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [
                 [
                     new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC'))
                 ],
                 [
                     new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC'))
                 ],
                 DataType::DATETIME,
                 [RequestType::REST],
@@ -806,11 +811,11 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [
                 [
                     new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC'))
                 ],
                 [
                     new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC'))
                 ],
                 DataType::DATE,
                 [RequestType::REST],
@@ -819,11 +824,11 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [
                 [
                     new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC'))
                 ],
                 [
                     new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC'))
                 ],
                 DataType::DATE,
                 [RequestType::REST],
@@ -870,11 +875,11 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [
                 [
                     new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC'))
                 ],
                 [
                     new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC'))
                 ],
                 DataType::TIME,
                 [RequestType::REST],
@@ -883,11 +888,11 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [
                 [
                     new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC'))
                 ],
                 [
                     new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC'))
                 ],
                 DataType::TIME,
                 [RequestType::REST],
@@ -932,7 +937,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             ['test_entities', 'Test\Entity', DataType::ENTITY_TYPE, [RequestType::REST], false],
             ['test_entities', 'test_entities', DataType::ENTITY_TYPE, [RequestType::REST], false],
             ['Test\Entity', 'test_entities', DataType::ENTITY_CLASS, [RequestType::REST], false],
-            ['Test\Entity', 'Test\Entity', DataType::ENTITY_CLASS, [RequestType::REST], false],
+            ['Test\Entity', 'Test\Entity', DataType::ENTITY_CLASS, [RequestType::REST], false]
         ];
     }
 
@@ -1071,7 +1076,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 ),
                 '00:00:00..00:00:01',
                 DataType::TIME
-            ],
+            ]
         ];
     }
 
@@ -1080,7 +1085,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNormalizeInvalidValue($expectedExceptionMessage, $value, $dataType, $requestType)
     {
-        $this->expectException('\UnexpectedValueException');
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->valueNormalizer->normalizeValue($value, $dataType, new RequestType($requestType), true);
     }
@@ -1374,7 +1379,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 '10:30:59,test',
                 DataType::TIME,
                 [RequestType::REST]
-            ],
+            ]
         ];
     }
 
@@ -1383,7 +1388,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNormalizeInvalidRangeValue($expectedExceptionMessage, $value, $dataType, $requestType)
     {
-        $this->expectException('\UnexpectedValueException');
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->valueNormalizer->normalizeValue($value, $dataType, new RequestType($requestType), true, true);
     }
@@ -1641,7 +1646,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 '15:00:00..test',
                 DataType::TIME,
                 [RequestType::REST]
-            ],
+            ]
         ];
     }
 

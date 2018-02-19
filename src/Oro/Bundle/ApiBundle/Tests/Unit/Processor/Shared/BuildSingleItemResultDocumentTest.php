@@ -56,7 +56,7 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
 
         $documentBuilder->expects(self::once())
             ->method('setDataObject')
-            ->with(null);
+            ->with(null, $this->context->getRequestType());
         $documentBuilder->expects(self::never())
             ->method('getDocument');
 
@@ -81,7 +81,7 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
 
         $documentBuilder->expects(self::once())
             ->method('setDataObject')
-            ->with($result, $metadata);
+            ->with($result, $this->context->getRequestType(), $metadata);
         $documentBuilder->expects(self::never())
             ->method('getDocument');
 

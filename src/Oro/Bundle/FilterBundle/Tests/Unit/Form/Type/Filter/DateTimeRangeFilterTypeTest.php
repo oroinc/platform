@@ -60,7 +60,7 @@ class DateTimeRangeFilterTypeTest extends AbstractDateTypeTestCase
     /**
      * {@inheritDoc}
      */
-    public function setDefaultOptionsDataProvider()
+    public function configureOptionsDataProvider()
     {
         return [
             [

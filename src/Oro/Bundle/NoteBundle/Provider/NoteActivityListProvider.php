@@ -11,8 +11,8 @@ use Oro\Bundle\ActivityListBundle\Model\ActivityListUpdatedByProviderInterface;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class NoteActivityListProvider implements
     ActivityListProviderInterface,

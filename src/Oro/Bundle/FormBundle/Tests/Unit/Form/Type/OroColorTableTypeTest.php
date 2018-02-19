@@ -30,7 +30,7 @@ class OroColorTableTypeTest extends FormIntegrationTestCase
         $this->assertEquals($testData, $form->getData());
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $expectedOptions = [
             'picker_control' => null,
@@ -48,8 +48,10 @@ class OroColorTableTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider buildViewDataProvider
+     * @param array $options
+     * @param array $expectedVars
      */
-    public function testBuildView($options, $expectedVars)
+    public function testBuildView(array $options, array $expectedVars)
     {
         $form = $this->factory->create($this->formType, [], []);
         $form->submit(json_encode(['#FFFFFF', '#000000']));

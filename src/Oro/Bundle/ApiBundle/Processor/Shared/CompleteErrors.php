@@ -44,7 +44,7 @@ class CompleteErrors implements ProcessorInterface
         $metadata = $this->getMetadata($context);
         $errors = $context->getErrors();
         foreach ($errors as $error) {
-            $errorCompleter->complete($error, $metadata);
+            $errorCompleter->complete($error, $context->getRequestType(), $metadata);
         }
     }
 

@@ -1,0 +1,35 @@
+services:
+    oro_api.tests.migration_listener:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestEntitiesMigrationListener
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp }
+
+    oro_api.tests.entity_alias_provider:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestEntitiesAliasProvider
+        public: false
+        tags:
+            - { name: oro_entity.alias_provider }
+
+    oro_api.tests.config_registry:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry
+        arguments:
+            - '@oro_api.config_bag_registry'
+            - '@oro_api.config_provider'
+            - '@oro_api.relation_config_provider'
+            - '@oro_api.metadata_provider'
+            - '@oro_api.resources_provider'
+
+    oro_api.tests.check_request_type:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\CheckRequestType
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: get_list, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: delete, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: delete_list, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: create, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: update, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: get_relationship, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: update_relationship, group: initialize, priority: 250 }

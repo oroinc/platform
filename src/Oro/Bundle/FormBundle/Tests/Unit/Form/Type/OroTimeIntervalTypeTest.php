@@ -28,7 +28,7 @@ class OroTimeIntervalTypeTest extends FormIntegrationTestCase
         $this->assertEquals('time', $this->type->getParent());
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $expectedOptions = array(
             'widget'         => 'single_text',

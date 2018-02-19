@@ -11,6 +11,7 @@ use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -58,13 +59,14 @@ class TranslationController extends FOSRestController
      *      resource=true
      * )
      *
+     * @param Request $request
      * @return Response
      */
-    public function cgetAction()
+    public function cgetAction(Request $request)
     {
-        $page   = (int)$this->getRequest()->get('page', 1);
-        $limit  = (int)$this->getRequest()->get('limit', RestGetController::ITEMS_PER_PAGE);
-        $domain = $this->getRequest()->get('domain', 'messages');
+        $page   = (int)$request->get('page', 1);
+        $limit  = (int)$request->get('limit', RestGetController::ITEMS_PER_PAGE);
+        $domain = $request->get('domain', 'messages');
 
         $result = $this->get('translator')->getTranslations([$domain]);
 
@@ -96,7 +98,7 @@ class TranslationController extends FOSRestController
         $includeHandler->handle(
             new Context(
                 $this,
-                $this->get('request'),
+                $request,
                 $response,
                 RestGetController::ACTION_LIST,
                 $responseContext

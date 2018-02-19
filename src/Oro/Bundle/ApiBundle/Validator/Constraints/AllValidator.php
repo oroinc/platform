@@ -17,8 +17,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * The difference with Symfony constraint is that uninitialized lazy collection is not validated.
- * @see Symfony\Component\Validator\Constraints\All
- * @see Symfony\Component\Validator\Constraints\AllValidator
+ * @see \Symfony\Component\Validator\Constraints\All
+ * @see \Symfony\Component\Validator\Constraints\AllValidator
  */
 class AllValidator extends ConstraintValidator
 {

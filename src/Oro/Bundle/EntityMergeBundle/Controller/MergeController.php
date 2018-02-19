@@ -8,6 +8,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ValidatorInterface;
@@ -31,20 +33,24 @@ class MergeController extends Controller
      * @Route("/{gridName}/massAction/{actionName}", name="oro_entity_merge_massaction")
      * @AclAncestor("oro_entity_merge")
      * @Template("OroEntityMergeBundle:Merge:merge.html.twig")
+     * @param Request $request
+     * @param string $gridName
+     * @param string $actionName
+     * @return array|RedirectResponse
      */
-    public function mergeMassActionAction($gridName, $actionName)
+    public function mergeMassActionAction(Request $request, $gridName, $actionName)
     {
         /** @var MassActionDispatcher $massActionDispatcher */
         $massActionDispatcher = $this->get('oro_entity_merge.mass_action.dispatcher');
 
-        $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $this->getRequest());
+        $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
 
         $entityData = $this->getEntityDataFactory()->createEntityData(
             $response->getOption('entity_name'),
             $response->getOption('entities')
         );
 
-        return $this->mergeAction($entityData);
+        return $this->mergeAction($request, $entityData);
     }
 
     /**
@@ -56,12 +62,15 @@ class MergeController extends Controller
      *      category="entity"
      * )
      * @Template()
+     * @param Request $request
+     * @param EntityData|null $entityData
+     * @return array|RedirectResponse
      */
-    public function mergeAction(EntityData $entityData = null)
+    public function mergeAction(Request $request, EntityData $entityData = null)
     {
         if (!$entityData) {
-            $className = $this->getRequest()->get('className');
-            $ids = (array)$this->getRequest()->get('ids');
+            $className = $request->get('className');
+            $ids = (array)$request->get('ids');
 
             $entityData = $this->getEntityDataFactory()->createEntityDataByIds($className, $ids);
         } else {
@@ -90,8 +99,8 @@ class MergeController extends Controller
             )
         );
 
-        if ($this->getRequest()->isMethod('POST')) {
-            $form->submit($this->getRequest());
+        if ($request->isMethod('POST')) {
+            $form->submit($request);
             if ($form->isValid()) {
                 $merger = $this->getEntityMerger();
 

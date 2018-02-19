@@ -9,6 +9,7 @@ use FOS\RestBundle\Controller\Annotations\Get;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityTargetApiEntityManager;
@@ -66,6 +67,7 @@ class ActivityTargetController extends RestGetController
     /**
      * Get activities for the specified entity.
      *
+     * @param Request $request
      * @param string $entity The type of the target entity.
      * @param mixed  $id     The id of the target entity.
      *
@@ -91,13 +93,13 @@ class ActivityTargetController extends RestGetController
      *
      * @return Response
      */
-    public function getActivitiesAction($entity, $id)
+    public function getActivitiesAction(Request $request, $entity, $id)
     {
         $manager = $this->getManager();
         $manager->setClass($manager->resolveEntityClass($entity, true));
 
-        $page  = (int)$this->getRequest()->get('page', 1);
-        $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $page  = (int)$request->get('page', 1);
+        $limit = (int)$request->get('limit', self::ITEMS_PER_PAGE);
 
         $criteria = $this->buildFilterCriteria(['id' => ['=', $id]], [], ['id' => 'target.id']);
 

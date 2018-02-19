@@ -3,17 +3,17 @@
 namespace Oro\Bundle\ApiBundle\Processor\CollectSubresources;
 
 use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
-use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
-use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
-use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Config\SubresourceConfig;
 use Oro\Bundle\ApiBundle\Config\SubresourcesConfig;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
-use Oro\Bundle\ApiBundle\Provider\ConfigBag;
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
@@ -24,24 +24,24 @@ class LoadFromConfigBag extends LoadSubresources
     /** @var ConfigLoaderFactory */
     protected $configLoaderFactory;
 
-    /** @var ConfigBag */
-    protected $configBag;
+    /** @var ConfigBagRegistry */
+    protected $configBagRegistry;
 
     /**
      * @param ConfigLoaderFactory $configLoaderFactory
-     * @param ConfigBag           $configBag
+     * @param ConfigBagRegistry   $configBagRegistry
      * @param ConfigProvider      $configProvider
      * @param MetadataProvider    $metadataProvider
      */
     public function __construct(
         ConfigLoaderFactory $configLoaderFactory,
-        ConfigBag $configBag,
+        ConfigBagRegistry $configBagRegistry,
         ConfigProvider $configProvider,
         MetadataProvider $metadataProvider
     ) {
         parent::__construct($configProvider, $metadataProvider);
         $this->configLoaderFactory = $configLoaderFactory;
-        $this->configBag = $configBag;
+        $this->configBagRegistry = $configBagRegistry;
     }
 
     /**
@@ -61,7 +61,7 @@ class LoadFromConfigBag extends LoadSubresources
             if (in_array(ApiActions::GET_SUBRESOURCE, $resource->getExcludedActions(), true)) {
                 continue;
             }
-            $subresourcesConfig = $this->getSubresourcesConfig($entityClass, $version);
+            $subresourcesConfig = $this->getSubresourcesConfig($entityClass, $version, $requestType);
             if (null === $subresourcesConfig || $subresourcesConfig->isEmpty()) {
                 continue;
             }
@@ -230,13 +230,14 @@ class LoadFromConfigBag extends LoadSubresources
      *
      * @param string $entityClass
      * @param string $version
+     * @param RequestType $requestType
      *
      * @return SubresourcesConfig|null
      */
-    protected function getSubresourcesConfig($entityClass, $version)
+    protected function getSubresourcesConfig($entityClass, $version, RequestType $requestType)
     {
         $subresources = null;
-        $config = $this->configBag->getConfig($entityClass, $version);
+        $config = $this->configBagRegistry->getConfigBag($requestType)->getConfig($entityClass, $version);
         if (null !== $config && !empty($config[ConfigUtil::SUBRESOURCES])) {
             $subresourcesLoader = $this->configLoaderFactory->getLoader(ConfigUtil::SUBRESOURCES);
             $subresources = $subresourcesLoader->load($config[ConfigUtil::SUBRESOURCES]);

@@ -132,6 +132,7 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
                 // Doctrine DBAL can't save null to boolean field
                 // see https://github.com/doctrine/dbal/issues/2580
                 $options['configs']['allowClear'] = false;
+                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
                 $options['choices_as_values'] = true;
                 $options['choices'] = [
                     'No' => false,

@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteAsso
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteCustomAssociationHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteEntityDefinitionHelper;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\ExclusionProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -22,20 +23,20 @@ use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
  */
 class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    private $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $customAssociationHelper;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|CompleteCustomAssociationHelper */
+    private $customAssociationHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $exclusionProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ExclusionProviderRegistry */
+    private $exclusionProviderRegistry;
 
     /** @var CompleteEntityDefinitionHelper */
-    protected $completeEntityDefinitionHelper;
+    private $completeEntityDefinitionHelper;
 
     protected function setUp()
     {
@@ -44,14 +45,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->customAssociationHelper = $this->createMock(CompleteCustomAssociationHelper::class);
-        $this->exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry = $this->createMock(ExclusionProviderRegistry::class);
 
         $this->completeEntityDefinitionHelper = new CompleteEntityDefinitionHelper(
             $this->doctrineHelper,
             new EntityIdHelper(),
             new CompleteAssociationHelper($this->configProvider),
             $this->customAssociationHelper,
-            $this->exclusionProvider,
+            $this->exclusionProviderRegistry,
             new ExpandedAssociationExtractor()
         );
     }
@@ -72,7 +73,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ],
                 'field7' => [
                     'property_path' => 'realField7'
-                ],
+                ]
             ]
         ]);
         $context = new ConfigContext();
@@ -82,7 +83,12 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
 
-        $this->exclusionProvider->expects($this->exactly(6))
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::exactly(6))
             ->method('isIgnoredField')
             ->willReturnMap(
                 [
@@ -91,14 +97,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     [$rootEntityMetadata, 'field3', true],
                     [$rootEntityMetadata, 'field4', false],
                     [$rootEntityMetadata, 'realField6', false],
-                    [$rootEntityMetadata, 'realField7', true],
+                    [$rootEntityMetadata, 'realField7', true]
                 ]
             );
 
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(
                 [
@@ -109,14 +115,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     'field4',
                     'field5',
                     'realField6',
-                    'realField7',
+                    'realField7'
                 ]
             );
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn([]);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
@@ -143,7 +149,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     'field7' => [
                         'exclude'       => true,
                         'property_path' => 'realField7'
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -156,7 +162,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             'fields' => [
                 'association1' => [
                     'exclusion_policy' => 'all'
-                ],
+                ]
             ]
         ]);
         $context = new ConfigContext();
@@ -165,13 +171,13 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn(
                 [
@@ -182,17 +188,22 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ]
             );
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
-        $this->exclusionProvider->expects($this->once())
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::once())
             ->method('isIgnoredRelation')
             ->with($rootEntityMetadata, 'association1')
             ->willReturn(false);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn(
@@ -220,7 +231,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                         'target_class'           => 'Test\Association1Target',
                         'target_type'            => 'to-one',
                         'identifier_field_names' => ['id']
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -240,13 +251,13 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn(
                 [
@@ -257,17 +268,22 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ]
             );
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
-        $this->exclusionProvider->expects($this->once())
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::once())
             ->method('isIgnoredRelation')
             ->with($rootEntityMetadata, 'association1')
             ->willReturn(false);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn($this->createRelationConfigObject());
@@ -299,13 +315,13 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn(
                 [
@@ -316,17 +332,22 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ]
             );
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
-        $this->exclusionProvider->expects($this->once())
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::once())
             ->method('isIgnoredRelation')
             ->with($rootEntityMetadata, 'association1')
             ->willReturn(false);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn(
@@ -360,7 +381,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                                 'data_type' => 'integer'
                             ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -376,13 +397,13 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn(
                 [
@@ -393,17 +414,22 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ]
             );
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
-        $this->exclusionProvider->expects($this->once())
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::once())
             ->method('isIgnoredRelation')
             ->with($rootEntityMetadata, 'association1')
             ->willReturn(false);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn(
@@ -437,7 +463,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                                 'data_type' => 'integer'
                             ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -459,13 +485,13 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn(
                 [
@@ -476,17 +502,22 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ]
             );
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
-        $this->exclusionProvider->expects($this->once())
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::once())
             ->method('isIgnoredRelation')
             ->with($rootEntityMetadata, 'realAssociation1')
             ->willReturn(false);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn(
@@ -521,7 +552,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                                 'data_type' => 'integer'
                             ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -543,13 +574,13 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn(
                 [
@@ -560,15 +591,20 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ]
             );
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
-        $this->exclusionProvider->expects($this->never())
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::never())
             ->method('isIgnoredRelation');
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn(
@@ -603,7 +639,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                                 'data_type' => 'integer'
                             ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -625,13 +661,13 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn(
                 [
@@ -642,15 +678,20 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ]
             );
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
-        $this->exclusionProvider->expects($this->never())
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::never())
             ->method('isIgnoredRelation');
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn(
@@ -684,7 +725,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                                 'data_type' => 'integer'
                             ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -704,13 +745,13 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn(
                 [
@@ -721,17 +762,22 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ]
             );
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
-        $this->exclusionProvider->expects($this->once())
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::once())
             ->method('isIgnoredRelation')
             ->with($rootEntityMetadata, 'association1')
             ->willReturn(true);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn(
@@ -766,7 +812,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                                 'data_type' => 'integer'
                             ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -788,13 +834,13 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn(
                 [
@@ -805,17 +851,22 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ]
             );
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
-        $this->exclusionProvider->expects($this->once())
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::once())
             ->method('isIgnoredRelation')
             ->with($rootEntityMetadata, 'association1')
             ->willReturn(false);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn(
@@ -850,7 +901,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                                 'data_type' => 'integer'
                             ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -870,13 +921,13 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn(
                 [
@@ -887,17 +938,22 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ]
             );
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
-        $this->exclusionProvider->expects($this->once())
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::once())
             ->method('isIgnoredRelation')
             ->with($rootEntityMetadata, 'association1')
             ->willReturn(false);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn(
@@ -937,7 +993,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                                 'data_type' => 'integer'
                             ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -960,25 +1016,25 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn([]);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationNames')
             ->willReturn([]);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn(
@@ -1012,7 +1068,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                                 'data_type' => 'integer'
                             ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -1036,25 +1092,25 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn([]);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationNames')
             ->willReturn([]);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
@@ -1068,7 +1124,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                         'data_type'    => 'some_custom_association',
                         'target_class' => 'Test\Association1Target',
                         'target_type'  => 'to-one',
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -1086,7 +1142,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ],
                 'field3' => [
                     'property_path' => 'realField3'
-                ],
+                ]
             ]
         ]);
         $context = new ConfigContext();
@@ -1096,11 +1152,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
@@ -1130,7 +1186,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ],
                 'field3' => [
                     'property_path' => 'realField3'
-                ],
+                ]
             ]
         ]);
         $context = new ConfigContext();
@@ -1140,10 +1196,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->never())
+        $rootEntityMetadata->expects(self::never())
             ->method('getIdentifierFieldNames');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
@@ -1171,7 +1227,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ],
                 'field2' => [
                     'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
-                ],
+                ]
             ]
         ]);
         $context = new ConfigContext();
@@ -1181,11 +1237,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
@@ -1215,11 +1271,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
@@ -1250,10 +1306,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->never())
+        $rootEntityMetadata->expects(self::never())
             ->method('getIdentifierFieldNames');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
@@ -1287,11 +1343,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['name']);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
@@ -1328,10 +1384,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->never())
+        $rootEntityMetadata->expects(self::never())
             ->method('getIdentifierFieldNames');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
@@ -1361,22 +1417,22 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn([]);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
@@ -1410,22 +1466,22 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn([]);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
@@ -1458,22 +1514,22 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn([]);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
@@ -1505,13 +1561,13 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn(
                 [
@@ -1522,13 +1578,13 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ]
             );
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
 
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn(
@@ -1560,7 +1616,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                             'id'        => null,
                             '__class__' => null
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -1585,20 +1641,20 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
 
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('usesIdGenerator')
             ->willReturn($usesIdGenerator);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getFieldNames')
             ->willReturn(['id', 'field']);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn([]);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
@@ -1629,7 +1685,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                                 'mapped' => false
                             ]
                         ],
-                        'field' => null,
+                        'field' => null
                     ]
                 ]
             ],
@@ -1648,7 +1704,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                                 'mapped' => false
                             ]
                         ],
-                        'field' => null,
+                        'field' => null
                     ]
                 ]
             ],
@@ -1663,7 +1719,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     'identifier_field_names' => ['field'],
                     'fields'                 => [
                         'id'    => null,
-                        'field' => null,
+                        'field' => null
                     ]
                 ]
             ],
@@ -1678,7 +1734,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     'identifier_field_names' => ['field'],
                     'fields'                 => [
                         'id'    => null,
-                        'field' => null,
+                        'field' => null
                     ]
                 ]
             ],
@@ -1693,7 +1749,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     'identifier_field_names' => ['id'],
                     'fields'                 => [
                         'id'    => null,
-                        'field' => null,
+                        'field' => null
                     ]
                 ]
             ],
@@ -1714,10 +1770,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                         'renamedId' => [
                             'property_path' => 'id'
                         ],
-                        'field'     => null,
+                        'field'     => null
                     ]
                 ]
-            ],
+            ]
         ];
     }
 }

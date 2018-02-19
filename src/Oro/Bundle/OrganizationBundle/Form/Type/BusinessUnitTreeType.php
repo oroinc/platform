@@ -4,7 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTreeTransformer;
@@ -14,6 +14,9 @@ class BusinessUnitTreeType extends AbstractType
     /** @var BusinessUnitManager */
     protected $businessUnitManager;
 
+    /**
+     * @param BusinessUnitManager $businessUnitManager
+     */
     public function __construct(BusinessUnitManager $businessUnitManager)
     {
         $this->businessUnitManager = $businessUnitManager;
@@ -28,6 +31,9 @@ class BusinessUnitTreeType extends AbstractType
         $builder->addModelTransformer($transformer);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
         return 'choice';
@@ -52,7 +58,7 @@ class BusinessUnitTreeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'choices' => function (Options $options) {

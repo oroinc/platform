@@ -128,7 +128,6 @@ class Client extends BaseClient
             $container = $this->getContainer();
 
             $request = Request::create($this->getUrl($route, $gridParameters));
-            $container->get('oro_datagrid.datagrid.request_parameters_factory')->setRequest($request);
             $container->get('request_stack')->push($request);
             /** @var Manager $gridManager */
             $gridManager = $container->get('oro_datagrid.datagrid.manager');

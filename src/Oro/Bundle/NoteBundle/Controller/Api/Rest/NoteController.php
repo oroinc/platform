@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NoteBundle\Controller\Api\Rest;
 
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -30,6 +31,7 @@ class NoteController extends RestController implements ClassResourceInterface
     /**
      * Get notes for given entity
      *
+     * @param Request $request
      * @param string  $entityClass Entity class name
      * @param integer $entityId    Entity id
      *
@@ -52,12 +54,12 @@ class NoteController extends RestController implements ClassResourceInterface
      * @AclAncestor("oro_note_view")
      * @return Response
      */
-    public function cgetAction($entityClass, $entityId)
+    public function cgetAction(Request $request, $entityClass, $entityId)
     {
         $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
 
-        $page = (int) $this->getRequest()->get('page', 1);
-        $limit = (int) $this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $page = (int) $request->get('page', 1);
+        $limit = (int) $request->get('limit', self::ITEMS_PER_PAGE);
 
         /** @var NoteRepository $repo */
         $repo = $this->getManager()->getRepository();

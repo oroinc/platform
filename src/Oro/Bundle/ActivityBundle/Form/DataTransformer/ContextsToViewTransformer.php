@@ -12,6 +12,8 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class ContextsToViewTransformer implements DataTransformerInterface
 {
+    const SEPARATOR = '-|-';
+
     /** @var EntityManager */
     protected $entityManager;
 
@@ -21,9 +23,13 @@ class ContextsToViewTransformer implements DataTransformerInterface
     /** @var bool */
     protected $collectionModel;
 
+    /** @var string */
+    protected $separator = self::SEPARATOR;
+
     /**
-     * @param EntityManager         $entityManager
-     * @param bool                  $collectionModel True if result should be Collection instead of array
+     * @param EntityManager $entityManager
+     * @param bool $collectionModel True if result should be Collection instead of array
+     * @param string $separator
      */
     public function __construct(
         EntityManager $entityManager,
@@ -31,6 +37,14 @@ class ContextsToViewTransformer implements DataTransformerInterface
     ) {
         $this->entityManager = $entityManager;
         $this->collectionModel = $collectionModel;
+    }
+
+    /**
+     * @param string $separator
+     */
+    public function setSeparator($separator)
+    {
+        $this->separator = $separator;
     }
 
     /**
@@ -55,7 +69,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
                 );
             }
 
-            $value = implode(';', $result);
+            $value = implode($this->separator, $result);
         }
 
         return $value;
@@ -70,7 +84,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
             return [];
         }
 
-        $targets = explode(';', $value);
+        $targets = explode($this->separator, $value);
         $result  = [];
         $filters = [];
 

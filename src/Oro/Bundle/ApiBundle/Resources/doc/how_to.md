@@ -15,6 +15,7 @@
  - [Add a Custom Controller](#add-a-custom-controller)
  - [Add a Custom Route](#add-a-custom-route)
  - [Using a Non-primary Key to Identify an Entity](#using-a-non-primary-key-to-identify-an-entity)
+ - [Enable Custom API](#enable-custom-api)
 
 
 ## Turn on API for an Entity
@@ -522,3 +523,125 @@ api:
                 id:
                     exclude: true
 ```
+
+## Enable Custom API
+
+Before begin please ensure that you are familiar with [API request type](./request_type.md).
+
+Lets imagine you need API that will be used for an integration with some ERP system. In this case,
+to simplify the development and to avoid unnecessary API calls, it will be good if your API resources will have
+the same identifiers as the ERP system. The easiest way to achieve this is to create `erpId` field for each entity
+and map this field as the identifier of API resource via
+[identifier_field_names](#using-a-non-primary-key-to-identify-an-entity) configuration option. But the drawback of this
+approach is that you have to change existing API, and as the result it may lead to failure of existing API clients.
+To avoid this you can keep existing API unchanged and create a new type of API that will have all features
+of existing API and will have modifications specific for this new integration as well.
+
+To do this you need to follow several simple steps:
+
+- Decide how to API clients should inform server that they need to work with new type of API. The simplest way is
+  to use custom HTTP header. If a client sends this header it will work with new API, if it does not it will work
+  with already existing API. Lets assume that we will use `X-Integration-Type` header to switch
+  API types. If this header is sent and its value is `ERP` the new API will be used; otherwise, the already
+  existing API will be used.
+- Decide which name of the request type you will use for the new API. Lets assume it will be `erp`.
+- Decide which name of API configuration files you will use to add modifications specific for the new API.
+  Lets assume it will be `api_erp.yml`.
+- Add the new type of API to ApiBundle and configure API Sandbox via `Resources/config/oro/app.yml` configuration
+  file in your bundle:
+
+  ```yaml
+  oro_api:
+      # add API type for ERP integration
+      config_files:
+          erp:
+              # load API configuration for ERP integration from two types of files, api_erp.yml and api.yml
+              # the first file has higher priority and any configuration in this file will override
+              # configuration from the second one
+              file_name: [api_erp.yml, api.yml]
+              # use this configuration only if ERP integration API is requested
+              request_type: ['erp']
+
+      # configure API Sandbox
+      api_doc_views:
+          erp_rest_json_api:
+              label: ERP Integration
+              headers:
+                  Content-Type: application/vnd.api+json
+                  X-Integration-Type: ERP
+              request_type: ['rest', 'json_api', 'erp']
+  ```
+
+- Create a processor that will check the request header and add `erp` request type to the execution context
+  of processors:
+
+   ```php
+   <?php
+
+   namespace Acme\Bundle\AppBundle\Api\Processor;
+
+   use Oro\Component\ChainProcessor\ContextInterface;
+   use Oro\Component\ChainProcessor\ProcessorInterface;
+   use Oro\Bundle\ApiBundle\Processor\Context;
+
+   class CheckErpRequestType implements ProcessorInterface
+   {
+       const REQUEST_HEADER_NAME = 'X-Integration-Type';
+       const REQUEST_HEADER_VALUE = 'ERP';
+       const REQUEST_TYPE = 'erp';
+
+       /**
+        * {@inheritdoc}
+        */
+       public function process(ContextInterface $context)
+       {
+           /** @var Context $context */
+
+           $requestType = $context->getRequestType();
+           if (!$requestType->contains(self::REQUEST_TYPE)
+               && self::REQUEST_HEADER_VALUE === $context->getRequestHeaders()->get(self::REQUEST_HEADER_NAME)
+           ) {
+               $requestType->add(self::REQUEST_TYPE);
+           }
+       }
+   }
+   ```
+
+- Register this processor in the dependency injection container via `Resources/config/services.yml` file:
+
+  ```yaml
+  acme.api.erp.check_erp_request_type:
+      class: Acme\Bundle\AppBundle\Api\Processor\CheckErpRequestType
+      tags:
+          - { name: oro.api.processor, action: get, group: initialize, priority: 250 }
+          - { name: oro.api.processor, action: get_list, group: initialize, priority: 250 }
+          - { name: oro.api.processor, action: delete, group: initialize, priority: 250 }
+          - { name: oro.api.processor, action: delete_list, group: initialize, priority: 250 }
+          - { name: oro.api.processor, action: create, group: initialize, priority: 250 }
+          - { name: oro.api.processor, action: update, group: initialize, priority: 250 }
+          - { name: oro.api.processor, action: get_subresource, group: initialize, priority: 250 }
+          - { name: oro.api.processor, action: get_relationship, group: initialize, priority: 250 }
+          - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 250 }
+          - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 250 }
+          - { name: oro.api.processor, action: update_relationship, group: initialize, priority: 250 }
+  ```
+
+- Execute `cache:clear` command to apply the changes and `oro:api:doc:cache:clear` command to build API Sandbox.
+
+That is all. Now you can open [API Sandbox](https://oroinc.com/orocrm/doc/current/dev-guide/web-api#api-sandbox)
+and check that it has `ERP Integration` link at the top. Click on this link and try to perform any API request.
+
+To configure the new API use `Resources/config/oro/api_erp.yml` configuration file.
+
+All API processors related to the new API should be registered with `requestType: erp` attribute
+for `oro.api.processor` tag, e.g.:
+
+```yaml
+    acme.api.erp.do_something:
+        class: Acme\Bundle\AppBundle\Api\Processor\DoSomething
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, requestType: erp, priority: -10 }
+```
+
+For more details about the configuration and processors see [Configuration Reference](./configuration.md),
+[Actions](./actions.md) and [Processors](./processors.md).

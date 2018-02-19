@@ -582,6 +582,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->context->setClassName('Test\Class');
+        $this->context->setVersion('1.2');
         // set "known" sections
         $this->context->setConfigExtras([new FiltersConfigExtra(), new SortersConfigExtra()]);
 

@@ -35,7 +35,7 @@ class RecipientListTypeTest extends \PHPUnit_Framework_TestCase
         $this->type->buildForm($builder, []);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
@@ -43,6 +43,6 @@ class RecipientListTypeTest extends \PHPUnit_Framework_TestCase
             ->method('setDefaults')
             ->with($this->isType('array'));
 
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
     }
 }

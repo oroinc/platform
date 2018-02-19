@@ -88,17 +88,17 @@ class ConfigController extends Controller
      * )
      * @Template()
      *
+     * @param Request $request
      * @param string $id
      *
      * @return array|RedirectResponse
      */
-    public function updateAction($id)
+    public function updateAction(Request $request, $id)
     {
         $entity  = $this->getConfigManager()
             ->getEntityManager()
             ->getRepository('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
             ->find($id);
-        $request = $this->getRequest();
 
         $form = $this->createForm(
             'oro_entity_config_type',

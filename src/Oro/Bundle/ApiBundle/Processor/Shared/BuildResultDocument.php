@@ -86,7 +86,8 @@ abstract class BuildResultDocument implements ProcessorInterface
     {
         $context->setResponseStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         $error = Error::createByException($e);
-        $this->errorCompleterRegistry->getErrorCompleter($context->getRequestType())->complete($error);
+        $this->errorCompleterRegistry->getErrorCompleter($context->getRequestType())
+            ->complete($error, $context->getRequestType());
         $documentBuilder->clear();
         $documentBuilder->setErrorObject($error);
 

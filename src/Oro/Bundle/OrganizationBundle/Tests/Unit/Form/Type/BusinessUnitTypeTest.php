@@ -29,9 +29,9 @@ class BusinessUnitTypeTest extends \PHPUnit_Framework_TestCase
         $this->form = new BusinessUnitType($businessUnitManager, $tokenAccessor);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        $optionResolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $optionResolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $optionResolver->expects($this->once())
             ->method('setDefaults')
             ->with(
@@ -40,7 +40,7 @@ class BusinessUnitTypeTest extends \PHPUnit_Framework_TestCase
                     'ownership_disabled'      => true
                 ]
             );
-        $this->form->setDefaultOptions($optionResolver);
+        $this->form->configureOptions($optionResolver);
     }
 
     public function testBuildForm()

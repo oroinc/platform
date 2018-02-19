@@ -28,10 +28,10 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
         $this->formType = new OroSimpleColorPickerType($configManager, $translatorInterface);
     }
 
-    public function testSetDefaultOptionsWithCustomColorSchema()
+    public function testConfigureOptionsWithCustomColorSchema()
     {
         $resolver = $this->getOptionsResolver();
-        $this->formType->setDefaultOptions($resolver);
+        $this->formType->configureOptions($resolver);
 
         $options = [
             'color_schema'  => 'custom',
@@ -65,10 +65,10 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
         );
     }
 
-    public function testSetDefaultOptionsWithShortColorSchema()
+    public function testConfigureOptionsWithShortColorSchema()
     {
         $resolver = $this->getOptionsResolver();
-        $this->formType->setDefaultOptions($resolver);
+        $this->formType->configureOptions($resolver);
 
         $options = [
             'color_schema'  => 'short',
@@ -124,10 +124,10 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Unknown color schema: "unknown".
      */
-    public function testSetDefaultOptionsForUnknownColorSchema()
+    public function testConfigureOptionsForUnknownColorSchema()
     {
         $resolver = $this->getOptionsResolver();
-        $this->formType->setDefaultOptions($resolver);
+        $this->formType->configureOptions($resolver);
 
         $options = [
             'color_schema'  => 'unknown',

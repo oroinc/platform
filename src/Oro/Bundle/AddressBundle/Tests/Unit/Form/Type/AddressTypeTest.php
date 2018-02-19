@@ -101,7 +101,7 @@ class AddressTypeTest extends \PHPUnit_Framework_TestCase
         $this->type->buildForm($builder, array());
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->disableOriginalConstructor()

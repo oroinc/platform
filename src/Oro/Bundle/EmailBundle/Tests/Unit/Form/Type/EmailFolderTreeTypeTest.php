@@ -23,7 +23,7 @@ class EmailFolderTreeTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->disableOriginalConstructor()
@@ -35,7 +35,7 @@ class EmailFolderTreeTypeTest extends FormIntegrationTestCase
                 'allow_extra_fields' => true
             ]);
 
-        $this->emailFolderTreeType->setDefaultOptions($resolver);
+        $this->emailFolderTreeType->configureOptions($resolver);
     }
 
     public function testGetName()

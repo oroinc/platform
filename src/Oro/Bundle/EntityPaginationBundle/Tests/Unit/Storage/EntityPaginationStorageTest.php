@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Storage;
 
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -29,6 +30,9 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
     /** @var \stdClass */
     protected $entity;
 
+    /** @var RequestStack */
+    private $requestStack;
+
     protected function setUp()
     {
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
@@ -41,7 +45,12 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->storage = new EntityPaginationStorage($this->doctrineHelper, $this->paginationManager);
+        $this->requestStack = new RequestStack();
+        $this->storage = new EntityPaginationStorage(
+            $this->doctrineHelper,
+            $this->paginationManager,
+            $this->requestStack
+        );
         $this->entity = new \stdClass();
     }
 
@@ -583,7 +592,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
         );
         $request = new Request();
         $request->setSession($session);
-        $this->storage->setRequest($request);
+        $this->requestStack->push($request);
     }
 
     /**
@@ -601,6 +610,6 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
         $session = new Session(new MockArraySessionStorage());
         $request = new Request();
         $request->setSession($session);
-        $this->storage->setRequest($request);
+        $this->requestStack->push($request);
     }
 }

@@ -11,6 +11,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @NamePrefix("oro_api_")
@@ -20,6 +21,7 @@ class RoleController extends RestController implements ClassResourceInterface
     /**
      * Get the list of roles
      *
+     * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      * @ApiDoc(
      *      description="Get the list of roles",
@@ -39,10 +41,10 @@ class RoleController extends RestController implements ClassResourceInterface
      * )
      * @AclAncestor("oro_user_role_view")
      */
-    public function cgetAction()
+    public function cgetAction(Request $request)
     {
-        $page = (int) $this->getRequest()->get('page', 1);
-        $limit = (int) $this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $page = (int) $request->get('page', 1);
+        $limit = (int) $request->get('limit', self::ITEMS_PER_PAGE);
 
         return $this->handleGetListRequest($page, $limit);
     }
