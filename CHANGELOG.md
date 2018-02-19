@@ -1,5 +1,9 @@
 ## 2.7.0 (Unreleased)
 
+### Added
+#### ApiBundle
+* Added a possibility to enable custom API. For details see [how_to.md](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#enable-custom-api).
+
 ### Removed
 #### WorkflowBundle
 * Removed cache provider `oro_workflow.cache.provider.workflow_definition`. Doctrine result cache is used instead of.
