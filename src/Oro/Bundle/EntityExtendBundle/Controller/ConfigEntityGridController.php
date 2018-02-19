@@ -8,6 +8,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -27,6 +29,7 @@ use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 class ConfigEntityGridController extends Controller
 {
     /**
+     * @param Request $request
      * @param EntityConfigModel $entity
      * @return array
      *
@@ -44,7 +47,7 @@ class ConfigEntityGridController extends Controller
      * )
      * @Template
      */
-    public function uniqueAction(EntityConfigModel $entity)
+    public function uniqueAction(Request $request, EntityConfigModel $entity)
     {
         $className      = $entity->getClassName();
         $entityProvider = $this->get('oro_entity_config.provider.entity');
@@ -58,7 +61,6 @@ class ConfigEntityGridController extends Controller
             ]
         );
 
-        $request = $this->getRequest();
         if ($request->getMethod() == 'POST') {
             $form->submit($request);
 
@@ -88,11 +90,11 @@ class ConfigEntityGridController extends Controller
      *      group_name=""
      * )
      * @Template
+     * @param Request $request
+     * @return array|RedirectResponse
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        $request = $this->getRequest();
-
         /** @var ConfigManager $configManager */
         $configManager = $this->get('oro_entity_config.config_manager');
 

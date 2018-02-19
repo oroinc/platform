@@ -42,6 +42,7 @@ class LanguageType extends AbstractType
         $resolver->setDefaults(
             [
                 'choices' => $this->getLanguageChoices(true),
+                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
                 'choices_as_values' => true,
                 'show_all' => false,
                 'empty_value' => '',

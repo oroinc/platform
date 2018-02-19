@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Controller\Api\Rest;
 
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use FOS\RestBundle\Util\Codes;
@@ -46,15 +47,16 @@ class SegmentController extends RestController implements ClassResourceInterface
      *      description="Get entity segments",
      *      resource=true
      * )
+     * @param Request $request
      * @return Response
      */
-    public function getItemsAction()
+    public function getItemsAction(Request $request)
     {
         $entityName = $this->get('oro_entity.routing_helper')
-            ->resolveEntityClass($this->getRequest()->get('entityName'));
-        $page = $this->getRequest()->query->get('page', 1);
-        $term = $this->getRequest()->query->get('term');
-        $currentSegment = $this->getRequest()->query->get('currentSegment', null);
+            ->resolveEntityClass($request->get('entityName'));
+        $page = $request->query->get('page', 1);
+        $term = $request->query->get('term');
+        $currentSegment = $request->query->get('currentSegment', null);
         $statusCode = Codes::HTTP_OK;
 
         /** @var SegmentManager $provider */

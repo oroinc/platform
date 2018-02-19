@@ -319,7 +319,7 @@ class DirectMailer extends \Swift_Mailer
         if (php_sapi_name() === 'cli') {
             return;
         }
-        $host = $this->container->get('request')->server->get('HTTP_HOST');
+        $host = $this->container->get('request_stack')->getCurrentRequest()->server->get('HTTP_HOST');
         // fix local domain when wild-card vhost is used and auto-detection fails
         if (0 === strpos($transport->getLocalDomain(), '*') && !empty($host)) {
             $transport->setLocalDomain($host);

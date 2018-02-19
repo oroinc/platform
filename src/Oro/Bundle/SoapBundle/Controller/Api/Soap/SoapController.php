@@ -120,7 +120,7 @@ abstract class SoapController extends SoapGetController implements
      */
     protected function fixRequestAttributes($entity)
     {
-        $request = $this->container->get('request');
+        $request = $this->container->get('request_stack')->getCurrentRequest();
         $entityData = $request->get($this->getForm()->getName());
         if (!is_object($entityData)) {
             return;

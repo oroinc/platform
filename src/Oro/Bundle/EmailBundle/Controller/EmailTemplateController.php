@@ -12,6 +12,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @Route("/emailtemplate")
@@ -88,10 +89,11 @@ class EmailTemplateController extends Controller
      *      permission="VIEW"
      * )
      * @Template("OroEmailBundle:EmailTemplate:preview.html.twig")
+     * @param Request $request
      * @param bool|int $id
      * @return array
      */
-    public function previewAction($id = false)
+    public function previewAction(Request $request, $id = false)
     {
         if (!$id) {
             $emailTemplate = new EmailTemplate();
@@ -104,7 +106,6 @@ class EmailTemplateController extends Controller
         /** @var FormInterface $form */
         $form = $this->get('oro_email.form.emailtemplate');
         $form->setData($emailTemplate);
-        $request = $this->get('request');
 
         if (in_array($request->getMethod(), array('POST', 'PUT'))) {
             $form->submit($request);

@@ -238,14 +238,17 @@ class ResetController extends Controller
      * @Method({"GET", "POST"})
      * @Route("/set-password/{id}", name="oro_user_reset_set_password", requirements={"id"="\d+"})
      * @Template("OroUserBundle:Reset/dialog:update.html.twig")
+     * @param Request $request
+     * @param User $entity
+     * @return array
      */
-    public function setPasswordAction(User $entity)
+    public function setPasswordAction(Request $request, User $entity)
     {
         $entityRoutingHelper = $this->getEntityRoutingHelper();
 
         $formAction = $entityRoutingHelper->generateUrlByRequest(
             'oro_user_reset_set_password',
-            $this->getRequest(),
+            $request,
             ['id' => $entity->getId()]
         );
 

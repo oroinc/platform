@@ -34,7 +34,7 @@ class SetupStep extends AbstractStep
         $form = $this->createForm('oro_installer_setup');
         $form->setData($adminUser);
 
-        $form->handleRequest($this->getRequest());
+        $form->handleRequest($this->get('request_stack')->getCurrentRequest());
 
         if ($form->isValid()) {
             // pass "load demo fixtures" flag to the next step

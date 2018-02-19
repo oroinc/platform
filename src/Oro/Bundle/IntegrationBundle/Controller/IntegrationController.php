@@ -152,7 +152,7 @@ class IntegrationController extends Controller
      */
     protected function getForm()
     {
-        $isUpdateOnly = $this->get('request')->get(ChannelHandler::UPDATE_MARKER, false);
+        $isUpdateOnly = $this->get('request_stack')->getCurrentRequest()->get(ChannelHandler::UPDATE_MARKER, false);
 
         $form = $this->get('oro_integration.form.channel');
         // take different form due to JS validation should be shown even in case when it was not validated on backend

@@ -34,18 +34,18 @@ class GridController extends Controller
      *      requirements={"gridName"="[\w\:-]+"}
      * )
      * @Template
-     *
+     * @param Request $request
      * @param string $gridName
      *
-     * @return Response
+     * @return array
      */
-    public function widgetAction($gridName)
+    public function widgetAction(Request $request, $gridName)
     {
         return [
             'gridName'     => $gridName,
-            'params'       => $this->getRequest()->get('params', []),
-            'renderParams' => $this->getRenderParams(),
-            'multiselect'  => (bool)$this->getRequest()->get('multiselect', false),
+            'params'       => $request->get('params', []),
+            'renderParams' => $this->getRenderParams($request),
+            'multiselect'  => (bool)$request->get('multiselect', false),
         ];
     }
 
@@ -168,17 +168,15 @@ class GridController extends Controller
      *      name="oro_datagrid_mass_action",
      *      requirements={"gridName"="[\w\:-]+", "actionName"="[\w-]+"}
      * )
-     *
+     * @param Request $request
      * @param string $gridName
      * @param string $actionName
      *
      * @return Response
      * @throws \LogicException
      */
-    public function massActionAction($gridName, $actionName)
+    public function massActionAction(Request $request, $gridName, $actionName)
     {
-        $request = $this->getRequest();
-
         /* @var $tokenManager CsrfTokenManagerInterface */
         $tokenManager = $this->get('security.csrf.token_manager');
         if (!$tokenManager->isTokenValid(new CsrfToken($actionName, $request->get('token')))) {
@@ -203,12 +201,13 @@ class GridController extends Controller
     }
 
     /**
+     * @param Request $request
      * @return array
      */
-    protected function getRenderParams()
+    protected function getRenderParams(Request $request)
     {
-        $renderParams      = $this->getRequest()->get('renderParams', []);
-        $renderParamsTypes = $this->getRequest()->get('renderParamsTypes', []);
+        $renderParams      = $request->get('renderParams', []);
+        $renderParamsTypes = $request->get('renderParamsTypes', []);
 
         foreach ($renderParamsTypes as $param => $type) {
             if (array_key_exists($param, $renderParams)) {

@@ -31,6 +31,7 @@ class MergeType extends AbstractType
                 'multiple'                => false,
                 'tooltip'                 => 'oro.entity_merge.form.master_record.tooltip',
                 'expanded'                => true,
+                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
                 'choices_as_values'       => true,
                 'ownership_disabled'      => true,
                 'dynamic_fields_disabled' => true,

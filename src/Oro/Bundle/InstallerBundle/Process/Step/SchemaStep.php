@@ -22,7 +22,7 @@ class SchemaStep extends AbstractStep
     {
         set_time_limit(600);
 
-        switch ($this->getRequest()->query->get('action')) {
+        switch ($this->get('request_stack')->getCurrentRequest()->query->get('action')) {
             case 'cache':
                 // suppress warning: ini_set(): A session is active. You cannot change the session
                 // module's ini settings at this time

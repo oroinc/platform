@@ -47,6 +47,7 @@ class ChannelType extends AbstractType
             [
                 'required' => true,
                 'label'    => 'oro.integration.integration.type.label',
+                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
                 'choices_as_values' => true
             ]
         );
@@ -74,6 +75,7 @@ class ChannelType extends AbstractType
                 'choices'     => [], //will be filled in event listener
                 'mapped'      => false,
                 'constraints' => new NotBlank(),
+                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
                 'choices_as_values' => true
             ]
         );
@@ -88,6 +90,7 @@ class ChannelType extends AbstractType
                 'multiple' => true,
                 'choices'  => [], //will be filled in event listener
                 'required' => false,
+                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
                 'choices_as_values' => true
             ]
         );

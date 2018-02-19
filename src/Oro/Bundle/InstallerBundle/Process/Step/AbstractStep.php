@@ -48,7 +48,7 @@ abstract class AbstractStep extends AbstractControllerStep
      */
     protected function getAjaxActionResponse($exitCode)
     {
-        return $this->getRequest()->isXmlHttpRequest()
+        return $this->get('request_stack')->getCurrentRequest()->isXmlHttpRequest()
             ? new JsonResponse(['result' => true, 'exitCode' => $exitCode])
             : $this->redirect(
                 $this->generateUrl(

@@ -10,6 +10,7 @@ use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
@@ -80,10 +81,10 @@ class EmailActivityController extends RestGetController
      *      description="Get entities where an email found by specified filters is an activity",
      *      resource=true
      * )
-     *
+     * @param Request $request
      * @return Response
      */
-    public function cgetByFiltersAction()
+    public function cgetByFiltersAction(Request $request)
     {
         $manager = $this->getManager();
 
@@ -133,8 +134,8 @@ class EmailActivityController extends RestGetController
             return $this->buildResponse('', self::ACTION_READ, ['result' => null], Codes::HTTP_NOT_FOUND);
         }
 
-        $page     = (int)$this->getRequest()->get('page', 1);
-        $limit    = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $page     = (int)$request->get('page', 1);
+        $limit    = (int)$request->get('limit', self::ITEMS_PER_PAGE);
         $criteria = $this->buildFilterCriteria(['id' => ['=', $emailId]]);
 
         return $this->handleGetListRequest($page, $limit, $criteria);

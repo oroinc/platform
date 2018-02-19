@@ -23,7 +23,7 @@ class InstallationStep extends AbstractStep
     {
         set_time_limit(900);
 
-        $action = $this->getRequest()->query->get('action');
+        $action = $this->get('request_stack')->getCurrentRequest()->query->get('action');
         switch ($action) {
             case 'fixtures':
                 return $this->handleAjaxAction('oro:migration:data:load', ['--fixtures-type' => 'demo']);

@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 
 class ConfigurationController extends Controller
 {
@@ -25,8 +26,12 @@ class ConfigurationController extends Controller
      *      group_name="",
      *      category="application"
      * )
+     * @param Request $request
+     * @param mixed $activeGroup
+     * @param mixed $activeSubGroup
+     * @return array
      */
-    public function systemAction($activeGroup = null, $activeSubGroup = null)
+    public function systemAction(Request $request, $activeGroup = null, $activeSubGroup = null)
     {
         $provider = $this->get('oro_config.provider.system_configuration.form_provider');
 
@@ -38,7 +43,7 @@ class ConfigurationController extends Controller
         if ($activeSubGroup !== null) {
             $form = $provider->getForm($activeSubGroup);
 
-            if ($this->get('oro_config.form.handler.config')->process($form, $this->getRequest())) {
+            if ($this->get('oro_config.form.handler.config')->process($form, $request)) {
                 $this->get('session')->getFlashBag()->add(
                     'success',
                     $this->get('translator')->trans('oro.config.controller.config.saved.message')

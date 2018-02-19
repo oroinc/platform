@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Controller;
 
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -51,8 +52,12 @@ class AttachmentController extends Controller
      *      class="OroAttachmentBundle:Attachment",
      *      permission="CREATE"
      * )
+     * @param Request $request
+     * @param mixed $entityClass
+     * @param mixed $entityId
+     * @return array
      */
-    public function createAction($entityClass, $entityId)
+    public function createAction(Request $request, $entityClass, $entityId)
     {
         $entityRoutingHelper = $this->getEntityRoutingHelper();
 
@@ -70,7 +75,7 @@ class AttachmentController extends Controller
 
         $formAction = $entityRoutingHelper->generateUrlByRequest(
             'oro_attachment_create',
-            $this->getRequest(),
+            $request,
             $entityRoutingHelper->getRouteParameters($entityClass, $entityId)
         );
 
@@ -88,10 +93,13 @@ class AttachmentController extends Controller
      *      class="OroAttachmentBundle:Attachment",
      *      permission="EDIT"
      * )
+     * @param Request $request
+     * @param Attachment $attachment
+     * @return array
      */
-    public function updateAction(Attachment $attachment)
+    public function updateAction(Request $request, Attachment $attachment)
     {
-        $formAction = $this->getRequest()->getUri();
+        $formAction = $request->getUri();
         $form       = $this->createForm(
             $this->container->get('oro_attachment.form.type'),
             $attachment,

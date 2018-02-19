@@ -47,6 +47,7 @@ class MergeFieldType extends AbstractType
                 'choices'                 => $options['entities'],
                 'multiple'                => false,
                 'expanded'                => true,
+                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
                 'choices_as_values'       => true,
                 'ownership_disabled'      => true,
                 'dynamic_fields_disabled' => true,

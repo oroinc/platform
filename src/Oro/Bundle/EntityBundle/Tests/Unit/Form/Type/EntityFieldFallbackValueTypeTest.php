@@ -133,6 +133,7 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         $systemConfig = [
             'options' => [
                 'choices' => ['test1' => 'test1', 'test2' => 'test2'],
+                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
                 'choices_as_values' => true,
             ],
         ];
