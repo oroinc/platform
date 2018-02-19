@@ -15,6 +15,9 @@ use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand;
 
+/**
+ * Updates application to actual state that the corresponding to local code base
+ */
 class PlatformUpdateCommand extends AbstractCommand
 {
     const NAME = 'oro:platform:update';

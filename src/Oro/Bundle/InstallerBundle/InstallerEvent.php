@@ -7,6 +7,9 @@ use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * An event for install or update commands
+ */
 class InstallerEvent extends ConsoleEvent
 {
     /** @var CommandExecutor */

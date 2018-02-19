@@ -8,6 +8,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Will execute full search index re-indexation when database ready to work on installation process of application
+ */
 class InstallCommandListener
 {
     use ReindexationCommandTrait;

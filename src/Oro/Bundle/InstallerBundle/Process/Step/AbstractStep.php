@@ -12,6 +12,9 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 use Sylius\Bundle\FlowBundle\Process\Step\AbstractControllerStep;
 
+/**
+ * Abstract call for web installer steps
+ */
 abstract class AbstractStep extends AbstractControllerStep
 {
     const TRIGGER_EVENT = 'trigger:event';

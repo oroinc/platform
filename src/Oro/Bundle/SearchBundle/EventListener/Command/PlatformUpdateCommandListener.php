@@ -8,6 +8,9 @@ use Oro\Bundle\SearchBundle\Provider\Console\SearchReindexationGlobalOptionsProv
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 
+/**
+ * Will execute full search index re-indexation when database ready to work on update process of application
+ */
 class PlatformUpdateCommandListener
 {
     use ReindexationCommandTrait;

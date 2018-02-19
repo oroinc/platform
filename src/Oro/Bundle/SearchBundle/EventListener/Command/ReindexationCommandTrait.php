@@ -4,6 +4,9 @@ namespace Oro\Bundle\SearchBundle\EventListener\Command;
 
 use Oro\Bundle\InstallerBundle\InstallerEvent;
 
+/**
+ * Allows to run search re-indexation command
+ */
 trait ReindexationCommandTrait
 {
     /**

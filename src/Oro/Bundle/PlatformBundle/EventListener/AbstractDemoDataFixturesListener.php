@@ -4,6 +4,9 @@ namespace Oro\Bundle\PlatformBundle\EventListener;
 
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 
+/**
+ * Abstract class for the listeners that can disable some event listeners during installation demo fixtures
+ */
 class AbstractDemoDataFixturesListener extends AbstractDataFixturesListener
 {
     /**

@@ -9,6 +9,10 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
+/**
+ * Adds two new parameters to `oro:platform:update` command allowing skip or postpone full re-indexation of search index
+ * during application update process
+ */
 class SearchReindexationGlobalOptionsProvider extends AbstractGlobalOptionsProvider
 {
     const SKIP_REINDEXATION_OPTION_NAME = 'skip-search-reindexation';

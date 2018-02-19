@@ -9,6 +9,9 @@ use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 
 use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
 
+/**
+ * Database preparation step of web installer
+ */
 class SchemaStep extends AbstractStep
 {
     /**

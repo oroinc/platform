@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\InstallerBundle;
 
+/**
+ * Events that may triggered during installation or update process
+ */
 final class InstallerEvents
 {
     /**

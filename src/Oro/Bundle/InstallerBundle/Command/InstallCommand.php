@@ -23,6 +23,8 @@ use Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 
 /**
+ * Command installs application with all schema and data migrations, prepares assets and application cache
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class InstallCommand extends AbstractCommand implements InstallCommandInterface

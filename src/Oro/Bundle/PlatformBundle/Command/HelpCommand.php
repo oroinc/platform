@@ -7,6 +7,10 @@ use Symfony\Component\Console\Command\HelpCommand as SymfonyHelpCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Wraps the default Symfony help command to allowing access to the original command.
+ * This is done because the original command has private property and has no getter for that property.
+ */
 class HelpCommand extends SymfonyHelpCommand
 {
     /**

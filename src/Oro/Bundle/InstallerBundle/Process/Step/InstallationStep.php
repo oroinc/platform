@@ -10,6 +10,9 @@ use Oro\Bundle\InstallerBundle\InstallerEvents;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 
+/**
+ * Last step of web installation
+ */
 class InstallationStep extends AbstractStep
 {
     /**
