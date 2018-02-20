@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Data;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EntityDataFactory
 {

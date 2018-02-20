@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Filter;
 
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Doctrine\Common\Collections\Expr\Comparison as DoctrineComparison;
-use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
-use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchStringFilter;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
+use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchStringFilter;
+use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class SearchStringFilterTest extends \PHPUnit_Framework_TestCase
 {

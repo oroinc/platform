@@ -5,12 +5,10 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowVariablesHandler;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class WorkflowVariablesHandlerTest extends \PHPUnit_Framework_TestCase
 {

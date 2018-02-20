@@ -3,8 +3,8 @@
 namespace Oro\Bundle\SecurityBundle\Search;
 
 use Doctrine\Common\Collections\Expr\CompositeExpression;
-
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
+use Oro\Bundle\SearchBundle\Query\Criteria\ExpressionBuilder;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\EventListener\SearchListener;
@@ -93,7 +93,8 @@ class AclHelper
         }
 
         if (count($ownerExpressions) !== 0) {
-            $query->getCriteria()->andWhere(new CompositeExpression(CompositeExpression::TYPE_OR, $ownerExpressions));
+            $orExpression = new CompositeExpression(CompositeExpression::TYPE_OR, $ownerExpressions);
+            $query->getCriteria()->andWhere($orExpression);
         }
         $query->from($allowedAliases);
 
@@ -112,7 +113,7 @@ class AclHelper
 
     /**
      * @param Query $query
-     * @param $expr
+     * @param ExpressionBuilder $expr
      */
     protected function addOrganizationLimits(Query $query, $expr)
     {

@@ -4,12 +4,10 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
 use Doctrine\Common\EventManager;
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutor;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DataFixturesExecutorTest extends \PHPUnit_Framework_TestCase
 {

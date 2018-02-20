@@ -43,8 +43,8 @@ parameters:
 services:
     oro_datagrid.datagrid.name_strategy:
         class: %oro_datagrid.datagrid.name_strategy.class%
-        calls:
-            - [setRequest, ["@?request="]]
+        arguments:
+            - '@request_stack'
 
     oro_dashboard.config_resolver:
         class: %oro_dashboard.config_resolver.class%
@@ -69,8 +69,7 @@ services:
             - '@translator'
             - '@event_dispatcher'
             - '@oro_dashboard.widget_config_visibility_filter'
-        calls:
-            - [setRequest, ["@?request="]]
+            - '@request_stack'
 
     oro_dashboard.manager:
         class: %oro_dashboard.manager.class%

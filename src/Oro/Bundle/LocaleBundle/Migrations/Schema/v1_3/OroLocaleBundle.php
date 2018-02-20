@@ -4,7 +4,6 @@ namespace Oro\Bundle\LocaleBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
-
 use Oro\Bundle\EntityConfigBundle\Migration\RemoveFieldQuery;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;

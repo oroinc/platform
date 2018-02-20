@@ -2,12 +2,11 @@
 
 namespace Oro\Component\Layout\Tests\Unit\ExpressionLanguage\Encoder;
 
-use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
-use Symfony\Component\ExpressionLanguage\ParsedExpression;
-
 use Oro\Component\Layout\Action;
 use Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
+use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 class JsonExpressionEncoderTest extends \PHPUnit_Framework_TestCase
 {

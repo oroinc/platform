@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ConfigBundle\Api\Processor\Get\Rest;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Adds a configuration data request to return all fields of configuration options.

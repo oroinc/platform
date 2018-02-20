@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataAuditBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Disables collecting data audit data if the application is not installed yet.

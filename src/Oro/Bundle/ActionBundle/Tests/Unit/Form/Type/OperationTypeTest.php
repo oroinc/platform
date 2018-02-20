@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Bundle\ActionBundle\Form\EventListener\RequiredAttributesListener;
+use Oro\Bundle\ActionBundle\Form\Type\OperationType;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
-use Oro\Bundle\ActionBundle\Form\Type\OperationType;
-
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class OperationTypeTest extends FormIntegrationTestCase
 {

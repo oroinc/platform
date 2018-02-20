@@ -76,7 +76,7 @@ define(function(require) {
 
         destroy: function(options) {
             if (this.workflow) {
-                //Need to manually destroy collection elements to trigger all appropriate events
+                // Need to manually destroy collection elements to trigger all appropriate events
                 var removeTransitions = function(models) {
                     if (models.length) {
                         for (var i = models.length - 1; i > -1; i--) {
@@ -85,10 +85,10 @@ define(function(require) {
                     }
                 };
 
-                //Remove step transitions
+                // Remove step transitions
                 removeTransitions(this.getAllowedTransitions(this.workflow).models);
-                //Remove transitions which lead into removed step
-                removeTransitions(this.workflow.get('transitions').where({'step_to': this.get('name')}));
+                // Remove transitions which lead into removed step
+                removeTransitions(this.workflow.get('transitions').where({step_to: this.get('name')}));
             }
 
             StepModel.__super__.destroy.call(this, options);

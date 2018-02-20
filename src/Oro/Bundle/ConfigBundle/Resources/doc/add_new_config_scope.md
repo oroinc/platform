@@ -1,8 +1,8 @@
-## Add new configuration scope ##
+## Add new configuration scope
 
 To add new config scope, developer should do next steps.
 
-### Add scope manager ###
+### Add scope manager
 
 A scope manager is a class provides access to configuration attributes is a particular scope. This class should extend [AbstractScopeManager](./../../Config/AbstractScopeManager.php).
 
@@ -52,7 +52,7 @@ This manager should be registered as the service with tag `oro_config.scope` :
 After this, the scope `test` will be used during retrieving some config value. This scope will be between `global` and `user` scopes.
 A developer can use this scope with `oro_config.test` config provider.
 
-### Change scope values via UI ###
+### Change scope values via UI
 
 To be able to change values for new scope, developer should add new tree structure for this scope in `system_configuration.yml` file, e.g.:
 
@@ -134,7 +134,7 @@ add new action to manipulate data:
      * )
      * @Template()
      */
-    public function testConfigAction($activeGroup = null, $activeSubGroup = null)
+    public function testConfigAction(Request $request, $activeGroup = null, $activeSubGroup = null)
     {
         $provider = $this->get('acme_test.provider.form_provider.test');
 
@@ -150,7 +150,7 @@ add new action to manipulate data:
 
             if ($this->get('oro_config.form.handler.config')
                 ->setConfigManager($manager)
-                ->process($form, $this->getRequest())
+                ->process($form, $request)
             ) {
                 $this->get('session')->getFlashBag()->add(
                     'success',

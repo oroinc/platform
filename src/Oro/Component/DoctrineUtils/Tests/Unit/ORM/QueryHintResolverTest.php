@@ -3,7 +3,6 @@
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
 use Doctrine\ORM\Query;
-
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
 
 class QueryHintResolverTest extends \PHPUnit_Framework_TestCase
@@ -170,6 +169,29 @@ class QueryHintResolverTest extends \PHPUnit_Framework_TestCase
             [
                 Query::HINT_CUSTOM_TREE_WALKERS => ['another_walker_class', 'walker_class'],
                 Query::HINT_REFRESH             => true
+            ],
+            $query->getHints()
+        );
+    }
+
+    public function testAddHintsWithParameters()
+    {
+        $query = $this->getQuery();
+        $query->setParameter('parameter_name', 10);
+        $query->setParameter('parameter_name2', 100);
+
+        $this->queryHintResolver->addHints(
+            $query,
+            [
+                ['name' => 'HINT_WITH_PARAMETER', 'value' => ':parameter_name'],
+                ['name' => 'HINT_WITH_PARAMETER2', 'value' => ['id' => ':parameter_name2']]
+            ]
+        );
+
+        $this->assertEquals(
+            [
+                'HINT_WITH_PARAMETER' => 10,
+                'HINT_WITH_PARAMETER2' => ['id' => 100]
             ],
             $query->getHints()
         );

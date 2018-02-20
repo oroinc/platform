@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Bundle\LocaleBundle\Model\AddressInterface;
 use Oro\Bundle\LocaleBundle\Formatter\AddressFormatter;
+use Oro\Bundle\LocaleBundle\Model\AddressInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class AddressExtension extends \Twig_Extension
 {

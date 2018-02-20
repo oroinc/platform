@@ -3,9 +3,8 @@
 namespace Oro\Bundle\SegmentBundle\Migrations\Schema\v1_4;
 
 use Doctrine\DBAL\Types\Type;
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class ReplaceDateTimeFilterPartQuery extends ParametrizedSqlMigrationQuery
 {

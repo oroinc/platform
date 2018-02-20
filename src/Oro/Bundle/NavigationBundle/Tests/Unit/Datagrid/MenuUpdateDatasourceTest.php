@@ -4,7 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Datagrid;
 
 use Knp\Menu\MenuFactory;
 use Knp\Menu\Util\MenuManipulator;
-
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
 use Oro\Bundle\NavigationBundle\Datagrid\MenuUpdateDatasource;

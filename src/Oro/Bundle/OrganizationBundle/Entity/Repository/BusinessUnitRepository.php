@@ -3,10 +3,10 @@ namespace Oro\Bundle\OrganizationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class BusinessUnitRepository extends EntityRepository
 {
@@ -184,13 +184,15 @@ class BusinessUnitRepository extends EntityRepository
      */
     public function getGridFilterChoices($field, $entity, $alias = 'bu')
     {
+        QueryBuilderUtil::checkIdentifier($alias);
+        QueryBuilderUtil::checkIdentifier($field);
         $options = [];
 
         $result = $this->_em->createQueryBuilder()
             ->select($alias)
             ->from($entity, $alias)
-            ->add('select', $alias . '.' . $field)
-            ->distinct($alias . '.' . $field)
+            ->addSelect($alias . '.' . $field)
+            ->distinct()
             ->getQuery()
             ->getArrayResult();
 

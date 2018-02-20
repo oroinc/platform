@@ -6,20 +6,23 @@
     "type": "git",
     "url": "https://github.com/orocrm/platform"
   },
+  "scripts": {
+    "test-codestyle": "./node_modules/.bin/eslint ../../** -c .eslintrc.yml --ignore-path .eslintignore --quiet"
+  },
   "devDependencies": {
-    "jasmine-core": "2.5.2",
-    "jscs": "1.13.1",
-    "jshint": "2.8.0",
-    "jshint-junit-reporter": "0.2.2",
-    "karma": "1.5.0",
-    "karma-chrome-launcher": "2.0.0",
+    "eslint": "^4.13.1",
+    "eslint-config-google": "^0.9.1",
+    "eslint-plugin-oro": "git://github.com/laboro/eslint-plugin-oro#master",
+    "jasmine-core": "2.8.0",
+    "karma": "2.0.0",
+    "karma-chrome-launcher": "2.2.0",
     "karma-coverage": "1.1.1",
-    "karma-firefox-launcher": "1.0.1",
-    "karma-jasmine": "1.1.0",
+    "karma-firefox-launcher": "1.1.0",
+    "karma-jasmine": "1.1.1",
     "karma-junit-reporter": "1.2.0",
     "karma-phantomjs-launcher": "1.0.4",
     "karma-requirejs": "1.1.0",
     "karma-requirejs-exposure": "git://github.com/laboro/karma-requirejs-exposure#master",
-    "requirejs": "2.3.3"
+    "requirejs": "2.3.5"
   }
 }

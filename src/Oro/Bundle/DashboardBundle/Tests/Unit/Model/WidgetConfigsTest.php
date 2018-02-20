@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,6 +30,9 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
+
+    /** @var RequestStack|\PHPUnit_Framework_MockObject_MockObject */
+    protected $requestStack;
 
     public function setUp()
     {
@@ -67,6 +70,7 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
             ->method('filterConfigs')
             ->will($this->returnArgument(0));
 
+        $this->requestStack = new RequestStack();
         $this->widgetConfigs = new WidgetConfigs(
             $this->configProvider,
             $resolver,
@@ -74,7 +78,8 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
             $this->valueProvider,
             $this->translator,
             $this->eventDispatcher,
-            $widgetConfigVisibilityFilter
+            $widgetConfigVisibilityFilter,
+            $this->requestStack
         );
 
         $this->widgetRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
@@ -90,15 +95,13 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
 
     public function testGetWidgetOptionsShouldReturnEmptyArrayIfRequestIsNull()
     {
-        $this->widgetConfigs->setRequest(null);
-
         $this->assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
     }
 
     public function testGetWidgetOptionsShouldReturnEmptyArrayIfThereIsNoWidgetIdInRequestQuery()
     {
         $request = new Request();
-        $this->widgetConfigs->setRequest($request);
+        $this->requestStack->push($request);
 
         $this->assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
     }
@@ -108,7 +111,7 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
         $request = new Request([
             '_widgetId' => 1,
         ]);
-        $this->widgetConfigs->setRequest($request);
+        $this->requestStack->push($request);
 
         $widget = new Widget();
         $this->widgetRepository
@@ -139,7 +142,7 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
         $request = new Request([
             '_widgetId' => 1,
         ]);
-        $this->widgetConfigs->setRequest($request);
+        $this->requestStack->push($request);
 
         $widget = new Widget();
         $this->widgetRepository

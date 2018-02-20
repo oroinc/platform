@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Entity\Repository;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Entity\Repository\EmailNotificationRepository;
 

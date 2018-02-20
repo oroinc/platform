@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\UIBundle\Layout\Extension;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\OptionsResolver\Options;
-
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\ContextInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\OptionsResolver\Options;
 
 class WidgetContextConfigurator implements ContextConfiguratorInterface
 {

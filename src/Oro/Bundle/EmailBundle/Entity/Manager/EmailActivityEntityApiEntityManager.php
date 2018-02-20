@@ -5,12 +5,10 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class EmailActivityEntityApiEntityManager extends ApiEntityManager
 {
@@ -59,9 +57,10 @@ class EmailActivityEntityApiEntityManager extends ApiEntityManager
                     $qb->andWhere(
                         $qb->expr()->neq(
                             QueryBuilderUtil::getSelectExprByAlias($qb, 'entityId'),
-                            $currentUser->getId()
+                            ':currentUserId'
                         )
                     );
+                    $qb->setParameter('currentUserId', $currentUser->getId());
                 }
             }
         );

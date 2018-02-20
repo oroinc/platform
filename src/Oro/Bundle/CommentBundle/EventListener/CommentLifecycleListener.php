@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\CommentBundle\EventListener;
 
-use Symfony\Component\Security\Core\User\UserInterface;
-
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\UnitOfWork;
-
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class CommentLifecycleListener
 {

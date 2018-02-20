@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Datagrid;
 
-use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 
 class EntityPaginationExtension extends AbstractExtension
 {
@@ -16,7 +16,8 @@ class EntityPaginationExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
-            $config->isOrmDatasource()
+            parent::isApplicable($config)
+            && $config->isOrmDatasource()
             && null !== $config->offsetGetByPath(self::ENTITY_PAGINATION_PATH);
     }
 

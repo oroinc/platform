@@ -3,7 +3,6 @@
 namespace Oro\Bundle\CronBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class ScheduleRepository extends EntityRepository

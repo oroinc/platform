@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\PlatformBundle\Maintenance;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Lexik\Bundle\MaintenanceBundle\Drivers\DriverFactory;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Mode
 {

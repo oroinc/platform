@@ -3,14 +3,12 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Doctrine\Common\Cache\CacheProvider;
-
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockViewCache;
 use Oro\Component\Layout\LayoutContext;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class BlockViewCacheTest extends LayoutTestCase
 {

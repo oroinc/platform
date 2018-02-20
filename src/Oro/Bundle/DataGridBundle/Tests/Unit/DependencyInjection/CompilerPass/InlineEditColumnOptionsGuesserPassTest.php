@@ -1,10 +1,9 @@
 <?php
 
-namespace Oro\Bundle\DatagridBundle\Tests\Unit\DependencyInjection\CompilerPass;
-
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+namespace Oro\Bundle\DataGridBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
 use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\InlineEditColumnOptionsGuesserPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Class InlineEditColumnOptionsGuesserPassTest

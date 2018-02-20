@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -39,7 +38,7 @@ class OrmIndexer extends AbstractIndexer
     public function save($entity, array $context = [])
     {
         $entities = $this->getEntitiesArray($entity);
-        if (false == $entities) {
+        if (!$entities) {
             return false;
         }
 

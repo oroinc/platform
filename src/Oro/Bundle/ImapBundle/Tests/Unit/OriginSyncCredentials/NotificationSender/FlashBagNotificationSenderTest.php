@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\OriginSyncCredentials\NotificationSender;
 
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender\FlashBagNotificationSender;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender\FlashBagNotificationSender;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class FlashBagNotificationSenderTest extends \PHPUnit_Framework_TestCase
 {

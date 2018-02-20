@@ -113,9 +113,12 @@ define(function(require) {
             }
             this.text = text;
             var regexp = this.text;
+
             if (this.fuzzySearch) {
                 regexp = this.text.toLowerCase().replace(/\s/g, '').split('');
-                regexp = '[' + _.uniq(regexp).join('') + ']';
+                regexp = '[' + this._escape(_.uniq(regexp).join('')) + ']';
+            } else {
+                regexp = this._escape(regexp);
             }
             this.findText = this.text.length ? new RegExp(regexp, 'gi') : null;
 
@@ -288,19 +291,6 @@ define(function(require) {
                 $el.html($content.html());
                 $el.toggleClass(this.elementHighlightClass, this.isElementContentHighlighted($el));
             }
-
-            /*
-            fix text-transform: capitalize issue in Chrome
-            input text "Email Settings"
-            after highlight we get "Email Sett<span>ing</span>S" with capitalized "S" symbol
-            after fix we get "Email Sett<span>ing</span>s"
-             */
-            if ($el.css('text-transform') === 'capitalize') {
-                $el.css('text-transform', 'none');
-                setTimeout(function() {
-                    $el.css('text-transform', 'capitalize');
-                }, 0);
-            }
         },
 
         /**
@@ -351,6 +341,16 @@ define(function(require) {
             var fieldName = 'field__value';
 
             return elementName === fieldName;
+        },
+
+        /**
+         * Escaping special characters for regexp expression
+         *
+         * @param str
+         * @private
+         */
+        _escape: function(str) {
+            return str.replace(/[-[\]{}()*+?.,\\^$|#]/g, '\\$&');
         }
     });
 

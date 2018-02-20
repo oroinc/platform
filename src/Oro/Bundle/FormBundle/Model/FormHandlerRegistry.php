@@ -4,7 +4,6 @@ namespace Oro\Bundle\FormBundle\Model;
 
 use Oro\Bundle\FormBundle\Exception\UnknownFormHandlerException;
 use Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface;
-
 use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
 use Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface;
 use Oro\Component\DependencyInjection\ServiceLinkRegistryAwareTrait;

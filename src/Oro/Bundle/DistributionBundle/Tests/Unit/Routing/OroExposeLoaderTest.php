@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Routing;
 
-use Symfony\Component\Routing\Route;
-
 use Oro\Bundle\DistributionBundle\Routing\OroExposeLoader;
+use Symfony\Component\Routing\Route;
 
 class OroExposeLoaderTest extends AbstractLoaderTest
 {

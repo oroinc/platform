@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
+use Oro\Bundle\AddressBundle\Form\EventListener\ItemIdentifierCollectionTypeSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-
-use Oro\Bundle\AddressBundle\Form\EventListener\ItemIdentifierCollectionTypeSubscriber;
 
 class PhoneCollectionType extends AbstractType
 {

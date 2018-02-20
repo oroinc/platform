@@ -4,15 +4,13 @@ namespace Oro\Bundle\FilterBundle\Filter;
 
 use Doctrine\ORM\Query\Expr as Expr;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Component\DoctrineUtils\ORM\DqlUtil;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactoryInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -46,6 +44,11 @@ abstract class AbstractFilter implements FilterInterface
 
     /** @var array */
     protected $joinOperators = [];
+
+    /**
+     * @var string
+     */
+    protected $dataFieldName;
 
     /**
      * Constructor
@@ -92,7 +95,7 @@ abstract class AbstractFilter implements FilterInterface
         $joinOperator = $this->getJoinOperator($data['type']);
         $relatedJoin = $this->findRelatedJoin($ds);
         $type = ($joinOperator && $relatedJoin) ? $joinOperator : $data['type'];
-        $comparisonExpr = $this->buildExpr($ds, $type, $this->get(FilterUtility::DATA_NAME_KEY), $data);
+        $comparisonExpr = $this->buildExpr($ds, $type, $this->getDataFieldName(), $data);
         if (!$comparisonExpr) {
             return true;
         }
@@ -493,7 +496,7 @@ abstract class AbstractFilter implements FilterInterface
             return false;
         }
 
-        $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
+        $fieldName = $this->getDataFieldName();
         list($joinAlias) = explode('.', $fieldName);
 
         return QueryBuilderUtil::isToOne($ds->getQueryBuilder(), $joinAlias);
@@ -517,5 +520,18 @@ abstract class AbstractFilter implements FilterInterface
         }
 
         return $data;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDataFieldName()
+    {
+        if (!$this->dataFieldName) {
+            $this->dataFieldName = $this->get(FilterUtility::DATA_NAME_KEY);
+            QueryBuilderUtil::checkField($this->dataFieldName);
+        }
+
+        return $this->dataFieldName;
     }
 }

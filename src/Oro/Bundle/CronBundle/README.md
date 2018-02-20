@@ -3,7 +3,7 @@ OroCronBundle
 
 An interface and scheduler for time-based commands execution.
 
-## Usage ##
+## Usage
 
 All you need is to add `oro:cron` command to a system cron (on *nix systems), for example:
 

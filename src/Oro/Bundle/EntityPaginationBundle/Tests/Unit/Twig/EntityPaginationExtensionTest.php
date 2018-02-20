@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Twig;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-
 use Oro\Bundle\EntityPaginationBundle\Manager\MessageManager;
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
 use Oro\Bundle\EntityPaginationBundle\Twig\EntityPaginationExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
 {

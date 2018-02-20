@@ -4,14 +4,12 @@ namespace Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
-
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\UserBundle\Entity\Role;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 class LoadTranslationRoles extends AbstractFixture implements ContainerAwareInterface
 {

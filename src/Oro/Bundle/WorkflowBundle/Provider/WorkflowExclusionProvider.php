@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\EntityBundle\Provider\AbstractExclusionProvider;
 
 /**

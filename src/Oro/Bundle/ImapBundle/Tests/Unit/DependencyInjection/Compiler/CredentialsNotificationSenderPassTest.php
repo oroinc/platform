@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\ImapBundle\DependencyInjection\Compiler\CredentialsNotificationSenderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\ImapBundle\DependencyInjection\Compiler\CredentialsNotificationSenderPass;
 
 class CredentialsNotificationSenderPassTest extends \PHPUnit_Framework_TestCase
 {

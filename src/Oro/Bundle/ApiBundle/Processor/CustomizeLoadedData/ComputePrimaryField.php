@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 
 /**
  * Computes a value of "primary" field based on a "primary" flag in a collection.

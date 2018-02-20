@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\AttachmentBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Component\Config\CumulativeResourceManager;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroAttachmentExtensionTest extends \PHPUnit_Framework_TestCase
 {

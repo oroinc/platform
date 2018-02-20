@@ -3,7 +3,6 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Oro\Bundle\FormBundle\Entity\PrimaryItem;
 
 /**

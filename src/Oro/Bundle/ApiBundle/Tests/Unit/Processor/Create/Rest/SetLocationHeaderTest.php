@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create\Rest;
 
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Create\Rest\SetLocationHeader;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class SetLocationHeaderTest extends FormProcessorTestCase
 {
@@ -75,7 +74,7 @@ class SetLocationHeaderTest extends FormProcessorTestCase
         $this->router->expects($this->once())
             ->method('generate')
             ->with(
-                'oro_rest_api_get',
+                'oro_rest_api_item',
                 ['entity' => $entityType, 'id' => $transformedEntityId],
                 UrlGeneratorInterface::ABSOLUTE_URL
             )

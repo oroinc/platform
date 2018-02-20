@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActionBundle\Handler;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\ActionBundle\Model\ActionData;
 
 /**

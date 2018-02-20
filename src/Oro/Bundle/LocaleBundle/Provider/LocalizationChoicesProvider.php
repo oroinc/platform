@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\LocaleBundle\Provider;
 
-use Symfony\Component\Intl\Intl;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
+use Symfony\Component\Intl\Intl;
 
 class LocalizationChoicesProvider
 {

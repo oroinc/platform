@@ -5,7 +5,6 @@ namespace Oro\Component\EntitySerializer;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\ORM\ResultSetMappingUtil;

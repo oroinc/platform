@@ -2,28 +2,23 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
-use Symfony\Component\Form\FormInterface;
-
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use FOS\RestBundle\Util\Codes;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-
+use FOS\RestBundle\Routing\ClassResourceInterface;
+use FOS\RestBundle\Util\Codes;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
-
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\Role;
-use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Email;
-
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\UserBundle\Entity\Group;
+use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @NamePrefix("oro_api_")
@@ -52,6 +47,7 @@ class UserController extends RestController implements ClassResourceInterface
      *     description="Phone number."
      * )
      *
+     * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      * @ApiDoc(
      *      description="Get the list of users",
@@ -63,10 +59,10 @@ class UserController extends RestController implements ClassResourceInterface
      * )
      * @AclAncestor("oro_user_user_view")
      */
-    public function cgetAction()
+    public function cgetAction(Request $request)
     {
-        $page  = (int) $this->getRequest()->get('page', 1);
-        $limit = (int) $this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $page  = (int) $request->get('page', 1);
+        $limit = (int) $request->get('limit', self::ITEMS_PER_PAGE);
 
         $criteria = $this->getFilterCriteria($this->getSupportedQueryParameters(__FUNCTION__));
 
@@ -221,6 +217,7 @@ class UserController extends RestController implements ClassResourceInterface
      *      description="Username to filter"
      * )
      *
+     * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @ApiDoc(
@@ -233,10 +230,10 @@ class UserController extends RestController implements ClassResourceInterface
      * )
      * @AclAncestor("oro_user_user_view")
      */
-    public function getFilterAction()
+    public function getFilterAction(Request $request)
     {
         $params = array_intersect_key(
-            $this->getRequest()->query->all(),
+            $request->query->all(),
             array_flip($this->getSupportedQueryParameters(__FUNCTION__))
         );
 
@@ -342,7 +339,8 @@ class UserController extends RestController implements ClassResourceInterface
         //todo: Add user avatar to api
         /*$result['imagePath'] = null;
         if (isset($result['image'])) {
-            $result['imagePath'] = $this->getRequest()->getBasePath() . '/' . $entity->getImagePath();
+            $result['imagePath'] = $this->get('request_stack')
+                ->getCurrentRequest()->getBasePath() . '/' . $entity->getImagePath();
         }
         unset($result['image']);*/
 

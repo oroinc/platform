@@ -2,10 +2,9 @@
 
 namespace Oro\Component\ChainProcessor\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Component\ChainProcessor\DependencyInjection\ProcessorFactory;
 use Oro\Component\ChainProcessor\Tests\Unit\ProcessorMock;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ProcessorFactoryTest extends \PHPUnit_Framework_TestCase
 {

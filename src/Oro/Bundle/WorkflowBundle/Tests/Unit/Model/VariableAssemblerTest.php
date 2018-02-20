@@ -3,14 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Acl\AclManager;
-use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\VariableAssembler;
 use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
 use Oro\Bundle\WorkflowBundle\Model\VariableManager;
@@ -19,8 +16,8 @@ use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowVariableNormalizer;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
-
 use Oro\Component\Action\Exception\AssemblerException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class VariableAssemblerTest extends \PHPUnit_Framework_TestCase
 {

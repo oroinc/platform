@@ -2,26 +2,23 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Async;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Configuration as DbalConfiguration;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Logging\SQLLogger;
+use Doctrine\ORM\Configuration as OrmConfiguration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadataFactory;
-use Doctrine\ORM\Configuration as OrmConfiguration;
 use Doctrine\ORM\Events as OrmEvents;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Mapping\EntityListenerResolver;
-
-use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
-use Symfony\Component\DependencyInjection\Container;
-
-use Oro\Component\PhpUtils\ReflectionUtil;
 use Oro\Bundle\EntityBundle\ORM\OroClassMetadataFactory;
 use Oro\Bundle\EntityBundle\ORM\Repository\EntityRepositoryFactory;
 use Oro\Bundle\EntityExtendBundle\Async\OrmMetadataFactoryClearer;
+use Oro\Component\PhpUtils\ReflectionUtil;
+use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
+use Symfony\Component\DependencyInjection\Container;
 
 class OrmMetadataFactoryClearerTest extends \PHPUnit_Framework_TestCase
 {

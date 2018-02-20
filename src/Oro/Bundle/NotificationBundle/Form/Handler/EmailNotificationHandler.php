@@ -3,12 +3,10 @@
 namespace Oro\Bundle\NotificationBundle\Form\Handler;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class EmailNotificationHandler implements FormHandlerInterface
 {

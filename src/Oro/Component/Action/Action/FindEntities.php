@@ -6,12 +6,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
-use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class FindEntities extends AbstractAction
 {
@@ -110,8 +109,9 @@ class FindEntities extends AbstractAction
 
         // apply sorting
         foreach ($orderBy as $field => $direction) {
+            QueryBuilderUtil::checkIdentifier($field);
             $field = 'e.' . $field;
-            $queryBuilder->orderBy($field, $direction);
+            $queryBuilder->orderBy($field, QueryBuilderUtil::getSortOrder($direction));
         }
 
         return $queryBuilder->getQuery()->getResult();

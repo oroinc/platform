@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Provider;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\SomeClass;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
-use Liuggio\ExcelBundle\Factory;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-
+use Liuggio\ExcelBundle\Factory;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\XlsxFileReader;
 

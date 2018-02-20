@@ -67,10 +67,6 @@ layout:
                         meta_viewport: ~
                         theme_icon: ~
                         styles: ~
-                        require_js:
-                            requirejs_scripts: ~
-                        require_modules:
-                            app_script: ~
                     body:
                         wrapper:
                             page_container:
@@ -79,3 +75,7 @@ layout:
                                         page_main_header: ~
                                         page_sidebar: ~
                                         page_content: ~
+                        require_js:
+                            requirejs_scripts: ~
+                        require_modules:
+                            app_script: ~

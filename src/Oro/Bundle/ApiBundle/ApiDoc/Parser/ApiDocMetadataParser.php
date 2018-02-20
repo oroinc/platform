@@ -4,14 +4,13 @@ namespace Oro\Bundle\ApiBundle\ApiDoc\Parser;
 
 use Nelmio\ApiDocBundle\DataTypes as ApiDocDataTypes;
 use Nelmio\ApiDocBundle\Parser\ParserInterface;
-
 use Oro\Bundle\ApiBundle\ApiDoc\ApiDocDataTypeConverter;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
-use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;

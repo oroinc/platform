@@ -2,6 +2,18 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\MapPrimaryField;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\NameContainerType;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\RenamedNameContainerType;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\RestrictedNameContainerType;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormContextStub;
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -14,19 +26,6 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validation;
-
-use Oro\Component\ChainProcessor\ActionProcessorInterface;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension;
-use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
-use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\MapPrimaryField;
-use Oro\Bundle\ApiBundle\Processor\FormContext;
-use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
-use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\NameContainerType;
-use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\RenamedNameContainerType;
-use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\RestrictedNameContainerType;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormContextStub;
 
 class MapPrimaryFieldTest extends TypeTestCase
 {

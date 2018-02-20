@@ -3,16 +3,14 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
-use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EmailBundle\EventListener\EmailBodyAddListener;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
+use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
 {

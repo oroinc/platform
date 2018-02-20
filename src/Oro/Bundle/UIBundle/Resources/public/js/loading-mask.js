@@ -120,7 +120,7 @@ define([
             }
 
             var halfLoadingHeight = loadingHeight / 2;
-            var loadingTop = containerHeight / 2  - halfLoadingHeight;
+            var loadingTop = containerHeight / 2 - halfLoadingHeight;
             var loadingLeft = (containerWidth - loadingWidth) / 2;
 
             // Move loading message to visible center of container if container is visible

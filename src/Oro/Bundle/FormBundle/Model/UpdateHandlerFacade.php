@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\FormBundle\Model;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface;
+use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
+use Oro\Bundle\UIBundle\Route\Router;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface;
-use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
-use Oro\Bundle\UIBundle\Route\Router;
 
 class UpdateHandlerFacade
 {

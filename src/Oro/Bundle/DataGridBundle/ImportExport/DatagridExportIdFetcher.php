@@ -4,8 +4,6 @@ namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
@@ -13,6 +11,7 @@ use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DatagridExportIdFetcher implements ContextAwareInterface
 {

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model;
 
-use Oro\Bundle\ReminderBundle\Model\ReminderSender;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Oro\Bundle\ReminderBundle\Model\ReminderSender;
 
 class ReminderSenderTest extends \PHPUnit_Framework_TestCase
 {

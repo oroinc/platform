@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-
-use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\Version;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class RestDocViewDetector
 {

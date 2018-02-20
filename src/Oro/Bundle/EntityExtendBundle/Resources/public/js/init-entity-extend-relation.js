@@ -7,7 +7,7 @@ require([
         $(document).on('change', '[data-ftid=oro_entity_config_type_extend_relation_target_entity]', function(e) {
             var el = $(this);
             var target = el.find('option:selected').attr('value').replace(/\\/g, '_');
-            var query = routing.generate.apply(routing, ['oro_entityconfig_field_search', {id: target}]);
+            var query = routing.generate('oro_entityconfig_field_search', {id: target});
             var fields = $('form select.extend-rel-target-field');
 
             $(fields).each(function(index, el) {

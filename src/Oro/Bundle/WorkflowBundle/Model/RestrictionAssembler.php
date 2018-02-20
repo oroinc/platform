@@ -4,15 +4,13 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-
+use Oro\Bundle\ActionBundle\Exception\AssemblerException;
 use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Model\AbstractAssembler as ComponentAbstractAssembler;
-
-use Oro\Bundle\ActionBundle\Exception\AssemblerException;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
 class RestrictionAssembler extends ComponentAbstractAssembler
 {

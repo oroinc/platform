@@ -3,14 +3,12 @@
 namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
 use Carbon\Carbon;
-
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
-
 use Oro\Bundle\SearchBundle\Entity\AbstractItem;
 
 /**

@@ -20,12 +20,12 @@ define(function(require) {
             name: '',
             label: '',
             entity: '',
-            'entity_attribute': 'entity',
-            'start_step': null,
-            'steps_display_ordered': false,
+            entity_attribute: 'entity',
+            start_step: null,
+            steps_display_ordered: false,
             steps: null,
             transitions: null,
-            'transition_definitions': null,
+            transition_definitions: null,
             attributes: null,
             translateLinkLabel: null,
             priority: 0,
@@ -171,16 +171,16 @@ define(function(require) {
 
         getAttributeByPropertyPath: function(propertyPath) {
             var fullPropertyPath = this.get('entity_attribute') + '.' + propertyPath;
-            return this.get('attributes').findWhere({'property_path': fullPropertyPath});
+            return this.get('attributes').findWhere({property_path: fullPropertyPath});
         },
 
         ensureAttributeByPropertyPath: function(propertyPath) {
             var fullPropertyPath = this.get('entity_attribute') + '.' + propertyPath;
-            var attribute = this.get('attributes').findWhere({'property_path': fullPropertyPath});
+            var attribute = this.get('attributes').findWhere({property_path: fullPropertyPath});
             if (!attribute) {
                 attribute = new AttributeModel({
-                    'name': this.generateAttributeName(propertyPath),
-                    'property_path': fullPropertyPath
+                    name: this.generateAttributeName(propertyPath),
+                    property_path: fullPropertyPath
                 });
                 this.get('attributes').add(attribute);
             }
@@ -200,7 +200,7 @@ define(function(require) {
         },
 
         getStartStep: function() {
-            return this.get('steps').where({'_is_start': true});
+            return this.get('steps').where({_is_start: true});
         },
 
         getTransitionByName: function(name) {
@@ -212,11 +212,11 @@ define(function(require) {
         },
 
         getStartTransitions: function() {
-            return this.get('transitions').where({'is_start': true});
+            return this.get('transitions').where({is_start: true});
         },
 
         _getByName: function(item, name) {
-            return this.get(item).findWhere({'name': name});
+            return this.get(item).findWhere({name: name});
         },
 
         getState: function() {

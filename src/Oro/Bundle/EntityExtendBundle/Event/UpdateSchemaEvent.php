@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Event;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Allows to do things after the database schema is changed.
@@ -31,6 +30,26 @@ class UpdateSchemaEvent extends Event
     {
         $this->commandExecutor = $commandExecutor;
         $this->logger = $logger;
+    }
+
+    /**
+     * {@inheritdoc}
+     * Temporarily added method to prevent deprecation notice in test.
+     * TODO: remove deprecated method in scope of BAP-15564
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * {@inheritdoc}
+     * Temporarily added method to prevent deprecation notice in test.
+     * TODO: remove deprecated method in scope of BAP-15564
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
     /**

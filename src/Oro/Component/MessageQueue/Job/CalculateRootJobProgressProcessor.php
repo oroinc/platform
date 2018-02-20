@@ -1,13 +1,12 @@
 <?php
 namespace Oro\Component\MessageQueue\Job;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerInterface;
 
 /**
  * @deprecated since 2.6. Kept only to avoid "MessageProcessor was not found" error after update from old version

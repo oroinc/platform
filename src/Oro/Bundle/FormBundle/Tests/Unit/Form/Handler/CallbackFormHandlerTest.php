@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Handler;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\FormBundle\Form\Handler\CallbackFormHandler;
 use Oro\Bundle\TestFrameworkBundle\Test\Stub\CallableStub;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class CallbackFormHandlerTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\UIBundle\Form\DataTransformer;
 
+use Oro\Bundle\UIBundle\Model\TreeItem;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-
-use Oro\Bundle\UIBundle\Model\TreeItem;
 
 class TreeItemIdTransformer implements DataTransformerInterface
 {

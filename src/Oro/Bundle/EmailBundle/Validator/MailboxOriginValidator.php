@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Validator;
 
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Model\FolderType;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
 
 class MailboxOriginValidator extends ConstraintValidator
 {

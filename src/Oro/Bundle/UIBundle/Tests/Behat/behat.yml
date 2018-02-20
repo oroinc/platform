@@ -1,5 +1,33 @@
 oro_behat_extension:
+  suites:
+    OroUIBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroUIBundle::DragAndDropContext
+        - OroFormBundle::FormContext
+        - OroDataGridBundle::GridContext
+      paths:
+        - '@OroUIBundle/Tests/Behat/Features'
+
   elements:
+    Sidebar:
+      selector: '.content-with-sidebar--sidebar'
+
+    Closed Sidebar:
+      selector: '.content-sidebar-minimized'
+
+    Sidebar Drag Handler:
+      selector: '.ui-resizable-handle.ui-resizable-e.resizable-area'
+
+    Not Resizable Sidebar:
+     selector: '.content-with-sidebar--sidebar.ui-resizable-disabled'
+
+    Close Sidebar Trigger:
+      selector: 'div[data-role="sidebar-minimize"]'
+
+    Open Sidebar Trigger:
+      selector: 'div[data-role="sidebar-maximize"]'
+
     Page:
       selector:
         type: xpath

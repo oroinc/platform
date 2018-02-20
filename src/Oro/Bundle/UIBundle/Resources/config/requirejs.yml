@@ -189,10 +189,12 @@ config:
         'oroui/js/app/modules/init-layout': 'bundles/oroui/js/app/modules/init-layout.js'
         'oroui/js/app/modules/init-lightgallery': 'bundles/oroui/js/app/modules/init-lightgallery.js'
         'oroui/js/app/modules/component-shortcuts-module': 'bundles/oroui/js/app/modules/component-shortcuts-module.js'
+        'oroui/js/app/modules/resizable-area-module': 'bundles/oroui/js/app/modules/resizable-area-module.js'
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/services/registry': 'bundles/oroui/js/app/services/registry.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
+        'oroui/js/app/models/sync-machine-proxy-cache': 'bundles/oroui/js/app/models/sync-machine-proxy-cache.js'
         'oroui/js/app/views/hidden-initialization-view': 'bundles/oroui/js/app/views/hidden-initialization-view.js'
         'oroui/js/app/views/page-center-title-view': 'bundles/oroui/js/app/views/page-center-title-view.js'
         'oroui/js/app/views/page/before-content-addition-view': 'bundles/oroui/js/app/views/page/before-content-addition-view.js'
@@ -209,6 +211,9 @@ config:
         'oroui/js/app/views/content-sidebar-view': 'bundles/oroui/js/app/views/content-sidebar-view.js'
         'oroui/js/app/views/highlight-text-view': 'bundles/oroui/js/app/views/highlight-text-view.js'
         'oroui/js/app/views/side-panel-view': 'bundles/oroui/js/app/views/side-panel-view.js'
+        'oroui/js/app/views/flash-message-view': 'bundles/oroui/js/app/views/flash-message-view.js'
+
+        'oroui/js/app/plugins/plugin-resizable-area': 'bundles/oroui/js/app/plugins/plugin-resizable-area.js'
 
         'oroui/js/viewport-manager': 'bundles/oroui/js/viewport-manager.js'
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
@@ -217,10 +222,14 @@ config:
         'oroui/js/layout': 'bundles/oroui/js/layout.js'
         'oroui/js/loading-mask': 'bundles/oroui/js/loading-mask.js'
         'oroui/js/mediator': 'bundles/oroui/js/mediator.js'
+        'oroui/js/tools': 'bundles/oroui/js/tools.js'
         'oroui/js/messenger': 'bundles/oroui/js/messenger.js'
         'oroui/js/modal': 'bundles/oroui/js/modal.js'
         'oroui/js/scrollspy': 'bundles/oroui/js/scrollspy.js'
         'oroui/js/drag-n-drop-sorting': 'bundles/oroui/js/drag-n-drop-sorting.js'
+
+        'oroui/js/extend/jquery': 'bundles/oroui/js/extend/jquery.js'
+        'oroui/js/extend/underscore': 'bundles/oroui/js/extend/underscore.js'
 
         'oroui/js/app/components/ajax-button': 'bundles/oroui/js/app/components/ajax-button.js'
         'oroui/js/app/components/hidden-redirect-component': 'bundles/oroui/js/app/components/hidden-redirect-component.js'
@@ -291,6 +300,7 @@ config:
         - oroui/js/app/modules/jstree-actions-module
         - oroui/js/app/modules/component-shortcuts-module
         - oroui/js/app/modules/viewport-module
+        - oroui/js/app/modules/resizable-area-module
 
 build:
     paths:

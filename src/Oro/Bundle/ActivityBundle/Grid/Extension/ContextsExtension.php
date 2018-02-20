@@ -3,9 +3,6 @@
 namespace Oro\Bundle\ActivityBundle\Grid\Extension;
 
 use Doctrine\Common\Collections\Criteria;
-
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
@@ -14,6 +11,7 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Extends ActivityTarget grid with a `contexts` column
@@ -97,7 +95,8 @@ class ContextsExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
-            $config->isOrmDatasource()
+            parent::isApplicable($config)
+            && $config->isOrmDatasource()
             && $config->offsetGetByPath(self::CONTEXTS_ENABLED_PATH)
             && in_array($this->getEntityClassName($config), $this->activityManager->getActivityTypes(), true);
     }

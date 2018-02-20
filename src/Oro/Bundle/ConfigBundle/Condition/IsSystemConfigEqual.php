@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ConfigBundle\Condition;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-
 use Oro\Component\ConfigExpression\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;

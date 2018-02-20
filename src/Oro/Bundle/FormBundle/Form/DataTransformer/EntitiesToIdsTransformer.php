@@ -3,7 +3,6 @@
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
 use Doctrine\ORM\QueryBuilder;
-
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
@@ -46,16 +45,6 @@ class EntitiesToIdsTransformer extends EntityToIdTransformer
         if (!is_array($value) && !$value instanceof \Traversable) {
             throw new UnexpectedTypeException($value, 'array');
         }
-        // The filtration fixes transformation from empty string to array with empty string.
-        // The case is affected by Genemu\Bundle\FormBundle\Form\JQuery\DataTransformer::reverseTransform()
-        // Example: explode(',', '') => array(0=>'').
-        // @todo remove after vendor fixation
-        $value = array_filter(
-            $value,
-            function ($val) {
-                return $val !== '';
-            }
-        );
 
         $entities = $this->loadEntitiesByIds($value);
 

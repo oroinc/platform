@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestrictionIdentity;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class WorkflowRestrictionIdentityTest extends \PHPUnit_Framework_TestCase
 {

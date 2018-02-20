@@ -3,13 +3,13 @@ namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class PdoMysql extends BaseDriver
 {
@@ -57,7 +57,7 @@ class PdoMysql extends BaseDriver
      * Add text search to qb
      *
      * @param  QueryBuilder $qb
-     * @param  integer      $index
+     * @param  string       $index
      * @param  array        $searchCondition
      * @param  boolean      $setOrderBy
      *
@@ -118,7 +118,7 @@ class PdoMysql extends BaseDriver
      *
      * @param QueryBuilder $qb
      * @param string $fieldValue
-     * @param $index
+     * @param string $index
      *
      * @return string
      */
@@ -133,7 +133,7 @@ class PdoMysql extends BaseDriver
      *
      * @param QueryBuilder $qb
      * @param string $fieldValue
-     * @param $index
+     * @param string $index
      *
      * @return string
      */
@@ -242,10 +242,12 @@ class PdoMysql extends BaseDriver
         array $searchCondition,
         $setOrderBy = true
     ) {
+        QueryBuilderUtil::checkIdentifier($index);
         $joinAlias      = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $fieldName      = $searchCondition['fieldName'];
         $fieldParameter = 'field' . $index;
         $valueParameter = 'value' . $index;
+        QueryBuilderUtil::checkIdentifier($joinAlias);
 
         $result = "MATCH_AGAINST($joinAlias.value, :$valueParameter 'IN BOOLEAN MODE') > 0";
         if ($words) {
@@ -276,8 +278,8 @@ class PdoMysql extends BaseDriver
      *
      * @param QueryBuilder $qb
      * @param array        $words
-     * @param              $index
-     * @param  array       $searchCondition
+     * @param string $index
+     * @param array       $searchCondition
      *
      * @return string
      */
@@ -287,13 +289,16 @@ class PdoMysql extends BaseDriver
         $index,
         array $searchCondition
     ) {
+        QueryBuilderUtil::checkIdentifier($index);
         $joinAlias  = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $fieldName  = $searchCondition['fieldName'];
+        QueryBuilderUtil::checkIdentifier($joinAlias);
 
         $result = $qb->expr()->orX();
         foreach (array_values($words) as $key => $value) {
             $valueParameter = 'value' . $index . '_w' . $key;
-            $result->add("$joinAlias.value LIKE :$valueParameter");
+            QueryBuilderUtil::checkIdentifier($valueParameter);
+            $result->add($qb->expr()->like($joinAlias. '.value', ':' . $valueParameter));
             $qb->setParameter($valueParameter, "%$value%");
         }
         if ($this->isConcreteField($fieldName) && !$this->isAllDataField($fieldName)) {
@@ -307,7 +312,7 @@ class PdoMysql extends BaseDriver
 
     /**
      * @param  QueryBuilder $qb
-     * @param  int          $index
+     * @param  string       $index
      * @param  array        $words
      * @param  array        $searchCondition
      *
@@ -338,7 +343,7 @@ class PdoMysql extends BaseDriver
 
     /**
      * @param  QueryBuilder $qb
-     * @param  int          $index
+     * @param  string       $index
      * @param  string       $value
      * @param  array        $searchCondition
      * @param  string       $operator
@@ -371,7 +376,7 @@ class PdoMysql extends BaseDriver
     /**
      * @param QueryBuilder $qb
      * @param string $fieldValue
-     * @param int $index
+     * @param string $index
      * @param array $searchCondition
      * @return string
      */

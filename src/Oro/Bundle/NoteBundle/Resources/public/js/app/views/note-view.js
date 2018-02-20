@@ -12,7 +12,7 @@ define([
 
     NoteView = BaseView.extend({
         options: {
-            'template': null
+            template: null
         },
 
         attributes: {
@@ -47,10 +47,10 @@ define([
             data.createdBy_url = null;
             data.updatedBy_url = null;
             if (data.createdBy_id && data.createdBy_viewable) {
-                data.createdBy_url = routing.generate('oro_user_view', {'id': data.createdBy_id});
+                data.createdBy_url = routing.generate('oro_user_view', {id: data.createdBy_id});
             }
             if (data.updatedBy_id && data.updatedBy_viewable) {
-                data.updatedBy_url = routing.generate('oro_user_view', {'id': data.updatedBy_id});
+                data.updatedBy_url = routing.generate('oro_user_view', {id: data.updatedBy_id});
             }
             data.message = _.escape(data.message);
             data.brief_message = data.message.replace(new RegExp('\r?\n', 'g'), ' ');

@@ -2,11 +2,10 @@
 
 namespace Oro\Component\Action\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Routing\RouterInterface;
 
 class Redirect extends AssignUrl
 {

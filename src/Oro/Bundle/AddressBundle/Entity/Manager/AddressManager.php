@@ -4,7 +4,6 @@ namespace Oro\Bundle\AddressBundle\Entity\Manager;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
-
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 
 class AddressManager implements StorageInterface

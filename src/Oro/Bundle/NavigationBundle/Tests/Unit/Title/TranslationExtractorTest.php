@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Title;
 
+use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
+use Oro\Bundle\NavigationBundle\Title\TranslationExtractor;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-
-use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
-use Oro\Bundle\NavigationBundle\Title\TranslationExtractor;
 
 class TranslationExtractorTest extends \PHPUnit_Framework_TestCase
 {

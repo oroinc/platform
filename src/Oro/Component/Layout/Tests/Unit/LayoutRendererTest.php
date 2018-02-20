@@ -3,8 +3,8 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\LayoutRenderer;
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
+use Oro\Component\Layout\LayoutRenderer;
 
 class LayoutRendererTest extends \PHPUnit_Framework_TestCase
 {

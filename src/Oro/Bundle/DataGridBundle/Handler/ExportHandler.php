@@ -4,9 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Handler;
 
 use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutionWarningHandlerInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutor;
@@ -16,6 +13,7 @@ use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
+use Psr\Log\LoggerInterface;
 
 class ExportHandler implements StepExecutionWarningHandlerInterface
 {

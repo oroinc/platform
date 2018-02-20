@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\NavigationBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-
 use Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class TitleReaderPass implements CompilerPassInterface
 {

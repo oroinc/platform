@@ -3,22 +3,21 @@
 namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
 use Carbon\Carbon;
-
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\SearchBundle\Entity\AbstractItem;
 use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -219,7 +218,8 @@ abstract class BaseDriver implements DBALPersisterInterface
         foreach ($query->getAggregations() as $name => $options) {
             $field = $options['field'];
             $function = $options['function'];
-            list($fieldType, $fieldName) = Criteria::explodeFieldTypeName($field);
+            $fieldName = Criteria::explodeFieldTypeName($field)[1];
+            QueryBuilderUtil::checkField($fieldName);
 
             // prepare query builder to apply grouping
             $aggregatedQuery = clone $query;
@@ -257,7 +257,7 @@ abstract class BaseDriver implements DBALPersisterInterface
                     break;
 
                 default:
-                    throw new \LogicException(sprintf('Aggregating function %s is not suppored', $function));
+                    throw new \LogicException(sprintf('Aggregating function %s is not supported', $function));
             }
         }
 
@@ -288,7 +288,7 @@ abstract class BaseDriver implements DBALPersisterInterface
      * Add text search to qb
      *
      * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param integer                    $index
+     * @param string                     $index
      * @param array                      $searchCondition
      * @param boolean                    $setOrderBy
      *
@@ -298,7 +298,7 @@ abstract class BaseDriver implements DBALPersisterInterface
 
     /**
      * @param string $fieldType
-     * @param int    $index
+     * @param string|int $index
      *
      * @return string
      */
@@ -449,7 +449,7 @@ abstract class BaseDriver implements DBALPersisterInterface
      * Add non string search to qb
      *
      * @param QueryBuilder $qb
-     * @param integer $index
+     * @param string $index
      * @param array $searchCondition
      *
      * @return string
@@ -552,9 +552,13 @@ abstract class BaseDriver implements DBALPersisterInterface
 
         foreach ($selects as $select) {
             list($type, $name) = Criteria::explodeFieldTypeName($select);
+            QueryBuilderUtil::checkIdentifier($name);
+            QueryBuilderUtil::checkIdentifier($type);
 
             $joinField = $this->getJoinField($type);
             list($joinAlias, $uniqIndex) = $this->getJoinAttributes($name, $type, $qb->getAllAliases());
+            QueryBuilderUtil::checkIdentifier($joinAlias);
+            QueryBuilderUtil::checkIdentifier($uniqIndex);
 
             $param = sprintf('param%s', $uniqIndex);
             $withClause = sprintf('%s.field = :%s', $joinAlias, $param);
@@ -622,9 +626,10 @@ abstract class BaseDriver implements DBALPersisterInterface
         if ($orderBy) {
             $direction = reset($orderBy);
             list($fieldType, $fieldName) = Criteria::explodeFieldTypeName(key($orderBy));
+            QueryBuilderUtil::checkIdentifier($fieldType);
             $orderRelation = $fieldType . 'Fields';
             $qb->leftJoin('search.' . $orderRelation, 'orderTable', 'WITH', 'orderTable.field = :orderField')
-                ->orderBy('orderTable.value', $direction)
+                ->orderBy('orderTable.value', QueryBuilderUtil::getSortOrder($direction))
                 ->setParameter('orderField', $fieldName);
             $qb->addSelect('orderTable.value');
         }

@@ -2,6 +2,7 @@
 
 namespace Oro\Component\MessageQueue\Consumption;
 
+use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -9,8 +10,6 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-
-use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 
 class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
 {

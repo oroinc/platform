@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Twig;
 
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EmbeddedFormBundle\Twig\BackLinkExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class BackLinkExtensionTest extends \PHPUnit_Framework_TestCase
 {

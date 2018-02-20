@@ -2,9 +2,9 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Async;
 
 use Oro\Bundle\SearchBundle\Async\IndexEntitiesByRangeMessageProcessor;
+use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 

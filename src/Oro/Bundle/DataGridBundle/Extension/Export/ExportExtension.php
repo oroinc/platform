@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Export;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ExportExtension extends AbstractExtension
 {
@@ -45,7 +44,7 @@ class ExportExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        if (!$this->isGranted()) {
+        if (!parent::isApplicable($config) || !$this->isGranted()) {
             return false;
         }
 

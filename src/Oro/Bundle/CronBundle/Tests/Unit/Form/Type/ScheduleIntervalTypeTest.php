@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\CronBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\PreloadedExtension;
-
 use Oro\Bundle\CronBundle\Entity\ScheduleIntervalInterface;
 use Oro\Bundle\CronBundle\Form\Type\ScheduleIntervalType;
 use Oro\Bundle\CronBundle\Tests\Unit\Stub\ScheduleIntervalStub;
 use Oro\Bundle\FormBundle\Form\Type\OroDateTimeType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\PreloadedExtension;
 
 class ScheduleIntervalTypeTest extends FormIntegrationTestCase
 {

@@ -3,12 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Cache;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Event\EmailBodyLoaded;
 use Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EmailCacheManager
 {

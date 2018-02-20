@@ -2,25 +2,26 @@
 
 namespace Oro\Bundle\DataGridBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Security\Csrf\CsrfToken;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
 use Oro\Bundle\DataGridBundle\Async\Topics;
+use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
+use Oro\Bundle\DataGridBundle\Extension\Export\Configuration;
+use Oro\Bundle\DataGridBundle\Extension\Export\ExportExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class GridController extends Controller
 {
@@ -31,18 +32,18 @@ class GridController extends Controller
      *      requirements={"gridName"="[\w\:-]+"}
      * )
      * @Template
-     *
+     * @param Request $request
      * @param string $gridName
      *
-     * @return Response
+     * @return array
      */
-    public function widgetAction($gridName)
+    public function widgetAction(Request $request, $gridName)
     {
         return [
             'gridName'     => $gridName,
-            'params'       => $this->getRequest()->get('params', []),
-            'renderParams' => $this->getRenderParams(),
-            'multiselect'  => (bool)$this->getRequest()->get('multiselect', false),
+            'params'       => $request->get('params', []),
+            'renderParams' => $this->getRenderParams($request),
+            'multiselect'  => (bool)$request->get('multiselect', false),
         ];
     }
 
@@ -137,14 +138,21 @@ class GridController extends Controller
         $format = $request->query->get('format');
         $formatType = $request->query->get('format_type', 'excel');
         $gridParameters = $this->getRequestParametersFactory()->fetchParameters($gridName);
+        $parameters = [
+            'gridName' => $gridName,
+            'gridParameters' => $gridParameters,
+            FormatterProvider::FORMAT_TYPE => $formatType,
+        ];
+
+        $gridConfiguration = $this->getGridManager()->getConfigurationForGrid($gridName);
+        $exportOptions = $gridConfiguration->offsetGetByPath(ExportExtension::EXPORT_OPTION_PATH);
+        if (isset($exportOptions[$format][Configuration::OPTION_PAGE_SIZE])) {
+            $parameters['pageSize'] = (int)$exportOptions[$format][Configuration::OPTION_PAGE_SIZE];
+        }
 
         $this->getMessageProducer()->send(Topics::PRE_EXPORT, [
             'format' => $format,
-            'parameters' => [
-                'gridName' => $gridName,
-                'gridParameters' => $gridParameters,
-                FormatterProvider::FORMAT_TYPE => $formatType,
-            ]
+            'parameters' => $parameters,
         ]);
 
         return new JsonResponse([
@@ -158,17 +166,15 @@ class GridController extends Controller
      *      name="oro_datagrid_mass_action",
      *      requirements={"gridName"="[\w\:-]+", "actionName"="[\w-]+"}
      * )
-     *
+     * @param Request $request
      * @param string $gridName
      * @param string $actionName
      *
      * @return Response
      * @throws \LogicException
      */
-    public function massActionAction($gridName, $actionName)
+    public function massActionAction(Request $request, $gridName, $actionName)
     {
-        $request = $this->getRequest();
-
         /* @var $tokenManager CsrfTokenManagerInterface */
         $tokenManager = $this->get('security.csrf.token_manager');
         if (!$tokenManager->isTokenValid(new CsrfToken($actionName, $request->get('token')))) {
@@ -193,12 +199,13 @@ class GridController extends Controller
     }
 
     /**
+     * @param Request $request
      * @return array
      */
-    protected function getRenderParams()
+    protected function getRenderParams(Request $request)
     {
-        $renderParams      = $this->getRequest()->get('renderParams', []);
-        $renderParamsTypes = $this->getRequest()->get('renderParamsTypes', []);
+        $renderParams      = $request->get('renderParams', []);
+        $renderParamsTypes = $request->get('renderParamsTypes', []);
 
         foreach ($renderParamsTypes as $param => $type) {
             if (array_key_exists($param, $renderParams)) {
@@ -232,5 +239,13 @@ class GridController extends Controller
     protected function getRequestParametersFactory()
     {
         return $this->get('oro_datagrid.datagrid.request_parameters_factory');
+    }
+
+    /**
+     * @return Manager
+     */
+    protected function getGridManager()
+    {
+        return $this->get('oro_datagrid.datagrid.manager');
     }
 }

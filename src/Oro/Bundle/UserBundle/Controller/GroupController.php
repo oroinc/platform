@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\UserBundle\Entity\Group;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @Route("/group")
@@ -28,10 +26,12 @@ class GroupController extends Controller
      *      class="OroUserBundle:Group",
      *      permission="CREATE"
      * )
+     * @param Request $request
+     * @return array
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        return $this->update(new Group());
+        return $this->update($request, new Group());
     }
 
     /**
@@ -45,10 +45,12 @@ class GroupController extends Controller
      *      class="OroUserBundle:Group",
      *      permission="EDIT"
      * )
+     * @param Request $request
+     * @return array
      */
-    public function updateAction(Group $entity)
+    public function updateAction(Request $request, Group $entity)
     {
-        return $this->update($entity);
+        return $this->update($request, $entity);
     }
 
     /**
@@ -74,10 +76,11 @@ class GroupController extends Controller
     }
 
     /**
+     * @param Request $request
      * @param Group $entity
      * @return array
      */
-    protected function update(Group $entity)
+    protected function update(Request $request, Group $entity)
     {
         if ($this->get('oro_user.form.handler.group')->process($entity)) {
             $this->get('session')->getFlashBag()->add(
@@ -85,7 +88,7 @@ class GroupController extends Controller
                 $this->get('translator')->trans('oro.user.controller.group.message.saved')
             );
 
-            if (!$this->getRequest()->get('_widgetContainer')) {
+            if (!$request->get('_widgetContainer')) {
                 return $this->get('oro_ui.router')->redirect($entity);
             }
         }

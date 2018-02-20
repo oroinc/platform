@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Query;
 
-use Doctrine\Common\Persistence\ObjectManager;
-
-use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
 /**
  * @TODO: In platform 2.0 this class should be extended from the Doctrine\Common\Collections\Criteria.

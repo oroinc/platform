@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_3;
 
-use Psr\Log\LoggerInterface;
-
-use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
-use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
-
 use Doctrine\DBAL\Connection;
+use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class ChangeEnumIdentityQuery extends ParametrizedMigrationQuery
 {

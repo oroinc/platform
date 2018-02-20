@@ -4,7 +4,6 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Util;
 
 use Oro\Bundle\SegmentBundle\Validator\Constraints\Sorting;
 use Oro\Bundle\SegmentBundle\Validator\SortingValidator;
-
 use Symfony\Component\Validator\Constraint;
 
 class SortingTest extends \PHPUnit_Framework_TestCase

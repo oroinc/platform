@@ -3,12 +3,10 @@
 namespace Oro\Bundle\DistributionBundle\EventListener;
 
 use Knp\Menu\ItemInterface;
-
+use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 
 class NavigationListener
 {

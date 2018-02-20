@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\EventListener\ApiEventListener;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SoapBundle\Event\FindAfter;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class ApiEventListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,15 +23,20 @@ class ApiEventListenerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $aclHelper;
 
+    /** @var RequestStack */
+    protected $requestStack;
+
     public function setUp()
     {
         $this->requestAuthorizationChecker = $this->createMock(RequestAuthorizationChecker::class);
         $this->aclHelper = $this->createMock(AclHelper::class);
         $this->request = new Request();
+        $this->requestStack = new RequestStack();
 
         $this->listener = new ApiEventListener(
             $this->requestAuthorizationChecker,
-            $this->aclHelper
+            $this->aclHelper,
+            $this->requestStack
         );
     }
 
@@ -40,7 +45,7 @@ class ApiEventListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnFindAfter($isGranted, $throwException)
     {
-        $this->listener->setRequest($this->request);
+        $this->requestStack->push($this->request);
         $object = new \stdClass();
         $this->requestAuthorizationChecker->expects($this->once())
             ->method('isRequestObjectIsGranted')

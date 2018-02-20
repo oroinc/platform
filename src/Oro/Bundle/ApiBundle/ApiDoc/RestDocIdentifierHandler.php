@@ -3,26 +3,24 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Symfony\Component\Routing\Route;
-
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDescriptions;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Symfony\Component\Routing\Route;
 
 class RestDocIdentifierHandler
 {
     const ID_ATTRIBUTE = 'id';
 
     /** @var RestDocViewDetector */
-    protected $docViewDetector;
+    private $docViewDetector;
 
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /** @var ApiDocDataTypeConverter */
-    protected $dataTypeConverter;
+    private $dataTypeConverter;
 
     /**
      * @param RestDocViewDetector     $docViewDetector
@@ -79,7 +77,7 @@ class RestDocIdentifierHandler
      *
      * @return string
      */
-    protected function getIdRequirement(EntityMetadata $metadata)
+    private function getIdRequirement(EntityMetadata $metadata)
     {
         $idFields = $metadata->getIdentifierFieldNames();
         $idFieldCount = count($idFields);
@@ -102,7 +100,7 @@ class RestDocIdentifierHandler
      *
      * @return string
      */
-    protected function getIdFieldRequirement($fieldType)
+    private function getIdFieldRequirement($fieldType)
     {
         $result = $this->valueNormalizer->getRequirement(
             $fieldType,

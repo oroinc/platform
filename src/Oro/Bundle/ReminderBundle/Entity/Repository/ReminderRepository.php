@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ReminderBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
-
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor;

@@ -1,5 +1,5 @@
 define(['underscore', 'backgrid', 'orolocale/js/formatter/datetime'
-    ], function(_, Backgrid, DateTimeFormatter) {
+], function(_, Backgrid, DateTimeFormatter) {
     'use strict';
 
     /**
@@ -60,9 +60,10 @@ define(['underscore', 'backgrid', 'orolocale/js/formatter/datetime'
             }
 
             var functionName = prefix + capitaliseFirstLetter(this.type) + suffix;
-            if (!DateTimeFormatter.hasOwnProperty(functionName) ||
-                    typeof DateTimeFormatter[functionName] !== 'function'
-                    ) {
+            if (
+                !DateTimeFormatter.hasOwnProperty(functionName) ||
+                typeof DateTimeFormatter[functionName] !== 'function'
+            ) {
                 throw new Error('Can\'t use formatter function with name ' + functionName);
             }
 

@@ -24,7 +24,8 @@ define(['underscore', 'backbone'], function(_, Backbone) {
                     if (Cell.prototype.delegatedEventBinding && !_.isFunction(Cell.prototype.events)) {
                         var events = Cell.prototype.events;
                         // prevent CS error 'cause we must completely repeat Backbone behaviour
-                        for (var eventName in events) { // jshint forin:false
+                        // eslint-disable-next-line guard-for-in
+                        for (var eventName in events) {
                             if (!cellEventsList.hasOwnProperty(eventName)) {
                                 cellEventsList[eventName] = true;
                             }

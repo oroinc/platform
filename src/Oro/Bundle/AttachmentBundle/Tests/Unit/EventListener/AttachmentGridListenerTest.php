@@ -4,7 +4,6 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\AttachmentBundle\EventListener\AttachmentGridListener;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestGridConfiguration;
-
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;

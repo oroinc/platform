@@ -1,14 +1,13 @@
-Activity list inheritance targets
-=================================
+# Activity List Inheritance Targets
 
-You can add inheritance of activity lists to target entity from some related inheritance target entities. 
-It means that in target entities you can see all activity list from general entity and all activity lists
-from related entities.
 
-To enable this option you should configure target entity to identify all inheritance 
-target entities: use migration extension for adding all necessary configuration to entity config.
+You can add inheritance of activity lists to the target entity from some related inheritance target entities. 
 
-Example of migration to enable displaying contact activity lists in appropriate account:
+It means that in target entities, you can see all activity list from the general entity and related entities.
+
+To enable this option, configure the target entity to identify all inheritance target entities: use migration extension to add all necessary configuration to the entity config.
+
+The following is an example of the migration to enable the display of contact activity lists in the appropriate account:
 
 class InheritanceActivityTargets implements Migration, ActivityListExtensionAwareInterface
 {

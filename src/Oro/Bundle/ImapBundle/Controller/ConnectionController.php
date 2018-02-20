@@ -3,21 +3,18 @@
 namespace Oro\Bundle\ImapBundle\Controller;
 
 use FOS\RestBundle\Util\Codes;
-
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
+use Oro\Bundle\ImapBundle\Connector\ImapConfig;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
-use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
-use Oro\Bundle\EmailBundle\Entity\Mailbox;
-use Oro\Bundle\ImapBundle\Connector\ImapConfig;
-use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class ConnectionController extends Controller
 {

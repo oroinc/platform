@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EmailActivityTest extends WebTestCase
 {

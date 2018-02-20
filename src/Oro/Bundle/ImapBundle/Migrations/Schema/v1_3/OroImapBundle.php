@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImapBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Schema\Schema;
-
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;

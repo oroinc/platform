@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Command\Util;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Component\Layout\LayoutContext;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DebugLayoutContext extends LayoutContext
 {

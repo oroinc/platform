@@ -2,10 +2,8 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 
 use Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract;
-
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobContext;

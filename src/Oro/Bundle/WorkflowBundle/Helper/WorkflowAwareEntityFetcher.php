@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Helper;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class WorkflowAwareEntityFetcher

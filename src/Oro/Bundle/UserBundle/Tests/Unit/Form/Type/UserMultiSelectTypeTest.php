@@ -2,7 +2,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 
 use Oro\Bundle\UserBundle\Form\Type\UserMultiSelectType;
-use Symfony\Component\Form\FormEvents;
 
 class UserMultiSelectTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -46,28 +45,6 @@ class UserMultiSelectTypeTest extends \PHPUnit_Framework_TestCase
             ->method('getSingleIdentifierFieldName')
             ->will($this->returnValue('id'));
 
-        $phpUnit = $this;
-        $builder->expects($this->once())
-            ->method('addEventListener')
-            ->with(FormEvents::PRE_SUBMIT, $this->isInstanceOf('\Closure'))
-            ->will(
-                $this->returnCallback(
-                    function ($event, $callback) use ($phpUnit) {
-                        $eventMock = $phpUnit->getMockBuilder('Symfony\Component\Form\FormEvent')
-                            ->disableOriginalConstructor()
-                            ->getMock();
-                        $eventMock->expects($phpUnit->once())
-                            ->method('getData')
-                            ->will($phpUnit->returnValue(''));
-                        $eventMock->expects($phpUnit->once())
-                            ->method('setData')
-                            ->with($phpUnit->equalTo(array()));
-
-                        $callback($eventMock);
-                    }
-                )
-            );
-
         $builder->expects($this->once())
             ->method('addModelTransformer')
             ->with($this->isInstanceOf('Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer'));
@@ -75,13 +52,13 @@ class UserMultiSelectTypeTest extends \PHPUnit_Framework_TestCase
         $this->type->buildForm($builder, array('entity_class' => 'Oro\Bundle\UserBundle\Entity\User'));
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
     }
 
     public function testGetParent()

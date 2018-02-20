@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Acl\Voter;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-
 use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
 

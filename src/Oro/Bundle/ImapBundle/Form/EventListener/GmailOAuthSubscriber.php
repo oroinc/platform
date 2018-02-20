@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ImapBundle\Form\EventListener;
 
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
 class GmailOAuthSubscriber implements EventSubscriberInterface
 {

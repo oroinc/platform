@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Command;
 
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
 class EntityAliasDebugCommand extends ContainerAwareCommand
 {

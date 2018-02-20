@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Model;
 
-use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\Test\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface;
 use Oro\Bundle\FormBundle\Model\FormHandlerRegistry;
 use Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry;
 use Oro\Bundle\FormBundle\Model\UpdateFactory;
 use Oro\Bundle\FormBundle\Model\UpdateInterface;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\Test\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class UpdateFactoryTest extends \PHPUnit_Framework_TestCase
 {

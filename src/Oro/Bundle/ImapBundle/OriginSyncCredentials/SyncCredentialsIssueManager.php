@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ImapBundle\OriginSyncCredentials;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * The manager that process the notifications about wrong credential sync email boxes
@@ -76,16 +75,21 @@ class SyncCredentialsIssueManager
     /**
      * Sends the messages to the notification channels about wrong credential sync email boxes and deletes
      * the information about wrong boxes from the storage to avoid notification duplications.
+     *
+     * @return UserEmailOrigin[]
      */
     public function processInvalidOrigins()
     {
-        foreach ($this->credentialsDriver->getAllOrigins() as $invalidOrigin) {
+        $processedOrigins = $this->credentialsDriver->getAllOrigins();
+        foreach ($processedOrigins as $invalidOrigin) {
             foreach ($this->notificationSenders as $notificationSender) {
                 $notificationSender->sendNotification($invalidOrigin);
             }
         }
 
         $this->credentialsDriver->deleteAllOrigins();
+
+        return $processedOrigins;
     }
 
     /**

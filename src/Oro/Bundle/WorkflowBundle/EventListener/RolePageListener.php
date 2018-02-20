@@ -2,35 +2,28 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
 use Oro\Bundle\UserBundle\Entity\Role;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class RolePageListener
 {
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /**
      * @param TranslatorInterface $translator
+     * @param RequestStack $requestStack
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, RequestStack $requestStack)
     {
         $this->translator = $translator;
-    }
-
-    /**
-     * @param Request|null $request
-     */
-    public function setRequest(Request $request = null)
-    {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -40,12 +33,13 @@ class RolePageListener
      */
     public function onUpdatePageRender(BeforeFormRenderEvent $event)
     {
-        if (!$this->request) {
+        $request = $this->requestStack->getCurrentRequest();
+        if (!$request) {
             return;
         }
 
-        $route = $this->request->attributes->get('_route');
-        $routeParameters = $this->request->attributes->get('_route_params');
+        $route = $request->attributes->get('_route');
+        $routeParameters = $request->attributes->get('_route_params');
 
         if (!in_array($route, ['oro_action_widget_form', 'oro_user_role_update', 'oro_user_role_create'], true)) {
             // not a manipulate role page
@@ -73,11 +67,12 @@ class RolePageListener
      */
     public function onViewPageRender(BeforeViewRenderEvent $event)
     {
-        if (!$this->request) {
+        $request = $this->requestStack->getCurrentRequest();
+        if (!$request) {
             return;
         }
 
-        if ($this->request->attributes->get('_route') !== 'oro_user_role_view') {
+        if ($request->attributes->get('_route') !== 'oro_user_role_view') {
             // we are not at view role page
             return;
         }

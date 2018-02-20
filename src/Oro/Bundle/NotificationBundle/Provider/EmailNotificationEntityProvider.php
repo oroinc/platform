@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\NotificationBundle\Provider;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Doctrine\ORM\EntityManager;
-
-use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class EmailNotificationEntityProvider extends EntityProvider
 {

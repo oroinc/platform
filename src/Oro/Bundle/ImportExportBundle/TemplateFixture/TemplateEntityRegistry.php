@@ -4,12 +4,10 @@ namespace Oro\Bundle\ImportExportBundle\TemplateFixture;
 
 use ArrayIterator;
 use Iterator;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\LoadTemplateFixturesEvent;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class TemplateEntityRegistry
 {

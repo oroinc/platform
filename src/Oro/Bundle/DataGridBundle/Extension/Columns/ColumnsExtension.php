@@ -3,10 +3,10 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Columns;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
@@ -14,7 +14,6 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\DataGridBundle\Entity\GridView;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -68,6 +67,10 @@ class ColumnsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
+        if (!parent::isApplicable($config)) {
+            return false;
+        }
+
         $columns = $config->offsetGetOr(self::COLUMNS_PATH, []);
         $this->processConfigs($config);
 

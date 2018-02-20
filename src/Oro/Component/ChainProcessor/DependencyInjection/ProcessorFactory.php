@@ -2,9 +2,8 @@
 
 namespace Oro\Component\ChainProcessor\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * A factory that can be used to get processors from DIC.

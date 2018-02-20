@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Sorter;
 
-use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration as OrmQuery;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
 
 class HintExtension extends AbstractExtension
 {
@@ -41,7 +41,7 @@ class HintExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $config->isOrmDatasource();
+        return parent::isApplicable($config) && $config->isOrmDatasource();
     }
 
     /**

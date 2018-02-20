@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\EventListener;
 
-use Symfony\Component\Console\Event\ConsoleTerminateEvent;
-
 use Oro\Bundle\UserBundle\Command\UpdateUserCommand;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 
 /**
  * Update user in test environment after it was changed by --user-password --user-email options

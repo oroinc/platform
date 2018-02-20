@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider;
 use Oro\Bundle\UIBundle\Provider\LabelProviderInterface;
 use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class GroupingChainWidgetProviderTest extends \PHPUnit_Framework_TestCase
 {

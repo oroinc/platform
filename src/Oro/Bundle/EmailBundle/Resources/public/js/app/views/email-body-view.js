@@ -66,7 +66,7 @@ define(function(require) {
                 content = content.replace(/[&<>]/g, function(c) {
                     return '&#' + c.charCodeAt(0) + ';';
                 });
-                $content = $('<div class="plain-text">' + content +  '</div>');
+                $content = $('<div class="plain-text">' + content + '</div>');
             }
             this.$('body').html($content);
             this._injectStyles();

@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Serializer;
 
+use Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewNormalizer;
+use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\BlockViewCollection;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
-
-use Oro\Component\Layout\BlockViewCollection;
-use Oro\Component\Layout\BlockView;
-
-use Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewNormalizer;
 
 class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
 {

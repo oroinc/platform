@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ReportBundle\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Oro\Bundle\SegmentBundle\Event\ConditionBuilderOptionsLoadEvent;
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SegmentSubscriber implements EventSubscriberInterface
 {

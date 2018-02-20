@@ -8,15 +8,13 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
+use Oro\Bundle\BatchBundle\Event\CountQueryOptimizationEvent;
+use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
+use Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity\Tagging;
+use Oro\Bundle\EntityBundle\Helper\RelationHelper;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
-use Oro\Bundle\BatchBundle\Event\CountQueryOptimizationEvent;
-use Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity\Tagging;
-use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
-use Oro\Bundle\EntityBundle\Helper\RelationHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CountQueryBuilderOptimizerTest extends OrmTestCase
 {

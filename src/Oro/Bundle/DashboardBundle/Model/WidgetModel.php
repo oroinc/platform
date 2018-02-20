@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
+use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Entity\WidgetState;
-use JMS\Serializer\Annotation as JMS;
 
 /**
  * @JMS\ExclusionPolicy("ALL")

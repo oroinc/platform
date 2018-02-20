@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Performance\Indexer;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\ORM\Tools\SchemaTool;
-
 use Oro\Bundle\SearchBundle\Command\AddFulltextIndexesCommand;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class PerformanceTest extends WebTestCase
 {

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\GeneratedValueStrategyListenerPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class GeneratedValueStrategyListenerPassTest extends \PHPUnit_Framework_TestCase
 {

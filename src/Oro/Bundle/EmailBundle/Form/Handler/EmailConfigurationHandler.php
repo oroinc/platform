@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Handler;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\DependencyInjection\Configuration as Config;
 use Oro\Bundle\EmailBundle\Event\SmtpSettingsSaved;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormInterface;
 
 class EmailConfigurationHandler
 {

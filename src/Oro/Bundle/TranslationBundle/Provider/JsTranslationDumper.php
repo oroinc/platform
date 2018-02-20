@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
+use Oro\Bundle\TranslationBundle\Controller\Controller;
+use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
-
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Filesystem\Exception\IOException;
-
-use Oro\Bundle\TranslationBundle\Controller\Controller;
-use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 
 class JsTranslationDumper implements LoggerAwareInterface
 {

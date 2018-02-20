@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ActivityListBundle\Helper;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Bundle\DoctrineBundle\Registry;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class ActivityInheritanceTargetsHelper
 {
@@ -58,8 +58,9 @@ class ActivityInheritanceTargetsHelper
      */
     public function applyInheritanceActivity(QueryBuilder $qb, $inheritanceTarget, $aliasSuffix, $entityIdExpr, $head)
     {
+        QueryBuilderUtil::checkIdentifier($aliasSuffix);
         $alias = 'ta_' . $aliasSuffix;
-        $qb->leftJoin('activity.' . $inheritanceTarget['targetClassAlias'], $alias);
+        $qb->leftJoin(QueryBuilderUtil::getField('activity', $inheritanceTarget['targetClassAlias']), $alias);
         $qb->andWhere($qb->expr()->in(
             $alias . '.id',
             $this->getSubQuery(
@@ -109,12 +110,13 @@ class ActivityInheritanceTargetsHelper
      * @param string   $target
      * @param string[] $path
      * @param string   $entityIdExpr
-     * @param integer  $uniqueKey
+     * @param string  $uniqueKey
      *
      * @return QueryBuilder
      */
     protected function getSubQuery($target, $path, $entityIdExpr, $uniqueKey)
     {
+        QueryBuilderUtil::checkIdentifier($uniqueKey);
         $alias = 'inherit_' . $uniqueKey;
 
         /** @var QueryBuilder $subQueryBuilder */
@@ -122,21 +124,22 @@ class ActivityInheritanceTargetsHelper
         $subQueryBuilder->select($alias . '.id')->from($target, $alias);
 
         foreach ($path as $key => $field) {
+            QueryBuilderUtil::checkIdentifier($key);
             $newAlias = 't_' . $uniqueKey . '_' . $key;
-            if (is_array($field)) {
+            if (\is_array($field)) {
                 $subQueryBuilder->join(
                     $field['join'],
                     $newAlias,
                     $field['conditionType'],
-                    sprintf('%s.%s = %s', $newAlias, $field['field'], $alias)
+                    $subQueryBuilder->expr()->eq(QueryBuilderUtil::getField($newAlias, $field['field']), $alias)
                 );
             } else {
-                $subQueryBuilder->join($alias . '.' . $field, $newAlias);
+                $subQueryBuilder->join(QueryBuilderUtil::getField($alias, $field), $newAlias);
             }
             $alias = $newAlias;
         }
 
-        $subQueryBuilder->where($alias . '.id = '. $entityIdExpr);
+        $subQueryBuilder->where($subQueryBuilder->expr()->eq(QueryBuilderUtil::getField($alias, 'id'), $entityIdExpr));
 
         return $subQueryBuilder;
     }

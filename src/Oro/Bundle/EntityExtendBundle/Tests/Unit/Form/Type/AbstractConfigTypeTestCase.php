@@ -2,20 +2,19 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Form\Extension\ConfigExtension;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Validator;
-
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityConfigBundle\Form\Extension\ConfigExtension;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class AbstractConfigTypeTestCase extends TypeTestCase
 {
@@ -98,8 +97,8 @@ class AbstractConfigTypeTestCase extends TypeTestCase
         $extendConfig->set('state', $state);
         $extendConfigProvider = $this->getConfigProviderMock();
         $extendConfigProvider->expects($this->any())
-            ->method('getConfig')
-            ->with('Test\Entity')
+            ->method('getConfigById')
+            ->with($config->getId())
             ->will($this->returnValue($extendConfig));
         $this->configManager->expects($this->any())
             ->method('getConfig')

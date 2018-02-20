@@ -2,10 +2,9 @@
 namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
@@ -55,7 +54,7 @@ class PdoPgsql extends BaseDriver
      * Add text search to qb
      *
      * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param integer                    $index
+     * @param string                     $index
      * @param array                      $searchCondition
      * @param boolean                    $setOrderBy
      *
@@ -116,7 +115,7 @@ class PdoPgsql extends BaseDriver
     /**
      * Create search string for string parameters (contains)
      *
-     * @param integer $index
+     * @param string $index
      * @param bool    $useFieldName
      * @param string  $operator
      *
@@ -137,7 +136,7 @@ class PdoPgsql extends BaseDriver
     /**
      * Create fulltext search string for string parameters (contains)
      *
-     * @param integer $index
+     * @param string $index
      * @param bool    $useFieldName
      *
      * @return string
@@ -206,7 +205,7 @@ class PdoPgsql extends BaseDriver
     /**
      * Create search string for string parameters (not contains)
      *
-     * @param integer $index
+     * @param string $index
      * @param bool    $useFieldName
      *
      * @return string
@@ -228,7 +227,7 @@ class PdoPgsql extends BaseDriver
      * Set string parameter for qb
      *
      * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param integer                    $index
+     * @param string                     $index
      * @param string                     $fieldValue
      * @param string                     $searchCondition
      */
@@ -262,7 +261,7 @@ class PdoPgsql extends BaseDriver
      * Set fulltext range order by
      *
      * @param QueryBuilder $qb
-     * @param int $index
+     * @param string $index
      */
     protected function setTextOrderBy(QueryBuilder $qb, $index)
     {

@@ -3,17 +3,17 @@
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Event\BuildAfter;
-use Oro\Bundle\DataGridBundle\Event\BuildBefore;
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\DataGridBundle\Event\BuildAfter;
+use Oro\Bundle\DataGridBundle\Event\BuildBefore;
+use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -169,7 +169,9 @@ abstract class AbstractConfigGridListener
                     'data_name'      => isset($field['expression']) ? $field['expression'] : null,
                     'apply_callback' => function (OrmDatasource $datasource, $sortKey, $direction) {
                         if ($sortKey) {
-                            $datasource->getQueryBuilder()->addOrderBy($sortKey, $direction);
+                            QueryBuilderUtil::checkField($sortKey);
+                            $datasource->getQueryBuilder()
+                                ->addOrderBy($sortKey, QueryBuilderUtil::getSortOrder($direction));
                         }
                     }
                 ];
@@ -337,10 +339,13 @@ abstract class AbstractConfigGridListener
      */
     protected function prepareQuery(QueryBuilder $query, $rootAlias, $joinAlias, $itemsType)
     {
+        QueryBuilderUtil::checkIdentifier($rootAlias);
+        QueryBuilderUtil::checkIdentifier($joinAlias);
         $providers = $this->configManager->getProviders();
         foreach ($providers as $provider) {
             $configItems = $provider->getPropertyConfig()->getItems($itemsType);
             foreach ($configItems as $code => $item) {
+                QueryBuilderUtil::checkIdentifier($code);
                 if (!isset($item['grid'])) {
                     continue;
                 }

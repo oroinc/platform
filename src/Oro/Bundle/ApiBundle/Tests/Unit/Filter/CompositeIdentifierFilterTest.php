@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
-
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\CompositeIdentifierFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;

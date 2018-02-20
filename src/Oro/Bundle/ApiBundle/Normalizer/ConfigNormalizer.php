@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 /**
  * Prepares a configuration to be used by ObjectNormalizer.
  * This class should be synchronized with the config normalizer for EntitySerializer.
- * @see Oro\Bundle\ApiBundle\Util\ConfigNormalizer
+ * @see \Oro\Bundle\ApiBundle\Util\ConfigNormalizer
  */
 class ConfigNormalizer
 {

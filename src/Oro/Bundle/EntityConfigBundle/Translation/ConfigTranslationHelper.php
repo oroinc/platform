@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Translation;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ConfigTranslationHelper
 {

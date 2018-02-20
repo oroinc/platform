@@ -2,17 +2,19 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
+use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
-
+/**
+ * The CLI command to clear Data API cache.
+ */
 class CacheClearCommand extends ContainerAwareCommand
 {
-    const COMMAND_NAME = 'oro:api:cache:clear';
+    public const COMMAND_NAME = 'oro:api:cache:clear';
 
     /**
      * {@inheritdoc}
@@ -21,8 +23,9 @@ class CacheClearCommand extends ContainerAwareCommand
     {
         $this
             ->setName(self::COMMAND_NAME)
-            ->setDescription('Clears Data API cache')
-            ->setHelp(<<<EOF
+            ->setDescription('Clears Data API cache.')
+            ->setHelp(
+                <<<EOF
 The <info>%command.name%</info> command clears Data API cache:
 
   <info>php %command.full_name%</info>
@@ -46,9 +49,9 @@ EOF
         $resourcesCache->clear();
 
         $io->comment('Clearing the cache for entity aliases');
-        /** @var EntityAliasResolver $entityAliasResolver */
-        $entityAliasResolver = $this->getContainer()->get('oro_api.entity_alias_resolver');
-        $entityAliasResolver->clearCache();
+        /** @var EntityAliasResolverRegistry $entityAliasResolverRegistry */
+        $entityAliasResolverRegistry = $this->getContainer()->get('oro_api.entity_alias_resolver_registry');
+        $entityAliasResolverRegistry->clearCache();
 
         $io->success('API cache was successfully cleared.');
     }

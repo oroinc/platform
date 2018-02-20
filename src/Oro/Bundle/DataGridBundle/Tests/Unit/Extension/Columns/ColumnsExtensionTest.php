@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Columns;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
@@ -42,6 +41,8 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
             $this->aclHelper,
             $this->columnsHelper
         );
+
+        $this->extension->setParameters(new ParameterBag());
     }
 
     /**

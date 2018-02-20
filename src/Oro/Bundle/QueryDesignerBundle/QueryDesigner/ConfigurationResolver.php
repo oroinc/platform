@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ConfigurationResolver
 {

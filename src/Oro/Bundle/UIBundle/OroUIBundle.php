@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\UIBundle;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
+use Oro\Bundle\UIBundle\DependencyInjection\Compiler\ConstantsPass;
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass;
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\FormattersPass;
-use Oro\Bundle\UIBundle\DependencyInjection\Compiler\ViewActionWidgetProviderPass;
-use Oro\Bundle\UIBundle\DependencyInjection\Compiler\UpdateActionWidgetProviderPass;
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
-use Oro\Bundle\UIBundle\DependencyInjection\Compiler\ConstantsPass;
+use Oro\Bundle\UIBundle\DependencyInjection\Compiler\UpdateActionWidgetProviderPass;
+use Oro\Bundle\UIBundle\DependencyInjection\Compiler\ViewActionWidgetProviderPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroUIBundle extends Bundle
 {

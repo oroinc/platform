@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;

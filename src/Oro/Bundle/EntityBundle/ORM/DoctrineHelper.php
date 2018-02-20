@@ -9,9 +9,8 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\PersistentCollection;
-
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\Exception;
 
 /**

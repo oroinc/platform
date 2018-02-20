@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension\Generator;
 
+use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
 use CG\Generator\PhpMethod;
 use CG\Generator\PhpParameter;
-use CG\Core\DefaultGeneratorStrategy;
-use Symfony\Component\ExpressionLanguage\ParsedExpression;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-
-use Oro\Component\Layout\Loader\Generator\VisitContext;
-use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
-
 use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ExpressionConditionVisitor;
+use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
+use Oro\Component\Layout\Loader\Generator\VisitContext;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 class ExpressionConditionVisitorTest extends \PHPUnit_Framework_TestCase
 {

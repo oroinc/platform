@@ -6,16 +6,20 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\AbstractDocumentBuilder;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * The document builder for plain REST API response.
+ */
 class RestDocumentBuilder extends AbstractDocumentBuilder
 {
-    const OBJECT_TYPE = 'entity';
+    public const OBJECT_TYPE = 'entity';
 
-    const ERROR_CODE   = 'code';
-    const ERROR_TITLE  = 'title';
-    const ERROR_DETAIL = 'detail';
-    const ERROR_SOURCE = 'source';
+    private const ERROR_CODE   = 'code';
+    private const ERROR_TITLE  = 'title';
+    private const ERROR_DETAIL = 'detail';
+    private const ERROR_SOURCE = 'source';
 
     /**
      * {@inheritdoc}
@@ -38,13 +42,13 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function convertCollectionToArray($collection, EntityMetadata $metadata = null)
+    protected function convertCollectionToArray($collection, RequestType $requestType, EntityMetadata $metadata = null)
     {
         $result = [];
         foreach ($collection as $object) {
             $result[] = null === $object || is_scalar($object)
                 ? $object
-                : $this->convertObjectToArray($object, $metadata);
+                : $this->convertObjectToArray($object, $requestType, $metadata);
         }
 
         return $result;
@@ -53,7 +57,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function convertObjectToArray($object, EntityMetadata $metadata = null)
+    protected function convertObjectToArray($object, RequestType $requestType, EntityMetadata $metadata = null)
     {
         if (null === $metadata) {
             $result = $this->objectAccessor->toArray($object);
@@ -67,11 +71,11 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
             $result = [];
             $data = $this->objectAccessor->toArray($object);
             if ($metadata->hasMetaProperty(ConfigUtil::CLASS_NAME)) {
-                $result[self::OBJECT_TYPE] = $this->getEntityTypeForObject($object, $metadata);
+                $result[self::OBJECT_TYPE] = $this->getEntityTypeForObject($object, $requestType, $metadata);
             }
             $this->addMeta($result, $data, $metadata);
             $this->addAttributes($result, $data, $metadata);
-            $this->addRelationships($result, $data, $metadata);
+            $this->addRelationships($result, $data, $requestType, $metadata);
         }
 
         return $result;
@@ -110,7 +114,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function convertToEntityType($entityClass, $throwException = true)
+    protected function convertToEntityType($entityClass, RequestType $requestType, $throwException = true)
     {
         return $entityClass;
     }
@@ -149,21 +153,29 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     /**
      * @param array          $result
      * @param array          $data
+     * @param RequestType    $requestType
      * @param EntityMetadata $metadata
      */
-    protected function addRelationships(array &$result, array $data, EntityMetadata $metadata)
-    {
+    protected function addRelationships(
+        array &$result,
+        array $data,
+        RequestType $requestType,
+        EntityMetadata $metadata
+    ) {
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
-            $result[$name] = $this->getRelationshipValue($data, $name, $association);
+            $result[$name] = $this->getRelationshipValue($data, $requestType, $name, $association);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function processRelatedObject($object, AssociationMetadata $associationMetadata)
-    {
+    protected function processRelatedObject(
+        $object,
+        RequestType $requestType,
+        AssociationMetadata $associationMetadata
+    ) {
         if (is_scalar($object)) {
             return $object;
         }
@@ -177,7 +189,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
                 : $data;
         }
 
-        return $this->convertObjectToArray($object, $targetMetadata);
+        return $this->convertObjectToArray($object, $requestType, $targetMetadata);
     }
 
     /**

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub;
 
+use Oro\Bundle\EntityBundle\Form\Type\EntityFieldFallbackValueType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\EntityBundle\Form\Type\EntityFieldFallbackValueType;
 
 class FallbackParentStubType extends AbstractType
 {

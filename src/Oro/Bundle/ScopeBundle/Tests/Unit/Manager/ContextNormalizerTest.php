@@ -4,7 +4,6 @@ namespace Oro\Bundle\ScopeBundle\Tests\Unit\Manager;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\ScopeBundle\Manager\ContextNormalizer;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 

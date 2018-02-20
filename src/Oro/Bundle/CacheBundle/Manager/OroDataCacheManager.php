@@ -3,7 +3,6 @@
 namespace Oro\Bundle\CacheBundle\Manager;
 
 use Doctrine\Common\Cache\ClearableCache;
-
 use Oro\Bundle\CacheBundle\Provider\SyncCacheInterface;
 
 class OroDataCacheManager

@@ -926,7 +926,7 @@ Currently, every time we want to wrap content into a `<div>` element, we have to
 ```php
 namespace Acme\Bundle\LayoutBundle\Layout\Block\Extension;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\BlockInterface;
@@ -939,7 +939,7 @@ class ContainerExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setOptional(['type']);
     }
@@ -1149,7 +1149,7 @@ This should render into the following HTML:
 ## Working with Forms
 
 
-### Non Page Specific Form ###
+### Non Page Specific Form
 
 Let us implement a simple search form by means of the layout engine.
 
@@ -1270,7 +1270,7 @@ You should get the result similar to the following code:
 </div>
 ```
 
-### Page Specific Form ###
+### Page Specific Form
 
 For the case when the form is page specific, we need a layout data provider that returns form and form view.
 In our layout updates and templates we use FormView class, and in the controller we use the FormInterface from the same form.
@@ -1334,8 +1334,7 @@ We register the form in the container using the newly created form type:
 
     acme_product.form.product:
         class:                        Symfony\Component\Form\Form
-        factory_method:               createNamed
-        factory_service:              form.factory
+        factory:                      ['@form.factory', createNamed]
         arguments:
             - ~
             - 'acme_product_product'
@@ -1555,7 +1554,7 @@ First, let's create the block type file itself and place it in the `Acme/Bundle/
 ```php
 namespace Acme\Bundle\LayoutBundle\Layout\Block\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\BlockInterface;
@@ -1568,7 +1567,7 @@ class ImageType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
             ->setRequired(['path'])

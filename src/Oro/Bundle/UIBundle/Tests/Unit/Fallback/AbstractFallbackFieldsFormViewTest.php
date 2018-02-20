@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Fallback;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
+use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
+use Oro\Bundle\UIBundle\Tests\Unit\Fallback\ProductStub;
+use Oro\Bundle\UIBundle\View\ScrollData;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
-
-use Oro\Bundle\UIBundle\Tests\Unit\Fallback\ProductStub;
-use Oro\Bundle\UIBundle\View\ScrollData;
-use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 
 class AbstractFallbackFieldsFormViewTest extends \PHPUnit_Framework_TestCase
 {

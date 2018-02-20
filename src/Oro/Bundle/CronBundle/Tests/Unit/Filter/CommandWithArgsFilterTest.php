@@ -4,9 +4,8 @@ namespace Oro\Bundle\CronBundle\Tests\Unit\Filter;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL92Platform;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
-
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\CronBundle\Filter\CommandWithArgsFilter;
 use Oro\Bundle\CronBundle\ORM\CommandArgsNormalizer;
 use Oro\Bundle\CronBundle\ORM\CommandArgsTokenizer;

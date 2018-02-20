@@ -3,7 +3,6 @@
 namespace Oro\Bundle\BatchBundle\ORM\Query;
 
 use Doctrine\ORM\Query;
-
 use Oro\Bundle\BatchBundle\ORM\Query\ResultIterator\IdentifierIterationStrategy;
 use Oro\Bundle\BatchBundle\ORM\Query\ResultIterator\IdentityIterationStrategyInterface;
 

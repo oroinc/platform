@@ -3,17 +3,16 @@
 namespace Oro\Bundle\EmailBundle\Filter;
 
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\Form\FormFactoryInterface;
-
-use Oro\Component\PhpUtils\ArrayUtil;
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\FilterBundle\Filter\ChoiceFilter;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
-use Oro\Bundle\EmailBundle\Model\FolderType;
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
+use Oro\Bundle\FilterBundle\Filter\ChoiceFilter;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class ChoiceMessageTypeFilter extends ChoiceFilter
 {
@@ -111,7 +110,7 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
 
         list($dql, $replacements) = $this->createDQLWithReplacedAliases($ds, $subQb);
 
-        $replacedFieldExpr = sprintf('%s.%s', $replacements['eu'], 'id');
+        $replacedFieldExpr = QueryBuilderUtil::getField($replacements['eu'], 'id');
         $oldExpr = sprintf('%1$s = %1$s', $replacedFieldExpr);
         $newExpr = sprintf('%s = eu.id', $replacedFieldExpr);
         $dql = strtr($dql, [$oldExpr => $newExpr]);

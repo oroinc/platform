@@ -3,12 +3,11 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Configuration;
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
-
 use Oro\Bundle\EntityExtendBundle\Tools\SaveSchemaTool;
 
 class SaveSchemaToolTest extends \PHPUnit_Framework_TestCase

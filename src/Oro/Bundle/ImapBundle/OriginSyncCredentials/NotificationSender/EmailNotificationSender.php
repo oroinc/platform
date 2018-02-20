@@ -3,12 +3,11 @@
 namespace Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSenderInterface;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSenderInterface;
 
 /**
  * Wrong credential sync email box notification sender channel that uses email messaging as the channel.
@@ -59,7 +58,7 @@ class EmailNotificationSender implements NotificationSenderInterface
             $sendTo = $emailOrigin->getOwner()->getEmail();
         } else {
             $templateName = 'sync_wrong_credentials_system_box';
-            $sendTo = $senderEmail;
+            $sendTo = $emailOrigin->getMailbox()->getEmail();
         }
 
         $template = $this->doctrine

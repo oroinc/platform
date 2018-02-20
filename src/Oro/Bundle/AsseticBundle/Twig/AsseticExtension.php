@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\AsseticBundle\Twig;
 
-use Symfony\Bundle\AsseticBundle\Factory\AssetFactory;
-
 use Oro\Bundle\AsseticBundle\AssetsConfiguration;
+use Symfony\Bundle\AsseticBundle\Factory\AssetFactory;
 
 class AsseticExtension extends \Twig_Extension
 {

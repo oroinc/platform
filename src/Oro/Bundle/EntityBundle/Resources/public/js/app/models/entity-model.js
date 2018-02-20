@@ -19,11 +19,11 @@ define(function(require) {
      */
     EntityModel = BaseModel.extend(_.extend({}, Chaplin.SyncMachine, /** @lends EntityModel.prototype */ {
         ROUTE: {
-            'create': 'oro_rest_api_post',
-            'update': 'oro_rest_api_patch',
-            'patch':  'oro_rest_api_patch',
-            'delete': 'oro_rest_api_delete',
-            'read':   'oro_rest_api_get'
+            'create': 'oro_rest_api_list',
+            'update': 'oro_rest_api_item',
+            'patch': 'oro_rest_api_item',
+            'delete': 'oro_rest_api_item',
+            'read': 'oro_rest_api_item'
         },
 
         /**
@@ -67,7 +67,7 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function(data, options) {
+        constructor: function EntityModel(data, options) {
             options = options || {};
             _.extend(this, _.pick(data && data.data || options, 'type', 'id'));
             if (!this.type) {
@@ -115,7 +115,7 @@ define(function(require) {
         /**
          * Converts model in to an object that is used for API requests
          *
-         * @param {Object?} options
+         * @param {Object} [options]
          * @return {{
          *  data: {
          *      id: string?,
@@ -300,7 +300,7 @@ define(function(require) {
         toString: function() {
             return _.result(this._meta, 'title') || '';
         }
-    }), /** @lends EntityModel */  {
+    }), /** @lends EntityModel */ {
         /**
          * Build global ID on a base of identifier properties of passed object
          *

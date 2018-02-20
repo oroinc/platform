@@ -3,14 +3,11 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
-
-use Symfony\Component\Form\AbstractExtension;
-
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
+use Symfony\Component\Form\AbstractExtension;
 
 class EntitySelectOrCreateInlineFormExtension extends AbstractExtension
 {
@@ -51,7 +48,10 @@ class EntitySelectOrCreateInlineFormExtension extends AbstractExtension
     {
         return [
             new OroJquerySelect2HiddenType($this->em, $this->searchRegistry, $this->configProvider),
-            new Select2Type('hidden')
+            new Select2Type(
+                'Symfony\Component\Form\Extension\Core\Type\HiddenType',
+                'oro_select2_hidden'
+            )
         ];
     }
 }

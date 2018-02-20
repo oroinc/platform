@@ -20,10 +20,10 @@ define(function(require) {
         ROUTE: {
             // returns a list of entities of the given type
             // path: /api/{entity}
-            'read':   'oro_rest_api_cget',
+            'read': 'oro_rest_api_list',
             // deletes a list of entities of the given type by the given filters
             // path: /api/{entity}
-            'delete': 'oro_rest_api_cdelete'
+            'delete': 'oro_rest_api_list'
         },
 
         /**
@@ -32,7 +32,7 @@ define(function(require) {
          */
         type: null,
 
-        constructor: function(data, options) {
+        constructor: function EntityCollection(data, options) {
             options = options || {};
             _.extend(this, _.pick(options, 'type'));
             if (!this.type) {
@@ -65,16 +65,16 @@ define(function(require) {
         },
 
         /**
-         * Converts model in to an object that is used for API requests
+         * Converts collection in to an object that is used for API requests
          *
-         * @param {Object?} options
-         * @return {Object<string, {data: Array<EntityModel.identifier>}>}
+         * @param {Object} [options]
+         * @return {Object<string, {data: Array<Object>}>}
          */
         toJSON: function(options) {
-            var identifiers = this.map(function(model) {
-                return model.identifier;
+            var data = this.map(function(model) {
+                return model.toJSON(options).data;
             });
-            return {data: identifiers};
+            return {data: data};
         },
 
         sync: function(method, model, options) {

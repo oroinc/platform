@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Layout\Extension;
 
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\ContextInterface;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class IsLoggedInContextConfigurator implements ContextConfiguratorInterface
 {

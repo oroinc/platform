@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Entity\EntityListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
-
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator;
 

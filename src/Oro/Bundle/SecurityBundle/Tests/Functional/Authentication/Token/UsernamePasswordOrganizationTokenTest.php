@@ -3,12 +3,10 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Functional\Authentication\Token;
 
 use Doctrine\ORM\EntityManagerInterface;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class UsernamePasswordOrganizationTokenTest extends WebTestCase

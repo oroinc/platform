@@ -1,3 +1,4 @@
+{% set rootPath = path(rootRoute) %}
 <style type="text/css">
     #summary { display: none; }
     #api_type { float: left; font-size: 1.2em; padding: 12px 24px; }
@@ -61,8 +62,7 @@
             clientTime = new Date(),
             serverTimeOffset = Date.parse(serverTime) - clientTime,
             $apiDocLink = $('#header a').first(),
-            apiDocHref = $apiDocLink.attr('href'),
-            apiType = window.location.pathname.substr(apiDocHref.length + 1),
+            apiType = window.location.pathname.substr('{{ rootPath }}'.length + 1) || '{{ defaultView }}',
             apiPrefix = '',
             escapeSelector = function (val) {
                 return val.replace(/(:|\.|\[|\]|\{|\}|,)/g, "\\$1");
@@ -108,12 +108,27 @@
             apiPrefix = '-' + apiPrefixMatch[1];
         }
 
-        $apiDocLink.after('<div id="api_type">type:&nbsp;&nbsp;' +
-            '<a href="' + apiDocHref + '"' + (apiType === '' ? ' class="active"' : '') + '>plain</a>' +
-            '&nbsp;|&nbsp;' +
-            '<a href="' + apiDocHref + '/rest_json_api"' + (apiType === 'rest_json_api' ? ' class="active"' : '') + '>JSON.API</a>' +
-            '</div>'
-        );
+        /**
+         * Set "home" URI
+         */
+        $apiDocLink.attr('href', '{{ rootPath }}');
+
+        /**
+         * Add the ApiDoc view selector
+         */
+        {% if views is defined and views and views|length > 1 -%}
+        $apiDocLink.after('<div id="api_type">type:' +
+            {%- for name, view in views %}
+            {%- if view.sandbox %}
+                {%- set viewLink = view.default ? '' : '/' ~ name %}
+                {%- set viewType = view.default ? '' : name %}
+                {%- if loop.first %}'&nbsp;' + {% else %}'&nbsp;|&nbsp;' + {% endif -%}
+                '<a href="' + '{{ rootPath ~ viewLink }}"' +
+                (apiType === '{{ viewType }}' ? ' class="active"' : '') + '>{{ view.label }}</a>' +
+            {%- endif %}
+            {%- endfor -%}
+            '</div>');
+        {% endif %}
 
         /**
          * Add the authentication type selector
@@ -132,20 +147,6 @@
         );
         if (!wsseAllowed) {
             $('#header').css('background-color', '#F7FE2E');
-        }
-
-        /**
-         * Make JSON as default body format for JSON.API sandbox
-         */
-        if (apiType === 'rest_json_api') {
-            $('#body_format').val('json');
-        }
-
-        /**
-         * Disable the request format selector for JSON.API and new implementation of REST
-         */
-        if (apiType === 'rest_json_api' || apiType === 'rest_plain') {
-            $('#request_format').attr('disabled', 'disabled');
         }
 
         /**
@@ -209,14 +210,21 @@
             }
 
             /**
-             * Add Header "Content-Type: application/vnd.api+json" for JSON.API resources
+             * Add view headers
              */
-            var $headers = $(this).closest('.content').find('fieldset.headers'),
-                routePath = $(this).parents('li.operation').find('div.heading span.path').text(),
-                isAllowedRoute = apiType === 'rest_json_api' && routePath.indexOf('/api/rest/') === -1;
-            if (isAllowedRoute) {
-                addHeader($headers, 'Content-Type', 'application/vnd.api+json');
-            }
+            {% if views is defined and views -%}
+                var $headers = $(this).closest('.content').find('fieldset.headers'),
+                    routePath = $(this).parents('li.operation').find('div.heading span.path').text();
+                {% for name, view in views -%}
+                {% if view.headers is defined and view.headers -%}
+                if (apiType === '{{ name }}' && routePath.indexOf('/api/rest/') === -1) {
+                    {%- for headerName, headerValue in view.headers -%}
+                    addHeader($headers, '{{ headerName }}', '{{ headerValue }}');
+                    {%- endfor -%}
+                }
+                {% endif %}
+                {%- endfor %}
+            {%- endif -%}
         });
 
         /**
@@ -308,27 +316,27 @@
                 }
             });
 
+            {% if not enableFormatParameter -%}
             /**
-             * Remove "_format" parameter for JSON.API and new implementation of REST sandboxes
+             * Remove "_format" parameter
              */
-            if (apiType === 'rest_json_api' || apiType === 'rest_plain') {
-                options.url = options.url.replace(
-                    new RegExp("([\?&])(_format=json&?)"), "$1"
-                );
-                if (options.data.lastIndexOf('{"', 0) === 0) {
-                    // json
-                    var data = JSON.parse(options.data);
-                    if (data.hasOwnProperty('_format')) {
-                        delete data['_format'];
-                        options.data = JSON.stringify(data);
-                    }
-                } else {
-                    // uri string
-                    options.data = options.data.replace(
-                        new RegExp("([&]?)(_format=json&?)"), "$1"
-                    );
+            options.url = options.url.replace(
+                new RegExp("([\?&])(_format=&?)"), "$1"
+            );
+            if (options.data.lastIndexOf('{"', 0) === 0) {
+                // json
+                var data = JSON.parse(options.data);
+                if (data.hasOwnProperty('_format')) {
+                    delete data['_format'];
+                    options.data = JSON.stringify(data);
                 }
+            } else {
+                // uri string
+                options.data = options.data.replace(
+                    new RegExp("([&]?)(_format=&?)"), "$1"
+                );
             }
+            {% endif %}
 
             /**
              * Remove "Content-type" header if both "Content-type" and "Content-Type" headers exist

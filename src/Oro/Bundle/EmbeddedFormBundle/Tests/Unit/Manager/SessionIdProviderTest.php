@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Manager;
 
+use Oro\Bundle\EmbeddedFormBundle\Manager\SessionIdProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-
-use Oro\Bundle\EmbeddedFormBundle\Manager\SessionIdProvider;
 
 class SessionIdProviderTest extends \PHPUnit_Framework_TestCase
 {

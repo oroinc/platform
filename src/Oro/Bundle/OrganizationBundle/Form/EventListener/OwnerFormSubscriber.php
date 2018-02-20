@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\EventListener;
 
+use Doctrine\Common\Util\ClassUtils;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-use Doctrine\Common\Util\ClassUtils;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class OwnerFormSubscriber implements EventSubscriberInterface
 {

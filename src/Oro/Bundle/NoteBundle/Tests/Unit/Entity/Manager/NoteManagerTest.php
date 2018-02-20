@@ -3,17 +3,15 @@
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
+use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Tests\Unit\Stub\AttachmentProviderStub;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class NoteManagerTest extends \PHPUnit_Framework_TestCase
 {

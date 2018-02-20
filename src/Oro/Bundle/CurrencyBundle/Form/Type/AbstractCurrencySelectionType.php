@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\CurrencyBundle\Form\Type;
 
+use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
+use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
+use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
+use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -12,12 +17,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
-use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
-use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
-use Oro\Bundle\FormBundle\Utils\FormUtils;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 abstract class AbstractCurrencySelectionType extends AbstractType
 {

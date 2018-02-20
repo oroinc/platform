@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\WindowsBundle\Tests\Manager;
 
+use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-
-use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
 
 class WindowsStateRequestManagerTest extends \PHPUnit_Framework_TestCase
 {

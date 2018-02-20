@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\DependencyInjection\Container;
-
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerClearer;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Container;
 
 class ContainerClearerTest extends \PHPUnit_Framework_TestCase
 {

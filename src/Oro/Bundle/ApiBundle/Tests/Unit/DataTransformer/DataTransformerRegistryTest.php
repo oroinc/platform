@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\DataTransformer;
 
-use Oro\Component\EntitySerializer\DataTransformerInterface;
 use Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Oro\Component\EntitySerializer\DataTransformerInterface;
 
 class DataTransformerRegistryTest extends \PHPUnit_Framework_TestCase
 {

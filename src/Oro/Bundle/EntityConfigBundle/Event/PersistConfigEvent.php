@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
-
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 
 /**
  * @deprecated since 1.9. Use PreFlushConfigEvent instead

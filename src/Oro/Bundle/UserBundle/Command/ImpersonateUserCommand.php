@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\UserBundle\Command;
 
+use Oro\Bundle\UserBundle\Entity\Impersonation;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\UserBundle\Entity\Impersonation;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\UserManager;
-use Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator;
 
 class ImpersonateUserCommand extends ContainerAwareCommand
 {

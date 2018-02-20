@@ -4,11 +4,9 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Helper;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Helper\TranslationHelper;
-
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class TranslationHelperTest extends \PHPUnit_Framework_TestCase

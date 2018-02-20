@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass;
 
+use Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-use Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait;
 
 class ButtonProviderPass implements CompilerPassInterface
 {

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\SearchBundle\Datagrid\Datasource;
 
-use Symfony\Component\Config\Definition\Processor;
-
-use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
 use Oro\Bundle\SearchBundle\Query\AbstractSearchQuery;
+use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
+use Symfony\Component\Config\Definition\Processor;
 
 class YamlToSearchQueryConverter
 {

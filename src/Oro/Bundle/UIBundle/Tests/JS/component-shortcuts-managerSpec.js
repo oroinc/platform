@@ -18,15 +18,15 @@ define(['underscore'], function(_) {
         }
     };
 
-    beforeEach(function(done) {
-        requirejs.undef('oroui/js/component-shortcuts-manager');
-        require(['oroui/js/component-shortcuts-manager'], function(m) {
-            componentShortcutsManager = m;
-            done();
-        });
-    });
-
     describe('Component Shortcuts Manager', function() {
+        beforeEach(function(done) {
+            requirejs.undef('oroui/js/component-shortcuts-manager');
+            require(['oroui/js/component-shortcuts-manager'], function(m) {
+                componentShortcutsManager = m;
+                done();
+            });
+        });
+
         it('Initialize manager with custom module config', function() {
             expect(componentShortcutsManager.reservedKeys).toEqual(['options', 'testOption']);
         });
@@ -104,7 +104,7 @@ define(['underscore'], function(_) {
 
         it('Get component object data - scalar', function() {
             var shortcut = _.extend({}, testWidgetConfiguration, {scalarOption: 'height'});
-            var testPageComponentOptions =  _.extend({}, testWidgetConfiguration.options, {'height': 80});
+            var testPageComponentOptions = _.extend({}, testWidgetConfiguration.options, {height: 80});
 
             expect(componentShortcutsManager.getComponentData(shortcut, 80)).toEqual({
                 pageComponentModule: testWidgetConfiguration.moduleName,

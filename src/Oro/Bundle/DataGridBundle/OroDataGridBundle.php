@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle;
 
+use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass;
 
 class OroDataGridBundle extends Bundle
 {

@@ -39,30 +39,30 @@ define([
         },
 
         defaultMapping: {
-            'namePrefix': 'prefix',
-            'nameSuffix': 'suffix',
-            'firstName': 'first_name',
-            'middleName': 'middle_name',
-            'lastName': 'last_name',
-            'organization': 'organization',
-            'street': 'street',
-            'street2': 'street2',
-            'city': 'city',
-            'country': 'country',
-            'countryIso2': 'country_iso2',
-            'countryIso3': 'country_iso3',
-            'postalCode': 'postal_code',
-            'region': 'region',
-            'regionText': 'region',
-            'regionCode': 'region_code',
-            'phone': 'phone'
+            namePrefix: 'prefix',
+            nameSuffix: 'suffix',
+            firstName: 'first_name',
+            middleName: 'middle_name',
+            lastName: 'last_name',
+            organization: 'organization',
+            street: 'street',
+            street2: 'street2',
+            city: 'city',
+            country: 'country',
+            countryIso2: 'country_iso2',
+            countryIso3: 'country_iso3',
+            postalCode: 'postal_code',
+            region: 'region',
+            regionText: 'region',
+            regionCode: 'region_code',
+            phone: 'phone'
         },
 
         options: {
             map: {},
-            'allowToRemovePrimary': false,
-            'confirmRemove': false,
-            'addressDeleteUrl': null
+            allowToRemovePrimary: false,
+            confirmRemove: false,
+            addressDeleteUrl: null
         },
 
         initialize: function(options) {

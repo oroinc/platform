@@ -3,12 +3,9 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Action;
 
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
@@ -18,8 +15,10 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionFactory;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionMetadataFactory;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface;
+use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class ActionExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -64,18 +63,25 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
         self::assertTrue($this->extension->isApplicable($config));
     }
 
-    public function testIsApplicableWhenEnableActionsParameterIsTrue()
+    public function testIsNotApplicableInImportExportMode()
     {
+        $params = new ParameterBag();
+        $params->set(
+            ParameterBag::DATAGRID_MODES_PARAMETER,
+            [DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE]
+        );
         $config = DatagridConfiguration::create([]);
-        $this->extension->getParameters()->set(ActionExtension::ENABLE_ACTIONS_PARAMETER, true);
-
-        self::assertTrue($this->extension->isApplicable($config));
+        $this->extension->setParameters($params);
+        self::assertFalse($this->extension->isApplicable($config));
     }
 
-    public function testIsApplicableWhenEnableActionsParameterIsFalse()
+    public function testIsNotApplicableWhenExportMode()
     {
         $config = DatagridConfiguration::create([]);
-        $this->extension->getParameters()->set(ActionExtension::ENABLE_ACTIONS_PARAMETER, false);
+        $this->extension->getParameters()->set(
+            ParameterBag::DATAGRID_MODES_PARAMETER,
+            [DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE]
+        );
 
         self::assertFalse($this->extension->isApplicable($config));
     }

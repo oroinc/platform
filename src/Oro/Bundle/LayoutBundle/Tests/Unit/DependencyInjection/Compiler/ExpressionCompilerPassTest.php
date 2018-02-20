@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ExpressionCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ExpressionCompilerPass;
 
 class ExpressionCompilerPassTest extends \PHPUnit_Framework_TestCase
 {

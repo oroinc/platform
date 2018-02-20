@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;

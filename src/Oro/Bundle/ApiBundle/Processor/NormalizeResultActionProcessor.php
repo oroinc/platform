@@ -2,21 +2,21 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
+use Oro\Bundle\ApiBundle\Exception\UnhandledErrorsException;
+use Oro\Bundle\ApiBundle\Exception\ValidationExceptionInterface;
+use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Model\Label;
+use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
+use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
+use Oro\Component\ChainProcessor\ActionProcessor;
+use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
-
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
-use Oro\Component\ChainProcessor\ActionProcessor;
-use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
-use Oro\Bundle\ApiBundle\Exception\RuntimeException;
-use Oro\Bundle\ApiBundle\Exception\ValidationExceptionInterface;
-use Oro\Bundle\ApiBundle\Model\Error;
-use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
-use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 
 class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAwareInterface
 {
@@ -82,11 +82,21 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
      */
     protected function handleErrors(NormalizeResultContext $context, $processorId, $group)
     {
+        if (null !== $this->logger) {
+            $this->logger->info(
+                sprintf('Error(s) occurred in "%s" processor.', $processorId),
+                array_merge(
+                    ['errors' => $this->getErrorsForLog($context->getErrors())],
+                    $this->getLogContext($context)
+                )
+            );
+        }
+
         if ($this->isNormalizeResultEnabled($context)) {
             // go to the "normalize_result" group
             $this->executeNormalizeResultProcessors($context);
         } elseif (!$context->isSoftErrorsHandling()) {
-            throw $this->buildErrorException($context->getErrors());
+            throw new UnhandledErrorsException($context->getErrors());
         }
     }
 
@@ -122,20 +132,25 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
     }
 
     /**
-     * @param \Exception                $e
-     * @param string                    $processorId
-     * @param ComponentContextInterface $context
+     * @param \Exception             $e
+     * @param string                 $processorId
+     * @param NormalizeResultContext $context
      */
-    protected function logException(\Exception $e, string $processorId, ComponentContextInterface $context)
+    protected function logException(\Exception $e, string $processorId, NormalizeResultContext $context)
     {
-        if (!$this->isLoggableException(ExceptionUtil::getProcessorUnderlyingException($e))) {
-            return;
-        }
-
-        if ($context instanceof NormalizeResultContext && $context->isSoftErrorsHandling()) {
-            $this->logger->warning(
+        $underlyingException = ExceptionUtil::getProcessorUnderlyingException($e);
+        if ($context->isSoftErrorsHandling() || $this->isSafeException($underlyingException)) {
+            $this->logger->info(
                 sprintf('An exception occurred in "%s" processor.', $processorId),
                 array_merge(['exception' => $e], $this->getLogContext($context))
+            );
+        } elseif ($underlyingException instanceof UnhandledErrorsException) {
+            $this->logger->error(
+                sprintf('Unhandled error(s) occurred in "%s" processor.', $processorId),
+                array_merge(
+                    ['errors' => $this->getErrorsForLog($underlyingException->getErrors())],
+                    $this->getLogContext($context)
+                )
             );
         } else {
             $this->logger->error(
@@ -146,33 +161,39 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
     }
 
     /**
-     * Indicates whether the given exceptions need to be added to the log.
+     * Indicates whether the given exception represents an error
+     * that is properly handled and the current API action response contains information about this error.
+     * Actualy such exceptions are an alternative for adding an error to the action context.
+     * Examples of safe exceptions:
+     * * invalid request data
+     * * requesting not existing resource
+     * * access to the requested resource is denied
      *
      * @param \Exception $e
      *
      * @return bool
      */
-    protected function isLoggableException(\Exception $e)
+    protected function isSafeException(\Exception $e)
     {
         if ($e instanceof HttpExceptionInterface) {
-            return $e->getStatusCode() >= Response::HTTP_INTERNAL_SERVER_ERROR;
+            return $e->getStatusCode() < Response::HTTP_INTERNAL_SERVER_ERROR;
         }
         if ($e instanceof AccessDeniedException || $e instanceof ForbiddenException) {
-            return false;
+            return true;
         }
         if ($e instanceof ValidationExceptionInterface) {
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**
-     * @param ComponentContextInterface $context
+     * @param NormalizeResultContext $context
      *
      * @return bool
      */
-    protected function isNormalizeResultEnabled(ComponentContextInterface $context)
+    protected function isNormalizeResultEnabled(NormalizeResultContext $context)
     {
         return !$context->getLastGroup();
     }
@@ -181,11 +202,11 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
      * Executes processors from the "normalize_result" group.
      * These processors are intended to prepare valid response, regardless whether an error occurred or not.
      *
-     * @param ComponentContextInterface $context
+     * @param NormalizeResultContext $context
      *
      * @throws \Exception if some processor throws an exception
      */
-    protected function executeNormalizeResultProcessors(ComponentContextInterface $context)
+    protected function executeNormalizeResultProcessors(NormalizeResultContext $context)
     {
         $context->setFirstGroup(self::NORMALIZE_RESULT_GROUP);
         $processors = $this->processorBag->getProcessors($context);
@@ -207,44 +228,111 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
     }
 
     /**
-     * @param Error[] $errors
-     *
-     * @return \Exception
-     */
-    protected function buildErrorException(array $errors)
-    {
-        /** @var Error $firstError */
-        $firstError = reset($errors);
-        $exception = $firstError->getInnerException();
-        if (null === $exception) {
-            $exceptionMessage = sprintf('An unexpected error occurred: %s.', $firstError->getTitle());
-            $detail = $firstError->getDetail();
-            if ($detail) {
-                $exceptionMessage .= ' ' . $detail;
-            }
-            $exception = new RuntimeException($exceptionMessage);
-        }
-
-        return $exception;
-    }
-
-    /**
-     * @param ComponentContextInterface $context
+     * @param NormalizeResultContext $context
      *
      * @return array
      */
-    protected function getLogContext(ComponentContextInterface $context)
+    protected function getLogContext(NormalizeResultContext $context): array
     {
-        $result = ['action' => $context->getAction()];
-        if ($context instanceof ApiContext) {
-            $result['requestType'] = (string)$context->getRequestType();
-            $result['version'] = $context->getVersion();
-        }
+        $result = [
+            'action'      => $context->getAction(),
+            'requestType' => (string)$context->getRequestType(),
+            'version'     => $context->getVersion()
+        ];
         if ($context instanceof Context) {
             $result['class'] = $context->getClassName();
         }
         if ($context instanceof SingleItemContext) {
             $result['id'] = $context->getId();
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param Error[] $errors
+     *
+     * @return array
+     */
+    private function getErrorsForLog(array $errors): array
+    {
+        return array_map(
+            function (Error $error) {
+                return $this->getErrorForLog($error);
+            },
+            $errors
+        );
+    }
+
+    /**
+     * @param Error $error
+     *
+     * @return array
+     */
+    private function getErrorForLog(Error $error): array
+    {
+        $result = [];
+        $title = $this->getErrorTextPropertyForLog($error->getTitle());
+        if ($title) {
+            $result['title'] = $title;
+        }
+        $detail = $this->getErrorTextPropertyForLog($error->getDetail());
+        if ($detail) {
+            $result['detail'] = $detail;
+        }
+        $statusCode = $error->getStatusCode();
+        if ($statusCode) {
+            $result['statusCode'] = $statusCode;
+        }
+        $code = $error->getCode();
+        if ($code) {
+            $result['code'] = $code;
+        }
+        $exception = $error->getInnerException();
+        if (null !== $exception) {
+            $result['exception'] = sprintf('%s: %s', get_class($exception), $exception->getMessage());
+        }
+        $source = $error->getSource();
+        if (null !== $source) {
+            $result = array_merge($result, $this->getErrorSourceForLog($source));
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string|Label|null $value
+     *
+     * @return string|null
+     */
+    private function getErrorTextPropertyForLog($value): ?string
+    {
+        if ($value instanceof Label) {
+            $value = $value->getName();
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param ErrorSource $errorSource
+     *
+     * @return array
+     */
+    private function getErrorSourceForLog(ErrorSource $errorSource): array
+    {
+        $result = [];
+        $parameter = $errorSource->getParameter();
+        if ($parameter) {
+            $result['source.parameter'] = $parameter;
+        }
+        $pointer = $errorSource->getPointer();
+        if ($pointer) {
+            $result['source.pointer'] = $pointer;
+        }
+        $propertyPath = $errorSource->getPropertyPath();
+        if ($propertyPath) {
+            $result['source.propertyPath'] = $propertyPath;
         }
 
         return $result;

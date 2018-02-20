@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\GridParams;
 
-use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 
 /**
  * @TODO: should be refactored in BAP-6849
@@ -16,7 +16,9 @@ class GridParamsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $config->isOrmDatasource();
+        return
+            parent::isApplicable($config)
+            && $config->isOrmDatasource();
     }
 
     /**

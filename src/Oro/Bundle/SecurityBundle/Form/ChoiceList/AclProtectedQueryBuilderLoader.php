@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\Form\ChoiceList;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\DBAL\Connection;
-
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
 {
@@ -79,6 +78,7 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
      */
     public function getEntitiesByIds($identifier, array $values)
     {
+        QueryBuilderUtil::checkIdentifier($identifier);
         $qb        = clone ($this->queryBuilder);
         $alias     = current($qb->getRootAliases());
         $parameter = 'ORMQueryBuilderLoader_getEntitiesByIds_' . $identifier;

@@ -3,12 +3,10 @@
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
 use Doctrine\DBAL\Connection;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class UpdateEntityConfigIndexFieldValueQuery implements MigrationQuery, ConnectionAwareInterface
 {

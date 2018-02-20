@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-
 use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
 use Oro\Bundle\SecurityBundle\EventListener\ControllerListener;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\TestDomainObject;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class ControllerListenerTest extends \PHPUnit_Framework_TestCase
 {

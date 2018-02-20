@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker;
+use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Component\DependencyInjection\ServiceLink;
-use Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker;
 
 class DecorateAuthorizationCheckerPass implements CompilerPassInterface
 {

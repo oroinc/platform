@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler;

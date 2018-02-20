@@ -3,9 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Handler;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Oro\Bundle\WorkflowBundle\Serializer\Handler\WorkflowResultHandler;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
+use Oro\Bundle\WorkflowBundle\Serializer\Handler\WorkflowResultHandler;
 
 class WorkflowResultHandlerTest extends \PHPUnit_Framework_TestCase
 {

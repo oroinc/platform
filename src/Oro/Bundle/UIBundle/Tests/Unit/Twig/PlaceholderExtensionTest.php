@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
+use Oro\Bundle\UIBundle\Twig\PlaceholderExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
-
-use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
-use Oro\Bundle\UIBundle\Twig\PlaceholderExtension;
-use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
 {

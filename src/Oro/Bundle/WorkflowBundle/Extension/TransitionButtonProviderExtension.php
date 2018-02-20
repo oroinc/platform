@@ -3,15 +3,13 @@
 namespace Oro\Bundle\WorkflowBundle\Extension;
 
 use Doctrine\Common\Collections\Collection;
-
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
-
+use Oro\Bundle\WorkflowBundle\Button\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
-use Oro\Bundle\WorkflowBundle\Button\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 class TransitionButtonProviderExtension extends AbstractButtonProviderExtension

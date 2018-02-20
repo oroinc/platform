@@ -8,8 +8,8 @@ use Symfony\Component\Form\DataTransformerInterface;
  * This data transformer is used to wrap all view transformers,
  * that allows Data API to correct handling of NULL and empty string values.
  * Also see the related changes:
- * @see Oro\Bundle\ApiBundle\Form\Extension\EmptyDataExtension
- * @see Oro\Bundle\ApiBundle\Form\ApiFormBuilder
+ * @see \Oro\Bundle\ApiBundle\Form\Extension\EmptyDataExtension
+ * @see \Oro\Bundle\ApiBundle\Form\ApiFormBuilder
  */
 class NullValueTransformer implements DataTransformerInterface
 {

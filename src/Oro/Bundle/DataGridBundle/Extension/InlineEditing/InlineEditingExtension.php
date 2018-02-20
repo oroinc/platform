@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
+use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class InlineEditingExtension extends AbstractExtension
 {
@@ -23,6 +23,11 @@ class InlineEditingExtension extends AbstractExtension
 
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
+
+    /** {@inheritdoc} */
+    protected $excludedModes = [
+        DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
+    ];
 
     /**
      * @param InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser
@@ -44,7 +49,9 @@ class InlineEditingExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $config->offsetGetByPath(Configuration::ENABLED_CONFIG_PATH);
+        return
+            parent::isApplicable($config)
+            && $config->offsetGetByPath(Configuration::ENABLED_CONFIG_PATH);
     }
 
     /**

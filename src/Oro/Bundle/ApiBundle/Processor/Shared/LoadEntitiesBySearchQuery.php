@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Processor\ListContext;
+use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndex;
+use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\ListContext;
-use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
-use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndex;
 
 /**
  * Loads entities using search query.

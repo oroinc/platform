@@ -3,11 +3,9 @@
 namespace Oro\Bundle\EntityConfigBundle\Datagrid;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AttributeFamilyActionsConfiguration
 {

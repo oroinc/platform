@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\UserBundle\Provider\GenderProvider;
 use Oro\Bundle\UserBundle\Model\Gender;
+use Oro\Bundle\UserBundle\Provider\GenderProvider;
 
 class GenderProviderTest extends \PHPUnit_Framework_TestCase
 {

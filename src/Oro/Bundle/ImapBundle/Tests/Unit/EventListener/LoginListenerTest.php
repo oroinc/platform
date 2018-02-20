@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\EventListener;
 
+use Oro\Bundle\ImapBundle\EventListener\LoginListener;
+use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\AbstractUserStub;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Tests\Unit\Stub\AbstractUserStub;
-use Oro\Bundle\ImapBundle\EventListener\LoginListener;
-use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
 
 class LoginListenerTest extends \PHPUnit_Framework_TestCase
 {

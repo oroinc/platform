@@ -4,10 +4,9 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
-
 use Oro\Bundle\EntityConfigBundle\Migration\RemoveManyToManyRelationQuery;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tests\Functional\Fixture\LoadExtendedRelationsData;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 

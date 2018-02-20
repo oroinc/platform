@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class HtmlTagExtension extends \Twig_Extension
 {
@@ -34,6 +33,7 @@ class HtmlTagExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFilter('oro_tag_filter', [$this, 'tagFilter'], ['is_safe' => ['all']]),
+            new \Twig_SimpleFilter('oro_attribute_name_purify', [$this, 'attributeNamePurify']),
             new \Twig_SimpleFilter('oro_html_purify', [$this, 'htmlPurify']),
             new \Twig_SimpleFilter('oro_html_sanitize', [$this, 'htmlSanitize'], ['is_safe' => ['html']]),
             new \Twig_SimpleFilter('oro_html_tag_trim', [$this, 'htmlTagTrim'], ['is_safe' => ['html']]),
@@ -48,6 +48,17 @@ class HtmlTagExtension extends \Twig_Extension
     public function tagFilter($string)
     {
         return $this->getHtmlTagHelper()->stripTags($string);
+    }
+
+    /**
+     * Remove all non alpha-numeric symbols
+     *
+     * @param string $string
+     * @return string
+     */
+    public function attributeNamePurify($string)
+    {
+        return preg_replace('/[^a-z0-9_-]+/i', '', $string);
     }
 
     /**

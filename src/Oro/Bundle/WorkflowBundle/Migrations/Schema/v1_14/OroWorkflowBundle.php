@@ -5,13 +5,11 @@ namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
-
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider;
 
 class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface

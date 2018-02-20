@@ -4,14 +4,11 @@ namespace Oro\Bundle\ActionBundle\Configuration;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Collections\Collection;
-
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\CacheBundle\Loader\ConfigurationLoader;
 use Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface;
-
 use Oro\Component\Config\Merger\ConfigurationMerger;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCacheWarmerInterface
 {

@@ -8,23 +8,22 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
+use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
-use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class CommentApiManager extends ApiEntityManager
 {
@@ -53,6 +52,9 @@ class CommentApiManager extends ApiEntityManager
 
     /** @var ConfigManager */
     protected $configManager;
+
+    /** @var HtmlTagHelper */
+    protected $htmlTagHelper;
 
     /**
      * @param Registry                      $doctrine
@@ -85,6 +87,14 @@ class CommentApiManager extends ApiEntityManager
         parent::__construct(Comment::ENTITY_NAME, $this->em);
 
         $this->setEventDispatcher($eventDispatcher);
+    }
+
+    /**
+     * @param HtmlTagHelper $htmlTagHelper
+     */
+    public function setHtmlTagHelper(HtmlTagHelper $htmlTagHelper)
+    {
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**
@@ -209,7 +219,7 @@ class CommentApiManager extends ApiEntityManager
             'owner_id'      => $ownerId,
             'editor'        => $editorName,
             'editor_id'     => $editorId,
-            'message'       => $entity->getMessage(),
+            'message'       => $this->htmlTagHelper->sanitize($entity->getMessage()),
             'relationClass' => $entityClass,
             'relationId'    => $entityId,
             'createdAt'     => $entity->getCreatedAt()->format('c'),

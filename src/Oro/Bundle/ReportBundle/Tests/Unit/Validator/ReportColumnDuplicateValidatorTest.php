@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Validator;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Validator\ReportColumnDuplicateValidator;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class ReportColumnDuplicateValidatorTest extends \PHPUnit_Framework_TestCase
 {

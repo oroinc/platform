@@ -2,10 +2,10 @@
 
 namespace Oro\Component\Action\Condition;
 
-use Oro\Component\ConfigExpression\ExpressionAssembler;
-use Oro\Component\ConfigExpression\ExpressionInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
+use Oro\Component\ConfigExpression\ExpressionAssembler;
+use Oro\Component\ConfigExpression\ExpressionInterface;
 
 class Configurable extends AbstractCondition implements ContextAccessorAwareInterface
 {

@@ -2,17 +2,14 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
-
-use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityManager;
-
-use Oro\Bundle\IntegrationBundle\Exception\LogicException;
-use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
-use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Oro\Bundle\IntegrationBundle\Exception\LogicException;
+use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class ConnectorContextMediator
 {

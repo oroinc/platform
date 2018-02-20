@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
- * Warms up API resourses and sub-resources caches.
+ * Warms up Data API resourses and sub-resources caches.
  */
 class ResourcesCacheWarmer implements CacheWarmerInterface
 {
-    /** @var EntityAliasResolver */
-    private $entityAliasResolver;
+    /** @var EntityAliasResolverRegistry */
+    private $entityAliasResolverRegistry;
 
     /** @var ResourcesProvider */
     private $resourcesProvider;
@@ -26,18 +24,18 @@ class ResourcesCacheWarmer implements CacheWarmerInterface
     private $requestTypes;
 
     /**
-     * @param EntityAliasResolver  $entityAliasResolver
-     * @param ResourcesProvider    $resourcesProvider
-     * @param SubresourcesProvider $subresourcesProvider
-     * @param array                $requestTypes
+     * @param EntityAliasResolverRegistry $entityAliasResolverRegistry
+     * @param ResourcesProvider           $resourcesProvider
+     * @param SubresourcesProvider        $subresourcesProvider
+     * @param array                       $requestTypes
      */
     public function __construct(
-        EntityAliasResolver $entityAliasResolver,
+        EntityAliasResolverRegistry $entityAliasResolverRegistry,
         ResourcesProvider $resourcesProvider,
         SubresourcesProvider $subresourcesProvider,
         array $requestTypes
     ) {
-        $this->entityAliasResolver = $entityAliasResolver;
+        $this->entityAliasResolverRegistry = $entityAliasResolverRegistry;
         $this->resourcesProvider = $resourcesProvider;
         $this->subresourcesProvider = $subresourcesProvider;
         $this->requestTypes = $requestTypes;
@@ -48,7 +46,7 @@ class ResourcesCacheWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
-        $this->entityAliasResolver->warmUpCache();
+        $this->entityAliasResolverRegistry->warmUpCache();
 
         foreach ($this->requestTypes as $requestType) {
             $requestType = new RequestType($requestType);

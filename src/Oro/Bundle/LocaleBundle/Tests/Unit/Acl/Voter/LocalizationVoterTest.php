@@ -3,14 +3,12 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Acl\Voter;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Acl\Voter\LocalizationVoter;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
-
 use Oro\Component\Testing\Unit\EntityTrait;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class LocalizationVoterTest extends \PHPUnit_Framework_TestCase
 {

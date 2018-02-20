@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig;
 
-use Symfony\Component\Form\FormView;
-
+use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
+use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
-
-use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
-use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
+use Symfony\Component\Form\FormView;
 
 class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,16 +3,16 @@ Autocomplete Form Type
 
 #### Overview
 
-Autocomplete element is based on [GenemuFormBundle](https://github.com/genemu/GenemuFormBundle) [Select2](http://ivaynberg.github.io/select2/)
+Autocomplete element is based on [Select2](http://ivaynberg.github.io/select2/)
 form type. In case when autocomplete functionality is required for static selects
-or for entity based selects generic genemu_jqueryselect2_* form types may be used. For example:
+or for entity based selects generic oro_select2_* form types may be used. For example:
 
-- genemu_jqueryselect2_choice
-- genemu_jqueryselect2_country
-- genemu_jqueryselect2_entity
+- oro_select2_choice
+- oro_select2_country
+- oro_select2_entity
 
 oro_jqueryselect2_hidden was created to add more complex support of AJAX based data sources.
-Main differences from genemu_jqueryselect2_hidden are:
+Main differences from oro_select2_hidden are:
 
 - support of configuration based autocompletition
 - selected value text is shown on entity edit form

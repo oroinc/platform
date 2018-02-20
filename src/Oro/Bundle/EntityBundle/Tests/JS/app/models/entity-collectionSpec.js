@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    var Backbone = require('backbone');
     var exposure = require('requirejs-exposure')
         .disclose('oroentity/js/app/models/entity-collection');
     var RegistryMock = require('../../Fixture/app/services/registry/registry-mock');
@@ -9,13 +8,9 @@ define(function(require) {
     var EntityCollection = require('oroentity/js/app/models/entity-collection');
 
     describe('oroentity/js/app/models/entity-collection', function() {
-        var applicant1;
-        var applicant2;
         var registryMock;
 
         beforeEach(function() {
-            applicant1 = Object.create(Backbone.Events);
-            applicant2 = Object.create(Backbone.Events);
             registryMock = new RegistryMock();
             exposure.substitute('registry').by(registryMock);
         });
@@ -97,8 +92,8 @@ define(function(require) {
             it('convert collection to JSON', function() {
                 expect(collection.toJSON()).toEqual({
                     data: [
-                        {type: 'users', id: '1'},
-                        {type: 'users', id: '2'}
+                        {type: 'users', id: '1', attributes: {name: 'John'}},
+                        {type: 'users', id: '2', attributes: {name: 'Jack'}}
                     ]
                 });
             });

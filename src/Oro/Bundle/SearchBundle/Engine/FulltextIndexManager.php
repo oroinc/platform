@@ -4,7 +4,6 @@ namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
-
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 
 class FulltextIndexManager

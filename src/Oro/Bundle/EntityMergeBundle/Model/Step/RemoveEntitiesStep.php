@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityMergeBundle\Model\Step;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 

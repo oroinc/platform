@@ -3,6 +3,7 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\ContentProvider;
 
 use Oro\Bundle\UIBundle\ContentProvider\CurrentRouteContentProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CurrentRouteContentProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,6 +13,11 @@ class CurrentRouteContentProviderTest extends \PHPUnit_Framework_TestCase
     protected $request;
 
     /**
+     * @var RequestStack
+     */
+    protected $requestStack;
+
+    /**
      * @var CurrentRouteContentProvider
      */
     protected $provider;
@@ -19,13 +25,14 @@ class CurrentRouteContentProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->request = new Request();
-        $this->provider = new CurrentRouteContentProvider();
+        $this->requestStack = new RequestStack();
+        $this->provider = new CurrentRouteContentProvider($this->requestStack);
     }
 
     public function testGetContent()
     {
         $this->request->attributes->set('_master_request_route', 'test_route');
-        $this->provider->setRequest($this->request);
+        $this->requestStack->push($this->request);
         $this->assertEquals('test_route', $this->provider->getContent());
     }
 

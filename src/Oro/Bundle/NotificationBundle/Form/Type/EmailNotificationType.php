@@ -3,18 +3,16 @@
 namespace Oro\Bundle\NotificationBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
-
+use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
+use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
+use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
+use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
-
-use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
-use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
-use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber;
 
 class EmailNotificationType extends AbstractType
 {
@@ -80,7 +78,7 @@ class EmailNotificationType extends AbstractType
 
         $builder->add(
             'event',
-            'genemu_jqueryselect2_entity',
+            'oro_select2_entity',
             [
                 'label'         => 'oro.notification.emailnotification.event.label',
                 'class'         => 'OroNotificationBundle:Event',
@@ -102,7 +100,7 @@ class EmailNotificationType extends AbstractType
 
         $builder->add(
             'template',
-            'genemu_jqueryselect2_translatable_entity',
+            'oro_select2_translatable_entity',
             [
                 'label' => 'oro.notification.emailnotification.template.label',
                 'class' => 'OroEmailBundle:EmailTemplate',

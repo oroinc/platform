@@ -4,9 +4,8 @@ namespace Oro\Bundle\EntityBundle\Tests\Functional\EventListener;
 
 use Extend\Entity\TestEntity1;
 use Extend\Entity\TestEntity2;
-
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\EntityExtendBundle\Tests\Functional\Fixture\LoadExtendedRelationsData;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EntityRelationGridListenerTest extends WebTestCase
 {

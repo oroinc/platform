@@ -2,13 +2,12 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Loader\Driver;
 
-use Symfony\Component\Filesystem\Filesystem;
-
 use Oro\Component\Layout\Exception\SyntaxException;
 use Oro\Component\Layout\Loader\Driver\YamlDriver;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
+use Symfony\Component\Filesystem\Filesystem;
 
 class YamlDriverTest extends \PHPUnit_Framework_TestCase
 {

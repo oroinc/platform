@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
@@ -12,14 +11,13 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 class NotAccessibleResourceTest extends RestJsonApiTestCase
 {
     /**
-     * @param string $action
      * @param string $method
      * @param string $route
      * @param array  $routeParameters
      *
      * @dataProvider notAccessibleResourceActionsProvider
      */
-    public function testNotAccessibleResource($action, $method, $route, array $routeParameters = [])
+    public function testNotAccessibleResource($method, $route, array $routeParameters = [])
     {
         $entityType = $this->getEntityType(EntityIdentifier::class);
 
@@ -27,7 +25,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             $method,
             $this->getUrl($route, array_merge($routeParameters, ['entity' => $entityType]))
         );
-        self::assertApiResponseStatusCodeEquals($response, 404, $entityType, $action);
+        self::assertResponseStatusCodeEquals($response, 404);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         self::assertEquals(
             [
@@ -49,42 +47,73 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
     public function notAccessibleResourceActionsProvider()
     {
         return [
-            [ApiActions::GET, 'GET', 'oro_rest_api_get', ['id' => 123]],
-            [ApiActions::GET_LIST, 'GET', 'oro_rest_api_cget'],
-            [ApiActions::UPDATE, 'PATCH', 'oro_rest_api_patch', ['id' => 123]],
-            [ApiActions::CREATE, 'POST', 'oro_rest_api_post'],
-            [ApiActions::DELETE, 'DELETE', 'oro_rest_api_delete', ['id' => 123]],
-            [ApiActions::DELETE_LIST, 'DELETE', 'oro_rest_api_cdelete'],
-            [
-                ApiActions::GET_SUBRESOURCE,
-                'GET',
-                'oro_rest_api_get_subresource',
-                ['id' => 123, 'association' => 'test']
-            ],
-            [
-                ApiActions::GET_RELATIONSHIP,
-                'GET',
-                'oro_rest_api_get_relationship',
-                ['id' => 123, 'association' => 'test']
-            ],
-            [
-                ApiActions::UPDATE_RELATIONSHIP,
-                'PATCH',
-                'oro_rest_api_patch_relationship',
-                ['id' => 123, 'association' => 'test']
-            ],
-            [
-                ApiActions::ADD_RELATIONSHIP,
-                'POST',
-                'oro_rest_api_post_relationship',
-                ['id' => 123, 'association' => 'test']
-            ],
-            [
-                ApiActions::DELETE_RELATIONSHIP,
-                'DELETE',
-                'oro_rest_api_delete_relationship',
-                ['id' => 123, 'association' => 'test']
-            ],
+            ['GET', 'oro_rest_api_item', ['id' => 123]],
+            ['GET', 'oro_rest_api_list'],
+            ['PATCH', 'oro_rest_api_item', ['id' => 123]],
+            ['POST', 'oro_rest_api_list'],
+            ['DELETE', 'oro_rest_api_item', ['id' => 123]],
+            ['DELETE', 'oro_rest_api_list'],
+            ['GET', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
+            ['GET', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
+            ['PATCH', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
+            ['POST', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
+            ['DELETE', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']]
+        ];
+    }
+
+    /**
+     * @param string $method
+     * @param string $route
+     * @param array  $routeParameters
+     *
+     * @dataProvider unknownResourceActionsProvider
+     */
+    public function testUnknownResource($method, $route, array $routeParameters = [])
+    {
+        $entityType = 'unknown_entity';
+
+        $response = $this->request(
+            $method,
+            $this->getUrl($route, array_merge($routeParameters, ['entity' => $entityType]))
+        );
+        self::assertResponseStatusCodeEquals($response, 404);
+        if ('HEAD' === $method) {
+            // the HEAD response should not have the content
+            self::assertEmpty($response->getContent());
+        }
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+    }
+
+    /**
+     * @return array
+     */
+    public function unknownResourceActionsProvider()
+    {
+        return [
+            ['HEAD', 'oro_rest_api_item', ['id' => 123]],
+            ['HEAD', 'oro_rest_api_list'],
+            ['HEAD', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
+            ['HEAD', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
+            ['OPTIONS', 'oro_rest_api_item', ['id' => 123]],
+            ['OPTIONS', 'oro_rest_api_list'],
+            ['OPTIONS', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
+            ['OPTIONS', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
+            ['GET', 'oro_rest_api_item', ['id' => 123]],
+            ['GET', 'oro_rest_api_list'],
+            ['GET', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
+            ['GET', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
+            ['POST', 'oro_rest_api_item', ['id' => 123]],
+            ['POST', 'oro_rest_api_list'],
+            ['POST', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
+            ['POST', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
+            ['PATCH', 'oro_rest_api_item', ['id' => 123]],
+            ['PATCH', 'oro_rest_api_list'],
+            ['PATCH', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
+            ['PATCH', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
+            ['DELETE', 'oro_rest_api_item', ['id' => 123]],
+            ['DELETE', 'oro_rest_api_list'],
+            ['DELETE', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
+            ['DELETE', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']]
         ];
     }
 
@@ -136,7 +165,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         );
         self::assertResponseStatusCodeEquals($response, 405);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('DELETE', $response->headers->get('Allow'));
+        self::assertEquals('POST, DELETE', $response->headers->get('Allow'));
     }
 
     public function testDisabledGetListWhenGetIsDisabled()
@@ -175,7 +204,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         );
         self::assertResponseStatusCodeEquals($response, 405);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH, DELETE', $response->headers->get('Allow'));
+        self::assertEquals('GET, DELETE', $response->headers->get('Allow'));
     }
 
     public function testDisabledCreateWhenGetIsDisabled()
@@ -214,7 +243,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         );
         self::assertResponseStatusCodeEquals($response, 405);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, POST, DELETE', $response->headers->get('Allow'));
+        self::assertEquals('GET, DELETE', $response->headers->get('Allow'));
     }
 
     public function testDisabledUpdateWhenGetIsDisabled()
@@ -253,7 +282,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         );
         self::assertResponseStatusCodeEquals($response, 405);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, POST, PATCH', $response->headers->get('Allow'));
+        self::assertEquals('GET, PATCH', $response->headers->get('Allow'));
     }
 
     public function testDisabledDeleteWhenGetIsDisabled()
@@ -292,7 +321,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         );
         self::assertResponseStatusCodeEquals($response, 405);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET', $response->headers->get('Allow'));
+        self::assertEquals('GET, POST', $response->headers->get('Allow'));
     }
 
     public function testDisabledDeleteListWhenGetIsDisabled()
@@ -588,11 +617,10 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
     public function testPostMethodForSingleItemPrimaryResourceRoute()
     {
-        self::markTestSkipped('should be fixed in BAP-16413');
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'POST',
-            $this->getUrl('oro_rest_api_get', ['entity' => $entityType, 'id' => '1'])
+            $this->getUrl('oro_rest_api_item', ['entity' => $entityType, 'id' => '1'])
         );
         self::assertResponseStatusCodeEquals($response, 405);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
@@ -601,11 +629,10 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
     public function testOptionsMethodForSingleItemPrimaryResourceRoute()
     {
-        self::markTestSkipped('should be fixed in BAP-16413');
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'OPTIONS',
-            $this->getUrl('oro_rest_api_get', ['entity' => $entityType, 'id' => '1'])
+            $this->getUrl('oro_rest_api_item', ['entity' => $entityType, 'id' => '1'])
         );
         self::assertResponseStatusCodeEquals($response, 405);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
@@ -614,11 +641,10 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
     public function testHeadMethodForSingleItemPrimaryResourceRoute()
     {
-        self::markTestSkipped('should be fixed in BAP-16413');
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'HEAD',
-            $this->getUrl('oro_rest_api_get', ['entity' => $entityType, 'id' => '1'])
+            $this->getUrl('oro_rest_api_item', ['entity' => $entityType, 'id' => '1'])
         );
         self::assertResponseStatusCodeEquals($response, 405);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
@@ -627,51 +653,47 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
     public function testPatchMethodForListPrimaryResourceRoute()
     {
-        self::markTestSkipped('should be fixed in BAP-16413');
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'PATCH',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType])
+            $this->getUrl('oro_rest_api_list', ['entity' => $entityType])
         );
         self::assertResponseStatusCodeEquals($response, 405);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, DELETE', $response->headers->get('Allow'));
+        self::assertEquals('GET, POST, DELETE', $response->headers->get('Allow'));
     }
 
     public function testOptionsMethodForListPrimaryResourceRoute()
     {
-        self::markTestSkipped('should be fixed in BAP-16413');
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'OPTIONS',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType])
+            $this->getUrl('oro_rest_api_list', ['entity' => $entityType])
         );
         self::assertResponseStatusCodeEquals($response, 405);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, DELETE', $response->headers->get('Allow'));
+        self::assertEquals('GET, POST, DELETE', $response->headers->get('Allow'));
     }
 
     public function testHeadMethodForListPrimaryResourceRoute()
     {
-        self::markTestSkipped('should be fixed in BAP-16413');
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'HEAD',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType])
+            $this->getUrl('oro_rest_api_list', ['entity' => $entityType])
         );
         self::assertResponseStatusCodeEquals($response, 405);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, DELETE', $response->headers->get('Allow'));
+        self::assertEquals('GET, POST, DELETE', $response->headers->get('Allow'));
     }
 
     public function testOptionsMethodForRelationshipRoute()
     {
-        self::markTestSkipped('should be fixed in BAP-16413');
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'OPTIONS',
             $this->getUrl(
-                'oro_rest_api_get_relationship',
+                'oro_rest_api_relationship',
                 ['entity' => $entityType, 'id' => '1', 'association' => 'staff']
             )
         );
@@ -682,12 +704,11 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
     public function testHeadMethodForRelationshipRoute()
     {
-        self::markTestSkipped('should be fixed in BAP-16413');
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'HEAD',
             $this->getUrl(
-                'oro_rest_api_get_relationship',
+                'oro_rest_api_relationship',
                 ['entity' => $entityType, 'id' => '1', 'association' => 'staff']
             )
         );
@@ -698,12 +719,11 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
     public function testPostMethodForSubresourceRoute()
     {
-        self::markTestSkipped('should be fixed in BAP-16413');
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'POST',
             $this->getUrl(
-                'oro_rest_api_get_subresource',
+                'oro_rest_api_subresource',
                 ['entity' => $entityType, 'id' => '1', 'association' => 'staff']
             )
         );
@@ -714,12 +734,11 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
     public function testPatchMethodForSubresourceRoute()
     {
-        self::markTestSkipped('should be fixed in BAP-16413');
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'PATCH',
             $this->getUrl(
-                'oro_rest_api_get_subresource',
+                'oro_rest_api_subresource',
                 ['entity' => $entityType, 'id' => '1', 'association' => 'staff']
             )
         );
@@ -730,12 +749,11 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
     public function testDeleteMethodForSubresourceRoute()
     {
-        self::markTestSkipped('should be fixed in BAP-16413');
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'DELETE',
             $this->getUrl(
-                'oro_rest_api_get_subresource',
+                'oro_rest_api_subresource',
                 ['entity' => $entityType, 'id' => '1', 'association' => 'staff']
             )
         );
@@ -746,12 +764,11 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
     public function testOptionsMethodForSubresourceRoute()
     {
-        self::markTestSkipped('should be fixed in BAP-16413');
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'OPTIONS',
             $this->getUrl(
-                'oro_rest_api_get_subresource',
+                'oro_rest_api_subresource',
                 ['entity' => $entityType, 'id' => '1', 'association' => 'staff']
             )
         );
@@ -762,12 +779,11 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
 
     public function testHeadMethodForSubresourceRoute()
     {
-        self::markTestSkipped('should be fixed in BAP-16413');
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'HEAD',
             $this->getUrl(
-                'oro_rest_api_get_subresource',
+                'oro_rest_api_subresource',
                 ['entity' => $entityType, 'id' => '1', 'association' => 'staff']
             )
         );

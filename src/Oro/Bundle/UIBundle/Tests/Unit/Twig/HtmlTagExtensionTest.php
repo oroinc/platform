@@ -50,4 +50,28 @@ EOF;
             self::callTwigFilter($this->extension, 'oro_html_tag_trim', [$html, $tags])
         );
     }
+
+    /**
+     * @dataProvider attributeDataProvider
+     * @param string $string
+     * @param string $expected
+     */
+    public function testAttributeNamePurify($string, $expected)
+    {
+        $this->assertSame(
+            $expected,
+            self::callTwigFilter($this->extension, 'oro_attribute_name_purify', [$string])
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function attributeDataProvider()
+    {
+        return [
+            [' onclick=alert(1)', 'onclickalert1'],
+            ['тест\/"\'attribute_some-123 HelloFake%20attr', 'attribute_some-123HelloFake20attr']
+        ];
+    }
 }

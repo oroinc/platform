@@ -5,9 +5,9 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\OriginSyncCredentials\NotificationSen
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender\EmailNotificationSender;
@@ -50,6 +50,9 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
         $origin = new UserEmailOrigin();
         $origin->setUser('test@example.com');
         $origin->setImapHost('example.com');
+        $mailbox = new Mailbox();
+        $mailbox->setEmail('test@example.com');
+        $origin->setMailbox($mailbox);
 
         $template = new EmailTemplate();
 
@@ -95,7 +98,7 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
                 /** @var $message \Swift_Message */
                 $this->assertEquals('subject', $message->getSubject());
                 $this->assertEquals(['sender@test.com' => 'sender name'], $message->getFrom());
-                $this->assertEquals(['sender@test.com' => null], $message->getTo());
+                $this->assertEquals(['test@example.com' => null], $message->getTo());
                 $this->assertEquals('emailData', $message->getBody());
 
                 return 1;

@@ -3,12 +3,11 @@
 namespace Oro\Bundle\EmailBundle\Processor;
 
 use Doctrine\Common\Util\ClassUtils;
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Symfony\Component\Routing\RouterInterface;
 
 class EntityRouteVariableProcessor implements VariableProcessorInterface
 {

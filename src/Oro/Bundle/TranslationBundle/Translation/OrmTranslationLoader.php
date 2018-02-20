@@ -4,13 +4,11 @@ namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-
-use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
-use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 
 class OrmTranslationLoader implements LoaderInterface
 {

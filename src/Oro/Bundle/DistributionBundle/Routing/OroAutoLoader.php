@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\DistributionBundle\Routing;
 
-use Symfony\Component\HttpKernel\KernelInterface;
-
-use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
-
 use Oro\Bundle\DistributionBundle\Event\RouteCollectionEvent;
+use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class OroAutoLoader extends AbstractLoader
 {

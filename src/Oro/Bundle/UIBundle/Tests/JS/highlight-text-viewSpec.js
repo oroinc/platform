@@ -5,7 +5,7 @@ define(function(require) {
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var HighlightTextView = require('oroui/js/app/views/highlight-text-view');
-    //fixtures
+    // fixtures
     var html = require('text!./Fixture/highlight-text-view.html');
 
     var createView = function(options) {
@@ -112,6 +112,28 @@ define(function(require) {
                 mediator.trigger(':highlight-text:update', 'Group 2.Field 2.1');
                 expect(this.view.$(this.view.findNotFoundClass).length).toEqual(0);
                 expect(this.view.$(this.view.findFoundClass).length).toEqual(0);
+            });
+        });
+
+        describe('check find text escaping special characters', function() {
+            beforeEach(function() {
+                this.view = createView({
+                    highlightSelectors: ['.settings-title', '.group', '.field'],
+                    toggleSelectors: {
+                        '.field': '.fields',
+                        '.group': '.settings-content'
+                    }
+                });
+            });
+
+            it('escaping special characters', function() {
+                mediator.trigger(':highlight-text:update', '-\\[]{}()*+?.,\\^$#');
+                expect(this.view.findText).toEqual(/\-\\\[\]\{\}\(\)\*\+\?\.\,\\\^\$\#/gi);
+            });
+
+            it('escaping mixed string', function() {
+                mediator.trigger(':highlight-text:update', 'Grou#$p 2.F\ield 2*.1');
+                expect(this.view.findText).toEqual(/Grou\#\$p 2\.Field 2\*\.1/gi);
             });
         });
     });

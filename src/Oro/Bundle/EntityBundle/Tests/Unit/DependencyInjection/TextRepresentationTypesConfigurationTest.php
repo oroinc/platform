@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Processor;
-
 use Oro\Bundle\EntityBundle\DependencyInjection\Configuration;
+use Symfony\Component\Config\Definition\Processor;
 
 class TextRepresentationTypesConfigurationTest extends \PHPUnit_Framework_TestCase
 {

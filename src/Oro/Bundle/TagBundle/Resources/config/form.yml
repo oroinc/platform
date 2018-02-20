@@ -17,16 +17,14 @@ parameters:
 services:
     oro_tag.form.tag:
         class: Symfony\Component\Form\Form
-        factory_method: createNamed
-        factory_service: form.factory
+        factory: ['@form.factory', createNamed]
         arguments: ["oro_tag_tag_form", "oro_tag_tag"]
 
     oro_tag.form.handler.tag:
         class: %oro_tag.tag.form.handler.tag.class%
-        scope: request
         arguments:
             - '@oro_tag.form.tag'
-            - '@request'
+            - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
     oro_tag.form.type.tag:
@@ -81,24 +79,21 @@ services:
 
     oro_tag.form.tag.api:
         class: Symfony\Component\Form\Form
-        factory_method: createNamed
-        factory_service: form.factory
+        factory: ['@form.factory', createNamed]
         arguments: ["oro_tag_tag_form", "oro_tag_tag", null]
 
     oro_tag.form.handler.api:
         class: %oro_tag.tag.form.handler.tag.class%
-        scope: request
         arguments:
             - '@oro_tag.form.type.tag.api'
-            - '@request'
+            - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
     oro_tag.form.handler.taggable.api:
         class: Oro\Bundle\TagBundle\Form\Handler\TagEntityApiHandler
-        scope: request
         arguments:
             - '@oro_tag.form.taggable.api'
-            - '@request'
+            - '@request_stack'
             - '@doctrine.orm.entity_manager'
             - '@oro_tag.tag.manager'
             - '@oro_tag.helper.taggable_helper'
@@ -123,24 +118,21 @@ services:
 
     oro_tag.form.taggable.api:
         class: Symfony\Component\Form\Form
-        factory_method: createNamed
-        factory_service: form.factory
+        factory: ['@form.factory', createNamed]
         arguments:
             - tags
             - 'oro_tag_standalone_collection_api'
 
     oro_tag.form.taxonomy:
         class: Symfony\Component\Form\Form
-        factory_method: createNamed
-        factory_service: form.factory
+        factory: ['@form.factory', createNamed]
         arguments: ["oro_tag_taxonomy_form", "oro_tag_taxonomy"]
 
     oro_tag.form.handler.taxonomy:
         class: %oro_tag.tag.form.handler.taxonomy.class%
-        scope: request
         arguments:
             - '@oro_tag.form.taxonomy'
-            - '@request'
+            - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
     oro_tag.form.type.taxonomy:

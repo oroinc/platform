@@ -3,13 +3,11 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
-use Oro\Bundle\ActionBundle\Model\Parameter;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
-
+use Oro\Bundle\ActionBundle\Model\Parameter;
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;

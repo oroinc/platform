@@ -15,7 +15,7 @@ class NameFormatTypeTest extends \PHPUnit_Framework_TestCase
         $nameFormatter->expects($this->once())
             ->method('getNameFormat')
             ->will($this->returnValue($format));
-        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolverInterface')
+        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->getMock();
         $resolver->expects($this->once())
             ->method('setDefaults')
@@ -24,6 +24,6 @@ class NameFormatTypeTest extends \PHPUnit_Framework_TestCase
         $type = new NameFormatType($nameFormatter);
         $this->assertEquals('text', $type->getParent());
         $this->assertEquals('oro_name_format', $type->getName());
-        $type->setDefaultOptions($resolver);
+        $type->configureOptions($resolver);
     }
 }

@@ -14,7 +14,6 @@ use Oro\Bundle\ActionBundle\Model\OperationRegistryFilterInterface;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\ActionBundle\Tests\Unit\Filter\Stub\CallbackOperationRegistryFilter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 

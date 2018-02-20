@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\CurrencyBundle\Form\Type;
 
+use Oro\Bundle\CurrencyBundle\Form\DataTransformer\PriceTransformer;
+use Oro\Bundle\CurrencyBundle\Rounding\RoundingServiceInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\CurrencyBundle\Form\DataTransformer\PriceTransformer;
-use Oro\Bundle\CurrencyBundle\Rounding\RoundingServiceInterface;
 
 class PriceType extends AbstractType
 {

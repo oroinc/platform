@@ -2,23 +2,22 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class UserController extends Controller
 {
@@ -203,14 +202,24 @@ class UserController extends Controller
     /**
      * @Route("/widget/info/{id}", name="oro_user_widget_info", requirements={"id"="\d+"})
      * @Template
-     * @AclAncestor("oro_user_user_view")
+     * @param Request $request
+     * @param User $user
+     * @return array
      */
-    public function infoAction(User $user)
+    public function infoAction(Request $request, User $user)
     {
+        $isViewProfile = (bool)$request->query->get('viewProfile', false);
+
+        if (!(($isViewProfile && $this->getUser()->getId() === $user->getId())
+            || $this->isGranted('oro_user_user_view', $user))
+        ) {
+            throw new AccessDeniedException();
+        }
+
         return array(
             'entity'      => $user,
             'userApi'     => $this->getUserApi($user),
-            'viewProfile' => (bool)$this->getRequest()->query->get('viewProfile', false)
+            'viewProfile' => $isViewProfile
         );
     }
 

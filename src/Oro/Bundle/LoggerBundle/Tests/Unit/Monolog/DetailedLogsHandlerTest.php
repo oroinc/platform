@@ -3,15 +3,12 @@
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\Monolog;
 
 use Doctrine\Common\Cache\CacheProvider;
-
 use Monolog\Handler\HandlerInterface;
 use Monolog\Logger;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
+use Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DetailedLogsHandlerTest extends \PHPUnit_Framework_TestCase
 {

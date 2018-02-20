@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\OriginSyncCredentials;
 
-use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestNotificationSender;
-use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\WrongCredentialsOriginsDriverInterface;
+use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestNotificationSender;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class SyncCredentialsIssueManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -68,9 +67,10 @@ class SyncCredentialsIssueManagerTest extends \PHPUnit_Framework_TestCase
         $this->credentialsDriver->expects($this->once())
             ->method('deleteAllOrigins');
 
-        $this->manager->processInvalidOrigins();
+        $processedOrigins = $this->manager->processInvalidOrigins();
 
         $this->assertEquals([$origin], $notificationSender->processedOrigins);
+        $this->assertEquals([$origin], $processedOrigins);
     }
 
     public function testProcessInvalidOriginsForUserWithoutPermissionToGetSystemOriginNotifications()

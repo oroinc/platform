@@ -19,7 +19,7 @@ define(function(require) {
             date_part: '.audit-filter-container [name=datetime_part]',
             value: {
                 start: '.audit-filter-container input[name="start"]',
-                end:   '.audit-filter-container input[name="end"]'
+                end: '.audit-filter-container input[name="end"]'
             }
         }),
 

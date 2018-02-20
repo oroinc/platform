@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\EmailBundle\Processor\VariableProcessorInterface;
 use Oro\Bundle\EmailBundle\Processor\VariableProcessorRegistry;
-
 use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
 use Oro\Component\DependencyInjection\ServiceLinkRegistry;
 

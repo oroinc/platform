@@ -3,13 +3,12 @@
 namespace Oro\Bundle\UserBundle\Datagrid\Extension\MassAction;
 
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\HttpFoundation\RequestStack;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
-use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class ResetPasswordExtension extends AbstractExtension
 {
@@ -17,6 +16,11 @@ class ResetPasswordExtension extends AbstractExtension
 
     /** @var RequestStack */
     protected $requestStack;
+
+    /** {@inheritdoc} */
+    protected $excludedModes = [
+        DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
+    ];
 
     /**
      * {@inheritdoc}
@@ -27,10 +31,11 @@ class ResetPasswordExtension extends AbstractExtension
         $name = $config->offsetGetOr('name', null);
 
         return
-            $name &&
-            $name === self::USERS_GRID_NAME &&
-            $request &&
-            $request->get('actionName', false) === 'reset_password';
+            parent::isApplicable($config)
+            && $name
+            && $name === self::USERS_GRID_NAME
+            && $request
+            && $request->get('actionName', false) === 'reset_password';
     }
 
     /**

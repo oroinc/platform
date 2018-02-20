@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
-
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
-use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
 
 class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
 {

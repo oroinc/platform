@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-
-use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class CurrentApplicationProviderTest extends \PHPUnit_Framework_TestCase
 {

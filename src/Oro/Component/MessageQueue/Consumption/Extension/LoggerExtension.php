@@ -2,10 +2,9 @@
 
 namespace Oro\Component\MessageQueue\Consumption\Extension;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
+use Psr\Log\LoggerInterface;
 
 class LoggerExtension extends AbstractExtension
 {

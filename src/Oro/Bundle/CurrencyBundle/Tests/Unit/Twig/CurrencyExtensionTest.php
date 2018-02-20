@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Provider\ViewTypeConfigProvider;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Utils\CurrencyNameHelperStub;
 use Oro\Bundle\CurrencyBundle\Twig\CurrencyExtension;
-use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 

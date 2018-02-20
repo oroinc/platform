@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Create\Rest;
 
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
-
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Sets the location of the newly created entity to the "Location" response header.
@@ -62,7 +61,7 @@ class SetLocationHeader implements ProcessorInterface
         );
         $entityId = $this->entityIdTransformer->transform($context->getId(), $context->getMetadata());
         $location = $this->router->generate(
-            'oro_rest_api_get',
+            'oro_rest_api_item',
             ['entity' => $entityType, 'id' => $entityId],
             UrlGeneratorInterface::ABSOLUTE_URL
         );

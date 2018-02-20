@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\OptionsResolver\Options;
-
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EntityChoiceType extends AbstractType
 {
@@ -29,7 +28,7 @@ class EntityChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $defaultConfigs = [
             'placeholder'             => 'oro.entity.form.choose_entity',
@@ -140,7 +139,7 @@ class EntityChoiceType extends AbstractType
      */
     public function getParent()
     {
-        return 'genemu_jqueryselect2_choice';
+        return 'oro_select2_choice';
     }
 
     /**

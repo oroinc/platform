@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UIBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
-
 use Twig_Environment;
 
 class BeforeViewRenderEvent extends Event

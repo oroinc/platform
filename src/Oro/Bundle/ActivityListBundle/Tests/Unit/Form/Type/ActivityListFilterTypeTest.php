@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter;
+use Oro\Bundle\ActivityListBundle\Form\Type\ActivityListFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\ConstraintViolationList;
-
-use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter;
-use Oro\Bundle\ActivityListBundle\Form\Type\ActivityListFilterType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 
 class ActivityListFilterTypeTest extends TypeTestCase
 {

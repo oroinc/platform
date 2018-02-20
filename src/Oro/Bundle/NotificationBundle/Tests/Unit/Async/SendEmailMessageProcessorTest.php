@@ -4,9 +4,6 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Async;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
@@ -17,6 +14,7 @@ use Oro\Bundle\NotificationBundle\Async\Topics;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
 
 class SendEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {

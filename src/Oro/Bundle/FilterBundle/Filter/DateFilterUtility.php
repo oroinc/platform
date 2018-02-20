@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
+use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 class DateFilterUtility

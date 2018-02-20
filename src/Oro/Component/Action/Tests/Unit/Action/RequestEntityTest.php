@@ -3,13 +3,11 @@
 namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Component\Action\Action\RequestEntity;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class RequestEntityTest extends \PHPUnit_Framework_TestCase
 {
@@ -349,7 +347,7 @@ class RequestEntityTest extends \PHPUnit_Framework_TestCase
         $queryBuilder->expects($this->once())->method('setParameter')
             ->with($expectedParameter, $expectedValue)->will($this->returnSelf());
         $queryBuilder->expects($this->once())->method('orderBy')
-            ->with($expectedOrder, trim($options['order_by']['createdDate']))->will($this->returnSelf());
+            ->with($expectedOrder, strtoupper(trim($options['order_by']['createdDate'])))->will($this->returnSelf());
         $queryBuilder->expects($this->once())->method('getQuery')->will($this->returnValue($query));
         $queryBuilder->expects($this->once())->method('setMaxResults')->with($this->equalTo(1));
 

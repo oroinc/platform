@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Block\Type;
 
-use Symfony\Component\Form\FormView;
-
-use Oro\Component\Layout\Block\Type\BaseType;
-
 use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormStartType;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
 use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\BlockTypeTestCase;
+use Oro\Component\Layout\Block\Type\BaseType;
+use Symfony\Component\Form\FormView;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)

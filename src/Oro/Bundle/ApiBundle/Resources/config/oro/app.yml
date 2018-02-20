@@ -25,7 +25,19 @@ security:
             context: main
 
 oro_api:
-    api_doc_views: ['default', 'rest_json_api', 'rest_plain']
+    api_doc_views:
+        default:
+            label: plain
+            default: true
+            html_formatter: oro_api.api_doc.formatter.html_formatter.nelmio
+        rest_json_api:
+            label: JSON.API
+            headers:
+                Content-Type: application/vnd.api+json
+            request_type: ['rest', 'json_api']
+        rest_plain:
+            request_type: ['rest']
+            sandbox: false
     documentation_path: https://www.oroinc.com/doc/orocrm/current/book/data-api
 
     config_extensions:
@@ -398,3 +410,11 @@ oro_api:
                     priority: -70
                 normalize_result:
                     priority: -80
+        not_allowed:
+            processing_groups:
+                initialize:
+                    priority: -10
+                build_response:
+                    priority: -20
+                normalize_result:
+                    priority: -30

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DirectMailerTest extends \PHPUnit_Framework_TestCase
 {

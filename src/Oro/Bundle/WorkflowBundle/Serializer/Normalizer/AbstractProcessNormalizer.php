@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
+use Doctrine\Common\Util\ClassUtils;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
+use Oro\Bundle\WorkflowBundle\Serializer\ProcessDataSerializer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
-
-use Doctrine\Common\Util\ClassUtils;
-
-use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
-use Oro\Bundle\WorkflowBundle\Serializer\ProcessDataSerializer;
 
 abstract class AbstractProcessNormalizer extends SerializerAwareNormalizer implements
     NormalizerInterface,

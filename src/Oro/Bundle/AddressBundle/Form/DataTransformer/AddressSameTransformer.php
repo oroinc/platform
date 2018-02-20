@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\AddressBundle\Form\DataTransformer;
 
+use Oro\Bundle\AddressBundle\Entity\Address;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-
-use Oro\Bundle\AddressBundle\Entity\Address;
 
 class AddressSameTransformer implements DataTransformerInterface
 {

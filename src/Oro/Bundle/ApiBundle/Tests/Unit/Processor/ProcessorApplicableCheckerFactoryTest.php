@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
-use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Bundle\ApiBundle\Processor\MatchApplicableChecker;
 use Oro\Bundle\ApiBundle\Processor\ProcessorApplicableCheckerFactory;
+use Oro\Component\ChainProcessor\ChainApplicableChecker;
 
 class ProcessorApplicableCheckerFactoryTest extends \PHPUnit_Framework_TestCase
 {

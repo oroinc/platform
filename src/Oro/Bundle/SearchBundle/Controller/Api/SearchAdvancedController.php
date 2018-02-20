@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\SearchBundle\Controller\Api;
 
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("search_advanced")
@@ -108,13 +108,15 @@ class SearchAdvancedController extends FOSRestController
      *  }
      * )
      * @AclAncestor("oro_search")
+     * @param Request $request
+     * @return Response
      */
-    public function getAction()
+    public function getAction(Request $request)
     {
         $view = new View();
 
         $result = $this->get('oro_search.index')->advancedSearch(
-            $this->getRequest()->get('query')
+            $request->get('query')
         );
 
         $dispatcher = $this->container->get('event_dispatcher');

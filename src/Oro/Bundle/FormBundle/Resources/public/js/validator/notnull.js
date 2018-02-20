@@ -1,5 +1,5 @@
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate'
-    ], function($, _, __) {
+], function($, _, __) {
     'use strict';
 
     var defaultParam = {

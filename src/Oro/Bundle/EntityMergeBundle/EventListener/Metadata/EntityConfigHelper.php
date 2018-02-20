@@ -3,9 +3,8 @@
 namespace Oro\Bundle\EntityMergeBundle\EventListener\Metadata;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class EntityConfigHelper

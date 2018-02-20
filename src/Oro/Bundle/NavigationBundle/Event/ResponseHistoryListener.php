@@ -2,22 +2,20 @@
 
 namespace Oro\Bundle\NavigationBundle\Event;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\HttpKernel\HttpKernel;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\Event\OroEventManager;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class ResponseHistoryListener
 {
@@ -78,12 +76,11 @@ class ResponseHistoryListener
             return null;
         }
 
-        /** @var EntityManager $em */
-        $em       = $this->registry->getManagerForClass($this->historyItemFQCN);
-        $request  = $event->getRequest();
+        $request = $event->getRequest();
         $response = $event->getResponse();
-        $token    = $this->tokenStorage->getToken();
-        $user     = $organization = null;
+        $token = $this->tokenStorage->getToken();
+
+        $user = null;
         if ($token instanceof TokenInterface) {
             $user = $token->getUser();
         }
@@ -93,6 +90,7 @@ class ResponseHistoryListener
             return false;
         }
 
+        $organization = null;
         if ($token instanceof OrganizationContextTokenInterface) {
             $organization = $token->getOrganizationContext();
         }
@@ -103,7 +101,9 @@ class ResponseHistoryListener
             'organization' => $organization
         ];
 
-        /** @var $historyItem  NavigationHistoryItem */
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass($this->historyItemFQCN);
+        /** @var NavigationHistoryItem $historyItem */
         $historyItem = $em->getRepository($this->historyItemFQCN)->findOneBy($postArray);
 
         if (!$historyItem) {
@@ -121,7 +121,6 @@ class ResponseHistoryListener
             $postArray['routeParameters'] = $routeParameters;
             $postArray['entityId']        = $entityId;
 
-            /** @var $historyItem \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
             $historyItem = $this->navItemFactory->createItem(
                 $this->navigationHistoryItemType,
                 $postArray

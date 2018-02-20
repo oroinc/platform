@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\PlatformBundle\Maintenance;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Lexik\Bundle\MaintenanceBundle\Drivers\DatabaseDriver;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ModeTest extends \PHPUnit_Framework_TestCase
 {

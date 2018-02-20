@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Model\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager;
 use Oro\Bundle\IntegrationBundle\Model\Action\RemoveFieldsChangesAction;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
-
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class RemoveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
 {

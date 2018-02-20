@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Functional\Controller;
 
-use Symfony\Component\DomCrawler\Form;
-use Symfony\Component\Translation\TranslatorInterface;
-
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DomCrawler\Form;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ReportDateGroupingControllerTest extends WebTestCase
 {

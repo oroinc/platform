@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_3;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Schema\Schema;
-
-use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroIntegrationBundle implements Migration, OrderedMigrationInterface
 {

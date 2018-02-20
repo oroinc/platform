@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Form\EventListener;
 
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormInterface;
-
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber;
 use Oro\Bundle\NotificationBundle\Provider\ContactInformationEmailsProvider;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormInterface;
 
 class ContactInformationEmailsSubscriberTest extends \PHPUnit_Framework_TestCase
 {

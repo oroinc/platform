@@ -3,9 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetConfig\JsonApi;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodeConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
@@ -13,6 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\JsonApi\CompleteStatusCodes;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Symfony\Component\HttpFoundation\Response;
 
 class CompleteStatusCodesTest extends ConfigProcessorTestCase
 {

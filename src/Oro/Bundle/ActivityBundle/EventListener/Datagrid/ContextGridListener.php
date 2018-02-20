@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActivityBundle\EventListener\Datagrid;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 

@@ -2,14 +2,6 @@
 
 namespace Oro\Bundle\MessageQueueBundle;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-use Oro\Component\MessageQueue\DependencyInjection\DbalTransportFactory;
-use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
-use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
-use Oro\Component\MessageQueue\Job\Topics;
-
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildDestinationMetaRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildExtensionsPass;
@@ -22,6 +14,12 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureDbalTran
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeAnnotationReaderServicesPersistentPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeLoggerServicesPersistentPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
+use Oro\Component\MessageQueue\DependencyInjection\DbalTransportFactory;
+use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
+use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
+use Oro\Component\MessageQueue\Job\Topics;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroMessageQueueBundle extends Bundle
 {

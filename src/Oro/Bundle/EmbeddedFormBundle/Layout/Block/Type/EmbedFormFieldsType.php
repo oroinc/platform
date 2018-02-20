@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type;
 
-use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\Options;
-
-use Oro\Component\Layout\Block\Type\ContainerType;
-use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\BlockInterface;
-use Oro\Component\Layout\BlockBuilderInterface;
-use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
-use Oro\Component\Layout\Block\Type\Options as LayoutOptions;
-use Oro\Component\Layout\Util\BlockUtils;
-
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\ConfigurableFormAccessorInterface;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilderInterface;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\ContainerType;
+use Oro\Component\Layout\Block\Type\Options as LayoutOptions;
+use Oro\Component\Layout\BlockBuilderInterface;
+use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Util\BlockUtils;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 
 /**
  * This block type is responsible to build the layout for a Symfony's form object.

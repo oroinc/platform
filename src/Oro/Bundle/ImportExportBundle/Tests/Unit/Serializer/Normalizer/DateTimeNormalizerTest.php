@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\ImportExport\Serializer\Normalizer;
 
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DateTimeNormalizer;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
 {

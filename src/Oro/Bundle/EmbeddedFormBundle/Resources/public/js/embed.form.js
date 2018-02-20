@@ -1,8 +1,5 @@
-/*jshint -W098*/
 var ORO = (function(ORO) {
     'use strict';
-
-    var console = window.console;
 
     var IframeEmbeddedForm = function(container, options) {
         this.container = document.getElementById(container);

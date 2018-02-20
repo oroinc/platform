@@ -7,10 +7,10 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class DatabaseHelper
 {
@@ -98,7 +98,7 @@ class DatabaseHelper
 
         $storageKey = $this->getStorageKey($serializationCriteria);
 
-        if (empty($this->entities[$entityName]) || empty($this->entities[$entityName][$storageKey])) {
+        if (empty($this->entities[$entityName]) || !array_key_exists($storageKey, $this->entities[$entityName])) {
             /** @var EntityRepository $entityRepository */
             $entityRepository = $this->doctrineHelper->getEntityRepository($entityName);
             $queryBuilder = $entityRepository->createQueryBuilder('e')
@@ -107,6 +107,7 @@ class DatabaseHelper
                 ->setMaxResults(1);
 
             if ($this->shouldBeAddedOrganizationLimits($entityName)) {
+                /** @var OwnershipMetadataProvider $ownershipMetadataProvider */
                 $ownershipMetadataProvider = $this->ownershipMetadataProviderLink->getService();
                 $organizationField = $ownershipMetadataProvider->getMetadata($entityName)->getOrganizationFieldName();
                 $queryBuilder->andWhere('e.' . $organizationField . ' = :organization')
@@ -205,6 +206,7 @@ class DatabaseHelper
      */
     protected function getStorageKey(array $criteria = [])
     {
+        ksort($criteria);
         return serialize($criteria);
     }
 

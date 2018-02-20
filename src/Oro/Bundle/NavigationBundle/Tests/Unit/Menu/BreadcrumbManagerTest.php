@@ -5,11 +5,9 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 use Knp\Menu\Matcher\Matcher;
 use Knp\Menu\MenuFactory;
 use Knp\Menu\MenuItem;
-
-use Symfony\Component\Routing\Router;
-
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
+use Symfony\Component\Routing\Router;
 
 class BreadcrumbManagerTest extends \PHPUnit_Framework_TestCase
 {

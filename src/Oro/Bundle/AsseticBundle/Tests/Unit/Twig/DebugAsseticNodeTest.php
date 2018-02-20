@@ -1,10 +1,9 @@
 <?php
 namespace Oro\Bundle\AsseticBundle\Tests\Unit\Twig;
 
-use Assetic\Asset\FileAsset;
 use Assetic\Asset\AssetCollection;
 use Assetic\Asset\AssetInterface;
-
+use Assetic\Asset\FileAsset;
 use Oro\Bundle\AsseticBundle\Twig\DebugAsseticNode;
 
 class DebugAsseticNodeTest extends \PHPUnit_Framework_TestCase

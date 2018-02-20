@@ -18,7 +18,8 @@ class DebugConditionCommand extends AbstractDebugCommand
         $this->setName(self::COMMAND_NAME)
             ->setDescription('Displays current "conditions" for an application')
             ->addArgument(self::ARGUMENT_NAME, InputArgument::OPTIONAL, 'A condition name')
-            ->setHelp(<<<EOF
+            ->setHelp(
+                <<<EOF
 The <info>%command.name%</info> displays list of all conditions with full description:
 
   <info>php %command.full_name%</info>

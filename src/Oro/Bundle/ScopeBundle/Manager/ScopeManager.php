@@ -8,7 +8,6 @@ use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\ScopeBundle\Entity\Repository\ScopeRepository;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
-
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
@@ -46,7 +45,7 @@ class ScopeManager
 
     /**
      * @param ScopeEntityStorage $entityStorage
-     * @param ServiceLink        $entityFieldProviderLink
+     * @param ServiceLink $entityFieldProviderLink
      */
     public function __construct(ScopeEntityStorage $entityStorage, ServiceLink $entityFieldProviderLink)
     {
@@ -158,10 +157,9 @@ class ScopeManager
      */
     public function findOrCreate($scopeType, $context = null, $flush = true)
     {
-        $criteria = $this->getCriteria($scopeType, $context);
-
         $scope = $this->find($scopeType, $context);
         if (!$scope) {
+            $criteria = $this->getCriteria($scopeType, $context);
             $scope = $this->createScopeByCriteria($criteria, $flush);
         }
 
@@ -280,7 +278,7 @@ class ScopeManager
             ->toArray();
 
         foreach ($scopeCriteriaContext as $field => $value) {
-            if (null !== $value && $criteriaContext[$field] != $value) {
+            if (null !== $value && $criteriaContext[$field] !== $value) {
                 return false;
             }
         }

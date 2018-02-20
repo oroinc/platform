@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\TranslationBundle\Form\Type;
 
-use Symfony\Component\Intl\Intl;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Intl\Intl;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class AddLanguageType extends AbstractType
 {

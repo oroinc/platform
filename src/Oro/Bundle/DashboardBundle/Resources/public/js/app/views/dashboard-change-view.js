@@ -9,7 +9,7 @@ define(function(require) {
 
     DashboardChangeView = BaseView.extend({
         events: {
-            'change': 'onChange'
+            change: 'onChange'
         },
 
         onChange: function(e) {

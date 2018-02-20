@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtension;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionInterface;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionWrapper;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ResettableExtensionWrapperTest extends \PHPUnit_Framework_TestCase
 {

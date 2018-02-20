@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Processor\VariableProcessorRegistry;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEntityForVariableProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class EmailRendererTest extends \PHPUnit_Framework_TestCase
 {

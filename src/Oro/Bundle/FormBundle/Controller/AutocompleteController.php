@@ -2,18 +2,17 @@
 
 namespace Oro\Bundle\FormBundle\Controller;
 
+use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
+use Oro\Bundle\FormBundle\Autocomplete\Security;
+use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
-use Oro\Bundle\FormBundle\Autocomplete\Security;
-use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 
 /**
  * @Route("/autocomplete")

@@ -9,7 +9,7 @@ define([
     var BookmarkItemView;
 
     BookmarkItemView = BaseView.extend({
-        tagName:  'li',
+        tagName: 'li',
 
         events: {
             'click .btn-close': 'toRemove',
