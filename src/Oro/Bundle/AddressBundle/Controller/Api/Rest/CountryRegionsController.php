@@ -2,21 +2,16 @@
 
 namespace Oro\Bundle\AddressBundle\Controller\Api\Rest;
 
-use Symfony\Component\HttpFoundation\Response;
-
 use Doctrine\ORM\Query;
-
-use FOS\RestBundle\Util\Codes;
-use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
-
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("country/regions")

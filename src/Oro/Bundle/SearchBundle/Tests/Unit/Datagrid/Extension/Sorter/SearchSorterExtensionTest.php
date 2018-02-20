@@ -8,8 +8,8 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
-use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\Sorter\SearchSorterExtension;
+use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
 class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
 {

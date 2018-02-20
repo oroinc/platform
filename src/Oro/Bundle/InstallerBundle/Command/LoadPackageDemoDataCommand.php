@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-
 use Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand;
 use Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class LoadPackageDemoDataCommand extends LoadDataFixturesCommand
 {

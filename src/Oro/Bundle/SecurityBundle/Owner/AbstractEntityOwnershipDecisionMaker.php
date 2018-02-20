@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
-use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
-use Symfony\Component\Security\Acl\Util\ClassUtils;
-
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
-use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
+use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
  * This class implements AccessLevelOwnershipDecisionMakerInterface interface and allows to make ownership related

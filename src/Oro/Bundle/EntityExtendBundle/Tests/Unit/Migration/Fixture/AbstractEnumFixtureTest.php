@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Fixture;
 
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\EntityExtendBundle\Migration\Fixture\AbstractEnumFixture;
 
 class AbstractEnumFixtureTest extends \PHPUnit_Framework_TestCase

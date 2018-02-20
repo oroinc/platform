@@ -3,15 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-
+use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Validator\Validation;
-
-use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
-use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class ChangeRelationshipTestCase extends \PHPUnit_Framework_TestCase
 {

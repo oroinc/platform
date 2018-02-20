@@ -2,9 +2,8 @@
 
 namespace Oro\Component\ConfigExpression;
 
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
 use Oro\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class ContextAccessor implements ContextAccessorInterface
 {

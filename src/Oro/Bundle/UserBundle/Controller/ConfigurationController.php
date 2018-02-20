@@ -84,7 +84,7 @@ class ConfigurationController extends Controller
 
             if ($this->get('oro_config.form.handler.config')
                 ->setConfigManager($manager)
-                ->process($form, $this->getRequest())
+                ->process($form, $this->get('request_stack')->getCurrentRequest())
             ) {
                 $this->get('session')->getFlashBag()->add(
                     'success',

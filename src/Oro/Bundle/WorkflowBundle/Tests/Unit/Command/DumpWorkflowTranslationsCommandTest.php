@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Command;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-
 use Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
 {

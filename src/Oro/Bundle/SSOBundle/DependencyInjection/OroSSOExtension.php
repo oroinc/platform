@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\SSOBundle\DependencyInjection;
 
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-
-use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 
 class OroSSOExtension extends Extension implements PrependExtensionInterface
 {

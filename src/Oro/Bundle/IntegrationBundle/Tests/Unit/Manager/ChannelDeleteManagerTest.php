@@ -3,10 +3,8 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Manager;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\DeleteManager;
-
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestIntegrationDeleteProvider;
 
 class ChannelDeleteManagerTest extends \PHPUnit_Framework_TestCase

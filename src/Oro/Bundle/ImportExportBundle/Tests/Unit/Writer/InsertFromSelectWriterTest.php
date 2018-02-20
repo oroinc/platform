@@ -4,7 +4,6 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor;
 use Oro\Bundle\ImportExportBundle\Writer\AbstractNativeQueryWriter;
 use Oro\Bundle\ImportExportBundle\Writer\InsertFromSelectWriter;

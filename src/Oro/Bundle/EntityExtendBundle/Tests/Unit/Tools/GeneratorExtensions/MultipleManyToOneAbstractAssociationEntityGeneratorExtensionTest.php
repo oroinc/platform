@@ -4,10 +4,9 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\GeneratorExtensions;
 
 use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
 
 class MultipleManyToOneAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
 {

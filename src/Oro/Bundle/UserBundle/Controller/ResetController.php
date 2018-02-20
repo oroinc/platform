@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\UserBundle\Entity\User;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-
-use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 class ResetController extends Controller
 {
@@ -238,14 +236,17 @@ class ResetController extends Controller
      * @Method({"GET", "POST"})
      * @Route("/set-password/{id}", name="oro_user_reset_set_password", requirements={"id"="\d+"})
      * @Template("OroUserBundle:Reset/dialog:update.html.twig")
+     * @param Request $request
+     * @param User $entity
+     * @return array
      */
-    public function setPasswordAction(User $entity)
+    public function setPasswordAction(Request $request, User $entity)
     {
         $entityRoutingHelper = $this->getEntityRoutingHelper();
 
         $formAction = $entityRoutingHelper->generateUrlByRequest(
             'oro_user_reset_set_password',
-            $this->getRequest(),
+            $request,
             ['id' => $entity->getId()]
         );
 

@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authorization;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Oro\Component\DependencyInjection\ServiceLink;
-use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AuthorizationCheckerTest extends \PHPUnit_Framework_TestCase
 {

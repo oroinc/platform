@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class AbstractDynamicFieldsExtension extends \Twig_Extension
 {

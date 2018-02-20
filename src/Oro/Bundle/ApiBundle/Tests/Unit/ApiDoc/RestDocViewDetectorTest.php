@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-
 use Oro\Bundle\ApiBundle\ApiDoc\RequestTypeProviderInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class RestDocViewDetectorTest extends \PHPUnit_Framework_TestCase
 {

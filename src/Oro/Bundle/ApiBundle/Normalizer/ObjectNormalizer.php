@@ -3,14 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Normalizer;
 
 use Doctrine\Common\Util\ClassUtils;
-
-use Oro\Component\EntitySerializer\ConfigUtil;
-use Oro\Component\EntitySerializer\DataAccessorInterface;
-use Oro\Component\EntitySerializer\DataNormalizer;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Component\EntitySerializer\ConfigUtil;
+use Oro\Component\EntitySerializer\DataAccessorInterface;
+use Oro\Component\EntitySerializer\DataNormalizer;
 use Oro\Component\EntitySerializer\SerializationHelper;
 
 class ObjectNormalizer

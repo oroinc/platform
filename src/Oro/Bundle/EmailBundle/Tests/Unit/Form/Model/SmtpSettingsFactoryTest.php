@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Model;
 
+use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory;
 use Symfony\Component\HttpFoundation\Request;
-
-use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 
 class SmtpSettingsFactoryTest extends \PHPUnit_Framework_TestCase
 {

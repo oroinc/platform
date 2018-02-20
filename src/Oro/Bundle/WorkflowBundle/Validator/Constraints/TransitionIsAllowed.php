@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Symfony\Component\Validator\Constraint;
 
 class TransitionIsAllowed extends Constraint
 {

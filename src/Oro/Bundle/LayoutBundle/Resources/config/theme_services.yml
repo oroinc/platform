@@ -63,8 +63,8 @@ services:
 
     oro_layout.layout_context_configurator.theme:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\ThemeContextConfigurator
-        calls:
-            - [setRequest, ["@?request="]]
+        arguments:
+            - '@request_stack'
         tags:
             - { name: layout.context_configurator, priority: -100 }
 

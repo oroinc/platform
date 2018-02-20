@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\MaintenanceExtension;
 use Oro\Bundle\PlatformBundle\Maintenance\Mode;
 use Oro\Component\MessageQueue\Consumption\Context;
+use Psr\Log\LoggerInterface;
 
 class MaintenanceExtensionTest extends \PHPUnit_Framework_TestCase
 {

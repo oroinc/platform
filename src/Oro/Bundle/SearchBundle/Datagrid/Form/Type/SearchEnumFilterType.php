@@ -4,8 +4,8 @@ namespace Oro\Bundle\SearchBundle\Datagrid\Form\Type;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SearchEnumFilterType extends AbstractType
 {

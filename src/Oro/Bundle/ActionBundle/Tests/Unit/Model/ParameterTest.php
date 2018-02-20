@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Model\Parameter;
-
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 class ParameterTest extends \PHPUnit_Framework_TestCase

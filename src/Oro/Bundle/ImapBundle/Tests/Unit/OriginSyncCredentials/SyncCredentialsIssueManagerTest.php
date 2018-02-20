@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\OriginSyncCredentials;
 
-use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestNotificationSender;
-use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\WrongCredentialsOriginsDriverInterface;
+use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestNotificationSender;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class SyncCredentialsIssueManagerTest extends \PHPUnit_Framework_TestCase
 {

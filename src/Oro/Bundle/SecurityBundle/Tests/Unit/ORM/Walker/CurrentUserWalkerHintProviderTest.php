@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalkerHintProvider;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class CurrentUserWalkerHintProviderTest extends \PHPUnit_Framework_TestCase
 {

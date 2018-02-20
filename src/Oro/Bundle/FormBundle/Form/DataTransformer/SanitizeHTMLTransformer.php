@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
+use Oro\Bundle\FormBundle\Form\Converter\TagDefinitionConverter;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\DataTransformerInterface;
-
-use Oro\Bundle\FormBundle\Form\Converter\TagDefinitionConverter;
 
 class SanitizeHTMLTransformer implements DataTransformerInterface
 {

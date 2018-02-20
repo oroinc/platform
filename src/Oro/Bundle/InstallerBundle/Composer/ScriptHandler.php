@@ -3,9 +3,7 @@
 namespace Oro\Bundle\InstallerBundle\Composer;
 
 use Composer\Script\Event;
-
 use Sensio\Bundle\DistributionBundle\Composer\ScriptHandler as SensioScriptHandler;
-
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Yaml;

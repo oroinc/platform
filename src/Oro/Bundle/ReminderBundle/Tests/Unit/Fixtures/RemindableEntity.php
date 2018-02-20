@@ -4,7 +4,6 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Fixtures;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-
 use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
 use Oro\Bundle\ReminderBundle\Model\ReminderData;
 use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;

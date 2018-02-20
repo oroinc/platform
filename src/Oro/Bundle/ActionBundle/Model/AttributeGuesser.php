@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
-
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 class AttributeGuesser extends AbstractGuesser
 {

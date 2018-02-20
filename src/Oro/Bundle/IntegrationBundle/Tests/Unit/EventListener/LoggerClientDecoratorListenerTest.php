@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\EventListener;
 
-use Psr\Log\LoggerInterface;
-
-use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
-use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\RestTransportSettingsInterface;
 use Oro\Bundle\IntegrationBundle\Event\ClientCreatedAfterEvent;
 use Oro\Bundle\IntegrationBundle\EventListener\LoggerClientDecoratorListener;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator\LoggerClientDecorator;
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\RestTransportSettingsInterface;
+use Psr\Log\LoggerInterface;
 
 class LoggerClientDecoratorListenerTest extends \PHPUnit_Framework_TestCase
 {

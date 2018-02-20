@@ -3,7 +3,6 @@
 namespace Oro\Component\Action\Tests\Unit\Action\Stub;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
 class ArrayCondition extends ArrayCollection implements ExpressionInterface

@@ -1,8 +1,6 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
@@ -10,10 +8,11 @@ use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
 
 class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {

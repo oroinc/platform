@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Api\Processor\GetList;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection;
 use Oro\Bundle\ConfigBundle\Api\Processor\GetList\LoadConfigurationSections;
 use Oro\Bundle\ConfigBundle\Api\Processor\GetScope;
 use Oro\Bundle\ConfigBundle\Api\Repository\ConfigurationRepository;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class LoadConfigurationSectionsTest extends GetListProcessorTestCase
 {

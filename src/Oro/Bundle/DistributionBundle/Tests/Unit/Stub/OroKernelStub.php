@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Stub;
 
-use Symfony\Component\Config\Loader\LoaderInterface;
-
 use Oro\Bundle\DistributionBundle\OroKernel;
+use Symfony\Component\Config\Loader\LoaderInterface;
 
 class OroKernelStub extends OroKernel
 {

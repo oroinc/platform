@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
-use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Form\FormBuilder;
-
 use Oro\Bundle\ApiBundle\Form\DataTransformer\NullTransformer;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\NullValueTransformer;
+use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\FormBuilder;
 
 class ApiFormBuilder extends FormBuilder
 {

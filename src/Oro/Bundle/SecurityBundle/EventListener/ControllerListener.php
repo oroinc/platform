@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
+use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
 use Psr\Log\LoggerInterface;
-
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
-use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
 
 class ControllerListener
 {

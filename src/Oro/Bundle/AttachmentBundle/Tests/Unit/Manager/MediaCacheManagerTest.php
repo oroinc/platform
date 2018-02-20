@@ -5,12 +5,9 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 use Gaufrette\Filesystem;
 use Gaufrette\Stream;
 use Gaufrette\StreamMode;
-
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
-
-use Prophecy\Argument;
-
 use Oro\Bundle\AttachmentBundle\Manager\MediaCacheManager;
+use Prophecy\Argument;
 
 class MediaCacheManagerTest extends \PHPUnit_Framework_TestCase
 {

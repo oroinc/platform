@@ -4,13 +4,12 @@ namespace Oro\Bundle\EntityConfigBundle\Config;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
-
-use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper as ToolConfigHelper;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
  * IMPORTANT: A performance of this class is very crucial, be careful during a refactoring.

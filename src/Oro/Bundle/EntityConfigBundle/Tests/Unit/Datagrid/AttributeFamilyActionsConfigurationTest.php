@@ -3,13 +3,11 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Datagrid;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Datagrid\AttributeFamilyActionsConfiguration;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AttributeFamilyActionsConfigurationTest extends \PHPUnit_Framework_TestCase
 {

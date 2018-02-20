@@ -27,7 +27,7 @@ class OroDurationTypeTest extends FormIntegrationTestCase
         $this->assertEquals('text', $this->type->getParent());
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $expectedOptions = [
             'tooltip' => 'oro.form.oro_duration.tooltip',
@@ -58,6 +58,9 @@ class OroDurationTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expected, $data);
     }
 
+    /**
+     * @return array
+     */
     public function submitDataProvider()
     {
         return [
@@ -83,20 +86,5 @@ class OroDurationTypeTest extends FormIntegrationTestCase
         $errors = $form->getErrors();
 
         $this->assertCount(1, $errors);
-    }
-
-    public function testConfigureOptions()
-    {
-        $expectedOptions = [
-            'tooltip' => 'test',
-        ];
-
-        $form = $this->factory->create($this->type, null, $expectedOptions);
-
-        $options = $form->getConfig()->getOptions();
-        foreach ($expectedOptions as $name => $expectedValue) {
-            $this->assertArrayHasKey($name, $options);
-            $this->assertEquals($expectedValue, $options[$name]);
-        }
     }
 }

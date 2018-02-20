@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Board;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager;
 

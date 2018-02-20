@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Component\EntitySerializer\EntitySerializer;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaProperty;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadNestedAssociation as BaseLoadNestedAssociation;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
@@ -11,6 +10,7 @@ use Oro\Bundle\ApiBundle\Provider\EntityTitleProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
+use Oro\Component\EntitySerializer\EntitySerializer;
 
 /**
  * Loads nested association data using the EntitySerializer component

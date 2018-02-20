@@ -4,7 +4,6 @@ namespace Oro\Bundle\BatchBundle\ORM\QueryBuilder;
 
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Component\DoctrineUtils\ORM\DqlUtil;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 

@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Async\Export;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-
+use Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor;
+use Oro\Bundle\DataGridBundle\Async\Topics;
+use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
+use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -16,13 +16,10 @@ use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-
-use Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor;
-use Oro\Bundle\DataGridBundle\Async\Topics;
-use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
-use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
-use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {

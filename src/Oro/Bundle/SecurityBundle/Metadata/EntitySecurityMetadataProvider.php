@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\SecurityBundle\Metadata;
 
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\SecurityBundle\Event\LoadFieldsMetadata;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class EntitySecurityMetadataProvider
 {

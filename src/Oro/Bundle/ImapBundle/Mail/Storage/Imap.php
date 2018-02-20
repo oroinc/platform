@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
-use Zend\Mail\Storage\Exception as BaseException;
-
 use Oro\Bundle\ImapBundle\Exception\InvalidCredentialsException;
 use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
-use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
+use Zend\Mail\Storage\Exception as BaseException;
 
 /**
  * Class Imap

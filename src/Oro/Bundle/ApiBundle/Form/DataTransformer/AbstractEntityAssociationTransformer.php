@@ -4,12 +4,10 @@ namespace Oro\Bundle\ApiBundle\Form\DataTransformer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\ORMException;
-
-use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Form\Exception\TransformationFailedException;
-
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
+use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
 abstract class AbstractEntityAssociationTransformer implements DataTransformerInterface
 {

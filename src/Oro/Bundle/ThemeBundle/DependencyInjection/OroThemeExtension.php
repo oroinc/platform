@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ThemeBundle\DependencyInjection;
 
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroThemeExtension extends Extension
 {

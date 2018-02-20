@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * This extension signals (by calling the tick method) that a consumer did not fail and continue to work normally
@@ -45,7 +44,8 @@ class ConsumerHeartbeatExtension extends AbstractExtension
 
         $currentTime = new \DateTime('now', new \DateTimeZone('UTC'));
         if (!$this->lastUpdatedTime
-            || (($currentTime->getTimestamp() - $this->lastUpdatedTime->getTimestamp())/60
+            || (
+                ($currentTime->getTimestamp() - $this->lastUpdatedTime->getTimestamp())/60
                 >= $this->updateHeartbeatPeriod
             )
         ) {

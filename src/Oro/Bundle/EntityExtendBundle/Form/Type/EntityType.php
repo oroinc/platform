@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
-
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
 class EntityType extends AbstractType
 {
@@ -46,7 +45,7 @@ class EntityType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [

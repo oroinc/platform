@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Security;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
+use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\DriverFactoryInterface;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
-use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * The message queue driver factory that wraps a drive created by a specific inner factory

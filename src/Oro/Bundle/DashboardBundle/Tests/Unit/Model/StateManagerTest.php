@@ -4,7 +4,6 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\DashboardBundle\Model\StateManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 

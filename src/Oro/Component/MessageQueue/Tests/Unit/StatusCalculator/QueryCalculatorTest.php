@@ -2,10 +2,10 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\StatusCalculator;
 
-use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Checker\JobStatusChecker;
-use Oro\Component\MessageQueue\StatusCalculator\QueryCalculator;
+use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\StatusCalculator\QueryCalculator;
 
 class QueryCalculatorTest extends \PHPUnit_Framework_TestCase
 {

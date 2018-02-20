@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ThemeBundle\Command;
 
+use Oro\Bundle\ThemeBundle\Model\Theme;
+use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
-use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
-use Oro\Bundle\ThemeBundle\Model\Theme;
 
 class ThemeCommand extends ContainerAwareCommand
 {

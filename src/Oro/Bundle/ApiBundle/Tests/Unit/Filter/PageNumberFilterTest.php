@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
 use Doctrine\Common\Collections\Criteria;
-
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\PageNumberFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;

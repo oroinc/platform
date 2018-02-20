@@ -8,15 +8,14 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
-use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\Board\Configuration;
 use Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 
 class DefaultProcessor implements BoardProcessorInterface
 {

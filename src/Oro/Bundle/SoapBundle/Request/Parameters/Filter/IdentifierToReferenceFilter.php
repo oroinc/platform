@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SoapBundle\Request\Parameters\Filter;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
 
 class IdentifierToReferenceFilter implements ParameterFilterInterface
 {

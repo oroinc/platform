@@ -2,29 +2,32 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
-
-use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
-use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
+use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
+/**
+ * Adds all REST API routes to REST API Sandbox based on the current ApiDoc view and Data API configuration.
+ */
 class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 {
-    const ROUTE_GROUP = 'rest_api';
+    public const ENTITY_ATTRIBUTE        = 'entity';
+    public const ENTITY_PLACEHOLDER      = '{entity}';
+    public const ASSOCIATION_ATTRIBUTE   = 'association';
+    public const ASSOCIATION_PLACEHOLDER = '{association}';
+    public const ACTION_ATTRIBUTE        = '_action';
+    public const GROUP_OPTION            = 'group';
+    public const OVERRIDE_PATH_OPTION    = 'override_path';
 
-    const ENTITY_ATTRIBUTE        = 'entity';
-    const ENTITY_PLACEHOLDER      = '{entity}';
-    const ASSOCIATION_ATTRIBUTE   = 'association';
-    const ASSOCIATION_PLACEHOLDER = '{association}';
-    const ACTION_ATTRIBUTE        = '_action';
-    const GROUP_OPTION            = 'group';
-    const OVERRIDE_PATH_OPTION    = 'override_path';
+    /** @var string The group of routes that should be processed by this resolver */
+    private $routeGroup;
 
     /** @var RestDocViewDetector */
     private $docViewDetector;
@@ -48,24 +51,27 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     private $overrides = [];
 
     /**
+     * @param string               $routeGroup
+     * @param RestActionMapper     $actionMapper
      * @param RestDocViewDetector  $docViewDetector
      * @param ResourcesProvider    $resourcesProvider
      * @param SubresourcesProvider $subresourcesProvider
      * @param ValueNormalizer      $valueNormalizer
-     * @param RestActionMapper     $actionMapper
      */
     public function __construct(
+        string $routeGroup,
+        RestActionMapper $actionMapper,
         RestDocViewDetector $docViewDetector,
         ResourcesProvider $resourcesProvider,
         SubresourcesProvider $subresourcesProvider,
-        ValueNormalizer $valueNormalizer,
-        RestActionMapper $actionMapper
+        ValueNormalizer $valueNormalizer
     ) {
+        $this->routeGroup = $routeGroup;
+        $this->actionMapper = $actionMapper;
         $this->docViewDetector = $docViewDetector;
         $this->resourcesProvider = $resourcesProvider;
         $this->subresourcesProvider = $subresourcesProvider;
         $this->valueNormalizer = $valueNormalizer;
-        $this->actionMapper = $actionMapper;
     }
 
     /**
@@ -78,7 +84,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
             $routes->remove($routes->getName($route));
             return;
         }
-        if ($group !== self::ROUTE_GROUP
+        if ($group !== $this->routeGroup
             || $this->docViewDetector->getRequestType()->isEmpty()
         ) {
             return;

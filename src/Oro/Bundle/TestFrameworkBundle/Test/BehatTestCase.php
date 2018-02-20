@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
+use Behat\Behat\Console\Command\BehatCommand;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Behat\Behat\Console\Command\BehatCommand;
 
 abstract class BehatTestCase extends WebTestCase
 {

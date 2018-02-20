@@ -3,7 +3,6 @@
 namespace Oro\Component\Testing\Unit\Form\Type\Stub;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;

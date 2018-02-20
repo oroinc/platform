@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraints\NotNull;
-
 use Oro\Bundle\ApiBundle\Validator\Constraints\All;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 class AllTest extends \PHPUnit_Framework_TestCase
 {

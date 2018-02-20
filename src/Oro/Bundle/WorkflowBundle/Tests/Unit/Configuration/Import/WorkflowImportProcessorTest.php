@@ -3,8 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessor;
 use Oro\Bundle\WorkflowBundle\Configuration\ConfigImportProcessorInterface;
+use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessor;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowConfigurationImportException;

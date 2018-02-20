@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\QueryDesignerBundle;
 
+use Oro\Bundle\QueryDesignerBundle\DependencyInjection\Compiler\ConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-use Oro\Bundle\QueryDesignerBundle\DependencyInjection\Compiler\ConfigurationPass;
 
 class OroQueryDesignerBundle extends Bundle
 {

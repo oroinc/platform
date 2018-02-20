@@ -3,10 +3,8 @@
 namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_8;
 
 use Doctrine\DBAL\Schema\Schema;
-
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-
 use Oro\Bundle\SecurityBundle\Migrations\Schema\SetOwnershipTypeQuery;
 
 class OroIntegrationBundle implements Migration

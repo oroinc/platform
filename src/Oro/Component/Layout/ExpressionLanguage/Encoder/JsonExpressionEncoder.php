@@ -2,10 +2,9 @@
 
 namespace Oro\Component\Layout\ExpressionLanguage\Encoder;
 
-use Symfony\Component\ExpressionLanguage\ParsedExpression;
-
 use Oro\Component\Layout\Action;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 class JsonExpressionEncoder implements ExpressionEncoderInterface
 {

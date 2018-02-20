@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\DataGridBundle\Layout\Block\Type;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
-
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\AbstractContainerType;
-use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\Block\Type\Options;
+use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ImportLayoutManipulator;
 use Oro\Component\Layout\Util\BlockUtils;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class DatagridType extends AbstractContainerType
 {

@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Writer;
 
-use Akeneo\Bundle\BatchBundle\Item\ExecutionContext;
-use Psr\Log\LoggerInterface;
-
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
-
+use Akeneo\Bundle\BatchBundle\Item\ExecutionContext;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 use Oro\Bundle\IntegrationBundle\Event\WriterErrorEvent;
 use Oro\Bundle\IntegrationBundle\ImportExport\Writer\PersistentBatchWriter;
+use Psr\Log\LoggerInterface;
 
 class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
 {

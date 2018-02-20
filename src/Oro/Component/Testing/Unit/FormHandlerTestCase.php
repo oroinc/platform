@@ -2,10 +2,9 @@
 
 namespace Oro\Component\Testing\Unit;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-
-use Doctrine\Common\Persistence\ObjectManager;
 
 abstract class FormHandlerTestCase extends \PHPUnit_Framework_TestCase
 {

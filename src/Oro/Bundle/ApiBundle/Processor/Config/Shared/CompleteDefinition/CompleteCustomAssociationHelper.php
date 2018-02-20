@@ -11,6 +11,12 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
+/**
+ * The helper class to complete the configuraton of different kind of custom associations.
+ * @see \Oro\Bundle\ApiBundle\Request\DataType::isNestedObject
+ * @see \Oro\Bundle\ApiBundle\Request\DataType::isNestedAssociation
+ * @see \Oro\Bundle\ApiBundle\Request\DataType::isExtendedAssociation
+ */
 class CompleteCustomAssociationHelper
 {
     /** @var DoctrineHelper */

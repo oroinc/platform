@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SidebarBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**

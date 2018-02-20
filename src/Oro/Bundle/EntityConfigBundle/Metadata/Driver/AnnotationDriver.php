@@ -3,12 +3,9 @@
 namespace Oro\Bundle\EntityConfigBundle\Metadata\Driver;
 
 use Doctrine\Common\Annotations\Reader;
-
 use Metadata\Driver\DriverInterface;
-
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 

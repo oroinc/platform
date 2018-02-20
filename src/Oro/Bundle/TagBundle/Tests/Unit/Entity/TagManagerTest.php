@@ -3,13 +3,11 @@
 namespace Oro\Bundle\TagBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class TagManagerTest extends \PHPUnit_Framework_TestCase
 {

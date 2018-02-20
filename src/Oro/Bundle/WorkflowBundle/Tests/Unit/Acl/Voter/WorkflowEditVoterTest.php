@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Voter;
 
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
 use Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEditVoter;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class WorkflowEditVoterTest extends \PHPUnit_Framework_TestCase
 {

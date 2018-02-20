@@ -3,7 +3,6 @@
 namespace Oro\Bundle\AttachmentBundle\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
-
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;

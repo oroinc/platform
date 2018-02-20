@@ -3,10 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
-
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**

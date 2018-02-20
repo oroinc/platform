@@ -2,12 +2,10 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
-use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\ContainerType;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\BlockFactory;
 use Oro\Component\Layout\BlockInterface;
@@ -25,6 +23,7 @@ use Oro\Component\Layout\OptionValueBag;
 use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\Tests\Unit\Fixtures\AbstractExtensionStub;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class BlockFactoryTest extends LayoutTestCase
 {

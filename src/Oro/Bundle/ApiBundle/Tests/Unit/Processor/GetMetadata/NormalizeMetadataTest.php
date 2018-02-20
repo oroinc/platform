@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;

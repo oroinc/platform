@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EmailFolderTest extends \PHPUnit_Framework_TestCase
 {

@@ -9,14 +9,15 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode    = $treeBuilder->root('oro_api');
+        $rootNode = $treeBuilder->root('oro_api');
 
         $node = $rootNode->children();
+        $this->appendConfigFiles($node);
         $this->appendConfigOptions($node);
         $this->appendConfigExtensionsNode($node);
         $this->appendActionsNode($node);
@@ -32,7 +33,77 @@ class Configuration implements ConfigurationInterface
     /**
      * @param NodeBuilder $node
      */
-    protected function appendConfigOptions(NodeBuilder $node)
+    private function appendConfigFiles(NodeBuilder $node)
+    {
+        $node
+            ->arrayNode('config_files')
+                ->info('All supported Data API configuration files')
+                ->validate()
+                    ->always(function (array $value) {
+                        if (!array_key_exists('default', $value)) {
+                            $value['default'] = ['file_name' => ['api.yml']];
+                        }
+                        foreach ($value as $k1 => $v1) {
+                            $requestType1 = self::getRequestType($v1);
+                            foreach ($value as $k2 => $v2) {
+                                if ($k1 !== $k2
+                                    && self::areRequestTypesEqual($requestType1, self::getRequestType($v2))
+                                ) {
+                                    throw new \LogicException(sprintf(
+                                        'The "request_type" options for "%s" and "%s" are duplicated.',
+                                        $k1,
+                                        $k2
+                                    ));
+                                }
+                            }
+                        }
+
+                        return $value;
+                    })
+                ->end()
+                ->defaultValue(['default' => ['file_name' => ['api.yml']]])
+                ->useAttributeAsKey('name')
+                ->prototype('array')
+                    ->beforeNormalization()
+                        ->always(function (array $value) {
+                            if (!array_key_exists('file_name', $value)) {
+                                $value['file_name'] = 'api.yml';
+                            }
+
+                            return $value;
+                        })
+                    ->end()
+                    ->children()
+                        ->variableNode('file_name')
+                            ->info(
+                                'The name of a file that contain Data API resources configuration.'
+                                . ' Can contain several files, in this case all of them are merged.'
+                            )
+                            ->validate()
+                                ->ifTrue(function ($value) {
+                                    return !self::isValidConfigFileName($value);
+                                })
+                                ->thenInvalid('Should be a string or array of strings')
+                            ->end()
+                            ->validate()
+                                ->always(function ($value) {
+                                    return (array)$value;
+                                })
+                            ->end()
+                        ->end()
+                        ->arrayNode('request_type')
+                            ->info('The request type for which this file is applicable.')
+                            ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    /**
+     * @param NodeBuilder $node
+     */
+    private function appendConfigOptions(NodeBuilder $node)
     {
         $node
             ->integerNode('config_max_nesting_level')
@@ -45,7 +116,36 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->arrayNode('api_doc_views')
                 ->info('All supported ApiDoc views')
-                ->prototype('scalar')->end()
+                ->useAttributeAsKey('name')
+                ->prototype('array')
+                    ->children()
+                        ->scalarNode('label')
+                            ->info('The view label.')
+                        ->end()
+                        ->booleanNode('default')
+                            ->info('Is the given view is default.')
+                            ->defaultFalse()
+                        ->end()
+                        ->arrayNode('request_type')
+                            ->info('The request type supported by this view.')
+                            ->prototype('scalar')->end()
+                        ->end()
+                        ->scalarNode('html_formatter')
+                            ->info('The HTML formatter that should be used by this view.')
+                            ->defaultValue('oro_api.api_doc.formatter.html_formatter')
+                        ->end()
+                        ->booleanNode('sandbox')
+                            ->info('Should the sandbox have a link to this view.')
+                            ->defaultTrue()
+                        ->end()
+                        ->arrayNode('headers')
+                            ->info('Headers should be sent with request in Sandbox.')
+                            ->useAttributeAsKey('name')
+                            ->normalizeKeys(false)
+                            ->prototype('variable')->end()
+                        ->end()
+                    ->end()
+                ->end()
                 ->defaultValue(['default'])
             ->end()
             ->scalarNode('documentation_path')
@@ -57,7 +157,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @param NodeBuilder $node
      */
-    protected function appendConfigExtensionsNode(NodeBuilder $node)
+    private function appendConfigExtensionsNode(NodeBuilder $node)
     {
         $node
             ->arrayNode('config_extensions')
@@ -71,7 +171,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @param NodeBuilder $node
      */
-    protected function appendActionsNode(NodeBuilder $node)
+    private function appendActionsNode(NodeBuilder $node)
     {
         $node
             ->arrayNode('actions')
@@ -133,7 +233,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @param NodeBuilder $node
      */
-    protected function appendFiltersNode(NodeBuilder $node)
+    private function appendFiltersNode(NodeBuilder $node)
     {
         $node
             ->arrayNode('filters')
@@ -197,7 +297,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @param NodeBuilder $node
      */
-    protected function appendFormTypesNode(NodeBuilder $node)
+    private function appendFormTypesNode(NodeBuilder $node)
     {
         $node
             ->arrayNode('form_types')
@@ -211,7 +311,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @param NodeBuilder $node
      */
-    protected function appendFormTypeExtensionsNode(NodeBuilder $node)
+    private function appendFormTypeExtensionsNode(NodeBuilder $node)
     {
         $node
             ->arrayNode('form_type_extensions')
@@ -225,7 +325,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @param NodeBuilder $node
      */
-    protected function appendFormTypeGuessersNode(NodeBuilder $node)
+    private function appendFormTypeGuessersNode(NodeBuilder $node)
     {
         $node
             ->arrayNode('form_type_guessers')
@@ -239,7 +339,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @param NodeBuilder $node
      */
-    protected function appendFormTypeGuessesNode(NodeBuilder $node)
+    private function appendFormTypeGuessesNode(NodeBuilder $node)
     {
         $node
             ->arrayNode('form_type_guesses')
@@ -269,5 +369,63 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end();
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    private static function isValidConfigFileName($value)
+    {
+        $isValid = false;
+        if (is_string($value)) {
+            $isValid = ('' !== trim($value));
+        } elseif (is_array($value)) {
+            $isValid = true;
+            foreach ($value as $v) {
+                if (!is_string($v) || '' === trim($v)) {
+                    $isValid = false;
+                    break;
+                }
+            }
+        }
+
+        return $isValid;
+    }
+
+    /**
+     * @param array $requestType1
+     * @param array $requestType2
+     *
+     * @return bool
+     */
+    private static function areRequestTypesEqual(array $requestType1, array $requestType2)
+    {
+        sort($requestType1, SORT_STRING);
+        sort($requestType2, SORT_STRING);
+
+        return implode(',', $requestType1) === implode(',', $requestType2);
+    }
+
+    /**
+     * @param array $value
+     *
+     * @return string[]
+     */
+    private static function getRequestType(array $value): array
+    {
+        $requestType = null;
+        if (array_key_exists('request_type', $value)) {
+            $requestType = $value['request_type'];
+        }
+        if (null === $requestType) {
+            $requestType = '';
+        }
+        if (!is_array($requestType)) {
+            $requestType = [(string)$requestType];
+        }
+
+        return $requestType;
     }
 }

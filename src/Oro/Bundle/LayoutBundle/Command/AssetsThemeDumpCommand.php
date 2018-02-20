@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\LayoutBundle\Command;
 
+use Oro\Bundle\LayoutBundle\Assetic\LayoutResource;
 use Symfony\Bundle\AsseticBundle\Command\AbstractCommand;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-
-use Oro\Bundle\LayoutBundle\Assetic\LayoutResource;
 
 /**
  * Extends Symfony 'assetic:dump'

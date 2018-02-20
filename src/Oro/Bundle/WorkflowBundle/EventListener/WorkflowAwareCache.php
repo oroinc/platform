@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Doctrine\Common\Cache\Cache;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WorkflowAwareCache implements EventSubscriberInterface
 {

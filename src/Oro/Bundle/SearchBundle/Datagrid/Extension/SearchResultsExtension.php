@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\SearchBundle\Datagrid\Extension;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
-use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Formatter\ResultFormatter;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SearchResultsExtension extends AbstractExtension
 {

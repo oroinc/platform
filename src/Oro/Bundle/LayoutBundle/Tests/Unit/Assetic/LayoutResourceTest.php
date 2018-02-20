@@ -3,11 +3,9 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Assetic;
 
 use Oro\Bundle\LayoutBundle\Assetic\LayoutResource;
-use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
-
+use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Psr\Log\LoggerInterface;
-
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 

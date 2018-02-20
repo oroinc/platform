@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Cache;
 
-use Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer as InnerCacheWarmer;
-
 use Oro\Bundle\TranslationBundle\Cache\TranslationCacheWarmer;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
+use Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer as InnerCacheWarmer;
 
 class TranslationCacheWarmerTest extends \PHPUnit_Framework_TestCase
 {

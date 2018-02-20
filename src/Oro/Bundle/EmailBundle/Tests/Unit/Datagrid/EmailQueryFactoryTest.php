@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
@@ -13,6 +11,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class EmailQueryFactoryTest extends OrmTestCase
 {

@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Translation;
 
 use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
-
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;

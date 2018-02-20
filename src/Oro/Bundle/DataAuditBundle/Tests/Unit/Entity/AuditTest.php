@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Entity;
 
 use DateTime;
-
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\UserBundle\Entity\User;

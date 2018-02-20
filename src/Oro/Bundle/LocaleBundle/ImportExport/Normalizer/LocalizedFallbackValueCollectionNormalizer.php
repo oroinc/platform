@@ -4,7 +4,6 @@ namespace Oro\Bundle\LocaleBundle\ImportExport\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\CollectionNormalizer;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;

@@ -2,10 +2,10 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Oro\Component\MessageQueue\Checker\JobStatusChecker;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Job\RootJobStatusCalculator;
-use Oro\Component\MessageQueue\Checker\JobStatusChecker;
 use Oro\Component\MessageQueue\StatusCalculator\CollectionCalculator;
 use Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver;
 

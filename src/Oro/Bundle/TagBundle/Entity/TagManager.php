@@ -2,22 +2,20 @@
 
 namespace Oro\Bundle\TagBundle\Entity;
 
-use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\EntityManager;
-use Doctrine\Common\Util\ClassUtils;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\TagBundle\Entity\Repository\TagRepository;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

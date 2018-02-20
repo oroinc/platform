@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Processor;
 
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Processor\EntityRouteVariableProcessor;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouterInterface;
 
 class EntityRouteVariableProcessorTest extends \PHPUnit_Framework_TestCase
 {

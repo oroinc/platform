@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\TypeTestCase;
-
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetFilterType;
 use Oro\Bundle\QueryDesignerBundle\Form\Type\FilterType;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class WidgetFilterTypeTest extends TypeTestCase
 {

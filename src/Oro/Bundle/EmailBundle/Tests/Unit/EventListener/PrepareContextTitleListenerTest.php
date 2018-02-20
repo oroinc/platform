@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
-use Symfony\Component\Routing\Router;
-
-use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\EventListener\PrepareContextTitleListener;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Symfony\Component\Routing\Router;
 
 class PrepareContextTitleListenerTest extends \PHPUnit_Framework_TestCase
 {

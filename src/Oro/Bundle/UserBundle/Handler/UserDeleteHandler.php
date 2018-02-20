@@ -3,10 +3,9 @@
 namespace Oro\Bundle\UserBundle\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
+use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 
 class UserDeleteHandler extends DeleteHandler
 {

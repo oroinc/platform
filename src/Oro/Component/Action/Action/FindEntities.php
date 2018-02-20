@@ -6,13 +6,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
-
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Exception\NotManageableEntityException;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
-use Oro\Component\Action\Exception\NotManageableEntityException;
-use Oro\Component\Action\Exception\InvalidParameterException;
-use Oro\Component\ConfigExpression\ContextAccessor;
 
 class FindEntities extends AbstractAction
 {

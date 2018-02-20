@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\MigrationBundle;
 
+use Oro\Bundle\MigrationBundle\DependencyInjection\Compiler\MigrationExtensionPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-use Oro\Bundle\MigrationBundle\DependencyInjection\Compiler\MigrationExtensionPass;
 
 class OroMigrationBundle extends Bundle
 {

@@ -7,7 +7,6 @@ use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 

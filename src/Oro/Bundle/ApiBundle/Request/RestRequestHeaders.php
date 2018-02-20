@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Component\ChainProcessor\AbstractParameterBag;
+use Symfony\Component\HttpFoundation\Request;
 
 class RestRequestHeaders extends AbstractParameterBag
 {

@@ -10,95 +10,106 @@ class RequestTypeTest extends \PHPUnit_Framework_TestCase
     {
         $requestType = new RequestType([]);
 
-        $this->assertTrue($requestType->isEmpty());
+        self::assertTrue($requestType->isEmpty());
     }
 
     public function testIsEmptyForNotEmptyRequestType()
     {
         $requestType = new RequestType([RequestType::REST]);
 
-        $this->assertFalse($requestType->isEmpty());
+        self::assertFalse($requestType->isEmpty());
     }
 
     public function testClear()
     {
         $requestType = new RequestType([RequestType::REST]);
 
-        $this->assertEquals(RequestType::REST, (string)$requestType);
+        self::assertEquals(RequestType::REST, (string)$requestType);
         $requestType->clear();
-        $this->assertTrue($requestType->isEmpty());
-        $this->assertEquals('', (string)$requestType);
+        self::assertTrue($requestType->isEmpty());
+        self::assertEquals('', (string)$requestType);
     }
 
     public function testToString()
     {
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
-        $this->assertEquals(RequestType::REST . ',' . RequestType::JSON_API, (string)$requestType);
+        self::assertEquals(RequestType::REST . ',' . RequestType::JSON_API, (string)$requestType);
+        // test that internal state was not changed
+        self::assertEquals([RequestType::REST, RequestType::JSON_API], $requestType->toArray());
+    }
+
+    public function testToStringShouldSortAspectsBeforeBuildStringRepresentation()
+    {
+        $requestType = new RequestType([RequestType::JSON_API, RequestType::REST]);
+
+        self::assertEquals(RequestType::REST . ',' . RequestType::JSON_API, (string)$requestType);
+        // test that internal state was not changed
+        self::assertEquals([RequestType::JSON_API, RequestType::REST], $requestType->toArray());
     }
 
     public function testToArray()
     {
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
-        $this->assertEquals([RequestType::REST, RequestType::JSON_API], $requestType->toArray());
+        self::assertEquals([RequestType::REST, RequestType::JSON_API], $requestType->toArray());
     }
 
     public function testContains()
     {
         $requestType = new RequestType([RequestType::REST]);
 
-        $this->assertTrue($requestType->contains(RequestType::REST));
-        $this->assertFalse($requestType->contains('another'));
+        self::assertTrue($requestType->contains(RequestType::REST));
+        self::assertFalse($requestType->contains('another'));
     }
 
     public function testAdd()
     {
         $requestType = new RequestType([RequestType::REST]);
 
-        $this->assertEquals(RequestType::REST, (string)$requestType);
+        self::assertEquals(RequestType::REST, (string)$requestType);
         $requestType->add(RequestType::JSON_API);
-        $this->assertEquals(RequestType::REST . ',' . RequestType::JSON_API, (string)$requestType);
-        $this->assertEquals([RequestType::REST, RequestType::JSON_API], $requestType->toArray());
+        self::assertEquals(RequestType::REST . ',' . RequestType::JSON_API, (string)$requestType);
+        self::assertEquals([RequestType::REST, RequestType::JSON_API], $requestType->toArray());
     }
 
     public function testAddDuplicate()
     {
         $requestType = new RequestType([RequestType::REST]);
 
-        $this->assertEquals(RequestType::REST, (string)$requestType);
+        self::assertEquals(RequestType::REST, (string)$requestType);
         $requestType->add(RequestType::REST);
-        $this->assertEquals(RequestType::REST, (string)$requestType);
-        $this->assertEquals([RequestType::REST], $requestType->toArray());
+        self::assertEquals(RequestType::REST, (string)$requestType);
+        self::assertEquals([RequestType::REST], $requestType->toArray());
     }
 
     public function testRemove()
     {
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
-        $this->assertEquals(RequestType::REST . ',' . RequestType::JSON_API, (string)$requestType);
+        self::assertEquals(RequestType::REST . ',' . RequestType::JSON_API, (string)$requestType);
         $requestType->remove(RequestType::REST);
-        $this->assertEquals(RequestType::JSON_API, (string)$requestType);
-        $this->assertEquals([RequestType::JSON_API], $requestType->toArray());
+        self::assertEquals(RequestType::JSON_API, (string)$requestType);
+        self::assertEquals([RequestType::JSON_API], $requestType->toArray());
     }
 
     public function testRemoveUnknown()
     {
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
-        $this->assertEquals(RequestType::REST . ',' . RequestType::JSON_API, (string)$requestType);
+        self::assertEquals(RequestType::REST . ',' . RequestType::JSON_API, (string)$requestType);
         $requestType->remove('another');
-        $this->assertEquals(RequestType::REST . ',' . RequestType::JSON_API, (string)$requestType);
-        $this->assertEquals([RequestType::REST, RequestType::JSON_API], $requestType->toArray());
+        self::assertEquals(RequestType::REST . ',' . RequestType::JSON_API, (string)$requestType);
+        self::assertEquals([RequestType::REST, RequestType::JSON_API], $requestType->toArray());
     }
 
     public function testSet()
     {
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
-        $this->assertEquals(RequestType::REST . ',' . RequestType::JSON_API, (string)$requestType);
+        self::assertEquals(RequestType::REST . ',' . RequestType::JSON_API, (string)$requestType);
         $requestType->set(new RequestType([RequestType::REST]));
-        $this->assertEquals(RequestType::REST, (string)$requestType);
-        $this->assertEquals([RequestType::REST], $requestType->toArray());
+        self::assertEquals(RequestType::REST, (string)$requestType);
+        self::assertEquals([RequestType::REST], $requestType->toArray());
     }
 }

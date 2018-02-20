@@ -4,18 +4,16 @@ namespace Oro\Bundle\ActivityListBundle\Migration;
 
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class ActivityListMigrationQuery extends ParametrizedMigrationQuery
 {

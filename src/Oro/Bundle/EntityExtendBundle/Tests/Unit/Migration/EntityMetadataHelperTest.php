@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 
 class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase

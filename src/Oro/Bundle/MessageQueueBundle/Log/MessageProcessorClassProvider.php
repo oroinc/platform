@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Log;
 
-use ProxyManager\Proxy\ValueHolderInterface;
-
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\DelegateMessageProcessor;
 use Oro\Component\MessageQueue\Client\MessageProcessorRegistryInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
+use ProxyManager\Proxy\ValueHolderInterface;
 
 /**
  * This class can be used to extract the class name of executing message queue processor.

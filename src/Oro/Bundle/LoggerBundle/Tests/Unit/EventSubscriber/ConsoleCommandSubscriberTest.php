@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\EventSubscriber;
 
 use Monolog\Logger;
-
 use Oro\Bundle\LoggerBundle\EventSubscriber\ConsoleCommandSubscriber;
 use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Symfony\Component\Console\ConsoleEvents;

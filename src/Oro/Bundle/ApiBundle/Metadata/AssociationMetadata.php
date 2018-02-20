@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Metadata;
 
 use Oro\Component\ChainProcessor\ToArrayInterface;
 
+/**
+ * The metadata for an entity association.
+ */
 class AssociationMetadata extends PropertyMetadata implements ToArrayInterface
 {
     /** @var string */
@@ -184,7 +187,7 @@ class AssociationMetadata extends PropertyMetadata implements ToArrayInterface
     /**
      * Gets the type of the association.
      * For example "manyToOne" or "manyToMany".
-     * @see Oro\Bundle\EntityExtendBundle\Extend\RelationType
+     * @see \Oro\Bundle\EntityExtendBundle\Extend\RelationType
      *
      * @return string
      */
@@ -196,7 +199,7 @@ class AssociationMetadata extends PropertyMetadata implements ToArrayInterface
     /**
      * Sets the type of the association.
      * For example "manyToOne" or "manyToMany".
-     * @see Oro\Bundle\EntityExtendBundle\Extend\RelationType
+     * @see \Oro\Bundle\EntityExtendBundle\Extend\RelationType
      *
      * @param string $associationType
      */

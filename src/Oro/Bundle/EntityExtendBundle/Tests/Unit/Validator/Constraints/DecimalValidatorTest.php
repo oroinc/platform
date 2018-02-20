@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
-use Oro\Bundle\EntityExtendBundle\Validator\Constraints\DecimalValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\Decimal;
+use Oro\Bundle\EntityExtendBundle\Validator\Constraints\DecimalValidator;
 
 class DecimalValidatorTest extends \PHPUnit_Framework_TestCase
 {

@@ -5,15 +5,13 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
-
+use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowAwareEntities;
-
-use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 
 class WorkflowItemRepositoryTest extends WebTestCase
 {

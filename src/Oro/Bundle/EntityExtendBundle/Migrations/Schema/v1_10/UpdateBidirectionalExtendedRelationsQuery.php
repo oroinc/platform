@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_10;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Query\AbstractEntityConfigQuery;
+use Psr\Log\LoggerInterface;
 
 class UpdateBidirectionalExtendedRelationsQuery extends AbstractEntityConfigQuery
 {

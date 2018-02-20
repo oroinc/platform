@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Provider\PageData;
 
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Symfony\Component\Routing\RouterInterface;
 
 class TransitionPageDataProvider
 {

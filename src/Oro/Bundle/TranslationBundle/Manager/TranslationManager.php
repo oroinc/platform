@@ -5,7 +5,6 @@ namespace Oro\Bundle\TranslationBundle\Manager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;

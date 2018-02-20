@@ -5,9 +5,9 @@ namespace Oro\Bundle\EntityMergeBundle\Twig;
 use Oro\Bundle\EntityMergeBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
-use Oro\Bundle\EntityMergeBundle\Metadata\Metadata;
-use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use Oro\Bundle\EntityMergeBundle\Metadata\Metadata;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MergeRenderer

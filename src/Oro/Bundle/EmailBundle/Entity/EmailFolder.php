@@ -3,13 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use DateTime;
-
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
-use Doctrine\Common\Collections\ArrayCollection;
-
 use JMS\Serializer\Annotation as JMS;
-
 use Oro\Bundle\EmailBundle\Model\FolderType;
 
 /**

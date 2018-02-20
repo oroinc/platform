@@ -1,10 +1,9 @@
 <?php
 namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
-use Oro\Bundle\UserBundle\Form\Type\StatusType;
 use Oro\Bundle\UserBundle\Entity\Status;
+use Oro\Bundle\UserBundle\Form\Type\StatusType;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class StatusTypeTest extends FormIntegrationTestCase
 {

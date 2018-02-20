@@ -6,10 +6,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
-
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**

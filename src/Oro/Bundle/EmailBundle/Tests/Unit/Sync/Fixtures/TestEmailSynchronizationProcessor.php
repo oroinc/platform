@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;

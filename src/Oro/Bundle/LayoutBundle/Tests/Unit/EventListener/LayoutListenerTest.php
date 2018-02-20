@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\EventListener;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\LayoutBuilderInterface;
-use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
+use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
 use Oro\Bundle\LayoutBundle\Layout\LayoutManager;
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
-use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
-use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
+use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\LayoutBuilderInterface;
+use Oro\Component\Layout\LayoutContext;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)

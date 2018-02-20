@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
-
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\AbstractImportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler;

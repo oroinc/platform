@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\WindowsBundle\Manager;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\User\UserInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WindowsBundle\Entity\AbstractWindowsState;
 use Oro\Bundle\WindowsBundle\Entity\Repository\AbstractWindowsStateRepository;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class WindowsStateManager
 {

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\LayoutBundle\Provider;
 
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-
 use Oro\Bundle\LayoutBundle\Model\ThemeImageType;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ImageTypeProvider
 {

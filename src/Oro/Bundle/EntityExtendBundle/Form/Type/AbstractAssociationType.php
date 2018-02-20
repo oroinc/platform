@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * The abstract class for form types are used to work with entity config attributes
@@ -30,9 +29,9 @@ abstract class AbstractAssociationType extends AbstractConfigType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::setDefaultOptions($resolver);
+        parent::configureOptions($resolver);
 
         $resolver->setDefaults(
             [

@@ -3,11 +3,10 @@
 namespace Oro\Bundle\InstallerBundle\Migration;
 
 use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class UpdateTableFieldQuery extends ParametrizedMigrationQuery
 {

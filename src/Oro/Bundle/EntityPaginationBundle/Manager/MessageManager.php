@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Manager;
 
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class MessageManager
 {

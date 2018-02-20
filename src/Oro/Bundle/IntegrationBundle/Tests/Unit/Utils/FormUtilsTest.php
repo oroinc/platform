@@ -4,12 +4,11 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
-use Oro\Bundle\IntegrationBundle\Utils\FormUtils;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
-
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestConnector;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestIntegrationType;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestTwoWayConnector;
+use Oro\Bundle\IntegrationBundle\Utils\FormUtils;
 
 class FormUtilsTest extends \PHPUnit_Framework_TestCase
 {

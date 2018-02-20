@@ -18,9 +18,9 @@ class BuildListResultDocument extends BuildResultDocument
     {
         $result = $context->getResult();
         if (empty($result)) {
-            $documentBuilder->setDataCollection($result);
+            $documentBuilder->setDataCollection($result, $context->getRequestType());
         } else {
-            $documentBuilder->setDataCollection($result, $context->getMetadata());
+            $documentBuilder->setDataCollection($result, $context->getRequestType(), $context->getMetadata());
         }
     }
 }

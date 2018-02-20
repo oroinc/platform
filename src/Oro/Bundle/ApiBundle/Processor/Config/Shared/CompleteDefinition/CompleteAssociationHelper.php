@@ -14,6 +14,9 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * The helper class to complete the configuraton of different kind of ORM associations.
+ */
 class CompleteAssociationHelper
 {
     /** @var ConfigProvider */

@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\EventListener;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-
 use Oro\Bundle\NavigationBundle\EventListener\ContainerListener;
 use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
 use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 class ContainerListenerTest extends \PHPUnit_Framework_TestCase
 {

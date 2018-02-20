@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
-use Akeneo\Bundle\BatchBundle\Item\ExecutionContext;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-
+use Akeneo\Bundle\BatchBundle\Item\ExecutionContext;
+use Oro\Bundle\ImportExportBundle\Context\Context;
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
-use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
-use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
-use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\IntegrationBundle\Provider\AbstractConnector;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
+use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\TestConnector;
-
 use Psr\Log\NullLogger;
 
 class AbstractConnectorTest extends \PHPUnit_Framework_TestCase

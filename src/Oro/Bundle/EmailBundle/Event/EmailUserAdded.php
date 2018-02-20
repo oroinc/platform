@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Symfony\Component\EventDispatcher\Event;
 
 class EmailUserAdded extends Event
 {

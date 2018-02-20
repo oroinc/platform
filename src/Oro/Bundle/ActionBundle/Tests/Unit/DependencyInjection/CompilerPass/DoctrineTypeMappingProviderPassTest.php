@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\DoctrineTypeMappingProviderPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class DoctrineTypeMappingProviderPassTest extends \PHPUnit_Framework_TestCase
 {

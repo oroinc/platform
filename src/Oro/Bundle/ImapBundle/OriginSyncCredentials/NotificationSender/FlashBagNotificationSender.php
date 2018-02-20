@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender;
 
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSenderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSenderInterface;
-use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
 /**
  * Wrong credential sync email box notification sender channel that uses user flashbag messages as the channel.

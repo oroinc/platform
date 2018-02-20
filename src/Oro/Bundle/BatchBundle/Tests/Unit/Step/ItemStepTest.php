@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Step;
 
+use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Akeneo\Bundle\BatchBundle\Job\ExitStatus;
 use Oro\Bundle\BatchBundle\Step\ItemStep;
-use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 
 /**
  * Tests related to the ItemStep class

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Data;
 
-use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
-use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\Exception\OutOfBoundsException;
+use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class EntityData
 {

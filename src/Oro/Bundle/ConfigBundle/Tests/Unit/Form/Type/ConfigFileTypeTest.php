@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type;
 
-use Prophecy\Argument;
-
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\HttpFoundation\File\File as HttpFile;
-use Symfony\Component\Validator\Validation;
-
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer;
 use Oro\Bundle\ConfigBundle\Form\Type\ConfigFileType;
+use Prophecy\Argument;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\HttpFoundation\File\File as HttpFile;
+use Symfony\Component\Validator\Validation;
 
 class ConfigFileTypeTest extends FormIntegrationTestCase
 {

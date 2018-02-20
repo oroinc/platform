@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class ApplicationsUrlHelperTest extends \PHPUnit_Framework_TestCase
 {

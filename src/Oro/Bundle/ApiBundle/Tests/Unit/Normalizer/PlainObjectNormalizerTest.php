@@ -3,12 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Component\EntitySerializer\DataNormalizer;
-use Oro\Component\EntitySerializer\EntityDataTransformer;
-use Oro\Component\EntitySerializer\SerializationHelper;
 use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
@@ -16,6 +10,10 @@ use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityDataAccessor;
+use Oro\Component\EntitySerializer\DataNormalizer;
+use Oro\Component\EntitySerializer\EntityDataTransformer;
+use Oro\Component\EntitySerializer\SerializationHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 {

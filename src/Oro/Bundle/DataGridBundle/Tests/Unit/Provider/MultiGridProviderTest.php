@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Provider;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Provider\MultiGridProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class MultiGridProviderTest extends \PHPUnit_Framework_TestCase
 {

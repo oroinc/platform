@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Oro\Bundle\SearchBundle\Engine\EngineInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
@@ -12,6 +11,7 @@ use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class IndexerTest extends \PHPUnit_Framework_TestCase
 {

@@ -4,7 +4,6 @@ namespace Oro\Bundle\NoteBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 

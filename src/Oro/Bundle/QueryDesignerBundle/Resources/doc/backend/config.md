@@ -50,11 +50,11 @@ This will add an additional condition to the `applicable` attribute of the exist
 
 Grouping configuration
 ----------------------
-Currently the configuration of the grouping columns has only one attribute. It is `exclude` attribute. Using this attribute you can specify which fields cannot be used in `GROUP BY` SQL clause. By [default](../../config/oro/query_designer.yml) the following data types are not available for grouping: `text`, `array`, `object`. Here is an example of grouping configuration:
+Currently the configuration of the grouping columns has only one attribute. It is `exclude` attribute. Using this attribute you can specify which fields cannot be used in `GROUP BY` SQL clause. By [default](../../config/oro/query_designer.yml) the following data types are not available for grouping: `array`, `object`. Here is an example of grouping configuration:
 ``` yaml
 query_designer:
     grouping:
-        exclude: [{type: text}, {type: array}, {type: object}]
+        exclude: [{type: array}, {type: object}]
 ```
 Each item in the `exclude` array can have the following attributes:
 

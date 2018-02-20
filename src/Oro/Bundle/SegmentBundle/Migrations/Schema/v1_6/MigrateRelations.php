@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SegmentBundle\Migrations\Schema\v1_6;
 
 use Doctrine\DBAL\Schema\Schema;
-
 use Oro\Bundle\InstallerBundle\Migration\UpdateTableFieldQuery;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;

@@ -3,9 +3,7 @@
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\Form;
 
 use Composer\Package\Package;
-
 use Doctrine\Common\Cache\CacheProvider;
-
 use Oro\Bundle\PlatformBundle\Form\UrlGenerator;
 use Oro\Bundle\PlatformBundle\Provider\PackageProvider;
 

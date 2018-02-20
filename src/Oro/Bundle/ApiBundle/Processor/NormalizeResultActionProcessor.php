@@ -2,23 +2,21 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
-use Oro\Component\ChainProcessor\ActionProcessor;
-use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
-use Oro\Bundle\ApiBundle\Exception\ValidationExceptionInterface;
 use Oro\Bundle\ApiBundle\Exception\UnhandledErrorsException;
+use Oro\Bundle\ApiBundle\Exception\ValidationExceptionInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
+use Oro\Component\ChainProcessor\ActionProcessor;
+use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAwareInterface
 {

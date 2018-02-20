@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\SyncBundle\Authentication\Ticket;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\User\UserInterface;
-
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestStorage\TicketDigestStorageInterface;
 use Oro\Bundle\UserBundle\Security\UserProvider;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Provider for getting and validating Sync authentication tickets.

@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionFactory;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class MassActionFactoryTest extends \PHPUnit_Framework_TestCase
 {

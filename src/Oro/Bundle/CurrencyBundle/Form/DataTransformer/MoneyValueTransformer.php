@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\CurrencyBundle\Form\DataTransformer;
 
-use Symfony\Component\Form\DataTransformerInterface;
-
 use Oro\Bundle\CurrencyBundle\DoctrineExtension\Dbal\Types\MoneyValueType;
+use Symfony\Component\Form\DataTransformerInterface;
 
 /**
  * The aim of this transformer is converting value that we get from number form type to database format

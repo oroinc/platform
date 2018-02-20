@@ -3,11 +3,10 @@
 namespace Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter;
 
 use Doctrine\Common\Collections\Expr\Expression;
-
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
 class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
 {

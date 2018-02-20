@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\EventListener;
 
 use Doctrine\Common\Collections\Collection;
-
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\TestActivityScopeProvider;

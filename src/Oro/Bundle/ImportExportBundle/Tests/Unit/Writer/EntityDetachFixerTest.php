@@ -5,12 +5,10 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
-
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SearchBundle\Query;
 
 use Doctrine\Common\Collections\Expr\Expression;
-
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 

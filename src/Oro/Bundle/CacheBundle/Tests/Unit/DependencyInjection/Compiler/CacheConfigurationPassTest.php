@@ -4,15 +4,13 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Cache;
-
+use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheConfigurationPass;
+use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
+use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
-use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
-use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheConfigurationPass;
 
 class CacheConfigurationPassTest extends \PHPUnit_Framework_TestCase
 {

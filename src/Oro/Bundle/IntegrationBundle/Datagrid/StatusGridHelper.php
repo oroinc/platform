@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\IntegrationBundle\Datagrid;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\DataGridBundle\Event\BuildAfter;
-use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Oro\Bundle\DataGridBundle\Event\BuildAfter;
+use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class StatusGridHelper
 {

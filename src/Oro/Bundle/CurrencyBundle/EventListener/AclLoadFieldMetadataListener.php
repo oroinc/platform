@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\CurrencyBundle\EventListener;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -11,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Event\LoadFieldsMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * As currency functionality is represented by three fields (from entity side) we have to hide such fields from

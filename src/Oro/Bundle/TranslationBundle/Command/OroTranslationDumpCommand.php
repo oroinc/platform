@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
+use Oro\Component\Log\OutputLogger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Component\Log\OutputLogger;
 
 class OroTranslationDumpCommand extends ContainerAwareCommand
 {

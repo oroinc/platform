@@ -6,11 +6,10 @@ use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\SecurityBundle\Configuration\PermissionListConfiguration;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
+use Oro\Bundle\SecurityBundle\Configuration\PermissionListConfiguration;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository;
 

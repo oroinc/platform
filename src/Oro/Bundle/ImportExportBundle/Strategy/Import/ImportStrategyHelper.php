@@ -5,22 +5,20 @@ namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\ImportExportBundle\Context\BatchContextInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ValidatorInterface;
-
-use Oro\Bundle\EntityBundle\Helper\FieldHelper;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\ImportExportBundle\Context\BatchContextInterface;
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\ImportExportBundle\Exception\LogicException;
-use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class ImportStrategyHelper
 {

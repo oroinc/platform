@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\ApiBundle\Validator\Constraints\HasAdderAndRemover;
+use Symfony\Component\HttpFoundation\Response;
 
 class HasAdderAndRemoverTest extends \PHPUnit_Framework_TestCase
 {

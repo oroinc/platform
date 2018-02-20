@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
-
 use Oro\Bundle\EntityBundle\Tools\CheckDatabaseStateManager;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
 
 class ConsoleCommandListener
 {

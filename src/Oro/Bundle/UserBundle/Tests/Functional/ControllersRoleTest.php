@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional;
 
-use Symfony\Component\DomCrawler\Form;
-use Symfony\Component\DomCrawler\Crawler;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\Form;
 
 class ControllersRoleTest extends WebTestCase
 {

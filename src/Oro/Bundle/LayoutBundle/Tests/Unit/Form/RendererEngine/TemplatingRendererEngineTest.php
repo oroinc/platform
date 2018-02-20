@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form\RendererEngine;
 
-use Symfony\Component\Form\FormView;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-
 use Oro\Bundle\LayoutBundle\Form\RendererEngine\TemplatingRendererEngine;
 use Oro\Bundle\LayoutBundle\Tests\Unit\Form\RendererEngineTest;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Symfony\Component\Form\FormView;
 
 class TemplatingRendererEngineTest extends RendererEngineTest
 {

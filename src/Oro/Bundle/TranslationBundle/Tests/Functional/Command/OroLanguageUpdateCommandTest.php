@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Command;
 
-use Symfony\Component\Intl\Intl;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Exception\TranslationProviderException;
 use Oro\Bundle\TranslationBundle\Provider\ExternalTranslationsProvider;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
+use Symfony\Component\Intl\Intl;
 
 class OroLanguageUpdateCommandTest extends WebTestCase
 {

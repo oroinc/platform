@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 
-use Symfony\Component\DomCrawler\Crawler;
-
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\UIBundle\Route\Router;
+use Symfony\Component\DomCrawler\Crawler;
 
 /**
  * @group dist

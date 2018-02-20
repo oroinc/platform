@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\Constraint;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Applies all requested filters to the Criteria object.

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\ActivityListBundle\DependencyInjection\OroActivityListExtension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroActivityListExtensionTest extends \PHPUnit_Framework_TestCase
 {

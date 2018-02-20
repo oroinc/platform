@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\AbstractFixture;
-
+use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;

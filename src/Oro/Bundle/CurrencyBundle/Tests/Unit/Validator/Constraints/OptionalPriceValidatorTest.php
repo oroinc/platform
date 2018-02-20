@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Validator\Constraints;
 
+use Oro\Bundle\CurrencyBundle\Entity\Price;
+use Oro\Bundle\CurrencyBundle\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ExecutionContextInterface;
-
-use Oro\Bundle\CurrencyBundle\Validator\Constraints;
-use Oro\Bundle\CurrencyBundle\Entity\Price;
 
 class OptionalPriceValidatorTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-
+use Oro\Bundle\EntityPaginationBundle\Manager\MessageManager;
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
-use Oro\Bundle\EntityPaginationBundle\Manager\MessageManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class EntityPaginationExtension extends \Twig_Extension
 {

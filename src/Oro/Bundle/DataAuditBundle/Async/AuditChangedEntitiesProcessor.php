@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataAuditBundle\Async;
 
+use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
+use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -9,9 +11,6 @@ use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-
-use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
-use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 
 class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements TopicSubscriberInterface
 {

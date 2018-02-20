@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\SearchBundle\Provider;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Cache;
-
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SearchMappingProvider extends AbstractSearchMappingProvider
 {

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\CurrencyBundle\Datagrid\EventListener;
 
+use Oro\Bundle\CurrencyBundle\Datagrid\InlineEditing\InlineEditColumnOptions\MultiCurrencyGuesser as Guesser;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-use Oro\Bundle\CurrencyBundle\Datagrid\InlineEditing\InlineEditColumnOptions\MultiCurrencyGuesser as Guesser;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class ColumnConfigListener

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\CurrencyBundle\Grid;
 
+use Oro\Bundle\CurrencyBundle\DoctrineExtension\Dbal\Types\MoneyValueType;
 use Oro\Bundle\DataGridBundle\Datagrid\AbstractColumnOptionsGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
-use Oro\Bundle\CurrencyBundle\DoctrineExtension\Dbal\Types\MoneyValueType;
 
 class MoneyValueColumnOptionsGuesser extends AbstractColumnOptionsGuesser
 {

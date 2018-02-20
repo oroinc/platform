@@ -3,16 +3,14 @@
 namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
 use Doctrine\Common\Util\ClassUtils;
-
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent;
+use Oro\Bundle\ImportExportBundle\Event\Events;
+use Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-
-use Oro\Bundle\EntityBundle\Helper\FieldHelper;
-use Oro\Bundle\ImportExportBundle\Event\Events;
-use Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent;
-use Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent;
 
 class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer implements SerializerAwareInterface
 {

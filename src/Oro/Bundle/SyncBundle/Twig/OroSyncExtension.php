@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SyncBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class OroSyncExtension extends \Twig_Extension
 {

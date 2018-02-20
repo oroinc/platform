@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\ORM;
 
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
-
 use Oro\Bundle\CustomerBundle\Entity\CustomerUserRole;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools\Generator;
 
-use CG\Generator\Writer;
-use CG\Generator\PhpClass;
 use CG\Generator\DefaultVisitor;
+use CG\Generator\PhpClass;
+use CG\Generator\Writer;
 
 class Visitor extends DefaultVisitor
 {

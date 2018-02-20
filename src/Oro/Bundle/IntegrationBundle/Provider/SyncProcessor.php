@@ -3,20 +3,16 @@
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Oro\Component\PhpUtils\ArrayUtil;
-
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Event\SyncEvent;
 use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SyncProcessor extends AbstractSyncProcessor
 {

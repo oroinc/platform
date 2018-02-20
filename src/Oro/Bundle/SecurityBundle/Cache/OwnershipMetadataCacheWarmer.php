@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Cache;
 
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 class OwnershipMetadataCacheWarmer implements CacheWarmerInterface
 {

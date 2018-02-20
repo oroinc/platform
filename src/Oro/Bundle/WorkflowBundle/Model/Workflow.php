@@ -2,14 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-
+use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager as BaseAttributeManager;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-
 use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
@@ -17,8 +14,8 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
-use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
+use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 

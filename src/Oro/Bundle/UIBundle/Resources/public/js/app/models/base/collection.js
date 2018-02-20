@@ -15,7 +15,7 @@ define(function(require) {
 
         model: BaseModel,
 
-        constructor: function(data, options) {
+        constructor: function BaseCollection(data, options) {
             this.cid = _.uniqueId(this.cidPrefix);
             BaseCollection.__super__.constructor.call(this, data, options);
         },

@@ -3,19 +3,18 @@
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\TreeWalkerAdapter;
 use Doctrine\ORM\Query\AST\ConditionalPrimary;
 use Doctrine\ORM\Query\AST\ConditionalTerm;
 use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\AST\SelectStatement;
 use Doctrine\ORM\Query\AST\Subselect;
 use Doctrine\ORM\Query\AST\WhereClause;
-
+use Doctrine\ORM\Query\TreeWalkerAdapter;
 use Oro\Bundle\SecurityBundle\Exception\NotFoundAclConditionFactorBuilderException;
+use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage;
-use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
 
 /**
  * Class AclWalker

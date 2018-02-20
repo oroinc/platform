@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Model;
 
-use LogicException;
-
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\Validator\Validation;
-use Symfony\Component\Validator\ValidatorInterface;
-
+use LogicException;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\GroupNodeConstraint;
+use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\ValidatorInterface;
 
 class ExpressionBuilder
 {

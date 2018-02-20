@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Event;
 
-use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 
 class PostFlushConfigEvent extends Event
 {

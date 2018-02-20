@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ChartBundle\Form\EventListener;
 
+use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-
-use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
 
 class ChartTypeEventListener implements EventSubscriberInterface
 {

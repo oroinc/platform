@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
-
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 

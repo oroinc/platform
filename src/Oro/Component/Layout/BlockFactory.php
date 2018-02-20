@@ -2,11 +2,10 @@
 
 namespace Oro\Component\Layout;
 
-use Symfony\Component\ExpressionLanguage\Expression;
-
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class BlockFactory implements BlockFactoryInterface
 {

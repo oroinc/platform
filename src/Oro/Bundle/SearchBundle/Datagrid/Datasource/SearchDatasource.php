@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\SearchBundle\Datagrid\Datasource;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\SearchBundle\Datagrid\Event\SearchResultAfter;
 use Oro\Bundle\SearchBundle\Datagrid\Event\SearchResultBefore;
-use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Query\Factory\QueryFactoryInterface;
+use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SearchDatasource implements DatasourceInterface
 {

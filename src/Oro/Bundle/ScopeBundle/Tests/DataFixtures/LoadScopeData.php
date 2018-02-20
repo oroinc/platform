@@ -4,7 +4,6 @@ namespace Oro\Bundle\ScopeBundle\Tests\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 
 class LoadScopeData extends AbstractFixture

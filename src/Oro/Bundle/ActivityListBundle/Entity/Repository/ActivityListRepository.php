@@ -4,7 +4,6 @@ namespace Oro\Bundle\ActivityListBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 

@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest;
 
-use Symfony\Component\HttpFoundation\Response;
-
-use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AbstractAddStatusCodes;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractCompleteStatusCodes extends AbstractAddStatusCodes
 {

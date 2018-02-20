@@ -2,20 +2,17 @@
 
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormBuilderInterface;
-
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
-use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
+use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 /**
  * This widget must not has any model transformers that converts entities identifiers to object because it

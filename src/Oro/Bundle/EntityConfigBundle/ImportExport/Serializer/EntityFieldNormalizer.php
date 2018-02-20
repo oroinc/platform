@@ -3,15 +3,13 @@
 namespace Oro\Bundle\EntityConfigBundle\ImportExport\Serializer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterface
 {

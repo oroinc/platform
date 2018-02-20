@@ -2,20 +2,22 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Yaml\Yaml;
-
-use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
+use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Yaml\Yaml;
 
+/**
+ * The CLI command to show metadata of Data API resources.
+ */
 class DumpMetadataCommand extends AbstractDebugCommand
 {
     /**

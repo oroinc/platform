@@ -2,21 +2,20 @@
 
 namespace Oro\Bundle\ImapBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraints\Valid;
-
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\EventListener\ApplySyncSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)

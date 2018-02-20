@@ -105,11 +105,29 @@ services:
         tags:
             - { name: 'suite.generator', priority: 100 }
 
+    oro_test.faker_generator:
+        class: Faker\Generator
+
+    oro_test.provider.xss_payload_provider:
+        class: Oro\Bundle\TestFrameworkBundle\Provider\XssPayloadProvider
+
+    oro_test.encoder.mcrypt:
+        class: Oro\Bundle\SecurityBundle\Encoder\Mcrypt
+        arguments: [ %kernel.secret% ]
+
+    oro_test.faker.provider.xss:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Faker\Provider\XssProvider
+        arguments:
+            - '@oro_test.faker_generator'
+            - '@oro_test.provider.xss_payload_provider'
+            - '@oro_test.encoder.mcrypt'
+
     oro_test.alice_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader
         calls:
             - [addPopulator, ['@oro_behat_extension.fixtures.doctrine_entity_populator']]
             - [addParser, ['@oro_behat_extension.fixtures.yml_parser']]
+            - [addProvider, ['@oro_test.faker.provider.xss']]
 
     oro_test.environment.handler.feature_environment_handler:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\FeatureEnvironmentHandler

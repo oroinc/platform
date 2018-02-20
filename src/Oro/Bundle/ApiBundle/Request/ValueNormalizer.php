@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
-use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 /**
  * Provides a way to convert incoming value to concrete data-type.

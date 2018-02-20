@@ -110,8 +110,6 @@ class CustomizeFormDataContextTest extends \PHPUnit_Framework_TestCase
 
     public function testForm()
     {
-        $this->assertNull($this->context->getForm());
-
         $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $this->context->setForm($form);
         $this->assertSame($form, $this->context->getForm());

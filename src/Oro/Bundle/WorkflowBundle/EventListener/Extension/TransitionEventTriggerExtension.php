@@ -4,9 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\EventListener\Extension;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
-
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerProcessor;
@@ -16,8 +13,8 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Handler\TransitionEventTriggerHandler;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
-
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
 {

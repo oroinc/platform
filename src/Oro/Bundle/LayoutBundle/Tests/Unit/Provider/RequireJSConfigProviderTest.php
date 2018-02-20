@@ -3,16 +3,13 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
-
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-
 use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 use Oro\Bundle\LayoutBundle\Provider\RequireJSConfigProvider;
 use Oro\Bundle\RequireJSBundle\Config\Config;
-
-use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Oro\Component\Layout\LayoutContext;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
 class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
 {

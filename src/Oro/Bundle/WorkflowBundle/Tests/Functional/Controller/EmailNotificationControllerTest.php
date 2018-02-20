@@ -3,18 +3,15 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\DomCrawler\Form;
-
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\NotificationBundle\Entity\Event;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
-use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowEmailTemplates;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
-
+use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowEmailTemplates;
 use Oro\Component\Testing\ResponseExtension;
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\Form;
 
 class EmailNotificationControllerTest extends WebTestCase
 {

@@ -4,8 +4,8 @@ namespace Oro\Bundle\ActionBundle\Tests\Functional\Stub;
 
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
-use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 
 class ButtonProviderExtensionStub implements ButtonProviderExtensionInterface
 {

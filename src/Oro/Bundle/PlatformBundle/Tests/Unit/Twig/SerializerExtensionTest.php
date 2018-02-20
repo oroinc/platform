@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Oro\Bundle\PlatformBundle\Twig\SerializerExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SerializerExtensionTest extends \PHPUnit_Framework_TestCase
 {

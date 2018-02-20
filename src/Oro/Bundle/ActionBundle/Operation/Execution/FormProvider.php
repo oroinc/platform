@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\ActionBundle\Operation\Execution;
 
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
-
-use Oro\Component\Action\Exception\InvalidConfigurationException;
-
 use Oro\Bundle\ActionBundle\Form\Type\OperationExecutionType;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Component\Action\Exception\InvalidConfigurationException;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 /**
  * Provides csrf protected operation execution form and csrf token data which is used

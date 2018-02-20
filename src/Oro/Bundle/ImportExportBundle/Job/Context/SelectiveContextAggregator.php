@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Job\Context;
 
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
-
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Job\ContextHelper;

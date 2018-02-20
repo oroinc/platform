@@ -3,16 +3,13 @@
 namespace Oro\Bundle\EntityConfigBundle\Command;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader;
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigLogger;
+use Oro\Component\Log\OutputLogger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Component\Log\OutputLogger;
-
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigLogger;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader;
 
 class UpdateCommand extends ContainerAwareCommand
 {

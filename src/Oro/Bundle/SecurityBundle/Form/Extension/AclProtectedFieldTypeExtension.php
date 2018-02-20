@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\SecurityBundle\Form\Extension;
 
+use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
 use Psr\Log\LoggerInterface;
-
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormErrorIterator;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-
-use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

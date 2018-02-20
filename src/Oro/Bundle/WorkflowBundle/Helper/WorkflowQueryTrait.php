@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Helper;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 

@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Serializer;
 
+use Oro\Bundle\LayoutBundle\Exception\UnexpectedBlockViewVarTypeException;
+use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\BlockViewCollection;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-
-use Oro\Component\Layout\BlockViewCollection;
-use Oro\Component\Layout\BlockView;
-
-use Oro\Bundle\LayoutBundle\Exception\UnexpectedBlockViewVarTypeException;
 
 class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {

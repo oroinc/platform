@@ -2,21 +2,19 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
-
-use Oro\Component\Testing\Unit\EntityTrait;
-use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
 
 class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
 {

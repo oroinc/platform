@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\Configuration;
 
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\Merger\ConfigurationMerger;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 abstract class AbstractPermissionsConfigurationProvider
 {

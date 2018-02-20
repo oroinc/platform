@@ -3,10 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest;
 
 use Doctrine\Common\Collections\Criteria;
-
+use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
 
 /**
  * Converts a string represents "orderBy" type to an associative array.

@@ -3,9 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-
 use Liuggio\ExcelBundle\Factory;
-
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Writer\XlsxFileWriter;
 

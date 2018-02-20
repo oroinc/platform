@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\FormBundle\Form\Extension;
 
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AdditionalAttrExtension extends AbstractTypeExtension
 {
@@ -16,7 +15,7 @@ class AdditionalAttrExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array('random_id' => true));
     }

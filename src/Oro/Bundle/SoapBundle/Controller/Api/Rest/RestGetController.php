@@ -2,30 +2,26 @@
 
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Security\Acl\Voter\FieldVote;
-
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\UnitOfWork;
-use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\Common\Collections\Criteria;
-
-use FOS\RestBundle\Util\Codes;
-use FOS\RestBundle\View\View;
+use Doctrine\ORM\Proxy\Proxy;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\UnitOfWork;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
-
-use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
+use FOS\RestBundle\Util\Codes;
+use FOS\RestBundle\View\View;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
-use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
+use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
+use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -301,7 +297,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     {
         if (false === preg_match_all(
             '#(?P<name>[\w\d_-]+)(?P<operator>(<|>|%3C|%3E)?=|<>|%3C%3E|(<|>|%3C|%3E))(?P<value>[^&]+)#',
-            $this->getRequest()->getQueryString(),
+            $this->get('request_stack')->getCurrentRequest()->getQueryString(),
             $matches,
             PREG_SET_ORDER
         )) {
@@ -401,7 +397,13 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         }
 
         $includeHandler = $this->get('oro_soap.handler.include');
-        $includeHandler->handle(new Context($this, $this->get('request'), $response, $action, $contextValues));
+        $includeHandler->handle(new Context(
+            $this,
+            $this->get('request_stack')->getCurrentRequest(),
+            $response,
+            $action,
+            $contextValues
+        ));
 
         return $response;
     }

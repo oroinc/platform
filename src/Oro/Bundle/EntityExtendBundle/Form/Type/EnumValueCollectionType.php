@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EnumValueCollectionType extends AbstractType
 {
@@ -30,7 +29,7 @@ class EnumValueCollectionType extends AbstractType
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [

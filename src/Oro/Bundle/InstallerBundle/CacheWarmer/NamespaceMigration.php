@@ -5,7 +5,6 @@ namespace Oro\Bundle\InstallerBundle\CacheWarmer;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
-
 use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 

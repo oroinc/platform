@@ -3,13 +3,11 @@
 namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\PropertyAccess\PropertyPath;
-
-use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\RemoveEntity;
+use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class RemoveEntityTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class ContentProviderPassTest extends \PHPUnit_Framework_TestCase
 {

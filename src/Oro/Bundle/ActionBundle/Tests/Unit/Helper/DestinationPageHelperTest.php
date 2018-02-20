@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\ActionBundle\Helper\DestinationPageHelper;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 
 class DestinationPageHelperTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityMergeBundle\EventListener\Metadata;
 
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
-
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 

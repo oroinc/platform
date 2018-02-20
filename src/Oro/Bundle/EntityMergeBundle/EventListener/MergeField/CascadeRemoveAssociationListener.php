@@ -3,10 +3,10 @@
 namespace Oro\Bundle\EntityMergeBundle\EventListener\MergeField;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
+use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Event\FieldDataEvent;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
-use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 
 /**
  * Clear references to selected value from other entities, because it will be deleted according to cascade remove logic.

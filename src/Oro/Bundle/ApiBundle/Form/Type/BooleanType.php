@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Form\Type;
 
+use Oro\Bundle\ApiBundle\Form\DataTransformer\BooleanToStringTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\ApiBundle\Form\DataTransformer\BooleanToStringTransformer;
 
 class BooleanType extends AbstractType
 {

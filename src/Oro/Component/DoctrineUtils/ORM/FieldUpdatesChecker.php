@@ -2,14 +2,12 @@
 
 namespace Oro\Component\DoctrineUtils\ORM;
 
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
-
 use Oro\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class FieldUpdatesChecker
 {

@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 abstract class AbstractTransitionTriggerTestCase extends \PHPUnit_Framework_TestCase

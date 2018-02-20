@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Utils;
 
-use Oro\Bundle\ScopeBundle\Entity\Scope;
-use Oro\Component\Testing\Unit\EntityTrait;
-
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
@@ -12,6 +9,8 @@ use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
 {

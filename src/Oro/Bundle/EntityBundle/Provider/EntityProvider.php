@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class EntityProvider
 {

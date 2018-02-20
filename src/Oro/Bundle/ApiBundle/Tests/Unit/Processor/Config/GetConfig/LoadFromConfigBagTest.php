@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetConfig;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\EntityConfigMerger;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
@@ -12,11 +13,11 @@ use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\LoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeActionConfigHelper;
-use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeEntityConfigHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeFilterConfigHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeParentResourceHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeSubresourceConfigHelper;
-use Oro\Bundle\ApiBundle\Provider\ConfigBag;
+use Oro\Bundle\ApiBundle\Provider\ConfigBagInterface;
+use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
@@ -47,18 +48,16 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
-        $this->resourceHierarchyProvider = $this->getMockBuilder(ResourceHierarchyProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configBag = $this->getMockBuilder(ConfigBag::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->resourcesProvider = $this->getMockBuilder(ResourcesProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->resourceHierarchyProvider = $this->createMock(ResourceHierarchyProvider::class);
+        $this->configBag = $this->createMock(ConfigBagInterface::class);
+
+        $configBagRegistry = $this->createMock(ConfigBagRegistry::class);
+        $configBagRegistry->expects(self::any())
+            ->method('getConfigBag')
+            ->willReturn($this->configBag);
+
+        $this->resourcesProvider = $this->createMock(ResourcesProvider::class);
+        $this->configProvider = $this->createMock(ConfigProvider::class);
 
         $mergeActionConfigHelper = new MergeActionConfigHelper();
 
@@ -66,10 +65,10 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             $this->configExtensionRegistry,
             new ConfigLoaderFactory($this->configExtensionRegistry),
             $this->resourceHierarchyProvider,
-            $this->configBag,
+            $configBagRegistry,
             $this->resourcesProvider,
+            new EntityConfigMerger($this->configExtensionRegistry),
             new MergeParentResourceHelper($this->configProvider),
-            new MergeEntityConfigHelper($this->configExtensionRegistry),
             $mergeActionConfigHelper,
             new MergeSubresourceConfigHelper($mergeActionConfigHelper, new MergeFilterConfigHelper())
         );

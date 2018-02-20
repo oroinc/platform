@@ -4,14 +4,13 @@ namespace Oro\Bundle\EmailBundle\Async\Manager;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class AssociationManager

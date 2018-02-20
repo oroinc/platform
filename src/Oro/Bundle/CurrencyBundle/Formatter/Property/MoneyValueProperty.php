@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\CurrencyBundle\Formatter\Property;
 
-use Psr\Log\LoggerInterface;
-
+use Oro\Bundle\CurrencyBundle\Exception\InvalidRoundingTypeException;
+use Oro\Bundle\CurrencyBundle\Formatter\MoneyValueTypeFormatter;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\AbstractProperty;
-use Oro\Bundle\CurrencyBundle\Formatter\MoneyValueTypeFormatter;
-use Oro\Bundle\CurrencyBundle\Exception\InvalidRoundingTypeException;
+use Psr\Log\LoggerInterface;
 
 class MoneyValueProperty extends AbstractProperty
 {

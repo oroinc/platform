@@ -3,14 +3,12 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ConfigExpression;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\Security\Acl\Util\ClassUtils;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\PropertyAccess\PropertyPath;
-
-use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ConfigExpression\AclGranted;
+use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AclGrantedTest extends \PHPUnit_Framework_TestCase
 {

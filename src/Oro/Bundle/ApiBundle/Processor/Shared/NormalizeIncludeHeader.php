@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\Context;
 
 /**
  * Splits the value of "X-Include" request header into an array by ";".

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
+use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-
-use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 
 class PlaceholderExtension extends \Twig_Extension
 {

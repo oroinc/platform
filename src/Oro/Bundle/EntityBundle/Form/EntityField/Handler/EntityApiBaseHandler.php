@@ -3,11 +3,9 @@
 namespace Oro\Bundle\EntityBundle\Form\EntityField\Handler;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-
+use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-
-use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 
 class EntityApiBaseHandler
 {

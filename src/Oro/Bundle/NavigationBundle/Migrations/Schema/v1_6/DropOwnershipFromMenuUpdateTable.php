@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Migrations\Schema\v1_6;
 
 use Doctrine\DBAL\Schema\Schema;
-
 use Oro\Bundle\EntityConfigBundle\Migration\RemoveFieldQuery;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
-
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
 {

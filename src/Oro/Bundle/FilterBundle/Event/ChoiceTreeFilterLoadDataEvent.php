@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\FilterBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
+use Symfony\Component\EventDispatcher\Event;
 
 class ChoiceTreeFilterLoadDataEvent extends Event
 {

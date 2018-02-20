@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Validator\Constraints;
 
+use Oro\Bundle\ApiBundle\Form\ReflectionUtil;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-
-use Oro\Bundle\ApiBundle\Form\ReflectionUtil;
 
 class HasAdderAndRemoverValidator extends ConstraintValidator
 {

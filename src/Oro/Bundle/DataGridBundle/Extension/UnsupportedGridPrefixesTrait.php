@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension;
 
-use Oro\Component\PhpUtils\ArrayUtil;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 trait UnsupportedGridPrefixesTrait
 {

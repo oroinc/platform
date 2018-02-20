@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Gedmo\Translatable\Entity\MappedSuperclass\AbstractTranslation;
 
 /**

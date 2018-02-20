@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Selenium;
 
-use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
+use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
 
 /**
  * Class GridTest

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\AsseticBundle\Command;
 
+use Oro\Bundle\AsseticBundle\AssetsConfiguration;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
-use Oro\Bundle\AsseticBundle\AssetsConfiguration;
 
 class OroAsseticGroupsCommand extends ContainerAwareCommand
 {

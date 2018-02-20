@@ -4,13 +4,12 @@ namespace Oro\Bundle\TagBundle\Form\Handler;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectManager;
-
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-
+use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
-use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class TagEntityApiHandler extends ApiFormHandler
 {
@@ -22,19 +21,19 @@ class TagEntityApiHandler extends ApiFormHandler
 
     /**
      * @param FormInterface  $form
-     * @param Request        $request
+     * @param RequestStack   $requestStack
      * @param ObjectManager  $entityManager
      * @param TagManager     $tagManager
      * @param TaggableHelper $helper
      */
     public function __construct(
         FormInterface $form,
-        Request $request,
+        RequestStack $requestStack,
         ObjectManager $entityManager,
         TagManager $tagManager,
         TaggableHelper $helper
     ) {
-        parent::__construct($form, $request, $entityManager);
+        parent::__construct($form, $requestStack, $entityManager);
 
         $this->tagManager     = $tagManager;
         $this->taggableHelper = $helper;

@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;

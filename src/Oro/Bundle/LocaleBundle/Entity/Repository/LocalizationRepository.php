@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LocaleBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\EntityBundle\ORM\Repository\BatchIteratorInterface;
 use Oro\Bundle\EntityBundle\ORM\Repository\BatchIteratorTrait;
 use Oro\Bundle\LocaleBundle\Entity\Localization;

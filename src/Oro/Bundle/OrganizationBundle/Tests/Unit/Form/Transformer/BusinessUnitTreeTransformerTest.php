@@ -3,7 +3,6 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Transformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTreeTransformer;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
 

@@ -3,14 +3,12 @@
 namespace Oro\Bundle\SecurityBundle\Owner;
 
 use Doctrine\Common\Util\Inflector;
-
+use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Util\ClassUtils;
-
-use Oro\Component\PropertyAccess\PropertyAccessor;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
-use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 /**
  * This class allows to get the owner of an entity

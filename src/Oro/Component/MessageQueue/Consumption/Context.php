@@ -2,8 +2,8 @@
 namespace Oro\Component\MessageQueue\Consumption;
 
 use Oro\Component\MessageQueue\Consumption\Exception\IllegalContextModificationException;
-use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 

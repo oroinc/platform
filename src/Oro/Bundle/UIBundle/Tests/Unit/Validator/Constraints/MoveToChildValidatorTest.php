@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Validator\Constraints;
 
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-
 use Oro\Bundle\UIBundle\Model\TreeCollection;
 use Oro\Bundle\UIBundle\Model\TreeItem;
 use Oro\Bundle\UIBundle\Validator\Constraints\MoveToChild;
 use Oro\Bundle\UIBundle\Validator\Constraints\MoveToChildValidator;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class MoveToChildValidatorTest extends \PHPUnit_Framework_TestCase
 {

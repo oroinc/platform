@@ -3,10 +3,10 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestEntityWithOwnerFieldButWithoutGetOwnerMethod;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 
 class EntityOwnerAccessorTest extends \PHPUnit_Framework_TestCase
 {

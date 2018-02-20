@@ -6,7 +6,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\SchemaValidator;
-
 use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\SchemaTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;

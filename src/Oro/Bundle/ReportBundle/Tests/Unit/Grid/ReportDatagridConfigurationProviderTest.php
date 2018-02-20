@@ -3,16 +3,15 @@
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Grid;
 
 use Doctrine\Common\Cache\Cache;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider;
-use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 
 class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 {

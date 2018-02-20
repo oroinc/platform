@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenKeyType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UserApiKeyGenKeyTypeTest extends \PHPUnit_Framework_TestCase
 {

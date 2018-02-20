@@ -4,7 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
 

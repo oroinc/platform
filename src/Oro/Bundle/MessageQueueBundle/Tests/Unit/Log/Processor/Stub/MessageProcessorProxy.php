@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Processor\Stub;
 
-use ProxyManager\Proxy\ValueHolderInterface;
-
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use ProxyManager\Proxy\ValueHolderInterface;
 
 class MessageProcessorProxy implements MessageProcessorInterface, ValueHolderInterface
 {

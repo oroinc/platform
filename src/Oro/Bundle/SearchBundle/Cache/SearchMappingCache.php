@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\Cache;
 
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-
-use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 
 class SearchMappingCache implements CacheWarmerInterface, CacheClearerInterface
 {

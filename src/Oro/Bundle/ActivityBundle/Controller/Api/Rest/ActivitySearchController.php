@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\ActivityBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-
+use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ChainParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\EntityClassParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("activity_search_relation")
@@ -25,6 +23,7 @@ class ActivitySearchController extends RestGetController
     /**
      * Searches entities associated with the specified type of activity.
      *
+     * @param Request $request
      * @param string $activity The type of the activity entity.
      *
      * @Get("/activities/{activity}/relations/search")
@@ -61,18 +60,18 @@ class ActivitySearchController extends RestGetController
      *
      * @return Response
      */
-    public function cgetAction($activity)
+    public function cgetAction(Request $request, $activity)
     {
         $manager = $this->getManager();
         $manager->setClass($manager->resolveEntityClass($activity, true));
 
-        $page  = (int)$this->getRequest()->get('page', 1);
-        $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $page  = (int)$request->get('page', 1);
+        $limit = (int)$request->get('limit', self::ITEMS_PER_PAGE);
 
         $filters = [
-            'search' => $this->getRequest()->get('search')
+            'search' => $request->get('search')
         ];
-        $from    = $this->getRequest()->get('from', null);
+        $from = $request->get('from', null);
         if ($from) {
             $filter          = new ChainParameterFilter(
                 [

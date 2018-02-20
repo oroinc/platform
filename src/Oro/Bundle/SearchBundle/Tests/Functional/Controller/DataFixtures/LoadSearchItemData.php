@@ -5,9 +5,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
-
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterface

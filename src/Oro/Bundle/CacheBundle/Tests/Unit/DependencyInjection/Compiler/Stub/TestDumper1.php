@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler\Stub;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class TestDumper1 implements ConfigMetadataDumperInterface
 {

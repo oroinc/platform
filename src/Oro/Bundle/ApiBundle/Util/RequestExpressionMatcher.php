@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\AbstractMatcher;
 use Oro\Component\ChainProcessor\ExpressionParser;
-use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class RequestExpressionMatcher extends AbstractMatcher
 {

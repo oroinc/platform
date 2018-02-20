@@ -2,16 +2,12 @@
 
 namespace Oro\Bundle\DataAuditBundle\EventListener;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\PersistentCollection;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
 use Oro\Bundle\DataAuditBundle\Model\AdditionalEntityChangesToAuditStorage;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
@@ -23,6 +19,9 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * The listener does not support next features:

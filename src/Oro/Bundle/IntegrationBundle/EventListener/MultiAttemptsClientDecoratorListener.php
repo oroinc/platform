@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\IntegrationBundle\EventListener;
 
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\LoggerAwareInterface;
-
-use Oro\Bundle\IntegrationBundle\Utils\MultiAttemptsConfigTrait;
 use Oro\Bundle\IntegrationBundle\Event\ClientCreatedAfterEvent;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator\MultiAttemptsClientDecorator;
+use Oro\Bundle\IntegrationBundle\Utils\MultiAttemptsConfigTrait;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
 class MultiAttemptsClientDecoratorListener extends AbstractClientDecoratorListener implements LoggerAwareInterface
 {

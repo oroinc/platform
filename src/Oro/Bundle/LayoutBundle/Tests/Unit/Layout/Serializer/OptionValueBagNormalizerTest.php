@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Serializer;
 
+use Oro\Bundle\LayoutBundle\Layout\Serializer\OptionValueBagNormalizer;
+use Oro\Component\Layout\OptionValueBag;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-
-use Oro\Bundle\LayoutBundle\Layout\Serializer\OptionValueBagNormalizer;
-
-use Oro\Component\Layout\OptionValueBag;
 
 class OptionValueBagNormalizerTest extends \PHPUnit_Framework_TestCase
 {

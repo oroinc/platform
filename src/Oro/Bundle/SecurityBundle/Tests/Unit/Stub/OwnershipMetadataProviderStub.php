@@ -3,12 +3,11 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Stub;
 
 use Doctrine\Common\Cache\CacheProvider;
-
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity;
 
 class OwnershipMetadataProviderStub extends OwnershipMetadataProvider

@@ -1,14 +1,13 @@
 <?php
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Async;
 
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\ImapBundle\Async\SyncEmailsMessageProcessor;
 use Oro\Bundle\ImapBundle\Async\Topics;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
 
 class SyncEmailsMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {

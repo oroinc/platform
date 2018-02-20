@@ -4,14 +4,13 @@ namespace Oro\Bundle\ReportBundle\Tests\Functional\EventListener;
 
 use Knp\Menu\MenuFactory;
 use Knp\Menu\MenuItem;
-
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\EventListener\NavigationListener;
 use Oro\Bundle\ReportBundle\Tests\Functional\DataFixtures\LoadReportsData;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 
 /**

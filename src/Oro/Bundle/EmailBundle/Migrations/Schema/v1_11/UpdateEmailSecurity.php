@@ -3,10 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_11;
 
 use Doctrine\DBAL\Schema\Schema;
-
+use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigEntityValueQuery;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigEntityValueQuery;
 
 class UpdateEmailSecurity implements Migration
 {

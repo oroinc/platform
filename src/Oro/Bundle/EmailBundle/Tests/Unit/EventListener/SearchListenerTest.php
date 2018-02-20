@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\EmailBundle\EventListener\SearchListener;
-
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
-
+use Oro\Bundle\EmailBundle\EventListener\SearchListener;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestOrganization;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
-
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 
 class SearchListenerTest extends \PHPUnit_Framework_TestCase

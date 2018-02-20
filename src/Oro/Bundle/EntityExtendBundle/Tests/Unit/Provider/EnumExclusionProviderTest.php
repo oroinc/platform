@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumExclusionProvider;
 

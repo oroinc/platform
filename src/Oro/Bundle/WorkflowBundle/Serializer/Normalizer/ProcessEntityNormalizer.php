@@ -4,9 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 class ProcessEntityNormalizer extends AbstractProcessNormalizer
 {

@@ -7,8 +7,8 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 
 class BeforeMapObjectSearchListener
 {
@@ -70,7 +70,8 @@ class BeforeMapObjectSearchListener
                 if (isset($mapConfig[$className])
                     && (
                         $extendConfig->get('owner') === ExtendScope::OWNER_SYSTEM
-                        || ($extendConfig->get('owner') === ExtendScope::OWNER_CUSTOM
+                        || (
+                            $extendConfig->get('owner') === ExtendScope::OWNER_CUSTOM
                             && $this->configManager->getProvider('search')->getConfig($className)->is('searchable')
                         )
                     )

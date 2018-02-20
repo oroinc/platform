@@ -53,7 +53,8 @@ define(function(require) {
      * Error handler object used to handle EntityError in the safe methods
      *
      * @typedef {Object} ErrorHandler
-     * @property {function(EntityError)} handle
+     * @property {function(EntityError)} handle takes care of EntityError inside methods with "Safely" suffix
+     * @property {Function} handleOutdatedDataError is used for handling error of outdated cache
      */
 
     /**
@@ -212,6 +213,13 @@ define(function(require) {
          * @type {fieldsFilterer|null}
          */
         fieldsFilterer: null,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function EntityStructureDataProvider(options) {
+            EntityStructureDataProvider.__super__.constructor.call(this, options);
+        },
 
         /**
          * @inheritDoc
@@ -1004,6 +1012,9 @@ define(function(require) {
                 collection: collection
             }, options));
             provider.listenToOnce(applicant, 'dispose', provider.dispose);
+            provider.listenToOnce(collection, 'proxy-cache:stale-data-in-use', function() {
+                provider.errorHandler.handleOutdatedDataError();
+            });
 
             return collection.ensureSync().then(function() {
                 return provider;

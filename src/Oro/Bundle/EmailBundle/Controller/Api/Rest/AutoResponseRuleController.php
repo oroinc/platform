@@ -3,16 +3,12 @@
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
 use BadMethodCallException;
-
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
-
-use Symfony\Component\HttpFoundation\Response;
-
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("autoresponserule")

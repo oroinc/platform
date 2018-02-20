@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Category;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)

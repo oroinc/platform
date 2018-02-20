@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\Entity;
 
-use Symfony\Component\HttpFoundation\ParameterBag;
-
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class TestTransport extends Transport
 {

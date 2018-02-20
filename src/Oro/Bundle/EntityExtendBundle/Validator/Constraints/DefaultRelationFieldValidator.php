@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Symfony\Component\Validator\Constraint;
 
 class DefaultRelationFieldValidator extends AbstractFieldValidator
 {

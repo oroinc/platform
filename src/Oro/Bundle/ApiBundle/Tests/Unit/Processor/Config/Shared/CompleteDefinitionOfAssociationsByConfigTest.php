@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinitionOfAssociationsByConfig;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;

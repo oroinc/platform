@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\LoggerBundle\Command;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Validator\Constraints\Email;
-
-use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class LoggerEmailNotificationCommand extends ContainerAwareCommand
 {

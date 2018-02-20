@@ -3,9 +3,8 @@
 namespace Oro\Bundle\SegmentBundle\Model;
 
 use Doctrine\ORM\EntityManager;
-
-use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 /**
  * Class DatagridSourceSegmentProxy

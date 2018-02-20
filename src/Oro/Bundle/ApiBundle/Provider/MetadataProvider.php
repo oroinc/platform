@@ -2,20 +2,23 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
+/**
+ * Provides the metadata for a specific Data API resource.
+ */
 class MetadataProvider
 {
     /** @var ActionProcessorInterface */
-    protected $processor;
+    private $processor;
 
     /** @var array */
-    protected $cache = [];
+    private $cache = [];
 
     /**
      * @param ActionProcessorInterface $processor
@@ -39,13 +42,13 @@ class MetadataProvider
      * @return EntityMetadata|null
      */
     public function getMetadata(
-        $className,
-        $version,
+        string $className,
+        string $version,
         RequestType $requestType,
         EntityDefinitionConfig $config,
         array $extras = [],
-        $withExcludedProperties = false
-    ) {
+        bool $withExcludedProperties = false
+    ): ?EntityMetadata {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty.');
         }
@@ -94,7 +97,7 @@ class MetadataProvider
     /**
      * Removes all already built metadatas from the internal cache.
      */
-    public function clearCache()
+    public function clearCache(): void
     {
         $this->cache = [];
     }
@@ -109,14 +112,14 @@ class MetadataProvider
      *
      * @return EntityMetadata|null
      */
-    protected function loadMetadata(
-        $className,
-        $version,
+    private function loadMetadata(
+        string $className,
+        string $version,
         RequestType $requestType,
         EntityDefinitionConfig $config,
         array $extras,
-        $withExcludedProperties
-    ) {
+        bool $withExcludedProperties
+    ): ?EntityMetadata {
         /** @var MetadataContext $context */
         $context = $this->processor->createContext();
         $context->setClassName($className);
@@ -148,14 +151,14 @@ class MetadataProvider
      *
      * @return string
      */
-    protected function buildCacheKey(
-        $className,
-        $version,
+    private function buildCacheKey(
+        string $className,
+        string $version,
         RequestType $requestType,
         array $extras,
-        $withExcludedProperties,
-        $configKey
-    ) {
+        bool $withExcludedProperties,
+        string $configKey
+    ): string {
         $cacheKey = (string)$requestType
             . '|' . $version
             . '|' . $className

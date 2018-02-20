@@ -3,9 +3,8 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Step;
 
 use Oro\Bundle\EntityMergeBundle\Event\FieldDataEvent;
-
-use Oro\Bundle\EntityMergeBundle\Model\Step\MergeFieldsStep;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
+use Oro\Bundle\EntityMergeBundle\Model\Step\MergeFieldsStep;
 
 class MergerFieldsStepTest extends \PHPUnit_Framework_TestCase
 {

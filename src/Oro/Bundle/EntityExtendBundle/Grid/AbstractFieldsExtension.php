@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Grid;
 
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Bundle\DataGridBundle\Extension\FieldAcl\Configuration as FieldAclConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration as SorterConfiguration;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
@@ -15,7 +16,6 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration as FilterConfiguration;
-use Oro\Bundle\DataGridBundle\Extension\FieldAcl\Configuration as FieldAclConfiguration;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 abstract class AbstractFieldsExtension extends AbstractExtension

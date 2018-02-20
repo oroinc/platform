@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\QueryException;
-
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class CriteriaConnector
 {

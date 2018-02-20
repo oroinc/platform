@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\ActionBundle\Helper;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
-
 use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class ContextHelper
 {

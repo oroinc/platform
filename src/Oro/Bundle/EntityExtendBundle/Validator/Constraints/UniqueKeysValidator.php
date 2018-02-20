@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
+use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-
-use Oro\Component\PhpUtils\ArrayUtil;
 
 class UniqueKeysValidator extends ConstraintValidator
 {

@@ -3,12 +3,10 @@
 namespace Oro\Bundle\SegmentBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
+use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentRepository;
 
 class SegmentChoiceType extends AbstractType
 {

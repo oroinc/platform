@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\ORM\Query;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 
 interface BufferedQueryResultIteratorInterface extends \Iterator, \Countable
 {

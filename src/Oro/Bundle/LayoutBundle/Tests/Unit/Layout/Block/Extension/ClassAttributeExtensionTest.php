@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Extension;
 
+use Oro\Bundle\LayoutBundle\Layout\Block\Extension\ClassAttributeExtension;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockView;
@@ -10,8 +11,6 @@ use Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\OptionValueBag;
-
-use Oro\Bundle\LayoutBundle\Layout\Block\Extension\ClassAttributeExtension;
 
 class ClassAttributeExtensionTest extends \PHPUnit_Framework_TestCase
 {

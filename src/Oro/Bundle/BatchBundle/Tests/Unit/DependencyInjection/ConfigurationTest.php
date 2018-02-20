@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Oro\Bundle\BatchBundle\DependencyInjection\Configuration;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 /**
  * Test related class

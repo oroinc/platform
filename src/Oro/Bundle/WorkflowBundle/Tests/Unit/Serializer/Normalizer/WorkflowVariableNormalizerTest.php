@@ -8,7 +8,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass;
 
+use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 
 class ProcessorsPass implements CompilerPassInterface
 {

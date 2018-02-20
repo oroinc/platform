@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class GroupApiType extends GroupType
 {
@@ -20,9 +19,9 @@ class GroupApiType extends GroupType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::setDefaultOptions($resolver);
+        parent::configureOptions($resolver);
 
         $resolver->setDefaults(['csrf_protection' => false]);
     }

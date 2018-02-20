@@ -4,9 +4,8 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-
-use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class EmailAddressManager
 {

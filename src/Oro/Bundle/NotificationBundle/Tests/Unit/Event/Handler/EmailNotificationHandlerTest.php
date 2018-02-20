@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler;
