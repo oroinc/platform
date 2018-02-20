@@ -2,6 +2,9 @@
 
 namespace Oro\Component\ChainProcessor;
 
+/**
+ * Represents a container for key/value pairs.
+ */
 interface ParameterBagInterface extends \IteratorAggregate, \Countable, \ArrayAccess
 {
     /**
