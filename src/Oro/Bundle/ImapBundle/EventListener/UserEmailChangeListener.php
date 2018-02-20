@@ -3,9 +3,12 @@
 namespace Oro\Bundle\ImapBundle\EventListener;
 
 use Doctrine\ORM\Event\PreUpdateEventArgs;
-
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Cleans user IMAP configuration when primary email of user changed
+ */
 class UserEmailChangeListener
 {
     /**
@@ -21,7 +24,13 @@ class UserEmailChangeListener
         $userEmailOrigin = $user->getImapConfiguration();
         if ($userEmailOrigin) {
             $user->setImapConfiguration(null);
-            $args->getEntityManager()->flush($userEmailOrigin);
+
+            $em = $args->getEntityManager();
+            $em->getUnitOfWork()
+                ->computeChangeSet(
+                    $em->getClassMetadata(UserEmailOrigin::class),
+                    $userEmailOrigin
+                );
         }
     }
 }
