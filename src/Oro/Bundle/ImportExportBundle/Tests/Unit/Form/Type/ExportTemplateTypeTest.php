@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
+use Oro\Bundle\ImportExportBundle\Form\Type\ExportTemplateType;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Bundle\ImportExportBundle\Form\Type\ExportTemplateType;
-use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
 
 class ExportTemplateTypeTest extends FormIntegrationTestCase
 {

@@ -4,7 +4,6 @@ namespace Oro\Bundle\DashboardBundle\Model;
 
 use Oro\Bundle\DashboardBundle\Event\WidgetConfigurationLoadEvent;
 use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
-
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ConfigProvider

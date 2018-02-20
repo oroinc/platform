@@ -4,12 +4,10 @@ namespace Oro\Bundle\LayoutBundle\Layout\Extension\Generator;
 
 use CG\Generator\PhpMethod;
 use CG\Generator\PhpParameter;
-
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\ParsedExpression;
-
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 class ExpressionConditionVisitor implements VisitorInterface
 {

@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
-
 use Symfony\Component\Form\FormInterface;
 
 class DoctrineTagGenerator implements TagGeneratorInterface

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\Tests\FormInterface;
-
 use Oro\Bundle\FormBundle\Form\EventListener\FixArrayToStringListener;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\Tests\FormInterface;
 
 class FixArrayToStringListenerTest extends \PHPUnit_Framework_TestCase
 {

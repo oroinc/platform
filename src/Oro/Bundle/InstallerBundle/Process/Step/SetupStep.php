@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\InstallerBundle\Process\Step;
 
-use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Entity\User;
+use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
 
 class SetupStep extends AbstractStep
 {
@@ -34,7 +33,7 @@ class SetupStep extends AbstractStep
         $form = $this->createForm('oro_installer_setup');
         $form->setData($adminUser);
 
-        $form->handleRequest($this->getRequest());
+        $form->handleRequest($this->get('request_stack')->getCurrentRequest());
 
         if ($form->isValid()) {
             // pass "load demo fixtures" flag to the next step

@@ -2,3 +2,8 @@ oro_behat_extension:
   elements:
     Query Designer:
         selector: "div[id$='-column-form']"
+    Column Function:
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+      selector:
+        locator: '//select[contains(@name, "[column][func]")]'
+        type: xpath

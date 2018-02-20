@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\SyncBundle\Wamp;
 
-use Psr\Log\LoggerInterface;
-
-use Ratchet\Wamp\Topic;
 use JDare\ClankBundle\Periodic\PeriodicInterface;
-
 use Oro\Bundle\SyncBundle\Authentication\AuthenticationTopicHandler;
+use Psr\Log\LoggerInterface;
+use Ratchet\Wamp\Topic;
 
 /**
  * This periodic service is used to broadcast messages to clients to prevent connection loose

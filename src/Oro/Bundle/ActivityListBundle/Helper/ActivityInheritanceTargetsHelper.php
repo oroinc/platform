@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ActivityListBundle\Helper;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Bundle\DoctrineBundle\Registry;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 

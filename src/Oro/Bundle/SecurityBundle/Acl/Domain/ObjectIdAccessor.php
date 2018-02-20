@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Domain;
 
-use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
-use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
-use Symfony\Component\Security\Acl\Voter\FieldVote;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
+use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 /**
  * This class allows to get the class of a domain object

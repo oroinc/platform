@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
+use Symfony\Component\Validator\Constraint;
 
 class UniqueEntityValidator extends DoctrineHelperValidator
 {

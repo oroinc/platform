@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ConfigBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineEventHandlersPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineEventHandlersPass;
 
 class ListenerExcludeConfigConnectionPass implements CompilerPassInterface
 {

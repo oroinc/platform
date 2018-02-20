@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Bundle\AddressBundle\Form\EventListener;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * When address is created/updated from single form, it will ensure the rules of one primary address and address types

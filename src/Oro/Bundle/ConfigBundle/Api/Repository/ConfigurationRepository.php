@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ConfigBundle\Api\Repository;
 
-use Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection;
 use Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption;
+use Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection;
 use Oro\Bundle\ConfigBundle\Config\ConfigApiManager;
 
 class ConfigurationRepository

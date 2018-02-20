@@ -2,26 +2,24 @@
 
 namespace Oro\Bundle\SegmentBundle\Controller\Api\Rest;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Response;
-
-use FOS\RestBundle\Util\Codes;
-use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Routing\ClassResourceInterface;
+use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
+use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
+use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
-use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
-use Oro\Bundle\SegmentBundle\Entity\Segment;
-use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("segment")
@@ -46,15 +44,16 @@ class SegmentController extends RestController implements ClassResourceInterface
      *      description="Get entity segments",
      *      resource=true
      * )
+     * @param Request $request
      * @return Response
      */
-    public function getItemsAction()
+    public function getItemsAction(Request $request)
     {
         $entityName = $this->get('oro_entity.routing_helper')
-            ->resolveEntityClass($this->getRequest()->get('entityName'));
-        $page = $this->getRequest()->query->get('page', 1);
-        $term = $this->getRequest()->query->get('term');
-        $currentSegment = $this->getRequest()->query->get('currentSegment', null);
+            ->resolveEntityClass($request->get('entityName'));
+        $page = $request->query->get('page', 1);
+        $term = $request->query->get('term');
+        $currentSegment = $request->query->get('currentSegment', null);
         $statusCode = Codes::HTTP_OK;
 
         /** @var SegmentManager $provider */

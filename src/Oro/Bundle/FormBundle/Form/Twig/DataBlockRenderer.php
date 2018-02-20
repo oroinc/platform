@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\FormBundle\Form\Twig;
 
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\FormBundle\Form\Builder\DataBlockBuilder;
+use Symfony\Component\Form\FormView;
 
 class DataBlockRenderer
 {

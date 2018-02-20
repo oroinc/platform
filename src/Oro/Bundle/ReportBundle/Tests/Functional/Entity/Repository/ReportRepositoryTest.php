@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ReportBundle\Tests\Functional\Entity\Repository;
 
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Entity\Repository\ReportRepository;
 use Oro\Bundle\ReportBundle\Tests\Functional\DataFixtures\LoadReportsData;

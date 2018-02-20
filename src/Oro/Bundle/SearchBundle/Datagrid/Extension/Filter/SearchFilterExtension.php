@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\SearchBundle\Datagrid\Extension\Filter;
 
-use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
-use Oro\Bundle\FilterBundle\Grid\Extension\Configuration;
-use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
-use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
+use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
+use Oro\Bundle\FilterBundle\Grid\Extension\Configuration;
+use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
+use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
 
 class SearchFilterExtension extends AbstractFilterExtension
 {

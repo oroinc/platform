@@ -3,12 +3,10 @@
 namespace Oro\Bundle\ActionBundle\Condition;
 
 use Doctrine\Common\Collections\Collection;
-
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Component\ConfigExpression\Condition\AbstractComparison;
 use Oro\Component\ConfigExpression\Exception;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class CollectionElementValueExists extends AbstractComparison
 {

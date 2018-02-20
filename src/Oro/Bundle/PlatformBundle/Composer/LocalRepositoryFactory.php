@@ -5,7 +5,6 @@ namespace Oro\Bundle\PlatformBundle\Composer;
 use Composer\Json\JsonFile;
 use Composer\Repository\InstalledFilesystemRepository;
 use Composer\Repository\WritableRepositoryInterface;
-
 use Symfony\Component\Filesystem\Filesystem;
 
 class LocalRepositoryFactory

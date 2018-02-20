@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\WorkflowBundle\Formatter\WorkflowVariableFormatter;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class WorkflowExtension extends \Twig_Extension
 {

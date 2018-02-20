@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyDoctrineListenersPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class LazyDoctrineListenersPassTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass;
 
+use Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider;
+use Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper;
-use Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider;
 
 class ConfigurationPass implements CompilerPassInterface
 {

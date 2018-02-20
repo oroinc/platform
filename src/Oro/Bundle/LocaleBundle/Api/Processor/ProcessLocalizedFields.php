@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LocaleBundle\Api\Processor;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;

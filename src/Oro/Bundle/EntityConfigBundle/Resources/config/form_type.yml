@@ -67,7 +67,6 @@ services:
 
     oro_entity_config.form.handler.config_field_handler:
         class: Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigFieldHandler
-        scope: request
         arguments:
             - '@oro_entity_config.form.handler.config_helper_handler'
             - '@request_stack'

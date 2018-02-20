@@ -18,7 +18,8 @@ class DebugActionCommand extends AbstractDebugCommand
         $this->setName(self::COMMAND_NAME)
             ->setDescription('Displays current "actions" for an application')
             ->addArgument(self::ARGUMENT_NAME, InputArgument::OPTIONAL, 'An "action" name')
-            ->setHelp(<<<'EOF'
+            ->setHelp(
+                <<<'EOF'
 The <info>%command.name%</info> displays the configured 'actions':
 
   <info>php %command.full_name%</info>

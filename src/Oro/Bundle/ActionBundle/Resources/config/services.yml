@@ -193,7 +193,7 @@ services:
         class: Oro\Bundle\ActionBundle\Datagrid\Action\ButtonWidgetAction
         arguments:
             - '@translator'
-        scope: prototype
+        shared: false
         tags:
             - { name: oro_datagrid.extension.action.type, type: button-widget }
 

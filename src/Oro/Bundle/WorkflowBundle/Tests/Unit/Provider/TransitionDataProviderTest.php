@@ -6,9 +6,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
-use Oro\Bundle\WorkflowBundle\Provider\TransitionDataProvider;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Provider\TransitionDataProvider;
 
 class TransitionDataProviderTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\EventListener;
 
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 
 /**
  * This listener removes attributes from workflow data if they are not present in form in PRE_SET_DATA event

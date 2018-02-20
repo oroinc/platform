@@ -3,10 +3,8 @@
 namespace Oro\Bundle\DataGridBundle\Event;
 
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Symfony\Component\EventDispatcher\Event;
 
 class OrmResultBeforeQuery extends Event implements GridEventInterface
 {

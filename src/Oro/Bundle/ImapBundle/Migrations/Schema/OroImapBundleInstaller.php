@@ -3,11 +3,10 @@
 namespace Oro\Bundle\ImapBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-
-use Oro\Bundle\MigrationBundle\Migration\Installation;
-use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\ImapBundle\Migrations\Schema\v1_3\OroImapBundle as v13;
 use Oro\Bundle\ImapBundle\Migrations\Schema\v1_4\OroImapBundle as v14;
+use Oro\Bundle\MigrationBundle\Migration\Installation;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroImapBundleInstaller implements Installation
 {

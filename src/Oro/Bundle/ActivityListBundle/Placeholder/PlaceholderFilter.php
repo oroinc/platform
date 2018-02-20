@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActivityListBundle\Placeholder;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;

@@ -1,0 +1,26 @@
+api:
+    entity_aliases:
+        Test\Entity2:
+            alias: entity2
+            plural_alias: entity2_plural
+
+    entities:
+        Test\Entity1:
+            exclude: true
+        Test\Entity2:
+            fields:
+                field1: ~
+                field2:
+                    exclude: false
+        Test\Entity3:
+            exclude: false
+        Test\Entity4:
+            exclude: true
+        Test\Entity5:
+            exclude: false
+        Test\Entity6:
+            exclude: true
+        Test\Entity10:
+            exclude: false
+        Test\Entity11:
+            exclude: true

@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\OrganizationBundle\Migrations\Schema\v1_1;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\DBAL\Types\Type;
-
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class UpdateCustomEntityOwnerQuery extends ParametrizedMigrationQuery
 {

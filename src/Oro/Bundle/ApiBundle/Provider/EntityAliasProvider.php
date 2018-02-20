@@ -6,13 +6,17 @@ use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface;
 
+/**
+ * The entity aliases provider that returns Data API specific aliases
+ * configured via "Resources/config/oro/api.yml" files.
+ */
 class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassProviderInterface
 {
     /** @var array */
-    protected $entityAliases;
+    private $entityAliases;
 
     /** @var array */
-    protected $exclusions;
+    private $exclusions;
 
     /**
      * @param array $entityAliases The Data API specific aliases

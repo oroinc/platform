@@ -3,11 +3,9 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
-
 use Oro\Component\Testing\Unit\EntityTrait;
 
 trait FallbackTrait

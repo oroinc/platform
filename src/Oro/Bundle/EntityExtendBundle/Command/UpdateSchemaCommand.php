@@ -3,16 +3,14 @@
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
+use Oro\Bundle\EntityExtendBundle\Tools\SaveSchemaTool;
+use Oro\Bundle\EntityExtendBundle\Tools\SchemaTrait;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\SchemaTrait;
-use Oro\Bundle\EntityExtendBundle\Tools\SaveSchemaTool;
-use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
 
 class UpdateSchemaCommand extends ContainerAwareCommand
 {

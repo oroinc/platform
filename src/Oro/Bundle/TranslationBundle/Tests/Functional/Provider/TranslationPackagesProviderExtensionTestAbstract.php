@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Provider;
 
-use Symfony\Component\Config\FileLocatorInterface;
-
+use Composer\Composer;
+use Composer\Installer\InstallationManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Provider\TranslationPackageProvider;
 use Oro\Bundle\TranslationBundle\Provider\TranslationPackagesProviderExtensionInterface;
+use Oro\Bundle\TranslationBundle\Tests\Functional\Stub\ComposerInstallerStub;
+use Symfony\Component\Config\FileLocatorInterface;
 
 abstract class TranslationPackagesProviderExtensionTestAbstract extends WebTestCase
 {
@@ -16,6 +18,8 @@ abstract class TranslationPackagesProviderExtensionTestAbstract extends WebTestC
     protected function setUp()
     {
         $this->initClient();
+
+        $this->setUpComposer($this->getPackageName());
 
         $this->provider = $this->getContainer()->get('oro_translation.packages_provider.translation');
     }
@@ -49,7 +53,40 @@ abstract class TranslationPackagesProviderExtensionTestAbstract extends WebTestC
     }
 
     /**
+     * @param string $packageName
+     */
+    protected function setUpComposer(string $packageName)
+    {
+        $container = $this->getContainer();
+
+        $installer = new ComposerInstallerStub(
+            sprintf(
+                '%s/../vendor/oro/%s',
+                rtrim(
+                    $container->getParameter('kernel.root_dir'),
+                    '/'
+                ),
+                $packageName
+            )
+        );
+
+        $installationManager = new InstallationManager();
+        $installationManager->addInstaller($installer);
+
+        $composer = new Composer();
+        $composer->setInstallationManager($installationManager);
+
+        $container->set('oro_distribution.composer.installation_manager', $installationManager);
+        $container->set('oro_distribution.composer', $composer);
+    }
+
+    /**
      * @return array|\Generator
      */
     abstract public function expectedPackagesDataProvider();
+
+    /**
+     * @return array|\Generator
+     */
+    abstract protected function getPackageName();
 }

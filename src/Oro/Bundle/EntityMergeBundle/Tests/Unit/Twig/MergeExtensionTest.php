@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Oro\Bundle\EntityMergeBundle\Twig\MergeExtension;
 use Oro\Bundle\EntityMergeBundle\Twig\MergeRenderer;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class MergeExtensionTest extends \PHPUnit_Framework_TestCase
 {

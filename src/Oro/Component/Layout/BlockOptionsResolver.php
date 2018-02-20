@@ -2,9 +2,8 @@
 
 namespace Oro\Component\Layout;
 
-use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
-
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class BlockOptionsResolver
 {

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\MessageQueueBundle\EventListener;
 
+use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
 
 /**
  * Listener that checks that consumers are alive upon a user login.

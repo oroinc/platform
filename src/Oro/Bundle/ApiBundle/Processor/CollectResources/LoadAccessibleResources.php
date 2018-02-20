@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CollectResources;
 
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
 
 /**
  * Builds a list of resources accessible through Data API.

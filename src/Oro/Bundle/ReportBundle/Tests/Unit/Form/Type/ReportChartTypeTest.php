@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsCollectionType;
-use Oro\Bundle\ReportBundle\Form\Type\ReportChartSchemaCollectionType;
 use Oro\Bundle\ChartBundle\Form\Type\ChartType;
+use Oro\Bundle\ReportBundle\Form\Type\ReportChartSchemaCollectionType;
 use Oro\Bundle\ReportBundle\Form\Type\ReportChartType;
 use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ReportChartTypeTest extends FormIntegrationTestCase
 {

@@ -5,11 +5,9 @@ namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_8;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class RemoveInvalidEntityConfigQuery implements MigrationQuery, ConnectionAwareInterface
 {

@@ -3,14 +3,9 @@
 namespace Oro\Bundle\TagBundle\EventListener;
 
 use Countable;
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\ImportExportBundle\Event\AfterEntityPageLoadedEvent;
 use Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
@@ -18,8 +13,10 @@ use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
 use Oro\Bundle\ImportExportBundle\Event\LoadTemplateFixturesEvent;
 use Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent;
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
-use Oro\Bundle\TagBundle\Manager\TagImportManager;
 use Oro\Bundle\TagBundle\Entity\Tag;
+use Oro\Bundle\TagBundle\Manager\TagImportManager;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ImportExportTagsSubscriber implements EventSubscriberInterface
 {

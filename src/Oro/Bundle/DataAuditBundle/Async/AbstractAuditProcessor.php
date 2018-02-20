@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\DataAuditBundle\Async;
 
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 
 abstract class AbstractAuditProcessor implements MessageProcessorInterface
 {

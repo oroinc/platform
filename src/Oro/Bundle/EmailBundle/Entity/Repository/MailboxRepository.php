@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
@@ -123,18 +122,18 @@ class MailboxRepository extends EntityRepository
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('mb')
-           ->from('OroEmailBundle:Mailbox', 'mb')
-           ->leftJoin('mb.emailUsers', 'eu')
-           ->leftJoin('eu.folders', 'f')
-           ->leftJoin('mb.processSettings', 'ps')
-           ->where($qb->expr()->isInstanceOf('ps', $settingsClass))
-           ->andWhere('eu.email = :email')
-           ->andWhere(
-               $qb->expr()->orX(
-                   'f.type = \'inbox\'',
-                   'f.type = \'other\''
-               )
-           );
+            ->from('OroEmailBundle:Mailbox', 'mb')
+            ->leftJoin('mb.emailUsers', 'eu')
+            ->leftJoin('eu.folders', 'f')
+            ->leftJoin('mb.processSettings', 'ps')
+            ->where($qb->expr()->isInstanceOf('ps', $settingsClass))
+            ->andWhere('eu.email = :email')
+            ->andWhere(
+                $qb->expr()->orX(
+                    'f.type = \'inbox\'',
+                    'f.type = \'other\''
+                )
+            );
 
         $qb->setParameter('email', $email);
 

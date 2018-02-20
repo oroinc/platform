@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\EventListener;
 
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-
 use Oro\Component\Action\Action\ActionInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormEvents;
 
 class FormInitListener implements EventSubscriberInterface
 {

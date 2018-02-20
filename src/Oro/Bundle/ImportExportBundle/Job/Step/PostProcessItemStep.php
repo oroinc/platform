@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Job\Step;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-
 use Oro\Bundle\BatchBundle\Step\ItemStep;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 

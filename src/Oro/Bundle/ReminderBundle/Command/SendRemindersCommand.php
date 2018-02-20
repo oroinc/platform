@@ -3,13 +3,10 @@
 namespace Oro\Bundle\ReminderBundle\Command;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
-
 use Oro\Bundle\ReminderBundle\Model\ReminderSender;
-
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Twig;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
+use Oro\Bundle\UserBundle\Model\Gender;
 use Oro\Bundle\UserBundle\Provider\GenderProvider;
 use Oro\Bundle\UserBundle\Twig\OroUserExtension;
-use Oro\Bundle\UserBundle\Model\Gender;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
 {

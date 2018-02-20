@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Validator;
 
+use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
+use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AbstractLoader;
-
-use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
-use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
 
 class WorkflowValidationLoader extends AbstractLoader
 {

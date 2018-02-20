@@ -3,7 +3,6 @@
 namespace Oro\Bundle\OrganizationBundle\Autocomplete;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 

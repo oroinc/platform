@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Acl\Voter;
 
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
+use Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
-use Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class EmailVoterTest extends \PHPUnit_Framework_TestCase
 {

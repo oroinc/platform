@@ -9,6 +9,9 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
+/**
+ * The helper class to complete the configuraton of Data API resource based on not ORM entity.
+ */
 class CompleteObjectDefinitionHelper
 {
     /** @var CompleteAssociationHelper */

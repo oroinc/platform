@@ -3,14 +3,12 @@
 namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Doctrine\ORM\Event\PostFlushEventArgs;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class AutoResponseListener extends MailboxEmailListener implements FeatureToggleableInterface
 {

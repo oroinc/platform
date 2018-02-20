@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Log\Processor;
 
-use ProxyManager\Proxy\ValueHolderInterface;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
+use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
+use Oro\Bundle\MessageQueueBundle\Log\Converter\MessageToArrayConverterInterface;
+use Oro\Bundle\MessageQueueBundle\Log\MessageProcessorClassProvider;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
-use Oro\Bundle\MessageQueueBundle\Log\Converter\MessageToArrayConverterInterface;
-use Oro\Bundle\MessageQueueBundle\Log\MessageProcessorClassProvider;
+use ProxyManager\Proxy\ValueHolderInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Adds information about the current consumer extension, message processor, message and job to the log record.

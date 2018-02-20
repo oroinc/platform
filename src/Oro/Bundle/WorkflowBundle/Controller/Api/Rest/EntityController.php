@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Symfony\Component\HttpFoundation\Response;
-
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
-
-use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
+use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Rest\NamePrefix("oro_api_workflow_entity_")

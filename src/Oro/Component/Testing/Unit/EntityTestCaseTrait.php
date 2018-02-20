@@ -3,10 +3,9 @@
 namespace Oro\Component\Testing\Unit;
 
 use Doctrine\Common\Util\ClassUtils;
-
-use Oro\Component\Testing\Unit\PropertyAccess\CollectionAccessor;
 use Oro\Component\Testing\Unit\Constraint\PropertyGetterReturnsDefaultValue;
 use Oro\Component\Testing\Unit\Constraint\PropertyGetterReturnsSetValue;
+use Oro\Component\Testing\Unit\PropertyAccess\CollectionAccessor;
 
 trait EntityTestCaseTrait
 {

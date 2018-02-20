@@ -2,8 +2,8 @@
 
 namespace Oro\Component\Math;
 
-use Brick\Math\BigRational as BrickBigRational;
 use Brick\Math\BigInteger as BrickBigInteger;
+use Brick\Math\BigRational as BrickBigRational;
 
 /**
  * An arbitrarily large rational number.

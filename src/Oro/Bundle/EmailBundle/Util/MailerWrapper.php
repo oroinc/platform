@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Util;
 
 use Monolog\Logger;
-
 use Oro\Component\DependencyInjection\ServiceLink;
 
 class MailerWrapper extends \Swift_Mailer

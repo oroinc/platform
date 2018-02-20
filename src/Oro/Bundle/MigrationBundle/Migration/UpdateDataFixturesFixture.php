@@ -4,7 +4,6 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\MigrationBundle\Entity\DataFixture;
 
 class UpdateDataFixturesFixture extends AbstractFixture

@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\DistributionBundle\Routing;
 
+use Oro\Bundle\DistributionBundle\Event\RouteCollectionEvent;
+use Oro\Component\Routing\Loader\CumulativeRoutingFileLoader;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouteCollection;
-
-use Oro\Component\Routing\Loader\CumulativeRoutingFileLoader;
-
-use Oro\Bundle\DistributionBundle\Event\RouteCollectionEvent;
 
 abstract class AbstractLoader extends CumulativeRoutingFileLoader
 {

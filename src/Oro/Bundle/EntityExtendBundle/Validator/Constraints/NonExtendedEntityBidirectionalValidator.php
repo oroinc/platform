@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class NonExtendedEntityBidirectionalValidator extends ConstraintValidator
 {

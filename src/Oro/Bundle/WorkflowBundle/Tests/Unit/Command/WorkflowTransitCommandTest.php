@@ -4,15 +4,13 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Command;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
-
-use Symfony\Component\Console\Input\Input;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\WorkflowBundle\Command\WorkflowTransitCommand;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
+use Symfony\Component\Console\Input\Input;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class WorkflowTransitCommandTest extends \PHPUnit_Framework_TestCase
 {

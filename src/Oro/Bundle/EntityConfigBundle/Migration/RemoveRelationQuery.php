@@ -4,12 +4,10 @@ namespace Oro\Bundle\EntityConfigBundle\Migration;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Psr\Log\LoggerInterface;
 
 abstract class RemoveRelationQuery extends RemoveFieldQuery
 {

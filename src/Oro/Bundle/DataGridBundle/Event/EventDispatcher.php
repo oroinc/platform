@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 
 class EventDispatcher extends ImmutableEventDispatcher
 {

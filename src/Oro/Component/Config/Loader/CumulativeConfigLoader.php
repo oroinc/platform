@@ -2,11 +2,10 @@
 
 namespace Oro\Component\Config\Loader;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\CumulativeResourceManager;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class CumulativeConfigLoader
 {

@@ -5,9 +5,6 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Component\EntitySerializer\ConfigConverter;
 use Oro\Component\EntitySerializer\ConfigNormalizer;
@@ -23,6 +20,7 @@ use Oro\Component\EntitySerializer\SerializationHelper;
 use Oro\Component\EntitySerializer\ValueTransformer;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class EntitySerializerTestCase extends OrmTestCase
 {

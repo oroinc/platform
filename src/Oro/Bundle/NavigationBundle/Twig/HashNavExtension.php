@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\NavigationBundle\Twig;
 
+use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
-
-use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 
 class HashNavExtension extends \Twig_Extension
 {

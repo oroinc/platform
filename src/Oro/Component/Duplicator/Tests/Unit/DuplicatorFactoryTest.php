@@ -4,7 +4,6 @@ namespace Oro\Component\Duplicator\Tests\Unit;
 
 use DeepCopy\Filter\SetNullFilter;
 use DeepCopy\Matcher\PropertyNameMatcher;
-
 use Oro\Component\Duplicator\DuplicatorFactory;
 use Oro\Component\Duplicator\Filter\FilterFactory;
 use Oro\Component\Duplicator\Matcher\MatcherFactory;

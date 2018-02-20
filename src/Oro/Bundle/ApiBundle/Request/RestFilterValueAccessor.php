@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
-use Symfony\Component\HttpFoundation\Request;
-
-use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Extracts filters from REST API HTTP Request.

@@ -5,13 +5,11 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\Form\FormFactoryInterface;
-
-use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class StringFilterTest extends \PHPUnit_Framework_TestCase
 {

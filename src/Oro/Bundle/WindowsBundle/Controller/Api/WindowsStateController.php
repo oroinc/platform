@@ -7,11 +7,9 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
+use Oro\Bundle\WindowsBundle\Manager\WindowsStateManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-
-use Oro\Bundle\WindowsBundle\Manager\WindowsStateManager;
 
 /**
  * @RouteResource("windows")

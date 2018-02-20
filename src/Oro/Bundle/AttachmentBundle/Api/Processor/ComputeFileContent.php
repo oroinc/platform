@@ -3,13 +3,11 @@
 namespace Oro\Bundle\AttachmentBundle\Api\Processor;
 
 use Gaufrette\Exception\FileNotFound;
-
-use Psr\Log\LoggerInterface;
-
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Computes a value of "content" field for File entity.

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Symfony\Component\EventDispatcher\Event;
 
 class StartTransitionEvent extends Event
 {

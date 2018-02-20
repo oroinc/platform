@@ -3,11 +3,9 @@
 namespace Oro\Bundle\NotificationBundle\DependencyInjection\Compiler;
 
 use Doctrine\DBAL\Connection;
-
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class EventsCompilerPass implements CompilerPassInterface
 {

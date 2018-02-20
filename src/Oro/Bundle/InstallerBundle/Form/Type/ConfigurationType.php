@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\InstallerBundle\Form\Type;
 
+use Oro\Bundle\InstallerBundle\Validator\Constraints as Assert;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\InstallerBundle\Validator\Constraints as Assert;
 
 class ConfigurationType extends AbstractType
 {

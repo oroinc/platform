@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\ConfigBundle\Config;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * A base class for configuration scope managers

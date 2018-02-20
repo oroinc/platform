@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\CurrencyBundle\Form\DataTransformer;
 
-use Symfony\Component\Form\DataTransformerInterface;
-
 use Oro\Bundle\CurrencyBundle\Entity\Price;
+use Symfony\Component\Form\DataTransformerInterface;
 
 class PriceTransformer implements DataTransformerInterface
 {

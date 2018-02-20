@@ -2,12 +2,11 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Loader\Driver;
 
-use Symfony\Component\Filesystem\Filesystem;
-
 use Oro\Component\Layout\Exception\SyntaxException;
 use Oro\Component\Layout\Loader\Driver\PhpDriver;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 class PhpDriverTest extends \PHPUnit_Framework_TestCase
 {

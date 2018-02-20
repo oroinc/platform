@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\NotificationBundle\Provider;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ObjectManager;
-
+use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Event\Handler\EventHandlerInterface;
+use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 
 class NotificationManager
 {

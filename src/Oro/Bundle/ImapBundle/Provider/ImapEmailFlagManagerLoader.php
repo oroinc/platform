@@ -3,13 +3,12 @@
 namespace Oro\Bundle\ImapBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerLoaderInterface;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
+use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFlagManager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;

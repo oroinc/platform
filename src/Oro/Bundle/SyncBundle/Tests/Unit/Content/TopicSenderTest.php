@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Content;
 
+use Oro\Bundle\SyncBundle\Content\TagGeneratorChain;
+use Oro\Bundle\SyncBundle\Content\TopicSender;
+use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
+use Oro\Component\DependencyInjection\ServiceLink;
 use Psr\Log\LoggerInterface;
-
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-
-use Oro\Bundle\SyncBundle\Content\TagGeneratorChain;
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
-use Oro\Bundle\SyncBundle\Content\TopicSender;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class TopicSenderTest extends \PHPUnit_Framework_TestCase
 {

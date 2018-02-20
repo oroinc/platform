@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActionBundle\Extension;
 
 use Doctrine\Common\Collections\Collection;
-
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;

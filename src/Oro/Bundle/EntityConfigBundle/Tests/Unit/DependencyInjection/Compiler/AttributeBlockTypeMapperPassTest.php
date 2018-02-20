@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\AttributeBlockTypeMapperPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\AttributeBlockTypeMapperPass;
 
 class AttributeBlockTypeMapperPassTest extends \PHPUnit_Framework_TestCase
 {

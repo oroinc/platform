@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-
 use Oro\Component\Action\Action\ActionAssembler;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Condition\AbstractCondition;

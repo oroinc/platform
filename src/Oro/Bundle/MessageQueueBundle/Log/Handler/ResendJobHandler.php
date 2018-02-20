@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Log\Handler;
 
-use Psr\Log\LoggerInterface;
-
 use Monolog\Logger;
-
 use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
+use Psr\Log\LoggerInterface;
 
 /**
  * Resends a message queue job related log record to the special logger.

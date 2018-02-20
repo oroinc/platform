@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetConfig;
 
-use Symfony\Component\Form\DataTransformerInterface as FormDataTransformerInterface;
-
-use Oro\Component\EntitySerializer\DataTransformerInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry;
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDataTransformers;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Component\EntitySerializer\DataTransformerInterface;
+use Symfony\Component\Form\DataTransformerInterface as FormDataTransformerInterface;
 
 class SetDataTransformersTest extends ConfigProcessorTestCase
 {

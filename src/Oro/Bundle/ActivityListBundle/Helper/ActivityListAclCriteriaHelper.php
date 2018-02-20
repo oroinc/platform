@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\ActivityListBundle\Helper;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Value;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\Common\Collections\Criteria;
-
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class ActivityListAclCriteriaHelper
 {

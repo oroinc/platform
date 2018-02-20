@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Definition;
-
 use Oro\Bundle\WorkflowBundle\DependencyInjection\OroWorkflowExtension;
+use Symfony\Component\DependencyInjection\Definition;
 
 class OroWorkflowExtensionTest extends \PHPUnit_Framework_TestCase
 {

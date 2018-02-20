@@ -4,12 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Bundle\ApiBundle\Processor\Shared\SetTotalCountHeader;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 
 class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
 {

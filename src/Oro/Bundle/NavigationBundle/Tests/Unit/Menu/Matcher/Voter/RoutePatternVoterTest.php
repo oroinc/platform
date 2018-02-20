@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Matcher\Voter;
 
-use Symfony\Component\HttpFoundation\Request;
 use Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RoutePatternVoter;
+use Symfony\Component\HttpFoundation\Request;
 
 class RoutePatternVoterTest extends \PHPUnit_Framework_TestCase
 {

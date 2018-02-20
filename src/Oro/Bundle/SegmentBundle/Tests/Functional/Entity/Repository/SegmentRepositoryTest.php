@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\Entity\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-
 use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentRepository;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentData;

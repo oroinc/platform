@@ -4,8 +4,8 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
-use Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator;
 use Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSyntax;
+use Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 

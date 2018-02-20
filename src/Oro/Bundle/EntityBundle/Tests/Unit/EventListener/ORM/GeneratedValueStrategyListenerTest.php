@@ -7,7 +7,6 @@ use Doctrine\ORM\Id\AbstractIdGenerator;
 use Doctrine\ORM\Id\BigIntegerIdentityGenerator;
 use Doctrine\ORM\Id\IdentityGenerator;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\EntityBundle\EventListener\ORM\GeneratedValueStrategyListener;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 

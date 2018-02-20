@@ -4,7 +4,6 @@ namespace Oro\Bundle\SidebarBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 
 class UpdateDashboardsWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface

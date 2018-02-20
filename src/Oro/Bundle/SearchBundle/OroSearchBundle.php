@@ -4,12 +4,11 @@ namespace Oro\Bundle\SearchBundle;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Oro\Bundle\SearchBundle\Async\Topics;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
 use Oro\Bundle\SearchBundle\DependencyInjection\Compiler\FilterTypesPass;
 use Oro\Bundle\SearchBundle\DependencyInjection\Compiler\ListenerExcludeSearchConnectionPass;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroSearchBundle extends Bundle
 {

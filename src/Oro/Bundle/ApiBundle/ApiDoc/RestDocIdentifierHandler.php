@@ -3,13 +3,11 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Symfony\Component\Routing\Route;
-
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDescriptions;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Symfony\Component\Routing\Route;
 
 class RestDocIdentifierHandler
 {

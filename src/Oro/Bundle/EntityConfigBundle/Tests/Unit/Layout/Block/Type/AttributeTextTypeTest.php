@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Layout\Block\Type;
 
-use Symfony\Component\ExpressionLanguage\Expression;
-
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeTextType;
+use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
-
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class AttributeTextTypeTest extends BlockTypeTestCase
 {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
 use Liuggio\ExcelBundle\Factory as ExcelFactory;
-
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 
 abstract class XlsxFileStreamWriter extends FileStreamWriter

@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Action;
 
+use Oro\Bundle\ActionBundle\Action\DuplicateEntity;
+use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\Duplicator\DuplicatorFactory;
 use Oro\Component\Duplicator\Filter\Filter;
 use Oro\Component\Duplicator\Filter\FilterFactory;
 use Oro\Component\Duplicator\Matcher\Matcher;
 use Oro\Component\Duplicator\Matcher\MatcherFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Oro\Bundle\ActionBundle\Action\DuplicateEntity;
-use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Component\ConfigExpression\ContextAccessor;
-use Oro\Component\Duplicator\DuplicatorFactory;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class DuplicateEntityTest extends \PHPUnit_Framework_TestCase

@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
-use Symfony\Component\BrowserKit\Cookie;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
-use Symfony\Component\BrowserKit\Request as InternalRequest;
-use Symfony\Component\BrowserKit\Response as InternalResponse;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
+use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
+use Symfony\Component\BrowserKit\Cookie;
+use Symfony\Component\BrowserKit\Request as InternalRequest;
+use Symfony\Component\BrowserKit\Response as InternalResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class Client extends BaseClient
 {
@@ -128,7 +127,6 @@ class Client extends BaseClient
             $container = $this->getContainer();
 
             $request = Request::create($this->getUrl($route, $gridParameters));
-            $container->get('oro_datagrid.datagrid.request_parameters_factory')->setRequest($request);
             $container->get('request_stack')->push($request);
             /** @var Manager $gridManager */
             $gridManager = $container->get('oro_datagrid.datagrid.manager');

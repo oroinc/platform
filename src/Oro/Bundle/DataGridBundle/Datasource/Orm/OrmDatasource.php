@@ -3,24 +3,19 @@
 namespace Oro\Bundle\DataGridBundle\Datasource\Orm;
 
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
-
-use Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\ConfigProcessorInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\ConfigProcessorInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
-
 use Oro\Bundle\DataGridBundle\Exception\BadMethodCallException;
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterface
 {

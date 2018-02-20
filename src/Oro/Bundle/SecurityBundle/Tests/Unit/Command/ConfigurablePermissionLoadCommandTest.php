@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Command;
 
+use Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider;
+use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider;
-use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
 
 class ConfigurablePermissionLoadCommandTest extends \PHPUnit_Framework_TestCase
 {

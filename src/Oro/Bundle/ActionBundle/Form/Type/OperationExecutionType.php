@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Form\Type;
 
+use Oro\Bundle\ActionBundle\Model\Operation;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\ActionBundle\Model\Operation;
 
 /**
  * Form type with enabled csrf protection for Operation execution.

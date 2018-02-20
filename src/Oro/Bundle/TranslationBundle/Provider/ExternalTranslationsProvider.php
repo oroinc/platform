@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Exception\TranslationProviderException;

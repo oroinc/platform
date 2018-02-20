@@ -3,7 +3,6 @@
 namespace Oro\Component\Action\Tests\Unit\Action\Stub;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ExpressionInterface;

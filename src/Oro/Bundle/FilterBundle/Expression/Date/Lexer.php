@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\FilterBundle\Expression\Date;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException;
+use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class Lexer
 {

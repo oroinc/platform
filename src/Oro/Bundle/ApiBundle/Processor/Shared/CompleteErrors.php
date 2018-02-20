@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Checks if there are any errors in the Context,
@@ -44,7 +44,7 @@ class CompleteErrors implements ProcessorInterface
         $metadata = $this->getMetadata($context);
         $errors = $context->getErrors();
         foreach ($errors as $error) {
-            $errorCompleter->complete($error, $metadata);
+            $errorCompleter->complete($error, $context->getRequestType(), $metadata);
         }
     }
 

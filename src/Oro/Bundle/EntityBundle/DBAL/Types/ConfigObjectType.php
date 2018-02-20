@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\DBAL\Types;
 
-use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\JsonArrayType;
-
 use Oro\Component\Config\Common\ConfigObject;
 
 class ConfigObjectType extends JsonArrayType

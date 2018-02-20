@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Attribute;
 
 /**

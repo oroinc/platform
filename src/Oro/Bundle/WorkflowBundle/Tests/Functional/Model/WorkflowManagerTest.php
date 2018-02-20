@@ -5,13 +5,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Model;
 use Doctrine\Common\EventManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
-
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\WorkflowTestCase;
-
 use Oro\Component\Testing\Doctrine\StubEventListener;
 
 /**

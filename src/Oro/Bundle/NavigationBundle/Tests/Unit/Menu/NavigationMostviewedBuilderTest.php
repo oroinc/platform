@@ -3,15 +3,13 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Menu\NavigationMostviewedBuilder;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class NavigationMostviewedBuilderTest extends \PHPUnit_Framework_TestCase
 {

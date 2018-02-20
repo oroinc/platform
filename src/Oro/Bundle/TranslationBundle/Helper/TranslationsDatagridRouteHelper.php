@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Helper;
 
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
+use Symfony\Component\Routing\RouterInterface;
 
 class TranslationsDatagridRouteHelper
 {

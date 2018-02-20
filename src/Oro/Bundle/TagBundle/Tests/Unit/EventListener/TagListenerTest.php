@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\TagBundle\Entity\Taggable as TaggableInterface;
 use Oro\Bundle\TagBundle\EventListener\TagListener;
 use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable;
-use Oro\Bundle\TagBundle\Entity\Taggable as TaggableInterface;
 
 class TagListenerTest extends \PHPUnit_Framework_TestCase
 {

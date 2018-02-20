@@ -4,12 +4,10 @@ namespace Oro\Bundle\NotificationBundle\Provider;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-
-use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DoctrineListener implements OptionalListenerInterface
 {

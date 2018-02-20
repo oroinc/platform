@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\TypeTestCase;
-
 use Oro\Bundle\ApiBundle\Form\Type\BooleanType;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class BooleanTypeTest extends TypeTestCase
 {

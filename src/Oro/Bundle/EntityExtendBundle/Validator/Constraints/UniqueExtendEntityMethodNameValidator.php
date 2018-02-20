@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
+use Symfony\Component\Validator\Constraint;
 
 /**
  * Validates method name for uniqueness for field name.

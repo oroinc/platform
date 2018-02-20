@@ -3,7 +3,6 @@
 namespace Oro\Component\Layout\Loader\Generator\Extension;
 
 use CG\Generator\PhpMethod;
-
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
 

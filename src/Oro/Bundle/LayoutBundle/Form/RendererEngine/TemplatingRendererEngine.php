@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Form\RendererEngine;
 
-use Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine as BaseEngine;
-use Symfony\Component\Templating\EngineInterface;
-
 use Oro\Bundle\LayoutBundle\Form\RendererEngineTrait;
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
+use Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine as BaseEngine;
+use Symfony\Component\Templating\EngineInterface;
 
 /**
  * Extends Templating Renderer Engine to add possibility for changing default themes after container was locked

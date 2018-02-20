@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Validator;
 
+use Oro\Bundle\FormBundle\Validator\DoctrineInitializer;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\Form\Util\OrderedHashMap;
 use Symfony\Component\Validator\ObjectInitializerInterface;
-
-use Oro\Bundle\FormBundle\Validator\DoctrineInitializer;
 
 class DoctrineInitializerTest extends \PHPUnit_Framework_TestCase
 {

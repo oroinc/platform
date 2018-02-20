@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Bundle\ActionBundle\Action\CreateDate;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class CreateDateTest extends \PHPUnit_Framework_TestCase
 {

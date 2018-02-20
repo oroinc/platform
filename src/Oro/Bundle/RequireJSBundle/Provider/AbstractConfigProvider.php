@@ -3,14 +3,10 @@
 namespace Oro\Bundle\RequireJSBundle\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
-
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Bundle\RequireJSBundle\Config\Config as RequireJSConfig;
-
 use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Symfony\Component\Yaml\Yaml;
 
 abstract class AbstractConfigProvider implements ConfigProviderInterface
 {

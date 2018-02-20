@@ -5,7 +5,6 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Entity;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub\Localization;
 use Oro\Bundle\TranslationBundle\Entity\Language;
-
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 use Oro\Component\Testing\Unit\EntityTrait;
 

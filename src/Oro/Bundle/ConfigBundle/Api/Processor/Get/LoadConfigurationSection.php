@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ConfigBundle\Api\Processor\Get;
 
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ConfigBundle\Api\Processor\GetScope;
 use Oro\Bundle\ConfigBundle\Api\Repository\ConfigurationRepository;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Loads a configuration section.

@@ -3,10 +3,9 @@
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_2;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class ChangeExtendClassNameQuery extends ParametrizedMigrationQuery
 {

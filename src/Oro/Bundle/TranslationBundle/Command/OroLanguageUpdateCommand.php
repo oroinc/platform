@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
+use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
+use Oro\Bundle\TranslationBundle\Exception\TranslationProviderException;
+use Oro\Bundle\TranslationBundle\Provider\ExternalTranslationsProvider;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Intl\Intl;
-
-use Oro\Bundle\TranslationBundle\Entity\Language;
-use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
-use Oro\Bundle\TranslationBundle\Exception\TranslationProviderException;
-use Oro\Bundle\TranslationBundle\Provider\ExternalTranslationsProvider;
 
 class OroLanguageUpdateCommand extends ContainerAwareCommand
 {

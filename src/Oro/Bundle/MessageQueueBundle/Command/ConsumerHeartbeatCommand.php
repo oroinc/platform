@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Command;
 
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\SynchronousCommandInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
-use Oro\Bundle\CronBundle\Command\SynchronousCommandInterface;
 
 /**
  * Cron command that checks that consumers are alive and pushes the message if there are no available consumers.

@@ -2,9 +2,8 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Templating\Helper;
 
-use Oro\Component\Layout\Form\FormRendererInterface;
-
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Form\FormRendererInterface;
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
 use Oro\Component\Layout\Templating\Helper\LayoutHelper;
 use Oro\Component\Layout\Templating\TextHelper;

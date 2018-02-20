@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Functional\Autocomplete;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserACLData;

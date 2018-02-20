@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetEntityJquerySelect2HiddenType;
+use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WidgetBusinessUnitSelectType extends WidgetEntityJquerySelect2HiddenType
 {
@@ -14,9 +13,9 @@ class WidgetBusinessUnitSelectType extends WidgetEntityJquerySelect2HiddenType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::setDefaultOptions($resolver);
+        parent::configureOptions($resolver);
 
         $resolver->setDefaults(
             [

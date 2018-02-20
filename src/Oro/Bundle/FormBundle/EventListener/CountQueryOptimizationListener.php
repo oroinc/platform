@@ -4,7 +4,6 @@ namespace Oro\Bundle\FormBundle\EventListener;
 
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
-
 use Oro\Bundle\BatchBundle\Event\CountQueryOptimizationEvent;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryOptimizationContext;
 

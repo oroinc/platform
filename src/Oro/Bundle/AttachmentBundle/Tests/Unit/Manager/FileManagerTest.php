@@ -5,12 +5,10 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 use Gaufrette\Exception\FileNotFound;
 use Gaufrette\Stream\InMemoryBuffer;
 use Gaufrette\StreamMode;
-
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileManagerTest extends \PHPUnit_Framework_TestCase
 {

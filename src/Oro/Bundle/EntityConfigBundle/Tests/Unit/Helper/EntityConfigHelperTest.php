@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Helper;
 
-use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 
 class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase

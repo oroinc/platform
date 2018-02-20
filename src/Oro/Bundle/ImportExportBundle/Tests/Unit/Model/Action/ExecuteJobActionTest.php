@@ -1,13 +1,11 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Model\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Model\Action\ExecuteJobAction;
-
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class ExecuteJobActionTest extends \PHPUnit_Framework_TestCase
 {

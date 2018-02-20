@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdater;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TriggersBag;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowTransitionTriggersAssembler;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WorkflowTransitionTriggersListener implements EventSubscriberInterface
 {

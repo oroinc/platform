@@ -2,20 +2,17 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
-
-use Symfony\Component\Security\Core\Util\ClassUtils;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Util\ClassUtils as DoctrineClassUtils;
 use Doctrine\Common\Util\Inflector;
-
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EmailBundle\Processor\VariableProcessorRegistry;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Security\Core\Util\ClassUtils;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class EmailRenderer extends \Twig_Environment
 {

@@ -8,7 +8,6 @@ use Oro\Bundle\EntityConfigBundle\Manager\AttributeFamilyManager;
 use Oro\Bundle\EntityConfigBundle\Voter\AttributeFamilyVoter;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
 use Oro\Component\Testing\Unit\EntityTrait;
-
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class AttributeFamilyVoterTest extends \PHPUnit_Framework_TestCase

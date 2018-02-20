@@ -4,7 +4,6 @@ namespace Oro\Bundle\LayoutBundle\Provider;
 
 use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 use Oro\Bundle\RequireJSBundle\Provider\AbstractConfigProvider;
-
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\LayoutContext;

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\EventListener;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\DataAuditBundle\EventListener\SegmentWidgetOptionsListener;
-use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
 use Oro\Bundle\DataAuditBundle\SegmentWidget\ContextChecker;
+use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class SegmentWidgetOptionsListenerTest extends \PHPUnit_Framework_TestCase
 {

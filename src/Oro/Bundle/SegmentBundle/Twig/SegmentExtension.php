@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SegmentBundle\Twig;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\SegmentBundle\Event\ConditionBuilderOptionsLoadEvent;
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SegmentExtension extends \Twig_Extension
 {

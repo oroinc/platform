@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\CurrencyBundle\Form\Type\CurrencyType;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\CurrencyBundle\Form\Type\CurrencyType;
 
 class CurrencyTypeTest extends \PHPUnit_Framework_TestCase
 {

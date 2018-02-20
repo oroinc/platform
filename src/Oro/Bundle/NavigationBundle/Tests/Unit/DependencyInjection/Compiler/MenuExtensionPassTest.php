@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuExtensionPass;
-
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;

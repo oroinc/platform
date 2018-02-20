@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\EventListener;
 
+use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Bundle\IntegrationBundle\Provider\DefaultOwnerTypeAwareInterface;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
-
-use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
-use Oro\Bundle\IntegrationBundle\Provider\DefaultOwnerTypeAwareInterface;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class DefaultOwnerSubscriber implements EventSubscriberInterface
 {

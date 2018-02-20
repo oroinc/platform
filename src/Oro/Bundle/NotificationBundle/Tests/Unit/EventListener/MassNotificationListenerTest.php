@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\NotificationBundle\Entity\MassNotification;
 use Oro\Bundle\NotificationBundle\EventListener\MassNotificationListener;
 use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
-use Oro\Bundle\NotificationBundle\Entity\MassNotification;
 
 class MassNotificationListenerTest extends \PHPUnit_Framework_TestCase
 {

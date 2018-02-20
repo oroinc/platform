@@ -2,21 +2,18 @@
 
 namespace Oro\Bundle\WorkflowBundle\Validator\Constraints;
 
-use Symfony\Component\Form\Form;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-
 use Doctrine\ORM\EntityManager;
-
-use Oro\Component\PropertyAccess\PropertyAccessor;
-
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
+use Oro\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class WorkflowEntityValidator extends ConstraintValidator
 {

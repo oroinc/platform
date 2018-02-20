@@ -9,7 +9,6 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevel;
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
-
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase

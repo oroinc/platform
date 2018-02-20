@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ReportBundle\EventListener;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\ReportBundle\Grid\StoreSqlExtension;
+use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 
 class StoreSqlListener
 {

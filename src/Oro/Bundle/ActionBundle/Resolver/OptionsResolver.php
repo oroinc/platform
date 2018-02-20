@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActionBundle\Resolver;
 
 use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
-
 use Oro\Component\ConfigExpression\ContextAccessor;
 
 class OptionsResolver

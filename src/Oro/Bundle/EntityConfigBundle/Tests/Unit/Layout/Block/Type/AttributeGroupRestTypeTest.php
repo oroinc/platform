@@ -3,9 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Layout\BlockType;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\ExpressionLanguage\Expression;
-
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry;
@@ -13,10 +10,10 @@ use Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeGroupRestType;
 use Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeGroupType;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\ConfigurableType;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
-
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
 {

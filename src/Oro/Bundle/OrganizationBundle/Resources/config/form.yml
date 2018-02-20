@@ -21,9 +21,8 @@ services:
     # Business Unit
     #
     oro_organization.form.business_unit:
-        class:           Symfony\Component\Form\Form
-        factory_method:  createNamed
-        factory_service: form.factory
+        class: Symfony\Component\Form\Form
+        factory: ['@form.factory', createNamed]
         arguments:
             - oro_business_unit_form
             - oro_business_unit
@@ -46,10 +45,9 @@ services:
 
     oro_organization.form.handler.business_unit:
         class: %oro_organization.form.handler.business_unit.class%
-        scope: request
         arguments:
             - '@oro_organization.form.business_unit'
-            - '@request'
+            - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
     oro_organization.form.type.business_unit_tree_type:
@@ -65,17 +63,15 @@ services:
             - { name: form.type, alias: oro_business_unit_tree_select }
 
     oro_organization.form.business_unit.api:
-        class:           Symfony\Component\Form\Form
-        factory_method:  createNamed
-        factory_service: form.factory
-        arguments:       ["business_unit", "business_unit", null]
+        class: Symfony\Component\Form\Form
+        factory: ['@form.factory', createNamed]
+        arguments: ["business_unit", "business_unit", null]
 
     oro_organization.form.handler.business_unit.api:
         class: %oro_organization.form.handler.business_unit.class%
-        scope: request
         arguments:
             - '@oro_organization.form.business_unit.api'
-            - '@request'
+            - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
     oro_organization.form.type.businesS_unit_select:
@@ -107,18 +103,16 @@ services:
 
     oro_organization.form.organization:
         class: Symfony\Component\Form\Form
-        factory_method: createNamed
-        factory_service: form.factory
+        factory: ['@form.factory', createNamed]
         arguments:
             - 'oro_organization_form'
             - 'oro_organization'
 
     oro_organization.form.handler.organization:
         class: %oro_organization.form.handler.organization.class%
-        scope: request
         arguments:
             - '@oro_organization.form.organization'
-            - '@request'
+            - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
     oro_organization.form.type.organization_select:

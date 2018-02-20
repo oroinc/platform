@@ -4,7 +4,6 @@ namespace Oro\Bundle\FeatureToggleBundle\Menu;
 
 use Knp\Menu\Factory\ExtensionInterface;
 use Knp\Menu\ItemInterface;
-
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class FeatureAwareMenuFactoryExtension implements ExtensionInterface

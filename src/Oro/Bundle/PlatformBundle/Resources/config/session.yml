@@ -1,9 +1,8 @@
 services:
     doctrine.dbal.session_connection.wrapped:
         public: false
-        factory_service: doctrine.dbal.session_connection
-        factory_method:  getWrappedConnection
-        class:           PDO
+        factory: ['@doctrine.dbal.session_connection', getWrappedConnection]
+        class: PDO
 
     session.handler.pdo:
         class: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler

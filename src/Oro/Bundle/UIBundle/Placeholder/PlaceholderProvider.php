@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\UIBundle\Placeholder;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\Config\Resolver\ResolverInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class PlaceholderProvider
 {

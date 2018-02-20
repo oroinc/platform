@@ -3,18 +3,24 @@
 namespace Oro\Bundle\InstallerBundle\Process\Step;
 
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\InstallerBundle\InstallerEvents;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
-
 use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
 
+/**
+ * Database preparation step of web installer
+ */
 class SchemaStep extends AbstractStep
 {
+    /**
+     * @param ProcessContextInterface $context
+     * @return mixed
+     */
     public function displayAction(ProcessContextInterface $context)
     {
         set_time_limit(600);
 
-        switch ($this->getRequest()->query->get('action')) {
+        switch ($this->get('request_stack')->getCurrentRequest()->query->get('action')) {
             case 'cache':
                 // suppress warning: ini_set(): A session is active. You cannot change the session
                 // module's ini settings at this time
@@ -26,6 +32,11 @@ class SchemaStep extends AbstractStep
                 return $this->handleAjaxAction('oro:entity-extend:cache:clear', ['--no-warmup' => true]);
             case 'schema-drop':
                 return $this->handleDropDatabase($context);
+            case 'before-database':
+                return $this->handleAjaxAction(
+                    self::TRIGGER_EVENT,
+                    ['name' => InstallerEvents::INSTALLER_BEFORE_DATABASE_PREPARATION]
+                );
             case 'schema-update':
                 return $this->handleAjaxAction('oro:migration:load', ['--force' => true]);
             case 'fixtures':

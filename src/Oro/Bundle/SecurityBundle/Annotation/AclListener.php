@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\Annotation;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-
 use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoader;
 use Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider;
 use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 class AclListener
 {

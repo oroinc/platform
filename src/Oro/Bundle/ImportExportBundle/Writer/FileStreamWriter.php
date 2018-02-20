@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
-
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 

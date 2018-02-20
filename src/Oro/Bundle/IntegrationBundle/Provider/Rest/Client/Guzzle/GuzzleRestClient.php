@@ -6,7 +6,6 @@ use Guzzle\Http\Client as GuzzleClient;
 use Guzzle\Http\Exception\BadResponseException;
 use Guzzle\Http\Message\RequestInterface;
 use Guzzle\Http\Url as GuzzleUrl;
-
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
 
 class GuzzleRestClient implements RestClientInterface

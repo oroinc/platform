@@ -6,10 +6,9 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\ORMException;
-
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class OrmRelatedTestCase extends OrmTestCase
 {

@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\DashboardBundle\Helper\DateHelper;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class FilterDateRangeConverter extends ConfigValueConverterAbstract
 {

@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Functional\EventListener;
 
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
-
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class RefreshContextListenerTest extends WebTestCase
 {

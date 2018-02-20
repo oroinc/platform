@@ -2,11 +2,10 @@
 
 namespace Oro\Component\ChainProcessor\DependencyInjection;
 
+use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-
-use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 
 /**
  * This DIC compiler pass can be used if you want to use DIC tags to load processors

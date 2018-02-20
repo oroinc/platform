@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\SearchBundle\DependencyInjection\Compiler\ListenerExcludeSearchConnectionPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ListenerExcludeSearchConnectionPassTest extends \PHPUnit_Framework_TestCase
 {

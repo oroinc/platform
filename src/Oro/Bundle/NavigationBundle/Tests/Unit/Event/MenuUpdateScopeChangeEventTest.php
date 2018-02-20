@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
-
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class MenuUpdateScopeChangeEventTest extends \PHPUnit_Framework_TestCase

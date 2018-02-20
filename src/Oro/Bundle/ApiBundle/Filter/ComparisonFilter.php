@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Filter;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
-
 use Oro\Bundle\ApiBundle\Model\Range;
 
 /**

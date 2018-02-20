@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Symfony\Component\Form\FormRegistryInterface;
-
 use Oro\Bundle\FormBundle\Model\FormHandlerRegistry;
 use Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
+use Symfony\Component\Form\FormRegistryInterface;
 
 class FormOptionsConfigurationAssembler
 {

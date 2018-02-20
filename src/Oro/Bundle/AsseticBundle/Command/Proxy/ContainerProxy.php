@@ -44,11 +44,12 @@ class ContainerProxy implements ContainerInterface
     }
 
     /**
+     * @TODO: remove $scope parameter in scope of BAP-15236
      * {@inheritdoc}
      */
     public function set($id, $service, $scope = ContainerInterface::SCOPE_CONTAINER)
     {
-        $this->container->set($id, $service, $scope);
+        $this->container->set($id, $service);
     }
 
     /**
@@ -93,6 +94,7 @@ class ContainerProxy implements ContainerInterface
         $this->container->setParameter($name, $value);
     }
 
+    // @TODO: remove code below in scope of BAP-15236
     /**
      * {@inheritdoc}
      */

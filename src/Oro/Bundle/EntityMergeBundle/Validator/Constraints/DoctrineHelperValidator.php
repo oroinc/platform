@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Validator\Constraints;
 
-use Symfony\Component\Validator\ConstraintValidator;
-
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
+use Symfony\Component\Validator\ConstraintValidator;
 
 abstract class DoctrineHelperValidator extends ConstraintValidator
 {

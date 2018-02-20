@@ -2,23 +2,20 @@
 
 namespace Oro\Bundle\ActionBundle\Datagrid\Provider;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
+use Oro\Bundle\ActionBundle\Button\ButtonInterface;
+use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
+use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Button\OperationButton;
+use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
+use Oro\Bundle\ActionBundle\Helper\ContextHelper;
+use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
+use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-
-use Oro\Bundle\ActionBundle\Button\ButtonInterface;
-use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
-use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
-use Oro\Bundle\ActionBundle\Button\OperationButton;
-
-use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
-use Oro\Bundle\ActionBundle\Helper\ContextHelper;
-use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
-use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class DatagridActionButtonProvider implements DatagridActionProviderInterface
 {

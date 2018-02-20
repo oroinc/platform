@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 
 class ProcessDefinitionRepository extends EntityRepository

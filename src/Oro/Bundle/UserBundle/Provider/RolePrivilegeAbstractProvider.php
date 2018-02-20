@@ -3,13 +3,11 @@
 namespace Oro\Bundle\UserBundle\Provider;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
+use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
+use Symfony\Component\Translation\TranslatorInterface;
 
 abstract class RolePrivilegeAbstractProvider
 {

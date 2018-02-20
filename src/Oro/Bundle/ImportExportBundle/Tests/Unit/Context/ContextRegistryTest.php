@@ -4,7 +4,6 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
 use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 
 class ContextRegistryTest extends \PHPUnit_Framework_TestCase

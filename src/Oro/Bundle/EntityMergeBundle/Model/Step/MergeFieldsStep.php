@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Model\Step;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Event\FieldDataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MergeFieldsStep implements DependentMergeStepInterface
 {

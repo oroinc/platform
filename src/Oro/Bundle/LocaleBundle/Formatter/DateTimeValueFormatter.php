@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\UIBundle\Formatter\FormatterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class DateTimeValueFormatter implements FormatterInterface
 {

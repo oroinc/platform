@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Reference;
-
 use Oro\Bundle\ReminderBundle\DependencyInjection\Compiler\AddSendProcessorCompilerPass;
+use Symfony\Component\DependencyInjection\Reference;
 
 class AddSendProcessorCompilerPassTest extends \PHPUnit_Framework_TestCase
 {

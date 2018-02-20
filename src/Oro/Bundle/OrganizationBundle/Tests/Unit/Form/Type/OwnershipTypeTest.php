@@ -20,14 +20,14 @@ class OwnershipTypeTest extends \PHPUnit_Framework_TestCase
         unset($this->type);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        $optionResolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $optionResolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
 
         $optionResolver->expects($this->once())
             ->method('setDefaults')
             ->with(array('choices' => $this->type->getOwnershipsArray()));
-        $this->type->setDefaultOptions($optionResolver);
+        $this->type->configureOptions($optionResolver);
     }
 
     public function testGetName()

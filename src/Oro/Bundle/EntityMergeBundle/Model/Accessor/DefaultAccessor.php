@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Model\Accessor;
 
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-
-use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class DefaultAccessor implements AccessorInterface
 {

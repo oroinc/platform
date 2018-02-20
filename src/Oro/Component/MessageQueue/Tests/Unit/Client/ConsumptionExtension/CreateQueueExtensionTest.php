@@ -2,14 +2,13 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Client\ConsumptionExtension;
 
-use Psr\Log\LoggerInterface;
-
-use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Client\ConsumptionExtension\CreateQueueExtension;
 use Oro\Component\MessageQueue\Client\DriverInterface;
+use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Transport\QueueCollection;
 use Oro\Component\MessageQueue\Transport\QueueInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
 
 class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
 {

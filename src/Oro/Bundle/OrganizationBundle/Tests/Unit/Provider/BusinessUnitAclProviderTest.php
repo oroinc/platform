@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Provider;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
+use Oro\Bundle\OrganizationBundle\Provider\BusinessUnitAclProvider;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\OrganizationBundle\Provider\BusinessUnitAclProvider;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class BusinessUnitAclProviderTest extends \PHPUnit_Framework_TestCase
 {

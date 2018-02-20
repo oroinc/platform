@@ -1,6 +1,8 @@
 ## 2.7.0 (Unreleased)
 
 ### Added
+#### ApiBundle
+* Added a possibility to enable custom API. For details see [how_to.md](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#enable-custom-api).
 #### EntityBundle
 * Added method `getEntityTreeNodeByPropertyPath` to JS `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js#L903-L947) (see [documentation](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md#get-entity-tree-node-by-property-path))
 * Added magic property `entityTree` to `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js#L1061-L1079) (see [documentation](https://github.com/oroinc/platform/tree/2.7.0/src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md#entity-tree)) that allows walk through entity fields tree

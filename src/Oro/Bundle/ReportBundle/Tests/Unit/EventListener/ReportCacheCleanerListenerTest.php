@@ -4,7 +4,6 @@ namespace Oro\Bundle\ReportBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-
 use Oro\Bundle\ReportBundle\EventListener\ReportCacheCleanerListener;
 use Oro\Bundle\ReportBundle\Tests\Unit\Stub\ReportStub;
 

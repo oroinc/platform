@@ -2,6 +2,15 @@
 
 namespace Oro\Component\ChainProcessor;
 
+/**
+ * Delegates the decision whether a processor should be executed in the current execution context
+ * to child checkers.
+ * Implemented the following algorithm:
+ * * NOT_APPLICABLE if any child checker desides that a processor is not applicable
+ * * APPLICABLE if at least one child checker desides that a processor is applicable
+ *   and there are no checkers that deside that a processor is not applicable
+ * * ABSTAIN if there are no checkers that can deside whether a processor is applicable or not
+ */
 class ChainApplicableChecker implements ApplicableCheckerInterface, \IteratorAggregate
 {
     /** @var ApplicableCheckerInterface[] */
@@ -52,10 +61,11 @@ class ChainApplicableChecker implements ApplicableCheckerInterface, \IteratorAgg
         $result = self::ABSTAIN;
         foreach ($this->checkers as $checker) {
             $checkResult = $this->executeChecker($checker, $context, $processorAttributes);
-            if ($checkResult === self::NOT_APPLICABLE) {
+            if (self::NOT_APPLICABLE === $checkResult) {
                 $result = self::NOT_APPLICABLE;
                 break;
-            } elseif ($checkResult === self::APPLICABLE && $result === self::ABSTAIN) {
+            }
+            if (self::APPLICABLE === $checkResult && self::ABSTAIN === $result) {
                 $result = self::APPLICABLE;
             }
         }

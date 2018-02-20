@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
+use Symfony\Component\EventDispatcher\Event;
 
 class EntityMetadataEvent extends Event
 {

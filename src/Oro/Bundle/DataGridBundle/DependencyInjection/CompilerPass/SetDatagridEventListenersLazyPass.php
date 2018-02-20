@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass;
 
+use Oro\Bundle\DataGridBundle\Event as DatagridEvent;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-use Oro\Bundle\DataGridBundle\Event as DatagridEvent;
 
 /**
  * Marks event listener services for all data grids as "lazy"

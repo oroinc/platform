@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Model;
 
-use PHPUnit\Framework\TestCase;
-
 use Oro\Bundle\LocaleBundle\Model\Calendar;
-
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class CalendarTest extends TestCase

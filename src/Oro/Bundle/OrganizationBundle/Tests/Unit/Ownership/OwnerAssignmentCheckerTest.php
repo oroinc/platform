@@ -4,9 +4,9 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Ownership;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Oro\Bundle\OrganizationBundle\Ownership\OwnerAssignmentChecker;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
-use Oro\Bundle\OrganizationBundle\Ownership\OwnerAssignmentChecker;
 
 class OwnerAssignmentCheckerTest extends OrmTestCase
 {

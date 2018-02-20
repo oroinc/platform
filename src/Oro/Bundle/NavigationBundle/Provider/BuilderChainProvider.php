@@ -3,13 +3,11 @@
 namespace Oro\Bundle\NavigationBundle\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
-
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Loader\ArrayLoader;
 use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Util\MenuManipulator;
-
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 
 class BuilderChainProvider implements MenuProviderInterface

@@ -3,14 +3,12 @@
 namespace Oro\Bundle\ImportExportBundle\Serializer;
 
 use Doctrine\Common\Collections\Collection;
-
-use Symfony\Component\Serializer\Exception\RuntimeException;
-use Symfony\Component\Serializer\Serializer as BaseSerializer;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-use Symfony\Component\Serializer\Exception\LogicException;
-
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\RuntimeException;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Serializer as BaseSerializer;
 
 class Serializer extends BaseSerializer implements DenormalizerInterface, NormalizerInterface
 {

@@ -3,17 +3,15 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataMapper;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Form\FormConfigBuilder;
-use Symfony\Component\Form\FormConfigInterface;
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Bundle\ApiBundle\Form\DataMapper\AppendRelationshipMapper;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\EntityWithoutGettersAndSetters;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use Symfony\Component\Form\FormConfigBuilder;
+use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
 {

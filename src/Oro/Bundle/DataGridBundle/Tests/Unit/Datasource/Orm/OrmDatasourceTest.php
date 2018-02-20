@@ -2,19 +2,16 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datasource\Orm;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\Configuration;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
-
-use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
-
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor;
-use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
 {

@@ -4,11 +4,9 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\EventListener;
 
 use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuFactory;
-
+use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\UIBundle\Model\TreeItem;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 
 class MenuUpdateTreeHandlerTest extends \PHPUnit_Framework_TestCase
 {

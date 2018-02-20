@@ -3,18 +3,15 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Workflow\Action;
 
 use Doctrine\Common\Persistence\ObjectManager;
-
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Validator\Validator;
-
-use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Workflow\Action\SendEmail;
 use Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate;
-use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
-use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Validator\Validator;
 
 class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
 {

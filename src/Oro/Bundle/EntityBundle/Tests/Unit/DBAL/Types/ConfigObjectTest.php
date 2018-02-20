@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\DBAL\Types;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-
-use Oro\Component\Config\Common\ConfigObject;
+use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityBundle\DBAL\Types\ConfigObjectType;
+use Oro\Component\Config\Common\ConfigObject;
 
 class ConfigObjectTest extends \PHPUnit_Framework_TestCase
 {

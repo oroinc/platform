@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityBundle\Form\Handler;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 
 class EntitySelectHandler extends SearchHandler

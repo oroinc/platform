@@ -2,9 +2,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-
 use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor;
-
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;

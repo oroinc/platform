@@ -10,85 +10,98 @@ use Oro\Component\ChainProcessor\ToArrayInterface;
 class RequestType implements ToArrayInterface
 {
     /**
-     * REST API request
+     * REST API request.
      */
-    const REST = 'rest';
+    public const REST = 'rest';
 
     /**
-     * A request that conforms JSON API specification
-     * @see http://jsonapi.org
+     * A request that conforms JSON API specification.
+     * @link http://jsonapi.org
      */
-    const JSON_API = 'json_api';
+    public const JSON_API = 'json_api';
 
     /** @var string[] */
-    protected $types = [];
+    private $aspects = [];
 
     /** @var string */
     private $str;
 
     /**
-     * @param string[] $types
+     * @param string[] $aspects
      */
-    public function __construct(array $types)
+    public function __construct(array $aspects)
     {
-        $this->types = $types;
+        $this->aspects = $aspects;
     }
 
     /**
-     * @param string $type
+     * Checks whether this request type represents the given aspect.
+     *
+     * @param string $aspect
      *
      * @return bool
      */
-    public function contains($type)
+    public function contains(string $aspect)
     {
-        return in_array($type, $this->types, true);
+        return \in_array($aspect, $this->aspects, true);
     }
 
     /**
-     * @param string $type
+     * Adds an aspect to this request type.
+     *
+     * @param string $aspect
      */
-    public function add($type)
+    public function add(string $aspect)
     {
-        if (!in_array($type, $this->types, true)) {
-            $this->types[] = $type;
-            $this->str     = null;
+        if (!\in_array($aspect, $this->aspects, true)) {
+            $this->aspects[] = $aspect;
+            $this->str = null;
         }
     }
 
     /**
-     * @param string $type
+     * Adds an aspect from this request type.
+     *
+     * @param string $aspect
      */
-    public function remove($type)
+    public function remove(string $aspect)
     {
-        $key = array_search($type, $this->types, true);
+        $key = \array_search($aspect, $this->aspects, true);
         if (false !== $key) {
-            unset($this->types[$key]);
-            $this->types = array_values($this->types);
-            $this->str   = null;
+            unset($this->aspects[$key]);
+            $this->aspects = \array_values($this->aspects);
+            $this->str = null;
         }
     }
 
     /**
+     * Initializes this request type based on an another request type.
+     *
      * @param RequestType $requestType
      */
-    public function set(RequestType $requestType)
+    public function set(RequestType $requestType): void
     {
-        $this->types = $requestType->types;
-        $this->str   = $requestType->str;
+        $this->aspects = $requestType->aspects;
+        $this->str = $requestType->str;
     }
 
     /**
+     * Checks if this request type represents at least one aspect.
+     *
      * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
-        return empty($this->types);
+        return empty($this->aspects);
     }
 
-    public function clear()
+    /**
+     * Removes all aspects from this request type.
+     */
+    public function clear(): void
     {
-        $this->types = [];
-        $this->str   = null;
+        $this->aspects = [];
+        $this->str = null;
     }
 
     /**
@@ -96,7 +109,7 @@ class RequestType implements ToArrayInterface
      */
     public function toArray()
     {
-        return $this->types;
+        return $this->aspects;
     }
 
     /**
@@ -105,7 +118,9 @@ class RequestType implements ToArrayInterface
     public function __toString()
     {
         if (null === $this->str) {
-            $this->str = implode(',', $this->types);
+            $aspects = $this->aspects;
+            \rsort($aspects, SORT_STRING);
+            $this->str = \implode(',', $aspects);
         }
 
         return $this->str;

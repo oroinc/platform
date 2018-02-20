@@ -6,7 +6,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
-
 use Symfony\Component\DomCrawler\Form;
 
 /**

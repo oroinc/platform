@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\FormBundle\Form\EventListener;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
+use Doctrine\ORM\PersistentCollection;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class MultipleEntitySubscriber implements EventSubscriberInterface
 {

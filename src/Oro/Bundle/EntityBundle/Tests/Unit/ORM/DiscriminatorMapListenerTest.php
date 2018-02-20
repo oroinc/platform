@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\EntityBundle\ORM\DiscriminatorMapListener;
 
 class DiscriminatorMapListenerTest extends \PHPUnit_Framework_TestCase

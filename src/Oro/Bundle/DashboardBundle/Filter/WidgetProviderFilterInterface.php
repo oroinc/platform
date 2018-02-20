@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DashboardBundle\Filter;
 
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 
 /**

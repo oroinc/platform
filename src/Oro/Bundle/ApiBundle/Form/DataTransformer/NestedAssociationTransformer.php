@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Form\DataTransformer;
 
 use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 
 class NestedAssociationTransformer extends AbstractEntityAssociationTransformer

@@ -6,7 +6,6 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Component\Action\Action\Substring;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
-
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 

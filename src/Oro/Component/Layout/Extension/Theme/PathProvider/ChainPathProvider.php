@@ -2,8 +2,8 @@
 
 namespace Oro\Component\Layout\Extension\Theme\PathProvider;
 
-use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextAwareInterface;
+use Oro\Component\Layout\ContextInterface;
 
 class ChainPathProvider implements ContextAwareInterface, PathProviderInterface
 {
