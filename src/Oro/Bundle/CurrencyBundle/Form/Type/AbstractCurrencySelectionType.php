@@ -18,6 +18,9 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Abstract form type for building extended currency selection types.
+ */
 abstract class AbstractCurrencySelectionType extends AbstractType
 {
     /**

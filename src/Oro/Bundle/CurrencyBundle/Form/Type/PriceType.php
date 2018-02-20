@@ -10,6 +10,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * General form type for the price entering
+ */
 class PriceType extends AbstractType
 {
     const NAME = 'oro_currency_price';
