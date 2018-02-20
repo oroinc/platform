@@ -184,6 +184,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             self::ACTION_PROCESSOR_BAG_SERVICE_ID
         );
         if (null !== $actionProcessorBagServiceDef) {
+            $debug = $container->getParameter('kernel.debug');
             $logger = new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
             foreach ($config['actions'] as $action => $actionConfig) {
                 if (empty($actionConfig['processor_service_id'])) {
@@ -201,6 +202,25 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
                     'addProcessor',
                     [new Reference($actionProcessorServiceId)]
                 );
+
+                // decorate with TraceableActionProcessor
+                if ($debug) {
+                    $actionProcessorDecoratorServiceId = $actionProcessorServiceId . '.oro_api.profiler';
+                    $container
+                        ->setDefinition(
+                            $actionProcessorDecoratorServiceId,
+                            new Definition(
+                                'Oro\Component\ChainProcessor\Debug\TraceableActionProcessor',
+                                [
+                                    new Reference($actionProcessorDecoratorServiceId . '.inner'),
+                                    new Reference('oro_api.profiler.logger')
+                                ]
+                            )
+                        )
+                        // should be at the top of the decoration chain
+                        ->setDecoratedService($actionProcessorServiceId, null, -255)
+                        ->setPublic(false);
+                }
             }
         }
     }
