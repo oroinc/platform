@@ -4,16 +4,14 @@ namespace Oro\Bundle\SearchBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
-
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
-use Oro\Bundle\SearchBundle\Migration\UseMyIsamEngineQuery;
 use Oro\Bundle\SearchBundle\Migration\MysqlVersionCheckTrait;
+use Oro\Bundle\SearchBundle\Migration\UseMyIsamEngineQuery;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)

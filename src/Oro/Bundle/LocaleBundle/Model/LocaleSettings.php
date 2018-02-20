@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\LocaleBundle\Model;
 
-use Symfony\Component\Intl\Intl;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfiguration;
 use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfig;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfiguration;
+use Symfony\Component\Intl\Intl;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

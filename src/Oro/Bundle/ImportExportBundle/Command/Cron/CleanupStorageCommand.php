@@ -3,14 +3,12 @@
 namespace Oro\Bundle\ImportExportBundle\Command\Cron;
 
 use Gaufrette\File;
-
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
-use Oro\Bundle\ImportExportBundle\File\FileManager;
 
 class CleanupStorageCommand extends ContainerAwareCommand implements CronCommandInterface
 {

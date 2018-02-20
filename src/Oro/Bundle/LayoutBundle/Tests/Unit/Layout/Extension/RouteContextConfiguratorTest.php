@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
-use Oro\Component\Layout\LayoutContext;
 use Oro\Bundle\LayoutBundle\Layout\Extension\RouteContextConfigurator;
+use Oro\Component\Layout\LayoutContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 

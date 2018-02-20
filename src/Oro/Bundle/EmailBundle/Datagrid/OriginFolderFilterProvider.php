@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;

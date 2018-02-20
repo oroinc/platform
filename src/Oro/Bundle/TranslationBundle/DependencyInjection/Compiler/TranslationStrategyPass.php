@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\TranslationBundle\DependencyInjection\Compiler;
 
+use Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-use Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait;
 
 class TranslationStrategyPass implements CompilerPassInterface
 {

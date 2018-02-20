@@ -3,7 +3,6 @@
 namespace Oro\Bundle\OrganizationBundle\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;

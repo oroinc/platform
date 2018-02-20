@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Form;
 
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Symfony\Component\Form\FormView;
 
 class TwigRendererEngine extends BaseTwigRendererEngine
 {

@@ -1,8 +1,8 @@
 <?php
 namespace Oro\Bundle\DataAuditBundle\Service;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\DBAL\Types\Type as DbalType;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAuditField;
 use Oro\Bundle\DataAuditBundle\Event\CollectAuditFieldsEvent;
 use Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper;

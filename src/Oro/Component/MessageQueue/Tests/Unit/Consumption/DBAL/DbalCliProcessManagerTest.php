@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\Dbal;
+namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\DBAL;
 
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalCliProcessManager;
 

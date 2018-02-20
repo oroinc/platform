@@ -4,7 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEdi
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\MultiSelectGuesser;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 

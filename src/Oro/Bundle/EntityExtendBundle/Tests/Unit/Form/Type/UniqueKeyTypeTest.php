@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\TypeTestCase;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyType;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Forms;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validation;
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-
-use Doctrine\Common\Annotations\AnnotationReader;
-
-use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyType;
 
 class UniqueKeyTypeTest extends TypeTestCase
 {

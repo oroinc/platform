@@ -4,20 +4,17 @@ namespace Oro\Bundle\EmailBundle\Workflow\Action;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
-
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Validator\Exception\ValidatorException;
-use Symfony\Component\Validator\Constraints\Email as EmailConstraints;
-
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
-use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\Validator\Constraints\Email as EmailConstraints;
+use Symfony\Component\Validator\Exception\ValidatorException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)

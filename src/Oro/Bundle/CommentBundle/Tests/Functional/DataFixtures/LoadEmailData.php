@@ -5,8 +5,8 @@ namespace Oro\Bundle\CommentBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use OroEntityProxy\OroEmailBundle\EmailAddressProxy;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LoadEmailData extends AbstractCommentFixture implements ContainerAwareInterface
 {

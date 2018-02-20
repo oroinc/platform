@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_15;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL92Platform;
-
-use Psr\Log\LoggerInterface;
-
-use Oro\Component\Config\Common\ConfigObject;
-
+use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityBundle\DBAL\Types\ConfigObjectType;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Oro\Component\Config\Common\ConfigObject;
+use Psr\Log\LoggerInterface;
 
 class UpdateIntegrationChannelSettingFieldsValue extends ParametrizedMigrationQuery
 {

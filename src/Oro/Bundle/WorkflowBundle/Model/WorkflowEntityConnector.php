@@ -7,7 +7,6 @@ use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Types\Type;
-
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 
 class WorkflowEntityConnector

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Cache;
 
-use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
-
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
+use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 
 class CacheClearer implements CacheClearerInterface
 {

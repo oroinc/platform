@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\AddressBundle\Form\Type\RegionType;
+use Symfony\Component\Form\FormView;
 
 class RegionTypeTest extends \PHPUnit_Framework_TestCase
 {

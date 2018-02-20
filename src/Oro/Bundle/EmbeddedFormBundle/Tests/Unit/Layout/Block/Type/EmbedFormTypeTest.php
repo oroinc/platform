@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Block\Type;
 
+use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormType;
+use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\BlockTypeTestCase;
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
-
-use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormType;
-use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\BlockTypeTestCase;
 
 class EmbedFormTypeTest extends BlockTypeTestCase
 {

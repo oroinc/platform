@@ -1,9 +1,8 @@
 <?php
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\AddressBundle\Form\Type\CountryType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CountryTypeTest extends \PHPUnit_Framework_TestCase
 {

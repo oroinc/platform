@@ -3,7 +3,6 @@
 namespace Oro\Bundle\OrganizationBundle\Event;
 
 use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 

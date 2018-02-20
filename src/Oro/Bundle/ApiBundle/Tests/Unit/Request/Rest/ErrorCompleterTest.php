@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\Rest;
 
-use Symfony\Component\HttpFoundation\Response;
-
-use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Rest\ErrorCompleter;
+use Symfony\Component\HttpFoundation\Response;
 
 class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
 {

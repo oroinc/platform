@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\SearchBundle\DependencyInjection\Compiler\FilterTypesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-
-use Oro\Bundle\SearchBundle\DependencyInjection\Compiler\FilterTypesPass;
 
 class FilterTypesPassTest extends \PHPUnit_Framework_TestCase
 {

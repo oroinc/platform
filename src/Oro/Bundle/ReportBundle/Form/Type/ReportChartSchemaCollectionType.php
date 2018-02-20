@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ReportBundle\Form\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
-
 use Oro\Bundle\ChartBundle\Form\Type\ConfigProviderAwareType;
+use Symfony\Component\Form\FormBuilderInterface;
 
 class ReportChartSchemaCollectionType extends ConfigProviderAwareType
 {

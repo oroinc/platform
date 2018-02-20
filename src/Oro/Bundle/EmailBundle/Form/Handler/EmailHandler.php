@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Handler;
 
-use Psr\Log\LoggerInterface;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;

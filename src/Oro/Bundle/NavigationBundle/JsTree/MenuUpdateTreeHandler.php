@@ -3,10 +3,8 @@
 namespace Oro\Bundle\NavigationBundle\JsTree;
 
 use Knp\Menu\ItemInterface;
-
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\UIBundle\Model\TreeItem;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class MenuUpdateTreeHandler
 {

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Form\Builder;
 
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\FormBundle\Config\BlockConfig;
 use Oro\Bundle\FormBundle\Config\FormConfig;
 use Oro\Bundle\FormBundle\Config\SubBlockConfig;
+use Symfony\Component\Form\FormView;
 
 class DataBlockBuilder
 {

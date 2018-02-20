@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\EventListener\ApiEventListener;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SoapBundle\Event\FindAfter;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ApiEventListenerTest extends \PHPUnit_Framework_TestCase

@@ -3,18 +3,15 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\DomCrawler\Crawler;
-
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Form\Type\WorkflowAwareEntityType;
-
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithFormConfiguration;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
+use Symfony\Component\DomCrawler\Crawler;
 
 /**
  * @dbIsolationPerTest

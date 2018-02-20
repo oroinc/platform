@@ -3,9 +3,9 @@
 namespace Oro\Bundle\DataGridBundle\EventListener;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\ParameterBinder;
 use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\ParameterBinder;
 
 /**
  * Binds datagrid parameters to datasource from datasource option "bind_parameters".

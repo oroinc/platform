@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
-use Oro\Component\EntitySerializer\ConfigNormalizer as BaseConfigNormalizer;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig as FieldConfig;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Component\EntitySerializer\ConfigNormalizer as BaseConfigNormalizer;
 
 /**
  * This class should be synchronized with the config normalizer for ObjectNormalizer.

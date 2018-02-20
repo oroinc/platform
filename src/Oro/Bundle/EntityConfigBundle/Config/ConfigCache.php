@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
 use Doctrine\Common\Cache\CacheProvider;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 

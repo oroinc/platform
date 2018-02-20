@@ -3,25 +3,22 @@
 namespace Oro\Bundle\EntityMergeBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
+use Oro\Bundle\EntityMergeBundle\Data\EntityData;
+use Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory;
+use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
+use Oro\Bundle\EntityMergeBundle\Exception\ValidationException;
+use Oro\Bundle\EntityMergeBundle\Model\EntityMerger;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ValidatorInterface;
-
-use Oro\Bundle\EntityMergeBundle\Exception\ValidationException;
-use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
-use Oro\Bundle\EntityMergeBundle\Data\EntityData;
-use Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory;
-use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
-use Oro\Bundle\EntityMergeBundle\Model\EntityMerger;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * @Route("/merge")

@@ -2,8 +2,8 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Engine;
 
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 use Oro\Bundle\SearchBundle\Entity\IndexText;
+use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item2;

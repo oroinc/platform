@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor as BaseExtractor;
-
 use Oro\Component\Routing\Resolver\RouteOptionsResolverAwareInterface;
 
 /**

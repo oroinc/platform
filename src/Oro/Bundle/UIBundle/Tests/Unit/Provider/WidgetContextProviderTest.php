@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\UIBundle\Provider\WidgetContextProvider;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class WidgetContextProviderTest extends \PHPUnit_Framework_TestCase

@@ -2,30 +2,26 @@
 
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Security\Acl\Voter\FieldVote;
-
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\UnitOfWork;
-use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\Common\Collections\Criteria;
-
-use FOS\RestBundle\Util\Codes;
-use FOS\RestBundle\View\View;
+use Doctrine\ORM\Proxy\Proxy;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\UnitOfWork;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
-
-use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
+use FOS\RestBundle\Util\Codes;
+use FOS\RestBundle\View\View;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
-use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
+use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
+use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

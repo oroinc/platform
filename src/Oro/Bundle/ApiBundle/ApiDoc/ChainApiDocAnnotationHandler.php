@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Symfony\Component\Routing\Route;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Routing\Route;
 
 /**
  * Delegates the handling of ApiDoc annotation to all child handlers.

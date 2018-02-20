@@ -3,12 +3,9 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Gedmo\Mapping\Annotation as Gedmo;
-
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
-
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 
 /**

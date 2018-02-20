@@ -3,11 +3,10 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Twig;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestTemplate;
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
 use Oro\Bundle\AttachmentBundle\Twig\FileExtension;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;

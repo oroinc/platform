@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType;
 
 class WidgetDateTimeRangeType extends AbstractType
 {

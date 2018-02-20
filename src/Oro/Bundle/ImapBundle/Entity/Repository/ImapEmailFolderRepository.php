@@ -5,9 +5,8 @@ namespace Oro\Bundle\ImapBundle\Entity\Repository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 
 class ImapEmailFolderRepository extends EntityRepository

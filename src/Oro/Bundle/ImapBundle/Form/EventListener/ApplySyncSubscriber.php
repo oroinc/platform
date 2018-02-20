@@ -3,13 +3,11 @@
 namespace Oro\Bundle\ImapBundle\Form\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 
 class ApplySyncSubscriber implements EventSubscriberInterface
 {

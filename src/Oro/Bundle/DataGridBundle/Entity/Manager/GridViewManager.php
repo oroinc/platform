@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Entity\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-
 use Doctrine\Common\Persistence\ObjectRepository;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
@@ -12,15 +11,14 @@ use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\GridViewUser;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewUserRepository;
+use Oro\Bundle\DataGridBundle\Extension\Board\BoardExtension;
+use Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface;
-use Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager;
-use Oro\Bundle\DataGridBundle\Extension\Board\BoardExtension;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
-
 use Oro\Component\PhpUtils\ArrayUtil;
 
 class GridViewManager

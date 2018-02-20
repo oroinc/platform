@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Metadata;
 
-use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\ChainProcessor\ParameterBag;
 
 /**
  * A base class for classes represents metadata for different kind of entity properties.

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Extension;
 
 use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
-
 use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\Options;

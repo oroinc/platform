@@ -2,10 +2,9 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class EndWithTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,14 +3,12 @@
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
 use Doctrine\Common\Util\ClassUtils;
-
-use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\EntityBundle\Exception\EntityExceptionInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
+use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class RelatedEntityTransformer implements DataTransformerInterface
 {

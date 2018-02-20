@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Doctrine\ORM\EntityRepository;
 
 class CountryType extends AbstractType
 {

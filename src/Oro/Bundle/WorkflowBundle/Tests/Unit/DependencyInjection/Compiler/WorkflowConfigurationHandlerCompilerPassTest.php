@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowConfigurationHandlerCompilerPass;
-
 use Oro\Component\DependencyInjection\Tests\Unit\AbstractExtensionCompilerPassTest;
 
 class WorkflowConfigurationHandlerCompilerPassTest extends AbstractExtensionCompilerPassTest

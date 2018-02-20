@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
+use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
-use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class EmailAddressFromType extends AbstractType
 {

@@ -3,12 +3,11 @@
 namespace Oro\Bundle\ActivityListBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-
-use Oro\Bundle\MigrationBundle\Migration\Installation;
-use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\ActivityListBundle\Migrations\Schema\v1_1\OroActivityListBundle as OroActivityListBundle11;
 use Oro\Bundle\ActivityListBundle\Migrations\Schema\v1_2\AddActivityDescription as AddActivityDescription12;
 use Oro\Bundle\ActivityListBundle\Migrations\Schema\v1_3\AddActivityOwner as AddActivityOwner13;
+use Oro\Bundle\MigrationBundle\Migration\Installation;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroActivityListBundleInstaller implements Installation
 {

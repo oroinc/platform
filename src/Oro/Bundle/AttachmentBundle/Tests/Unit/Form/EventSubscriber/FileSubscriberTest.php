@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\EventSubscriber;
 
-use Symfony\Component\Form\FormEvents;
-
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Form\EventSubscriber\FileSubscriber;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
+use Symfony\Component\Form\FormEvents;
 
 class FileSubscriberTest extends \PHPUnit_Framework_TestCase
 {

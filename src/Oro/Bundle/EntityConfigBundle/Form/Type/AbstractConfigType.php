@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 
 /**
  * The abstract class for form types are used to work with entity config attributes.

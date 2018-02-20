@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Handler;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Provider\NotificationManager;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;

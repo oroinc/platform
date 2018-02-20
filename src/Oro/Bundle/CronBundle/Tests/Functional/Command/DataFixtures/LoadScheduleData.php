@@ -4,7 +4,6 @@ namespace Oro\Bundle\CronBundle\Tests\Functional\Command\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\CronBundle\Entity\Schedule;
 
 class LoadScheduleData extends AbstractFixture

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectType;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
-use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectType;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase

@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\EmailBundle\Form\Type\SystemEmailTemplateSelectType;
 
 class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase

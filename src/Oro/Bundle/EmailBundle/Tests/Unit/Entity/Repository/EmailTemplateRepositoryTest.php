@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase

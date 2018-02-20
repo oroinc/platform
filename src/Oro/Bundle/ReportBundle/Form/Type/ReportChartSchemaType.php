@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ReportBundle\Form\Type;
 
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 
 class ReportChartSchemaType extends AbstractType
 {

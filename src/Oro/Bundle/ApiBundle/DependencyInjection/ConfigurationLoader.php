@@ -2,16 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
-use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
-use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
 use Oro\Bundle\ApiBundle\Provider\CombinedConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
@@ -21,6 +11,15 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\AliasedEntityExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasLoader;
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Configures services based on "config_files" section in the bundle configuration

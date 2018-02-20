@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationTypeSelectType;
+use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
 {

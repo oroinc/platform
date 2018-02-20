@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\EntityBundle\DataCollector;
 
-use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Doctrine\DBAL\Logging\DebugStack;
+use Oro\Bundle\EntityBundle\DataCollector\Analyzer\DuplicateQueryAnalyzer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
-use Doctrine\DBAL\Logging\DebugStack;
-
-use Oro\Bundle\EntityBundle\DataCollector\Analyzer\DuplicateQueryAnalyzer;
+use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
 class DuplicateQueriesDataCollector extends DataCollector
 {

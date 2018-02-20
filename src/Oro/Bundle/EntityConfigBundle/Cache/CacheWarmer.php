@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Cache;
 
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigCacheWarmer;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 class CacheWarmer implements CacheWarmerInterface
 {

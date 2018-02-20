@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ReportBundle\Form\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-
 use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
 use Oro\Bundle\QueryDesignerBundle\Model\DateGrouping;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Form\Type\ReportType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 class DateGroupingFormSubscriber implements EventSubscriberInterface
 {

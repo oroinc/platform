@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
 use Composer\Package\Package;
-
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 use Oro\Bundle\TranslationBundle\Provider\PackageProviderInterface;
 use Oro\Bundle\TranslationBundle\Provider\PackagesProvider;

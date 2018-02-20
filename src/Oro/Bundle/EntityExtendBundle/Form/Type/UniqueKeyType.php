@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 class UniqueKeyType extends AbstractType
 {

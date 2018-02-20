@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
-
 use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\BarBundle\BarBundle;
 use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooBundle;

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
+use Nelmio\ApiDocBundle\Formatter\AbstractFormatter;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Templating\EngineInterface;
-
-use Nelmio\ApiDocBundle\Formatter\AbstractFormatter;
 
 /**
  * Base HTML formatter that can be used for all types of REST API views.

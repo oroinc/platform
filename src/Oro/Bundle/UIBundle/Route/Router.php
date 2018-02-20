@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\UIBundle\Route;
 
+use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Bundle\FrameworkBundle\Routing\Router as SymfonyRouter;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class Router
 {

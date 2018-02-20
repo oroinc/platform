@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\ORM\Query;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
-
+use Doctrine\ORM\QueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\ORM\Walker\PreciseOrderByWalker;
 

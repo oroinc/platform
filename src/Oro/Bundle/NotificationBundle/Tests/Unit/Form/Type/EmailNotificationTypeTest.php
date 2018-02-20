@@ -3,16 +3,8 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -26,17 +18,22 @@ use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSub
 use Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationEntityChoiceType;
 use Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationType;
 use Oro\Bundle\NotificationBundle\Form\Type\RecipientListType;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\NotificationBundle\Provider\ContactInformationEmailsProvider;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
-
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class EmailNotificationTypeTest extends FormIntegrationTestCase
 {

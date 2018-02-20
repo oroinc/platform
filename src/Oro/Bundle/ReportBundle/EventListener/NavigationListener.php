@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ReportBundle\EventListener;
 
 use Knp\Menu\ItemInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;

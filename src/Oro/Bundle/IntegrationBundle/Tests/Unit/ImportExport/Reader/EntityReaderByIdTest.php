@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Reader;
 
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-
-use Doctrine\ORM\Query;
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-
+use Doctrine\ORM\Query;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\IntegrationBundle\Reader\EntityReaderById;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class EntityReaderByIdTest extends OrmTestCase
 {

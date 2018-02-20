@@ -3,11 +3,9 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Form\Exception\InvalidConfigurationException;
-
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreationTransformer;
 use Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity\TestCreationEntity;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 
 class EntityCreationTransformerTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,12 +3,12 @@
 namespace Oro\Bundle\EntityBundle\EventListener;
 
 use Doctrine\ORM\Query\Expr\Join;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 
 class EntityRelationGridListener
 {

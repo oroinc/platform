@@ -3,16 +3,13 @@
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityNotFoundException;
-
 use FOS\RestBundle\Util\Codes;
-
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Util\ClassUtils;
-
+use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
-use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 abstract class RestController extends RestGetController implements
     FormAwareInterface,

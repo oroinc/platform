@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\EmailBundle\Model\FolderType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-
-use Oro\Bundle\EmailBundle\Model\FolderType;
 
 class EmailFolderApiType extends AbstractType
 {

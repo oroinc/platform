@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Datasource\Orm;
 
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 
 /**
  * Iterates query result with elements of ResultRecord type

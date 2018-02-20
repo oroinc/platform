@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\DoctrineExtension\Dbal\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-
 use Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedStringType;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 

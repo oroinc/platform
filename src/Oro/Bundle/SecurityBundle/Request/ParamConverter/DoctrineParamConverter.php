@@ -2,15 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\Request\ParamConverter;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
 use Doctrine\Common\Persistence\ManagerRegistry;
-
+use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\DoctrineParamConverter as BaseParamConverter;
-
-use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class DoctrineParamConverter extends BaseParamConverter
 {

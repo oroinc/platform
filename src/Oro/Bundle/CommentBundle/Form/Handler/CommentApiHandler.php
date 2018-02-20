@@ -3,8 +3,8 @@
 namespace Oro\Bundle\CommentBundle\Form\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 

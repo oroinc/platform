@@ -3,7 +3,6 @@
 namespace Oro\Bundle\CommentBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 abstract class AbstractCommentFixture extends AbstractFixture

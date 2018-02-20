@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\FilterBundle\Form\EventListener;
 
+use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
+use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
-use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

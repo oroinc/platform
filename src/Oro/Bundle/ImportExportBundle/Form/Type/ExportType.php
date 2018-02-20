@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Form\Type;
 
+use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
 class ExportType extends AbstractType
 {

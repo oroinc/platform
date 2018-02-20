@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
-use Doctrine\ORM\Query;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
+use Doctrine\ORM\Query;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 
 class JoinCasesTest extends DatagridConfigurationBuilderTestCase

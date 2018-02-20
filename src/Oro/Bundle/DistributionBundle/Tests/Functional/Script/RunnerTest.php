@@ -4,10 +4,9 @@ namespace Oro\Bundle\DistributionBundle\Tests\Functional\Script;
 
 use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\DistributionBundle\Script\Runner;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Psr\Log\LoggerInterface;
 
 /**
  * @group dist

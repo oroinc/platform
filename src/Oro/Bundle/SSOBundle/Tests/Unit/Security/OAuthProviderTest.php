@@ -5,14 +5,12 @@ namespace Oro\Bundle\SSOBundle\Tests\Security;
 use HWI\Bundle\OAuthBundle\Security\Core\Authentication\Token\OAuthToken as HWIOauthToken;
 use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
 use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
-
-use Symfony\Component\Security\Core\User\UserCheckerInterface;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SSOBundle\Security\OAuthProvider;
 use Oro\Bundle\SSOBundle\Security\OAuthToken;
 use Oro\Bundle\SSOBundle\Security\OAuthTokenFactory;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
 class OAuthProviderTest extends \PHPUnit_Framework_TestCase
 {

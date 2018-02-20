@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataAuditBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\DataAuditBundle\Migrations\Schema\v1_9\AddImpersonationColumn;
 use Oro\Bundle\MigrationBundle\Migration\Installation;

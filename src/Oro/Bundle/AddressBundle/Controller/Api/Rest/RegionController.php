@@ -11,8 +11,6 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
 /**
  * @RouteResource("region")
  * @NamePrefix("oro_api_")

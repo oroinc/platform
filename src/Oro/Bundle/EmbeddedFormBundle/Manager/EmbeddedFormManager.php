@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormInterface;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormTypeInterface;
+use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 
 class EmbeddedFormManager
 {

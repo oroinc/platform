@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Translations;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\WorkflowDefinitionTranslationFieldsIterator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class TranslationCheckerTest extends WebTestCase
 {

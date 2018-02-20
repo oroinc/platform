@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
-
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeMultiSelectType;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 

@@ -4,16 +4,13 @@ namespace Oro\Bundle\EntityExtendBundle\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
-
-use Symfony\Component\HttpFoundation\Response;
-
-use FOS\RestBundle\Util\Codes;
-use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
-
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("entity_extend_enum")

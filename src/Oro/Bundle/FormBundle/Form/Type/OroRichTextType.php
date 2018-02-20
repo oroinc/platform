@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
+use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Symfony\Component\Asset\Packages as AssetHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Asset\Packages as AssetHelper;
-
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
-use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 
 class OroRichTextType extends AbstractType
 {

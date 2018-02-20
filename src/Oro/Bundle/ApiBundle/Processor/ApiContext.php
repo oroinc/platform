@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Oro\Component\ChainProcessor\Context as BaseContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Component\ChainProcessor\Context as BaseContext;
 
 abstract class ApiContext extends BaseContext
 {

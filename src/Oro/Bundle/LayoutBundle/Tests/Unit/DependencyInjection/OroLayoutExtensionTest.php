@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LayoutBundle\DependencyInjection\OroLayoutExtension;
 use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
 use Oro\Bundle\LayoutBundle\EventListener\ThemeListener;
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\TagBundle\Form\Type;
 
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AbstractConfigType;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TagConfigChoiceType extends AbstractConfigType
 {

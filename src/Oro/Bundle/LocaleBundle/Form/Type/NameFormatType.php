@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
+use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 
 class NameFormatType extends AbstractType
 {

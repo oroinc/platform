@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Search;
 
 use Doctrine\Common\Collections\Expr\CompositeExpression;
-
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Criteria\ExpressionBuilder;
 use Oro\Bundle\SearchBundle\Query\Query;

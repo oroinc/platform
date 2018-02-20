@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ReportBundle\Validator;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Validator\Constraints\ReportDefinitionConstraint;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
 
 class ReportDefinitionValidator extends ConstraintValidator
 {

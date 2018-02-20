@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Command\Util;
 
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\MatchApplicableChecker;
-use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class RequestTypeApplicableChecker extends MatchApplicableChecker
 {

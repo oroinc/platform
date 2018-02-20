@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
 use Oro\Bundle\UserBundle\Form\EventListener\ChangeRoleSubscriber;
+use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
 
 class AclRoleTypeTest extends \PHPUnit_Framework_TestCase
 {

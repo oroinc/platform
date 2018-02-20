@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider\Converters;
 
 use Doctrine\ORM\AbstractQuery;
-
 use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter;
 use Oro\Bundle\UserBundle\Entity\User;
 

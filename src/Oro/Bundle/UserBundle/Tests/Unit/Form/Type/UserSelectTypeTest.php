@@ -1,9 +1,8 @@
 <?php
 namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\UserBundle\Form\Type\UserSelectType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UserSelectTypeTest extends \PHPUnit_Framework_TestCase
 {

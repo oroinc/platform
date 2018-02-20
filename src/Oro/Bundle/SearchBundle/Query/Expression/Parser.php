@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Query\Expression;
 
-use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\Comparison;
-
+use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Criteria\ExpressionBuilder;

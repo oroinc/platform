@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Model;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment as EmailAttachmentEntity;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class EmailAttachment
 {

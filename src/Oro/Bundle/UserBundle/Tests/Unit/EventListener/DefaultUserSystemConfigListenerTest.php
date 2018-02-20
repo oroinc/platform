@@ -8,7 +8,6 @@ use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\EventListener\DefaultUserSystemConfigListener;
 use Oro\Bundle\UserBundle\Provider\DefaultUserProvider;
-
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class DefaultUserSystemConfigListenerTest extends \PHPUnit_Framework_TestCase

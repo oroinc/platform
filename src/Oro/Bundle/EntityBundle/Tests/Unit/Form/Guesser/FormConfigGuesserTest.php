@@ -5,13 +5,11 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\Guesser;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Form\Guess\TypeGuess;
-use Symfony\Component\Form\Guess\ValueGuess;
-
+use Oro\Bundle\EntityBundle\Form\Guesser\FormConfigGuesser;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityBundle\Form\Guesser\FormConfigGuesser;
+use Symfony\Component\Form\Guess\TypeGuess;
+use Symfony\Component\Form\Guess\ValueGuess;
 
 class FormConfigGuesserTest extends \PHPUnit_Framework_TestCase
 {

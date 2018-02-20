@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Form\EventListener;
 
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-
 use Oro\Bundle\ActionBundle\Form\EventListener\RequiredAttributesListener;
 use Oro\Bundle\ActionBundle\Model\ActionData;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 class RequiredAttributesListenerTest extends \PHPUnit_Framework_TestCase
 {

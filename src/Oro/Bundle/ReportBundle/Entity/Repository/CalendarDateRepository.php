@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ReportBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 
 class CalendarDateRepository extends EntityRepository

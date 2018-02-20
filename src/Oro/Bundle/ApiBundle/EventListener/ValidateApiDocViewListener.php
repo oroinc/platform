@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\EventListener;
 
+use Nelmio\ApiDocBundle\Controller\ApiDocController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-
-use Nelmio\ApiDocBundle\Controller\ApiDocController;
 
 /**
  * Checks whether the requested ApiDoc view is valid for REST API sandbox.

@@ -2,21 +2,18 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Async;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events as OrmEvents;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
-use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
-
-use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherAwareInterface;
-use Oro\Component\PhpUtils\ReflectionUtil;
 use Oro\Bundle\EntityBundle\ORM\OroClassMetadataFactory;
 use Oro\Bundle\EntityBundle\ORM\Repository\EntityRepositoryFactory;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearerInterface;
+use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherAwareInterface;
+use Oro\Component\PhpUtils\ReflectionUtil;
+use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 
 /**
  * Removes unnecessary ORM metadata factory to avoid keeping unnecessary objects in the memory.

@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Symfony\Component\Yaml\Yaml;
-
-use CG\Generator\PhpClass;
 use CG\Core\DefaultGeneratorStrategy;
-
+use CG\Generator\PhpClass;
 use Oro\Bundle\EntityExtendBundle\Tools\Generator\Visitor;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractEntityGeneratorExtension;
+use Symfony\Component\Yaml\Yaml;
 
 class EntityGenerator
 {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ReminderBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
-
 use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 
 interface RemindableInterface

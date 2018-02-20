@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ReportBundle\Validator;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-
+use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Validator\Constraints\ReportDateGroupingConstraint;
-use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
 
 class ReportDateGroupingValidator extends ConstraintValidator
 {

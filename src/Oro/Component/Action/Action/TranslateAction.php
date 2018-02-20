@@ -3,13 +3,11 @@
 namespace Oro\Component\Action\Action;
 
 use Doctrine\Common\Util\ClassUtils;
-
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Component\Action\Exception\InvalidParameterException;
-use Oro\Component\ConfigExpression\ContextAccessor;
 
 class TranslateAction extends AbstractAction
 {

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\ActionBundle\Tests\Unit\Action\ResolveDestinationPageTest as BaseTestCase;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Symfony\Component\HttpFoundation\Request;
 
 class ResolveDestinationPageTest extends BaseTestCase
 {

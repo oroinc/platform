@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Acl\Voter;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class WorkflowEditVoter extends Voter
 {

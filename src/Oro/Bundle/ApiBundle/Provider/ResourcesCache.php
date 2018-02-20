@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
-
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\RequestType;

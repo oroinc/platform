@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
+use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeys;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeys;
-use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
 
 class UniqueKeyCollectionType extends AbstractType
 {

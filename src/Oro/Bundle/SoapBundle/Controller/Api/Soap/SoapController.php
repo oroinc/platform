@@ -3,15 +3,13 @@
 namespace Oro\Bundle\SoapBundle\Controller\Api\Soap;
 
 use Doctrine\Common\Collections\Collection;
-
 use Doctrine\ORM\EntityNotFoundException;
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormInterface;
-
+use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
-use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 
 abstract class SoapController extends SoapGetController implements
     FormAwareInterface,

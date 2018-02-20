@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Symfony\Component\Form\FormInterface;
-
+use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
-use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Form\FormInterface;
 
 class FormTest extends WebTestCase
 {

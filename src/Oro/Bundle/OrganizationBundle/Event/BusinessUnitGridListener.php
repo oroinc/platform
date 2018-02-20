@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\OrganizationBundle\Event;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
+use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
-use Oro\Bundle\DataGridBundle\Event\BuildBefore;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class BusinessUnitGridListener
 {

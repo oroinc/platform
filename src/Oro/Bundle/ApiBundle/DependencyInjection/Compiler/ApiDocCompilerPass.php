@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension;
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension;
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 
 /**
  * Configures ApiDoc related services.

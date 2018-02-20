@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\Query\Parameter;
-
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NinComparisonExpression;
 

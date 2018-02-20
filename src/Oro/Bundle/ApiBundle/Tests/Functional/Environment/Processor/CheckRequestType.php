@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor;
 
+use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\Context;
 
 class CheckRequestType implements ProcessorInterface
 {

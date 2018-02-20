@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Form\Type\AbstractConfigType as BaseAbstractConfigType;
+use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Form\EventListener\ConfigTypeSubscriber;
+use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityExtendBundle\Form\EventListener\ConfigTypeSubscriber;
-use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
-use Oro\Bundle\EntityConfigBundle\Form\Type\AbstractConfigType as BaseAbstractConfigType;
-use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
  * The abstract class for form types are used to work with entity config attributes

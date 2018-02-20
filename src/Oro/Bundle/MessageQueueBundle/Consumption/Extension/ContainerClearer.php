@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
+use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Psr\Log\LoggerInterface;
-
 use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 use Symfony\Component\DependencyInjection\ResettableContainerInterface;
-
-use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 
 /**
  * Removes all services except persistent ones from the service container

@@ -3,12 +3,11 @@
 namespace Oro\Bundle\SoapBundle\Controller\Api\Soap;
 
 use Doctrine\Instantiator\Instantiator;
+use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
+use Oro\Bundle\SoapBundle\Entity\SoapEntityInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\Security\Core\Util\ClassUtils;
-
-use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
-use Oro\Bundle\SoapBundle\Entity\SoapEntityInterface;
 
 abstract class SoapGetController implements EntityManagerAwareInterface, SoapApiReadInterface, ContainerAwareInterface
 {

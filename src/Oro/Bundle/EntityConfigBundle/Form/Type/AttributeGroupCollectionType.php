@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
+use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Form\Type\CollectionType;
-use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 
 class AttributeGroupCollectionType extends AbstractType
 {

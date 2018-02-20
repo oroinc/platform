@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
+use Oro\Bundle\UserBundle\Form\EventListener\UserApiSubscriber;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\UserBundle\Form\EventListener\UserApiSubscriber;
-use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class UserApiType extends UserType
 {

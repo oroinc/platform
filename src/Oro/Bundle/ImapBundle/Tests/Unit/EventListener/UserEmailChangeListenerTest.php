@@ -4,7 +4,6 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
-
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\EventListener\UserEmailChangeListener;
 use Oro\Bundle\UserBundle\Entity\User;

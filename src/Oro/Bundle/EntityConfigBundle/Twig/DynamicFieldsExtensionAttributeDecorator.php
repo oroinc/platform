@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Acl\Util\ClassUtils;
-
 use Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Twig\AbstractDynamicFieldsExtension;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 class DynamicFieldsExtensionAttributeDecorator extends AbstractDynamicFieldsExtension
 {

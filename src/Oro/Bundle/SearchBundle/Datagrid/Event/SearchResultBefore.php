@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\SearchBundle\Datagrid\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
-use Oro\Bundle\DataGridBundle\Event\GridEventInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Event\GridEventInterface;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
+use Symfony\Component\EventDispatcher\Event;
 
 class SearchResultBefore extends Event implements GridEventInterface
 {

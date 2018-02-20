@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Metadata\Annotation;
 
 use Doctrine\Common\Annotations\Annotation;
-
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Exception\AnnotationException;
 

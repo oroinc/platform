@@ -3,7 +3,10 @@
 namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreationTransformer;
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
@@ -13,11 +16,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
-use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreationTransformer;
-use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 
 class OroEntitySelectOrCreateInlineType extends AbstractType
 {

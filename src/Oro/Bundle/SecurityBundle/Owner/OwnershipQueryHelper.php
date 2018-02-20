@@ -4,7 +4,6 @@ namespace Oro\Bundle\SecurityBundle\Owner;
 
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;

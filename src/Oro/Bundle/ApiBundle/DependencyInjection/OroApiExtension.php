@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -12,9 +14,6 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Yaml\Yaml;
-
-use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 
 class OroApiExtension extends Extension implements PrependExtensionInterface
 {

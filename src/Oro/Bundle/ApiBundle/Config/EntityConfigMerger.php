@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\NodeInterface;
-use Symfony\Component\Config\Definition\Processor;
-
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityDefinitionConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\TargetEntityDefinitionConfiguration;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\NodeInterface;
+use Symfony\Component\Config\Definition\Processor;
 
 /**
  * Provides functionality to merge two configurations loaded from

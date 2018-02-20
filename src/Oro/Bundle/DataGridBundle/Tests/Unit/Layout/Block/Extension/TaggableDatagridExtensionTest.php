@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Layout\Block\Extension;
 
-use Oro\Component\Layout\BlockInterface;
-use Oro\Component\Layout\BlockView;
+use Oro\Bundle\DataGridBundle\Layout\Block\Extension\TaggableDatagridExtension;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\Options;
-
-use Oro\Bundle\DataGridBundle\Layout\Block\Extension\TaggableDatagridExtension;
+use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockView;
 
 class TaggableDatagridExtensionTest extends \PHPUnit_Framework_TestCase
 {

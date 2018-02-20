@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Pager;
 
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Extension\Pager\ArrayDatasource\ArrayPager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Extension\Pager\ArrayPagerExtension;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\ArrayDatasource\ArrayDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 use Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension;
+use Oro\Bundle\DataGridBundle\Extension\Pager\ArrayDatasource\ArrayPager;
+use Oro\Bundle\DataGridBundle\Extension\Pager\ArrayPagerExtension;
+use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 
 class ArrayPagerExtensionTest extends \PHPUnit_Framework_TestCase
 {

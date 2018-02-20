@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ErrorCompleterCompilerPass;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 class ErrorCompleterCompilerPassTest extends \PHPUnit_Framework_TestCase
 {

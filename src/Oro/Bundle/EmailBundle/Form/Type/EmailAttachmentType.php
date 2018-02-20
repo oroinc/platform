@@ -3,16 +3,14 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ObjectManager;
-
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
+use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
+use Oro\Bundle\FormBundle\Form\Exception\FormException;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
-use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
-use Oro\Bundle\FormBundle\Form\Exception\FormException;
 
 class EmailAttachmentType extends AbstractType
 {

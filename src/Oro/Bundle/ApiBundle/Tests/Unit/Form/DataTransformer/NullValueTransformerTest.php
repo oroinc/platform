@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DateTransformer;
 
-use Symfony\Component\Form\DataTransformerInterface;
-
 use Oro\Bundle\ApiBundle\Form\DataTransformer\NullValueTransformer;
+use Symfony\Component\Form\DataTransformerInterface;
 
 class NullValueTransformerTest extends \PHPUnit_Framework_TestCase
 {

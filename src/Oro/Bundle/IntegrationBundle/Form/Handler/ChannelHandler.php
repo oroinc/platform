@@ -3,11 +3,11 @@
 namespace Oro\Bundle\IntegrationBundle\Form\Handler;
 
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Event\DefaultOwnerSetEvent;
-use Symfony\Component\Form\FormInterface;
+use Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ChannelHandler

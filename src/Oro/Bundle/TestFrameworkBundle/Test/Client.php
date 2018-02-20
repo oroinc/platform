@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
-use Symfony\Component\BrowserKit\Cookie;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
-use Symfony\Component\BrowserKit\Request as InternalRequest;
-use Symfony\Component\BrowserKit\Response as InternalResponse;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
+use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
+use Symfony\Component\BrowserKit\Cookie;
+use Symfony\Component\BrowserKit\Request as InternalRequest;
+use Symfony\Component\BrowserKit\Response as InternalResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class Client extends BaseClient
 {

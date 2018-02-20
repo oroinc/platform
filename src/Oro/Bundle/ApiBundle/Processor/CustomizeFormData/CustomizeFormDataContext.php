@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeFormData;
 
-use Symfony\Component\Form\FormInterface;
-
 use Oro\Bundle\ApiBundle\Processor\CustomizeDataContext;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * The context for the "customize_form_data" action.

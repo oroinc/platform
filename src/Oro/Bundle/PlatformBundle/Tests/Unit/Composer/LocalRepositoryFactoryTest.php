@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\Composer;
 
-use Symfony\Component\Filesystem\Filesystem;
-
 use Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory;
 use Oro\Bundle\PlatformBundle\OroPlatformBundle;
+use Symfony\Component\Filesystem\Filesystem;
 
 class LocalRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
 {

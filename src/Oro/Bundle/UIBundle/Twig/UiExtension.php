@@ -2,12 +2,6 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\Request;
-
-use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
@@ -16,6 +10,11 @@ use Oro\Bundle\UIBundle\Event\Events;
 use Oro\Bundle\UIBundle\Provider\UserAgentProviderInterface;
 use Oro\Bundle\UIBundle\Twig\Parser\PlaceholderTokenParser;
 use Oro\Bundle\UIBundle\View\ScrollData;
+use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

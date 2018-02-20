@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ConfigBundle\Config;
 
-use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
+use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Provider\ProviderInterface;
 
 class ConfigApiManager

@@ -5,9 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor;
 use Nelmio\ApiDocBundle\Formatter\FormatterInterface;
-
-use Symfony\Component\Routing\Route;
-
 use Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes;
@@ -15,6 +12,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
+use Symfony\Component\Routing\Route;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

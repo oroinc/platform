@@ -3,15 +3,12 @@
 namespace Oro\Bundle\LoggerBundle\Monolog;
 
 use Doctrine\Common\Cache\CacheProvider;
-
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Handler\HandlerInterface;
-
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DetailedLogsHandler extends AbstractProcessingHandler implements ContainerAwareInterface
 {

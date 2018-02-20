@@ -5,9 +5,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
-
-use Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
+use Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter;
 
 class PrimaryFieldFilterTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 
 class WidgetSortByType extends AbstractType
 {

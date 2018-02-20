@@ -5,8 +5,8 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\GridViews;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class GridViewManagerStub extends GridViewManager
 {

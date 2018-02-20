@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Form\Guesser;
 
-use Symfony\Component\Form\FormTypeGuesserInterface;
-use Symfony\Component\Form\Guess\TypeGuess;
-
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -14,6 +11,8 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Symfony\Component\Form\FormTypeGuesserInterface;
+use Symfony\Component\Form\Guess\TypeGuess;
 
 class MetadataTypeGuesser implements FormTypeGuesserInterface
 {

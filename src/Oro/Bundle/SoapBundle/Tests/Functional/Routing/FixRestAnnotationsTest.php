@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SoapBundle\Tests\Functional\Routing;
 
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
-
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class FixRestAnnotationsTest extends WebTestCase
 {

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Util;
 
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Validator\Constraints\Sorting as SortingConstraint;
 use Oro\Bundle\SegmentBundle\Validator\SortingValidator;
-
+use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class SortingValidatorTest extends AbstractConstraintValidatorTest

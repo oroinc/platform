@@ -20,7 +20,8 @@ class CheckRequirementsCommand extends ContainerAwareCommand
         $this
             ->setName('oro:check-requirements')
             ->setDescription('Checks that the application meets the system requirements.')
-            ->setHelp(<<<EOT
+            ->setHelp(
+                <<<EOT
 The <info>%command.name%</info> command checks that the application meets the system requirements.
 
 By default this command shows only errors, but you can specify the verbosity level to see warnings

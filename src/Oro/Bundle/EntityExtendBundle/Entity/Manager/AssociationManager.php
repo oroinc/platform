@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityExtendBundle\Entity\Manager;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\UnionQueryBuilder;

@@ -4,13 +4,12 @@ namespace Oro\Bundle\SoapBundle\Handler;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Component\DoctrineUtils\ORM\SqlQuery;
-use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
-use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestApiReadInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
+use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestApiReadInterface;
+use Oro\Component\DoctrineUtils\ORM\SqlQuery;
+use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 
 class TotalHeaderHandler implements IncludeHandlerInterface
 {

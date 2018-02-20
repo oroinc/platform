@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
+use Oro\Bundle\LocaleBundle\Form\DataTransformer\MultipleValueTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\LocaleBundle\Form\DataTransformer\MultipleValueTransformer;
 
 class LocalizedPropertyType extends AbstractType
 {

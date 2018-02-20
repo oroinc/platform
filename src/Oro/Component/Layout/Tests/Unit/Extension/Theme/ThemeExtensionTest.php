@@ -2,15 +2,15 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme;
 
+use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 use Oro\Component\Layout\Extension\Theme\PathProvider\ChainPathProvider;
 use Oro\Component\Layout\Extension\Theme\ResourceProvider\ResourceProviderInterface;
 use Oro\Component\Layout\Extension\Theme\ThemeExtension;
-use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutItem;
 use Oro\Component\Layout\LayoutItemInterface;
-use Oro\Component\Layout\Loader\LayoutUpdateLoader;
 use Oro\Component\Layout\Loader\Driver\DriverInterface;
+use Oro\Component\Layout\Loader\LayoutUpdateLoader;
 use Oro\Component\Layout\RawLayoutBuilder;
 
 class ThemeExtensionTest extends \PHPUnit_Framework_TestCase

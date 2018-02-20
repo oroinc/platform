@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentBuilderCompilerPass;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 class DocumentBuilderCompilerPassTest extends \PHPUnit_Framework_TestCase
 {

@@ -101,11 +101,11 @@ class View implements ViewInterface
         return $this->label;
     }
 
-     /**
-     * @param string $icon
-     *
-     * @return $this
-     */
+    /**
+    * @param string $icon
+    *
+    * @return $this
+    */
     public function setIcon($icon)
     {
         $this->icon = $icon;

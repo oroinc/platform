@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
+use Oro\Bundle\DashboardBundle\Model\DashboardModel;
+use Oro\Bundle\DashboardBundle\Model\Manager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-use Oro\Bundle\DashboardBundle\Model\Manager;
-use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 
 class DashboardSelectType extends AbstractType
 {

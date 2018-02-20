@@ -9,11 +9,9 @@ use FOS\RestBundle\Util\Codes;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Iterator\RecursiveItemIterator;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
+use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 
 /**
  * @RouteResource("shortcuts")

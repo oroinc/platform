@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\FieldConfig;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * Represents a configuration of an entity.

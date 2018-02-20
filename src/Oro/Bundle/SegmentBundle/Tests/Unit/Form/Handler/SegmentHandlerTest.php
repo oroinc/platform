@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Form\Handler;
 
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Form\Handler\SegmentHandler;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class SegmentHandlerTest extends \PHPUnit_Framework_TestCase

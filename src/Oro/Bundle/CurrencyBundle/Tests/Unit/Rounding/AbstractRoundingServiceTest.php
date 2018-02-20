@@ -3,7 +3,6 @@
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Rounding;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-
 use Oro\Bundle\CurrencyBundle\Rounding\AbstractRoundingService;
 
 abstract class AbstractRoundingServiceTest extends \PHPUnit_Framework_TestCase

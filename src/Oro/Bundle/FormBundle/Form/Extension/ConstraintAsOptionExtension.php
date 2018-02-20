@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\FormBundle\Form\Extension;
 
-use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\Options;
-
-use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
+use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
+use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ConstraintAsOptionExtension extends AbstractTypeExtension
 {

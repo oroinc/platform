@@ -4,7 +4,6 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-
 use Oro\Bundle\DashboardBundle\EventListener\WidgetSortByListener;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;

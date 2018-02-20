@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Extension;
 
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 
 class ConfigExtension extends AbstractTypeExtension
 {

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub;
 
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 
 class LocalizedFallbackValueCollectionTypeStub extends AbstractType
 {

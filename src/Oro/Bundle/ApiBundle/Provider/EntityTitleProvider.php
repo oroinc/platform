@@ -5,11 +5,10 @@ namespace Oro\Bundle\ApiBundle\Provider;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
-
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 
 /**
  * Provides a functionality to load a text representation of manageable (ORM) entities.

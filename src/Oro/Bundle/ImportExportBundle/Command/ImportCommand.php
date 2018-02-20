@@ -3,19 +3,16 @@
 namespace Oro\Bundle\ImportExportBundle\Command;
 
 use Akeneo\Bundle\BatchBundle\Connector\ConnectorRegistry;
-
+use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
-
-use Oro\Bundle\ImportExportBundle\Async\Topics;
-use Oro\Bundle\ImportExportBundle\File\FileManager;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class ImportCommand extends ContainerAwareCommand
 {

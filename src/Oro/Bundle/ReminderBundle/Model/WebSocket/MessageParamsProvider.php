@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ReminderBundle\Model\WebSocket;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\UrlProvider;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class MessageParamsProvider
 {

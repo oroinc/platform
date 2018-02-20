@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\TagBundle\Form\Transformer;
 
-use Symfony\Component\Form\DataTransformerInterface;
-
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Form\DataTransformerInterface;
 
 class TagTransformer implements DataTransformerInterface
 {

@@ -14,8 +14,8 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToStringTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class Select2Type extends AbstractType

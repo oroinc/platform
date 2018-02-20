@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\UIBundle\EventListener;
 
+use Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface;
+use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-
-use Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface;
-use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
 
 class ContentProviderListener
 {

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DistributionBundle\Entity\Security;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity()

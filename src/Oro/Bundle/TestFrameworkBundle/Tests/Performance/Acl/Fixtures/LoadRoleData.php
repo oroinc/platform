@@ -3,8 +3,8 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Performance\Acl\Fixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\UserBundle\Entity\Role;
 
 class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface

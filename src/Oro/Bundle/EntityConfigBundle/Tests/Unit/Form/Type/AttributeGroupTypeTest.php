@@ -4,11 +4,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupType;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeMultiSelectType;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\FormBundle\Tests\Unit\Stub\StripTagsExtensionStub;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;

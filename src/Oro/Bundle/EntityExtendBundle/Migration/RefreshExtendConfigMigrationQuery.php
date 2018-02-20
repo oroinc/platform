@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class RefreshExtendConfigMigrationQuery implements MigrationQuery
 {

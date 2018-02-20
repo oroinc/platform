@@ -4,12 +4,10 @@ namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
-
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\ORMException;
-
 use Oro\Bundle\EntityBundle\DataCollector\OrmLogger;
 use Oro\Bundle\EntityBundle\ORM\Event\PreCloseEventArgs;
 

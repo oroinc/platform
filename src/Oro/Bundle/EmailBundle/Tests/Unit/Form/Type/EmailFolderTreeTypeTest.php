@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class EmailFolderTreeTypeTest extends FormIntegrationTestCase
 {

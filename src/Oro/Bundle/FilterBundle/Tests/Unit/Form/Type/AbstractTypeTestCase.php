@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 
 abstract class AbstractTypeTestCase extends FormIntegrationTestCase
 {

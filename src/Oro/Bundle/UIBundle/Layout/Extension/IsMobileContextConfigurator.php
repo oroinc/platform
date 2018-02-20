@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\UIBundle\Layout\Extension;
 
-use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
+use Oro\Component\Layout\ContextConfiguratorInterface;
+use Oro\Component\Layout\ContextInterface;
 
 class IsMobileContextConfigurator implements ContextConfiguratorInterface
 {

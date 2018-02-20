@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
-use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
-use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
-use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractDateTypeTestCase;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
 use Oro\Bundle\FilterBundle\Form\Type\DateTimeRangeType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
+use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
+use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
+use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractDateTypeTestCase;
 
 class DateTimeRangeFilterTypeTest extends AbstractDateTypeTestCase
 {

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\DeleteList;
 
+use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\Context;
 
 /**
  * Calculates and sets the total number of deleted records to "X-Include-Deleted-Count" response header,

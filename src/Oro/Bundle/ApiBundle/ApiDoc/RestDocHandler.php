@@ -2,12 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Symfony\Component\Routing\Route;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
-
-use Oro\Component\PhpUtils\ReflectionUtil;
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadata;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -18,6 +14,8 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
+use Oro\Component\PhpUtils\ReflectionUtil;
+use Symfony\Component\Routing\Route;
 
 /**
  * Populates ApiDoc annotation based on the confoguration of Data API resource.

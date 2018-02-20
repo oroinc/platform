@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\AsseticBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\AsseticBundle\DependencyInjection\Compiler\AsseticFilterPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class AsseticFilterPassTest extends \PHPUnit_Framework_TestCase
 {

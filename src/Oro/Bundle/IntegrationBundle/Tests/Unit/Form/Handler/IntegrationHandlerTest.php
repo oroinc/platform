@@ -3,16 +3,14 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Handler;
 
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Oro\Bundle\IntegrationBundle\Event\DefaultOwnerSetEvent;
+use Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent;
+use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler as IntegrationHandler;
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
-use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler as IntegrationHandler;
-use Oro\Bundle\IntegrationBundle\Event\DefaultOwnerSetEvent;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase

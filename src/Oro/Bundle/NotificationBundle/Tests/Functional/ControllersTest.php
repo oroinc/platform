@@ -3,15 +3,12 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Functional;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\DomCrawler\Form;
-
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\NotificationBundle\Entity\Event;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
 use Oro\Component\Testing\ResponseExtension;
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\Form;
 
 class ControllersTest extends WebTestCase
 {

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
+use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -11,9 +13,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 
 class WidgetDateRangeType extends AbstractType
 {

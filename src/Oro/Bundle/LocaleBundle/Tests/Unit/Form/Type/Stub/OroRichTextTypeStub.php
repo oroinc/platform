@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub;
 
+use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 
 class OroRichTextTypeStub extends AbstractType
 {

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
+use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class BusinessUnitType extends AbstractType
 {

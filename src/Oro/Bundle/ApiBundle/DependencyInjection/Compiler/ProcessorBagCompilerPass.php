@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Oro\Component\ChainProcessor\DependencyInjection\ProcessorsLoader;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Adds all registered Data API processors to the processor bag service.

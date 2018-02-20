@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The registry that allows to get the error completer for a specific request type.

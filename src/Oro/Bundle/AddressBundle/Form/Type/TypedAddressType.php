@@ -4,7 +4,6 @@ namespace Oro\Bundle\AddressBundle\Form\Type;
 
 use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimarySubscriber;
 use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesTypesSubscriber;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;

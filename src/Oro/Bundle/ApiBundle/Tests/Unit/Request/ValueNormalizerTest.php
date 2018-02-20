@@ -3,10 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Doctrine\Common\Collections\Criteria;
-
-use Oro\Component\ChainProcessor\ProcessorBag;
-use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
-use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue as Processor;
@@ -16,6 +12,9 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Component\ChainProcessor\ProcessorBag;
+use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
+use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 
 /**
  * Tests ValueNormalizer and normalization processors for all supported simple types

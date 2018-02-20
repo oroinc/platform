@@ -17,7 +17,8 @@ class LoadConfigurablePermissionCommand extends ContainerAwareCommand
     {
         $this->setName(self::NAME)
             ->setDescription('Load configurable permissions into cache')
-            ->setHelp(<<<EOF
+            ->setHelp(
+                <<<EOF
 The <info>%command.name%</info> command load Configurable Permission into cache:
 
   <info>php %command.full_name%</info>

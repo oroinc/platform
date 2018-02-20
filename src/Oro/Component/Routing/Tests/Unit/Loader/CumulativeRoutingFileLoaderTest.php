@@ -2,10 +2,9 @@
 
 namespace Oro\Component\Routing\Tests\Unit\Loader;
 
+use Oro\Component\Routing\Loader\CumulativeRoutingFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-
-use Oro\Component\Routing\Loader\CumulativeRoutingFileLoader;
 
 class CumulativeRoutingFileLoaderTest extends \PHPUnit_Framework_TestCase
 {

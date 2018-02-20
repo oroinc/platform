@@ -9,7 +9,6 @@
 namespace Oro\Bundle\ApiBundle\Validator\Constraints;
 
 use Doctrine\Common\Collections\AbstractLazyCollection;
-
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;

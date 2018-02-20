@@ -4,7 +4,6 @@ namespace Oro\Bundle\TranslationBundle\Provider;
 
 use Composer\Config;
 use Composer\Package\PackageInterface;
-
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 
 class PackagesProvider implements PackageProviderInterface

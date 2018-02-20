@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\EventListener;
 
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-
-use Doctrine\ORM\PersistentCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
@@ -12,12 +9,13 @@ use Doctrine\ORM\Event\OnClearEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class IndexListener implements OptionalListenerInterface
 {

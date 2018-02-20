@@ -3,10 +3,9 @@
 namespace Oro\Bundle\UserBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-
-use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareTrait;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -16,25 +15,24 @@ use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterf
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_0\OroUserBundle;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_10\OroUserBundle as PasswordChanged;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\RemoveOldSchema;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\SetOwnerForEmail;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\UpdateEmailOriginRelation as EmailOrigin;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_16\AddRelationToMailbox;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\AddEmailUserColumn;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\ChangeEmailUserFolderRelation as ChangeEmailUserFolderRelation;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\DropEmailUserColumn;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_19\AddFirstNameLastNameIndex;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_2\OroUserBundle as UserAvatars;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_22\AddImpersonationTable;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_24\AddAuthStatusColumn;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_24\AddImpersonationIpColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_3\OroUserBundle as UserEmailActivities;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_4\AttachmentOwner;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_5\SetOwnerForEmailTemplates as EmailTemplateOwner;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_7\OroUserBundle as UserOrganization;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_9\OroUserBundle as ExtendTitle;
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_10\OroUserBundle as PasswordChanged;
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\UpdateEmailOriginRelation as EmailOrigin;
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\RemoveOldSchema;
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\SetOwnerForEmail;
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_16\AddRelationToMailbox;
-
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\ChangeEmailUserFolderRelation as ChangeEmailUserFolderRelation;
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\AddEmailUserColumn;
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\DropEmailUserColumn;
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_19\AddFirstNameLastNameIndex;
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_22\AddImpersonationTable;
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_24\AddAuthStatusColumn;
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_24\AddImpersonationIpColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v2_0\OroUserBundle as OroUserBundle20;
 
 /**

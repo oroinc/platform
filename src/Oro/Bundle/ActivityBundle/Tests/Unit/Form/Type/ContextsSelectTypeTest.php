@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 

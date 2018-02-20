@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider as BaseExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityRuleMatcher;

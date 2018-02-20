@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\EventListener;
 
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\EventListener\GmailOAuthSubscriber;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class GmailOAuthSubscriberTest extends \PHPUnit_Framework_TestCase
 {

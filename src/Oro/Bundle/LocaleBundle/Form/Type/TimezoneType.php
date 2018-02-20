@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
 use Doctrine\Common\Cache\Cache;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 

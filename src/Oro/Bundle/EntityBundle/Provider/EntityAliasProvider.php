@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\Common\Inflector\Inflector;
-
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 
 class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassProviderInterface

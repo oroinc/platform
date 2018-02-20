@@ -4,15 +4,12 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-
-use Prophecy\Prophecy\ObjectProphecy;
-
-use Symfony\Component\HttpFoundation\File\File as HttpFile;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Component\HttpFoundation\File\File as HttpFile;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ConfigFileDataTransformerTest extends \PHPUnit_Framework_TestCase
 {

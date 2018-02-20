@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The registry that allows to get the Data API resources configuratin bag

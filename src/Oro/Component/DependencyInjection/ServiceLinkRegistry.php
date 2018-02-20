@@ -2,9 +2,8 @@
 
 namespace Oro\Component\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ServiceLinkRegistry
 {

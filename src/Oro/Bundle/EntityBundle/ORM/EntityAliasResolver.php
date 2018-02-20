@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\Common\Cache\Cache;
-
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasLoader;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
+use Psr\Log\LoggerInterface;
 
 /**
  * Provides functionality to get singular and plural aliases for an entity class

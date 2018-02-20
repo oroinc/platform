@@ -3,17 +3,14 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Doctrine\Common\Annotations\Reader;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\CachingApiDocExtractor as BaseExtractor;
 use Nelmio\ApiDocBundle\Util\DocCommentExtractor;
-
+use Oro\Component\Routing\Resolver\RouteOptionsResolverAwareInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
-
-use Oro\Component\Routing\Resolver\RouteOptionsResolverAwareInterface;
 
 /**
  * The optimized and adapted version of Nelmio CachingApiDocExtractor.

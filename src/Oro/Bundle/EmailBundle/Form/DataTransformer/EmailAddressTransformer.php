@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Form\DataTransformer;
 
-use Symfony\Component\Form\DataTransformerInterface;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Form\DataTransformerInterface;
 
 class EmailAddressTransformer implements DataTransformerInterface
 {

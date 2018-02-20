@@ -4,10 +4,8 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Statement;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EntityConfigBundle\Migration\RemoveFieldQuery;
+use Psr\Log\LoggerInterface;
 
 class RemoveFieldQueryTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
-
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\TypeTestCase;
-
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class EmailAddressFromTypeTest extends TypeTestCase
 {

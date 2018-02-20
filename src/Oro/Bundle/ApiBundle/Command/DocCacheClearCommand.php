@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
-use Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor;
 
 /**
  * The CLI command to clear Data API documentation cache (ApiDoc cache).
@@ -55,7 +54,8 @@ class DocCacheClearCommand extends ContainerAwareCommand
                 [self::ALL_VIEWS]
             )
             ->addOption('no-warmup', null, InputOption::VALUE_NONE, 'Do not warm up the cache.')
-            ->setHelp(<<<EOF
+            ->setHelp(
+                <<<EOF
 The <info>%command.name%</info> command clears API documentation cache for a given view:
 
   <info>php %command.full_name%</info>

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\Event;
 
 class OrganizationSwitchAfter extends Event
 {

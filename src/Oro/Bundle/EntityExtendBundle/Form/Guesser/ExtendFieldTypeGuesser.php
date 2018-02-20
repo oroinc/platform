@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Form\Guesser;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\EntityBundle\Form\Guesser\AbstractFormGuesser;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -13,7 +12,6 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\Decimal;
-
 use Symfony\Component\Validator\Constraints\Length;
 
 class ExtendFieldTypeGuesser extends AbstractFormGuesser

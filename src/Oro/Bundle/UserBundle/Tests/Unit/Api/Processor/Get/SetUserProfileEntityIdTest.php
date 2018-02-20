@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Api\Processor\Get;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Oro\Bundle\UserBundle\Api\Processor\Get\SetUserProfileEntityId;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class SetUserProfileEntityIdTest extends GetProcessorTestCase
 {

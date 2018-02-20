@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ConfigBundle\Provider;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class GroupSearchProvider implements SearchProviderInterface
 {

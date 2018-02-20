@@ -3,19 +3,16 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
 use Doctrine\ORM\EntityManager;
-
 use Knp\Menu\ItemInterface as KnpItemInterface;
-
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface;
 use Oro\Bundle\NavigationBundle\Entity\Repository\NavigationItemRepository;
-use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Menu\NavigationItemBuilder;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Routing\RouterInterface;
 
 class NavigationItemBuilderTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Functional\Layout\DataProvider;
 
+use Oro\Bundle\LayoutBundle\Tests\Functional\Layout\DataProvider\Stubs\FormProviderStub;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Testing\Unit\Form\Type\Stub\FormStub;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-
-use Oro\Bundle\LayoutBundle\Tests\Functional\Layout\DataProvider\Stubs\FormProviderStub;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
-use Oro\Component\Testing\Unit\Form\Type\Stub\FormStub;
 
 class AbstractFormProviderTest extends WebTestCase
 {

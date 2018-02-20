@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Form\Type;
 
+use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchStringFilterType;
 
 class SearchStringFilterTypeTest extends AbstractTypeTestCase

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Symfony\Component\Form\DataTransformerInterface;
 
 class CollectionToArrayTransformer implements DataTransformerInterface

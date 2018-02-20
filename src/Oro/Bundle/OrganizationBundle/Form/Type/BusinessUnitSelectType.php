@@ -3,11 +3,9 @@
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class BusinessUnitSelectType extends AbstractType
 {

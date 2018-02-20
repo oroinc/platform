@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\AsseticBundle\Tests\Unit\Command\Proxy;
 
-use Symfony\Component\DependencyInjection\Scope;
 use Oro\Bundle\AsseticBundle\Command\Proxy\KernelProxy;
+use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class KernerProxyTest extends \PHPUnit_Framework_TestCase

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\OrganizationBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\UserBundle\Entity\User;

@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProviderInterface;
@@ -20,6 +16,9 @@ use Oro\Bundle\ApiBundle\Util\RequestDependedTextProcessor;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Adds human-readable descriptions for:

@@ -4,11 +4,8 @@ namespace Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions;
 
 use CG\Generator\PhpClass;
 use CG\Generator\PhpParameter;
-
 use Doctrine\Common\Inflector\Inflector;
-
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractEntityGeneratorExtension;
-
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Model\ExtendFallback;

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Processor;
 
-use Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException;
 
 class ProcessorRegistry
 {

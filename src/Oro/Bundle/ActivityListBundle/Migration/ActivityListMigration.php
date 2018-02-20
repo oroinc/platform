@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActivityListBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
-
 use Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;

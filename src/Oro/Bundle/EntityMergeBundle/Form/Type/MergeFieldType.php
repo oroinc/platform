@@ -3,18 +3,17 @@
 namespace Oro\Bundle\EntityMergeBundle\Form\Type;
 
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\OptionsResolver\Options;
-
-use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
-use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class MergeFieldType extends AbstractType
 {

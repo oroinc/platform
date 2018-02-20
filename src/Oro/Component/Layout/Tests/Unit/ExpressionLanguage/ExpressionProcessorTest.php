@@ -2,10 +2,6 @@
 
 namespace Oro\Component\Layout\Tests\Unit\ExpressionLanguage;
 
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
-use Symfony\Component\ExpressionLanguage\ParsedExpression;
-
 use Oro\Component\Layout\Action;
 use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry;
 use Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder;
@@ -13,6 +9,9 @@ use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\OptionValueBag;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
 {

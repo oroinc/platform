@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Step;
 
-use Akeneo\Bundle\BatchBundle\Step\ItemStep as BaseItemStep;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+use Akeneo\Bundle\BatchBundle\Step\ItemStep as BaseItemStep;
 use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
 /**

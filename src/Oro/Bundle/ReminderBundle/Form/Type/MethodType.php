@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ReminderBundle\Form\Type;
 
+use Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry;
 
 class MethodType extends AbstractType
 {

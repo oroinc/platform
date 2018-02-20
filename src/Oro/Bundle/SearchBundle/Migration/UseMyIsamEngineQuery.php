@@ -3,11 +3,9 @@
 namespace Oro\Bundle\SearchBundle\Migration;
 
 use Doctrine\DBAL\Connection;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class UseMyIsamEngineQuery implements MigrationQuery, ConnectionAwareInterface
 {

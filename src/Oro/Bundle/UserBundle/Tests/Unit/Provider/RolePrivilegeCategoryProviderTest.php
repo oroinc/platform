@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class RolePrivilegeCategoryProviderTest extends \PHPUnit_Framework_TestCase
 {

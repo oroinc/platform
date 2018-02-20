@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\CommentBundle\Form\Type;
 
+use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\CommentBundle\Form\EventListener\CommentSubscriber;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
-
-use Oro\Bundle\CommentBundle\Entity\Comment;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
-use Oro\Bundle\CommentBundle\Form\EventListener\CommentSubscriber;
 
 class CommentTypeApi extends AbstractType
 {

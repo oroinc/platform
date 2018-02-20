@@ -5,22 +5,19 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Manager;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
-
 use Gaufrette\Filesystem;
-
-use Symfony\Component\HttpFoundation\File\File as ComponentFile;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
+use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
-use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Symfony\Component\HttpFoundation\File\File as ComponentFile;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Class EmailAttachmentManagerTest

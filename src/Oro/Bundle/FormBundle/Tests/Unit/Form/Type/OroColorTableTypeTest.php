@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\OroColorTableType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
-use Oro\Bundle\FormBundle\Form\Type\OroColorTableType;
 
 class OroColorTableTypeTest extends FormIntegrationTestCase
 {

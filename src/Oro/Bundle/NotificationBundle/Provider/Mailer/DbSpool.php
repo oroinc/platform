@@ -3,12 +3,10 @@
 namespace Oro\Bundle\NotificationBundle\Provider\Mailer;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
+use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
 use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DbSpool extends \Swift_ConfigurableSpool
 {

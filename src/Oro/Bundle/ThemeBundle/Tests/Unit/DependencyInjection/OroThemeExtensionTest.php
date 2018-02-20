@@ -3,12 +3,10 @@
 
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\ThemeBundle\DependencyInjection\OroThemeExtension;
 use Oro\Bundle\ThemeBundle\Tests\Unit\Fixtures;
-
 use Oro\Component\Config\CumulativeResourceManager;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroThemeExtensionTest extends \PHPUnit_Framework_TestCase
 {

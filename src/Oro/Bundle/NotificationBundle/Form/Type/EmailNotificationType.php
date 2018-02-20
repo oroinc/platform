@@ -3,18 +3,16 @@
 namespace Oro\Bundle\NotificationBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
-
+use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
+use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
+use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
+use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
-
-use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
-use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
-use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber;
 
 class EmailNotificationType extends AbstractType
 {

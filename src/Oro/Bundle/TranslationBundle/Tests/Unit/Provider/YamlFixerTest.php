@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Bundle\TranslationBundle\Provider\YamlFixer;
+use Symfony\Component\Yaml\Yaml;
 
 class YamlFixerTest extends \PHPUnit_Framework_TestCase
 {

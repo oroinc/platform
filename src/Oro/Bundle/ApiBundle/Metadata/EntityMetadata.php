@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Metadata;
 
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ToArrayInterface;
 use Oro\Component\PhpUtils\ReflectionUtil;
-use Oro\Bundle\ApiBundle\Exception\RuntimeException;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * The metadata for an entity.

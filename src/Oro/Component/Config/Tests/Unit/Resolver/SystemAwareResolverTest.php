@@ -2,11 +2,10 @@
 
 namespace Oro\Component\Config\Tests\Unit\Resolver;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Component\Config\Resolver\SystemAwareResolver;
 use Oro\Component\Config\Tests\Unit\Fixtures\TestService;
 use Oro\Component\Routing\Tests\Unit\Resolver\TestResource;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
 {

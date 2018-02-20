@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectType;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectType;
 
 /**
  * Custom data transformer for OroEntityCreateOrSelectType

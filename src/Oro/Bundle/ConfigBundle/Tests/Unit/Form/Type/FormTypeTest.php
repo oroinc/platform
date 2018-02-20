@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Form\Type\FormType;
+use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
-
-use Oro\Bundle\ConfigBundle\Form\Type\FormType;
-use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 
 class FormTypeTest extends TypeTestCase
 {

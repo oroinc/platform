@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Job;
 
-use Oro\Component\MessageQueue\Job\Job;
-
 use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 use Oro\Bundle\MessageQueueBundle\Log\JobExtension;
+use Oro\Component\MessageQueue\Job\Job;
 
 class JobExtensionTest extends \PHPUnit_Framework_TestCase
 {

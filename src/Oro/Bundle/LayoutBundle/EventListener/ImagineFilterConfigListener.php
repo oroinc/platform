@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\EventListener;
 
+use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-
-use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
 
 /**
  * Loads dynamic Imagine filters

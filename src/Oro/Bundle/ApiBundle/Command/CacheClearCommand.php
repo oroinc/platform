@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
+use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
-use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
-use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
 
 /**
  * The CLI command to clear Data API cache.
@@ -25,7 +24,8 @@ class CacheClearCommand extends ContainerAwareCommand
         $this
             ->setName(self::COMMAND_NAME)
             ->setDescription('Clears Data API cache.')
-            ->setHelp(<<<EOF
+            ->setHelp(
+                <<<EOF
 The <info>%command.name%</info> command clears Data API cache:
 
   <info>php %command.full_name%</info>

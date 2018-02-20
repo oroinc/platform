@@ -3,20 +3,18 @@
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\Asset\Packages as AssetHelper;
-use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Form\Choice\Loader;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
-use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
+use Symfony\Component\Asset\Packages as AssetHelper;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IntegrationSelectType extends AbstractType
 {

@@ -2,22 +2,20 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
-
 use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeFamilyType;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupCollectionType;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupType;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeMultiSelectType;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
-use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\ImageTypeStub;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\AttributeFamilyStub;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\ImageTypeStub;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizedFallbackValueCollectionTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-
 use Symfony\Component\Form\PreloadedExtension;
 
 class AttributeFamilyTypeTest extends FormIntegrationTestCase

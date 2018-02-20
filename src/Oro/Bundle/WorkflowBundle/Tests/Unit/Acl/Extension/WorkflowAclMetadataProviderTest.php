@@ -7,14 +7,12 @@ use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclMetadata;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclMetadataProvider;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class WorkflowAclMetadataProviderTest extends \PHPUnit_Framework_TestCase
 {

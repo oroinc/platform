@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class HtmlTagExtension extends \Twig_Extension
 {

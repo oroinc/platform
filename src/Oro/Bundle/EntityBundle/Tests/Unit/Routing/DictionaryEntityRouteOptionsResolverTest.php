@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Routing;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Routing\Route;
-
-use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
-use Oro\Component\Routing\Resolver\SortableRouteCollection;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\EntityBundle\Routing\DictionaryEntityRouteOptionsResolver;
+use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
+use Oro\Component\Routing\Resolver\SortableRouteCollection;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\Route;
 
 class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCase
 {

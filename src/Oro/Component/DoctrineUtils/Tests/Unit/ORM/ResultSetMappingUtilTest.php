@@ -3,7 +3,6 @@
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-
 use Oro\Component\DoctrineUtils\ORM\PlatformResultSetMapping;
 use Oro\Component\DoctrineUtils\ORM\ResultSetMappingUtil;
 

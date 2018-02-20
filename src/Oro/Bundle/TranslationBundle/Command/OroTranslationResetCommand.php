@@ -3,14 +3,12 @@
 namespace Oro\Bundle\TranslationBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
-
+use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
 
 class OroTranslationResetCommand extends ContainerAwareCommand
 {

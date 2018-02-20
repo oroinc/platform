@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 
 /**
  * Removes temporary container parameter that is used to share ApiBundle configuration.

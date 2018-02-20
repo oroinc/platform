@@ -3,7 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Form\Extension;
 
 use Doctrine\Common\Collections\Collection;
-
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -11,10 +13,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Component\ChainProcessor\ActionProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
-use Oro\Bundle\ApiBundle\Processor\FormContext;
 
 class CustomizeFormDataExtension extends AbstractTypeExtension
 {

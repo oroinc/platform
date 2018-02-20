@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Parser;
-
-use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
-use Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension;
 
 class OroPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 {

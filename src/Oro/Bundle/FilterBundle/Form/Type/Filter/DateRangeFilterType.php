@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-
-use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateRangeFilterType extends AbstractDateFilterType
 {

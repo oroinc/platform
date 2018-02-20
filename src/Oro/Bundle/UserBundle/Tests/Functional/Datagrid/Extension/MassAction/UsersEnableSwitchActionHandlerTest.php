@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\UserBundle\Datagrid\Extension\MassAction;
 
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
-use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
-use Oro\Bundle\UserBundle\Entity\User;
-
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\AjaxMassAction;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class UsersEnableSwitchActionHandlerTest extends WebTestCase
 {

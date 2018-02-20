@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

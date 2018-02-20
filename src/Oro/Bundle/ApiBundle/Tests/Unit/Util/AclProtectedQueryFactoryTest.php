@@ -3,13 +3,12 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Doctrine\ORM\Query;
-
-use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
-use Oro\Component\EntitySerializer\DoctrineHelper;
-use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\AclProtectedQueryFactory;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
+use Oro\Component\EntitySerializer\DoctrineHelper;
+use Oro\Component\EntitySerializer\EntityConfig;
 
 class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
 {

@@ -3,13 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener\Extension;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\EventListener\Extension\AbstractEventTriggerExtension;
-
 use Oro\Component\Testing\Unit\EntityTrait;
 
 abstract class AbstractEventTriggerExtensionTest extends \PHPUnit_Framework_TestCase

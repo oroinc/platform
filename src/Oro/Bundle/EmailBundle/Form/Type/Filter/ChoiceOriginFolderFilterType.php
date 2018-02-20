@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type\Filter;
 
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractChoiceType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ChoiceOriginFolderFilterType extends AbstractChoiceType
 {

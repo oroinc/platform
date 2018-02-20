@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActivityBundle\Tools;
 
 use CG\Generator\PhpClass;
-
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;

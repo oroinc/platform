@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
-use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
 class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
 {

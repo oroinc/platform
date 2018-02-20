@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImapBundle\EventListener;
 
 use Doctrine\ORM\Event\PreUpdateEventArgs;
-
 use Oro\Bundle\UserBundle\Entity\User;
 
 class UserEmailChangeListener

@@ -5,12 +5,11 @@ namespace Oro\Bundle\InstallerBundle\Process\Step;
 use Oro\Bundle\InstallerBundle\Command\InstallCommand;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
+use Sylius\Bundle\FlowBundle\Process\Step\AbstractControllerStep;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Console\Output\StreamOutput;
-
-use Sylius\Bundle\FlowBundle\Process\Step\AbstractControllerStep;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Abstract call for web installer steps

@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Oro\Bundle\EmailBundle\Form\Model\EmailApi;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
@@ -11,8 +12,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
-
-use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class EmailApiType extends AbstractType
 {

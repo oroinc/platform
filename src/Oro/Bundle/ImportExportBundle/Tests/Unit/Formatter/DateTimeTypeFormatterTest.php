@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Formatter;
 
-use Symfony\Component\Translation\Translator;
-
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Formatter\DateTimeTypeFormatter;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Symfony\Component\Translation\Translator;
 
 class DateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
 {

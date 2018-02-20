@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
+use Symfony\Component\Form\FormView;
 
 class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
 {

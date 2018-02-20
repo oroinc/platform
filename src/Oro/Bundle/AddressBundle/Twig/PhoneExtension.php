@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\AddressBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class PhoneExtension extends \Twig_Extension
 {

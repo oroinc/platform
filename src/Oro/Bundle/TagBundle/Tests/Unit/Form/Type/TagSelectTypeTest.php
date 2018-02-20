@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\TagBundle\Form\Type\TagSelectType;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class TagSelectTypeTest extends \PHPUnit_Framework_TestCase
 {

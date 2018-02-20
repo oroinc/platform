@@ -5,7 +5,6 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Tools;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
-
 use Oro\Bundle\MigrationBundle\Twig\SchemaDumperExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 

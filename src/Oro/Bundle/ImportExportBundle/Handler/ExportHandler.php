@@ -3,15 +3,9 @@
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
 use Gaufrette\Exception\FileNotFound;
-
-use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
-use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
@@ -19,6 +13,10 @@ use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Reader\BatchIdsReaderInterface;
 use Oro\Bundle\ImportExportBundle\Reader\ReaderChain;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
+use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ExportHandler extends AbstractHandler
 {

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OrganizationSelectTypeTest extends \PHPUnit_Framework_TestCase
 {

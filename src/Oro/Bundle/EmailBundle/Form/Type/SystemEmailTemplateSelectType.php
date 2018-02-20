@@ -3,13 +3,11 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ObjectManager;
-
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\CallbackTransformer;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SystemEmailTemplateSelectType extends AbstractType
 {

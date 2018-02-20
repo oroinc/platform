@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\IntegrationBundle\ImportExport\Helper;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
-
-use Doctrine\ORM\UnitOfWork;
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
-
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class DefaultOwnerHelper
 {

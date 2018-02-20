@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\ApiBundle\Provider\ConfigExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 

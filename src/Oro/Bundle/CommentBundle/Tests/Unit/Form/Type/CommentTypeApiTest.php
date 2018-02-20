@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\CommentBundle\Form\Type\CommentTypeApi;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\CommentBundle\Entity\Comment;
-use Oro\Bundle\CommentBundle\Form\Type\CommentTypeApi;
 
 class CommentTypeApiTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentType;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;

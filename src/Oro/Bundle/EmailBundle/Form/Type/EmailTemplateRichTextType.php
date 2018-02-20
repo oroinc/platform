@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-
-use Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer;
 
 class EmailTemplateRichTextType extends AbstractType
 {

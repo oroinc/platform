@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use Symfony\Component\Form\PreloadedExtension;
-
-use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
+use Oro\Bundle\EntityBundle\Exception\Fallback\FallbackFieldConfigurationMissingException;
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
+use Oro\Bundle\EntityBundle\Form\Type\EntityFieldFallbackValueType;
 use Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\FallbackParentStub;
 use Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\FallbackParentStubType;
-use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
-use Oro\Bundle\EntityBundle\Form\Type\EntityFieldFallbackValueType;
-use Oro\Bundle\EntityBundle\Exception\Fallback\FallbackFieldConfigurationMissingException;
+use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\PreloadedExtension;
 
 class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
 {

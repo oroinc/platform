@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Command;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\TranslationBundle\Command\OroTranslationDumpCommand;
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Component\Log\OutputLogger;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class OroTranslationDumpCommandTest extends \PHPUnit_Framework_TestCase
 {

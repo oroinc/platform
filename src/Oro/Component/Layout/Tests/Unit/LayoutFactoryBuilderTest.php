@@ -7,6 +7,7 @@ use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\BlockTypeExtensionInterface;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\BlockViewCache;
+use Oro\Component\Layout\DeferredLayoutManipulatorInterface;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\Extension\ExtensionInterface;
 use Oro\Component\Layout\LayoutFactory;
@@ -16,7 +17,6 @@ use Oro\Component\Layout\LayoutRegistry;
 use Oro\Component\Layout\LayoutRendererInterface;
 use Oro\Component\Layout\LayoutRendererRegistry;
 use Oro\Component\Layout\LayoutUpdateInterface;
-use Oro\Component\Layout\DeferredLayoutManipulatorInterface;
 
 class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
 {

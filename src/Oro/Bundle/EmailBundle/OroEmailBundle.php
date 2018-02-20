@@ -3,25 +3,23 @@
 namespace Oro\Bundle\EmailBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-
+use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailBodyLoaderPass;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailFlagManagerLoaderPass;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailOwnerConfigurationPass;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailRecipientsProviderPass;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailSynchronizerPass;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailTemplateVariablesPass;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\MailboxProcessPass;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\OverrideServiceSwiftMailer;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass;
+use Oro\Component\PhpUtils\ClassLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
-
-use Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass;
-use Oro\Component\PhpUtils\ClassLoader;
-use Oro\Bundle\EmailBundle\Async\Topics;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailBodyLoaderPass;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailOwnerConfigurationPass;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailSynchronizerPass;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailTemplateVariablesPass;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\MailboxProcessPass;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailFlagManagerLoaderPass;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailRecipientsProviderPass;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\OverrideServiceSwiftMailer;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 
 class OroEmailBundle extends Bundle
 {

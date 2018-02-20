@@ -3,10 +3,9 @@
 namespace Oro\Bundle\NotificationBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\NotificationBundle\Entity\MassNotification;
 use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
 use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
-use Oro\Bundle\NotificationBundle\Entity\MassNotification;
 
 class MassNotificationListener
 {

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Form\Type;
 
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\AbstractType;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 
 class GroupingType extends AbstractType
 {

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\AbstractGroupingWidgetProviderPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 abstract class ActionWidgetProviderPassAbstractTest extends \PHPUnit_Framework_TestCase
 {

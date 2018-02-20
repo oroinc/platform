@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Extend;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;

@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Extension;
 
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Form\Extension\RestrictionsExtension;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class RestrictionsExtensionTest extends FormIntegrationTestCase
 {

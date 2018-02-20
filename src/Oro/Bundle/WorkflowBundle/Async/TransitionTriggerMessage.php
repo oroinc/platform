@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Async;
 
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
-
 use Oro\Component\MessageQueue\Util\JSON;
 
 class TransitionTriggerMessage

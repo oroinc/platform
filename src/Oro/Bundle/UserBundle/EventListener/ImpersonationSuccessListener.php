@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\EventListener;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-
 use Oro\Bundle\UserBundle\Event\ImpersonationSuccessEvent;
 use Oro\Bundle\UserBundle\Mailer\Processor;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 /**
  * Listens to successful impersonation logins and sends email to the impersonated user

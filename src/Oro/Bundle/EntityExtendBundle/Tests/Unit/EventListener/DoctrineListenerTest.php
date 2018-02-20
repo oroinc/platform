@@ -2,21 +2,18 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\Events;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-
-use Symfony\Component\DependencyInjection\Container;
-
-use Oro\Bundle\EntityExtendBundle\EventListener\DoctrineListener;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Entity\Manager\MultiEnumManager;
-use Oro\Bundle\EntityExtendBundle\ORM\ExtendMetadataBuilder;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
+use Oro\Bundle\EntityExtendBundle\Entity\Manager\MultiEnumManager;
+use Oro\Bundle\EntityExtendBundle\EventListener\DoctrineListener;
+use Oro\Bundle\EntityExtendBundle\ORM\ExtendMetadataBuilder;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Symfony\Component\DependencyInjection\Container;
 
 class DoctrineListenerTest extends OrmTestCase
 {

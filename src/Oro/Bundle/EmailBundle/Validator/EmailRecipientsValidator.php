@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Validator;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Validator\Constraints\EmailRecipients;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
 
 class EmailRecipientsValidator extends ConstraintValidator
 {

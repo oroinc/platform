@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Handler;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Form\Handler\UserHandler;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
