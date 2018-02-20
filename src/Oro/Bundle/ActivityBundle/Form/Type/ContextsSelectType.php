@@ -85,16 +85,15 @@ class ContextsSelectType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['attr']['data-selected-data'] = $this->getSelectedData($form, $options['configs']['separator']);
+        $view->vars['attr']['data-selected-data'] = $this->getSelectedData($form);
     }
 
     /**
      * @param FormInterface $form
-     * @param string $separator
      *
      * @return string
      */
-    protected function getSelectedData(FormInterface $form, $separator)
+    protected function getSelectedData(FormInterface $form)
     {
         $targetEntities = $form->getData();
         if (!$targetEntities) {
@@ -119,7 +118,7 @@ class ContextsSelectType extends AbstractType
             $result[] = json_encode($this->getResult($item['title'], $target));
         }
 
-        return implode($separator, $result);
+        return implode(ContextsToViewTransformer::SEPARATOR, $result);
     }
 
     /**
