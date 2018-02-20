@@ -5,9 +5,8 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Extension;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeFieldConfigExtension;
-
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;

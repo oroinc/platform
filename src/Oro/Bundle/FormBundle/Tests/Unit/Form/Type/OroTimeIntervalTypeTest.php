@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\FormBundle\Form\Type\OroTimeIntervalType;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroTimeIntervalTypeTest extends FormIntegrationTestCase
 {
@@ -28,7 +27,7 @@ class OroTimeIntervalTypeTest extends FormIntegrationTestCase
         $this->assertEquals('time', $this->type->getParent());
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $expectedOptions = array(
             'widget'         => 'single_text',

@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\WindowsBundle\Twig;
 
+use Oro\Bundle\WindowsBundle\Entity\AbstractWindowsState;
+use Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry;
+use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
-use Oro\Bundle\WindowsBundle\Entity\AbstractWindowsState;
-use Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry;
-use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
 
 class WindowsExtension extends \Twig_Extension
 {

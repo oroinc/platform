@@ -3,9 +3,8 @@
 namespace Oro\Bundle\LayoutBundle\Layout\Extension;
 
 use Doctrine\Common\Cache\Cache;
-
-use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
+use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;
 
 class LastModifiedDateContextConfigurator implements ContextConfiguratorInterface

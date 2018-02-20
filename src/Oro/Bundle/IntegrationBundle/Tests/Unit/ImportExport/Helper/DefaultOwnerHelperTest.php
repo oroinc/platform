@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Helper;
 
-use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityManager;
-
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\ImportExport\Helper\DefaultOwnerHelper;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;

@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_24;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\DBAL\Types\Type;
-
-use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
+use Oro\Bundle\UserBundle\Entity\UserManager;
+use Psr\Log\LoggerInterface;
 
 class InsertAuthStatusesQuery extends ParametrizedMigrationQuery
 {

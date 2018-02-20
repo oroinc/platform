@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ReportBundle\Tests\Functional;
 
 use Oro\Bundle\DataGridBundle\Async\Topics;
-
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;

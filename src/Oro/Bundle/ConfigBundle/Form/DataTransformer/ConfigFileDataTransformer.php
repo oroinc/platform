@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ConfigBundle\Form\DataTransformer;
 
+use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\HttpFoundation\File\File as HttpFile;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-
-use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ConfigFileDataTransformer implements DataTransformerInterface
 {

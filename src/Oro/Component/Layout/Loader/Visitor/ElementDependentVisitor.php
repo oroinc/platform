@@ -3,7 +3,6 @@
 namespace Oro\Component\Layout\Loader\Visitor;
 
 use CG\Generator\PhpMethod;
-
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 
 class ElementDependentVisitor implements VisitorInterface

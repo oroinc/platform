@@ -18,9 +18,9 @@ class BuildSingleItemResultDocument extends BuildResultDocument
     {
         $result = $context->getResult();
         if (null === $result) {
-            $documentBuilder->setDataObject($result);
+            $documentBuilder->setDataObject($result, $context->getRequestType());
         } else {
-            $documentBuilder->setDataObject($result, $context->getMetadata());
+            $documentBuilder->setDataObject($result, $context->getRequestType(), $context->getMetadata());
         }
     }
 }

@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\SidebarBundle\Tests\Unit\Twig;
 
-use Symfony\Component\Asset\Packages;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Asset\Packages as AssetHelper;
-
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry;
 use Oro\Bundle\SidebarBundle\Twig\SidebarExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Symfony\Component\Asset\Packages;
+use Symfony\Component\Asset\Packages as AssetHelper;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class SidebarExtensionTest extends \PHPUnit_Framework_TestCase
 {

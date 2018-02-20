@@ -5,14 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionEntityListener;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowActivationException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

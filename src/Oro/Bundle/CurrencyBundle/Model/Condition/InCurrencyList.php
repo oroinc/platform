@@ -1,13 +1,12 @@
 <?php
 namespace Oro\Bundle\CurrencyBundle\Model\Condition;
 
-use Oro\Component\Action\Condition\AbstractCondition;
-use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
-use Oro\Component\ConfigExpression\Exception;
-use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
-
 use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
 use Oro\Bundle\CurrencyBundle\Provider\CurrencyListProviderInterface;
+use Oro\Component\Action\Condition\AbstractCondition;
+use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
+use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
+use Oro\Component\ConfigExpression\Exception;
 
 class InCurrencyList extends AbstractCondition implements ContextAccessorAwareInterface
 {

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Model;
 
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfiguration;
 use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfiguration;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfiguration;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
 {

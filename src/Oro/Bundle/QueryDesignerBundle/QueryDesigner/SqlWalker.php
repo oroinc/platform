@@ -3,7 +3,6 @@
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
-
 use Oro\Component\DoctrineUtils\ORM\HookUnionTrait;
 
 /**

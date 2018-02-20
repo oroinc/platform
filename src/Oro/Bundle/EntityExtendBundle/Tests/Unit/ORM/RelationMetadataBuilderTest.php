@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\ORM;
 
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
-
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;

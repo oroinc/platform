@@ -3,14 +3,12 @@
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_5;
 
 use Doctrine\DBAL\Connection;
-
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class FixAssociationLabelsQuery extends ParametrizedMigrationQuery
 {

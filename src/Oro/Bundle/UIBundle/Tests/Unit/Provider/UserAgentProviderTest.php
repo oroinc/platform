@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-
-use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
 
 class UserAgentProviderTest extends \PHPUnit_Framework_TestCase
 {

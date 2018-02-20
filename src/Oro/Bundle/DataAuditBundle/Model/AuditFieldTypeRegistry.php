@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataAuditBundle\Model;
 
 use LogicException;
-
 use Oro\Bundle\DataAuditBundle\Exception\UnsupportedDataTypeException;
 
 class AuditFieldTypeRegistry

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityAliasProviderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityAliasProviderPass;
 
 class EntityAliasProviderPassTest extends \PHPUnit_Framework_TestCase
 {

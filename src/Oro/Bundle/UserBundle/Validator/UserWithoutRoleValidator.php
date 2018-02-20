@@ -3,15 +3,13 @@
 namespace Oro\Bundle\UserBundle\Validator;
 
 use Doctrine\Common\Collections\Collection;
-
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-
 use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 use Oro\Bundle\LocaleBundle\Model\LastNameInterface;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\UserBundle\Validator\Constraints\UserWithoutRole;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
 
 class UserWithoutRoleValidator extends ConstraintValidator
 {

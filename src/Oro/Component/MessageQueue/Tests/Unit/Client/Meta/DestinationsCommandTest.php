@@ -2,12 +2,11 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Client\Meta;
 
+use Oro\Component\MessageQueue\Client\Meta\DestinationMeta;
+use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
+use Oro\Component\MessageQueue\Client\Meta\DestinationsCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
-
-use Oro\Component\MessageQueue\Client\Meta\DestinationMeta;
-use Oro\Component\MessageQueue\Client\Meta\DestinationsCommand;
-use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 
 class DestinationsCommandTest extends \PHPUnit_Framework_TestCase
 {

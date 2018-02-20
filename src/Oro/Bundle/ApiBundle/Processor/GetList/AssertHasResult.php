@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetList;
 
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Makes sure that the valid result was added to the Context.

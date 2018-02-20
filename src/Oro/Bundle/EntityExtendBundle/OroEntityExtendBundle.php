@@ -2,14 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle;
 
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Process\ProcessBuilder;
-
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ConfigLoaderPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityExtendPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass;
@@ -19,6 +12,11 @@ use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\MigrationConfigPa
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\WarmerPass;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Process\ProcessBuilder;
 
 class OroEntityExtendBundle extends Bundle
 {

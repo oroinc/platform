@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AbstractConfigTypeTestCase extends TypeTestCase
 {
@@ -33,7 +32,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
      *
      * @return array
      */
-    protected function doTestSetDefaultOptions(
+    protected function doTestConfigureOptions(
         AbstractType $type,
         ConfigIdInterface $configId,
         $immutable,
@@ -43,7 +42,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
         $this->setIsReadOnlyExpectations($configId, $immutable);
 
         $resolver = $this->getOptionsResolver();
-        $type->setDefaultOptions($resolver);
+        $type->configureOptions($resolver);
 
         $options['config_id'] = $configId;
 
@@ -102,7 +101,10 @@ class AbstractConfigTypeTestCase extends TypeTestCase
         return $resolver;
     }
 
-    public function setDefaultOptionsProvider()
+    /**
+     * @return array
+     */
+    public function configureOptionsProvider()
     {
         return [
             [

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
-use Symfony\Component\Form\FormFactoryInterface;
-
-use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
+use Symfony\Component\Form\FormFactoryInterface;
 
 abstract class BaseMultiChoiceFilter extends AbstractFilter
 {

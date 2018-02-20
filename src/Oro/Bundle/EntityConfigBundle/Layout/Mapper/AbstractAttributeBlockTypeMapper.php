@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Layout\Mapper;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
 class AbstractAttributeBlockTypeMapper implements AttributeBlockTypeMapperInterface

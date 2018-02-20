@@ -6,18 +6,17 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\HttpFoundation\Request;
-
-use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
-use Oro\Bundle\EmailBundle\Form\Model\Factory;
-use Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
-use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
+use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
+use Oro\Bundle\EmailBundle\Form\Model\Factory;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
+use Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class EmailModelBuilder
@@ -34,10 +33,16 @@ class EmailModelBuilder
      * @var EmailModelBuilderHelper
      */
     protected $helper;
+
     /**
      * @var Request
      */
     protected $request;
+
+    /**
+     * @var RequestStack
+     */
+    protected $requestStack;
 
     /**
      * @var EntityManager
@@ -71,6 +76,7 @@ class EmailModelBuilder
      * @param EmailActivityListProvider $activityListProvider
      * @param EmailAttachmentProvider   $emailAttachmentProvider
      * @param Factory                   $factory
+     * @param RequestStack              $requestStack
      */
     public function __construct(
         EmailModelBuilderHelper $emailModelBuilderHelper,
@@ -78,7 +84,8 @@ class EmailModelBuilder
         ConfigManager $configManager,
         EmailActivityListProvider $activityListProvider,
         EmailAttachmentProvider $emailAttachmentProvider,
-        Factory $factory
+        Factory $factory,
+        RequestStack $requestStack
     ) {
         $this->helper               = $emailModelBuilderHelper;
         $this->entityManager        = $entityManager;
@@ -86,6 +93,7 @@ class EmailModelBuilder
         $this->activityListProvider = $activityListProvider;
         $this->emailAttachmentProvider = $emailAttachmentProvider;
         $this->factory = $factory;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -100,16 +108,17 @@ class EmailModelBuilder
             $emailModel->setMailType(EmailModel::MAIL_TYPE_DIRECT);
         }
 
-        if ($this->request && $this->request->getMethod() === 'GET') {
+        $request = $this->request ?? $this->requestStack->getCurrentRequest();
+        if ($request && $request->isMethod('GET')) {
             $this->applyRequest($emailModel);
             if (!count($emailModel->getContexts())) {
-                $entityClass = $this->request->get('entityClass');
-                $entityId = $this->request->get('entityId');
+                $entityClass = $request->get('entityClass');
+                $entityId = $request->get('entityId');
                 if ($entityClass && $entityId) {
                     $emailModel->setContexts([
                         $this->helper->getTargetEntity(
-                            $this->request->get('entityClass'),
-                            $this->request->get('entityId')
+                            $request->get('entityClass'),
+                            $request->get('entityId')
                         )
                     ]);
                 }
@@ -215,7 +224,8 @@ class EmailModelBuilder
         $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Forward:parentBody.html.twig');
         $emailModel->setBodyFooter($body);
         // link attachments of forwarded email to current email instance
-        if ($this->request->isMethod('GET')) {
+        $request = $this->request ?? $this->requestStack->getCurrentRequest();
+        if ($request && $request->isMethod('GET')) {
             $this->applyAttachments($emailModel, $parentEmailEntity);
         }
 
@@ -308,13 +318,14 @@ class EmailModelBuilder
      */
     protected function applyEntityData(EmailModel $emailModel)
     {
-        if ($this->request->query->has('entityClass')) {
+        $request = $this->request ?? $this->requestStack->getCurrentRequest();
+        if ($request->query->has('entityClass')) {
             $emailModel->setEntityClass(
-                $this->helper->decodeClassName($this->request->query->get('entityClass'))
+                $this->helper->decodeClassName($request->query->get('entityClass'))
             );
         }
-        if ($this->request->query->has('entityId')) {
-            $emailModel->setEntityId($this->request->query->get('entityId'));
+        if ($request->query->has('entityId')) {
+            $emailModel->setEntityId($request->query->get('entityId'));
         }
         if (!$emailModel->getEntityClass() || !$emailModel->getEntityId()) {
             if ($emailModel->getParentEmailId()) {
@@ -331,8 +342,9 @@ class EmailModelBuilder
     protected function applyFrom(EmailModel $emailModel)
     {
         if (!$emailModel->getFrom()) {
-            if ($this->request->query->has('from')) {
-                $from = $this->request->query->get('from');
+            $request = $this->request ?? $this->requestStack->getCurrentRequest();
+            if ($request->query->has('from')) {
+                $from = $request->query->get('from');
                 if (!empty($from)) {
                     $this->helper->preciseFullEmailAddress($from);
                 }
@@ -368,8 +380,9 @@ class EmailModelBuilder
     protected function getRecipients(EmailModel $emailModel, $type, $excludeCurrentUser = false)
     {
         $addresses = [];
-        if ($this->request->query->has($type)) {
-            $address = trim($this->request->query->get($type));
+        $request = $this->request ?? $this->requestStack->getCurrentRequest();
+        if ($request->query->has($type)) {
+            $address = trim($request->query->get($type));
             if (!empty($address)) {
                 $this->helper->preciseFullEmailAddress(
                     $address,
@@ -390,8 +403,9 @@ class EmailModelBuilder
      */
     protected function applySubject(EmailModel $model)
     {
-        if ($this->request->query->has('subject')) {
-            $subject = trim($this->request->query->get('subject'));
+        $request = $this->request ?? $this->requestStack->getCurrentRequest();
+        if ($request->query->has('subject')) {
+            $subject = trim($request->query->get('subject'));
             $model->setSubject($subject);
         }
     }

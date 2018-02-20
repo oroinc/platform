@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Selenium;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 use Oro\Bundle\SegmentBundle\Tests\Selenium\Pages\Segments;
+use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
 
 class SegmentsTest extends Selenium2TestCase

@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
+use Oro\Bundle\ApiBundle\Processor\MatchApplicableChecker;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorIterator;
 use Oro\Component\ChainProcessor\Tests\Unit\ProcessorMock;
-use Oro\Bundle\ApiBundle\Processor\MatchApplicableChecker;
 
 class MatchApplicableCheckerTest extends \PHPUnit_Framework_TestCase
 {

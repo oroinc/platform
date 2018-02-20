@@ -5,7 +5,6 @@ namespace Oro\Bundle\ScopeBundle\Tests\Functional;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubScope;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class AbstractScopeProviderTestCase extends WebTestCase

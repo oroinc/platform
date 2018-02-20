@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\LoggerBundle\Async\Extension;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
+use Oro\Bundle\MessageQueueBundle\Log\MessageProcessorClassProvider;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Bundle\MessageQueueBundle\Log\MessageProcessorClassProvider;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Writes info about the processor executed before consumption was interrupted to the log.

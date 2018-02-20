@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Sync;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
 interface EmailSynchronizerInterface
 {

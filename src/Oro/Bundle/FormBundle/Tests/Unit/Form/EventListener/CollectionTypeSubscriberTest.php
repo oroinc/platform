@@ -3,12 +3,10 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Form\Test\FormInterface;
+use Oro\Bundle\FormBundle\Form\EventListener\CollectionTypeSubscriber;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-
-use Oro\Bundle\FormBundle\Form\EventListener\CollectionTypeSubscriber;
+use Symfony\Component\Form\Test\FormInterface;
 
 class CollectionTypeSubscriberTest extends \PHPUnit_Framework_TestCase
 {

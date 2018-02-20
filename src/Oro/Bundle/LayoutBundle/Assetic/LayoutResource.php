@@ -3,14 +3,11 @@
 namespace Oro\Bundle\LayoutBundle\Assetic;
 
 use Assetic\Factory\Resource\ResourceInterface;
-
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Filesystem\Filesystem;
-
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 class LayoutResource implements ResourceInterface
 {

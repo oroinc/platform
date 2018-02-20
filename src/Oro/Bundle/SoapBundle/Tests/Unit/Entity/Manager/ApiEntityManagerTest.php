@@ -4,7 +4,6 @@ namespace Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
-
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager\Stub\Entity;
 

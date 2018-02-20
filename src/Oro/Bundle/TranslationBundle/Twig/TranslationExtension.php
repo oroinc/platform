@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\TranslationBundle\Twig;
 
+use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouterInterface;
-
-use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
 
 class TranslationExtension extends \Twig_Extension
 {

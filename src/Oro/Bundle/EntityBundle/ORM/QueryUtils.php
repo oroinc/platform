@@ -4,9 +4,8 @@ namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Component\DoctrineUtils\ORM\QueryUtils as BaseQueryUtils;
 use Oro\Bundle\EntityBundle\Exception;
+use Oro\Component\DoctrineUtils\ORM\QueryUtils as BaseQueryUtils;
 
 /**
  * @deprecated since 1.9. Use {@see Oro\Component\DoctrineUtils\ORM\QueryUtils} instead.

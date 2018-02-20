@@ -4,15 +4,12 @@ namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Knp\Menu\Factory;
 use Knp\Menu\ItemInterface;
-
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Routing\Router;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 {

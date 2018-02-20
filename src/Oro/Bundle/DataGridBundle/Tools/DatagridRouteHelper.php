@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Tools;
 
-use Symfony\Component\Routing\RouterInterface;
-
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\RouterInterface;
 
 class DatagridRouteHelper
 {

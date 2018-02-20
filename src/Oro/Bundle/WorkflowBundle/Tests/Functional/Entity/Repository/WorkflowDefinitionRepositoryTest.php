@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 
+use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Persistence\Proxy;
 use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\DBAL\Logging\EchoSQLLogger;
-use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ScopeBundle\Manager\ScopeCriteriaProviderInterface;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\TestActivityScopeProvider;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Scope\WorkflowScopeManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadTestActivitiesForScopes;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;

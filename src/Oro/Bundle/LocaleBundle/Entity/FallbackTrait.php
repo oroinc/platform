@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LocaleBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
-
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
 trait FallbackTrait

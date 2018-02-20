@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\TagBundle\Model\Accessor;
 
-use Oro\Bundle\TagBundle\Entity\TagManager;
-use Oro\Bundle\TagBundle\Helper\TaggableHelper;
-
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
+use Oro\Bundle\TagBundle\Entity\TagManager;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 class TagMergeAccessor implements AccessorInterface
 {

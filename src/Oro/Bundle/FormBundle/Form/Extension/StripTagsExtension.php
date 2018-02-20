@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\FormBundle\Form\Extension;
 
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
-use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 class StripTagsExtension extends AbstractTypeExtension
 {

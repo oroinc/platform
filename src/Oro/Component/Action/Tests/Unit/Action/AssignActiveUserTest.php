@@ -2,13 +2,12 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\User\User;
-
 use Oro\Component\Action\Action\AssignActiveUser;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\User\User;
 
 class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
 {

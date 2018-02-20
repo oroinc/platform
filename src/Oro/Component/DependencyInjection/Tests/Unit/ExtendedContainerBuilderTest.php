@@ -2,12 +2,11 @@
 
 namespace Oro\Component\DependencyInjection\Tests\Unit;
 
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
-
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Component\DependencyInjection\Tests\Unit\Fixtures\CompilerPass1;
 use Oro\Component\DependencyInjection\Tests\Unit\Fixtures\CompilerPass2;
 use Oro\Component\DependencyInjection\Tests\Unit\Fixtures\CompilerPass3;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 
 class ExtendedContainerBuilderTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Knp\Menu\ItemInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 

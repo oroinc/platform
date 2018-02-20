@@ -3,16 +3,15 @@
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\EntitySerializer\EntitySerializer;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\EntitySerializer\EntitySerializer;
 
 abstract class LoadCustomAssociation implements ProcessorInterface
 {

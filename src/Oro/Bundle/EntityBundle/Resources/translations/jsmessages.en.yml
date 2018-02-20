@@ -7,5 +7,6 @@ oro:
         form:
             choose_entity_field:    Choose a field...
         not_exist: "Utilized entity or its field does not exist"
+        structure_outdated.message: "Entities structure information is outdated, please <a href='#' data-action='page-refresh'>refresh the page</a>"
 
 "Change Entity Confirmation": "Change Entity Confirmation"

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Request;
 
+use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
+use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-
-use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
-use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 
 class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 {

@@ -4,14 +4,12 @@ namespace Oro\Bundle\WorkflowBundle\Command;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\WorkflowBundle\Model\ProcessData;
-use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 
 class HandleProcessTriggerCommand extends ContainerAwareCommand
 {

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber;
 use Symfony\Component\Validator\Constraints\Valid;
 
 class EmailSettingsType extends AbstractType

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\WebSocket;
 
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 

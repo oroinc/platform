@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
-use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-
 use Oro\Bundle\TranslationBundle\Controller\Controller;
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 class JsTranslationDumperTest extends \PHPUnit_Framework_TestCase
 {

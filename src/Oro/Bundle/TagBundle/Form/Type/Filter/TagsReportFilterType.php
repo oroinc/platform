@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\TagBundle\Form\Type\Filter;
 
-use Symfony\Component\Form\FormBuilderInterface;
-
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
+use Symfony\Component\Form\FormBuilderInterface;
 
 class TagsReportFilterType extends DictionaryFilterType
 {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Assetic;
 
 use Assetic\Factory\Resource\ResourceInterface;
-
 use Oro\Bundle\LayoutBundle\Assetic\LayoutFormulaLoader;
 
 class LayoutFormulaLoaderTest extends \PHPUnit_Framework_TestCase

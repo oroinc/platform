@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader;
 use WebDriver\Exception\ElementNotVisible;
-
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
 
 /**
  * @method GridRow getRowByNumber($rowNumber) @see Table::getRowByNumber($rowNumber)

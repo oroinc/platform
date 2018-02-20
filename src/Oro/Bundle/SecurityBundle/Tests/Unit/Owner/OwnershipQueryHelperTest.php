@@ -5,13 +5,12 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-
-use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity;
+use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class OwnershipQueryHelperTest extends OrmTestCase
 {

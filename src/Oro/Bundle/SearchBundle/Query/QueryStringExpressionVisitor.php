@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Doctrine\Common\Collections\Expr\Value;
-
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
 class QueryStringExpressionVisitor extends ExpressionVisitor

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Doctrine\Common\Cache\Cache;
-
 use Symfony\Component\Translation\Loader\LoaderInterface;
 
 class CachingTranslationLoader implements LoaderInterface

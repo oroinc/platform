@@ -3,10 +3,8 @@
 namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\Common\Inflector\Inflector;
-
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Symfony\Component\Translation\TranslatorInterface;
 
 abstract class AbstractEntityClassNameProvider
 {

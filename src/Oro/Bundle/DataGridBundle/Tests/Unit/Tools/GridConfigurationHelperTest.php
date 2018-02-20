@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Tools;
 
-use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 
 class GridConfigurationHelperTest extends \PHPUnit_Framework_TestCase
 {

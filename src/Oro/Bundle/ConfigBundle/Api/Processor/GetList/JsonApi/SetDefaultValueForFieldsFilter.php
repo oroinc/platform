@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\ConfigBundle\Api\Processor\GetList\JsonApi;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\FieldsFilter;
 use Oro\Bundle\ApiBundle\Filter\IncludeFilter;
-use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddIncludeFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddFieldsFilter;
+use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddIncludeFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Sets "id" as a default value for "fields[configuration]" filter.

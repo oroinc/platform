@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Cron;
 
+use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-
-use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
 
 abstract class AbstractTriggerCronScheduler implements LoggerAwareInterface
 {

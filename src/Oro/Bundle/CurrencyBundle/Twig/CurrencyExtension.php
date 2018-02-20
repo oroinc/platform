@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\CurrencyBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Intl\Intl;
-
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Intl\Intl;
 
 class CurrencyExtension extends \Twig_Extension
 {

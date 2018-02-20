@@ -3,11 +3,9 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc\Parser;
 
 use Michelf\MarkdownExtra;
-
-use Symfony\Component\HttpKernel\Config\FileLocator;
-
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\InheritDocUtil;
+use Symfony\Component\HttpKernel\Config\FileLocator;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Validator;
 
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\EmailValidator;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\ConstraintViolation;
-
-use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
 class EmailAddressValidator extends ConstraintValidator
 {

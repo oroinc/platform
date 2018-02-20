@@ -6,7 +6,6 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuItem;
 use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Twig\Helper;
-
 use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;

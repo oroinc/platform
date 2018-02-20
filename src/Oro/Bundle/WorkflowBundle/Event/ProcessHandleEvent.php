@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+use Symfony\Component\EventDispatcher\Event;
 
 class ProcessHandleEvent extends Event
 {

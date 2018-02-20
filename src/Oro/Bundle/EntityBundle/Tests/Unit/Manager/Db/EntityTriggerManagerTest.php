@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Manager\Db;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EntityBundle\Manager\Db\EntityTriggerManager;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;

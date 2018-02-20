@@ -2,21 +2,18 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Routing\ClassResourceInterface;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
+use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ChainParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\EntityClassParameterFilter;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 use Oro\Bundle\UserBundle\Entity\Manager\UserPermissionApiEntityManager;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
-use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 
 /**
  * @RouteResource("user_permission")

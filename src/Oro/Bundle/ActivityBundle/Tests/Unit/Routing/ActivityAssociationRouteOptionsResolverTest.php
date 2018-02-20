@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Routing;
 
-use Symfony\Component\Routing\Route;
-
-use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
-use Oro\Component\Routing\Resolver\SortableRouteCollection;
-
 use Oro\Bundle\ActivityBundle\Routing\ActivityAssociationRouteOptionsResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
+use Oro\Component\Routing\Resolver\SortableRouteCollection;
+use Symfony\Component\Routing\Route;
 
 class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit_Framework_TestCase
 {

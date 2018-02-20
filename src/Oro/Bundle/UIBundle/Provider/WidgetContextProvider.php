@@ -2,12 +2,22 @@
 
 namespace Oro\Bundle\UIBundle\Provider;
 
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class WidgetContextProvider
 {
-    /** @var string|bool */
-    protected $wid = false;
+    /**
+     * @var RequestStack
+     */
+    protected $requestStack;
+
+    /**
+     * @param RequestStack $requestStack
+     */
+    public function __construct(RequestStack $requestStack)
+    {
+        $this->requestStack = $requestStack;
+    }
 
     /**
      * Returns if working in scope of widget
@@ -16,7 +26,12 @@ class WidgetContextProvider
      */
     public function isActive()
     {
-        return false !== $this->wid;
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request) {
+            return (bool) $request->get('_wid', false);
+        }
+
+        return false;
     }
 
     /**
@@ -26,18 +41,11 @@ class WidgetContextProvider
      */
     public function getWid()
     {
-        return $this->wid;
-    }
-
-    /**
-     * @param Request|null $request
-     */
-    public function setRequest(Request $request = null)
-    {
-        if (!is_null($request)) {
-            $this->wid = $request->get('_wid', false);
-        } else {
-            $this->wid = false;
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request) {
+            return $request->get('_wid', false);
         }
+
+        return false;
     }
 }

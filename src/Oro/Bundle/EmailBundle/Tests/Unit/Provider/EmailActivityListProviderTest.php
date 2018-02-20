@@ -4,8 +4,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
@@ -17,6 +15,8 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -71,14 +71,8 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
         $htmlTagHelper = $this->getMockBuilder('Oro\Bundle\UIBundle\Tools\HtmlTagHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->doctrineRegistryLink = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->mailboxProcessStorageLink = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineRegistryLink = $this->createMock(ServiceLink::class);
+        $this->mailboxProcessStorageLink = $this->createMock(ServiceLink::class);
         $this->activityAssociationHelper = $this
             ->getMockBuilder('Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper')
             ->disableOriginalConstructor()

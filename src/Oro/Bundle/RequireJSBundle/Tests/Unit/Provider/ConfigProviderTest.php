@@ -3,11 +3,9 @@
 namespace Oro\Bundle\RequireJSBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
-
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-
 use Oro\Bundle\RequireJSBundle\Config\Config;
 use Oro\Bundle\RequireJSBundle\Provider\ConfigProvider;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
 class ConfigProviderTest extends \PHPUnit_Framework_TestCase
 {

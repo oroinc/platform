@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional;
 
-use Symfony\Component\DomCrawler\Form;
-
 use Doctrine\Bundle\DoctrineBundle\Registry;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
+use Symfony\Component\DomCrawler\Form;
 
 class ControllersTest extends WebTestCase
 {

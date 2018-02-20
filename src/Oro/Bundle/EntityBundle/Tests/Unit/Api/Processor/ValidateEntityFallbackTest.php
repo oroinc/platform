@@ -5,9 +5,9 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Api\Processor;
 use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\EntityBundle\Api\Processor\ValidateEntityFallback;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
-use Oro\Bundle\EntityBundle\Api\Processor\ValidateEntityFallback;
 
 class ValidateEntityFallbackTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Command;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigCacheWarmer;
 
 class CacheWarmupCommand extends ContainerAwareCommand
 {

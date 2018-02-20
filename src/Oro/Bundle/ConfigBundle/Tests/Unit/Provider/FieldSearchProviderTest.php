@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Provider;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Provider\FieldSearchProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class FieldSearchProviderTest extends \PHPUnit_Framework_TestCase
 {

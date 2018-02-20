@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Authentication\Ticket;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestStorage\TicketDigestStorageInterface;
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider;
 use Oro\Bundle\SyncBundle\Tests\Unit\Authentication\Ticket\TicketDigestStorage\InMemoryTicketDigestStorageStub;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Security\UserProvider;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 class TicketProviderTest extends \PHPUnit_Framework_TestCase
 {

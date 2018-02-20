@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
+use Symfony\Component\Form\FormView;
 
 class EmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,18 +25,18 @@ class EmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
         unset($this->type);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
     }
 
     public function testGetParent()
     {
-        $this->assertEquals('genemu_jqueryselect2_translatable_entity', $this->type->getParent());
+        $this->assertEquals('oro_select2_translatable_entity', $this->type->getParent());
     }
 
     public function testGetName()

@@ -2,14 +2,11 @@
 namespace Oro\Bundle\IntegrationBundle\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
-
 use Oro\Bundle\IntegrationBundle\Authentication\Token\IntegrationTokenAwareTrait;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
-
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;

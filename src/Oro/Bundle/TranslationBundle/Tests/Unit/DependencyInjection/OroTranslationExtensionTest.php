@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Definition;
-
 use Oro\Bundle\TranslationBundle\DependencyInjection\OroTranslationExtension;
+use Symfony\Component\DependencyInjection\Definition;
 
 class OroTranslationExtensionTest extends \PHPUnit_Framework_TestCase
 {

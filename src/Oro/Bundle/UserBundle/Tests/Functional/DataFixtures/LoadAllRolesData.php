@@ -4,7 +4,6 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\UserBundle\Entity\Role;
 
 class LoadAllRolesData extends AbstractFixture

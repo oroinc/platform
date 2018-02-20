@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type;
 
-use Symfony\Component\Form\FormView;
-
-use Oro\Component\Layout\BlockInterface;
-use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\Options;
+use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Util\BlockUtils;
+use Symfony\Component\Form\FormView;
 
 class EmbedFormFieldType extends AbstractFormType
 {

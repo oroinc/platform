@@ -2,7 +2,6 @@
 namespace Oro\Bundle\CurrencyBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
 
 class MultiCurrency implements EmptyItem

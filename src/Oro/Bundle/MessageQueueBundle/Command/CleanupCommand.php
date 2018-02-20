@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Command;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Component\MessageQueue\Job\Job as JobComponent;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\EntityManager;
-
-use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
-use Oro\Component\MessageQueue\Job\Job as JobComponent;
 
 class CleanupCommand extends ContainerAwareCommand implements CronCommandInterface
 {

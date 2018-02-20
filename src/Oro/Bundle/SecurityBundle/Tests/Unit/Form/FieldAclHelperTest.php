@@ -2,18 +2,17 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form;
 
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\Security\Acl\Voter\FieldVote;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
-use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
+use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class FieldAclHelperTest extends FormIntegrationTestCase
 {

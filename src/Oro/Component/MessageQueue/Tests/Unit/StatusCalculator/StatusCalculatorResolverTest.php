@@ -7,9 +7,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver;
-use Oro\Component\MessageQueue\StatusCalculator\QueryCalculator;
 use Oro\Component\MessageQueue\StatusCalculator\CollectionCalculator;
+use Oro\Component\MessageQueue\StatusCalculator\QueryCalculator;
+use Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver;
 
 class StatusCalculatorResolverTest extends \PHPUnit_Framework_TestCase
 {

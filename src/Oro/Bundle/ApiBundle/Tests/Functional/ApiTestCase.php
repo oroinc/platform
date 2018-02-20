@@ -3,12 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-
-use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -18,6 +12,10 @@ use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Testing\Assert\ArrayContainsConstraint;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 abstract class ApiTestCase extends WebTestCase
 {
@@ -348,7 +346,12 @@ abstract class ApiTestCase extends WebTestCase
      */
     protected function appendEntityConfig($entityClass, array $config, $affectResourcesCache = false)
     {
-        $this->getConfigRegistry()->appendEntityConfig($entityClass, $config, $affectResourcesCache);
+        $this->getConfigRegistry()->appendEntityConfig(
+            $this->getRequestType(),
+            $entityClass,
+            $config,
+            $affectResourcesCache
+        );
         // disable the kernel reboot to avoid loosing of changes in configs
         if (null !== $this->client && !$this->isKernelRebootDisabled) {
             $this->client->disableReboot();
@@ -363,7 +366,7 @@ abstract class ApiTestCase extends WebTestCase
      */
     protected function restoreConfigs()
     {
-        $this->getConfigRegistry()->restoreConfigs();
+        $this->getConfigRegistry()->restoreConfigs($this->getRequestType());
         // restore the kernel reboot if it was disabled in appendEntityConfig method
         if ($this->isKernelRebootDisabled) {
             $this->isKernelRebootDisabled = false;

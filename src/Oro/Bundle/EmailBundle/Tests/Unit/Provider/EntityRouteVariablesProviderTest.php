@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
-use Symfony\Component\Translation\Translator;
-
 use Oro\Bundle\EmailBundle\Provider\EntityRouteVariablesProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
@@ -11,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\Translation\Translator;
 
 class EntityRouteVariablesProviderTest extends \PHPUnit_Framework_TestCase
 {

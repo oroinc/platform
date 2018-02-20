@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 class EntityExclusionProvider implements ExclusionProviderInterface

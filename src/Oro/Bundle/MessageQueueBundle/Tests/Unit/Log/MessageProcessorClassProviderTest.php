@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log;
 
+use Oro\Bundle\MessageQueueBundle\Log\MessageProcessorClassProvider;
+use Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Processor\Stub\MessageProcessorProxy;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\DelegateMessageProcessor;
 use Oro\Component\MessageQueue\Client\MessageProcessorRegistryInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Processor\Stub\MessageProcessorProxy;
-use Oro\Bundle\MessageQueueBundle\Log\MessageProcessorClassProvider;
 
 class MessageProcessorClassProviderTest extends \PHPUnit_Framework_TestCase
 {

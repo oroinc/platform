@@ -3,12 +3,10 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\DefaultUserProvider;
-
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class DefaultUserProviderTest extends \PHPUnit_Framework_TestCase

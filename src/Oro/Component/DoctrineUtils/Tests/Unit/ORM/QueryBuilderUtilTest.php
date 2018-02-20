@@ -7,10 +7,9 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)

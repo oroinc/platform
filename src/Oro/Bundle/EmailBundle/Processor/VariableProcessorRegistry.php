@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Processor;
 
 use Oro\Bundle\EmailBundle\Exception\UnknownVariableProcessorException;
-
 use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
 use Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface;
 use Oro\Component\DependencyInjection\ServiceLinkRegistryAwareTrait;

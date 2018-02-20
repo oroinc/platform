@@ -3,13 +3,11 @@
 namespace Oro\Component\Layout\Extension\Theme\ResourceProvider;
 
 use Doctrine\Common\Cache\Cache;
-
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Layout\BlockViewCache;
 use Oro\Component\Layout\Config\Loader\LayoutUpdateCumulativeResourceLoader;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ThemeResourceProvider implements ResourceProviderInterface
 {

@@ -38,7 +38,8 @@ class RouterCacheClearCommand extends ContainerAwareCommand
         $this
             ->setName('router:cache:clear')
             ->setDescription('Clears the routing cache for an application')
-            ->setHelp(<<<EOF
+            ->setHelp(
+                <<<EOF
 The <info>%command.name%</info> clears the routing cache for a given environment:
 
   <info>php %command.full_name% --env=prod</info>

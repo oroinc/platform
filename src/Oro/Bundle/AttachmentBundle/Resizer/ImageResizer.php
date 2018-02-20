@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\AttachmentBundle\Resizer;
 
-use Liip\ImagineBundle\Binary\BinaryInterface;
 use Imagine\Exception\RuntimeException;
+use Liip\ImagineBundle\Binary\BinaryInterface;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFileContentFactoryInterface;

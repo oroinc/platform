@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Routing;
 
+use Oro\Bundle\DistributionBundle\Event\RouteCollectionEvent;
+use Oro\Bundle\DistributionBundle\Routing\AbstractLoader;
+use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\RouteCollection;
-
-use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
-
-use Oro\Bundle\DistributionBundle\Event\RouteCollectionEvent;
-use Oro\Bundle\DistributionBundle\Routing\AbstractLoader;
 
 abstract class AbstractLoaderTest extends \PHPUnit_Framework_TestCase
 {

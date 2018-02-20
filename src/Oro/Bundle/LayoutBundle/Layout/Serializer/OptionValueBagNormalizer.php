@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Serializer;
 
+use Oro\Component\Layout\OptionValueBag;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-
-use Oro\Component\Layout\OptionValueBag;
 
 class OptionValueBagNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {

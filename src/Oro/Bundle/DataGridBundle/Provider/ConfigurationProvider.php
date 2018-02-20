@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\DataGridBundle\Provider;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Doctrine\Common\Cache\CacheProvider;
-
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\PhpUtils\ArrayUtil;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ConfigurationProvider implements ConfigurationProviderInterface
 {

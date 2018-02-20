@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 
 /**
  * Interface EmailFlagManagerInterface

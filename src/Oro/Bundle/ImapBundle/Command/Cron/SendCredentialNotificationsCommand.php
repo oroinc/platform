@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ImapBundle\Command\Cron;
 
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 
 /**
  * Cron command that runs processing the invalid email origins that was failed during sync.

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Symfony\Component\EventDispatcher\Event;
 
 class SendEmailTransport extends Event
 {

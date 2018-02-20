@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Async;
 
 use Doctrine\DBAL\Driver\AbstractDriverException;
 use Doctrine\ORM\EntityManagerInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DatabaseExceptionHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Async\DeletedAttributeRelationProcessor;
@@ -15,7 +14,6 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-
 use Psr\Log\LoggerInterface;
 
 class DeletedAttributeRelationProcessorTest extends \PHPUnit_Framework_TestCase

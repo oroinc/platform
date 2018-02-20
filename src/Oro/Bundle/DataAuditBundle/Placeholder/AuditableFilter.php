@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataAuditBundle\Placeholder;
 
 use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class AuditableFilter

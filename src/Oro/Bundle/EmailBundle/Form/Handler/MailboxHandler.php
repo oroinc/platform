@@ -4,17 +4,15 @@ namespace Oro\Bundle\EmailBundle\Form\Handler;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-
-use Oro\Bundle\EmailBundle\Event\MailboxSaved;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Event\MailboxSaved;
 use Oro\Bundle\EmailBundle\Form\Type\MailboxType;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class MailboxHandler implements FormAwareInterface
 {
@@ -29,8 +27,8 @@ class MailboxHandler implements FormAwareInterface
     /** @var MailboxProcessStorage */
     protected $mailboxProcessStorage;
 
-    /** @var Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /** @var FormFactoryInterface */
     private $formFactory;
@@ -40,14 +38,14 @@ class MailboxHandler implements FormAwareInterface
 
     /**
      * @param FormFactoryInterface     $formFactory
-     * @param Request                  $request
+     * @param RequestStack             $requestStack
      * @param Registry                 $doctrine
      * @param MailboxProcessStorage    $mailboxProcessStorage
      * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         FormFactoryInterface $formFactory,
-        Request $request,
+        RequestStack $requestStack,
         Registry $doctrine,
         MailboxProcessStorage $mailboxProcessStorage,
         EventDispatcherInterface $dispatcher
@@ -55,7 +53,7 @@ class MailboxHandler implements FormAwareInterface
         $this->doctrine              = $doctrine;
         $this->formFactory           = $formFactory;
         $this->form                  = $this->formFactory->create(self::FORM);
-        $this->request               = $request;
+        $this->requestStack          = $requestStack;
         $this->mailboxProcessStorage = $mailboxProcessStorage;
         $this->dispatcher            = $dispatcher;
     }
@@ -71,12 +69,13 @@ class MailboxHandler implements FormAwareInterface
     {
         $this->form->setData($mailbox);
 
-        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
+        $request = $this->requestStack->getCurrentRequest();
+        if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
             // If this request is marked as reload, process as reload.
-            if ($this->request->get(MailboxType::RELOAD_MARKER, false)) {
+            if ($request->get(MailboxType::RELOAD_MARKER, false)) {
                 $this->processReload();
             } else {
-                $this->form->handleRequest($this->request);
+                $this->form->handleRequest($request);
                 if ($this->form->isValid()) {
                     $this->onSuccess();
 
@@ -108,7 +107,7 @@ class MailboxHandler implements FormAwareInterface
      */
     protected function processReload()
     {
-        $this->form->handleRequest($this->request);
+        $this->form->handleRequest($this->requestStack->getCurrentRequest());
 
         $type = $this->form->get('processType')->getViewData();
         /** @var Mailbox $data */

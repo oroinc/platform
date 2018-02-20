@@ -4,9 +4,8 @@ namespace Oro\Bundle\ReminderBundle\Entity\Collection;
 
 use Doctrine\Common\Collections\AbstractLazyCollection;
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
+use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 
 class RemindersPersistentCollection extends AbstractLazyCollection
 {

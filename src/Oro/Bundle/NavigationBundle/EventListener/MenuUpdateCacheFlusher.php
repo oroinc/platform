@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\EventListener;
 
 use Doctrine\Common\Cache\CacheProvider;
-
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;

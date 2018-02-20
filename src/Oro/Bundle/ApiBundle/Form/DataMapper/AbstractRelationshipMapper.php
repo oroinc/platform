@@ -3,16 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Form\DataMapper;
 
 use Doctrine\Common\Collections\Collection;
-
+use Oro\Bundle\ApiBundle\Form\ReflectionUtil;
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
-use Oro\Bundle\ApiBundle\Form\ReflectionUtil;
-use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 
 abstract class AbstractRelationshipMapper implements DataMapperInterface
 {

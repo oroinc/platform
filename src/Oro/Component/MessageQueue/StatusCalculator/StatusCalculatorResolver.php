@@ -4,7 +4,6 @@ namespace Oro\Component\MessageQueue\StatusCalculator;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
-
 use Oro\Component\MessageQueue\Job\Job;
 
 class StatusCalculatorResolver

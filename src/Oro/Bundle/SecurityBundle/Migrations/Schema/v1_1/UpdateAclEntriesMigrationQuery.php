@@ -3,15 +3,12 @@
 namespace Oro\Bundle\SecurityBundle\Migrations\Schema\v1_1;
 
 use Doctrine\DBAL\Types\Type;
-
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Security\Acl\Model\AclCacheInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 
 class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
 {

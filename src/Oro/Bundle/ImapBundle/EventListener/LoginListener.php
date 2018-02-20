@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ImapBundle\EventListener;
 
-use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
 /**
  * Listener that runs processing the invalid email origins that was failed during sync for the logged user.

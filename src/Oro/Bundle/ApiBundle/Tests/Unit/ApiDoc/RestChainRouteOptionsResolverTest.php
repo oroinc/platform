@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
 
-use Symfony\Component\Routing\Route;
-
 use Oro\Bundle\ApiBundle\ApiDoc\RestChainRouteOptionsResolver;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+use Symfony\Component\Routing\Route;
 
 class RestChainRouteOptionsResolverTest extends \PHPUnit_Framework_TestCase
 {

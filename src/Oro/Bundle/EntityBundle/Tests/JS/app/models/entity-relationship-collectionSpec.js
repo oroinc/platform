@@ -137,8 +137,8 @@ define(function(require) {
 
             beforeEach(function() {
                 collection = new EntityRelationshipCollection({data: [
-                    {type: 'users', id: '1'},
-                    {type: 'users', id: '2'}
+                    {type: 'users', id: '1', attributes: {name: 'John'}},
+                    {type: 'users', id: '2', attributes: {name: 'Jack'}}
                 ]}, {type: 'test', id: '13', association: 'users'});
             });
 
@@ -148,6 +148,15 @@ define(function(require) {
 
             it('collection identifier', function() {
                 expect(collection.identifier).toEqual({type: 'test', id: '13', association: 'users'});
+            });
+
+            it('convert collection to JSON', function() {
+                expect(collection.toJSON()).toEqual({
+                    data: [
+                        {type: 'users', id: '1'},
+                        {type: 'users', id: '2'}
+                    ]
+                });
             });
         });
     });

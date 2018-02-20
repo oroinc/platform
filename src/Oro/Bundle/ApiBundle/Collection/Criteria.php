@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Collection;
 
 use Doctrine\Common\Collections\Criteria as BaseCriteria;
 use Doctrine\ORM\ORMException;
-
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class Criteria extends BaseCriteria

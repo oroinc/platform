@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\ORM\Query\Expr\Comparison as OrmComparison;
 use Doctrine\ORM\Query\Parameter;
-
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ContainsComparisonExpression;
 

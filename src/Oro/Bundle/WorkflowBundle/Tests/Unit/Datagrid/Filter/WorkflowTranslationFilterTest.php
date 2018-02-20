@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid\Filter;
 
-use Symfony\Component\Form\FormFactoryInterface;
-
-use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
+use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowTranslationFilter;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class WorkflowTranslationFilterTest extends \PHPUnit_Framework_TestCase
 {

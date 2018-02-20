@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Validator;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\DefinitionQueryConstraint;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
 
 /**
  * This validator check if the columns and entity classes are available to be used in query designer.

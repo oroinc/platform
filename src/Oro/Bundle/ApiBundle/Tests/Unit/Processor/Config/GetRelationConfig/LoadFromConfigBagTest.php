@@ -4,9 +4,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetRelationConfig;
 
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\RelationConfigMerger;
 use Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\LoadFromConfigBag;
-use Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\MergeConfig\MergeRelationConfigHelper;
-use Oro\Bundle\ApiBundle\Provider\ConfigBag;
+use Oro\Bundle\ApiBundle\Provider\ConfigBagInterface;
+use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
 use Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 
@@ -25,19 +26,20 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
-        $this->resourceHierarchyProvider = $this->getMockBuilder(ResourceHierarchyProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configBag = $this->getMockBuilder(ConfigBag::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->resourceHierarchyProvider = $this->createMock(ResourceHierarchyProvider::class);
+        $this->configBag = $this->createMock(ConfigBagInterface::class);
+
+        $configBagRegistry = $this->createMock(ConfigBagRegistry::class);
+        $configBagRegistry->expects(self::any())
+            ->method('getConfigBag')
+            ->willReturn($this->configBag);
 
         $this->processor = new LoadFromConfigBag(
             $this->configExtensionRegistry,
             new ConfigLoaderFactory($this->configExtensionRegistry),
             $this->resourceHierarchyProvider,
-            $this->configBag,
-            new MergeRelationConfigHelper($this->configExtensionRegistry)
+            $configBagRegistry,
+            new RelationConfigMerger($this->configExtensionRegistry)
         );
     }
 

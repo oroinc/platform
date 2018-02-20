@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\LessThan;
-
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 class OroMoneyType extends AbstractType
 {
@@ -62,7 +61,7 @@ class OroMoneyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $currencyCode = $this->localeSettings->getCurrency();
         $currencySymbol = $this->localeSettings->getCurrencySymbolByCurrency($currencyCode);

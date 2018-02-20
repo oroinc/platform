@@ -2,18 +2,15 @@
 
 namespace Oro\Component\Action\Action;
 
-use Psr\Log\NullLogger;
-use Psr\Log\LoggerInterface;
-
-use Doctrine\ORM\EntityManager;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
 use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Creates a managed entity clone

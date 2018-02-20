@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\EventListener;
 
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Bundle\FrameworkBundle\EventListener\TestSessionListener as BaseTestSessionListener;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 class TestSessionListener extends BaseTestSessionListener
 {

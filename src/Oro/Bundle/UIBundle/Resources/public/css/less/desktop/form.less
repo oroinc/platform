@@ -1,6 +1,10 @@
 .oro-item-collection {
-  input[type="email"], input[type="text"] {
-    width: 261px;
+  input {
+    &[type="email"],
+    [type="text"],
+    :not(.datepicker-input, .timepicker-input) {
+      width: 261px;
+    }
   }
   .input-append, .input-prepend {
     input[type="email"], input[type="text"] {

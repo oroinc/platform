@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form;
 
-use Symfony\Component\Form\FormExtensionInterface;
-use Symfony\Component\Form\FormRegistry;
-use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
-
 use Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension;
 use Oro\Bundle\ApiBundle\Form\FormExtensionState;
 use Oro\Bundle\ApiBundle\Form\SwitchableFormRegistry;
+use Symfony\Component\Form\FormExtensionInterface;
+use Symfony\Component\Form\FormRegistry;
+use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
 
 class SwitchableFormRegistryTest extends \PHPUnit_Framework_TestCase
 {

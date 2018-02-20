@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget\MassEdit;
 
-use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget\WindowMassAction;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget\WindowMassAction;
 use Symfony\Component\HttpFoundation\Request;
 
 class MassEditAction extends WindowMassAction

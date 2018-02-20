@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Cache;
 
-use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
-
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
+use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 
 class LocalizationCacheCleaner implements CacheClearerInterface
 {

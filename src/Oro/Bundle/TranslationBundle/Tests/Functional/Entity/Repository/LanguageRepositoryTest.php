@@ -3,20 +3,16 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Entity\Repository;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslationUsers;
-
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class LanguageRepositoryTest extends WebTestCase
 {

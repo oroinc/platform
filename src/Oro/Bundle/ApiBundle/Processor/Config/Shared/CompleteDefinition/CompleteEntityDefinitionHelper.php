@@ -3,13 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Provider\ExclusionProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -17,9 +17,10 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
-use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 /**
+ * The helper class to complete the configuraton of Data API resource based on ORM entity.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class CompleteEntityDefinitionHelper
@@ -36,8 +37,8 @@ class CompleteEntityDefinitionHelper
     /** @var CompleteCustomAssociationHelper */
     protected $customAssociationHelper;
 
-    /** @var ExclusionProviderInterface */
-    protected $exclusionProvider;
+    /** @var ExclusionProviderRegistry */
+    protected $exclusionProviderRegistry;
 
     /** @var ExpandedAssociationExtractor */
     protected $expandedAssociationExtractor;
@@ -47,7 +48,7 @@ class CompleteEntityDefinitionHelper
      * @param EntityIdHelper                  $entityIdHelper
      * @param CompleteAssociationHelper       $associationHelper
      * @param CompleteCustomAssociationHelper $customAssociationHelper
-     * @param ExclusionProviderInterface      $exclusionProvider
+     * @param ExclusionProviderRegistry       $exclusionProviderRegistry
      * @param ExpandedAssociationExtractor    $expandedAssociationExtractor
      */
     public function __construct(
@@ -55,14 +56,14 @@ class CompleteEntityDefinitionHelper
         EntityIdHelper $entityIdHelper,
         CompleteAssociationHelper $associationHelper,
         CompleteCustomAssociationHelper $customAssociationHelper,
-        ExclusionProviderInterface $exclusionProvider,
+        ExclusionProviderRegistry $exclusionProviderRegistry,
         ExpandedAssociationExtractor $expandedAssociationExtractor
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityIdHelper = $entityIdHelper;
         $this->associationHelper = $associationHelper;
         $this->customAssociationHelper = $customAssociationHelper;
-        $this->exclusionProvider = $exclusionProvider;
+        $this->exclusionProviderRegistry = $exclusionProviderRegistry;
         $this->expandedAssociationExtractor = $expandedAssociationExtractor;
     }
 
@@ -102,7 +103,7 @@ class CompleteEntityDefinitionHelper
                 $requestType
             );
             $this->completeDependentAssociations($definition, $metadata, $version, $requestType);
-            $this->completeFields($definition, $metadata, $existingFields);
+            $this->completeFields($definition, $metadata, $existingFields, $requestType);
         }
         // make sure that identifier field names are set
         $idFieldNames = $definition->getIdentifierFieldNames();
@@ -239,12 +240,15 @@ class CompleteEntityDefinitionHelper
      * @param EntityDefinitionConfig $definition
      * @param ClassMetadata          $metadata
      * @param array                  $existingFields [property path => field name, ...]
+     * @param RequestType            $requestType
      */
     protected function completeFields(
         EntityDefinitionConfig $definition,
         ClassMetadata $metadata,
-        array $existingFields
+        array $existingFields,
+        RequestType $requestType
     ) {
+        $exclusionProvider = $this->exclusionProviderRegistry->getExclusionProvider($requestType);
         $fieldNames = $metadata->getFieldNames();
         foreach ($fieldNames as $propertyPath) {
             if (isset($existingFields[$propertyPath])) {
@@ -254,7 +258,7 @@ class CompleteEntityDefinitionHelper
             }
             if (!$field->hasExcluded()
                 && !$field->isExcluded()
-                && $this->exclusionProvider->isIgnoredField($metadata, $propertyPath)
+                && $exclusionProvider->isIgnoredField($metadata, $propertyPath)
             ) {
                 $field->setExcluded();
             }
@@ -277,6 +281,7 @@ class CompleteEntityDefinitionHelper
         $version,
         RequestType $requestType
     ) {
+        $exclusionProvider = $this->exclusionProviderRegistry->getExclusionProvider($requestType);
         $associations = $metadata->getAssociationMappings();
         foreach ($associations as $propertyPath => $mapping) {
             if (isset($existingFields[$propertyPath])) {
@@ -288,7 +293,7 @@ class CompleteEntityDefinitionHelper
             }
             if (!$field->hasExcluded()
                 && !$field->isExcluded()
-                && $this->exclusionProvider->isIgnoredRelation($metadata, $propertyPath)
+                && $exclusionProvider->isIgnoredRelation($metadata, $propertyPath)
             ) {
                 $field->setExcluded();
             }

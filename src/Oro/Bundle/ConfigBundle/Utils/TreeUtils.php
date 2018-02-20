@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ConfigBundle\Utils;
 
-use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 
 class TreeUtils
 {

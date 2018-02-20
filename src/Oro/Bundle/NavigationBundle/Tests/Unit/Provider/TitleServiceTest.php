@@ -3,10 +3,10 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
 use Knp\Menu\ItemInterface;
-
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -57,9 +57,7 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $breadcrumbLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $breadcrumbLink = $this->createMock(ServiceLink::class);
 
         $breadcrumbLink->expects($this->any())->method('getService')->willReturn($this->breadcrumbManager);
 

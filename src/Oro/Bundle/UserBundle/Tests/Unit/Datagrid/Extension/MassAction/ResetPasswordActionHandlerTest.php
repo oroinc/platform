@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Datagrid\Extension\MassAction;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordActionHandler;
 use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
 {

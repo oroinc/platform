@@ -84,13 +84,7 @@ class ProcessorIterator implements \Iterator
             return null;
         }
 
-        $attributes = $this->processors[$this->index][1];
-
-        if (!isset($attributes['group'])) {
-            return null;
-        }
-
-        return $attributes['group'];
+        return $this->processors[$this->index][1]['group'] ?? null;
     }
 
     /**
@@ -129,7 +123,7 @@ class ProcessorIterator implements \Iterator
         $processorId = $this->processors[$this->index][0];
         $processor = $this->processorFactory->getProcessor($processorId);
         if (null === $processor) {
-            throw new \RuntimeException(sprintf('The processor "%s" does not exist.', $processorId));
+            throw new \RuntimeException(\sprintf('The processor "%s" does not exist.', $processorId));
         }
 
         return $processor;
@@ -165,7 +159,7 @@ class ProcessorIterator implements \Iterator
     public function rewind()
     {
         $this->index = -1;
-        $this->maxIndex = count($this->processors) - 1;
+        $this->maxIndex = \count($this->processors) - 1;
         $this->nextApplicable();
     }
 
@@ -180,7 +174,7 @@ class ProcessorIterator implements \Iterator
                 $this->context,
                 $this->processors[$this->index][1]
             );
-            if ($applicable !== ApplicableCheckerInterface::NOT_APPLICABLE) {
+            if (ApplicableCheckerInterface::NOT_APPLICABLE !== $applicable) {
                 break;
             }
             $this->index++;

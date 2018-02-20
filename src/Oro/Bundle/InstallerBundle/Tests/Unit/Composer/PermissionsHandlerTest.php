@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\InstallerBundle\Tests\Unit\Composer;
 
-use Symfony\Component\Filesystem\Filesystem;
-
 use Oro\Bundle\InstallerBundle\Composer\PermissionsHandler;
+use Symfony\Component\Filesystem\Filesystem;
 
 class PermissionsHandlerTest extends \PHPUnit_Framework_TestCase
 {

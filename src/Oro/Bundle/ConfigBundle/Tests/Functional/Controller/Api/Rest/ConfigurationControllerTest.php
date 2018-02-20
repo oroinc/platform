@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Functional\Controller\Api\Rest;
 
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class ConfigurationControllerTest extends WebTestCase
 {

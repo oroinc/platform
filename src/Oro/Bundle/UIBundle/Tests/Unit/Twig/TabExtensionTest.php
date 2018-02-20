@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
 use Oro\Bundle\UIBundle\Twig\TabExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class TabExtensionTest extends \PHPUnit_Framework_TestCase
 {

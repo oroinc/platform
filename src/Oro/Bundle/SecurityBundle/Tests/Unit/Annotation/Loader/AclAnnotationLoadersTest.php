@@ -3,12 +3,10 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Loader;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-
-use Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\TestBundle;
 use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoader;
 use Oro\Bundle\SecurityBundle\Annotation\Loader\AclConfigLoader;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
-
+use Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\TestBundle;
 use Oro\Component\Config\CumulativeResourceManager;
 
 class AclAnnotationLoadersTest extends \PHPUnit_Framework_TestCase

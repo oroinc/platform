@@ -4,7 +4,6 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Entity\Repository;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository;
 

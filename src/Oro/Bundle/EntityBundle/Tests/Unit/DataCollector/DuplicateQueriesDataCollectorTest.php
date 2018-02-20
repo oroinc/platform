@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\DataCollector;
 
+use Doctrine\DBAL\Logging\DebugStack;
+use Oro\Bundle\EntityBundle\DataCollector\DuplicateQueriesDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
-use Doctrine\DBAL\Logging\DebugStack;
-
-use Oro\Bundle\EntityBundle\DataCollector\DuplicateQueriesDataCollector;
 
 class DuplicateQueriesDataCollectorTest extends \PHPUnit_Framework_TestCase
 {

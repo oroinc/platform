@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\DataAuditBundle\Async;
 
-use Psr\Log\LoggerInterface;
-
+use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-
-use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
+use Psr\Log\LoggerInterface;
 
 class AuditChangedEntitiesRelationsProcessor extends AbstractAuditProcessor implements TopicSubscriberInterface
 {

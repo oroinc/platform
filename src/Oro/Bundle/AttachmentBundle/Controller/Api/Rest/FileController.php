@@ -2,22 +2,20 @@
 
 namespace Oro\Bundle\AttachmentBundle\Controller\Api\Rest;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\View\View;
-
-use Oro\Bundle\SoapBundle\Model\BinaryDataProviderInterface;
-use Oro\Bundle\SoapBundle\Handler\Context;
-use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
+use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\SoapBundle\Handler\Context;
+use Oro\Bundle\SoapBundle\Model\BinaryDataProviderInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @RouteResource("file")
@@ -28,6 +26,7 @@ class FileController extends RestGetController implements ClassResourceInterface
     /**
      * Get file.
      *
+     * @param Request $request
      * @param string $key
      * @param string $_format
      *
@@ -42,13 +41,13 @@ class FileController extends RestGetController implements ClassResourceInterface
      *
      * @return Response
      */
-    public function getAction($key, $_format)
+    public function getAction(Request $request, $key, $_format)
     {
         // @todo: For now I do not known why, but _format does not set automatically.
         // @todo: It seems that it is a bug in FOS Rest Bundle
         // @todo: https://magecore.atlassian.net/browse/BAP-8352
         if ($_format) {
-            $this->getRequest()->setRequestFormat($_format);
+            $request->setRequestFormat($_format);
         }
 
         return $this->handleGetRequest($key);
@@ -73,7 +72,7 @@ class FileController extends RestGetController implements ClassResourceInterface
     protected function buildResponse($data, $action, $contextValues = [], $status = Codes::HTTP_OK)
     {
         if ($status === Codes::HTTP_OK) {
-            $format = $this->getRequest()->getRequestFormat();
+            $format = $this->get('request_stack')->getCurrentRequest()->getRequestFormat();
             if ($format === 'binary') {
                 if ($action !== self::ACTION_READ) {
                     throw new BadRequestHttpException('Only single file can be returned in the binary format');
@@ -125,7 +124,13 @@ class FileController extends RestGetController implements ClassResourceInterface
         );
 
         $includeHandler = $this->get('oro_soap.handler.include');
-        $includeHandler->handle(new Context($this, $this->getRequest(), $response, $action, $contextValues));
+        $includeHandler->handle(new Context(
+            $this,
+            $this->get('request_stack')->getCurrentRequest(),
+            $response,
+            $action,
+            $contextValues
+        ));
 
         return $response;
     }

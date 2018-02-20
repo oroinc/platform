@@ -3,7 +3,6 @@
 namespace Oro\Bundle\PlatformBundle\Provider;
 
 use Composer\Package\PackageInterface;
-
 use Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory;
 
 class PackageProvider

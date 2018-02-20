@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\TagBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class TagExtension extends \Twig_Extension
 {

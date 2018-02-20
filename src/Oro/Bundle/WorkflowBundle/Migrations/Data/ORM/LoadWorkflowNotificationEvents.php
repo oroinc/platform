@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Migrations\Data\ORM;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\AbstractFixture;
-
+use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\NotificationBundle\Entity\Event;
 
 class LoadWorkflowNotificationEvents extends AbstractFixture

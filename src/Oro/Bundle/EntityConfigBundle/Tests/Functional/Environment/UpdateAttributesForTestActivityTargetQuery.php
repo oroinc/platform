@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\Environment;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
+use Psr\Log\LoggerInterface;
 
 /**
  * Marks "deleted_system_attribute" and "deleted_regular_attribute" extended attributes

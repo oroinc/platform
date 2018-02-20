@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Validator;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-
 use Oro\Bundle\QueryDesignerBundle\Model\GroupNode;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
 
 class GroupNodeValidator extends ConstraintValidator
 {

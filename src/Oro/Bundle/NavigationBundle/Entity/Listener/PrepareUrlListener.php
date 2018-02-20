@@ -4,7 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Entity\Listener;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-
 use Oro\Bundle\NavigationBundle\Model\UrlAwareInterface;
 
 class PrepareUrlListener

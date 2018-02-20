@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async;
 
-use Symfony\Component\Routing\Router;
-
-use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Symfony\Component\Routing\Router;
 
 class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -280,9 +279,9 @@ class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
         return $this->createMock(ConfigManager::class);
     }
 
-     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FileManager
-     */
+    /**
+    * @return \PHPUnit_Framework_MockObject_MockObject|FileManager
+    */
     private function createFileManagerMock()
     {
         return $this->createMock(FileManager::class);

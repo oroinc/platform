@@ -7,7 +7,6 @@ use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
-
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
 class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase

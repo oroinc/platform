@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class FormattingCodeFormatter
 {

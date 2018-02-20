@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
-use Symfony\Component\HttpFoundation\ParameterBag;
-
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Provider\SOAPTransport;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class SoapTransportTest extends \PHPUnit_Framework_TestCase
 {

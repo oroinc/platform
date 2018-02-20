@@ -4,15 +4,12 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Async;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
-
 use Oro\Bundle\IntegrationBundle\Async\SyncIntegrationProcessor;
-
 use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Provider\AbstractSyncProcessor;
-
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;

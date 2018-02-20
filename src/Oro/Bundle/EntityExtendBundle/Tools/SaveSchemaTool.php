@@ -3,10 +3,10 @@
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\Index;
-use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\Index;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\SchemaTool;
 
 class SaveSchemaTool extends SchemaTool
 {

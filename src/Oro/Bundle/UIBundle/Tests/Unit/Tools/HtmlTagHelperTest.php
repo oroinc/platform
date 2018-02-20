@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Tools;
 
-use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 class HtmlTagHelperTest extends \PHPUnit_Framework_TestCase
 {

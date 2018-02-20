@@ -3,11 +3,10 @@
 namespace Oro\Bundle\FormBundle\Validator\Constraints;
 
 use Doctrine\ORM\Query;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class UnchangeableFieldValidator extends ConstraintValidator
 {

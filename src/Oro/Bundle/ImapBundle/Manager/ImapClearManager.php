@@ -4,12 +4,6 @@ namespace Oro\Bundle\ImapBundle\Manager;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
-
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-
-use Symfony\Bridge\Doctrine\RegistryInterface;
-
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
@@ -19,6 +13,9 @@ use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class ImapClearManager implements LoggerAwareInterface
 {

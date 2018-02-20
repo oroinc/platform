@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Translation;
 
-use Symfony\Component\Config\ConfigCacheFactory;
-use Symfony\Component\Config\ResourceCheckerConfigCacheFactory;
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
@@ -13,6 +9,9 @@ use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadStrategyLanguages;
 use Oro\Bundle\TranslationBundle\Tests\Functional\Stub\Strategy\TranslationStrategy;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Symfony\Component\Config\ConfigCacheFactory;
+use Symfony\Component\Config\ResourceCheckerConfigCacheFactory;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @dbIsolationPerTest

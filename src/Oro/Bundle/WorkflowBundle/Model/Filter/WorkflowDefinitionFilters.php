@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Model\Filter;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class WorkflowDefinitionFilters

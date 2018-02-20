@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ImapBundle\OriginSyncCredentials;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * The manager that process the notifications about wrong credential sync email boxes

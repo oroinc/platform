@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CollectSubresources;
 
-use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Component\ChainProcessor\ContextInterface;
 
 /**
  * Initializes sub-resources for all API resources based on API configuration and metadata.

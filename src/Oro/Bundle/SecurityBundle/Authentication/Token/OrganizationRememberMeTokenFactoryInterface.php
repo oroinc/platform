@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Authentication\Token;
 
-use Symfony\Component\Security\Core\User\UserInterface;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 interface OrganizationRememberMeTokenFactoryInterface
 {

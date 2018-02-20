@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Request\DocumentBuilder;
 
 use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Component\EntitySerializer\DataAccessorInterface;
 
 class EntityPropertyAccessor implements ObjectPropertyAccessorInterface

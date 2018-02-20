@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\EventListener;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
-
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * @group search

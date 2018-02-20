@@ -6,11 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Guess\TypeGuess;
-
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowVariablesType;
 use Oro\Bundle\WorkflowBundle\Form\WorkflowVariableDataTransformer;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
@@ -18,6 +13,9 @@ use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Guess\TypeGuess;
 
 class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {

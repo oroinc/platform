@@ -3,6 +3,7 @@ define(function(require) {
 
     var _ = require('underscore');
     var error = require('oroui/js/error');
+    var tools = require('oroui/js/tools');
 
     return {
         /**
@@ -19,7 +20,10 @@ define(function(require) {
             var tpl = _.template(message, {
                 interpolate: /\{\{([\s\S]+?)}}/g
             });
-            error.showErrorInConsole(new Error('Warning: ' + tpl(variables || {})));
+
+            if (tools.debug) {
+                error.showErrorInConsole(new Error('Warning: ' + tpl(variables || {})));
+            }
         },
 
         /**

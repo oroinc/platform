@@ -3,13 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Filter;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-
 use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilters;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Filter\Stub\DefaultDefinitionFilter;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Filter\Stub\SystemDefinitionFilter;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class WorkflowDefinitionFiltersTest extends \PHPUnit_Framework_TestCase
 {

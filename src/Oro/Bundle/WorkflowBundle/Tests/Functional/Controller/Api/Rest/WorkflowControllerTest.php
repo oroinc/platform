@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller\Api\Rest;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;

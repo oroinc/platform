@@ -8,6 +8,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -31,6 +32,11 @@ class FlashMessageTest extends \PHPUnit_Framework_TestCase
     protected $htmlTagHelper;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|RequestStack
+     */
+    protected $requestStack;
+
+    /**
      * @var FlashMessage
      */
     protected $action;
@@ -40,8 +46,13 @@ class FlashMessageTest extends \PHPUnit_Framework_TestCase
         $this->contextAccessor = new ContextAccessor();
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
-
-        $this->action = new FlashMessage($this->contextAccessor, $this->translator, $this->htmlTagHelper);
+        $this->requestStack = new RequestStack();
+        $this->action = new FlashMessage(
+            $this->contextAccessor,
+            $this->translator,
+            $this->htmlTagHelper,
+            $this->requestStack
+        );
 
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
@@ -131,7 +142,7 @@ class FlashMessageTest extends \PHPUnit_Framework_TestCase
             ->with($translatedMessage)
             ->willReturn($sanitizedMessage);
 
-        $this->action->setRequest($request);
+        $this->requestStack->push($request);
         $this->action->execute($context);
     }
 }

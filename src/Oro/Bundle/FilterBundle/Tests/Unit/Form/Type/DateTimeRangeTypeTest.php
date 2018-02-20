@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
 use Oro\Bundle\FilterBundle\Form\Type\DateTimeRangeType;
+use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 
 class DateTimeRangeTypeTest extends AbstractTypeTestCase
 {
@@ -56,7 +56,7 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    public function setDefaultOptionsDataProvider()
+    public function configureOptionsDataProvider()
     {
         return array(
             array(

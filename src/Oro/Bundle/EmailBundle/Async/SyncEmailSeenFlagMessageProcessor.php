@@ -3,9 +3,7 @@ namespace Oro\Bundle\EmailBundle\Async;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
-
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository;
 use Oro\Bundle\EmailBundle\Manager\EmailFlagManager;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;

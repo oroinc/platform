@@ -3,13 +3,14 @@
 namespace Oro\Component\ChainProcessor;
 
 /**
- * Provides an interface that should be implemented by all applicable checker classes.
+ * Provides an interface that should be implemented by classes that is used to check
+ * whether a processor should be executed in the current execution context.
  */
 interface ApplicableCheckerInterface
 {
-    const APPLICABLE = 1;
-    const ABSTAIN = 0;
-    const NOT_APPLICABLE = -1;
+    public const APPLICABLE     = 1;
+    public const ABSTAIN        = 0;
+    public const NOT_APPLICABLE = -1;
 
     /**
      * Checks whether a processor can be executed in the given context.

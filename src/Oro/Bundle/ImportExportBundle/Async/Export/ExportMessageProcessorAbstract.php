@@ -1,8 +1,6 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
@@ -10,6 +8,7 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
 
 abstract class ExportMessageProcessorAbstract implements MessageProcessorInterface, TopicSubscriberInterface
 {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Filter;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 

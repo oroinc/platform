@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityConfigBundle\Form\DataTransformer;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
-
 use Symfony\Component\Form\DataTransformerInterface;
 
 class AttributeRelationsTransformer implements DataTransformerInterface

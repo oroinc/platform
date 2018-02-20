@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\NavigationBundle\Form\Type;
 
+use Oro\Bundle\NavigationBundle\Provider\TitleService;
+use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
+use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
+use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
-
-use Oro\Bundle\NavigationBundle\Provider\TitleService;
-use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
-use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
-
-use Oro\Component\DependencyInjection\ServiceLink;
 
 class RouteChoiceType extends AbstractType
 {
@@ -256,6 +254,6 @@ class RouteChoiceType extends AbstractType
      */
     public function getParent()
     {
-        return 'genemu_jqueryselect2_choice';
+        return 'oro_select2_choice';
     }
 }

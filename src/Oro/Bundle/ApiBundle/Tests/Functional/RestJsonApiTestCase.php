@@ -3,14 +3,12 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Doctrine\Common\Util\ClassUtils;
-
+use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Yaml\Yaml;
-
-use Oro\Component\PhpUtils\ArrayUtil;
-use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
-use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

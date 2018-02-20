@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
-
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 

@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 
 /**

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\Guesser;
 
-use Symfony\Component\Form\Guess\TypeGuess;
-
 use Oro\Bundle\EntityBundle\Form\Guesser\DoctrineTypeGuesser;
+use Symfony\Component\Form\Guess\TypeGuess;
 
 class DoctrineTypeGuesserTest extends \PHPUnit_Framework_TestCase
 {

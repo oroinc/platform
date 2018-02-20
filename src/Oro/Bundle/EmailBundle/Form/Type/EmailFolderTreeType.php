@@ -4,14 +4,12 @@ namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailFolderTreeType extends AbstractType
 {
@@ -64,7 +62,7 @@ class EmailFolderTreeType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'allow_extra_fields' => true,

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
-use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\ChainProcessor\ContextInterface;
 
 /**
  * Removes all filters marked as excluded.

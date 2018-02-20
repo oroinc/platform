@@ -56,8 +56,8 @@ services:
 
     oro_layout.layout_context_configurator.route:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\RouteContextConfigurator
-        calls:
-            - [setRequest, ["@?request="]]
+        arguments:
+            - '@request_stack'
         tags:
             - { name: layout.context_configurator, priority: -100 }
 

@@ -3,12 +3,10 @@
 namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator;
 
 use FOS\RestBundle\Util\Codes;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestResponseInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException;
+use Psr\Log\LoggerInterface;
 
 class MultiAttemptsClientDecorator implements RestClientInterface
 {

@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\UserBundle\Datagrid\Extension\MassAction;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
-use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ResetPasswordActionHandler implements MassActionHandlerInterface
 {

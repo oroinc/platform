@@ -2,22 +2,20 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
-
 use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeFamilyType;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupCollectionType;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupType;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeMultiSelectType;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
-use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\ImageTypeStub;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\AttributeFamilyStub;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\ImageTypeStub;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizedFallbackValueCollectionTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-
 use Symfony\Component\Form\PreloadedExtension;
 
 class AttributeFamilyTypeTest extends FormIntegrationTestCase
@@ -79,7 +77,10 @@ class AttributeFamilyTypeTest extends FormIntegrationTestCase
                     AttributeGroupCollectionType::NAME => new AttributeGroupCollectionType(),
                     AttributeGroupType::NAME => new AttributeGroupType(),
                     AttributeMultiSelectType::NAME => new AttributeMultiSelectType($attributeManagerMock),
-                    'genemu_jqueryselect2_choice' => new Select2Type('choice'),
+                    'oro_select2_choice' => new Select2Type(
+                        'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+                        'oro_select2_choice'
+                    ),
                 ],
                 [
                     'form' => [

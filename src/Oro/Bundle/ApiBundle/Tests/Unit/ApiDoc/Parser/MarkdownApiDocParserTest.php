@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
 
-use Symfony\Component\HttpKernel\Config\FileLocator;
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
+use Symfony\Component\HttpKernel\Config\FileLocator;
+use Symfony\Component\Yaml\Yaml;
 
 class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
 {

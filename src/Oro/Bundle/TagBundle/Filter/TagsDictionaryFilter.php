@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TagBundle\Filter;
 
 use Doctrine\ORM\Query\Expr\Func;
-
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\DictionaryFilter;

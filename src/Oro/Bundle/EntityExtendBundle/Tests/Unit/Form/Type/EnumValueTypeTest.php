@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\Constraint;
@@ -15,12 +17,9 @@ use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
+use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\Validator;
-use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
-
-use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 class EnumValueTypeTest extends TypeTestCase
 {

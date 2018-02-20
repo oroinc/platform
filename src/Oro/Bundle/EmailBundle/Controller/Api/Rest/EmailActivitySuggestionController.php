@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-
+use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("activity_email_suggestion")
@@ -51,14 +49,14 @@ class EmailActivitySuggestionController extends RestGetController
      *      description="Suggests entities associated with the email activity",
      *      resource=true
      * )
-     *
+     * @param Request $request
      * @return Response
      */
-    public function cgetAction($id)
+    public function cgetAction(Request $request, $id)
     {
-        $page  = (int)$this->getRequest()->get('page', 1);
-        $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
-        $excludeCurrentUser = filter_var($this->getRequest()->get('exclude-current-user'), FILTER_VALIDATE_BOOLEAN);
+        $page  = (int)$request->get('page', 1);
+        $limit = (int)$request->get('limit', self::ITEMS_PER_PAGE);
+        $excludeCurrentUser = filter_var($request->get('exclude-current-user'), FILTER_VALIDATE_BOOLEAN);
 
         $data = $this->getManager()->getSuggestionResult($id, $page, $limit, $excludeCurrentUser);
 

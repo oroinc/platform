@@ -3,7 +3,6 @@
 namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
 use Psr\Log\LoggerInterface;
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 

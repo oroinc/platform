@@ -4,15 +4,13 @@ namespace Oro\Bundle\AddressBundle\Entity;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
-
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-
 use Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion;
 use Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegionValidator;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
 use Oro\Bundle\LocaleBundle\Model\AddressInterface;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Address

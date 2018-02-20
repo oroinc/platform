@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Form\EventListener;
 
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 /**

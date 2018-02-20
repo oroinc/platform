@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Log\Handler;
 
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleTerminateEvent;
-use Symfony\Bridge\Monolog\Handler\ConsoleHandler as BaseConsoleHandler;
-
 use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 use Oro\Bundle\MessageQueueBundle\Log\Formatter\ConsoleFormatter;
+use Symfony\Bridge\Monolog\Handler\ConsoleHandler as BaseConsoleHandler;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 
 /**
  * Writes message queue consumer related logs to the console output depending on its verbosity setting.

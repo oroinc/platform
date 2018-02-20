@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
+use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType;
-use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
 class BooleanFilter extends AbstractFilter
 {

@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType;
+use Oro\Bundle\LocaleBundle\Form\Type\FallbackValueType;
+use Oro\Bundle\LocaleBundle\Model\FallbackType;
+use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\OroRichTextTypeStub;
+use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\TextTypeStub;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\LocaleBundle\Form\Type\FallbackValueType;
-use Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType;
-use Oro\Bundle\LocaleBundle\Model\FallbackType;
-use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\OroRichTextTypeStub;
-use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\TextTypeStub;
 
 class FallbackValueTypeTest extends FormIntegrationTestCase
 {

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Helper;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class DefaultOperationRequestHelper
 {

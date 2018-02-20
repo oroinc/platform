@@ -3,14 +3,11 @@
 namespace Oro\Bundle\CurrencyBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-
+use Oro\Bundle\CurrencyBundle\Migrations\Schema\v1_0\CurrencyConfigOrganizationMigration;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-
-use Oro\Bundle\CurrencyBundle\Migrations\Schema\v1_0\CurrencyConfigOrganizationMigration;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class OroCurrencyBundleInstaller implements Installation, ContainerAwareInterface
 {

@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\SegmentBundle\Query;
 
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-
-use Oro\Component\DependencyInjection\ServiceLink;
-
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Model\RestrictionSegmentProxy;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class DynamicSegmentQueryBuilder implements QueryBuilderInterface
 {

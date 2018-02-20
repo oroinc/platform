@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Validator;
 
+use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\GroupingConstraint;
+use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-
-use Oro\Component\PhpUtils\ArrayUtil;
-
-use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
-use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\GroupingConstraint;
 
 class GroupingValidator extends ConstraintValidator
 {

@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-
 use Oro\Bundle\ActionBundle\Action\FormatName;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FormatNameTest extends \PHPUnit_Framework_TestCase
 {

@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\Dbal\Extension;
+namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\DBAL\Extension;
 
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RejectMessageOnExceptionDbalExtension;

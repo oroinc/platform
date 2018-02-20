@@ -2,14 +2,23 @@ define(function(require) {
     'use strict';
 
     var EntityStructuresCollection;
+    var _ = require('underscore');
+    var SyncMachineProxyCache = require('oroui/js/app/models/sync-machine-proxy-cache');
     var EntityCollection = require('oroentity/js/app/models/entity-collection');
 
-    EntityStructuresCollection = EntityCollection.extend({
+    EntityStructuresCollection = EntityCollection.extend(/** @lends EntityStructuresCollection.prototype */{
         ROUTE: {
             read: 'oro_rest_api_list'
         },
 
         type: 'entitystructures',
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function EntityStructuresCollection(data, options) {
+            EntityStructuresCollection.__super__.constructor.call(this, data, options);
+        },
 
         /**
          * Converts entity identifier to its class name
@@ -45,11 +54,17 @@ define(function(require) {
         }
     });
 
-    Object.defineProperty(EntityStructuresCollection.prototype, 'globalId', {
-        get: function() {
-            return this.type;
-        }
+    Object.defineProperties(EntityStructuresCollection.prototype, {
+        globalId: {
+            get: function() {
+                return this.type;
+            }
+        },
+        SYNC_MACHINE_PROXY_CACHE_STORAGE_KEY: {value: 'entitystructures_data'},
+        SYNC_MACHINE_PROXY_CACHE_EXPIRE_TIME: {value: 1000 * 60 * 60 * 24}
     });
+
+    _.extend(EntityStructuresCollection.prototype, SyncMachineProxyCache);
 
     return EntityStructuresCollection;
 });

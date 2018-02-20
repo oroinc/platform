@@ -132,9 +132,10 @@ class OroSelenium2Driver extends Selenium2Driver
      */
     protected function setTextInputElement(Element $element, $value)
     {
+        $value = json_encode($value);
         $script = <<<JS
 var node = {{ELEMENT}};
-node.value = '$value';
+node.value = $value;
 JS;
         $this->executeJsOnElement($element, $script);
     }

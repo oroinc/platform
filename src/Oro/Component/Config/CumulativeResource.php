@@ -5,12 +5,13 @@ namespace Oro\Component\Config;
 use Oro\Component\Config\Loader\CumulativeResourceLoader;
 use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
 
 /**
  * CumulativeResource represents a resource which can be located in any bundle
  * and does not required any special registration in a bundle.
  */
-class CumulativeResource implements ResourceInterface, \Serializable
+class CumulativeResource implements ResourceInterface, \Serializable, SelfCheckingResourceInterface
 {
     /**
      * @var string
@@ -78,7 +79,7 @@ class CumulativeResource implements ResourceInterface, \Serializable
             $appRootDir = CumulativeResourceManager::getInstance()->getAppRootDir();
             foreach ($bundles as $bundleName => $bundleClass) {
                 $reflection = new \ReflectionClass($bundleClass);
-                $bundleDir  = dirname($reflection->getFilename());
+                $bundleDir  = dirname($reflection->getFileName());
 
                 $bundleAppDir = '';
                 /**

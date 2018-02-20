@@ -3,7 +3,6 @@
 namespace Oro\Component\Layout\Tests\Unit\Loader\Generator;
 
 use CG\Generator\PhpClass;
-
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 
 class VisitContextTest extends \PHPUnit_Framework_TestCase

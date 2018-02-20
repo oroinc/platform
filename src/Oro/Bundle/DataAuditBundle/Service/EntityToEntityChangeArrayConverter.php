@@ -3,7 +3,6 @@ namespace Oro\Bundle\DataAuditBundle\Service;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
-
 use Oro\Bundle\DataAuditBundle\Entity\AuditAdditionalFieldsInterface;
 
 class EntityToEntityChangeArrayConverter

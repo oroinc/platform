@@ -4,13 +4,11 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-
-use Symfony\Component\HttpFoundation\File\File as ComponentFile;
-
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\EventListener\FileListener;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
 class FileListenerTest extends \PHPUnit_Framework_TestCase
 {

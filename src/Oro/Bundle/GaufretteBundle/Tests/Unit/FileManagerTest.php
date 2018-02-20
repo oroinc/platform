@@ -7,12 +7,9 @@ use Gaufrette\Filesystem;
 use Gaufrette\Stream\InMemoryBuffer;
 use Gaufrette\Stream\Local as LocalStream;
 use Gaufrette\StreamMode;
-
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
-
-use Symfony\Component\Filesystem\Exception\IOException;
-
 use Oro\Bundle\GaufretteBundle\FileManager;
+use Symfony\Component\Filesystem\Exception\IOException;
 
 class FileManagerTest extends \PHPUnit_Framework_TestCase
 {

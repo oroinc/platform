@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Layout\Extension;
 
-use Oro\Component\Layout\LayoutContext;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Layout\Extension\IsLoggedInContextConfigurator;
+use Oro\Component\Layout\LayoutContext;
 
 class IsLoggedInContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,21 +2,23 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
-
+/**
+ * Registers all possible ORM expressions that can be used in Criteria object.
+ * @see \Oro\Bundle\ApiBundle\Util\CriteriaConnector::applyCriteria
+ */
 class QueryExpressionCompilerPass implements CompilerPassInterface
 {
-    const QUERY_EXPRESSION_VISITOR_FACTORY_SERVICE_ID = 'oro_api.query.expression_visitor_factory';
+    private const QUERY_EXPRESSION_VISITOR_FACTORY_SERVICE_ID = 'oro_api.query.expression_visitor_factory';
 
-    const COMPOSITE_EXPRESSION_TAG  = 'oro.api.query.composite_expression';
-    const COMPOSITE_EXPRESSION_TYPE = 'type';
-
-    const COMPARISON_EXPRESSION_TAG      = 'oro.api.query.comparison_expression';
-    const COMPARISON_EXPRESSION_OPERATOR = 'operator';
+    private const COMPOSITE_EXPRESSION_TAG       = 'oro.api.query.composite_expression';
+    private const COMPOSITE_EXPRESSION_TYPE      = 'type';
+    private const COMPARISON_EXPRESSION_TAG      = 'oro.api.query.comparison_expression';
+    private const COMPARISON_EXPRESSION_OPERATOR = 'operator';
 
     /**
      * {@inheritdoc}
@@ -46,29 +48,26 @@ class QueryExpressionCompilerPass implements CompilerPassInterface
      *
      * @return array [operator name => provider definition, ...]
      */
-    protected function getExpressions(ContainerBuilder $container, $tagName, $operatorPlaceholder)
+    private function getExpressions(ContainerBuilder $container, string $tagName, string $operatorPlaceholder): array
     {
-        $expressions = [];
-        // find services
         $services = [];
         $taggedServices = $container->findTaggedServiceIds($tagName);
         foreach ($taggedServices as $id => $tags) {
             foreach ($tags as $tag) {
-                $expressionType = $tag[$operatorPlaceholder];
-                $priority = isset($tag['priority']) ? $tag['priority'] : 0;
-                $services[$priority][] = [$operatorPlaceholder => $expressionType, 'definition' => new Reference($id)];
+                $services[DependencyInjectionUtil::getPriority($tag)][] = [
+                    DependencyInjectionUtil::getRequiredAttribute($tag, $operatorPlaceholder, $id, $tagName),
+                    new Reference($id)
+                ];
             }
         }
         if (empty($services)) {
-            return $expressions;
+            return [];
         }
 
-        // sort by priority and flatten
-        krsort($services);
-        $services = call_user_func_array('array_merge', $services);
-
-        foreach ($services as $serviceInfo) {
-            $expressions[$serviceInfo[$operatorPlaceholder]] = $serviceInfo['definition'];
+        $expressions = [];
+        $services = DependencyInjectionUtil::sortByPriorityAndFlatten($services);
+        foreach ($services as [$expressionType, $serviceRef]) {
+            $expressions[$expressionType] = $serviceRef;
         }
 
         return $expressions;
