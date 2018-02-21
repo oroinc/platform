@@ -21,14 +21,14 @@ class TwigSandboxConfigurationPass implements CompilerPassInterface
             && $container->hasDefinition(self::EMAIL_TEMPLATE_RENDERER_SERVICE_KEY)
             && $container->hasDefinition(self::UI_EXTENSION_SERVICE_KEY)
         ) {
-            // register 'oro_tag_filter' filter
+            // register 'oro_html_strip_tags' filter
             $securityPolicyDef = $container->getDefinition(self::EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY);
             $filters = $securityPolicyDef->getArgument(1);
-            $filters = array_merge($filters, array('oro_tag_filter'));
+            $filters = array_merge($filters, ['oro_html_strip_tags']);
             $securityPolicyDef->replaceArgument(1, $filters);
             // register an twig extension implements this function
             $rendererDef = $container->getDefinition(self::EMAIL_TEMPLATE_RENDERER_SERVICE_KEY);
-            $rendererDef->addMethodCall('addExtension', array(new Reference(self::UI_EXTENSION_SERVICE_KEY)));
+            $rendererDef->addMethodCall('addExtension', [new Reference(self::UI_EXTENSION_SERVICE_KEY)]);
         }
     }
 }

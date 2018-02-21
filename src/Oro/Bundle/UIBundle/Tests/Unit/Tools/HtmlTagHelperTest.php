@@ -29,6 +29,10 @@ class HtmlTagHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider shortStringProvider
+     *
+     * @param string $expected
+     * @param string $actual
+     * @param int $maxLength
      */
     public function testGetShort($expected, $actual, $maxLength)
     {
@@ -36,6 +40,9 @@ class HtmlTagHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $shortBody);
     }
 
+    /**
+     * @return array
+     */
     public static function shortStringProvider()
     {
         return [
@@ -75,5 +82,22 @@ same linesame line2
 STR;
 
         $this->assertEquals($expected, $this->helper->purify($testString));
+    }
+
+    public function testEscaped()
+    {
+        $testString = <<<HTML
+<span>same line</span><span>same line2</span>
+<p>same line</p><p>same line2</p>
+<script type="text/javascript">alert("test");</script>
+HTML;
+
+        $expected = <<<HTML
+<span>same line</span><span>same line2</span>
+<p>same line</p><p>same line2</p>
+&lt;script type="text/javascript"&gt;alert("test");&lt;/script&gt;
+HTML;
+
+        $this->assertEquals($expected, $this->helper->escaped($testString));
     }
 }

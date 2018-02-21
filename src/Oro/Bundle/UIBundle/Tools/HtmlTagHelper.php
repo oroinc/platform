@@ -102,4 +102,23 @@ class HtmlTagHelper
 
         return trim($string);
     }
+
+    /**
+     * Filter HTML with HTMLPurifier, allow embedded tags
+     *
+     * @param $string
+     * @return string
+     */
+    public function escaped($string)
+    {
+        $config = \HTMLPurifier_Config::createDefault();
+        $config->set('Cache.SerializerPath', $this->cacheDir);
+        $config->set('Cache.SerializerPermissions', 0775);
+        $config->set('Attr.EnableID', true);
+        $config->set('Core.EscapeInvalidTags', true);
+
+        $purifier = new \HTMLPurifier($config);
+
+        return $purifier->purify($string);
+    }
 }

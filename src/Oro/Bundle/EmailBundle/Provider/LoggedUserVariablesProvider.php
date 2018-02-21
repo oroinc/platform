@@ -209,7 +209,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
                 $val = [
                     'type'  => 'string',
                     'label' => $this->translator->trans('oro.email.emailtemplate.siganture'),
-                    'filter' => 'oro_tag_filter',
+                    'filter' => 'oro_html_strip_tags',
                 ];
             }
             $result['userSignature'] = $val;
