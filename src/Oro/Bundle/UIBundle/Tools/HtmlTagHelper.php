@@ -5,6 +5,9 @@ namespace Oro\Bundle\UIBundle\Tools;
 use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 
+/**
+ * This class helps format HTML
+ */
 class HtmlTagHelper
 {
     const MAX_STRING_LENGTH = 500;

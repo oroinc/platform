@@ -13,6 +13,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
+ * This class prepares email variables from current logged user
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
