@@ -91,7 +91,7 @@ abstract class AbstractCurrencySelectionType extends AbstractType
 
         $resolver->setNormalizer('choice_label', function (Options $options, $value) {
             return function ($currencyCode) use ($options) {
-                return $this->getCurrecnyLabel($currencyCode, $options);
+                return $this->getCurrencyLabel($currencyCode, $options);
             };
         });
     }
@@ -224,7 +224,7 @@ abstract class AbstractCurrencySelectionType extends AbstractType
      *
      * @return string
      */
-    protected function getCurrecnyLabel(string $currencyCode, \ArrayAccess $options)
+    protected function getCurrencyLabel(string $currencyCode, \ArrayAccess $options)
     {
         $viewType = null;
 
