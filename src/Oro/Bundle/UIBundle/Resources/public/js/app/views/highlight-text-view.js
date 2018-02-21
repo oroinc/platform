@@ -267,7 +267,7 @@ define(function(require) {
          * @return {boolean}
          */
         isViewHasHighlightedItems: function() {
-            return this.$el.find(this.findHighlightClass).length ? true: false;
+            return this.$el.find(this.findHighlightClass).length;
         },
 
         /**
@@ -371,7 +371,7 @@ define(function(require) {
          * @param {boolean} state
          */
         toggleHighlightSwitcher: function(state) {
-            var state = state ? state : this.isViewHasHighlightedItems();
+            state = state ? state : this.isViewHasHighlightedItems();
             this.$el.find(this.highlightSwitcherElement).toggleClass('hide', !state);
         },
 
@@ -381,7 +381,7 @@ define(function(require) {
         checkHighlightSwitcherState: function() {
             var switcherState = persistentStorage.getItem(this.highlightStateStorageKey);
             if (this.highlightStateStorageKey && switcherState) {
-                this.showNotFoundItems = switcherState === 'true' ? true : false;
+                this.showNotFoundItems = switcherState === 'true';
             }
             this.toggleHighlightSwitcherItems(!this.showNotFoundItems);
         },
@@ -403,7 +403,7 @@ define(function(require) {
          * @param {boolean} state
          */
         changeHighlightSwitcherState: function(state) {
-            var state = _.isBoolean(state) ? state : this.showNotFoundItems;
+            state = _.isBoolean(state) ? state : this.showNotFoundItems;
             this.setHighlightSwitcherState();
             this.toggleHighlightSwitcherItems(state);
             this.showNotFoundItems = !state;
