@@ -32,34 +32,6 @@ will print result:
 </div>
 ```
 
-### oro_html_purify
-The **oro_html_purify** filter is intended to purify script, style etc tags and content of them.
-```twig
-{{ data|oro_html_purify() }}
-```
-
-#### Example:
-```twig
-{% set data %}
-    <p>Paragraph 1: <strong>Strong</strong> like <b>Bold</b></p>
-    <p>Paragraph 2: <em>Italic</em></p>
-    <script type="text/javascript">alert("message");</script>
-{% endset %}
-
-<textarea>
-{{ data|oro_html_strip_tags() }}
-</textarea>
-```
-
-will print result:
-
-```html
-<textarea>
-    Paragraph 1: Strong like Bold
-    Paragraph 2: Italic
-</textarea>
-```
-
 ### oro_html_strip_tags
 The **oro_html_strip_tags** filter removes all HTML tags. 
 ```twig

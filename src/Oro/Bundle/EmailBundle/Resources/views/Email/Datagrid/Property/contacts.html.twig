@@ -38,10 +38,10 @@
         {% set title, label = label, label|truncate(maxLength) %}
     {% endif %}
     {%- if isNew -%}
-        <strong{% if title is defined %} title="{{ title }}"{% endif %}>{{ label|oro_html_purify }}</strong>
+        <strong{% if title is defined %} title="{{ title }}"{% endif %}>{{ label|oro_html_strip_tags }}</strong>
     {%- elseif title is defined -%}
-        <span title="{{ title }}">{{ label|oro_html_purify }}</span>
+        <span title="{{ title }}">{{ label|oro_html_strip_tags }}</span>
     {%- else -%}
-        {{ label|oro_html_purify }}
+        {{ label|oro_html_strip_tags }}
     {%- endif -%}
 {% endmacro %}

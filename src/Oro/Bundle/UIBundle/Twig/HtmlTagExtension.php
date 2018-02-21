@@ -37,7 +37,6 @@ class HtmlTagExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFilter('oro_html_strip_tags', [$this, 'htmlStripTags'], ['is_safe' => ['all']]),
             new \Twig_SimpleFilter('oro_attribute_name_purify', [$this, 'attributeNamePurify']),
-            new \Twig_SimpleFilter('oro_html_purify', [$this, 'htmlPurify']),
             new \Twig_SimpleFilter('oro_html_sanitize', [$this, 'htmlSanitize'], ['is_safe' => ['html']]),
             new \Twig_SimpleFilter('oro_html_escaped', [$this, 'htmlEscaped'], ['is_safe' => ['html']]),
         ];
@@ -63,17 +62,6 @@ class HtmlTagExtension extends \Twig_Extension
     public function attributeNamePurify($string)
     {
         return preg_replace('/[^a-z0-9_-]+/i', '', $string);
-    }
-
-    /**
-     * Filter is intended to purify script, style etc tags and content of them
-     *
-     * @param string $string
-     * @return string
-     */
-    public function htmlPurify($string)
-    {
-        return $this->getHtmlTagHelper()->purify($string);
     }
 
     /**

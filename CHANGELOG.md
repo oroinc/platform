@@ -7,6 +7,7 @@
 ### Removed
 #### UIBundle
 * Removed twig filter `oro_html_tag_trim` use `oro_html_escaped` instead. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_escaped).
+* Removed twig filter `oro_html_purify` use `oro_html_strip_tags` instead. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_strip_tags).
 
 #### WorkflowBundle
 * Removed cache provider `oro_workflow.cache.provider.workflow_definition`. Doctrine result cache is used instead of.

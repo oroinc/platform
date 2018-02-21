@@ -34,22 +34,6 @@ class HtmlTagExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_ui.html_tag', $this->extension->getName());
     }
 
-    public function testHtmlPurify()
-    {
-        $html = '<html>HTML</html>';
-
-        $this->htmlTagHelper
-            ->expects($this->once())
-            ->method('purify')
-            ->with($html)
-            ->willReturn('HTML');
-
-        $this->assertEquals(
-            'HTML',
-            self::callTwigFilter($this->extension, 'oro_html_purify', [$html])
-        );
-    }
-
     public function testHtmlSanitize()
     {
         $html = '<html>HTML</html>';
