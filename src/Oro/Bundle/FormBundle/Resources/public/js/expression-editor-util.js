@@ -164,7 +164,7 @@ define(function(require) {
                 this._fillRootEntitiesOptions(autocompleteData);
                 return autocompleteData;
             }
-            var fieldChain = this._findFieldChain(tokens, currentTokenIndex, this.options.rootEntities);
+            var fieldChain = this.findFieldChain(tokens, currentTokenIndex, this.options.rootEntities);
             var currentToken = tokens[currentTokenIndex];
             if (fieldChain) {
                 if (this.dataSourceNames.indexOf(fieldChain.entity.value) !== -1) {
@@ -249,7 +249,7 @@ define(function(require) {
             if (fieldChain.lastToken.test(Token.PUNCTUATION_TYPE, '.')) {
                 autocompleteData.replaceFrom = fieldChain.lastToken.cursor - 1 + fieldChain.lastToken.length;
                 autocompleteData.replaceTo = autocompleteData.replaceFrom;
-            } else {
+            } else if (fieldChain.fields.length !== 0) {
                 var lastToken = fieldChain.fields.pop();
                 autocompleteData.query = lastToken.value;
                 autocompleteData.replaceFrom = fieldChain.lastToken.cursor - 1;
@@ -261,7 +261,7 @@ define(function(require) {
             var levelLimit = this.options.itemLevelLimit - parts.length;
             var treeNode = this.entityDataProvider
                 .getEntityTreeNodeByPropertyPath(parts.join(this.strings.childSeparator));
-            if (treeNode && treeNode.__isEntity) {
+            if (levelLimit > 0 && treeNode && treeNode.__isEntity) {
                 _.each(treeNode, function(node) {
                     var isEntity = node.__isEntity;
                     if (isEntity && (omitRelationFields || !node.__hasScalarFieldsInSubtree(levelLimit))) {
@@ -382,9 +382,8 @@ define(function(require) {
          * @param {number} currentTokenIndex
          * @param {Array.<string>} names - names that can be used as start of a chain
          * @return {FieldChain|null}
-         * @private
          */
-        _findFieldChain: function(tokens, currentTokenIndex, names) {
+        findFieldChain: function(tokens, currentTokenIndex, names) {
             var chain = null;
             var i = 0;
             while (i < tokens.length && i <= currentTokenIndex) {
@@ -425,11 +424,11 @@ define(function(require) {
                     }
                 }
 
+                chain.lastToken = tokens[i - 1];
+
                 // if last chain member located before current token in the token array then try to find another chain
-                if (i <= currentTokenIndex) {
+                if (i <= currentTokenIndex || chain.lastToken === chain.entity) {
                     chain = null;
-                } else {
-                    chain.lastToken = tokens[i - 1];
                 }
                 i++;
             }

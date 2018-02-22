@@ -27,7 +27,7 @@ define(function(require) {
          * Tokenizes an expression.
          *
          * @param {string} expression The expression to tokenize
-         * @param {function(string, string, number)} [errorHandler] - callback that throws an error
+         * @param {function(string, number, string)} [errorHandler] - callback that throws an error
          * @return {TokenStream} a token stream instance
          * @protected
          */
@@ -118,7 +118,8 @@ define(function(require) {
 
             tokens.push(new Token(Token.EOF_TYPE, null, cursor + 1));
 
-            if (brackets.length) {
+            if (brackets.length && errorHandler.length !== 0) {
+                // if the method is called with stub error handler just skip it
                 bracket = brackets.pop();
                 message = 'Unclosed "' + bracket[0] + '"';
                 errorHandler(message, bracket[1], expression);

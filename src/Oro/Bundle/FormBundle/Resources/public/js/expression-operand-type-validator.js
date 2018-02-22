@@ -57,7 +57,7 @@ define(function(require) {
         expectValid: function(parsedExpression) {
             var astNodeWrapper = new ASTNodeWrapper(parsedExpression.getNodes());
             if (!this.isConditionalNodeAllowed) {
-                this._expectWithoudConditionals(astNodeWrapper);
+                this._expectWithoutConditionals(astNodeWrapper);
             }
             if (this.operations) {
                 this._expectAllowedOperators(astNodeWrapper);
@@ -73,9 +73,9 @@ define(function(require) {
          * @throws {TypeError} if node tree contains conditionals nodes
          * @protected
          */
-        _expectWithoudConditionals: function(astNodeWrapper) {
+        _expectWithoutConditionals: function(astNodeWrapper) {
             if (astNodeWrapper.findInstancesOf(ConditionalNode).length !== 0) {
-                throw new TypeError('Forbidden conditional constuction is used in expression.');
+                throw new TypeError('Forbidden conditional construction is used in expression.');
             }
         },
 
@@ -118,6 +118,9 @@ define(function(require) {
                 });
 
                 nameNodes.forEach(function(node) {
+                    if (node.parent === null || !node.parent.instanceOf(GetAttrNode)) {
+                        throw new TypeError('Attempt using `' + entity.name + '` entity like a variable.');
+                    }
                     var source = entity.name;
                     if (entity.isCollection) {
                         if (node.parent.attr('type') !== GetAttrNode.ARRAY_CALL) {
