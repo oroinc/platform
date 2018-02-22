@@ -46,6 +46,7 @@ abstract class AbstractEntityVoter implements VoterInterface
 
     /**
      * {@inheritDoc}
+     * TODO: change public to protected in scope of BAP-15236
      */
     public function supportsAttribute($attribute)
     {
@@ -54,6 +55,7 @@ abstract class AbstractEntityVoter implements VoterInterface
 
     /**
      * {@inheritdoc}
+     * TODO: change public to protected in scope of BAP-15236
      */
     public function supportsClass($class)
     {

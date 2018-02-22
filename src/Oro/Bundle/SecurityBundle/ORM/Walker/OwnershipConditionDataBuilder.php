@@ -14,29 +14,21 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
+ * Default ownership condition builder
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class OwnershipConditionDataBuilder
+class OwnershipConditionDataBuilder extends AbstractOwnershipConditionDataBuilder
 {
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
-
-    /** @var TokenStorageInterface */
-    protected $tokenStorage;
-
     /** @var ObjectIdAccessor */
     protected $objectIdAccessor;
 
     /** @var AclVoter */
     protected $aclVoter;
-
-    /** @var OwnershipMetadataProviderInterface */
-    protected $metadataProvider;
 
     /** @var EntitySecurityMetadataProvider */
     protected $entityMetadataProvider;
@@ -83,22 +75,7 @@ class OwnershipConditionDataBuilder
     }
 
     /**
-     * Get data for query acl access level check
-     *
-     * @param string $entityClassName
-     * @param string $permissions
-     *
-     * @return array Returns empty array if entity has full access,
-     *               array with null values if user does't have access to the entity
-     *               and array with entity field and field values which user has access to.
-     *               Array structure:
-     *               0 - owner field name
-     *               1 - owner values
-     *               2 - owner association type
-     *               3 - organization field name
-     *               4 - organization values
-     *               5 - should owners be checked
-     *                  (for example, in case of Organization ownership type, owners should not be checked)
+     * {@inheritdoc}
      */
     public function getAclConditionData($entityClassName, $permissions = 'VIEW')
     {
@@ -132,20 +109,6 @@ class OwnershipConditionDataBuilder
         }
 
         return $condition;
-    }
-
-    /**
-     * @param string $permissions
-     * @param string $entityType
-     *
-     * @return bool
-     */
-    protected function isEntityGranted($permissions, $entityType)
-    {
-        return $this->authorizationChecker->isGranted(
-            $permissions,
-            new ObjectIdentity('entity', $entityType)
-        );
     }
 
     /**
@@ -403,25 +366,5 @@ class OwnershipConditionDataBuilder
     protected function getTree()
     {
         return $this->treeProvider->getTree();
-    }
-
-    /**
-     * Gets the logged user
-     *
-     * @return null|mixed
-     */
-    public function getUser()
-    {
-        $token = $this->tokenStorage->getToken();
-        if (!$token) {
-            return null;
-        }
-
-        $user = $token->getUser();
-        if (!is_object($user) || !is_a($user, $this->metadataProvider->getUserClass())) {
-            return null;
-        }
-
-        return $user;
     }
 }

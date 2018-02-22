@@ -59,10 +59,6 @@ api:
                             property_path: relatedClass
                         id:
                             property_path: relatedId
-                relatedClass:
-                    exclude: true
-                relatedId:
-                    exclude: true
         Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
             filters:
                 fields:

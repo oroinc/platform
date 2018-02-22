@@ -40,6 +40,7 @@ class EmailVoter implements VoterInterface
 
     /**
      * {@inheritDoc}
+     * TODO: change public to protected in scope of BAP-15236
      */
     public function supportsAttribute($attribute)
     {
@@ -48,6 +49,7 @@ class EmailVoter implements VoterInterface
 
     /**
      * {@inheritDoc}
+     * TODO: change public to protected in scope of BAP-15236
      */
     public function supportsClass($class)
     {

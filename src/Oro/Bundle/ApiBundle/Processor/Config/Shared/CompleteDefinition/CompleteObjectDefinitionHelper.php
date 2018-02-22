@@ -66,17 +66,19 @@ class CompleteObjectDefinitionHelper
     ) {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            $this->completeObjectAssociation($fieldName, $field, $version, $requestType);
+            $this->completeObjectAssociation($definition, $fieldName, $field, $version, $requestType);
         }
     }
 
     /**
      * @param string                      $fieldName
+     * @param EntityDefinitionConfig      $definition
      * @param EntityDefinitionFieldConfig $field
      * @param string                      $version
      * @param RequestType                 $requestType
      */
     protected function completeObjectAssociation(
+        EntityDefinitionConfig $definition,
         $fieldName,
         EntityDefinitionFieldConfig $field,
         $version,
@@ -86,7 +88,7 @@ class CompleteObjectDefinitionHelper
         if (DataType::isNestedObject($dataType)) {
             $this->associationHelper->completeNestedObject($fieldName, $field);
         } elseif (DataType::isNestedAssociation($dataType)) {
-            $this->associationHelper->completeNestedAssociation($field, $version, $requestType);
+            $this->associationHelper->completeNestedAssociation($definition, $field, $version, $requestType);
         } else {
             $targetClass = $field->getTargetClass();
             if ($targetClass) {

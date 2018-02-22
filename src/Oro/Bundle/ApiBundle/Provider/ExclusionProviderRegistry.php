@@ -55,7 +55,7 @@ class ExclusionProviderRegistry
         }
 
         $exclusionProviderServiceId = null;
-        foreach ($this->exclusionProviders as [$serviceId, $expression]) {
+        foreach ($this->exclusionProviders as list($serviceId, $expression)) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 $exclusionProviderServiceId = $serviceId;
                 break;

@@ -129,7 +129,7 @@ class CompleteEntityDefinitionHelper
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             $propertyPath = $field->getPropertyPath();
-            if (empty($propertyPath) || ConfigUtil::IGNORE_PROPERTY_PATH === $propertyPath) {
+            if (!$propertyPath || ConfigUtil::IGNORE_PROPERTY_PATH === $propertyPath) {
                 $propertyPath = $fieldName;
             }
             $existingFields[$propertyPath] = $fieldName;
@@ -254,7 +254,7 @@ class CompleteEntityDefinitionHelper
             if (isset($existingFields[$propertyPath])) {
                 $field = $definition->getField($existingFields[$propertyPath]);
             } else {
-                $field = $definition->addField($propertyPath);
+                $field = $definition->getOrAddField($propertyPath);
             }
             if (!$field->hasExcluded()
                 && !$field->isExcluded()
@@ -289,7 +289,7 @@ class CompleteEntityDefinitionHelper
                 $field = $definition->getField($fieldName);
             } else {
                 $fieldName = $propertyPath;
-                $field = $definition->addField($fieldName);
+                $field = $definition->getOrAddField($fieldName);
             }
             if (!$field->hasExcluded()
                 && !$field->isExcluded()

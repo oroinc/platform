@@ -341,8 +341,6 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
       width: auto;
       float: left;
       .dropdown-toggle {
-        -webkit-border-radius: 3px 0 0 3px;
-        -moz-border-radius: 3px 0 0 3px;
         border-radius: 3px 0 0 3px;
       }
     }
@@ -377,6 +375,39 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
         position: absolute;
         right: 0;
         top: 0;
+      }
+
+      &.loading {
+        position: relative;
+
+        &:before,
+        &:after {
+          content: '';
+
+          position: absolute;
+
+          z-index: 1;
+        }
+
+        &:before {
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+
+          background-color: rgba(255, 255, 255, 0);
+        }
+
+        &:after {
+          top: 0;
+          right: 0;
+
+          height: 29px;
+          margin-right: 22px;
+          padding-right: inherit;
+
+          background: url('../../../oroui/img/loader-16.gif') no-repeat left center transparent;
+        }
       }
     }
   }

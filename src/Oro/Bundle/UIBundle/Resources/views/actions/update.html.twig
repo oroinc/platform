@@ -28,14 +28,21 @@
     {% endif %}
     {% set formAttr = formAttr|default({})|merge({
         'id': form.vars.id,
-        'name': form.vars.name,
-        'action': formAction,
-        'method': form.vars.method,
         'data-collect': 'true'
     }) %}
-    <form {{ UI.attributes(formAttr) }}
-          {{ form_enctype(form) }}
-          {% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}>
+
+    {% if pageComponent is defined %}
+        {% for key,value in pageComponent %}
+            {% if key == 'layout' %}
+                {% set formAttr = formAttr|merge({'data-layout': pageComponent.layout}) %}
+            {% elseif value is iterable %}
+                {% set formAttr = formAttr|merge({('data-page-component-' ~ key): value|json_encode}) %}
+            {% else %}
+                {% set formAttr = formAttr|merge({('data-page-component-' ~ key): value}) %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    {{ form_start(form, {'action': formAction, 'attr': formAttr}) }}
         {% if isWidgetContext %}
             {% block page_widget_actions %}
             <div class="widget-actions">
@@ -235,7 +242,7 @@
             {# block added just for possibility to disable it in child templates if needed #}
             {{ syncMacro.syncContentTags(form.vars.value) }}
         {% endblock %}
-    </form>
+    {{ form_end(form, {'render_rest': false}) }}
     {{ oro_form_js_validation(form) }}
     {% endif %}
 {% endblock content %}

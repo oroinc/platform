@@ -351,7 +351,7 @@ define(function(require) {
          * @protected
          */
         _focusCriteria: function() {
-            this.$(this.criteriaSelector + ' input[type=text]').focus().select();
+            this.$(this.criteriaSelector + ' input[type=text]').not('[data-skip-focus]').focus().select();
         },
 
         /**
