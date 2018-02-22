@@ -112,7 +112,7 @@ class HtmlTagHelper
      * @param $string
      * @return string
      */
-    public function escaped($string)
+    public function escape($string)
     {
         $config = \HTMLPurifier_Config::createDefault();
         $config->set('Cache.SerializerPath', $this->cacheDir);

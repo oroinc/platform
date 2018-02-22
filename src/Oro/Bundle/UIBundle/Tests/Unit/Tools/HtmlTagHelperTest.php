@@ -84,7 +84,7 @@ STR;
         $this->assertEquals($expected, $this->helper->purify($testString));
     }
 
-    public function testEscaped()
+    public function testEscape()
     {
         $testString = <<<HTML
 <span>same line</span><span>same line2</span>
@@ -98,6 +98,6 @@ HTML;
 &lt;script type="text/javascript"&gt;alert("test");&lt;/script&gt;
 HTML;
 
-        $this->assertEquals($expected, $this->helper->escaped($testString));
+        $this->assertEquals($expected, $this->helper->escape($testString));
     }
 }

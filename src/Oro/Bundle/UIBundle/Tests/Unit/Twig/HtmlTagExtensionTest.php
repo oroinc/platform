@@ -66,18 +66,18 @@ class HtmlTagExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testHtmlEscaped()
+    public function testHtmlEscape()
     {
         $html = '<div>HTML</div><script type="text/javascript"></script>';
 
         $this->htmlTagHelper
             ->expects($this->once())
-            ->method('escaped')
+            ->method('escape')
             ->with($html)
             ->willReturn('<div>HTML</div>');
         $this->assertEquals(
             '<div>HTML</div>',
-            self::callTwigFilter($this->extension, 'oro_html_escaped', [$html])
+            self::callTwigFilter($this->extension, 'oro_html_escape', [$html])
         );
     }
 

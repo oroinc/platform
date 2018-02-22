@@ -55,10 +55,10 @@ will print result:
 Paragraph 1: Strong like Bold Paragraph 2: Italic alert("message");
 ```
 
-### oro_html_escaped
-The **oro_html_escaped** filter allow HTML tags, all forbidden tags will be escaped.
+### oro_html_escape
+The **oro_html_escape** filter allow HTML tags, all forbidden tags will be escaped.
 ```twig
-{{ data|oro_html_escaped() }}
+{{ data|oro_html_escape() }}
 ```
 
 #### Example:
@@ -69,7 +69,7 @@ The **oro_html_escaped** filter allow HTML tags, all forbidden tags will be esca
     <script type="text/javascript">alert("message");</script>
 {% endset %}
 
-{{ data|oro_html_escaped() }}
+{{ data|oro_html_escape() }}
 ```
 
 will print result:

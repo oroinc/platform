@@ -38,7 +38,7 @@ class HtmlTagExtension extends \Twig_Extension
             new \Twig_SimpleFilter('oro_html_strip_tags', [$this, 'htmlStripTags'], ['is_safe' => ['all']]),
             new \Twig_SimpleFilter('oro_attribute_name_purify', [$this, 'attributeNamePurify']),
             new \Twig_SimpleFilter('oro_html_sanitize', [$this, 'htmlSanitize'], ['is_safe' => ['html']]),
-            new \Twig_SimpleFilter('oro_html_escaped', [$this, 'htmlEscaped'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFilter('oro_html_escape', [$this, 'htmlEscape'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -81,9 +81,9 @@ class HtmlTagExtension extends \Twig_Extension
      * @param $string
      * @return string
      */
-    public function htmlEscaped($string)
+    public function htmlEscape($string)
     {
-        return $this->getHtmlTagHelper()->escaped($string);
+        return $this->getHtmlTagHelper()->escape($string);
     }
 
     /**

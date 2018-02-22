@@ -6,7 +6,7 @@
 
 ### Removed
 #### UIBundle
-* Removed twig filter `oro_html_tag_trim` use `oro_html_escaped` instead. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_escaped).
+* Removed twig filter `oro_html_tag_trim` use `oro_html_escape` instead. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_escape).
 * Removed twig filter `oro_html_purify` use `oro_html_strip_tags` instead. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_strip_tags).
 
 #### WorkflowBundle
