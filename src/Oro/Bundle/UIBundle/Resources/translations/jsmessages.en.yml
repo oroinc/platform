@@ -98,8 +98,8 @@ oro:
             move_node_error: "You can not move node {{ nodeText }} here."
             no_node_selected_error: "You didn't select any node"
             actions:
-                expand: 'Expand all'
-                collapse: 'Collapse all'
+                expand: 'Expand All'
+                collapse: 'Collapse All'
                 move: 'Move To'
                 subitems:
                     itemsLabel: 'Items'
@@ -115,8 +115,8 @@ oro:
         widget_form_component:
             save_flash_success: Saved successfully
         highlight_switcher:
-            show_all_items: "Show hidden items"
-            show_highlighted_items_only: "Show search results only"
+            show_all_items: "Show Hidden Items"
+            show_highlighted_items_only: "Show Search Results Only"
         element_value:
             messages:
                 copied: Copied to clipboard
