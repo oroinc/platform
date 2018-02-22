@@ -81,9 +81,6 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translator->expects($this->any())
-            ->method('trans')
-            ->will($this->returnArgument(0));
 
         $this->exclusionProvider = $this->createMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
 
@@ -833,6 +830,9 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                 }
             }
         }
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->will($this->returnArgument(0));
     }
 
     /**
@@ -1031,5 +1031,47 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         ];
+    }
+
+    public function testGetTranslatedFields()
+    {
+        $field1Label  = 'C';
+        $config = [
+            'Acme\Entity\Test' => [
+                'config' => [
+                    'label' => 'Test Label',
+                    'plural_label' => 'Test Plural Label',
+                    'icon' => 'fa-test',
+                ],
+                'fields' => [
+                    'field1' => [
+                        'type' => 'string',
+                        'config' => [
+                            'label' => $field1Label
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $locale = 'it_IT';
+        $field1LabelTranslated = 'C Translated';
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with($field1Label, [], null, $locale)
+            ->will($this->returnValue($field1LabelTranslated));
+        $this->prepare($config);
+
+
+        $this->provider->setLocale($locale);
+        $result = $this->provider->getFields('Acme:Test');
+        $expected = [
+            [
+                'name' => 'field1',
+                'type' => 'string',
+                'label' => $field1LabelTranslated
+            ]
+        ];
+
+        $this->assertEquals($expected, $result);
     }
 }

@@ -57,6 +57,9 @@ class EntityFieldProvider
     /** @var array */
     protected $hiddenFields;
 
+    /** @var string|null The locale or null to use the default */
+    protected $locale = null;
+
     /**
      * Constructor
      *
@@ -389,7 +392,7 @@ class EntityFieldProvider
         $field = [
             'name'  => $name,
             'type'  => $type,
-            'label' => $translate ? $this->translator->trans($label) : $label
+            'label' => $translate ? $this->translate($label) : $label
         ];
         if ($isIdentifier) {
             $field['identifier'] = true;
@@ -485,8 +488,8 @@ class EntityFieldProvider
             $labelType    = ($mapping['type'] & ClassMetadataInfo::TO_ONE) ? 'label' : 'plural_label';
             $labelTypeKey = $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType);
             if ($translate) {
-                $labelKey = $this->translator->trans($labelKey);
-                $labelTypeKey = $this->translator->trans($labelTypeKey);
+                $labelKey = $this->translate($labelKey);
+                $labelTypeKey = $this->translate($labelTypeKey);
             }
             $label = sprintf('%s (%s)', $labelKey, $labelTypeKey);
 
@@ -572,7 +575,7 @@ class EntityFieldProvider
             $translateLabel = $translate;
         }
         if ($translateLabel) {
-            $label = $this->translator->trans($label);
+            $label = $this->translate($label);
         }
 
         $relation = [
@@ -786,5 +789,25 @@ class EntityFieldProvider
                 return strcasecmp($a['label'], $b['label']);
             }
         );
+    }
+
+    /**
+     * @param string $locale
+     */
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+    }
+
+    /**
+     * Translates the given message according to the set or default locale
+     *
+     * @param string $messageId
+     *
+     * @return string The translated string
+     */
+    protected function translate($messageId)
+    {
+        return $this->translator->trans($messageId, [], null, $this->locale);
     }
 }

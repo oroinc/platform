@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Utils\ArrayUtil;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\FormatConversionEvent;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Abstract data converter to export/import format
+ */
 abstract class AbstractTableDataConverter extends DefaultDataConverter
 {
     const BACKEND_TO_FRONTEND = 'backend_to_frontend';
@@ -25,6 +28,12 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
 
     /** @var array */
     protected $headerConversionRules;
+
+    /** @var ConfigManager */
+    protected $configManager;
+
+    /** @var bool */
+    protected $isTranslateUsingLocale = true;
 
     /**
      * {@inheritDoc}
@@ -86,6 +95,32 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * @param ConfigManager $configManager
+     *
+     * @return $this
+     */
+    public function setConfigManager(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
+
+        return $this;
+    }
+
+    /**
+     * Set the variable to FALSE if you want to use default translation
+     *
+     * @param bool $isTranslateUsingLocale
+     *
+     * @return $this
+     */
+    public function setIsTranslateUsingLocale($isTranslateUsingLocale)
+    {
+        $this->isTranslateUsingLocale = $isTranslateUsingLocale;
+
+        return $this;
     }
 
     /**
