@@ -534,4 +534,14 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
         // do not call twice
         $this->assertEquals($expectedRelations, $this->helper->getRelations($entityName));
     }
+
+    public function testTranslateUsingLocale()
+    {
+        $locale = 'it_IT';
+        $this->fieldProvider->expects($this->once())
+            ->method('setLocale')
+            ->with($locale);
+
+        $this->helper->translateUsingLocale($locale);
+    }
 }
