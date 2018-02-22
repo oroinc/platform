@@ -34,8 +34,7 @@ use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
- * Class OroEmailBundleInstaller
- * @package Oro\Bundle\EmailBundle\Migrations\Schema
+ * ORO installer for EmailBundle
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
@@ -46,7 +45,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_32';
+        return 'v1_33';
     }
 
     /**
@@ -93,6 +92,8 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle112_2::removeOldSchema($schema);
         OroEmailBundle112_3::updateEmailUser($schema);
 
+        $this->updateOroEmailUserTable($schema);
+
         OroEmailBundle113::addColumnMultiMessageId($schema);
 
         OroEmailBundle114::addEmbeddedContentIdField($schema);
@@ -130,5 +131,21 @@ class OroEmailBundleInstaller implements Installation
 
         OroEmailBundle132::changeEmailFromNameColumnLength($schema);
         OroEmailBundle132::changeEmailRecipientNameColumnLength($schema);
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    private function updateOroEmailUserTable(Schema $schema)
+    {
+        $table = $schema->getTable('oro_email_user');
+        $table->addColumn('origin_id', 'integer', ['notnull' => false]);
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_email_origin'),
+            ['origin_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+        $table->addIndex(['origin_id'], 'IDX_91F5CFF656A273CC', []);
     }
 }

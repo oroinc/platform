@@ -66,7 +66,7 @@ class QueryExpressionCompilerPass implements CompilerPassInterface
 
         $expressions = [];
         $services = DependencyInjectionUtil::sortByPriorityAndFlatten($services);
-        foreach ($services as [$expressionType, $serviceRef]) {
+        foreach ($services as list($expressionType, $serviceRef)) {
             $expressions[$expressionType] = $serviceRef;
         }
 

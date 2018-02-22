@@ -49,6 +49,10 @@ class NestedAssociationTest extends RestJsonApiTestCase
             ],
             $response
         );
+        $result = self::jsonToArray($response->getContent());
+        $attributes = $result['data']['attributes'];
+        self::assertArrayNotHasKey('relatedClass', $attributes);
+        self::assertArrayNotHasKey('relatedId', $attributes);
     }
 
     public function testCreate()
