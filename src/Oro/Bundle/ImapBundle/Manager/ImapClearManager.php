@@ -2,46 +2,46 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
-use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailBodyRepository;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailThreadRepository;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository;
-use Oro\Bundle\ImapBundle\Entity\ImapEmail;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
+use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
+use Oro\Bundle\ImapBundle\Entity\Repository\UserEmailOriginRepository;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Oro\Bundle\SearchBundle\Async\Indexer;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
+/**
+ * Purpose of this class is to mass purge emails from certain origin
+ */
 class ImapClearManager implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    /** @var RegistryInterface */
-    protected $registry;
+    const REINDEX_CHUNK_SIZE = 100;
 
-    /** @var OptionalListenerInterface */
-    protected $listener;
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
 
-    /** @var array[] */
-    private $deleteBuffer = [];
+    /** @var Indexer */
+    protected $indexer;
 
     /**
-     * @param RegistryInterface $registry
-     * @param OptionalListenerInterface $listener
+     * @param DoctrineHelper $doctrineHelper
+     * @param Indexer $indexer
      */
-    public function __construct(RegistryInterface $registry, OptionalListenerInterface $listener)
+    public function __construct(DoctrineHelper $doctrineHelper, Indexer $indexer)
     {
-        $this->registry = $registry;
-        /**
-         * @info This listener should be disabled because it does unnecessary work during removing.
-         *       It updates date in entities which will be deleted in method clearFolder().
-         */
-        $this->listener = $listener;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->indexer = $indexer;
     }
 
     /**
@@ -66,6 +66,9 @@ class ImapClearManager implements LoggerAwareInterface
             $this->logger->info('Origin processed successfully');
         }
 
+        $this->getEntityManager()->flush();
+        $this->clearBodiesAndThreads();
+
         return true;
     }
 
@@ -73,11 +76,10 @@ class ImapClearManager implements LoggerAwareInterface
      * @param int $originId
      *
      * @return UserEmailOrigin[]
-     * @throws \Exception
      */
     protected function getOriginsToClear($originId)
     {
-        $originRepository = $this->registry->getRepository(UserEmailOrigin::class);
+        $originRepository = $this->doctrineHelper->getEntityRepositoryForClass(UserEmailOrigin::class);
 
         if ($originId !== null) {
             /** @var UserEmailOrigin $origin */
@@ -99,155 +101,85 @@ class ImapClearManager implements LoggerAwareInterface
     /**
      * @param UserEmailOrigin $origin
      */
-    protected function clearOrigin($origin)
+    protected function clearOrigin(UserEmailOrigin $origin)
     {
-        $this->listener->setEnabled(false);
-
-        $folders = $origin->getFolders();
-
-        foreach ($this->getImapEmailFolders($folders) as $imapFolder) {
-            $folder = $imapFolder->getFolder();
-            if ($imapFolder && !$origin->isActive()) {
-                $this->clearFolder($imapFolder);
-
-                $this->addToDeleteBuffer($imapFolder);
-            } elseif ($imapFolder && !$folder->isSyncEnabled()) {
-                $this->clearFolder($imapFolder);
-                $folder->setSynchronizedAt(null);
-            }
-        }
-
-        foreach ($folders as $folder) {
-            if (!$origin->isActive()) {
-                $this->addToDeleteBuffer($folder);
-            }
-        }
+        $em = $this->getEntityManager();
 
         if (!$origin->isActive()) {
-            $this->addToDeleteBuffer($origin);
-        }
+            $this->clearEmails($origin);
+            $em->remove($origin); // EmailFolders & ImapEmailFolders will be deleted via onDelete=CASCADE
+        } else {
+            $this->clearEmails($origin, false);
 
-        $this->cleanUp();
+            /** @var ImapEmailFolderRepository $repo */
+            $repo = $this->doctrineHelper->getEntityRepositoryForClass(ImapEmailFolder::class);
 
-        $this->listener->setEnabled(true);
-    }
-
-    /**
-     * @param ImapEmailFolder $imapFolder
-     */
-    protected function clearFolder($imapFolder)
-    {
-        $folder = $imapFolder->getFolder();
-
-        /** @var EmailUserRepository $repository */
-        $repository = $this->registry->getRepository(EmailUser::class);
-        $emailUserIterator = new BufferedQueryResultIterator($repository->getEmailUserByFolder($folder));
-
-        /** @var EmailUser $item */
-        foreach ($emailUserIterator as $emailUser) {
-            /** @var EmailUser $emailUser */
-            $emailUser->removeFolder($folder);
-            $email = $emailUser->getEmail();
-
-            $imapEmailsIterator = $this->getImapEmails($email, $imapFolder);
-            foreach ($imapEmailsIterator as $imapEmail) {
-                $this->addToDeleteBuffer($imapEmail);
-            }
-
-            if ($emailUser->getFolders()->isEmpty()) {
-                $this->addToDeleteBuffer($emailUser);
+            $imapFolders = $repo->getFoldersByOrigin($origin, true, EmailFolder::SYNC_ENABLED_FALSE);
+            foreach ($imapFolders as $imapFolder) {
+                $imapFolder->getFolder()->setSynchronizedAt(null);
             }
         }
     }
 
     /**
-     * @return array
-     */
-    protected function entitiesToClear()
-    {
-        return [
-            ImapEmail::class,
-            EmailUser::class,
-            ImapEmailFolder::class,
-            EmailFolder::class,
-            UserEmailOrigin::class,
-        ];
-    }
-
-    /**
-     * Remove entities from buffer
-     */
-    protected function cleanUp()
-    {
-        foreach ($this->entitiesToClear() as $className) {
-            if (!array_key_exists($className, $this->deleteBuffer)) {
-                continue;
-            }
-
-            $buffer = $this->deleteBuffer[$className];
-
-            /** @var EntityManager $entityManager */
-            $entityManager = $this->registry->getManagerForClass($className);
-            foreach ($buffer as $item) {
-                $entityManager->remove($item);
-                $this->logger->info(sprintf('%s with ID %s removed', $className, $item->getId()));
-            }
-            $entityManager->flush($buffer);
-        }
-
-        $this->deleteBuffer = [];
-    }
-
-    /**
-     * @param Collection $folders
+     * Delete emails from specified origin
+     * Note that ImapEmails & EmailUsers will be deleted via onDelete=CASCADE
      *
-     * @return ImapEmailFolder[]
+     * @param UserEmailOrigin $origin
+     * @param null|bool $syncEnabled
      */
-    private function getImapEmailFolders(Collection $folders)
+    protected function clearEmails(UserEmailOrigin $origin, $syncEnabled = null)
     {
-        $repository = $this->registry->getRepository(ImapEmailFolder::class);
+        /** @var EmailUserRepository $emailUserRepo */
+        $emailUserRepo = $this->doctrineHelper->getEntityRepositoryForClass(EmailUser::class);
+        $emailUserIdsForReindexation = $emailUserRepo->getIdsFromOrigin($origin);
 
-        $qb = $repository->createQueryBuilder('ief');
-        $qb->innerJoin('ief.folder', 'ef');
-        $qb->where($qb->expr()->in('ief.folder', ':folders'));
-        $qb->setParameter('folders', $folders);
+        /** @var UserEmailOriginRepository $userEmailOriginRepo */
+        $userEmailOriginRepo = $this->doctrineHelper->getEntityRepositoryForClass(UserEmailOrigin::class);
+        $userEmailOriginRepo->deleteRelatedEmails($origin, $syncEnabled);
 
-        return $qb->getQuery()->getResult();
+        $this->sceduleEmailUsersReindexation($emailUserIdsForReindexation);
     }
 
     /**
-     * @param Email $email
-     * @param ImapEmailFolder $imapFolder
-     *
-     * @return BufferedQueryResultIterator
+     * Clears orphan EmailBodies & EmailThreads
+     * Note that EmailAttachment & EmailAttachmentContent will be deleted via onDelete=CASCADE
      */
-    private function getImapEmails(Email $email, ImapEmailFolder $imapFolder)
+    protected function clearBodiesAndThreads()
     {
-        $repository = $this->registry->getRepository(ImapEmail::class);
+        /** @var EmailBodyRepository $emailBodyRepo */
+        $emailBodyRepo = $this->doctrineHelper->getEntityRepositoryForClass(EmailBody::class);
+        $emailBodyRepo->deleteOrphanBodies();
 
-        $qb = $repository->createQueryBuilder('ie');
-        $qb->where($qb->expr()->andX(
-            $qb->expr()->eq('ie.email', ':email'),
-            $qb->expr()->eq('ie.imapFolder', ':imapFolder')
-        ));
-
-        $qb->setParameters([
-            'email' => $email,
-            'imapFolder' => $imapFolder,
-        ]);
-
-        return new BufferedQueryResultIterator($qb);
+        /** @var EmailThreadRepository $emailThreadRepo */
+        $emailThreadRepo = $this->doctrineHelper->getEntityRepositoryForClass(EmailThread::class);
+        $emailThreadRepo->deleteOrphanThreads();
     }
 
     /**
-     * @param ImapEmail|EmailUser|ImapEmailFolder|EmailFolder|UserEmailOrigin $entity
+     * @param iterable $emailsUsersIds
      */
-    private function addToDeleteBuffer($entity)
+    protected function sceduleEmailUsersReindexation($emailsUsersIds)
     {
-        foreach ($this->entitiesToClear() as $entityClass) {
-            if (is_a($entity, $entityClass)) {
-                $this->deleteBuffer[$entityClass][] = $entity;
+        $proxies = [];
+        foreach ($emailsUsersIds as $id) {
+            $proxies[$id] = $this->doctrineHelper->getEntityReference(EmailUser::class, $id);
+            if (count($proxies) >= self::REINDEX_CHUNK_SIZE) {
+                $this->indexer->save($proxies);
+                $proxies = [];
             }
         }
+
+        if ($proxies) {
+            $this->indexer->save($proxies);
+        }
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->doctrineHelper->getEntityManagerForClass(UserEmailOrigin::class);
     }
 }

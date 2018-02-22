@@ -33,7 +33,7 @@ class ImapEmail
      * @var Email
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\Email")
-     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     protected $email;
 
@@ -41,7 +41,7 @@ class ImapEmail
      * @var ImapEmailFolder
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\ImapBundle\Entity\ImapEmailFolder")
-     * @ORM\JoinColumn(name="imap_folder_id", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="imap_folder_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     protected $imapFolder;
 

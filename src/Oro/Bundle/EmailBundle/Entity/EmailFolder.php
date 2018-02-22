@@ -98,7 +98,7 @@ class EmailFolder
      * @var EmailOrigin
      *
      * @ORM\ManyToOne(targetEntity="EmailOrigin", inversedBy="folders")
-     * @ORM\JoinColumn(name="origin_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="origin_id", referencedColumnName="id", onDelete="CASCADE")
      * @JMS\Exclude
      */
     protected $origin;

@@ -20,7 +20,6 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\RemoveOldSchema;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\SetOwnerForEmail;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\UpdateEmailOriginRelation as EmailOrigin;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_16\AddRelationToMailbox;
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\AddEmailUserColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\ChangeEmailUserFolderRelation as ChangeEmailUserFolderRelation;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\DropEmailUserColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_19\AddFirstNameLastNameIndex;
@@ -36,6 +35,8 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_9\OroUserBundle as ExtendTitle;
 use Oro\Bundle\UserBundle\Migrations\Schema\v2_0\OroUserBundle as OroUserBundle20;
 
 /**
+ * ORO installer for UserBundle
+ *
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
@@ -134,8 +135,6 @@ class OroUserBundleInstaller implements
         // depends to the UserBundle
         ChangeEmailUserFolderRelation::createOroEmailUserFoldersTable($schema);
         ChangeEmailUserFolderRelation::addOroEmailUserFoldersForeignKeys($schema);
-        ChangeEmailUserFolderRelation::updateOroEmailUserTable($schema);
-        AddEmailUserColumn::updateOroEmailUserTable($schema);
         DropEmailUserColumn::updateOroEmailUserTable($schema);
         AddFirstNameLastNameIndex::addFirstNameLastNameIndex($schema);
         AddImpersonationTable::createOroUserImpersonationTable($schema);
