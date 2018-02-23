@@ -307,7 +307,7 @@ define(function(require) {
 
         collectPristineValues: function() {
             this.pristineValues = {};
-            this.elements().each(_.bind(function(index, element) {
+            this.elementsOf(this.currentForm).each(_.bind(function(index, element) {
                 if (!this.checkable(element)) {
                     this.pristineValues[element.name] = element.value;
                 }
