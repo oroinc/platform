@@ -3,8 +3,8 @@ oro:
         module_label: "System configuration"
 
         actions:
-            collapse_all:  "Collapse All"
-            expand_all:    "Expand All"
+            collapse_all:  "Collapse all"
+            expand_all:    "Expand all"
             save_settings: "Save settings"
             restore_saved_values: "Reset"
 
