@@ -117,3 +117,37 @@ Feature: Configuration Search in System, Personal and Organization configuration
     And I type "language" in "Quick Search"
     Then I should see "Language Settings" in the "Configuration Sidebar Content" element
     And I should not see "Quick Order Form" in the "Configuration Sidebar Content" element
+
+  Scenario: The Configuration Search show/hide all results
+    Given I go to System/ Configuration
+    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
+    When I type "Calendar" in "Quick Search"
+    And I should see "Show hidden items"
+    And I should not see "User bar"
+    And I should not see "Navigation bar"
+    And I should not see "Data Grid settings"
+    And I click "Show hidden items"
+    Then I should see "User bar"
+    And I should see "Navigation bar"
+    And I should see "Data Grid settings"
+    And I reload the page
+    And I should see "User bar"
+    And I should see "Navigation bar"
+    And I should see "Data Grid settings"
+    When I click "Show search results only"
+    And I should not see "User bar"
+    And I should not see "Navigation bar"
+    And I should not see "Data Grid settings"
+    And I click "Show hidden items"
+    Then I type "Items" in "Quick Search"
+    When I click "Show search results only"
+    And I should not see "User bar"
+    And I should not see "Navigation bar"
+    And I should see "Data Grid settings"
+    And I should see "Activity lists"
+    Then I type "Some not valid request" in "Quick Search"
+    And I should see "User bar"
+    And I should see "Navigation bar"
+    And I should see "Map Settings"
+    And I should see "Sidebar settings"
+    And I should see "Reports settings"
