@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 

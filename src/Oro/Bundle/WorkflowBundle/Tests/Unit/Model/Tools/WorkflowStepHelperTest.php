@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Tools;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
@@ -13,7 +12,6 @@ use Oro\Bundle\WorkflowBundle\Model\Tools\WorkflowStepHelper;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class WorkflowStepHelperTest extends \PHPUnit_Framework_TestCase

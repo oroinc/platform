@@ -4,7 +4,6 @@ namespace Oro\Bundle\WindowsBundle\Entity\Repository;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
-
 use Symfony\Component\Security\Core\User\UserInterface;
 
 abstract class AbstractWindowsStateRepository extends EntityRepository

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Knp\Menu\ItemInterface;
-
 use Symfony\Component\Routing\Route;
 
 interface BreadcrumbManagerInterface

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ActivityBundle\Migrations\Schema\v1_1;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class RemoveUnusedContextConfigQuery extends ParametrizedMigrationQuery
 {

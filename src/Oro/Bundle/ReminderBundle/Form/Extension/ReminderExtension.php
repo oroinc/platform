@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ReminderBundle\Form\Extension;
 
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
+use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
+use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-
-use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
-use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
-use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 
 class ReminderExtension extends AbstractTypeExtension
 {

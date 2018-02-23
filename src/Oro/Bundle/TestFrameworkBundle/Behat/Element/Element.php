@@ -4,7 +4,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Session;
-
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 

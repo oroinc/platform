@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Security;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
+use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareConsumptionExtension;
+use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
+use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareConsumptionExtension;
-use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
-use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class SecurityAwareConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
 {

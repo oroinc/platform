@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
-use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\ApiBundle\Config\EntityConfigInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Component\ChainProcessor\ContextInterface;
 
 /**
  * Makes sure that the sorters configuration contains all supported sorters

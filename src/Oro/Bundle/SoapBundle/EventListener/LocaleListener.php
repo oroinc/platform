@@ -3,12 +3,11 @@
 namespace Oro\Bundle\SoapBundle\EventListener;
 
 use Gedmo\Translatable\TranslatableListener;
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class LocaleListener implements EventSubscriberInterface
 {

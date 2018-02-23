@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Sync;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class EmailSynchronizationManager
 {

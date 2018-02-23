@@ -4,13 +4,12 @@ namespace Oro\Bundle\OrganizationBundle\Provider\Filter;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class ChoiceTreeBusinessUnitProvider
 {

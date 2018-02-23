@@ -4,7 +4,6 @@ namespace Oro\Bundle\UserBundle\Provider\Filter;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 

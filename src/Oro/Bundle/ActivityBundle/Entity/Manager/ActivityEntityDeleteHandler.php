@@ -4,15 +4,13 @@ namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
-
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Oro\Bundle\SoapBundle\Model\RelationIdentifier;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class ActivityEntityDeleteHandler extends DeleteHandler implements ActivityEntityDeleteHandlerInterface
 {

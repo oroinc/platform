@@ -4,12 +4,10 @@ namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v2_2;
 
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
-
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-
 use Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14\SplitGroupsToIndividualFieldsQuery;
 
 class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface

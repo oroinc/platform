@@ -3,13 +3,11 @@
 namespace Oro\Bundle\TagBundle\Tests\Functional\Controller;
 
 use Doctrine\ORM\EntityRepository;
-
-use Symfony\Component\Form\Form;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ImportExportControllerTest extends WebTestCase
 {

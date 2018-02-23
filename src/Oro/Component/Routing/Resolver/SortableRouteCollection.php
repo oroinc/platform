@@ -2,9 +2,8 @@
 
 namespace Oro\Component\Routing\Resolver;
 
-use Symfony\Component\Routing\Route;
-
 use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\Routing\Route;
 
 class SortableRouteCollection extends EnhancedRouteCollection
 {

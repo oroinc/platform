@@ -19,18 +19,6 @@ services:
         arguments:
             - '@oro_api.config_provider'
 
-    oro_api.merge_config_helper.entity:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeEntityConfigHelper
-        public: false
-        arguments:
-            - '@oro_api.config_extension_registry'
-
-    oro_api.merge_config_helper.relation:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\MergeConfig\MergeRelationConfigHelper
-        public: false
-        arguments:
-            - '@oro_api.config_extension_registry'
-
     oro_api.merge_config_helper.action:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeActionConfigHelper
         public: false
@@ -54,7 +42,7 @@ services:
             - '@oro_api.entity_id_helper'
             - '@oro_api.complete_definition_helper.association'
             - '@oro_api.complete_definition_helper.custom_association'
-            - '@oro_api.entity_exclusion_provider'
+            - '@oro_api.entity_exclusion_provider_registry'
             - '@oro_api.expanded_association_extractor'
 
     oro_api.complete_definition_helper.object:
@@ -87,10 +75,10 @@ services:
             - '@oro_api.config_extension_registry'
             - '@oro_api.config_loader_factory'
             - '@oro_api.resource_hierarchy_provider'
-            - '@oro_api.config_bag'
+            - '@oro_api.config_bag_registry'
             - '@oro_api.resources_provider'
+            - '@oro_api.config_merger.entity'
             - '@oro_api.merge_config_helper.parent_resource'
-            - '@oro_api.merge_config_helper.entity'
             - '@oro_api.merge_config_helper.action'
             - '@oro_api.merge_config_helper.subresource'
         tags:
@@ -190,8 +178,8 @@ services:
             - '@oro_api.config_extension_registry'
             - '@oro_api.config_loader_factory'
             - '@oro_api.resource_hierarchy_provider'
-            - '@oro_api.config_bag'
-            - '@oro_api.merge_config_helper.relation'
+            - '@oro_api.config_bag_registry'
+            - '@oro_api.config_merger.relation'
         tags:
             - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: 20 }
 

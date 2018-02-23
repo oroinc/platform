@@ -2,17 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\Filter;
 
-use Symfony\Component\Security\Acl\Voter\FieldVote;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Doctrine\ORM\EntityManagerInterface;
-
-use Oro\Component\EntitySerializer\DoctrineHelper;
-use Oro\Component\EntitySerializer\Filter\EntityAwareFilterInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Component\EntitySerializer\DoctrineHelper;
+use Oro\Component\EntitySerializer\Filter\EntityAwareFilterInterface;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class SerializerFieldFilter implements EntityAwareFilterInterface
 {

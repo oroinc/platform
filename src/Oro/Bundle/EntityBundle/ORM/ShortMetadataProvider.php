@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityBundle\ORM;
 use Doctrine\Common\Persistence\Mapping\AbstractClassMetadataFactory;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 
 class ShortMetadataProvider

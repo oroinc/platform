@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\ORM;
 
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 
 interface MetadataBuilderInterface

@@ -2,18 +2,17 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityRepositoryCompilerPass;
+use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\FirstEntity;
+use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\FirstEntityRepository;
+use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\SecondEntity;
+use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\SecondEntityRepository;
+use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\ThirdEntity;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\FirstEntity;
-use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\FirstEntityRepository;
-use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\SecondEntity;
-use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\ThirdEntity;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityRepositoryCompilerPass;
-use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\SecondEntityRepository;
 
 class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
 {

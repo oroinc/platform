@@ -4,14 +4,12 @@ namespace Oro\Bundle\ImapBundle\Form\Handler;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Exception\RefreshOAuthAccessTokenFailureException;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
+use Psr\Log\LoggerInterface;
 
 class GoogleImapConfigHandler
 {

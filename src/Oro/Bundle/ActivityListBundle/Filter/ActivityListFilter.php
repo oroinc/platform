@@ -5,11 +5,6 @@ namespace Oro\Bundle\ActivityListBundle\Filter;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Symfony\Component\Form\FormFactoryInterface;
-
-use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
 use Oro\Bundle\ActivityListBundle\Form\Type\ActivityListFilterType;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListQueryDesigner;
@@ -24,6 +19,9 @@ use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class ActivityListFilter extends EntityFilter
 {

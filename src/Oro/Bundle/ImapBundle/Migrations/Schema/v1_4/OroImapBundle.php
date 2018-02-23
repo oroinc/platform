@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\ImapBundle\Migrations\Schema\v1_4;
 
-use Doctrine\DBAL\Schema\SchemaException;
-
 use Doctrine\DBAL\Schema\Schema;
-
+use Doctrine\DBAL\Schema\SchemaException;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 

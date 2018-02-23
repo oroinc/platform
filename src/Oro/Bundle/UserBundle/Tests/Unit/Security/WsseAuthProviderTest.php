@@ -4,20 +4,17 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
-
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Tests\Unit\Fixture\RegularUser;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Security\WsseAuthProvider;
 use Oro\Bundle\UserBundle\Security\WsseTokenFactory;
+use Oro\Bundle\UserBundle\Tests\Unit\Fixture\RegularUser;
+use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
 {

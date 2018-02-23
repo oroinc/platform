@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\LocaleBundle\Migrations\Schema\v1_2;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Query\AbstractEntityConfigQuery;
-use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
+use Psr\Log\LoggerInterface;
 
 class UpdateLocalizedFallbackValueRelationsQuery extends AbstractEntityConfigQuery
 {

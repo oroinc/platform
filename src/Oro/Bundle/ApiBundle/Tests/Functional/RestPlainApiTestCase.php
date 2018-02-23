@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Symfony\Component\HttpFoundation\Response;
 
 class RestPlainApiTestCase extends ApiTestCase
 {

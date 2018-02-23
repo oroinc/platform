@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * An enum value selector based on 'choice' form type
@@ -13,9 +13,9 @@ class EnumChoiceType extends AbstractEnumType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::setDefaultOptions($resolver);
+        parent::configureOptions($resolver);
 
         $resolver->setDefaults(
             [

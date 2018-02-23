@@ -5,11 +5,11 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type;
 abstract class AbstractDateTypeTestCase extends AbstractTypeTestCase
 {
     /**
-     * @dataProvider setDefaultOptionsDataProvider
+     * @dataProvider configureOptionsDataProvider
      * @param array $defaultOptions
      * @param array $requiredOptions
      */
-    public function testSetDefaultOptions(array $defaultOptions, array $requiredOptions = array())
+    public function testConfigureOptions(array $defaultOptions, array $requiredOptions = array())
     {
         $resolver = $this->createMockOptionsResolver();
 
@@ -22,6 +22,6 @@ abstract class AbstractDateTypeTestCase extends AbstractTypeTestCase
             ->with($defaultOptions)
             ->will($this->returnSelf());
 
-        $this->getTestFormType()->setDefaultOptions($resolver);
+        $this->getTestFormType()->configureOptions($resolver);
     }
 }

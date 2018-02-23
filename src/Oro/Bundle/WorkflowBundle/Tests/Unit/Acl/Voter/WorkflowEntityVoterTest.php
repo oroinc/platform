@@ -3,19 +3,17 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Voter;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEntityVoter;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAclIdentity;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Voter\Stub\WorkflowEntity;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
 {
@@ -55,60 +53,6 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset($this->voter, $this->doctrineHelper);
-    }
-
-    /**
-     * @param string $attribute
-     * @param bool $expected
-     * @dataProvider supportsAttributeDataProvider
-     */
-    public function testSupportsAttribute($attribute, $expected)
-    {
-        $this->assertEquals($expected, $this->voter->supportsAttribute($attribute));
-    }
-
-    /**
-     * @return array
-     */
-    public function supportsAttributeDataProvider()
-    {
-        return [
-            'VIEW'   => ['VIEW', false],
-            'CREATE' => ['CREATE', false],
-            'EDIT'   => ['EDIT', false],
-            'DELETE' => ['DELETE', true],
-            'ASSIGN' => ['ASSIGN', false],
-        ];
-    }
-
-    /**
-     * @param string $class
-     * @param bool $expected
-     * @dataProvider supportsClassDataProvider
-     */
-    public function testSupportsClass($class, $expected)
-    {
-        $definition = new WorkflowDefinition();
-        $definition->setRelatedEntity('SupportedClass');
-
-        $entityAcl = new WorkflowEntityAcl();
-        $entityAcl->setEntityClass('SupportedClass');
-        $entityAcl->setDefinition($definition);
-        
-        $this->setRegistryRepositories([$entityAcl]);
-
-        $this->assertEquals($expected, $this->voter->supportsClass($class));
-    }
-
-    /**
-     * @return array
-     */
-    public function supportsClassDataProvider()
-    {
-        return [
-            'supported class'     => ['SupportedClass', true],
-            'not supported class' => ['NotSupportedClass', false],
-        ];
     }
 
     /**

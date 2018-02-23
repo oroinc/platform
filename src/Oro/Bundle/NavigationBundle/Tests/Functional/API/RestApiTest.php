@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\API;
 
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class RestApiTest extends WebTestCase
 {

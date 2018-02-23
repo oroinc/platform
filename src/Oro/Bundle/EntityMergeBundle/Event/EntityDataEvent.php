@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
+use Symfony\Component\EventDispatcher\Event;
 
 class EntityDataEvent extends Event
 {

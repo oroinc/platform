@@ -2,9 +2,8 @@
 
 namespace Oro\Component\PhpUtils;
 
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
 use Oro\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Oro\Component\Config\Resolver\ResolverInterface;
-
 use Oro\Bundle\IntegrationBundle\DependencyInjection\IntegrationConfiguration;
+use Oro\Component\Config\Resolver\ResolverInterface;
 
 class SettingsProvider
 {

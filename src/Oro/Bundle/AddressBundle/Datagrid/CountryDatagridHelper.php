@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\AddressBundle\Datagrid;
 
-use Doctrine\ORM\Query;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
 
 class CountryDatagridHelper
 {

@@ -3,10 +3,8 @@
 namespace Oro\Bundle\SecurityBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Types\Type;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class LoadBasePermissionsQuery extends ParametrizedSqlMigrationQuery
 {

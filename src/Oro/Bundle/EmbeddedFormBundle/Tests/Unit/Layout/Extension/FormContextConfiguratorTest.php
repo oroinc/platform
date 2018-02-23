@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Extension;
 
-use Oro\Component\Layout\LayoutContext;
-
-use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Extension\FormContextConfigurator;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\DependencyInjectionFormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
-use Oro\Bundle\EmbeddedFormBundle\Layout\Extension\FormContextConfigurator;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
+use Oro\Component\Layout\LayoutContext;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)

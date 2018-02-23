@@ -5,17 +5,14 @@ namespace Oro\Bundle\CronBundle\Command;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
-
-use Psr\Log\LoggerInterface;
-
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
 use Oro\Bundle\CronBundle\Engine\CommandRunnerInterface;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Helper\CronHelper;
 use Oro\Bundle\CronBundle\Tools\CommandRunner;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class CronCommand extends ContainerAwareCommand
 {

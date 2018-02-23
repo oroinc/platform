@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\EventListener;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class RequestListener
 {

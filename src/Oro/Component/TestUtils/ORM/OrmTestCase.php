@@ -4,12 +4,10 @@ namespace Oro\Component\TestUtils\ORM;
 
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Driver\Connection;
-
-use Symfony\Component\Filesystem\Filesystem;
-
 use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\Mocks\FetchIterator;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Base testcase class for all ORM testcases.

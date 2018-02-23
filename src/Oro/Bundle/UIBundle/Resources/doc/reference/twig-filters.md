@@ -1,5 +1,88 @@
-oro_sort_by
-===========
+# TWIG Filters
+
+## HTML
+
+### oro_html_sanitize
+The **oro_html_sanitize** filter removes HTML elements except allowed. List of allowed HTML tags you can find [here](../../../../FormBundle/Resources/config/oro/app.yml).
+```twig
+{{ data|oro_html_sanitize() }}
+```
+
+#### Example:
+```twig
+{% set data %}
+    <h1>Header</h1>
+    <div class="container" data-label="Container Label" id="root">
+        <p>Paragraph 1: <strong>Strong</strong> like <b>Bold</b></p>
+        <p>Paragraph 2: <em>Italic</em></p>
+        <script type="text/javascript">alert("Hello World!");</script>
+    </div>
+{% endset %}
+
+{{ data|oro_html_sanitize() }}
+```
+
+will print result:
+
+```html
+<div class="test">
+    <h1>Header</h1>
+    <p>Paragraph 1: <strong>Strong</strong> like <b>Bold</b></p>
+    <p>Paragraph 2: <em>Italic</em></p>
+</div>
+```
+
+### oro_html_strip_tags
+The **oro_html_strip_tags** filter removes all HTML tags. 
+```twig
+{{ data|oro_html_strip_tags() }}
+```
+
+#### Example:
+```twig
+{% set data %}
+    <p>Paragraph 1: <strong>Strong</strong> like <b>Bold</b></p>
+    <p>Paragraph 2: <em>Italic</em></p>
+    <script type="text/javascript">alert("message");</script>
+{% endset %}
+
+{{ data|oro_html_strip_tags() }}
+```
+
+will print result:
+
+```html
+Paragraph 1: Strong like Bold Paragraph 2: Italic alert("message");
+```
+
+### oro_html_escape
+The **oro_html_escape** filter allow HTML tags, all forbidden tags will be escaped.
+```twig
+{{ data|oro_html_escape() }}
+```
+
+#### Example:
+```twig
+{% set data %}
+    <p>Paragraph 1: <strong>Strong</strong> like <b>Bold</b></p>
+    <p>Paragraph 2: <em>Italic</em></p>
+    <script type="text/javascript">alert("message");</script>
+{% endset %}
+
+{{ data|oro_html_escape() }}
+```
+
+will print result:
+
+```html
+<p>Paragraph 1: <strong>Strong</strong> like <b>Bold</b></p>
+<p>Paragraph 2: <em>Italic</em></p>
+&lt;script type="text/javascript"&gt;alert("message");&lt;/script&gt;
+```
+
+## Array
+
+### Sort By
 The **oro_sort_by** filter sorts an array by a property. The following example shows how items can be sorted by priority:
 
 ``` twig

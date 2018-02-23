@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Tools;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\ORMException;
-
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 
 class SafeDatabaseCheckerTest extends \PHPUnit_Framework_TestCase

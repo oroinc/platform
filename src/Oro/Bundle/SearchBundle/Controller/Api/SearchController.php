@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\SearchBundle\Controller\Api;
 
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use FOS\RestBundle\Util\Codes;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
-
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Util\Codes;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("search")
@@ -31,14 +31,16 @@ class SearchController extends FOSRestController
      * )
      *
      * @AclAncestor("oro_search")
+     * @param Request $request
+     * @return Response
      */
-    public function getAction()
+    public function getAction(Request $request)
     {
         $searchResults = $this->get('oro_search.index')->simpleSearch(
-            $this->getRequest()->get('search'),
-            (int) $this->getRequest()->get('offset'),
-            (int) $this->getRequest()->get('max_results'),
-            $this->getRequest()->get('from')
+            $request->get('search'),
+            (int) $request->get('offset'),
+            (int) $request->get('max_results'),
+            $request->get('from')
         );
 
         $dispatcher = $this->get('event_dispatcher');

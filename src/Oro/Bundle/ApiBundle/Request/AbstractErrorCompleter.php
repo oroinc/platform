@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
+use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * A base class for different kind of error completers.
+ */
 abstract class AbstractErrorCompleter implements ErrorCompleterInterface
 {
     /** @var ExceptionTextExtractorInterface */

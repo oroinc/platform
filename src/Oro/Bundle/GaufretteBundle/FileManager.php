@@ -7,13 +7,10 @@ use Gaufrette\Filesystem;
 use Gaufrette\Stream;
 use Gaufrette\Stream\Local as LocalStream;
 use Gaufrette\StreamMode;
-
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
-
+use Oro\Bundle\GaufretteBundle\Exception\ProtocolConfigurationException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
-
-use Oro\Bundle\GaufretteBundle\Exception\ProtocolConfigurationException;
 
 class FileManager
 {

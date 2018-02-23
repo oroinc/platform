@@ -6,12 +6,11 @@ use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\Value;
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\Query\Expr as ExpressionBuilder;
 use Doctrine\ORM\Query\Expr\Andx;
+use Doctrine\ORM\Query\Expr as ExpressionBuilder;
 use Doctrine\ORM\Query\Expr\Comparison as OrmComparison;
 use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\Query\Parameter;
-
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AndCompositeExpression;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EqComparisonExpression;

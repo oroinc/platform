@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Install;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 use Oro\Bundle\InstallerBundle\Tests\Selenium\Pages\OroAdministration;
 use Oro\Bundle\InstallerBundle\Tests\Selenium\Pages\OroConfiguration;
 use Oro\Bundle\InstallerBundle\Tests\Selenium\Pages\OroFinish;
 use Oro\Bundle\InstallerBundle\Tests\Selenium\Pages\OroInstall;
 use Oro\Bundle\InstallerBundle\Tests\Selenium\Pages\OroRequirements;
+use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
 class InstallTest extends Selenium2TestCase
 {

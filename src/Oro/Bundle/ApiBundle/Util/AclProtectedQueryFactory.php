@@ -3,10 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\ORM\QueryBuilder;
-
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\QueryFactory;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class AclProtectedQueryFactory extends QueryFactory
 {

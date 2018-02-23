@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\DataTransformer\PercentToLocalizedStringTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\FormBundle\Form\DataTransformer\PercentToLocalizedStringTransformer;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroPercentType extends AbstractType
 {
@@ -39,7 +38,7 @@ class OroPercentType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array('precision' => null));
     }

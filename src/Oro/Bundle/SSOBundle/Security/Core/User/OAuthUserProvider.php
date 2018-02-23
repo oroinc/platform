@@ -4,13 +4,10 @@ namespace Oro\Bundle\SSOBundle\Security\Core\User;
 
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\SSOBundle\Security\Core\Exception\EmailDomainNotAllowedException;
-
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use RuntimeException;
-
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 /**

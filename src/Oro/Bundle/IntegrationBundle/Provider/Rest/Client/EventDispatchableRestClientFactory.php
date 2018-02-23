@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Client;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\IntegrationBundle\Event\ClientCreatedAfterEvent;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\RestTransportSettingsInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class EventDispatchableRestClientFactory is extending basic factory functionality

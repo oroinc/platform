@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Utils;
 
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\DataTransformerInterface;
-
-use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\FormBundle\Tests\Unit\Stub\StubTransformer;
+use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\FormView;
 
 class FormUtilsTest extends \PHPUnit_Framework_TestCase
 {

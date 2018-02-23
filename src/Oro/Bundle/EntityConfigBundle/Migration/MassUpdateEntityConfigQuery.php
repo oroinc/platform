@@ -4,11 +4,9 @@ namespace Oro\Bundle\EntityConfigBundle\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInterface
 {

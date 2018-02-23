@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider;
 
 class ConfigExclusionProviderTest extends \PHPUnit_Framework_TestCase

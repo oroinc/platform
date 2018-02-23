@@ -6,10 +6,10 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
-use Oro\Bundle\EntityConfigBundle\EventListener\AttributesDatagridListener;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRelationRepository;
+use Oro\Bundle\EntityConfigBundle\EventListener\AttributesDatagridListener;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class AttributesDatagridListenerTest extends \PHPUnit_Framework_TestCase

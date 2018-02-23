@@ -14,6 +14,9 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * The helper class to complete the configuraton of different kind of ORM associations.
+ */
 class CompleteAssociationHelper
 {
     /** @var ConfigProvider */
@@ -100,11 +103,13 @@ class CompleteAssociationHelper
     }
 
     /**
+     * @param EntityDefinitionConfig      $definition
      * @param EntityDefinitionFieldConfig $field
      * @param string                      $version
      * @param RequestType                 $requestType
      */
     public function completeNestedAssociation(
+        EntityDefinitionConfig $definition,
         EntityDefinitionFieldConfig $field,
         $version,
         RequestType $requestType
@@ -112,6 +117,18 @@ class CompleteAssociationHelper
         $field->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
         $this->completeAssociation($field, EntityIdentifier::class, $version, $requestType);
         $this->completeDependsOn($field);
+        // exclude source fields
+        $targetFields = $field->getTargetEntity()->getFields();
+        foreach ($targetFields as $targetField) {
+            $targetPropertyPath = $targetField->getPropertyPath();
+            if ($targetPropertyPath && ConfigUtil::IGNORE_PROPERTY_PATH !== $targetPropertyPath) {
+                $sourceField = $definition->findField($targetPropertyPath, true);
+                if (null === $sourceField) {
+                    $sourceField = $definition->addField($targetPropertyPath);
+                }
+                $sourceField->setExcluded();
+            }
+        }
     }
 
     /**

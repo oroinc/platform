@@ -3,11 +3,9 @@
 namespace Oro\Bundle\SearchBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Connection;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class OroSearchBundleUseInnoDbQuery implements MigrationQuery, ConnectionAwareInterface
 {

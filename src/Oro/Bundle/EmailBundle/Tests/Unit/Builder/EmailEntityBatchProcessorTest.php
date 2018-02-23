@@ -3,15 +3,14 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Builder;
 
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBatchProcessor;
-use Oro\Bundle\EmailBundle\Entity\EmailAddress;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
-
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase

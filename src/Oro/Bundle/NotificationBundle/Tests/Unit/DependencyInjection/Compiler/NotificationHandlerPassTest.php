@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\NotificationHandlerPass;
-
 use Oro\Component\DependencyInjection\Tests\Unit\AbstractExtensionCompilerPassTest;
 
 class NotificationHandlerPassTest extends AbstractExtensionCompilerPassTest

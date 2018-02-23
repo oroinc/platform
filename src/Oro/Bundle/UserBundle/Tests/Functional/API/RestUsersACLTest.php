@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 
-use Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData;
 
 class RestUsersACLTest extends WebTestCase
 {

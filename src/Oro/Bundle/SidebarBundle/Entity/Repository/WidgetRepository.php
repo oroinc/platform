@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\SidebarBundle\Entity\Repository;
 
-use Symfony\Component\Security\Core\User\UserInterface;
-
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class WidgetRepository extends EntityRepository
 {

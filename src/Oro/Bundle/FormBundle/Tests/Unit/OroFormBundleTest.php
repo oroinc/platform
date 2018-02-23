@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\FormBundle\DependencyInjection\Compiler;
 use Oro\Bundle\FormBundle\OroFormBundle;
-
 use Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroFormBundleTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,19 +29,11 @@ class OroFormBundleTest extends \PHPUnit_Framework_TestCase
             ->method('addCompilerPass')
             ->with(
                 $this->isInstanceOf(
-                    Compiler\FormCompilerPass::class
-                )
-            );
-
-        $containerBuilder->expects($this->at(2))
-            ->method('addCompilerPass')
-            ->with(
-                $this->isInstanceOf(
                     Compiler\FormGuesserCompilerPass::class
                 )
             );
 
-        $containerBuilder->expects($this->at(3))
+        $containerBuilder->expects($this->at(2))
             ->method('addCompilerPass')
             ->with(
                 new TaggedServiceLinkRegistryCompilerPass(
@@ -52,7 +42,7 @@ class OroFormBundleTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $containerBuilder->expects($this->at(4))
+        $containerBuilder->expects($this->at(3))
             ->method('addCompilerPass')
             ->with(
                 new TaggedServiceLinkRegistryCompilerPass(

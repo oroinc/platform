@@ -4,9 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tools;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
-
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;

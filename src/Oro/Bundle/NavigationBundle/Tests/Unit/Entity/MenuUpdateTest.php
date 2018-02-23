@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity;
 
-use Oro\Component\Testing\Unit\EntityTestCaseTrait;
-
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 class MenuUpdateTest extends \PHPUnit_Framework_TestCase
 {

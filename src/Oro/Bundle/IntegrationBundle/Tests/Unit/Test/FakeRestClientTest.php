@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Test;
 
-use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException;
-use Oro\Bundle\IntegrationBundle\Test\FakeRestResponse as Response;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestResponseInterface;
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException;
 use Oro\Bundle\IntegrationBundle\Test\FakeRestClient;
+use Oro\Bundle\IntegrationBundle\Test\FakeRestResponse as Response;
 
 /**
  * Class FakeRestClientTest is simple test for fake client just to ensure it's logic works

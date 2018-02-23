@@ -4,11 +4,9 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Executes ORM data fixtures.

@@ -5,7 +5,6 @@ namespace Oro\Component\Duplicator;
 use DeepCopy\DeepCopy;
 use DeepCopy\Filter\Filter;
 use DeepCopy\Matcher\Matcher;
-
 use Oro\Component\Duplicator\Filter\FilterFactory;
 use Oro\Component\Duplicator\Matcher\MatcherFactory;
 

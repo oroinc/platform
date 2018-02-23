@@ -3,10 +3,8 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
-
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class ActivityListEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase

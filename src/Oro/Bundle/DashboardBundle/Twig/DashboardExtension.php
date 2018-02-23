@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\DashboardBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DashboardExtension extends \Twig_Extension
 {

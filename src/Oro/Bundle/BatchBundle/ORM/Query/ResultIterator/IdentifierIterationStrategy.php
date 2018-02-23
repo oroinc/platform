@@ -3,7 +3,6 @@
 namespace Oro\Bundle\BatchBundle\ORM\Query\ResultIterator;
 
 use Doctrine\ORM\Query;
-
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 
 /**

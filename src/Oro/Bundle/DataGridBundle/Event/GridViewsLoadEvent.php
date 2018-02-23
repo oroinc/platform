@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\DataGridBundle\Entity\GridView;
+use Symfony\Component\EventDispatcher\Event;
 
 class GridViewsLoadEvent extends Event
 {

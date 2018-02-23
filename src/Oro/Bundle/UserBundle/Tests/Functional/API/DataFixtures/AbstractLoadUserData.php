@@ -4,7 +4,6 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AbstractFixture;
 use Oro\Bundle\UserBundle\Entity\Group;

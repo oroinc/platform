@@ -58,8 +58,6 @@ services:
         class: %oro_navigation.content_provider.navigation_elements.class%
         arguments:
             - '@oro_navigation.configuration.provider'
-        synchronized: true
-        calls:
-            - [setRequest, ["@?request="]]
+            - '@request_stack'
         tags:
             - { name: oro_ui.content_provider }

@@ -3,11 +3,9 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
 use Knp\Menu\MenuItem;
-
+use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Menu\ChainBreadcrumbManager;
-use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
-
 use Symfony\Component\Routing\Route;
 
 class ChainBreadcrumbManagerTest extends \PHPUnit_Framework_TestCase

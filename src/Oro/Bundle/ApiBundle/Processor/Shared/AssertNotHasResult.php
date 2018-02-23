@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 
 /**
  * Makes sure that the Context does not contain the result.

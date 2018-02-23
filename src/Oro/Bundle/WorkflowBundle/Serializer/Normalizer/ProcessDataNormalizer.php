@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ProcessDataNormalizer extends AbstractProcessNormalizer
 {

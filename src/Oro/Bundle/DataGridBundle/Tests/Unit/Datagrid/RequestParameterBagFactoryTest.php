@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class RequestParameterBagFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,8 +24,9 @@ class RequestParameterBagFactoryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->factory = new RequestParameterBagFactory(self::PARAMETERS_CLASS);
-        $this->factory->setRequest($this->request);
+        $requestStack = new RequestStack();
+        $requestStack->push($this->request);
+        $this->factory = new RequestParameterBagFactory(self::PARAMETERS_CLASS, $requestStack);
     }
 
     public function testCreateParameters()

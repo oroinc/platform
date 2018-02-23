@@ -2,9 +2,8 @@
 
 namespace Oro\Component\Layout\ExpressionLanguage\Encoder;
 
-use Symfony\Component\ExpressionLanguage\ParsedExpression;
-
 use Oro\Component\Layout\Action;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 interface ExpressionEncoderInterface
 {

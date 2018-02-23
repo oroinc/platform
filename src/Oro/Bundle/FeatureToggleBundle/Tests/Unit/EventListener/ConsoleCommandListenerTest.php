@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\FeatureToggleBundle\EventListener\ConsoleCommandListener;
+use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Stub\CommandStub;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
-
-use Oro\Bundle\FeatureToggleBundle\EventListener\ConsoleCommandListener;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Stub\CommandStub;
 
 class ConsoleCommandListenerTest extends \PHPUnit_Framework_TestCase
 {

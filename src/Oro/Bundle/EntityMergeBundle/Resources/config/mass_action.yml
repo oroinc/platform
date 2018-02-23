@@ -13,7 +13,7 @@ services:
         arguments:
             - '@oro_entity_config.provider.merge'
             - '@translator'
-        scope: prototype
+        shared: false
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: merge }
 

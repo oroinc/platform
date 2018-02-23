@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\AttachmentBundle\DependencyInjection;
 
-use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Yaml\Parser;
 
 class OroAttachmentExtension extends Extension
 {

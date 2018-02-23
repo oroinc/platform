@@ -535,6 +535,7 @@ services:
         abstract: true
         arguments:
             - '@oro_user.provider.default_user'
+            - '@oro_entity.doctrine_helper'
 
     oro_user.event_listener.turn_off_caching:
         class: 'Oro\Bundle\UserBundle\EventListener\TurnOffCachingListener'

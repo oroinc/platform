@@ -2,11 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Psr\Log\LoggerInterface;
-
+use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator;
 use Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler;
@@ -14,6 +11,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Psr\Log\LoggerInterface;
 
 class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,20 +2,17 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
-
-use Buzz\Message\MessageInterface;
 use Buzz\Client\ClientInterface;
 use Buzz\Client\Curl;
+use Buzz\Message\MessageInterface;
 use Buzz\Message\Request;
 use Buzz\Message\RequestInterface;
 use Buzz\Message\Response;
-
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
 use HWI\Bundle\OAuthBundle\OAuth\Response\PathUserResponse;
 use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Exception\RefreshOAuthAccessTokenFailureException;

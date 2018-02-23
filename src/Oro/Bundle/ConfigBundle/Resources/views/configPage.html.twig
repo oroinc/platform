@@ -28,18 +28,18 @@
             pageReload: pageReload,
             isFormValid: form.vars.valid
         } %}
-        <form
-            id="{{ form.vars.id }}"
-            name="{{ form.vars.name }}"
-            {{ form_enctype(form) }}
-            action="{{ formAction }}"
-            method="post"
-            data-collect="true"
-            data-page-component-view="{{ options|json_encode }}"
-        >
+
+        {{ form_start(form, {
+            'action': formAction,
+            'attr': {
+                'id': form.vars.id,
+                'data-collect': 'true',
+                'data-page-component-view': options|json_encode
+            }
+        }) }}
             {{ configUI.renderTitleAndButtons(pageTitle, [restoreButton, saveButton]) }}
             {{ configUI.renderScrollData(data, form, activeGroup, activeSubGroup, routeName, routeParameters) }}
-        </form>
+        {{ form_end(form, {'render_rest': false}) }}
         {{ oro_form_js_validation(form) }}
         {{ syncMacro.syncContentTags({name: 'system_configuration', params: [activeGroup, activeSubGroup]}) }}
     {% else %}

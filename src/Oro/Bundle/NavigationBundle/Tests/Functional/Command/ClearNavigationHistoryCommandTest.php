@@ -3,9 +3,9 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Command;
 
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
+use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
 use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\NavigationHistoryItemData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
 
 class ClearNavigationHistoryCommandTest extends WebTestCase
 {

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Event;
 
-use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
-
 use Doctrine\Common\EventArgs;
+use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class OroEventManager extends ContainerAwareEventManager

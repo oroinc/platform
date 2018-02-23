@@ -3,15 +3,13 @@
 namespace Oro\Bundle\NavigationBundle\Validator\Constraints;
 
 use Knp\Menu\ItemInterface;
-
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
-use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
+use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
 
 class MaxNestedLevelValidator extends ConstraintValidator
 {

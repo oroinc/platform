@@ -3,10 +3,8 @@
 namespace Oro\Bundle\BatchBundle\Event;
 
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryOptimizationContext;
+use Symfony\Component\EventDispatcher\Event;
 
 class CountQueryOptimizationEvent extends Event
 {

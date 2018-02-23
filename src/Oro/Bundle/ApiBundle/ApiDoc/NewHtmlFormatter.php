@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 use Nelmio\ApiDocBundle\DataTypes as ApiDocDataTypes;
 
 /**
- * The HTML formatter that is used for "rest_json_api" and "rest_plain" REST API views.
+ * The HTML formatter that is used for new REST API views, e.g. "rest_json_api" and "rest_plain".
  */
 class NewHtmlFormatter extends HtmlFormatter
 {

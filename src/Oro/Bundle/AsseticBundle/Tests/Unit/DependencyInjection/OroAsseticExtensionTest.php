@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\AsseticBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\AsseticBundle\DependencyInjection\OroAsseticExtension;
 use Oro\Bundle\AsseticBundle\Tests\Unit\Fixtures;
-
 use Oro\Component\Config\CumulativeResourceManager;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroAsseticExtensionTest extends \PHPUnit_Framework_TestCase
 {

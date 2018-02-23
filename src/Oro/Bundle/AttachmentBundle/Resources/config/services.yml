@@ -178,7 +178,7 @@ services:
 
     oro_attachment.datagrid.action.dialog:
         class: %oro_attachment.datagrid.action.dialog.class%
-        scope: prototype
+        shared: false
         tags:
             - { name: oro_datagrid.extension.action.type, type: dialog }
 

@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\UIBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-
 use Oro\Bundle\UIBundle\Form\DataTransformer\TreeItemIdTransformer;
 use Oro\Bundle\UIBundle\Model\TreeCollection;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TreeMoveType extends AbstractType
 {

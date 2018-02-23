@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ChartBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Processor;
-
 use Oro\Bundle\ChartBundle\DependencyInjection\Configuration;
+use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\SoapBundle\Handler;
 
+use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
+use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
-use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
-use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 
 class Context
 {

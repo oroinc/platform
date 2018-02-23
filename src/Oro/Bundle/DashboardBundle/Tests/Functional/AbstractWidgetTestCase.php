@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Functional;
 
+use Oro\Bundle\DashboardBundle\Entity\Widget;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\DomCrawler\Form;
-
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\DashboardBundle\Entity\Widget;
 
 class AbstractWidgetTestCase extends WebTestCase
 {

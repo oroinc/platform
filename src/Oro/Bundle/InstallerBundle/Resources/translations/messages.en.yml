@@ -82,6 +82,7 @@ process:
             clear-config:  Clear entities cache
             clear-extend:  Clear extended entities data
             schema-drop:   Drop current schema
+            before-database: Database preparation
             schema-update: Schema update
             fixtures:      Load fixtures
             permissions:   Load permissions configuration
@@ -93,6 +94,7 @@ process:
         installation:
             header:        Installation
             fixtures:      Load sample data
+            after-database: Finish database preparation
             navigation:    Init navigation
             js-routing:    Dump JS routing
             localization:  Dump localization
@@ -106,7 +108,7 @@ process:
             header:        Finish
             greeting:      Success!!!
             content:       'You are now ready to start using Oro.<br>For help please join our community <a href="http://community.oroinc.com">forums</a>.'
-            check-background-command: 'Ensure that at least one consumer service is running. Use the oro:message-queue:consume command to launch a consumer service instance <a href="https://oroinc.com/doc/orocrm/current/book/installation#activating-background-tasks" class="helper">?</a>'
+            check-background-command: 'Ensure that at least one consumer service is running. Use the oro:message-queue:consume command to launch a consumer service instance <a href="https://oroinc.com/orocrm/doc/current/install-upgrade/post-install-steps#activate-background-tasks" class="helper">?</a>'
     button:
         back:              Back
         next:              Next

@@ -4,7 +4,6 @@ namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Bundle\ActionBundle\Exception\AssemblerException;
 use Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException;
 use Oro\Bundle\ActionBundle\Model\ActionData;

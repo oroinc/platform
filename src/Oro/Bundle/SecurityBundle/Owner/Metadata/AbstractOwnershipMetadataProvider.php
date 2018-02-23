@@ -4,13 +4,14 @@ namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Util\ClassUtils;
-
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
+/**
+ * Abstract class for providers which provide ownership metadata for entities
+ */
 abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataProviderInterface
 {
     /** @var ConfigManager */

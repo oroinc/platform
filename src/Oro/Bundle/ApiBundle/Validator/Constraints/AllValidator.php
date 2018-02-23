@@ -9,7 +9,6 @@
 namespace Oro\Bundle\ApiBundle\Validator\Constraints;
 
 use Doctrine\Common\Collections\AbstractLazyCollection;
-
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -17,8 +16,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * The difference with Symfony constraint is that uninitialized lazy collection is not validated.
- * @see Symfony\Component\Validator\Constraints\All
- * @see Symfony\Component\Validator\Constraints\AllValidator
+ * @see \Symfony\Component\Validator\Constraints\All
+ * @see \Symfony\Component\Validator\Constraints\AllValidator
  */
 class AllValidator extends ConstraintValidator
 {

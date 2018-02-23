@@ -34,20 +34,50 @@ class HtmlTagExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_ui.html_tag', $this->extension->getName());
     }
 
-    public function testHtmlTagTrim()
+    public function testHtmlSanitize()
     {
-        $tags = ['script', 'style'];
-        $html = <<<EOF
-<iframe src="https://www.somehost"></iframe><script>alert('Some script')</script><style type="text/css">
-   h1 { 
-    font-size: 120%; 
-   }
-</style><script>alert('Some script again!')</script>
-EOF;
-        $expectedResult = '<iframe src="https://www.somehost"></iframe>';
+        $html = '<html>HTML</html>';
+
+        $this->htmlTagHelper
+            ->expects($this->once())
+            ->method('sanitize')
+            ->with($html)
+            ->willReturn('HTML');
+
         $this->assertEquals(
-            $expectedResult,
-            self::callTwigFilter($this->extension, 'oro_html_tag_trim', [$html, $tags])
+            'HTML',
+            self::callTwigFilter($this->extension, 'oro_html_sanitize', [$html])
+        );
+    }
+
+    public function testHtmlStripTags()
+    {
+        $html = '<html>HTML</html>';
+
+        $this->htmlTagHelper
+            ->expects($this->once())
+            ->method('stripTags')
+            ->with($html)
+            ->willReturn('HTML');
+
+        $this->assertEquals(
+            'HTML',
+            self::callTwigFilter($this->extension, 'oro_html_strip_tags', [$html])
+        );
+    }
+
+    public function testHtmlEscape()
+    {
+        $html = '<div>HTML</div><script type="text/javascript"></script>';
+
+        $this->htmlTagHelper
+            ->expects($this->once())
+            ->method('escape')
+            ->with($html)
+            ->willReturn('<div>HTML</div>');
+        $this->assertEquals(
+            '<div>HTML</div>',
+            self::callTwigFilter($this->extension, 'oro_html_escape', [$html])
         );
     }
 

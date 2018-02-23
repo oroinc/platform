@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigDatabaseChecker;
 use Oro\Bundle\EntityConfigBundle\Config\LockObject;
 

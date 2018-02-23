@@ -3,12 +3,10 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Layout\DataProvider;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Util\ClassUtils;
-
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Layout\DataProvider\AclProvider;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 class AclProviderTest extends \PHPUnit_Framework_TestCase
 {

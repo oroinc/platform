@@ -3,10 +3,9 @@
 namespace Oro\Bundle\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManager;
-
-use Oro\Bundle\DashboardBundle\Entity\WidgetStateNullObject;
-use Oro\Bundle\DashboardBundle\Entity\WidgetState;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
+use Oro\Bundle\DashboardBundle\Entity\WidgetState;
+use Oro\Bundle\DashboardBundle\Entity\WidgetStateNullObject;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 

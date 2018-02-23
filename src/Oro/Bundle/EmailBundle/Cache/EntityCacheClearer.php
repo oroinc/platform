@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Cache;
 
-use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
-
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 
 /**
  * @deprecated since 1.9. Removing classes breaks doctrine metadata functionality

@@ -3,16 +3,13 @@
 namespace Oro\Bundle\SegmentBundle\Query;
 
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
-
+use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAdapter;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\GroupingOrmQueryConverter;
-use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAdapter;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilderInterface;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class SegmentQueryConverter extends GroupingOrmQueryConverter
 {

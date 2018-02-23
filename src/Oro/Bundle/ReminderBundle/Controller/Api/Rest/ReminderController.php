@@ -6,8 +6,8 @@ use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Util\Codes;
-
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @NamePrefix("oro_api_")
@@ -16,10 +16,10 @@ class ReminderController extends FOSRestController implements ClassResourceInter
 {
     /**
      * Update reminder, set shown status
-     *
+     * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function postShownAction()
+    public function postShownAction(Request $request)
     {
         $user = $this->getUser();
 
@@ -29,7 +29,7 @@ class ReminderController extends FOSRestController implements ClassResourceInter
 
         $userId = $user->getId();
 
-        $reminders = $this->getReminderRepository()->findReminders($this->getRequest()->get('ids', []));
+        $reminders = $this->getReminderRepository()->findReminders($request->get('ids', []));
 
         /**
          * @var Reminder $reminder

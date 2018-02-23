@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Migrations\Schema\v2_1;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\DBAL\Types\Type;
-
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Converts data of api_key column of oro_user_api table to coded format.

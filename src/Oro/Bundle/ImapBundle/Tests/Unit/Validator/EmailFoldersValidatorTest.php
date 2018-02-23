@@ -4,14 +4,12 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Validator;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
-
-use Symfony\Component\Translation\Translator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Validator\Constraints\EmailFolders;
 use Oro\Bundle\ImapBundle\Validator\EmailFoldersValidator;
-use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Symfony\Component\Translation\Translator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class EmailFoldersValidatorTest extends \PHPUnit_Framework_TestCase
 {

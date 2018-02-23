@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ChartBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsCollectionType;
 use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ChartSettingsCollectionTypeTest extends FormIntegrationTestCase
 {

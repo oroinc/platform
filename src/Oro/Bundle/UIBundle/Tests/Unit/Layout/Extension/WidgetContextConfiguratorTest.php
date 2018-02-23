@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Extension;
 
+use Oro\Bundle\UIBundle\Layout\Extension\WidgetContextConfigurator;
+use Oro\Component\Layout\LayoutContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-
-use Oro\Component\Layout\LayoutContext;
-use Oro\Bundle\UIBundle\Layout\Extension\WidgetContextConfigurator;
 
 class WidgetContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Log\Handler;
 
-use Psr\Log\LoggerInterface;
-
 use Monolog\Handler\AbstractHandler;
 use Monolog\Logger;
-
 use Oro\Bundle\MessageQueueBundle\Log\Processor\RestoreOriginalChannelProcessor;
+use Psr\Log\LoggerInterface;
 
 /**
  * A base handler to resend log records to another log channel.

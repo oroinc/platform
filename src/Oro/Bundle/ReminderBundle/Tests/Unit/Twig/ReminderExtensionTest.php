@@ -4,16 +4,14 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Twig;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 use Oro\Bundle\ReminderBundle\Twig\ReminderExtension;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,12 +3,9 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Action;
 
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
@@ -21,6 +18,7 @@ use Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class ActionExtensionTest extends \PHPUnit_Framework_TestCase
 {

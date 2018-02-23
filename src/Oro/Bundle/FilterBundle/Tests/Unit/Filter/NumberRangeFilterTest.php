@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\NumberRangeFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterType;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class NumberRangeFilterTest extends NumberFilterTest
 {

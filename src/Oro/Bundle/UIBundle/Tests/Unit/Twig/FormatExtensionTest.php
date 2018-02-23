@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\UIBundle\Formatter\FormatterManager;
 use Oro\Bundle\UIBundle\Twig\FormatExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class FormatExtensionTest extends \PHPUnit_Framework_TestCase
 {

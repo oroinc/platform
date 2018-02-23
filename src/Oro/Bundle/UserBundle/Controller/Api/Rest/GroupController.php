@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
-
 use Oro\Bundle\UserBundle\Entity\Role;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @NamePrefix("oro_api_")
@@ -39,12 +37,13 @@ class GroupController extends RestController implements ClassResourceInterface
      *      description="Number of items per page. defaults to 10."
      * )
      * @AclAncestor("oro_user_group_view")
+     * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function cgetAction()
+    public function cgetAction(Request $request)
     {
-        $page = (int) $this->getRequest()->get('page', 1);
-        $limit = (int) $this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $page = (int) $request->get('page', 1);
+        $limit = (int) $request->get('limit', self::ITEMS_PER_PAGE);
 
         return $this->handleGetListRequest($page, $limit);
     }

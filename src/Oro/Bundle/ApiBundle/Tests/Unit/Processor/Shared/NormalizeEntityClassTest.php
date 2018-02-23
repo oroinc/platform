@@ -4,16 +4,18 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass;
+use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class NormalizeEntityClassTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $valueNormalizer;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    private $valueNormalizer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $resourcesProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesProvider */
+    private $resourcesProvider;
 
     /** @var NormalizeEntityClass */
     protected $processor;
@@ -22,12 +24,8 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
     {
         parent::setUp();
 
-        $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->resourcesProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ResourcesProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
+        $this->resourcesProvider = $this->createMock(ResourcesProvider::class);
 
         $this->processor = new NormalizeEntityClass(
             $this->valueNormalizer,
@@ -39,7 +37,7 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
     {
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError(
                     'entity type constraint',
@@ -64,18 +62,18 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
     {
         $this->context->setClassName('test');
 
-        $this->valueNormalizer->expects($this->once())
+        $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with($this->context->getClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn('Test\Class');
-        $this->resourcesProvider->expects($this->once())
+        $this->resourcesProvider->expects(self::once())
             ->method('isResourceAccessible')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn(true);
 
         $this->processor->process($this->context);
 
-        $this->assertSame('Test\Class', $this->context->getClassName());
+        self::assertSame('Test\Class', $this->context->getClassName());
     }
 
     /**
@@ -85,11 +83,11 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
     {
         $this->context->setClassName('test');
 
-        $this->valueNormalizer->expects($this->once())
+        $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with($this->context->getClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn('Test\Class');
-        $this->resourcesProvider->expects($this->once())
+        $this->resourcesProvider->expects(self::once())
             ->method('isResourceAccessible')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn(false);
@@ -101,17 +99,17 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
     {
         $this->context->setClassName('test');
 
-        $this->valueNormalizer->expects($this->once())
+        $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with($this->context->getClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willThrowException(new \Exception('some error'));
 
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getClassName());
-        $this->assertEquals(
+        self::assertNull($this->context->getClassName());
+        self::assertEquals(
             [
-                Error::createValidationError('entity type constraint', 'Unknown entity type: test.')
+                Error::createValidationError('entity type constraint', 'Unknown entity type: test.', 404)
             ],
             $this->context->getErrors()
         );

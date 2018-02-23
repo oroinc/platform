@@ -2,6 +2,9 @@
 
 namespace Oro\Component\ChainProcessor;
 
+/**
+ * The container for key/value pairs.
+ */
 class ParameterBag extends AbstractParameterBag
 {
     /** @var array */
@@ -12,7 +15,7 @@ class ParameterBag extends AbstractParameterBag
      */
     public function has($key)
     {
-        return array_key_exists($key, $this->items);
+        return \array_key_exists($key, $this->items);
     }
 
     /**
@@ -20,9 +23,7 @@ class ParameterBag extends AbstractParameterBag
      */
     public function get($key)
     {
-        return array_key_exists($key, $this->items)
-            ? $this->items[$key]
-            : null;
+        return $this->items[$key] ?? null;
     }
 
     /**

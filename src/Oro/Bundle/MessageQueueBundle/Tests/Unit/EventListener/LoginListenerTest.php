@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
+use Oro\Bundle\MessageQueueBundle\EventListener\LoginListener;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
-use Oro\Bundle\MessageQueueBundle\EventListener\LoginListener;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class LoginListenerTest extends \PHPUnit_Framework_TestCase
 {

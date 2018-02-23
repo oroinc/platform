@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
 use Doctrine\DBAL\DBALException;
-
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\SearchBundle\Engine\FulltextIndexManager;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;

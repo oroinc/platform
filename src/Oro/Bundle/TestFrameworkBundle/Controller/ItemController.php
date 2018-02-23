@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Controller;
 
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
-
-use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 class ItemController extends Controller
 {

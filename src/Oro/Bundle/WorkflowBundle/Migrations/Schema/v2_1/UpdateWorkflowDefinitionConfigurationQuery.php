@@ -3,11 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v2_1;
 
 use Doctrine\DBAL\Types\Type;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class UpdateWorkflowDefinitionConfigurationQuery extends ParametrizedMigrationQuery
 {

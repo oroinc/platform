@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\FormBuilder;
-
 use Oro\Bundle\IntegrationBundle\Form\Type\ChannelType as IntegrationType;
+use Symfony\Component\Form\FormBuilder;
 
 class IntegrationTypeTest extends \PHPUnit_Framework_TestCase
 {

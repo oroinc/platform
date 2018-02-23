@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form;
 
-use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\ORMException;
-
 use Oro\Bundle\WorkflowBundle\Model\Variable;
+use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class WorkflowVariableDataTransformer implements DataTransformerInterface
 {

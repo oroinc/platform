@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataAuditBundle\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
-
 use Symfony\Component\Translation\TranslatorInterface;
 
 class AuthorProvider

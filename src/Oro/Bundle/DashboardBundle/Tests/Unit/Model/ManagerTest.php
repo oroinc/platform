@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ManagerTest extends \PHPUnit_Framework_TestCase
 {

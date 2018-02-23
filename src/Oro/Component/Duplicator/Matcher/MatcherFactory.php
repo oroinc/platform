@@ -3,7 +3,6 @@
 namespace Oro\Component\Duplicator\Matcher;
 
 use DeepCopy\Matcher\Matcher as BaseMatcher;
-
 use Oro\Component\Duplicator\AbstractFactory;
 use Oro\Component\Duplicator\ObjectType;
 

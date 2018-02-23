@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ActionBundle\Helper;
 
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\OperationButton;
 use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class OptionsHelper
 {

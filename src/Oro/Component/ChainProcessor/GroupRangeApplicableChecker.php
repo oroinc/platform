@@ -4,7 +4,7 @@ namespace Oro\Component\ChainProcessor;
 
 /**
  * This applicable checker is used to skip processors are not included in a requested range of groups.
- * Use setFirstGroup and setLastGroup of the Context to define the range.
+ * Use setFirstGroup and setLastGroup of the execution context to define the range.
  */
 class GroupRangeApplicableChecker implements ApplicableCheckerInterface, ProcessorBagAwareApplicableCheckerInterface
 {
@@ -23,8 +23,8 @@ class GroupRangeApplicableChecker implements ApplicableCheckerInterface, Process
     public function setProcessorBag(ProcessorBagInterface $processorBag = null)
     {
         $this->processorBag = $processorBag;
-        $this->action       = null;
-        $this->groups       = null;
+        $this->action = null;
+        $this->groups = null;
     }
 
     /**
@@ -67,7 +67,7 @@ class GroupRangeApplicableChecker implements ApplicableCheckerInterface, Process
     {
         if ($action !== $this->action) {
             $this->action = $action;
-            $this->groups = array_flip($this->processorBag->getActionGroups($action));
+            $this->groups = \array_flip($this->processorBag->getActionGroups($action));
         }
     }
 }

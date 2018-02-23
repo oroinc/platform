@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures;
 
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Oro\Bundle\MigrationBundle\Migration\Migration;
-use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
-use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\TestExtension;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\TestExtensionAwareInterface;
+use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class MigrationWithTestExtension implements
     Migration,

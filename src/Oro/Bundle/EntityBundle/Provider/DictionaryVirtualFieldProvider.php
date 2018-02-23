@@ -5,13 +5,11 @@ namespace Oro\Bundle\EntityBundle\Provider;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Implements VirtualFieldProviderInterface for relations to dictionary entities

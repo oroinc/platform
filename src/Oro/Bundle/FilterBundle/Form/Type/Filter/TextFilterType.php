@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class TextFilterType extends AbstractType
 {
@@ -59,7 +58,7 @@ class TextFilterType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $choices = array(
             self::TYPE_CONTAINS           => $this->translator->trans('oro.filter.form.label_type_contains'),

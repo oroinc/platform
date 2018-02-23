@@ -3,10 +3,8 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datasource\Orm;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Query\Parameter;
-
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\ParameterBinder;
 

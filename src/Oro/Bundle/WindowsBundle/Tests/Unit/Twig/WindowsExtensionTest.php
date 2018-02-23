@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\WindowsBundle\Tests\Twig;
 
-use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
+use Oro\Bundle\WindowsBundle\Entity\WindowsState;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManager;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
-use Oro\Bundle\WindowsBundle\Entity\WindowsState;
 use Oro\Bundle\WindowsBundle\Twig\WindowsExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
 {

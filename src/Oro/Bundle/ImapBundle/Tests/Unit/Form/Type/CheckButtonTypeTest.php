@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
-use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 
 class CheckButtonTypeTest extends FormIntegrationTestCase
 {

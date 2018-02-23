@@ -2,14 +2,13 @@
 
 namespace Oro\Component\Action\Action;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Show flash message
@@ -36,9 +35,9 @@ class FlashMessage extends AbstractAction
     protected $htmlTagHelper;
 
     /**
-     * @var Request|null
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * @var string|PropertyPath
@@ -59,24 +58,19 @@ class FlashMessage extends AbstractAction
      * @param ContextAccessor $contextAccessor
      * @param TranslatorInterface $translator
      * @param HtmlTagHelper $htmlTagHelper
+     * @param RequestStack $requestStack
      */
     public function __construct(
         ContextAccessor $contextAccessor,
         TranslatorInterface $translator,
-        HtmlTagHelper $htmlTagHelper
+        HtmlTagHelper $htmlTagHelper,
+        RequestStack $requestStack
     ) {
         parent::__construct($contextAccessor);
 
         $this->translator = $translator;
         $this->htmlTagHelper = $htmlTagHelper;
-    }
-
-    /**
-     * @param Request|null $request
-     */
-    public function setRequest(Request $request = null)
-    {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -84,24 +78,27 @@ class FlashMessage extends AbstractAction
      */
     protected function executeAction($context)
     {
-        if ($this->request) {
-            $message = $this->contextAccessor->getValue($context, $this->message);
-
-            $messageParameters = $this->getMessageParameters($context);
-            $translatedMessage = $this->translator->trans($message, $messageParameters);
-
-            $type = $this->contextAccessor->getValue($context, $this->type);
-            if (!$type) {
-                $type = self::DEFAULT_MESSAGE_TYPE;
-            }
-
-            /** @var Session $session */
-            $session = $this->request->getSession();
-            $session->getFlashBag()->add(
-                $type,
-                $this->htmlTagHelper->sanitize($translatedMessage)
-            );
+        $request = $this->requestStack->getCurrentRequest();
+        if (!$request) {
+            return;
         }
+
+        $message = $this->contextAccessor->getValue($context, $this->message);
+
+        $messageParameters = $this->getMessageParameters($context);
+        $translatedMessage = $this->translator->trans($message, $messageParameters);
+
+        $type = $this->contextAccessor->getValue($context, $this->type);
+        if (!$type) {
+            $type = self::DEFAULT_MESSAGE_TYPE;
+        }
+
+        /** @var Session $session */
+        $session = $request->getSession();
+        $session->getFlashBag()->add(
+            $type,
+            $this->htmlTagHelper->sanitize($translatedMessage)
+        );
     }
 
     /**

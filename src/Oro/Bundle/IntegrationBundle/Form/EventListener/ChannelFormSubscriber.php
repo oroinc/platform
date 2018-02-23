@@ -3,18 +3,16 @@
 namespace Oro\Bundle\IntegrationBundle\Form\EventListener;
 
 use Doctrine\Common\Util\Inflector;
-
+use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationSettingsDynamicFormType;
+use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Bundle\IntegrationBundle\Provider\SettingsProvider;
 use Oro\Bundle\IntegrationBundle\Utils\EditModeUtils;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-use Oro\Bundle\FormBundle\Utils\FormUtils;
-use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
-use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
-use Oro\Bundle\IntegrationBundle\Provider\SettingsProvider;
-use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationSettingsDynamicFormType;
 
 class ChannelFormSubscriber implements EventSubscriberInterface
 {

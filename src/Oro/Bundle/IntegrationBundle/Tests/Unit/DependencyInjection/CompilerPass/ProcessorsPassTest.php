@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
+use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\ProcessorsPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\ProcessorsPass;
 
 class ProcessorsPassTest extends \PHPUnit_Framework_TestCase
 {

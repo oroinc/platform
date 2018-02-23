@@ -2,33 +2,26 @@
 
 namespace Oro\Bundle\NavigationBundle\ContentProvider;
 
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
 use Oro\Bundle\UIBundle\ContentProvider\AbstractContentProvider;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class NavigationElementsContentProvider extends AbstractContentProvider
 {
     /** @var ConfigurationProvider */
     private $configurationProvider;
 
-    /** @var Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /**
      * @param ConfigurationProvider $configurationProvider
+     * @param RequestStack $requestStack
      */
-    public function __construct(ConfigurationProvider $configurationProvider)
+    public function __construct(ConfigurationProvider $configurationProvider, RequestStack $requestStack)
     {
         $this->configurationProvider = $configurationProvider;
-    }
-
-    /**
-     * @param Request|null $request
-     */
-    public function setRequest(Request $request = null)
-    {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -47,8 +40,9 @@ class NavigationElementsContentProvider extends AbstractContentProvider
             $navigationElements
         );
 
-        if (null !== $this->request) {
-            $attributes = $this->request->attributes;
+        $request = $this->requestStack->getCurrentRequest();
+        if (null !== $request) {
+            $attributes = $request->attributes;
 
             $routeName  = $attributes->get('_route');
             if (!$routeName) {

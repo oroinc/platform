@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ChartBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Bundle\ChartBundle\DependencyInjection\OroChartExtension;
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroChartExtensionTest extends \PHPUnit_Framework_TestCase
 {

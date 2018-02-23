@@ -3,13 +3,10 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Extension;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
-
 use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
-
 use Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;

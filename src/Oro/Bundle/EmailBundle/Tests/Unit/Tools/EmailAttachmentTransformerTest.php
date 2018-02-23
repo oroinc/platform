@@ -3,14 +3,13 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Tools;
 
 use Gaufrette\Filesystem;
-
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\EmailBundle\Form\Model\Factory;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 
 class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
 {

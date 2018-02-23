@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_7;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class FixRestoredFieldsQuery extends ParametrizedMigrationQuery
 {

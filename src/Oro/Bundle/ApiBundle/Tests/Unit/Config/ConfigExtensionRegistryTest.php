@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
-
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\Definition\ConfigurationSectionInterface;
 use Oro\Bundle\ApiBundle\Config\Definition\ConfigurationSettings;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 class ConfigExtensionRegistryTest extends \PHPUnit_Framework_TestCase
 {

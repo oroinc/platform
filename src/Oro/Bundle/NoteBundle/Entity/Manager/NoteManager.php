@@ -3,17 +3,15 @@
 namespace Oro\Bundle\NoteBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
-
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class NoteManager
 {

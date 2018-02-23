@@ -1,13 +1,12 @@
 <?php
 namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Transport;
 
-use Symfony\Component\HttpFoundation\ParameterBag;
-
-use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
-use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
+use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientFactoryInterface;
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
 use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 abstract class AbstractRestTransport implements TransportInterface
 {

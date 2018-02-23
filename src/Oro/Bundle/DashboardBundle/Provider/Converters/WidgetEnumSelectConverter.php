@@ -3,11 +3,10 @@
 namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
 use Doctrine\ORM\EntityManager;
-
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 /**
  * @codeCoverageIgnore

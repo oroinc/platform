@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\LayoutBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\FormView;
-
-use Oro\Component\PhpUtils\ArrayUtil;
-use Oro\Component\Layout\Templating\TextHelper;
-use Oro\Component\Layout\BlockView;
-
 use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
+use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Templating\TextHelper;
+use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\FormView;
 
 class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRuntimeInterface
 {

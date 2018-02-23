@@ -3,15 +3,13 @@
 namespace Oro\Bundle\OrganizationBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
-
+use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
 
 class UpdateOrganizationCommand extends ContainerAwareCommand
 {

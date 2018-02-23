@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\DataGridBundle\Event\BuildBefore;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 class CustomEntityGridListener
 {

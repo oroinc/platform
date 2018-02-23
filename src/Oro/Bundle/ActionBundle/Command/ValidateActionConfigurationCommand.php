@@ -3,12 +3,10 @@
 namespace Oro\Bundle\ActionBundle\Command;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 
 class ValidateActionConfigurationCommand extends ContainerAwareCommand
 {

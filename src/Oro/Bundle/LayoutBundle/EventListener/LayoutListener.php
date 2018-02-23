@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\LayoutBundle\EventListener;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
-
-use Oro\Component\Layout\Layout;
-use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\Exception\LogicException;
-
-use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 use Oro\Bundle\LayoutBundle\Layout\LayoutManager;
+use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
+use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\Exception\LogicException;
+use Oro\Component\Layout\Layout;
+use Oro\Component\Layout\LayoutContext;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 /**
  * The LayoutListener class handles the @Layout annotation.

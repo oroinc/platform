@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\SecurityBundle\Authorization;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AuthorizationChecker implements AuthorizationCheckerInterface
 {

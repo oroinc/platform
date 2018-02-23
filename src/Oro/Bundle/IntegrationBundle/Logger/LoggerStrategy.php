@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Logger;
 
-use Psr\Log\NullLogger;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * Class LoggerStrategy

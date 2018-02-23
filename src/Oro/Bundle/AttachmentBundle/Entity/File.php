@@ -3,13 +3,11 @@
 namespace Oro\Bundle\AttachmentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
-use Symfony\Component\HttpFoundation\File\File as ComponentFile;
-use Symfony\Component\Security\Core\User\UserInterface;
-
+use Oro\Bundle\AttachmentBundle\Model\ExtendFile;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\AttachmentBundle\Model\ExtendFile;
+use Symfony\Component\HttpFoundation\File\File as ComponentFile;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Table(name="oro_attachment_file", indexes = {

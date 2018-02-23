@@ -2,11 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-
-use Oro\Component\ChainProcessor\AbstractParameterBag;
-use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -22,6 +17,10 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\GetSubresourceCont
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\UpdateRelationship\UpdateRelationshipContext;
 use Oro\Bundle\ApiBundle\Processor\Update\UpdateContext;
+use Oro\Component\ChainProcessor\AbstractParameterBag;
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class RequestActionHandler
 {

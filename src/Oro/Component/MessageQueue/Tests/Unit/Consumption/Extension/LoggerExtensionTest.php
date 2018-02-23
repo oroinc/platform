@@ -2,13 +2,12 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\Extension;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
+use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
+use Psr\Log\LoggerInterface;
 
 class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
 {

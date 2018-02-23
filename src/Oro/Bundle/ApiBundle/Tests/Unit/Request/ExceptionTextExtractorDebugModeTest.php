@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
-use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException;
 use Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractor;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
+use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ExceptionTextExtractorDebugModeTest extends \PHPUnit_Framework_TestCase
 {

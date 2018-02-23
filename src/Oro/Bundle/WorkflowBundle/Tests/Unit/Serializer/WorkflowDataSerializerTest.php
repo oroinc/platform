@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer;
 
-use Oro\Bundle\WorkflowBundle\Serializer\WorkflowDataSerializer;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Serializer\WorkflowDataSerializer;
 
 class WorkflowDataSerializerTest extends \PHPUnit_Framework_TestCase
 {

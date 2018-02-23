@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\AbstractImportHandler;
@@ -17,6 +15,7 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerInterface;
 
 abstract class PreImportMessageProcessorAbstract implements MessageProcessorInterface, TopicSubscriberInterface
 {

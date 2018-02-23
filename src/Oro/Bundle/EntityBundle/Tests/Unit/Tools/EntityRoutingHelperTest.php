@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Tools;
 
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\HttpFoundation\Request;
 
 class EntityRoutingHelperTest extends \PHPUnit_Framework_TestCase
 {

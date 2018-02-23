@@ -3,15 +3,12 @@
 namespace Oro\Bundle\EntityBundle\EventListener;
 
 use Doctrine\ORM\Query\Expr\Join;
-
-use Symfony\Component\HttpFoundation\Request;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 
 class EntityRelationGridListener
 {
@@ -21,9 +18,6 @@ class EntityRelationGridListener
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var Request */
-    protected $request;
-
     /**
      * @param ConfigManager  $configManager
      * @param DoctrineHelper $doctrineHelper
@@ -32,16 +26,6 @@ class EntityRelationGridListener
     {
         $this->configManager  = $configManager;
         $this->doctrineHelper = $doctrineHelper;
-    }
-
-    /**
-     * @param Request $request
-     */
-    public function setRequest(Request $request = null)
-    {
-        if ($request instanceof Request) {
-            $this->request = $request;
-        }
     }
 
     /**

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Http\Firewall;
 
+use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Psr\Log\LoggerInterface;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -11,8 +11,6 @@ use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener as BaseExceptionListener;
 use Symfony\Component\Security\Http\HttpUtils;
-
-use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 
 class ExceptionListener extends BaseExceptionListener
 {

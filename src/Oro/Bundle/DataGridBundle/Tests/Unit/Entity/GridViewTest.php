@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\AppearanceType;
+use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\UserBundle\Entity\User;
 

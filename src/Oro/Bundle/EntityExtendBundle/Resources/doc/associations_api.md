@@ -189,6 +189,7 @@ class ActivityEntityController extends RestController
     /**
      * Returns the list of entities associated with the specified activity entity.
      *
+     * @param Request $request
      * @param string $activity The type of the activity entity.
      * @param int    $id       The id of the activity entity.
      *
@@ -214,13 +215,13 @@ class ActivityEntityController extends RestController
      *
      * @return Response
      */
-    public function cgetAction($activity, $id)
+    public function cgetAction(Request $request, $activity, $id)
     {
         $manager = $this->getManager();
         $manager->setClass($manager->resolveEntityClass($activity, true));
 
-        $page  = (int)$this->getRequest()->get('page', 1);
-        $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $page  = (int)$request->get('page', 1);
+        $limit = (int)$request->get('limit', self::ITEMS_PER_PAGE);
 
         $criteria = $this->buildFilterCriteria(['id' => ['=', $id]]);
 
@@ -447,6 +448,7 @@ use FOS\RestBundle\Controller\Annotations\Get;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityTargetApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
@@ -461,6 +463,7 @@ class ActivityTargetController extends RestGetController
     /**
      * Returns the list of activities associated with the specified entity.
      *
+     * @param Request $request
      * @param string $entity The type of the target entity.
      * @param mixed  $id     The id of the target entity.
      *
@@ -486,13 +489,13 @@ class ActivityTargetController extends RestGetController
      *
      * @return Response
      */
-    public function getActivitiesAction($entity, $id)
+    public function getActivitiesAction(Request $request, $entity, $id)
     {
         $manager = $this->getManager();
         $manager->setClass($manager->resolveEntityClass($entity, true));
 
-        $page  = (int)$this->getRequest()->get('page', 1);
-        $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $page  = (int)$request->get('page', 1);
+        $limit = (int)$request->get('limit', self::ITEMS_PER_PAGE);
 
         $criteria = $this->buildFilterCriteria(['id' => ['=', $id]], [], ['id' => 'target.id']);
 

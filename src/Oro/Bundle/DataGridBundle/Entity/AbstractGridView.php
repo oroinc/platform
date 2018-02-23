@@ -4,14 +4,12 @@ namespace Oro\Bundle\DataGridBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-
-use Symfony\Component\Validator\Constraints as Assert;
-
-use Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
-use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity()

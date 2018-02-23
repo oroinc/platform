@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Processor\Stub;
 
-use ProxyManager\Proxy\ValueHolderInterface;
-
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
+use ProxyManager\Proxy\ValueHolderInterface;
 
 class ExtensionProxy extends AbstractExtension implements ValueHolderInterface
 {

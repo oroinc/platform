@@ -4,7 +4,6 @@ namespace Oro\Bundle\SecurityBundle\Event;
 
 use Doctrine\ORM\Query\AST\SelectStatement;
 use Doctrine\ORM\Query\AST\Subselect;
-
 use Symfony\Component\EventDispatcher\Event;
 
 class ProcessSelectAfter extends Event

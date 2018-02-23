@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class Manager implements FunctionProviderInterface
 {

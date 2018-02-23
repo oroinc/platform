@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType;
+use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType;
-use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
 class FallbackPropertyTypeTest extends FormIntegrationTestCase
 {

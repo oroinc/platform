@@ -2,20 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
-use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
-
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as JMS;
-
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
 
 /**
  * @ORM\Table(name="oro_workflow_definition")

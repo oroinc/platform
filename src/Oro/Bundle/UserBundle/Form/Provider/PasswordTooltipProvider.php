@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Form\Provider;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Generates a tooltip text for the system configured password complexity requirements

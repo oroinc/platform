@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Entity\Repository;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityRepository;
-
-use Symfony\Component\Security\Core\User\UserInterface;
-
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Entity\AbstractGridViewUser;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class GridViewUserRepository extends EntityRepository
 {

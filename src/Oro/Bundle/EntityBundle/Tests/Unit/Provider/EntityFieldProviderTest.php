@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Symfony\Component\Translation\Translator;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
@@ -17,6 +14,8 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Component\Translation\Translator;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
-
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\DatagridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\WorkflowBundle\EventListener\GridsSubscriber;
-use Oro\Bundle\DatagridBundle\Event\OrmResultBeforeQuery;
 
 class GridSubscriberTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,9 +2,8 @@
 
 namespace Oro\Component\ConfigExpression\Condition;
 
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
 use Oro\Component\ConfigExpression\Exception;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class Type extends AbstractComparison
 {

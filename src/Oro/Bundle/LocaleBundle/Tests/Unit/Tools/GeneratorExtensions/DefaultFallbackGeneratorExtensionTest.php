@@ -5,7 +5,6 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Tools\GeneratorExtensions;
 use CG\Generator\PhpClass;
 use CG\Generator\PhpMethod;
 use CG\Generator\PhpParameter;
-
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension;
 

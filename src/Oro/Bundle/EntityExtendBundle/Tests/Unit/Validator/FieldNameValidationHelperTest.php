@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
@@ -12,6 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Event\ValidateBeforeRemoveFieldEvent;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FieldNameValidationHelperTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Engine\Orm;
 
+use Doctrine\ORM\Configuration;
 use Gedmo\Tool\Logging\DBAL\QueryAnalyzer;
-
 use Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver;
 use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
-use Doctrine\ORM\Configuration;
 
 abstract class AbstractDriverTest extends WebTestCase
 {

@@ -79,11 +79,16 @@ services:
            - []
            - '@service_container'
 
-    oro_platform.event_listener.demo_data_fixtures_listener.abstract:
+    oro_platform.event_listener.data_fixtures_listener.abstract:
         class: 'Oro\Bundle\PlatformBundle\EventListener\AbstractDemoDataFixturesListener'
         abstract: true
         arguments:
             - '@oro_platform.optional_listeners.manager'
+
+    oro_platform.event_listener.demo_data_fixtures_listener.abstract:
+        parent: oro_platform.event_listener.data_fixtures_listener.abstract
+        class: 'Oro\Bundle\PlatformBundle\EventListener\AbstractDemoDataFixturesListener'
+        abstract: true
 
     oro_platform.provider.console.global_options_provider_registry:
         class: Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderRegistry

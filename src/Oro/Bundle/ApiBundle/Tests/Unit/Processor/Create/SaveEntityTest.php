@@ -4,15 +4,13 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create;
 
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Create\SaveEntity;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Symfony\Component\HttpFoundation\Response;
 
 class SaveEntityTest extends FormProcessorTestCase
 {

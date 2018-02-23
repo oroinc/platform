@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueCollectionType;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
-use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueCollectionType;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumValueCollectionTypeTest extends TypeTestCase
 {
@@ -34,16 +33,23 @@ class EnumValueCollectionTypeTest extends TypeTestCase
     }
 
     /**
-     * @dataProvider setDefaultOptionsProvider
+     * @dataProvider configureOptionsProvider
+     * @param ConfigIdInterface $configId
+     * @param boolean $isNewConfig
+     * @param string $enumCode
+     * @param boolean $isImmutableAdd
+     * @param boolean $isImmutableDelete
+     * @param array $options
+     * @param array $expectedOptions
      */
-    public function testSetDefaultOptions(
+    public function testConfigureOptions(
         ConfigIdInterface $configId,
         $isNewConfig,
         $enumCode,
         $isImmutableAdd,
         $isImmutableDelete,
-        $options,
-        $expectedOptions
+        array $options,
+        array $expectedOptions
     ) {
         $enumValueClassName = $enumCode ? ExtendHelper::buildEnumValueClassName($enumCode) : null;
 
@@ -66,7 +72,7 @@ class EnumValueCollectionTypeTest extends TypeTestCase
             );
 
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
 
         $options['config_id']     = $configId;
         $options['config_is_new'] = $isNewConfig;
@@ -109,7 +115,7 @@ class EnumValueCollectionTypeTest extends TypeTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function setDefaultOptionsProvider()
+    public function configureOptionsProvider()
     {
         return [
             [

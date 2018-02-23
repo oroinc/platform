@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\ImapBundle\OriginSyncCredentials\Driver;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
-
 use Oro\Bundle\ImapBundle\Entity\Repository\UserEmailOriginRepository;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\WrongCredentialsOriginsDriverInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * DBAL Storage of wrong credential sync origins.

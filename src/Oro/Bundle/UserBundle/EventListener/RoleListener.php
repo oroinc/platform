@@ -3,14 +3,12 @@
 namespace Oro\Bundle\UserBundle\EventListener;
 
 use Doctrine\Common\Persistence\ObjectRepository;
-use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-
-use Symfony\Component\Security\Core\Role\RoleInterface;
-
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\Security\Core\Role\RoleInterface;
 
 class RoleListener
 {

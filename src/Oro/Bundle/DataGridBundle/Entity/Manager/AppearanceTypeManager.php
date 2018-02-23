@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\DataGridBundle\Entity\AppearanceType;
 
 class AppearanceTypeManager

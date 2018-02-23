@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\StatusCodeConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 abstract class AbstractAddStatusCodes implements ProcessorInterface
 {

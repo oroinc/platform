@@ -1,0 +1,29 @@
+Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account:
+  actions:
+    get: '<p>New description for GET action.</p>'
+    get_list: '<p>Description for GET_LIST action</p><p><strong>text in bold</strong></p>'
+    create: '<p>Description for CREATE action</p><p><em>text in italic</em></p>'
+    update: "<p>Description for UPDATE action</p><p><a href=\"http://localhost.com\">a link to resource</a></p><pre><code>code block\n</code></pre>"
+  fields:
+    id:
+      common: '<p>New description for ID field.</p>'
+      delete: '<p>New description for ID field for DELETE action.</p>'
+    name:
+      common: '<p>Description for NAME field</p>'
+      create: '<p>Description for NAME field for CREATE and UPDATE actions</p>'
+      update: '<p>Description for NAME field for CREATE and UPDATE actions</p>'
+      delete: '<p>New description for NAME field for DELETE action.</p>'
+    createdat:
+      common: '<p>New description for CREATED_AT field.</p>'
+  filters:
+    id: 'Description for ID filter'
+    name: 'Description for NAME filter'
+    createdat: 'Description for CREATEDAT filter'
+    updatedat: 'Description for UPDATEDAT filter'
+  subresources:
+    contacts:
+        get_subresource: '<p>Description for <em>contacts GET_SUBRESOURCE</em> sub-resource</p>'
+Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Emphasize_In_Class_Name:
+  fields:
+    emphasize_in_field_name:
+      common: '<p>Description for <em>field</em></p>'

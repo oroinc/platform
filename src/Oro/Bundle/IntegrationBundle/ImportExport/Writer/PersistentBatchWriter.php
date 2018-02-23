@@ -2,24 +2,19 @@
 
 namespace Oro\Bundle\IntegrationBundle\ImportExport\Writer;
 
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
+use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
+use Doctrine\ORM\EntityManager;
+use Oro\Bundle\BatchBundle\Step\StepExecutionRestoreInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
+use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
+use Oro\Bundle\IntegrationBundle\Event\WriterErrorEvent;
 use Psr\Log\LoggerInterface;
-
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Doctrine\ORM\EntityManager;
-
-use Oro\Bundle\BatchBundle\Step\StepExecutionRestoreInterface;
-
-use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
-use Oro\Bundle\IntegrationBundle\Event\WriterErrorEvent;
-use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
-use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
-
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
-use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
-use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
 class PersistentBatchWriter implements
     ItemWriterInterface,

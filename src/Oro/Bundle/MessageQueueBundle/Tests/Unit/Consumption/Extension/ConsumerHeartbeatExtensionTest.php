@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 
-use Oro\Component\Testing\Unit\TestContainerBuilder;
-use Psr\Log\LoggerInterface;
-
-use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Transport\SessionInterface;
-
 use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ConsumerHeartbeatExtension;
+use Oro\Component\MessageQueue\Consumption\Context;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Psr\Log\LoggerInterface;
 
 class ConsumerHeartbeatExtensionTest extends \PHPUnit_Framework_TestCase
 {

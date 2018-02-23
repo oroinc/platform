@@ -2,18 +2,21 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\WorkflowBundle\EventListener\RolePageListener;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class RolePageListenerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var RolePageListener */
     protected $listener;
+
+    /** @var RequestStack */
+    protected $requestStack;
 
     protected function setUp()
     {
@@ -24,7 +27,8 @@ class RolePageListenerTest extends \PHPUnit_Framework_TestCase
                 return 'translated: ' . $value;
             });
 
-        $this->listener = new RolePageListener($translator);
+        $this->requestStack = new RequestStack();
+        $this->listener = new RolePageListener($translator, $this->requestStack);
     }
 
     public function testOnUpdatePageRenderWithoutRequest()
@@ -50,7 +54,7 @@ class RolePageListenerTest extends \PHPUnit_Framework_TestCase
             null
         );
 
-        $this->listener->setRequest(new Request([], [], ['_route' => 'some_route']));
+        $this->requestStack->push(new Request([], [], ['_route' => 'some_route']));
 
         $this->listener->onUpdatePageRender($event);
 
@@ -66,7 +70,7 @@ class RolePageListenerTest extends \PHPUnit_Framework_TestCase
             null
         );
 
-        $this->listener->setRequest(
+        $this->requestStack->push(
             new Request(
                 [],
                 [],
@@ -114,7 +118,7 @@ class RolePageListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($renderedHtml);
 
 
-        $this->listener->setRequest(new Request([], [], ['_route' => $routeName, '_route_params' => $routeParameters]));
+        $this->requestStack->push(new Request([], [], ['_route' => $routeName, '_route_params' => $routeParameters]));
 
         $this->listener->onUpdatePageRender($event);
 
@@ -166,7 +170,7 @@ class RolePageListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($renderedHtml);
 
 
-        $this->listener->setRequest(new Request([], [], ['_route' => $routeName, '_route_params' => $routeParameters]));
+        $this->requestStack->push(new Request([], [], ['_route' => $routeName, '_route_params' => $routeParameters]));
 
         $this->listener->onUpdatePageRender($event);
 
@@ -213,7 +217,7 @@ class RolePageListenerTest extends \PHPUnit_Framework_TestCase
             new \stdClass()
         );
 
-        $this->listener->setRequest(new Request([], [], ['_route' => 'some_route']));
+        $this->requestStack->push(new Request([], [], ['_route' => 'some_route']));
 
         $this->listener->onViewPageRender($event);
 
@@ -250,7 +254,7 @@ class RolePageListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($renderedHtml);
 
 
-        $this->listener->setRequest(new Request([], [], ['_route' => 'oro_user_role_view']));
+        $this->requestStack->push(new Request([], [], ['_route' => 'oro_user_role_view']));
 
         $this->listener->onViewPageRender($event);
 

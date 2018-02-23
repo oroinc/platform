@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\ImportExportBundle\Writer\DoctrineClearWriter;
 
 class DoctrineClearWriterTest extends \PHPUnit_Framework_TestCase

@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Command;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigCacheWarmer;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigCacheWarmer;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class CacheClearCommand extends ContainerAwareCommand
 {

@@ -4,13 +4,11 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Title\TitleReader;
 
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Cache\Cache;
-
+use Oro\Bundle\NavigationBundle\Annotation\TitleTemplate;
+use Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Router;
-
-use Oro\Bundle\NavigationBundle\Annotation\TitleTemplate;
-use Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader;
 
 class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
 {

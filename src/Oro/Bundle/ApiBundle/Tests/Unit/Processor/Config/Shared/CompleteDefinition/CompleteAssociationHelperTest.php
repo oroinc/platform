@@ -251,12 +251,6 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                             'property_path' => 'sourceEntityId'
                         ]
                     ]
-                ],
-                'sourceEntityClass' => [
-                    'exclude' => true
-                ],
-                'sourceEntityId'    => [
-                    'exclude' => true
                 ]
             ]
         ]);
@@ -281,6 +275,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
             );
 
         $this->completeAssociationHelper->completeNestedAssociation(
+            $config,
             $config->getField($fieldName),
             $version,
             $requestType
@@ -333,12 +328,6 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                             'property_path' => 'sourceEntityId'
                         ]
                     ]
-                ],
-                'sourceEntityClass' => [
-                    'exclude' => true
-                ],
-                'sourceEntityId'    => [
-                    'exclude' => true
                 ]
             ]
         ]);
@@ -363,6 +352,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
             );
 
         $this->completeAssociationHelper->completeNestedAssociation(
+            $config,
             $config->getField($fieldName),
             $version,
             $requestType
@@ -393,6 +383,174 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                     ],
                     'sourceEntityId'    => [
                         'exclude' => true
+                    ]
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCompleteNestedAssociationShouldExcludeSourceFieldsEvenIfTheyAreMarkedAsNotExcluded()
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'source'            => [
+                    'data_type' => 'nestedAssociation',
+                    'fields'    => [
+                        '__class__' => [
+                            'property_path' => 'sourceEntityClass'
+                        ],
+                        'id'        => [
+                            'property_path' => 'sourceEntityId'
+                        ]
+                    ]
+                ],
+                'sourceEntityClass' => [
+                    'exclude' => false
+                ],
+                'sourceEntityId'    => [
+                    'exclude' => false
+                ]
+            ]
+        ]);
+        $fieldName = 'source';
+        $version = self::TEST_VERSION;
+        $requestType = new RequestType([self::TEST_REQUEST_TYPE]);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(EntityIdentifier::class, $version, $requestType)
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'string'
+                            ]
+                        ]
+                    ]
+                )
+            );
+
+        $this->completeAssociationHelper->completeNestedAssociation(
+            $config,
+            $config->getField($fieldName),
+            $version,
+            $requestType
+        );
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'source'            => [
+                        'data_type'              => 'nestedAssociation',
+                        'property_path'          => '_',
+                        'depends_on'             => ['sourceEntityClass', 'sourceEntityId'],
+                        'fields'                 => [
+                            '__class__' => [
+                                'property_path' => 'sourceEntityClass'
+                            ],
+                            'id'        => [
+                                'property_path' => 'sourceEntityId'
+                            ]
+                        ],
+                        'exclusion_policy'       => 'all',
+                        'target_class'           => EntityIdentifier::class,
+                        'identifier_field_names' => ['id'],
+                        'collapse'               => true
+                    ],
+                    'sourceEntityClass' => [
+                        'exclude' => true
+                    ],
+                    'sourceEntityId'    => [
+                        'exclude' => true
+                    ]
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCompleteNestedAssociationShouldExcludeSourceFieldsEvenIfTheyAreRenamedAndMarkedAsNotExcluded()
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'source'            => [
+                    'data_type' => 'nestedAssociation',
+                    'fields'    => [
+                        '__class__' => [
+                            'property_path' => 'sourceEntityClass'
+                        ],
+                        'id'        => [
+                            'property_path' => 'sourceEntityId'
+                        ]
+                    ]
+                ],
+                'renamedSourceEntityClass' => [
+                    'exclude'       => false,
+                    'property_path' => 'sourceEntityClass'
+                ],
+                'renamedSourceEntityId'    => [
+                    'exclude'       => false,
+                    'property_path' => 'sourceEntityId'
+                ]
+            ]
+        ]);
+        $fieldName = 'source';
+        $version = self::TEST_VERSION;
+        $requestType = new RequestType([self::TEST_REQUEST_TYPE]);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(EntityIdentifier::class, $version, $requestType)
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'string'
+                            ]
+                        ]
+                    ]
+                )
+            );
+
+        $this->completeAssociationHelper->completeNestedAssociation(
+            $config,
+            $config->getField($fieldName),
+            $version,
+            $requestType
+        );
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'source'            => [
+                        'data_type'              => 'nestedAssociation',
+                        'property_path'          => '_',
+                        'depends_on'             => ['sourceEntityClass', 'sourceEntityId'],
+                        'fields'                 => [
+                            '__class__' => [
+                                'property_path' => 'sourceEntityClass'
+                            ],
+                            'id'        => [
+                                'property_path' => 'sourceEntityId'
+                            ]
+                        ],
+                        'exclusion_policy'       => 'all',
+                        'target_class'           => EntityIdentifier::class,
+                        'identifier_field_names' => ['id'],
+                        'collapse'               => true
+                    ],
+                    'renamedSourceEntityClass' => [
+                        'exclude'       => true,
+                        'property_path' => 'sourceEntityClass'
+                    ],
+                    'renamedSourceEntityId'    => [
+                        'exclude'       => true,
+                        'property_path' => 'sourceEntityId'
                     ]
                 ]
             ],

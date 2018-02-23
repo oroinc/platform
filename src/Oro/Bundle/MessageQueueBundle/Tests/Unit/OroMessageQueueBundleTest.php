@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildDestinationMetaRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildExtensionsPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageProcessorRegistryPass;
@@ -18,6 +16,7 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\OroMessageQueueBundle;
 use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 
 class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase

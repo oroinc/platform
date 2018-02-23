@@ -2,21 +2,17 @@
 
 namespace Oro\Bundle\ActionBundle\Handler;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Form\Exception as FormException;
-
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Oro\Component\Action\Exception as ActionException;
-
 use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
+use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
-use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
+use Oro\Component\Action\Exception as ActionException;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Form\Exception as FormException;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Handle operation execution request. Provide ExecuteOperationResult object after operation is processed with

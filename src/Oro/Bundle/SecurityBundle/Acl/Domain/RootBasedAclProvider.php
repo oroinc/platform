@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Domain;
 
+use Oro\Bundle\SecurityBundle\Acl\Cache\UnderlyingAclCache;
+use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\AclProviderInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
-use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
-
-use Oro\Bundle\SecurityBundle\Acl\Cache\UnderlyingAclCache;
 
 /**
  * Extends the default Symfony ACL provider with support of a root ACL.

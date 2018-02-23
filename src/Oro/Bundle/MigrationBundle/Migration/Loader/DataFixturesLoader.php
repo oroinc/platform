@@ -3,15 +3,13 @@
 namespace Oro\Bundle\MigrationBundle\Migration\Loader;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
-
 use Oro\Bundle\MigrationBundle\Entity\DataFixture;
+use Oro\Bundle\MigrationBundle\Fixture\LoadedFixtureVersionAwareInterface;
+use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 use Oro\Bundle\MigrationBundle\Migration\Sorter\DataFixturesSorter;
 use Oro\Bundle\MigrationBundle\Migration\UpdateDataFixturesFixture;
-use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
-use Oro\Bundle\MigrationBundle\Fixture\LoadedFixtureVersionAwareInterface;
+use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DataFixturesLoader extends ContainerAwareLoader
 {

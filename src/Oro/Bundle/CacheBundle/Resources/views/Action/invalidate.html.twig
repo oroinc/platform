@@ -3,11 +3,11 @@
     {% set buttonOptions = operation.definition.buttonOptions %}
     {% set pageComponentOptions = {} %}
     <div class="widget-content invalidate-cache-content" data-page-component-module="orocache/js/app/components/invalidate-cache-component">
-        <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ app.request.uri }}" {{ form_enctype(form) }}
-              method="{{ form.vars.method }}" data-collect="true" class="form-dialog invalidate-cache-form"
-
-                {% if buttonOptions.page_component_module is defined %}data-page-component-module="{{ buttonOptions.page_component_module }}"{% endif %}
-        >
+        {% set attr = {'id': form.vars.id, 'data-collect': 'true', 'class': 'form-dialog invalidate-cache-form'} %}
+        {% if buttonOptions.page_component_module is defined %}
+            {% set attr = attr|merge({'data-page-component-module': buttonOptions.page_component_module}) %}
+        {% endif %}
+        {{ form_start(form, {'action': app.request.uri, 'attr': attr}) }}
             <table>
                 <tbody>
                 <tr class="invalidate-cache-tr">
@@ -26,7 +26,7 @@
                 <button type="button" class="btn btn-danger" id="remove_scheduled_cache_invalidation_button">{{ 'oro.cache.invalidate.action.remove'|trans }}</button>
                 <button type="submit" class="btn btn-success">{{ 'oro.cache.invalidate.action.submit'|trans }}</button>
             </div>
-        </form>
+        {{ form_end(form) }}
         {{ oro_form_js_validation(form) }}
     </div>
 {% endblock %}

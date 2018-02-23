@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
 use Oro\Bundle\EmbeddedFormBundle\DependencyInjection\Compiler\EmbeddedFormPass;
 use Oro\Bundle\EmbeddedFormBundle\DependencyInjection\Compiler\LayoutManagerPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroEmbeddedFormBundle extends Bundle
 {

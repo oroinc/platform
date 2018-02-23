@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 
 class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {

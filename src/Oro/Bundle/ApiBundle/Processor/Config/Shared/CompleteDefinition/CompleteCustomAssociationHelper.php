@@ -11,6 +11,12 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
+/**
+ * The helper class to complete the configuraton of different kind of custom associations.
+ * @see \Oro\Bundle\ApiBundle\Request\DataType::isNestedObject
+ * @see \Oro\Bundle\ApiBundle\Request\DataType::isNestedAssociation
+ * @see \Oro\Bundle\ApiBundle\Request\DataType::isExtendedAssociation
+ */
 class CompleteCustomAssociationHelper
 {
     /** @var DoctrineHelper */
@@ -51,12 +57,13 @@ class CompleteCustomAssociationHelper
     ) {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            $this->completeCustomAssociation($entityClass, $fieldName, $field, $version, $requestType);
+            $this->completeCustomAssociation($entityClass, $definition, $fieldName, $field, $version, $requestType);
         }
     }
 
     /**
      * @param string                      $entityClass
+     * @param EntityDefinitionConfig      $definition
      * @param string                      $fieldName
      * @param EntityDefinitionFieldConfig $field
      * @param string                      $version
@@ -64,6 +71,7 @@ class CompleteCustomAssociationHelper
      */
     protected function completeCustomAssociation(
         $entityClass,
+        EntityDefinitionConfig $definition,
         $fieldName,
         EntityDefinitionFieldConfig $field,
         $version,
@@ -74,7 +82,7 @@ class CompleteCustomAssociationHelper
             if (DataType::isNestedObject($dataType)) {
                 $this->associationHelper->completeNestedObject($fieldName, $field);
             } elseif (DataType::isNestedAssociation($dataType)) {
-                $this->associationHelper->completeNestedAssociation($field, $version, $requestType);
+                $this->associationHelper->completeNestedAssociation($definition, $field, $version, $requestType);
             } elseif (DataType::isExtendedAssociation($dataType)) {
                 $this->completeExtendedAssociation($entityClass, $fieldName, $field, $version, $requestType);
             }

@@ -3,11 +3,9 @@
 namespace Oro\Bundle\LocaleBundle\ImportExport\DataConverter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Oro\Component\PhpUtils\ArrayUtil;
-
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizationCodeFormatter;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConverter
 {

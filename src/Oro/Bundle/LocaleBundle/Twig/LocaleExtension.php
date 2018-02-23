@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Twig;
 
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Intl\Intl;
-
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class LocaleExtension extends \Twig_Extension
 {

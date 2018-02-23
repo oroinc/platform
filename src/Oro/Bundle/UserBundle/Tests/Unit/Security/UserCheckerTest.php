@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
+use Oro\Bundle\UserBundle\Security\UserChecker;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\OrganizationStub;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\UserBundle\Security\UserChecker;
-use Oro\Bundle\UserBundle\Tests\Unit\Stub\OrganizationStub;
-use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 
 class UserCheckerTest extends \PHPUnit_Framework_TestCase
 {

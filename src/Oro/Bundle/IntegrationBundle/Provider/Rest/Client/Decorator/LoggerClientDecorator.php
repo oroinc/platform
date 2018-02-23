@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
+use Psr\Log\LoggerInterface;
 
 class LoggerClientDecorator implements RestClientInterface
 {

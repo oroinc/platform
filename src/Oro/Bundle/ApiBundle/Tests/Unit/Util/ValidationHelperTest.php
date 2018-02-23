@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-
 use Oro\Bundle\ApiBundle\Util\ValidationHelper;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ValidationHelperTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,11 +3,10 @@
 namespace Oro\Bundle\HelpBundle\Model;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\HelpBundle\Annotation\Help;
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
+use Symfony\Component\HttpFoundation\Request;
 
 class HelpLinkProvider
 {

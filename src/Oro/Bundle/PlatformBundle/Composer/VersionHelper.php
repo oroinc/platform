@@ -3,7 +3,6 @@
 namespace Oro\Bundle\PlatformBundle\Composer;
 
 use Composer\Package\PackageInterface;
-
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\PlatformBundle\OroPlatformBundle;
 

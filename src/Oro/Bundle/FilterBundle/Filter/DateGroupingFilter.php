@@ -8,15 +8,13 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Utils\ArrayTrait;
 use Oro\Bundle\ReportBundle\Entity\CalendarDate;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class DateGroupingFilter extends ChoiceFilter
 {

@@ -3,11 +3,9 @@
 namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
 use Doctrine\Common\Collections\Collection;
-
-use Symfony\Component\Form\Exception\InvalidConfigurationException;
-
 use Oro\Bundle\ActionBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\ActionBundle\Model\Attribute;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 
 class FormOptionsAssembler implements ConfigurationPassesAwareInterface
 {

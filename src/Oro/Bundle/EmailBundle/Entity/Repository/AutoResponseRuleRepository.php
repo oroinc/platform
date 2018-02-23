@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
 use DateTime;
-
 use Doctrine\ORM\EntityRepository;
 
 class AutoResponseRuleRepository extends EntityRepository

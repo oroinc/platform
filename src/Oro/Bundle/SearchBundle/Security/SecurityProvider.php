@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Security;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class SecurityProvider
 {

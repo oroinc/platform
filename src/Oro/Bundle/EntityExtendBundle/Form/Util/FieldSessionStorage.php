@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Form\Util;
 
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
-
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class FieldSessionStorage

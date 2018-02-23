@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ThemeBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ThemeExtension extends \Twig_Extension
 {

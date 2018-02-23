@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Functional\Stubs;
 
+use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
-
-use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType;
 
 class EmbeddedFormStub extends EmbeddedFormType
 {

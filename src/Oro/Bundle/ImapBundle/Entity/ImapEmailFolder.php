@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImapBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 
 /**
@@ -27,7 +26,7 @@ class ImapEmailFolder
      * @var EmailFolder
      *
      * @ORM\OneToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailFolder", cascade={"persist"})
-     * @ORM\JoinColumn(name="folder_id", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="folder_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     protected $folder;
 

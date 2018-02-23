@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Translation;
 
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Symfony\Component\Routing\RouterInterface;
 
 class TranslationsDatagridLinksProvider
 {

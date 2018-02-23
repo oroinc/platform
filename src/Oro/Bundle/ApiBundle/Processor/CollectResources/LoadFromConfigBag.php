@@ -2,25 +2,25 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CollectResources;
 
+use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
+use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Provider\ConfigBag;
-use Oro\Bundle\ApiBundle\Request\ApiResource;
 
 /**
  * Loads resources for all entities configured in "Resources/config/oro/api.yml".
  */
 class LoadFromConfigBag implements ProcessorInterface
 {
-    /** @var ConfigBag */
-    protected $configBag;
+    /** @var ConfigBagRegistry */
+    protected $configBagRegistry;
 
     /**
-     * @param ConfigBag $configBag
+     * @param ConfigBagRegistry $configBagRegistry
      */
-    public function __construct(ConfigBag $configBag)
+    public function __construct(ConfigBagRegistry $configBagRegistry)
     {
-        $this->configBag = $configBag;
+        $this->configBagRegistry = $configBagRegistry;
     }
 
     /**
@@ -31,8 +31,11 @@ class LoadFromConfigBag implements ProcessorInterface
         /** @var CollectResourcesContext $context */
 
         $resources = $context->getResult();
-        $configs = $this->configBag->getConfigs($context->getVersion());
-        foreach ($configs as $entityClass => $config) {
+        $requestType = $context->getRequestType();
+        $entityClasses = $this->configBagRegistry
+            ->getConfigBag($requestType)
+            ->getClassNames($context->getVersion());
+        foreach ($entityClasses as $entityClass) {
             if (!$resources->has($entityClass)) {
                 $resources->add(new ApiResource($entityClass));
             }

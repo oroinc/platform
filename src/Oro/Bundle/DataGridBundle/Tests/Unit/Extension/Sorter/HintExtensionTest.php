@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Sorter;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\HintExtension;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 class HintExtensionTest extends \PHPUnit_Framework_TestCase
 {

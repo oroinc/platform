@@ -5,22 +5,20 @@ namespace Oro\Bundle\SegmentBundle\Filter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
+use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
-use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
-use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
-use Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder;
-use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
+use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class SegmentFilter extends EntityFilter
 {

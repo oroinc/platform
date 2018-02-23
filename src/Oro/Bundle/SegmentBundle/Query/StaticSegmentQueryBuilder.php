@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SegmentBundle\Query;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 class StaticSegmentQueryBuilder implements QueryBuilderInterface

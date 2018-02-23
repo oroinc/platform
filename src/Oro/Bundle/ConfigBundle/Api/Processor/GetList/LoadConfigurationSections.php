@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ConfigBundle\Api\Processor\GetList;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\ListContext;
 use Oro\Bundle\ConfigBundle\Api\Processor\GetScope;
 use Oro\Bundle\ConfigBundle\Api\Repository\ConfigurationRepository;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * Loads configuration sections.

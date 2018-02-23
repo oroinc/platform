@@ -3,11 +3,10 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Job;
 
 use Doctrine\ORM\EntityManager;
-
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\DataFixtures\LoadJobData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\MessageQueue\Job\JobStorage;
 
 /**
  * @dbIsolationPerTest

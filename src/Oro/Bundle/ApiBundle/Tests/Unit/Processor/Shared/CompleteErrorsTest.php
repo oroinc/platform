@@ -52,7 +52,11 @@ class CompleteErrorsTest extends GetProcessorTestCase
 
         $this->errorCompleter->expects(self::once())
             ->method('complete')
-            ->with(self::identicalTo($error), self::identicalTo($metadata))
+            ->with(
+                self::identicalTo($error),
+                self::identicalTo($this->context->getRequestType()),
+                self::identicalTo($metadata)
+            )
             ->willReturnCallback(
                 function (Error $error) {
                     $error->setDetail($error->getInnerException()->getMessage());
@@ -76,7 +80,7 @@ class CompleteErrorsTest extends GetProcessorTestCase
 
         $this->errorCompleter->expects(self::once())
             ->method('complete')
-            ->with(self::identicalTo($error), null)
+            ->with(self::identicalTo($error), self::identicalTo($this->context->getRequestType()), null)
             ->willReturnCallback(
                 function (Error $error) {
                     $error->setDetail($error->getInnerException()->getMessage());
@@ -98,7 +102,7 @@ class CompleteErrorsTest extends GetProcessorTestCase
 
         $this->errorCompleter->expects(self::once())
             ->method('complete')
-            ->with(self::identicalTo($error), null)
+            ->with(self::identicalTo($error), self::identicalTo($this->context->getRequestType()), null)
             ->willReturnCallback(
                 function (Error $error) {
                     $error->setDetail($error->getInnerException()->getMessage());
@@ -124,7 +128,7 @@ class CompleteErrorsTest extends GetProcessorTestCase
             ->willThrowException(new \Exception('load config exception'));
         $this->errorCompleter->expects(self::once())
             ->method('complete')
-            ->with(self::identicalTo($error), null)
+            ->with(self::identicalTo($error), self::identicalTo($this->context->getRequestType()), null)
             ->willReturnCallback(
                 function (Error $error) {
                     $error->setDetail($error->getInnerException()->getMessage());
@@ -150,7 +154,7 @@ class CompleteErrorsTest extends GetProcessorTestCase
             ->willThrowException(new \Exception('load metadata exception'));
         $this->errorCompleter->expects(self::once())
             ->method('complete')
-            ->with(self::identicalTo($error), null)
+            ->with(self::identicalTo($error), self::identicalTo($this->context->getRequestType()), null)
             ->willReturnCallback(
                 function (Error $error) {
                     $error->setDetail($error->getInnerException()->getMessage());

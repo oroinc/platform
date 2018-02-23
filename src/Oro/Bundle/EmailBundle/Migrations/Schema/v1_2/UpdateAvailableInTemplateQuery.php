@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_2;
 
-use Psr\Log\LoggerInterface;
-
 use Metadata\MetadataFactory;
-
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 /**
  * Sets value of email.available_in_template attribute to TRUE for all fields

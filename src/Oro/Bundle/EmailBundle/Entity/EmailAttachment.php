@@ -3,9 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use JMS\Serializer\Annotation as JMS;
-
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
@@ -59,7 +57,7 @@ class EmailAttachment implements FileExtensionInterface
      * @var EmailBody
      *
      * @ORM\ManyToOne(targetEntity="EmailBody", inversedBy="attachments")
-     * @ORM\JoinColumn(name="body_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="body_id", referencedColumnName="id", onDelete="CASCADE")
      * @JMS\Exclude
      */
     protected $emailBody;

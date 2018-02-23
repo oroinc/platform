@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LocaleBundle\Manager;
 
 use Doctrine\Common\Cache\CacheProvider;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;

@@ -3,13 +3,11 @@
 namespace Oro\Bundle\EmailBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerInterface;
+use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerLoaderSelector;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
-use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerLoaderSelector;
-use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerInterface;
 
 /**
  * Class EmailFlagManager

@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\AddressBundle\Entity\Repository;
 
-use Doctrine\ORM\Query;
 use Doctrine\ORM\EntityRepository;
-
+use Doctrine\ORM\Query;
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
-
 use Oro\Bundle\AddressBundle\Entity\Country;
 
 class CountryRepository extends EntityRepository

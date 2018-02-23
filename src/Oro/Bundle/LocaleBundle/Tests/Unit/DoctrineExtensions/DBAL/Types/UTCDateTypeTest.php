@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\DoctrineExtensions\DBAL\Types;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-
+use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCTimeType;
 
 class UTCDateTypeTest extends \PHPUnit_Framework_TestCase

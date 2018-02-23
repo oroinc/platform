@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Cache;
 
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate as CacheWarmer;
-
-use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\EntityBundle\Tools\CheckDatabaseStateManager;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate as CacheWarmer;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 class CacheWarmerAggregate implements CacheWarmerInterface
 {

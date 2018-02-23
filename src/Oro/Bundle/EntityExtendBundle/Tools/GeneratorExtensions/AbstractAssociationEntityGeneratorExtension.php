@@ -3,12 +3,11 @@
 namespace Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions;
 
 use CG\Generator\PhpClass;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\AssociationNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * This class provides PHP code generation logic for entities with associations.
@@ -76,8 +75,10 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
 
         return
             $fieldConfigId instanceof FieldConfigId
-            && ($fieldConfigId->getFieldType() === $this->getAssociationType()
-                || ($this->getAssociationType() === RelationType::MULTIPLE_MANY_TO_ONE
+            && (
+                $fieldConfigId->getFieldType() === $this->getAssociationType()
+                || (
+                    $this->getAssociationType() === RelationType::MULTIPLE_MANY_TO_ONE
                     && RelationType::MANY_TO_ONE === $fieldConfigId->getFieldType()
                 )
             )

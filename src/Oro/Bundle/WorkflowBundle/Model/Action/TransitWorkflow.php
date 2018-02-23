@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-
 use Oro\Component\Action\Action\AbstractAction as ComponentAbstractAction;
 use Oro\Component\Action\Exception\ActionException;
 use Oro\Component\Action\Exception\InvalidParameterException;

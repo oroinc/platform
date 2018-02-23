@@ -3,10 +3,8 @@
 namespace Oro\Bundle\Workflow\Migration;
 
 use Doctrine\DBAL\Connection;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\WorkflowBundle\Migration\RemoveProcessesQuery;
+use Psr\Log\LoggerInterface;
 
 class RemoveProcessQueryTest extends \PHPUnit_Framework_TestCase
 {

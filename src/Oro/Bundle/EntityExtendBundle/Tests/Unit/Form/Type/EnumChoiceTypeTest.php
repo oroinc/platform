@@ -68,16 +68,16 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
     }
 
     /**
-     * @dataProvider setDefaultOptionsProvider
+     * @dataProvider configureOptionsProvider
      *
      * @param array $options
      * @param array $expectedOptions
      */
-    public function testSetDefaultOptions($multiple, array $options, array $expectedOptions)
+    public function testConfigureOptions($multiple, array $options, array $expectedOptions)
     {
         $resolver = $this->getOptionsResolver();
 
-        $resolvedOptions = $this->doTestSetDefaultOptions(
+        $resolvedOptions = $this->doTestConfigureOptions(
             $this->type,
             $resolver,
             'test_enum',
@@ -96,7 +96,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
     public function testClassNormalizerOptionsException()
     {
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
         $resolver->resolve([
             'enum_code' => null,
             'class' => null
@@ -110,7 +110,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
     public function testClassNormalizerUnexpectedEnumException()
     {
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
         $resolver->resolve([
             'enum_code' => 'unknown'
         ]);
@@ -119,7 +119,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
     /**
      * @return array
      */
-    public function setDefaultOptionsProvider()
+    public function configureOptionsProvider()
     {
         return [
             'not multiple, not expanded' => [

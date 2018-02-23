@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Event;
 
-use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 
 class SendEmailTransportTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\EventListener;
 
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-
 use Oro\Bundle\LayoutBundle\EventListener\ImagineFilterConfigListener;
 use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 class ImagineFilterConfigListenerTest extends \PHPUnit_Framework_TestCase
 {

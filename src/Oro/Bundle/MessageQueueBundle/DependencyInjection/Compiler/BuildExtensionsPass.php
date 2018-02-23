@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionInterface;
+use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionWrapper;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionInterface;
-use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionWrapper;
 
 /**
  * Collects consumption and job extensions.

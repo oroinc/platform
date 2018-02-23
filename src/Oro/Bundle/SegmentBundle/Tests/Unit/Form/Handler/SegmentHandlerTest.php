@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Form\Handler;
 
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Form\Handler\SegmentHandler;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class SegmentHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,6 +50,8 @@ class SegmentHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->request = new Request();
+        $requestStack = new RequestStack();
+        $requestStack->push($this->request);
         $this->managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->staticSegmentManager = $this->getMockBuilder(
             'Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager'
@@ -62,7 +64,7 @@ class SegmentHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->handler = new SegmentHandler(
             $this->form,
-            $this->request,
+            $requestStack,
             $this->managerRegistry,
             $this->staticSegmentManager
         );

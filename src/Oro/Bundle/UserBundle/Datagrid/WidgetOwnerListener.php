@@ -3,14 +3,11 @@
 namespace Oro\Bundle\UserBundle\Datagrid;
 
 use Doctrine\ORM\Query;
-
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-
-use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
-
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
+use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class WidgetOwnerListener
 {

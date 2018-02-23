@@ -2,13 +2,12 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Component\Action\Action\Configurable;
 use Oro\Component\Action\Action\Traverse;
-use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
+use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class TraverseTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,18 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Form\Extension;
 
+use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
-
 /**
  * Unlike default Symfony Forms behaviour, keeps NULL and empty string values as is.
  * Also see the related changes:
- * @see Oro\Bundle\ApiBundle\Form\DataTransformer\NullValueTransformer
+ * @see \Oro\Bundle\ApiBundle\Form\DataTransformer\NullValueTransformer
  */
 class EmptyDataExtension extends AbstractTypeExtension
 {

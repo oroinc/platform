@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
-use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
+use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 abstract class AbstractFieldValidator extends ConstraintValidator
 {

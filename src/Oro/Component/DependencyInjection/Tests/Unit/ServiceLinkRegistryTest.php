@@ -2,10 +2,9 @@
 
 namespace Oro\Component\DependencyInjection\Tests\Unit;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
 use Oro\Component\DependencyInjection\ServiceLinkRegistry;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ServiceLinkRegistryTest extends \PHPUnit_Framework_TestCase
 {

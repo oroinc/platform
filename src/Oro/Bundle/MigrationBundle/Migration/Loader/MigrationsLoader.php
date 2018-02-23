@@ -3,22 +3,21 @@
 namespace Oro\Bundle\MigrationBundle\Migration\Loader;
 
 use Doctrine\DBAL\Connection;
+use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
+use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
+use Oro\Bundle\MigrationBundle\Event\PreMigrationEvent;
+use Oro\Bundle\MigrationBundle\Migration\Installation;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\MigrationState;
+use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
+use Oro\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-
-use Oro\Bundle\MigrationBundle\Migration\Migration;
-use Oro\Bundle\MigrationBundle\Migration\MigrationState;
-use Oro\Bundle\MigrationBundle\Migration\Installation;
-use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
-use Oro\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration;
-use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
-use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
-use Oro\Bundle\MigrationBundle\Event\PreMigrationEvent;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

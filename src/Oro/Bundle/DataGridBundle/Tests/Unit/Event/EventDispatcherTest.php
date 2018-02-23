@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Event;
 
-use Oro\Bundle\DataGridBundle\Tests\Unit\Stub\GridConfigEvent;
-use Oro\Bundle\DataGridBundle\Tests\Unit\Stub\GridEvent;
-
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Event\EventDispatcher;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-
+use Oro\Bundle\DataGridBundle\Tests\Unit\Stub\GridConfigEvent;
+use Oro\Bundle\DataGridBundle\Tests\Unit\Stub\GridEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EventDispatcherTest extends \PHPUnit_Framework_TestCase

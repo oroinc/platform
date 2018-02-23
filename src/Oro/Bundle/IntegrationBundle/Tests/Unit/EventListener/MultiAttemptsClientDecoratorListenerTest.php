@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\EventListener;
 
-use Psr\Log\LoggerInterface;
-
-use Oro\Bundle\IntegrationBundle\Utils\MultiAttemptsConfigTrait;
-use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
-use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\RestTransportSettingsInterface;
 use Oro\Bundle\IntegrationBundle\Event\ClientCreatedAfterEvent;
 use Oro\Bundle\IntegrationBundle\EventListener\MultiAttemptsClientDecoratorListener;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator\MultiAttemptsClientDecorator;
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\RestTransportSettingsInterface;
+use Oro\Bundle\IntegrationBundle\Utils\MultiAttemptsConfigTrait;
+use Psr\Log\LoggerInterface;
 
 class MultiAttemptsClientDecoratorListenerTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 

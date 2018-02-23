@@ -2,8 +2,8 @@
 
 namespace Oro\Component\Layout\Loader\Visitor;
 
-use Oro\Component\Layout\Loader\Generator\VisitContext;
 use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
+use Oro\Component\Layout\Loader\Generator\VisitContext;
 
 class SimpleContextValueComparisonConditionVisitor implements VisitorInterface
 {

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Form\DataTransformer;
 
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-
-use Oro\Bundle\EmailBundle\Entity\Email;
 
 class EmailImportanceApiTransformer implements DataTransformerInterface
 {

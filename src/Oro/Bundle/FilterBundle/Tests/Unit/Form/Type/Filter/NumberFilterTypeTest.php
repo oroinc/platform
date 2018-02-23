@@ -3,10 +3,10 @@
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 
 class NumberFilterTypeTest extends AbstractTypeTestCase
 {
@@ -45,7 +45,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    public function setDefaultOptionsDataProvider()
+    public function configureOptionsDataProvider()
     {
         return array(
             array(

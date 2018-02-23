@@ -3,9 +3,8 @@
 namespace Oro\Bundle\DataGridBundle\Layout\Extension;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
-
-use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
+use Oro\Component\Layout\ContextInterface;
 
 class DatagridConfigContextConfigurator implements ContextConfiguratorInterface
 {

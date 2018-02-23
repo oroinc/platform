@@ -3,10 +3,9 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Entity\Repository;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 
 class TranslationKeyRepositoryTest extends WebTestCase

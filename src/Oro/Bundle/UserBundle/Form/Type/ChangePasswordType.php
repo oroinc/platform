@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
+use Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber;
+use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
-
-use Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber;
-use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Symfony\Component\Validator\Constraints\Valid;
 
 class ChangePasswordType extends AbstractType

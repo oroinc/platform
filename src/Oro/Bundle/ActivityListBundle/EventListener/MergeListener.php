@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ActivityListBundle\EventListener;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\ActivityListBundle\Model\MergeModes;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\ActivityListBundle\Model\MergeModes;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class MergeListener
 {

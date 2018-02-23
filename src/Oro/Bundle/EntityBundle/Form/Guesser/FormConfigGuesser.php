@@ -3,17 +3,13 @@
 namespace Oro\Bundle\EntityBundle\Form\Guesser;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\Form\Guess\TypeGuess;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Symfony\Component\Form\Guess\TypeGuess;
 
 class FormConfigGuesser extends AbstractFormGuesser
 {
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $formConfigProvider;
 
     /**
@@ -49,6 +45,15 @@ class FormConfigGuesser extends AbstractFormGuesser
         if ($hasNoFormType && $isSingleValuedAssoc) {
             // try to find form config for target class
             $guess = $this->guessType($metadata->getAssociationTargetClass($property), null);
+
+            $propertyLabel = $this->entityConfigProvider->getConfig($class, $property)->get('label');
+            if (null !== $propertyLabel && null !== $guess) {
+                $guess = $this->createTypeGuess(
+                    $guess->getType(),
+                    array_merge($guess->getOptions(), ['label' => $propertyLabel]),
+                    $guess->getConfidence()
+                );
+            }
         } elseif ($hasNoFormType) {
             $guess = $this->createDefaultTypeGuess();
         } else {
@@ -68,7 +73,7 @@ class FormConfigGuesser extends AbstractFormGuesser
     protected function getTypeGuess(ConfigInterface $formConfig, $class, $property)
     {
         $formType    = $formConfig->get('form_type');
-        $formOptions = $formConfig->get('form_options', false, array());
+        $formOptions = $formConfig->get('form_options', false, []);
         $formOptions = $this->addLabelOption($formOptions, $class, $property);
 
         return $this->createTypeGuess($formType, $formOptions);

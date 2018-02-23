@@ -2,21 +2,24 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\CollectSubresourcesContext;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
+/**
+ * Provides a list of all Data API sub-resources available for a specific entity.
+ */
 class SubresourcesProvider
 {
     /** @var ActionProcessorInterface */
-    protected $processor;
+    private $processor;
 
     /** @var ResourcesProvider */
-    protected $resourcesProvider;
+    private $resourcesProvider;
 
     /** @var ResourcesCache */
-    protected $resourcesCache;
+    private $resourcesCache;
 
     /**
      * @param ActionProcessorInterface $processor
@@ -42,8 +45,11 @@ class SubresourcesProvider
      *
      * @return ApiResourceSubresources|null
      */
-    public function getSubresources($entityClass, $version, RequestType $requestType)
-    {
+    public function getSubresources(
+        string $entityClass,
+        string $version,
+        RequestType $requestType
+    ): ?ApiResourceSubresources {
         $entitySubresources = $this->resourcesCache->getSubresources($entityClass, $version, $requestType);
         if (null !== $entitySubresources) {
             return $entitySubresources;
@@ -61,8 +67,6 @@ class SubresourcesProvider
         $subresources = $context->getResult()->toArray();
         $this->resourcesCache->saveSubresources($version, $requestType, array_values($subresources));
 
-        return isset($subresources[$entityClass])
-            ? $subresources[$entityClass]
-            : null;
+        return $subresources[$entityClass] ?? null;
     }
 }

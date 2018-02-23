@@ -3,15 +3,13 @@
 namespace Oro\Bundle\AttachmentBundle\Twig;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Security\Acl\Util\ClassUtils;
-
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 class FileExtension extends \Twig_Extension
 {
