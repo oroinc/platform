@@ -135,6 +135,8 @@ class OroUserBundleInstaller implements
         // depends to the UserBundle
         ChangeEmailUserFolderRelation::createOroEmailUserFoldersTable($schema);
         ChangeEmailUserFolderRelation::addOroEmailUserFoldersForeignKeys($schema);
+        ChangeEmailUserFolderRelation::updateOroEmailUserTable($schema);
+        $this->updateOroEmailUserTable($schema);
         DropEmailUserColumn::updateOroEmailUserTable($schema);
         AddFirstNameLastNameIndex::addFirstNameLastNameIndex($schema);
         AddImpersonationTable::createOroUserImpersonationTable($schema);
@@ -557,5 +559,20 @@ class OroUserBundleInstaller implements
                 RelationType::MANY_TO_ONE
             );
         }
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    private function updateOroEmailUserTable(Schema $schema)
+    {
+        $table = $schema->getTable('oro_email_user');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_email_origin'),
+            ['origin_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+        $table->addIndex(['origin_id'], 'IDX_91F5CFF656A273CC', []);
     }
 }
