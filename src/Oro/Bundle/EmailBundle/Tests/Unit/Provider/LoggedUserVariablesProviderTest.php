@@ -80,7 +80,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
                 'userSignature' => [
                     'type' => 'string',
                     'label' => 'oro.email.emailtemplate.siganture',
-                    'filter' => 'oro_tag_filter'
+                    'filter' => 'oro_html_strip_tags'
                 ],
             ],
             $result
@@ -110,7 +110,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
                 'userSignature'    => [
                     'type' => 'string',
                     'label' => 'oro.email.emailtemplate.siganture',
-                    'filter' => 'oro_tag_filter'
+                    'filter' => 'oro_html_strip_tags'
                 ],
             ],
             $result

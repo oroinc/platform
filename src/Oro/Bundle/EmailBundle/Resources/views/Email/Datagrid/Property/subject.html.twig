@@ -6,12 +6,12 @@
 <div class="nowrap-ellipsis">
     <div>
         {% if isNew %}
-            <strong class="email-subject">{{ valueToShow|oro_html_purify }}</strong>
+            <strong class="email-subject">{{ valueToShow|oro_html_strip_tags }}</strong>
         {% else %}
-            <span class="email-subject">{{ valueToShow|oro_html_purify }}</span>
+            <span class="email-subject">{{ valueToShow|oro_html_strip_tags }}</span>
         {% endif %}
         {% if emailBody.textBody is defined %}
-            <div class="email-body">{{ EA.email_short_body(emailBody)|oro_html_purify }}</div>
+            <div class="email-body">{{ EA.email_short_body(emailBody)|oro_html_strip_tags }}</div>
         {% endif %}
     </div>
 </div>
