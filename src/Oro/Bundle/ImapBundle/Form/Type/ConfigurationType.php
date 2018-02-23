@@ -19,6 +19,8 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 /**
+ * Used in System Configuration to set IMAP parameters in Email Configuration
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -355,13 +357,15 @@ class ConfigurationType extends AbstractType
                 $isSubmitted = $form->isSubmitted() === true;
                 if (($form->has('useImap') && $form->get('useImap')->getData() === true) || !$isSubmitted) {
                     $groups[] = 'Imap';
+
+                    if (!$form->getConfig()->getOption('skip_folders_validation')) {
+                        $groups[] = 'CheckFolderSelection';
+                    }
                 }
                 if (($form->has('useSmtp') && $form->get('useSmtp')->getData() === true) || !$isSubmitted) {
                     $groups[] = 'Smtp';
                 }
-                if (!$form->getConfig()->getOption('skip_folders_validation')) {
-                    $groups[] = 'CheckFolderSelection';
-                }
+
                 return $groups;
             },
         ]);

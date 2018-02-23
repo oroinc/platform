@@ -74,6 +74,15 @@ services:
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 
+    oro_message_queue.consumption.locale_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\LocaleExtension'
+        public: false
+        arguments:
+            - '@oro_locale.settings'
+            - '@stof_doctrine_extensions.listener.translatable'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }
+
     oro_message_queue.consumption.clear_logger_extension:
         class: Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearLoggerExtension
         public: false

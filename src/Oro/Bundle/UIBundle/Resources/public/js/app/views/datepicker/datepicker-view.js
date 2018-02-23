@@ -266,6 +266,11 @@ define(function(require) {
          */
         getFrontendMoment: function() {
             var value = this.$frontDateField.val();
+
+            if (_.isEmpty(_.trim(value))) {
+                return null;
+            }
+
             var format = this.getDateFormat();
             var momentInstance = moment.utc(value, format, true);
             if (momentInstance.isValid()) {

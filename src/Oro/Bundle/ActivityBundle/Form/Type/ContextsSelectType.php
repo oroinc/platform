@@ -76,6 +76,7 @@ class ContextsSelectType extends AbstractType
             $this->entityManager,
             $options['collectionModel']
         );
+        $contextsToViewTransformer->setSeparator($options['configs']['separator']);
         $builder->addViewTransformer($contextsToViewTransformer);
     }
 
@@ -117,7 +118,7 @@ class ContextsSelectType extends AbstractType
             $result[] = json_encode($this->getResult($item['title'], $target));
         }
 
-        return implode(';', $result);
+        return implode(ContextsToViewTransformer::SEPARATOR, $result);
     }
 
     /**
@@ -171,7 +172,7 @@ class ContextsSelectType extends AbstractType
             'placeholder'        => 'oro.activity.contexts.placeholder',
             'allowClear'         => true,
             'multiple'           => true,
-            'separator'          => ';',
+            'separator'          => ContextsToViewTransformer::SEPARATOR,
             'forceSelectedData'  => true,
             'minimumInputLength' => 0,
         ];
