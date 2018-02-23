@@ -9,6 +9,17 @@ define(function(require) {
 
     SelectCreateInlineTypeComponent = BaseComponent.extend({
         ViewConstructor: SelectCreateInlineTypeView,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function SelectCreateInlineTypeComponent() {
+            SelectCreateInlineTypeComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             SelectCreateInlineTypeComponent.__super__.initialize.apply(this, arguments);
             this.view = new this.ViewConstructor(_.extend({

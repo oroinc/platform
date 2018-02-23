@@ -10,6 +10,16 @@ define([
         pageItems: [],
         dataItems: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function HistoryView() {
+            HistoryView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.dataItems = options.dataItems || 'history';
             this.pageItems = [this.dataItems];

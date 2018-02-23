@@ -24,9 +24,13 @@ define([
         privileges: null,
 
         $form: null,
+
         $privileges: null,
+
         $appendUsers: null,
+
         $removeUsers: null,
+
         $fields: null,
 
         events: {
@@ -35,6 +39,13 @@ define([
 
         listen: {
             'securityAccessLevelsComponent:link:click mediator': 'onAccessLevelsLinkClicked'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function RoleView() {
+            RoleView.__super__.constructor.apply(this, arguments);
         },
 
         /**

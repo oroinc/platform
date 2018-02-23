@@ -17,6 +17,13 @@ define([
      */
     MergeMassAction = MassAction.extend({
         /**
+         * @inheritDoc
+         */
+        constructor: function MergeMassAction() {
+            MergeMassAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize view
          *
          * @param {Object} options

@@ -122,6 +122,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function RoutingCollection() {
+            RoutingCollection.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(models, options) {
             if (!options) {
                 options = {};

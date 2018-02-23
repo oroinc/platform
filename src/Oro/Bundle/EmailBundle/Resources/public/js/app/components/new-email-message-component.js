@@ -11,9 +11,22 @@ define(function(require) {
 
     NewEmailMessageComponent = BaseComponent.extend({
         notificationElement: null,
+
         debouncedHandler: null,
+
         messageTpl: '<%=_.__("oro.email.notification.new_email")%>' +
             '<span class="separator">|</span><a href="<%=url %>"><%=_.__("Read") %></a>',
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function NewEmailMessageComponent() {
+            NewEmailMessageComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             var channel = module.config().clankEvent;
             this.notificationElement = options.notificationElement;

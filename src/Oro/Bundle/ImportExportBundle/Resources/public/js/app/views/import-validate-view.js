@@ -17,6 +17,16 @@ define(function(require) {
             'importProcessorAliasesToConfirmMessages', 'wid'
         ]),
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ImportValidateView() {
+            ImportValidateView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             ImportValidateView.__super__.initialize.apply(this, arguments);
 

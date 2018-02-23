@@ -15,6 +15,13 @@ define([
      * @extends oro.datagrid.action.AjaxAction
      */
     ScheduleSyncAction = AjaxAction.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function ScheduleSyncAction() {
+            ScheduleSyncAction.__super__.constructor.apply(this, arguments);
+        },
+
         _onAjaxSuccess: function(data) {
             if (this.reloadData) {
                 this.datagrid.hideLoading();

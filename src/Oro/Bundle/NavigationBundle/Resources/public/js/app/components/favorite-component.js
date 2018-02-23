@@ -12,6 +12,16 @@ define([
     FavoriteComponent = BaseBookmarkComponent.extend({
         typeName: 'favorite',
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function FavoriteComponent() {
+            FavoriteComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         _createSubViews: function() {
             this._createButtonView();
             this._createTabView();

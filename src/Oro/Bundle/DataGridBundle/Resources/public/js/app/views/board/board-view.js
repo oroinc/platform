@@ -47,6 +47,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function BoardView() {
+            BoardView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.readonly = options.readonly;
             this.columns = options.columns;

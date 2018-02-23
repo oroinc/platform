@@ -40,6 +40,13 @@ define([
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function DialogAction() {
+            DialogAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize view
          *
          * @param {Object} options

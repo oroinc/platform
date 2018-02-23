@@ -46,6 +46,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function MultiRelationCell() {
+            MultiRelationCell.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         render: function() {
             var value = this.model.get(this.column.get('name'));
 

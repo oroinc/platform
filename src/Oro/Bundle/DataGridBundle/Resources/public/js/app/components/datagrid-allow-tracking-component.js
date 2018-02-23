@@ -8,6 +8,16 @@ define(function(require) {
     DataGridAllowTrackingComponent = BaseComponent.extend({
         optionNames: BaseComponent.prototype.optionNames.concat(['gridName']),
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function DataGridAllowTrackingComponent() {
+            DataGridAllowTrackingComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             GridTagBuilder.allowTracking(this.gridName);
 

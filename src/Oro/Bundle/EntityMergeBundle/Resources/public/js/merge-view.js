@@ -20,6 +20,16 @@ define(function(require) {
             'layout:reposition mediator': 'onFixTableWidth'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function MergeView() {
+            MergeView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             this.resetViewState();
 

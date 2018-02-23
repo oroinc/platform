@@ -24,12 +24,13 @@ define([
 ) {
     'use strict';
 
+    var AddressBookView;
     /**
      * @export  oroaddress/js/address-book
      * @class   oroaddress.AddressBook
      * @extends Backbone.View
      */
-    return BaseView.extend({
+    AddressBookView = BaseView.extend({
         isEmpty: false,
 
         options: {
@@ -53,6 +54,16 @@ define([
             'class': 'list-box map-box'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function AddressBookView() {
+            AddressBookView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.options.collection = this.options.collection || new AddressCollection();
@@ -261,4 +272,6 @@ define([
             this.mapView.updateMap(address.getSearchableString(), address.get('label'));
         }
     });
+
+    return AddressBookView;
 });

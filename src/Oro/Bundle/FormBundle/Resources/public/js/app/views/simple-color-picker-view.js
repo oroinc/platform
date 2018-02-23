@@ -4,6 +4,13 @@ define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
 
     var SimpleColorPickerView = BaseSimpleColorPickerView.extend({
         /**
+         * @inheritDoc
+         */
+        constructor: function SimpleColorPickerView() {
+            SimpleColorPickerView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @constructor
          * @param {object} options
          */

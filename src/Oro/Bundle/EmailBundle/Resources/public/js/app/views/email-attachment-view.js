@@ -7,6 +7,7 @@ define(function(require) {
 
     EmailAttachmentView = BaseView.extend({
         model: EmailAttachmentModel,
+
         inputName: '',
 
         events: {
@@ -17,6 +18,13 @@ define(function(require) {
             'change:fileName model': 'fileNameChange',
             'change:type model': 'typeChange',
             'change:icon model': 'iconChange'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailAttachmentView() {
+            EmailAttachmentView.__super__.constructor.apply(this, arguments);
         },
 
         getTemplateFunction: function() {

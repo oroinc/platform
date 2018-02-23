@@ -20,9 +20,17 @@ define(function(require) {
          * @type {Function}
          */
         notificationHandler: null,
+
         listen: {
             'change:settings model': 'onSettingsChange',
             'widget_dialog:open mediator': 'onWidgetDialogOpen'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function SidebarRecentEmailsComponent() {
+            SidebarRecentEmailsComponent.__super__.constructor.apply(this, arguments);
         },
 
         /**

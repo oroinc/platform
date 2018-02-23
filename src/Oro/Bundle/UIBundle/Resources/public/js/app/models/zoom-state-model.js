@@ -70,6 +70,16 @@ define(function(require) {
             };
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ZoomStateModel() {
+            ZoomStateModel.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(attributes, options) {
             ZoomStateModel.__super__.initialize.apply(this, arguments);
             if (!options.wrapper || !options.inner) {

@@ -104,7 +104,7 @@ define(function(require) {
             'change input[name=currency]': 'onChange'
         },
 
-        constructor: function(options) {
+        constructor: function MultiCurrencyEditorView(options) {
             this.availableCurrencies = options.choices;
             MultiCurrencyEditorView.__super__.constructor.apply(this, arguments);
         },

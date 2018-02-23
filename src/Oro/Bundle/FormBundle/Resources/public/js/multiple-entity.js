@@ -2,6 +2,7 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
 ], function(_, routing, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
     'use strict';
 
+    var MultipleEntityView;
     var $ = Backbone.$;
 
     /**
@@ -9,7 +10,7 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
      * @class   oroform.MultipleEntity
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    MultipleEntityView = Backbone.View.extend({
         options: {
             addedElement: null,
             allowAction: true,
@@ -31,6 +32,16 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
             'click .add-btn': 'addEntities'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function MultipleEntityView() {
+            MultipleEntityView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.template = _.template(this.options.template);
@@ -255,4 +266,6 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
             return this;
         }
     });
+
+    return MultipleEntityView;
 });

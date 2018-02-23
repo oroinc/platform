@@ -29,6 +29,16 @@ define([
             'change model': '_onModelChanged'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function NoteView() {
+            NoteView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.collapsed = false;

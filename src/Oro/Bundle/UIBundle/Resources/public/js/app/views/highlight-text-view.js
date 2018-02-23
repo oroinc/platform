@@ -78,6 +78,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function HighlightTextView() {
+            HighlightTextView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.findHighlightClass = '.' + this.highlightClass;
             this.findElementHighlightClass = '.' + this.elementHighlightClass;

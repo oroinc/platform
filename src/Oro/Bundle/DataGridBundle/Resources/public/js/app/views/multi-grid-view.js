@@ -12,6 +12,16 @@ define(function(require) {
      * @exports MultiGridView
      */
     var MultiGridView = BaseView.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function MultiGridView() {
+            MultiGridView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = options;
             this.template = _.template($('#multi-grid-item').html());

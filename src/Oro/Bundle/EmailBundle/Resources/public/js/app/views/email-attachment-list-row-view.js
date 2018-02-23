@@ -19,6 +19,13 @@ define(function(require) {
             'change:visible model': 'visibilityChange'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailAttachmentListRowView() {
+            EmailAttachmentListRowView.__super__.constructor.apply(this, arguments);
+        },
+
         render: function() {
             EmailAttachmentListRowView.__super__.render.call(this);
 

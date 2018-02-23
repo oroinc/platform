@@ -20,6 +20,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function BooleanCell() {
+            BooleanCell.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         render: function() {
             if (this.column.get('editable')) {
                 // render a checkbox for editable cell

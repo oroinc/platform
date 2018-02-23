@@ -32,7 +32,16 @@ define(function(require) {
             selectorTranslateLinkContainer: '#workflow_translate_link_label',
             entitySelectSelector: '[name$="[related_entity]"]'
         },
+        /**
+         * @inheritDoc
+         */
+        constructor: function WorkflowManagementView() {
+            WorkflowManagementView.__super__.constructor.apply(this, arguments);
+        },
 
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 

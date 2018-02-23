@@ -1,6 +1,7 @@
 define(function(require) {
     'use strict';
 
+    var TagUpdateView;
     var _ = require('underscore');
     var $ = require('jquery');
     var TagView = require('./view');
@@ -10,7 +11,7 @@ define(function(require) {
      * @class   orotag.UpdateView
      * @extends orotag.View
      */
-    return TagView.extend({
+    TagUpdateView = TagView.extend({
         /** @property */
         template: require('tpl!../templates/update-tag-list.html'),
 
@@ -34,6 +35,13 @@ define(function(require) {
 
         events: {
             'click [data-action="remove-tag"]': '_removeItem'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function TagUpdateView() {
+            TagUpdateView.__super__.constructor.apply(this, arguments);
         },
 
         /**
@@ -153,4 +161,6 @@ define(function(require) {
             $(this.options.ownFieldId).val(JSON.stringify(this.getCollection().getFilteredCollection('owner')));
         }
     });
+
+    return TagUpdateView;
 });

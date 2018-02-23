@@ -27,7 +27,9 @@ define([
      */
     Row = Chaplin.CollectionView.extend({
         tagName: 'tr',
+
         autoRender: false,
+
         animationDuration: 0,
 
         /**
@@ -35,6 +37,7 @@ define([
          * This code supports perfomance fix.
          */
         delegateEvents: Backbone.View.prototype.delegateEvents,
+
         events: function() {
             var resultEvents = {};
 
@@ -68,6 +71,13 @@ define([
             optionPrefix: 'row',
             className: 'grid-row',
             actionSelector: ''
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function Row() {
+            Row.__super__.constructor.apply(this, arguments);
         },
 
         /**

@@ -14,6 +14,13 @@ define([
      * @extends Chaplin.View
      */
     BaseView = Chaplin.View.extend(/** @lends BaseView.prototype */{
+        /**
+         * @inheritDoc
+         */
+        constructor: function BaseView() {
+            BaseView.__super__.constructor.apply(this, arguments);
+        },
+
         getTemplateFunction: function(templateKey) {
             templateKey = templateKey || 'template';
             var template = this[templateKey];

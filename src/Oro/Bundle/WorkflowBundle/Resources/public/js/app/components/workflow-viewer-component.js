@@ -18,12 +18,18 @@ define(function(require) {
      * @augments BaseComponent
      */
     WorkflowViewerComponent = BaseComponent.extend(/** @lends WorkflowViewerComponent.prototype */{
-
         options: {
             entity: {},
             chartOptions: {},
             connectionOptions: {},
             availableDestinations: {}
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function WorkflowViewerComponent() {
+            WorkflowViewerComponent.__super__.constructor.apply(this, arguments);
         },
 
         /**

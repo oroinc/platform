@@ -25,6 +25,16 @@ define([
          */
         showLoadingForce: true,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function BaseCollectionView() {
+            BaseCollectionView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['fallbackSelector', 'loadingSelector', 'loadingContainerSelector',
                 'itemSelector', 'listSelector', 'animationDuration']));

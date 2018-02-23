@@ -8,7 +8,9 @@ define(function(require) {
 
     ColumnManagerFilterView = BaseView.extend({
         template: template,
+
         autoRender: true,
+
         events: {
             'keyup [data-role="column-manager-search"]': 'onSearch',
             'change [data-role="column-manager-search"]': 'onSearch',
@@ -20,6 +22,13 @@ define(function(require) {
 
         listen: {
             'change model': 'updateView'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ColumnManagerFilterView() {
+            ColumnManagerFilterView.__super__.constructor.apply(this, arguments);
         },
 
         /**

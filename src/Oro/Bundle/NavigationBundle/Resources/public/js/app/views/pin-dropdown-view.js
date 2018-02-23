@@ -17,6 +17,16 @@ define([
             'page:afterChange mediator': 'updateDropdown'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function DropdownCollectionView() {
+            DropdownCollectionView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['position']));
             DropdownCollectionView.__super__.initialize.apply(this, arguments);

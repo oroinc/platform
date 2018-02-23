@@ -20,6 +20,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function FrontendMassAction() {
+            FrontendMassAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         execute: function() {
             var selectionState = this.datagrid.getSelectionState();
             if (selectionState.selectedIds.length === 0 && selectionState.inset) {

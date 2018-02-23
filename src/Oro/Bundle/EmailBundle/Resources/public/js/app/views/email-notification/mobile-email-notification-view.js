@@ -16,6 +16,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function MobileEmailNotificationView() {
+            MobileEmailNotificationView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             MobileEmailNotificationView.__super__.initialize.apply(this, arguments);
             this.countNewEmail = parseInt(options.countNewEmail);

@@ -16,6 +16,13 @@ define(function(require) {
         changesByCategory: null,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function EntityCategoryTabsComponent() {
+            EntityCategoryTabsComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @param {Object} options
          * @param {Array<Object>} options.data collection of tabs build over entities category
          */

@@ -13,6 +13,16 @@ define(function(require) {
             return classNames.join(' ');
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function FlowChartEditorTransitionOverlayView() {
+            FlowChartEditorTransitionOverlayView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.stepFrom = options.stepFrom;
             FlowChartEditorTransitionOverlayView.__super__.initialize.apply(this, arguments);

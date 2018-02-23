@@ -10,6 +10,13 @@ define(function(require) {
 
     CheckSmtpConnectionComponent = BaseComponent.extend({
         /**
+         * @inheritDoc
+         */
+        constructor: function CheckSmtpConnectionComponent() {
+            CheckSmtpConnectionComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize component
          *
          * @param {Object} options

@@ -17,7 +17,14 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        template: require('tpl!../../../../templates/board/column-header-view.html')
+        template: require('tpl!../../../../templates/board/column-header-view.html'),
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ColumnHeaderView() {
+            ColumnHeaderView.__super__.constructor.apply(this, arguments);
+        }
     });
 
     return ColumnHeaderView;

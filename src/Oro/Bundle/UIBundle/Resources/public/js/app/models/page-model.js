@@ -20,6 +20,13 @@ define([
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function PageModel() {
+            PageModel.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Fetches data from server
          *  - extends options with required parameters
          *

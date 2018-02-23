@@ -19,7 +19,14 @@ define([
         formatterPrototype: CurrencyFormatter,
 
         /** @property {String} */
-        style: 'currency'
+        style: 'currency',
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function CurrencyCell() {
+            CurrencyCell.__super__.constructor.apply(this, arguments);
+        }
     });
 
     return CurrencyCell;

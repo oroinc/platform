@@ -42,6 +42,13 @@ define(function(require) {
         checkboxEnabled: true,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function BaseTreeManageView() {
+            BaseTreeManageView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @param {Object} options
          */
         initialize: function(options) {

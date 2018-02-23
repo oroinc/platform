@@ -8,6 +8,16 @@ define(function(require) {
     FormLoadingView = BaseView.extend({
         autoRender: true,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function FormLoadingView() {
+            FormLoadingView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             this.subview('loadingMaskView', new LoadingMaskView({
                 container: this.$('.section-content')

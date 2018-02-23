@@ -76,6 +76,16 @@ define(function(require) {
             'destroy model': 'remove'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function TransitionEditView() {
+            TransitionEditView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             options = options || {};
             var requiredMissed = this.requiredOptions.filter(function(option) {

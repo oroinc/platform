@@ -21,6 +21,13 @@ define(function(require) {
         dispatched: true,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function MapAction() {
+            MapAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
         * @param {Object} options
         */
         initialize: function(options) {

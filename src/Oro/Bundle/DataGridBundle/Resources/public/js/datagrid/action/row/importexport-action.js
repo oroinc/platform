@@ -35,6 +35,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function ImportExportAction() {
+            ImportExportAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             ImportExportAction.__super__.initialize.apply(this, arguments);
 

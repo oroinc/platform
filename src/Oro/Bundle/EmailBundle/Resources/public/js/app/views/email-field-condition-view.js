@@ -11,6 +11,16 @@ define(function(require) {
     EmailFieldConditionView = FieldConditionView.extend({
         entityData: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailFieldConditionView() {
+            EmailFieldConditionView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.entityData = options.entityData;
             EmailFieldConditionView.__super__.initialize.call(this, options);

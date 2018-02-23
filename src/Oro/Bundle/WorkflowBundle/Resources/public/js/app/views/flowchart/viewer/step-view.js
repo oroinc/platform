@@ -12,6 +12,7 @@ define(function(require) {
         template: require('tpl!oroworkflow/templates/flowchart/viewer/step.html'),
 
         jsPlumbSource: null,
+
         jsPlumbTarget: null,
 
         className: function() {
@@ -35,6 +36,13 @@ define(function(require) {
             filter: '.jsplumb-source',
             connector: ['Smartline', {cornerRadius: 3, midpoint: 0.5}],
             maxConnections: 100
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function FlowchartViewerStepView() {
+            FlowchartViewerStepView.__super__.constructor.apply(this, arguments);
         },
 
         updateStepMinWidth: function() {

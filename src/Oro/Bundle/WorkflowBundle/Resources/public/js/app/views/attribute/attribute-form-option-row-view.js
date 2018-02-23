@@ -25,6 +25,16 @@ define(function(require) {
             }
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function AttributeFormOptionRowView() {
+            AttributeFormOptionRowView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#attribute-form-option-row-template').html();

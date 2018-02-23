@@ -9,7 +9,6 @@ define(function(require) {
     var messenger = require('oroui/js/messenger');
 
     IntegrationConnectionCheckerComponent = BaseComponent.extend({
-
         /**
          * @property {jquery} $button
          */
@@ -29,6 +28,13 @@ define(function(require) {
          * @property {LoadingMaskView} loadingMaskView
          */
         loadingMaskView: null,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function IntegrationConnectionCheckerComponent() {
+            IntegrationConnectionCheckerComponent.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * @inheritDoc

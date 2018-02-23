@@ -7,6 +7,14 @@ define(function(require) {
 
     GridColumns = Backgrid.Columns.extend({
         comparator: 'order',
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function GridColumns() {
+            GridColumns.__super__.constructor.apply(this, arguments);
+        },
+
         getCellEventList: function() {
             if (!this.cellEventList) {
                 this.cellEventList = new CellEventList(this);

@@ -20,6 +20,13 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function MultiCheckboxView() {
+            MultiCheckboxView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @constructor
          *
          * @param {Object} options

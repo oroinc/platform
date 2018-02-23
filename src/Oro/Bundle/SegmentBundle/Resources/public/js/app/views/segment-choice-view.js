@@ -20,6 +20,16 @@ define(function(require) {
             change: 'onChange'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function SegmentChoiceView() {
+            SegmentChoiceView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             options = $.extend(true, {}, this.defaultOptions, options);
             _.extend(this, _.pick(options, _.without(_.keys(this.defaultOptions), 'select2')));

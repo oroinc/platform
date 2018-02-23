@@ -30,6 +30,13 @@ define([
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function DeleteAction() {
+            DeleteAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Execute delete model
          */
         execute: function() {

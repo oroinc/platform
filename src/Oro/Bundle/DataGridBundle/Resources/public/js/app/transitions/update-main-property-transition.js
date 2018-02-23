@@ -11,7 +11,7 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
 
     UpdateMainPropertyTransition = AbstractTransition.extend({
-        constructor: function(options) {
+        constructor: function UpdateMainPropertyTransition(options) {
             UpdateMainPropertyTransition.__super__.constructor.call(this, options);
             this.propertyName = options.propertyName;
             this.boardPlugin = options.boardPlugin;

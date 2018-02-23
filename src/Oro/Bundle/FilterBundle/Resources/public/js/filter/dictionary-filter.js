@@ -86,6 +86,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function DictionaryFilter() {
+            DictionaryFilter.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             if (this.filterParams) {
                 this.dictionaryClass = this.filterParams.class.replace(/\\/g, '_');

@@ -12,6 +12,13 @@ define(function(require) {
             change: 'onChange'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function DashboardChangeView() {
+            DashboardChangeView.__super__.constructor.apply(this, arguments);
+        },
+
         onChange: function(e) {
             var url = routing.generate('oro_dashboard_view', {id: $(e.currentTarget).val(), change_dashboard: true});
             mediator.execute('redirectTo', {url: url}, {redirect: true});

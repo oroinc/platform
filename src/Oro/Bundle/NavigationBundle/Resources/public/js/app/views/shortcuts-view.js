@@ -31,6 +31,16 @@ define(function(require) {
         entityClass: '',
         entityId: 0,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ShortcutsView() {
+            ShortcutsView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             var self = this;
             this.options = _.defaults(options || {}, this.options);

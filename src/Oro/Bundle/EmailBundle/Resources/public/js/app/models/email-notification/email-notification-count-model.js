@@ -10,6 +10,13 @@ define(function(require) {
     EmailNotificationCountModel = BaseModel.extend({
         defaults: {
             unreadEmailsCount: 0
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailNotificationCountModel() {
+            EmailNotificationCountModel.__super__.constructor.apply(this, arguments);
         }
     });
 

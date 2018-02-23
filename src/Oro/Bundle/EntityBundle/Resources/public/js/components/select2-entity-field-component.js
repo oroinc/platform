@@ -7,6 +7,14 @@ define(function(require) {
 
     Select2EntityFieldComponent = Select2Component.extend({
         util: null,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function Select2EntityFieldComponent() {
+            Select2EntityFieldComponent.__super__.constructor.apply(this, arguments);
+        },
+
         preConfig: function(config) {
             var that = this;
             if (this.util === null) {

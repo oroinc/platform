@@ -97,6 +97,13 @@ define(function(require) {
 
         keyType: 'string',
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function SelectEditorView() {
+            SelectEditorView.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             if (options.key_type) {
                 this.keyType = options.key_type;

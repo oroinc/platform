@@ -10,7 +10,13 @@ define(function(require) {
         },
 
         /**
-         *
+         * @inheritDoc
+         */
+        constructor: function WidgetPickerFilterModel() {
+            WidgetPickerFilterModel.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @param {WidgetPickerModel} item
          * @returns {boolean} true if item included and false otherwise
          */

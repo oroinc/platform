@@ -11,7 +11,9 @@ define([
 
     HeaderRow = Chaplin.CollectionView.extend({
         tagName: 'tr',
+
         className: '',
+
         animationDuration: 0,
 
         /* Required fby current realization of grid.js, see header initialization code */
@@ -22,6 +24,16 @@ define([
             className: 'grid-header-row'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function HeaderRow() {
+            HeaderRow.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.columns = options.columns;
             this.dataCollection = options.dataCollection;

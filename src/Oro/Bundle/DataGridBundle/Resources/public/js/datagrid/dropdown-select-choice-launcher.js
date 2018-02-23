@@ -81,6 +81,13 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function SelectChoiceLauncher() {
+            SelectChoiceLauncher.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize
          *
          * @param {Object} options

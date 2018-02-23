@@ -18,7 +18,13 @@ define(function(require) {
      */
     FlowChartComponent = PieChartComponent.extend({
         /**
-         *
+         * @inheritDoc
+         */
+        constructor: function FlowChartComponent() {
+            FlowChartComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @overrides
          * @param {Object} options
          */

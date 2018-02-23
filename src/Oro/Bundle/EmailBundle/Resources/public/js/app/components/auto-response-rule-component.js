@@ -10,6 +10,16 @@ define(function(require) {
             conditionBuilderComponent: 'condition-builder'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function AutoResponseRuleComponent() {
+            AutoResponseRuleComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             if (!this.conditionBuilderComponent) {
                 throw new Error('Sibling component `conditionBuilderComponent` is required.');

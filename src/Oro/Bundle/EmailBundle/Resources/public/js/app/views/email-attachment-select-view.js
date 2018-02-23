@@ -9,10 +9,15 @@ define(function(require) {
 
     EmailAttachmentSelectView = BaseCollectionView.extend({
         itemView: EmailAttachmentListRowView,
+
         listSelector: '.attachment-list',
+
         fallbackSelector: '.no-items',
+
         isShowed: false,
+
         fileNameFilter: '',
+
         attachedCollection: null,
 
         events: {
@@ -22,6 +27,16 @@ define(function(require) {
             'input input.filter': 'filterChange'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailAttachmentSelectView() {
+            EmailAttachmentSelectView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             if (!_.has(options, 'attachedCollection')) {
                 throw new Error('Required option "attachedCollection" not found.');

@@ -28,6 +28,13 @@ define([
         formatter: new PhoneFormatter(),
 
         /**
+         * @inheritDoc
+         */
+        constructor: function PhoneCell() {
+            PhoneCell.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * If don't stop propagation click will select row
          */
         stopPropagation: function(e) {

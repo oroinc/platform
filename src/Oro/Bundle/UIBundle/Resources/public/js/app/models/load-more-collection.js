@@ -41,6 +41,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function LoadMoreCollection() {
+            LoadMoreCollection.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         parse: function(response) {
             if (!this.disposed) {
                 this._state.set('totalItemsQuantity', response.count || 0);

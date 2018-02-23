@@ -58,6 +58,16 @@ define([
          */
         caret: '<span class="caret"></span>',
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmptyFilter() {
+            EmptyFilter.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             var opts = _.pick(options || {}, 'caret');
             _.extend(this, opts);

@@ -21,6 +21,13 @@ define(function(require) {
             'unblock_add_btn': '_unblockAddBtn'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function WidgetPickerItemView() {
+            WidgetPickerItemView.__super__.constructor.apply(this, arguments);
+        },
+
         _blockAddBtn: function() {
             this.$('.widget-picker-add-btn').addClass('disabled');
         },

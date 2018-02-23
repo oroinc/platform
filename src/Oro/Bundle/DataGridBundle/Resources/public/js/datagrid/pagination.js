@@ -50,6 +50,13 @@ define([
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function Pagination() {
+            Pagination.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initializer.
          *
          * @param {Object} options

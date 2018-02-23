@@ -38,6 +38,16 @@ define(function(require) {
          */
         autoUpdateRangeFilterType: false,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function WidgetConfigDateRangeFilter() {
+            WidgetConfigDateRangeFilter.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             WidgetConfigDateRangeFilter.__super__.initialize.apply(this, arguments);
             options.$form.on('submit' + this.eventNamespace(), _.bind(this.onSubmit, this));

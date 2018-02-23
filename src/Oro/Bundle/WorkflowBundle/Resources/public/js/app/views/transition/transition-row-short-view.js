@@ -26,6 +26,16 @@ define(function(require) {
             'change model': 'render'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function TransitionsShortRowView() {
+            TransitionsShortRowView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#transition-row-short-template').html();

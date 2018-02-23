@@ -22,6 +22,16 @@ define([
             'toRemove collection': 'toRemove'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function BaseBookmarkComponent() {
+            BaseBookmarkComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             var $dataEl = $(options.dataSource);
             var data = $dataEl.data('data');

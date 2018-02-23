@@ -21,6 +21,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function ButtonComponent() {
+            ButtonComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             ButtonComponent.__super__.initialize.apply(this, arguments);
 

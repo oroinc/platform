@@ -8,14 +8,21 @@ define(function(require) {
     StickyNoteSetupView = BaseWidgetSetupView.extend({
         template: require('tpl!orosidebar/templates/sidebar-widget/sticky-note/sticky-note-setup-view.html'),
 
-        widgetTitle: function() {
-            return __('oro.sidebar.sticky_note_widget.settings');
-        },
-
         validation: {
             content: {
                 NotBlank: {}
             }
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function StickyNoteSetupView() {
+            StickyNoteSetupView.__super__.constructor.apply(this, arguments);
+        },
+
+        widgetTitle: function() {
+            return __('oro.sidebar.sticky_note_widget.settings');
         }
     });
 

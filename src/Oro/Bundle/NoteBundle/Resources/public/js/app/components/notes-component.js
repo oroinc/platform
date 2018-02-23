@@ -27,6 +27,16 @@ define(function(require) {
             modules: {}
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function NotesComponent() {
+            NotesComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             options = options || {};
             this.processOptions(options);

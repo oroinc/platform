@@ -14,7 +14,15 @@ define(function(require) {
      */
     StackedBarChartComponent = BaseChartComponent.extend({
         aspectRatio: 0.6,
+
         initialDatasetSize: 30,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function StackedBarChartComponent() {
+            StackedBarChartComponent.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * Draw chart

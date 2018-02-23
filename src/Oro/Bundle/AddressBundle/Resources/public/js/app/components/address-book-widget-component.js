@@ -12,6 +12,16 @@ define(function(require) {
             'wid', 'addressCreateUrl', 'addressUpdateRoute', 'addressDeleteRoute'
         ]),
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function AddressBookWidgetComponent() {
+            AddressBookWidgetComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             AddressBookWidgetComponent.__super__.initialize.call(this, arguments);
 

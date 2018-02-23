@@ -9,6 +9,16 @@ define(function(require) {
     var WidgetManager = require('oroui/js/widget-manager');
 
     ActivityContextView = BaseView.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActivityContextView() {
+            ActivityContextView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = options;
             this.template = _.template($('#activity-context-item').html());

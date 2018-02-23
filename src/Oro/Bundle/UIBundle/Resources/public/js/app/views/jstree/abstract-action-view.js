@@ -27,6 +27,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function AbstractActionView() {
+            AbstractActionView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = $.extend(true, {}, this.options, options);
             AbstractActionView.__super__.initialize.apply(this, arguments);

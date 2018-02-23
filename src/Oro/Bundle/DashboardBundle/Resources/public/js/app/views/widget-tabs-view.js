@@ -15,6 +15,16 @@ define(function(require) {
 
         widgetComponentProcessingClass: 'widget-component-processing',
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function WidgetTabsView() {
+            WidgetTabsView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             this.subview('loading', new LoadingMaskView({container: this._getTabContent()}));
 

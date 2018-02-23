@@ -158,6 +158,13 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function Grid() {
+            Grid.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize grid
          *
          * @param {Object} options

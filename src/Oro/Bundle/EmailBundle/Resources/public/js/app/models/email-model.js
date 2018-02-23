@@ -13,6 +13,13 @@ define(function(require) {
             entityId: undefined,
             cc: undefined,
             bcc: undefined
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailModel() {
+            EmailModel.__super__.constructor.apply(this, arguments);
         }
     });
 

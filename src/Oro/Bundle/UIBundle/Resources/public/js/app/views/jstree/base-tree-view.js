@@ -136,6 +136,13 @@ define(function(require) {
         _foundNodes: false,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function BaseTreeView() {
+            BaseTreeView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @param {Object} options
          */
         initialize: function(options) {

@@ -21,6 +21,13 @@ define([
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function EmailAttachmentLink() {
+            EmailAttachmentLink.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
         * Constructor
         *
         * @param options {Object}

@@ -23,6 +23,12 @@ define(function(require) {
          * @property {jQuery.Element}
          */
         $el: null,
+        /**
+         * @inheritDoc
+         */
+        constructor: function WorkflowDeactivateBtnView() {
+            WorkflowDeactivateBtnView.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * @inheritDoc

@@ -44,6 +44,13 @@ define([
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function DatepairView() {
+            DatepairView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @constructor
          *
          * @param {Object} options

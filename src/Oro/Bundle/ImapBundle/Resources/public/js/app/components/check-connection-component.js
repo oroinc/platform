@@ -10,6 +10,13 @@ define(function(require) {
 
     CheckConnectionComponent = BaseComponent.extend({
         /**
+         * @inheritDoc
+         */
+        constructor: function CheckConnectionComponent() {
+            CheckConnectionComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize component
          *
          * @param {Object} options

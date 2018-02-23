@@ -27,6 +27,13 @@ define([
         keepElement: false,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function FooterCell() {
+            FooterCell.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize.
          */
         initialize: function(options) {

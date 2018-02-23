@@ -13,18 +13,33 @@ define(function(require) {
 
     UserMenuEmailNotificationComponent = EmailNotificationComponent.extend({
         collection: null,
+
         countModel: null,
+
         /**
          * @type {Function}
          */
         notificationHandler: null,
+
         clankEvent: '',
+
         dropdownContainer: null,
+
         listen: {
             'sync collection': 'updateCountModel',
             'widget_dialog:open mediator': 'onWidgetDialogOpen'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function UserMenuEmailNotificationComponent() {
+            UserMenuEmailNotificationComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             var emails = options.emails || [];
             _.extend(this, _.pick(options, ['clankEvent']));

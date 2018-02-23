@@ -18,6 +18,13 @@ define(function(require) {
 
         comparator: 'createdAt',
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function CommentCollection() {
+            CommentCollection.__super__.constructor.apply(this, arguments);
+        },
+
         create: function() {
             return new CommentModel({
                 relationId: this._route.get('relationId'),

@@ -17,7 +17,14 @@ define([
         /**
          @property {(Backgrid.CellFormatter|Object|string)}
          */
-        formatter: new CellFormatter()
+        formatter: new CellFormatter(),
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function RelationCell() {
+            RelationCell.__super__.constructor.apply(this, arguments);
+        }
     });
 
     return RelationCell;

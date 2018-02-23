@@ -63,6 +63,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function FallbackView() {
+            FallbackView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             FallbackView.__super__.initialize.call(this, options);

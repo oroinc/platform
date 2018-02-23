@@ -18,6 +18,13 @@ define(['backbone'], function(Backbone) {
             initialState: {},
             rowActions: {},
             massActions: {}
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function MetadataModel() {
+            MetadataModel.__super__.constructor.apply(this, arguments);
         }
     });
 

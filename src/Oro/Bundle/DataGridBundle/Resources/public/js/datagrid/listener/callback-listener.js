@@ -18,6 +18,13 @@ define([
         processCallback: null,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function CallbackListener() {
+            CallbackListener.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize listener object
          *
          * @param {Object} options

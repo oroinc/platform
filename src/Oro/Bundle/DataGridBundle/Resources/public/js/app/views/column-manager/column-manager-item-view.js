@@ -9,6 +9,7 @@ define(function(require) {
 
     ColumnManagerItemView = BaseView.extend({
         template: template,
+
         tagName: 'tr',
 
         events: {
@@ -21,6 +22,13 @@ define(function(require) {
             // update view on model change
             'change:disabledVisibilityChange model': 'render',
             'change:renderable model': 'updateView'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ColumnManagerItemView() {
+            ColumnManagerItemView.__super__.constructor.apply(this, arguments);
         },
 
         /**

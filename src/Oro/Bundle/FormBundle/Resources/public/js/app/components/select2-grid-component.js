@@ -6,6 +6,13 @@ define(function(require) {
     var Select2Component = require('oro/select2-component');
 
     Select2GridComponent = Select2Component.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function Select2GridComponent() {
+            Select2GridComponent.__super__.constructor.apply(this, arguments);
+        },
+
         preConfig: function(config) {
             Select2GridComponent.__super__.preConfig.call(this, config);
             var that = this;

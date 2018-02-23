@@ -5,9 +5,9 @@ define([
 ], function(_, routing, BaseModel) {
     'use strict';
 
-    var Model;
+    var BaseNavigationItemModel;
 
-    Model = BaseModel.extend({
+    BaseNavigationItemModel = BaseModel.extend({
         route: 'oro_api_get_navigationitems',
 
         defaults: {
@@ -16,6 +16,13 @@ define([
             url: null,
             position: null,
             type: null
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function BaseNavigationItemModel() {
+            BaseNavigationItemModel.__super__.constructor.apply(this, arguments);
         },
 
         url: function() {
@@ -32,5 +39,5 @@ define([
         }
     });
 
-    return Model;
+    return BaseNavigationItemModel;
 });

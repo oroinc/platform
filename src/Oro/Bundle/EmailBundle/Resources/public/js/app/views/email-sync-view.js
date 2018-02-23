@@ -15,6 +15,13 @@ define(function(require) {
             'click [data-role="sync"]': 'onSync'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailSyncView() {
+            EmailSyncView.__super__.constructor.apply(this, arguments);
+        },
+
         onSync: function(e) {
             e.preventDefault();
 

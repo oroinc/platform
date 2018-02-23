@@ -43,6 +43,16 @@ define(function(require) {
 
         loadingMask: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function GoogleMapsView() {
+            GoogleMapsView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.defaults(options || {},
                 _.pick(localeSettings.settings, ['apiKey']),

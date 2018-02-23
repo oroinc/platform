@@ -8,15 +8,30 @@ define(function(require) {
 
     ActionPermissionsFieldView = ActionPermissionsReadonlyFieldView.extend({
         autoRender: false,
+
         animationDuration: 0,
+
         className: 'field-permission-container clearfix',
+
         template: require('tpl!orouser/templates/datagrid/action-permissions-field-view.html'),
+
         permissionView: PermissionView,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActionPermissionsFieldView() {
+            ActionPermissionsFieldView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             ActionPermissionsFieldView.__super__.initialize.call(this, options);
             this.listenTo(this.model.get('permissions'), 'change', this.onAccessLevelChange);
         },
+
         onAccessLevelChange: function(model) {
             mediator.trigger('securityAccessLevelsComponent:link:click', {
                 accessLevel: model.get('access_level'),

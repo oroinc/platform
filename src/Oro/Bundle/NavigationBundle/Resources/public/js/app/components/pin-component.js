@@ -21,6 +21,13 @@ define([
             'page:afterChange mediator': 'onPageAfterChange'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function PinComponent() {
+            PinComponent.__super__.constructor.apply(this, arguments);
+        },
+
         _createSubViews: function() {
             this._createButtonView();
             this._createBarView();

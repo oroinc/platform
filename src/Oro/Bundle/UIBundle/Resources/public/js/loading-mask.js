@@ -44,6 +44,13 @@ define([
         ),
 
         /**
+         * @inheritDoc
+         */
+        constructor: function LoadingMaskView() {
+            LoadingMaskView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize
          *
          * @param {Object} options

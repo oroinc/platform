@@ -19,6 +19,13 @@ define(function(require) {
         autoUpdateRangeFilterType: false,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function WidgetConfigDateTimeRangeFilter() {
+            WidgetConfigDateTimeRangeFilter.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Render filter view
          * Update value after render
          *

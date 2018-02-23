@@ -117,6 +117,13 @@ define(function(require) {
 
         format: datetimeFormatter.getBackendDateTimeFormat(),
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function DatetimeEditorView() {
+            DatetimeEditorView.__super__.constructor.apply(this, arguments);
+        },
+
         render: function() {
             var _this = this;
             DatetimeEditorView.__super__.render.call(this);

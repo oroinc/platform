@@ -26,7 +26,16 @@ define(function(require) {
         listen: {
             'destroy model': 'remove'
         },
+        /**
+         * @inheritDoc
+         */
+        constructor: function StepRowView() {
+            StepRowView.__super__.constructor.apply(this, arguments);
+        },
 
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#step-row-template').html();

@@ -25,6 +25,16 @@ define(function(require) {
             'destroy model': 'remove'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function StepEditView() {
+            StepEditView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 

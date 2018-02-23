@@ -22,6 +22,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function ButtonWidgetAction() {
+            ButtonWidgetAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             ButtonWidgetAction.__super__.initialize.apply(this, arguments);
             var buttonOptions = _.extend({action: _.pick(this, 'name', 'label')}, this.configuration);

@@ -32,6 +32,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function HiddenRedirectComponent() {
+            HiddenRedirectComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.element = options._sourceElement;
             if (!this.element) {

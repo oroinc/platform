@@ -22,6 +22,13 @@ define(function(require) {
     SearchApiAccessor = ApiAccessor.extend(/** @lends SearchApiAccessor.prototype */{
         DEFAULT_HTTP_METHOD: 'GET',
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function SearchApiAccessor() {
+            SearchApiAccessor.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             if (!options) {
                 options = {};

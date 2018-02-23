@@ -34,6 +34,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function EmailTreadView() {
+            EmailTreadView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['actionPanelSelector']));
             EmailTreadView.__super__.initialize.apply(this, arguments);

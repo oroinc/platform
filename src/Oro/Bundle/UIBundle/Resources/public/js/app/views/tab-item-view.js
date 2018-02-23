@@ -28,6 +28,13 @@ define(function(require) {
             'click [data-tab-link]': 'onSelect'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function TabItemView() {
+            TabItemView.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             TabItemView.__super__.initialize.apply(this, arguments);
 

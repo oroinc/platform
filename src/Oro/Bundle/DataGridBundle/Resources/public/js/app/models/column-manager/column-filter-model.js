@@ -10,6 +10,13 @@ define(function(require) {
             renderable: false
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ColumnFilterModel() {
+            ColumnFilterModel.__super__.constructor.apply(this, arguments);
+        },
+
         filterer: function(item) {
             var search = this.get('search').toLowerCase();
             if (search.length > 0 && item.get('label').toLowerCase().indexOf(search) === -1) {

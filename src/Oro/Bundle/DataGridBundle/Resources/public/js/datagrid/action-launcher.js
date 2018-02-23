@@ -86,6 +86,13 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function ActionLauncher() {
+            ActionLauncher.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize
          *
          * @param {Object} options

@@ -32,6 +32,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function PageStateView() {
+            PageStateView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             var confirmModal;
 

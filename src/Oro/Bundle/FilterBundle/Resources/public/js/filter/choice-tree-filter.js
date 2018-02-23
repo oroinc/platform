@@ -40,6 +40,16 @@ define(function(require) {
 
         loadedMetadata: true,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ChoiceTreeFilter() {
+            ChoiceTreeFilter.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             ChoiceTreeFilter.__super__.initialize.apply(this, arguments);
             this.data = this.data || [];

@@ -24,15 +24,26 @@ define(function(require) {
         },
 
         $container: null,
+
         $importButton: null,
+
         $importValidationButton: null,
+
         $exportButton: null,
+
         $templateButton: null,
 
         /**
          * @property {ImportExportManager}
          */
         importExportManager: null,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ImportExportButtonsView() {
+            ImportExportButtonsView.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * @inheritDoc

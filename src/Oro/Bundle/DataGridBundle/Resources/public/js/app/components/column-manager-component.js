@@ -52,6 +52,14 @@ define(function(require) {
         enableFilters: config.enableFilters,
 
         columnManagerView: ColumnManagerView,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ColumnManagerComponent() {
+            ColumnManagerComponent.__super__.constructor.apply(this, arguments);
+        },
+
         /**
          * @inheritDoc
          */
