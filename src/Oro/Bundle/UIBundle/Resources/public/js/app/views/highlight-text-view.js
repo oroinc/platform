@@ -109,6 +109,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function HighlightTextView() {
+            HighlightTextView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.findHighlightClass = '.' + this.highlightClass;
             this.findElementHighlightClass = '.' + this.elementHighlightClass;
@@ -262,12 +269,12 @@ define(function(require) {
         },
 
         /**
-         * Check highlighted items exists in the view
+         * Check hidden not highlighted items exists in the view
          *
          * @return {boolean}
          */
-        isViewHasHighlightedItems: function() {
-            return this.$el.find(this.findHighlightClass).length;
+        isViewHasHiddenItems: function() {
+            return this.$el.find(this.findNotFoundClass).length;
         },
 
         /**
@@ -371,7 +378,7 @@ define(function(require) {
          * @param {boolean} state
          */
         toggleHighlightSwitcher: function(state) {
-            state = state ? state : this.isViewHasHighlightedItems();
+            state = state ? state : this.isViewHasHiddenItems();
             this.$el.find(this.highlightSwitcherElement).toggleClass('hide', !state);
         },
 
