@@ -6,13 +6,10 @@ use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
-use Oro\Bundle\BatchBundle\Tests\Functional\ORM\Constraint\IsEqualById;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
+use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 
-/**
- * @dbIsolationPerTest
- */
 class BufferedIdentityQueryResultIteratorTest extends WebTestCase
 {
     /**
@@ -23,18 +20,262 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         parent::setUp();
 
         $this->initClient();
-
         $this->loadFixtures([
             LoadOrganization::class,
             '@OroBatchBundle/Tests/Functional/Fixture/data/buffered_iterator.yml',
         ]);
     }
 
+    public function testSimpleQuery()
+    {
+        $em = $this->getContainer()->get('doctrine');
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+
+        $this->assertSameResult($queryBuilder);
+    }
+
+    public function testJoinAndGroup()
+    {
+        $em = $this->getContainer()->get('doctrine');
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder
+            ->select('item.id, item.stringValue, SUM(value.id)')
+            ->leftJoin('item.values', 'value')
+            ->groupBy('item.id');
+
+        $this->assertSameResult($queryBuilder);
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testInconsistentKey()
+    {
+        $em = $this->getContainer()->get('doctrine');
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder
+            ->select('item.id, item.stringValue, value.id')
+            ->leftJoin('item.values', 'value')
+            ->groupBy('value.id');
+
+        $this->assertSameResult($queryBuilder);
+    }
+
+    /**
+     * When selecting certain fields default hydration will be array
+     * In this case result rows may appear in different order after iteration by Iterator
+     */
+    public function testLeftJoinScalar()
+    {
+        $em = $this->getContainer()->get('doctrine');
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder
+            ->select('item.id, item.stringValue, value.id as vid')
+            ->leftJoin('item.values', 'value');
+
+        $this->assertSameResult($queryBuilder);
+    }
+
+    public function testLeftJoinObject()
+    {
+        $em = $this->getContainer()->get('doctrine');
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder
+            ->select('item, value')
+            ->leftJoin('item.values', 'value');
+
+        $this->assertSameResult($queryBuilder);
+    }
+
+    public function testWhereScalar()
+    {
+        $em = $this->getContainer()->get('doctrine');
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder
+            ->select('item.id, item.stringValue, value.id as vid')
+            ->leftJoin('item.values', 'value')
+            ->where('value.id > 15 and item.stringValue != :stringValue')
+            ->setParameter('stringValue', 'String Value 3');
+
+        $this->assertSameResult($queryBuilder);
+    }
+
+    public function testWhereObject()
+    {
+        $em = $this->getContainer()->get('doctrine');
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder
+            ->select('item, value')
+            ->leftJoin('item.values', 'value')
+            ->where('value.id > 15 and item.stringValue != :stringValue')
+            ->setParameter('stringValue', 'String Value 3');
+
+        $this->assertSameResult($queryBuilder);
+    }
+
+    /**
+     * @dataProvider limitOffsetProvider
+     *
+     * @param integer $offset
+     * @param integer $limit
+     */
+    public function testLimitOffset($offset, $limit)
+    {
+        $em = $this->getContainer()->get('doctrine');
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder->setFirstResult($offset);
+        $queryBuilder->setMaxResults($limit);
+
+        $this->assertSameResult($queryBuilder);
+    }
+
+    public function limitOffsetProvider()
+    {
+        $data = [];
+        foreach (range(0, 10) as $i) {
+            $data[] = [
+                'offset' => $i % 5,
+                'limit'  => $i * 2,
+            ];
+        }
+
+        return $data;
+    }
+
+    public function testChangingDataset()
+    {
+        $em = $this->getContainer()->get('doctrine');
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder->where('item.stringValue != :v');
+        $queryBuilder->setParameter('v', 'processed');
+
+        $result = $queryBuilder->getQuery()->execute();
+
+        $iterator = new BufferedIdentityQueryResultIterator($queryBuilder);
+        $iterator->setBufferSize(3);
+
+        $iteratorResult = [];
+        foreach ($iterator as $i => $item) {
+            // every few records set one as processed to change initial dataset (ruins default pagination)
+            if ($i % 3 == 0) {
+                $id = $item->getId();
+                $em->getConnection()
+                    ->exec("update test_search_item set stringValue = 'processed' where id = {$id}");
+            }
+            $iteratorResult[] = $item;
+        }
+
+        if ($this->isPostgreSql()) {
+            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
+            $queryBuilder->orderBy('item.id');
+        }
+
+        self::assertEquals($result, $iteratorResult);
+    }
+
+    public function testDelete()
+    {
+        $em = $this->getContainer()->get('doctrine');
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:ItemValue')->createQueryBuilder('value');
+        $all = count($queryBuilder->getQuery()->execute());
+
+        //every 3rd row
+        $queryBuilder->where('Mod(value.id, 3) = 0');
+        $toDelete = count($queryBuilder->getQuery()->execute());
+
+        $iterator = new BufferedIdentityQueryResultIterator($queryBuilder);
+        $iterator->setBufferSize(4);
+
+        foreach ($iterator as $item) {
+            $id = $item->getId();
+            $em->getConnection()
+                ->exec("delete from test_search_item_value where id = {$id}");
+        }
+
+        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:ItemValue')->createQueryBuilder('value');
+        $afterDelete = count($queryBuilder->getQuery()->execute());
+
+        if ($this->isPostgreSql()) {
+            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
+            $queryBuilder->orderBy('item.id');
+        }
+
+        self::assertEquals($all - $toDelete, $afterDelete);
+    }
+
+    /**
+     * When selecting certain fields default hydration will be array
+     * In this case result rows may appear in different order after iteration by Iterator
+     */
+    public function testOrderByJoinedFieldScalar()
+    {
+        $em = $this->getContainer()->get('doctrine');
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder
+            ->select('item.id, item.stringValue, item.integerValue')
+            ->leftJoin('item.values', 'value')
+            ->orderBy('item.stringValue')
+            ->where('MOD(value.id, 2) = 0')
+            ->orderBy('value.id');
+
+        if ($this->isPostgreSql()) {
+            self::expectException(\LogicException::class);
+        }
+
+        $this->assertSameByIdWithoutOrder($queryBuilder);
+    }
+
+    /**
+     * With Object Hydration there will be no previous problem
+     */
+    public function testOrderByJoinedFieldObjectHydration()
+    {
+        $em = $this->getContainer()->get('doctrine');
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder
+            ->select('item, value')
+            ->leftJoin('item.values', 'value')
+            ->orderBy('item.stringValue')
+            ->where('MOD(value.id, 2) = 0')
+            ->orderBy('value.id');
+
+        if ($this->isPostgreSql()) {
+            self::expectException(\LogicException::class);
+        }
+
+        $this->assertSameResult($queryBuilder);
+    }
+
     /**
      * @param $queryBuilder
+     *
      * @return array
      */
-    protected function getResultsWithForeachLoop(QueryBuilder $queryBuilder)
+    private function getResultsWithForeachLoop(QueryBuilder $queryBuilder)
     {
         $iterator = new BufferedIdentityQueryResultIterator($queryBuilder);
         $iterator->setBufferSize(3);
@@ -47,14 +288,15 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         $query = $queryBuilder->getQuery();
         $result = $query->execute();
 
-        return array($result, $iteratorResult);
+        return [$result, $iteratorResult];
     }
 
     /**
      * @param $queryBuilder
+     *
      * @return array
      */
-    protected function getResultsWithWhileLoopRewindFirst(QueryBuilder $queryBuilder)
+    private function getResultsWithWhileLoopRewindFirst(QueryBuilder $queryBuilder)
     {
         $iteratorResult = [];
 
@@ -72,14 +314,15 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         $query = $queryBuilder->getQuery();
         $result = $query->execute();
 
-        return array($result, $iteratorResult);
+        return [$result, $iteratorResult];
     }
 
     /**
      * @param $queryBuilder
+     *
      * @return array
      */
-    protected function getResultsWithWhileLoopNextFirst(QueryBuilder $queryBuilder)
+    private function getResultsWithWhileLoopNextFirst(QueryBuilder $queryBuilder)
     {
         $iteratorResult = [];
 
@@ -101,24 +344,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         $query = $queryBuilder->getQuery();
         $result = $query->execute();
 
-        return array($result, $iteratorResult);
-    }
-
-    /**
-     * Asserts that 2 arrays has equal Root Entity IDs and Order. Joined fields may have different order
-     *
-     * @param QueryBuilder $queryBuilder
-     */
-    protected function assertSameById(QueryBuilder $queryBuilder)
-    {
-        list($expected, $actual) = $this->getResultsWithForeachLoop($queryBuilder);
-        static::assertThat($actual, new IsEqualById($expected));
-
-        list($expected, $actual) = $this->getResultsWithWhileLoopRewindFirst($queryBuilder);
-        static::assertThat($actual, new IsEqualById($expected));
-
-        list($expected, $actual) = $this->getResultsWithWhileLoopNextFirst($queryBuilder);
-        static::assertThat($actual, new IsEqualById($expected));
+        return [$result, $iteratorResult];
     }
 
     /**
@@ -126,315 +352,57 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
      *
      * @param QueryBuilder $queryBuilder
      */
-    protected function assertSameResult(QueryBuilder $queryBuilder)
+    private function assertSameResult(QueryBuilder $queryBuilder)
     {
         list($expected, $actual) = $this->getResultsWithForeachLoop($queryBuilder);
-        $this->assertEquals($expected, $actual);
+        self::assertSame(count($expected), count($actual));
+        self::assertThat($expected, new ArrayContainsConstraint($actual, false));
 
         list($expected, $actual) = $this->getResultsWithWhileLoopRewindFirst($queryBuilder);
-        $this->assertEquals($expected, $actual);
+        self::assertSame(count($expected), count($actual));
+        self::assertThat($expected, new ArrayContainsConstraint($actual, false));
 
         list($expected, $actual) = $this->getResultsWithWhileLoopNextFirst($queryBuilder);
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testSimpleQuery()
-    {
-        $this->markTestSkipped('Random failed test. Should be fixed in BAP-16058');
-        $em = $this->getContainer()->get('doctrine');
-
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
-        if ($this->isPostgreSql()) {
-            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
-            $queryBuilder->orderBy('item.id');
-        }
-
-        $this->assertSameResult($queryBuilder);
-    }
-
-    public function testJoinAndGroup()
-    {
-        $this->markTestSkipped('Random failed test. Should be fixed in BAP-16058');
-        $em = $this->getContainer()->get('doctrine');
-
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
-
-        $queryBuilder
-            ->select('item.id, item.stringValue, SUM(value.id)')
-            ->leftJoin('item.values', 'value')
-            ->groupBy('item.id');
-
-        if ($this->isPostgreSql()) {
-            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
-            $queryBuilder->orderBy('item.id');
-        }
-
-        $this->assertSameResult($queryBuilder);
+        self::assertSame(count($expected), count($actual));
+        self::assertThat($expected, new ArrayContainsConstraint($actual, false));
     }
 
     /**
-     * @expectedException \LogicException
-     */
-    public function testInconsistentKey()
-    {
-        $this->markTestSkipped('Random failed test. Should be fixed in BAP-16058');
-        $em = $this->getContainer()->get('doctrine');
-
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
-
-        $queryBuilder
-            ->select('item.id, item.stringValue, value.id')
-            ->leftJoin('item.values', 'value')
-            ->groupBy('value.id');
-
-        $this->assertSameResult($queryBuilder);
-    }
-
-    /**
-     * When selecting certain fields default hydration will be array
-     * In this case result rows may appear in different order after iteration by Iterator
-     */
-    public function testLeftJoinScalar()
-    {
-        $this->markTestSkipped('Random failed test. Should be fixed in BAP-16058');
-        $em = $this->getContainer()->get('doctrine');
-
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
-
-        $queryBuilder
-            ->select('item.id, item.stringValue, value.id as vid')
-            ->leftJoin('item.values', 'value');
-
-        if ($this->isPostgreSql()) {
-            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
-            $queryBuilder->orderBy('item.id');
-            $this->assertSameById($queryBuilder);
-        } else {
-            $this->assertSameResult($queryBuilder);
-        }
-    }
-
-    public function testLeftJoinObject()
-    {
-        $this->markTestSkipped('Random failed test. Should be fixed in BAP-16058');
-        $em = $this->getContainer()->get('doctrine');
-
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
-
-        $queryBuilder
-            ->select('item, value')
-            ->leftJoin('item.values', 'value');
-
-        if ($this->isPostgreSql()) {
-            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
-            $queryBuilder->orderBy('item.id');
-        }
-
-        $this->assertSameResult($queryBuilder);
-    }
-
-    public function testWhereScalar()
-    {
-        $this->markTestSkipped('Random failed test. Should be fixed in BAP-16058');
-        $em = $this->getContainer()->get('doctrine');
-
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
-
-        $queryBuilder
-            ->select('item.id, item.stringValue, value.id as vid')
-            ->leftJoin('item.values', 'value')
-            ->where('value.id > 15 and item.stringValue != :stringValue')
-            ->setParameter('stringValue', 'String Value 3');
-
-        if ($this->isPostgreSql()) {
-            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
-            $queryBuilder->orderBy('item.id');
-            $this->assertSameById($queryBuilder);
-        } else {
-            $this->assertSameResult($queryBuilder);
-        }
-    }
-
-    public function testWhereObject()
-    {
-        $this->markTestSkipped('Random failed test. Should be fixed in BAP-16058');
-        $em = $this->getContainer()->get('doctrine');
-
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
-
-        $queryBuilder
-            ->select('item, value')
-            ->leftJoin('item.values', 'value')
-            ->where('value.id > 15 and item.stringValue != :stringValue')
-            ->setParameter('stringValue', 'String Value 3');
-
-        if ($this->isPostgreSql()) {
-            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
-            $queryBuilder->orderBy('item.id');
-        }
-
-        $this->assertSameResult($queryBuilder);
-    }
-
-    /**
-     * @dataProvider limitOffsetProvider
+     * Asserts 2 datasets are equal by comparing only result IDs without taking into account results order.
      *
-     * @param integer $offset
-     * @param integer $limit
+     * @param QueryBuilder $queryBuilder
      */
-    public function testLimitOffset($offset, $limit)
+    private function assertSameByIdWithoutOrder(QueryBuilder $queryBuilder)
     {
-        $this->markTestSkipped('Random failed test. Should be fixed in BAP-16058');
-        $em = $this->getContainer()->get('doctrine');
+        list($expected, $actual) = $this->getResultsWithForeachLoop($queryBuilder);
+        self::compareQueryResultWithIteratorResult($expected, $actual);
 
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
-        $queryBuilder->setFirstResult($offset);
-        $queryBuilder->setMaxResults($limit);
+        list($expected, $actual) = $this->getResultsWithWhileLoopRewindFirst($queryBuilder);
+        self::compareQueryResultWithIteratorResult($expected, $actual);
 
-        if ($this->isPostgreSql()) {
-            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
-            $queryBuilder->orderBy('item.id');
-        }
-
-        $this->assertSameResult($queryBuilder);
-    }
-
-    public function limitOffsetProvider()
-    {
-        $data = [];
-        foreach (range(0, 10) as $i) {
-            $data[] = [
-                'offset' => $i % 5,
-                'limit'  => $i * 2,
-            ];
-        }
-
-        return $data;
-    }
-
-    public function testChangingDataset()
-    {
-        $this->markTestSkipped('Random failed test. Should be fixed in BAP-16058');
-        $em = $this->getContainer()->get('doctrine');
-
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
-        $queryBuilder->where('item.stringValue != :v');
-        $queryBuilder->setParameter('v', 'processed');
-
-        $result = $queryBuilder->getQuery()->execute();
-
-        $iterator = new BufferedIdentityQueryResultIterator($queryBuilder);
-        $iterator->setBufferSize(3);
-
-        $iteratorResult = [];
-        foreach ($iterator as $i => $item) {
-            // every few records set one as processed to change initial dataset (ruins default pagination)
-            if ($i % 3 == 0) {
-                $id = $item->getId();
-                $em->getConnection()
-                   ->exec("update test_search_item set stringValue = 'processed' where id = {$id}");
-            }
-            $iteratorResult[] = $item;
-        }
-
-        if ($this->isPostgreSql()) {
-            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
-            $queryBuilder->orderBy('item.id');
-        }
-
-        $this->assertEquals($result, $iteratorResult);
-    }
-
-    public function testDelete()
-    {
-        $this->markTestSkipped('Random failed test. Should be fixed in BAP-16058');
-        $em = $this->getContainer()->get('doctrine');
-
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:ItemValue')->createQueryBuilder('value');
-        $all = count($queryBuilder->getQuery()->execute());
-
-        //every 3rd row
-        $queryBuilder->where('Mod(value.id, 3) = 0');
-        $toDelete = count($queryBuilder->getQuery()->execute());
-
-
-        $iterator = new BufferedIdentityQueryResultIterator($queryBuilder);
-        $iterator->setBufferSize(4);
-
-        foreach ($iterator as $item) {
-            $id = $item->getId();
-            $em->getConnection()
-               ->exec("delete from test_search_item_value where id = {$id}");
-        }
-
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:ItemValue')->createQueryBuilder('value');
-        $afterDelete = count($queryBuilder->getQuery()->execute());
-
-        if ($this->isPostgreSql()) {
-            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
-            $queryBuilder->orderBy('item.id');
-        }
-
-        $this->assertEquals($all - $toDelete, $afterDelete);
+        list($expected, $actual) = $this->getResultsWithWhileLoopNextFirst($queryBuilder);
+        self::compareQueryResultWithIteratorResult($expected, $actual);
     }
 
     /**
-     * When selecting certain fields default hydration will be array
-     * In this case result rows may appear in different order after iteration by Iterator
+     * @param array $queryResult
+     * @param array $iteratorResult
      */
-    public function testOrderByJoinedFieldScalar()
+    private function compareQueryResultWithIteratorResult($queryResult, $iteratorResult)
     {
-        $this->markTestSkipped('Random failed test. Should be fixed in BAP-16058');
-        $em = $this->getContainer()->get('doctrine');
+        // Compares datasets expecting each item will contain 'id' field
+        $queryResultIds = array_column($queryResult, 'id');
+        $iteratorResultIds = array_column($iteratorResult, 'id');
+        self::assertSame(count($queryResultIds), count($iteratorResultIds));
 
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
-        $queryBuilder
-            ->select('item.id, item.stringValue, item.integerValue')
-            ->leftJoin('item.values', 'value')
-            ->orderBy('item.stringValue')
-            ->where('MOD(value.id, 2) = 0')
-            ->orderBy('value.id');
+        // Sorting results due to result rows may appear in different order after iteration by Iterator
+        asort($queryResultIds, SORT_NUMERIC);
+        asort($iteratorResultIds, SORT_NUMERIC);
 
-        if ($this->isPostgreSql()) {
-            $this->expectException(\LogicException::class);
-        }
-
-        $this->assertSameById($queryBuilder);
-    }
-
-    /**
-     * With Object Hydration there will be no previous problem
-     */
-    public function testOrderByJoinedFieldObjectHydration()
-    {
-        $this->markTestSkipped('Random failed test. Should be fixed in BAP-16058');
-        $em = $this->getContainer()->get('doctrine');
-
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
-        $queryBuilder
-            ->select('item, value')
-            ->leftJoin('item.values', 'value')
-            ->orderBy('item.stringValue')
-            ->where('MOD(value.id, 2) = 0')
-            ->orderBy('value.id');
-
-        if ($this->isPostgreSql()) {
-            $this->expectException(\LogicException::class);
-        }
-
-        $this->assertSameResult($queryBuilder);
+        self::assertSame(
+            array_values($queryResultIds),
+            array_values($iteratorResultIds)
+        );
     }
 
     /**
