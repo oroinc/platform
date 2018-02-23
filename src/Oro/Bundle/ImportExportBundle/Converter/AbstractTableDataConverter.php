@@ -10,7 +10,9 @@ use Oro\Bundle\ImportExportBundle\Utils\ArrayUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Abstract data converter to export/import format
+ * Abstract data converter to export/import format.
+ * Converts exportedRecord to the format expected by its destination.
+ * Converts importedRecord to the format which is used to deserialize the entity from the array.
  */
 abstract class AbstractTableDataConverter extends DefaultDataConverter
 {

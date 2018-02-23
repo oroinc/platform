@@ -10,6 +10,8 @@ use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
+ * ConfigurableTableDataConverter is a class that is responsible for the data conversion
+ *
  * @SuppressWarnings(PHPMD.NPathComplexity)
  * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
