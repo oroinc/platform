@@ -8,6 +8,8 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -18,14 +20,14 @@ use Symfony\Component\Form\FormInterface;
 
 class BuildFormBuilderTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $formFactory;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|FormFactoryInterface */
+    private $formFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $container;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    private $container;
 
     /** @var BuildFormBuilder */
-    protected $processor;
+    private $processor;
 
     public function setUp()
     {
@@ -69,7 +71,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $this->context->setFormBuilder($formBuilder);
         $this->processor->process($this->context);
-        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
     public function testProcessWhenFormAlreadyExists()
@@ -78,8 +80,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
-        $this->assertFalse($this->context->hasFormBuilder());
-        $this->assertSame($form, $this->context->getForm());
+        self::assertFalse($this->context->hasFormBuilder());
+        self::assertSame($form, $this->context->getForm());
     }
 
     public function testProcessForCustomForm()
@@ -92,7 +94,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $config->setFormType($formType);
         $config->setFormOptions(['validation_groups' => ['Default', 'api', 'my_group']]);
 
-        $this->formFactory->expects($this->once())
+        $this->formFactory->expects(self::once())
             ->method('createNamedBuilder')
             ->with(
                 null,
@@ -106,13 +108,13 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 ]
             )
             ->willReturn($formBuilder);
-        $formBuilder->expects($this->never())
+        $formBuilder->expects(self::never())
             ->method('add');
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
         $this->processor->process($this->context);
-        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
     /**
@@ -150,7 +152,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $metadata->addAssociation($this->createAssociationMetadata('association3'))
             ->setPropertyPath('realAssociation3');
 
-        $this->formFactory->expects($this->once())
+        $this->formFactory->expects(self::once())
             ->method('createNamedBuilder')
             ->with(
                 null,
@@ -165,42 +167,42 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             )
             ->willReturn($formBuilder);
 
-        $formBuilder->expects($this->at(0))
+        $formBuilder->expects(self::at(0))
             ->method('add')
             ->with(
                 'field1',
                 null,
                 []
             );
-        $formBuilder->expects($this->at(1))
+        $formBuilder->expects(self::at(1))
             ->method('add')
             ->with(
                 'field2',
                 null,
                 ['property_path' => 'realField2']
             );
-        $formBuilder->expects($this->at(2))
+        $formBuilder->expects(self::at(2))
             ->method('add')
             ->with(
                 'field3',
                 'text',
                 ['property_path' => 'realField3', 'trim' => false]
             );
-        $formBuilder->expects($this->at(3))
+        $formBuilder->expects(self::at(3))
             ->method('add')
             ->with(
                 'association1',
                 null,
                 []
             );
-        $formBuilder->expects($this->at(4))
+        $formBuilder->expects(self::at(4))
             ->method('add')
             ->with(
                 'association2',
                 null,
                 ['property_path' => 'realAssociation2']
             );
-        $formBuilder->expects($this->at(5))
+        $formBuilder->expects(self::at(5))
             ->method('add')
             ->with(
                 'association3',
@@ -213,7 +215,97 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->context->setResult($data);
         $this->processor->process($this->context);
-        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
+    public function testProcessForApiResourceBasedOnManageableEntity()
+    {
+        $entityClass = UserProfile::class;
+        $parentEntityClass = User::class;
+        $data = new User();
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
+
+        $config = new EntityDefinitionConfig();
+        $config->setParentResourceClass($parentEntityClass);
+        $config->addField('field1');
+
+        $metadata = new EntityMetadata();
+        $metadata->addField($this->createFieldMetadata('field1'));
+
+        $this->formFactory->expects(self::once())
+            ->method('createNamedBuilder')
+            ->with(
+                null,
+                'form',
+                $data,
+                [
+                    'data_class'           => $parentEntityClass,
+                    'validation_groups'    => ['Default', 'api'],
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'api_context'          => $this->context
+                ]
+            )
+            ->willReturn($formBuilder);
+
+        $formBuilder->expects(self::at(0))
+            ->method('add')
+            ->with(
+                'field1',
+                null,
+                []
+            );
+
+        $this->context->setClassName($entityClass);
+        $this->context->setConfig($config);
+        $this->context->setMetadata($metadata);
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
+    public function testProcessForApiResourceBasedOnManageableEntityWithCustomProcessorToLoadEntity()
+    {
+        $entityClass = UserProfile::class;
+        $parentEntityClass = User::class;
+        $data = new UserProfile();
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
+
+        $config = new EntityDefinitionConfig();
+        $config->setParentResourceClass($parentEntityClass);
+        $config->addField('field1');
+
+        $metadata = new EntityMetadata();
+        $metadata->addField($this->createFieldMetadata('field1'));
+
+        $this->formFactory->expects(self::once())
+            ->method('createNamedBuilder')
+            ->with(
+                null,
+                'form',
+                $data,
+                [
+                    'data_class'           => $entityClass,
+                    'validation_groups'    => ['Default', 'api'],
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'api_context'          => $this->context
+                ]
+            )
+            ->willReturn($formBuilder);
+
+        $formBuilder->expects(self::at(0))
+            ->method('add')
+            ->with(
+                'field1',
+                null,
+                []
+            );
+
+        $this->context->setClassName($entityClass);
+        $this->context->setConfig($config);
+        $this->context->setMetadata($metadata);
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
     public function testProcessForIgnoredField()
@@ -230,7 +322,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $metadata->addField($this->createFieldMetadata('field1'))
             ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
-        $this->formFactory->expects($this->once())
+        $this->formFactory->expects(self::once())
             ->method('createNamedBuilder')
             ->with(
                 null,
@@ -245,7 +337,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             )
             ->willReturn($formBuilder);
 
-        $formBuilder->expects($this->once())
+        $formBuilder->expects(self::once())
             ->method('add')
             ->with(
                 'field1',
@@ -258,7 +350,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->context->setResult($data);
         $this->processor->process($this->context);
-        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
     public function testProcessForFieldIgnoredOnlyForGetActions()
@@ -274,7 +366,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $metadata = new EntityMetadata();
         $metadata->addField($this->createFieldMetadata('field1'));
 
-        $this->formFactory->expects($this->once())
+        $this->formFactory->expects(self::once())
             ->method('createNamedBuilder')
             ->with(
                 null,
@@ -289,7 +381,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             )
             ->willReturn($formBuilder);
 
-        $formBuilder->expects($this->once())
+        $formBuilder->expects(self::once())
             ->method('add')
             ->with(
                 'field1',
@@ -302,7 +394,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->context->setResult($data);
         $this->processor->process($this->context);
-        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
     public function testProcessForIgnoredAssociation()
@@ -319,7 +411,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $metadata->addAssociation($this->createAssociationMetadata('association1'))
             ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
-        $this->formFactory->expects($this->once())
+        $this->formFactory->expects(self::once())
             ->method('createNamedBuilder')
             ->with(
                 null,
@@ -334,7 +426,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             )
             ->willReturn($formBuilder);
 
-        $formBuilder->expects($this->once())
+        $formBuilder->expects(self::once())
             ->method('add')
             ->with(
                 'association1',
@@ -347,7 +439,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->context->setResult($data);
         $this->processor->process($this->context);
-        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
     public function testProcessForAssociationIgnoredOnlyForGetActions()
@@ -363,7 +455,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $metadata = new EntityMetadata();
         $metadata->addAssociation($this->createAssociationMetadata('association1'));
 
-        $this->formFactory->expects($this->once())
+        $this->formFactory->expects(self::once())
             ->method('createNamedBuilder')
             ->with(
                 null,
@@ -378,7 +470,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             )
             ->willReturn($formBuilder);
 
-        $formBuilder->expects($this->once())
+        $formBuilder->expects(self::once())
             ->method('add')
             ->with(
                 'association1',
@@ -391,7 +483,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->context->setResult($data);
         $this->processor->process($this->context);
-        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
     public function testProcessForCustomEventSubscriber()
@@ -406,7 +498,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $config = new EntityDefinitionConfig();
         $config->setFormEventSubscribers([$eventSubscriberServiceId]);
 
-        $this->formFactory->expects($this->once())
+        $this->formFactory->expects(self::once())
             ->method('createNamedBuilder')
             ->with(
                 null,
@@ -421,21 +513,21 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             )
             ->willReturn($formBuilder);
 
-        $this->container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('get')
             ->with($eventSubscriberServiceId)
             ->willReturn($eventSubscriber);
 
-        $formBuilder->expects($this->once())
+        $formBuilder->expects(self::once())
             ->method('addEventSubscriber')
-            ->with($this->identicalTo($eventSubscriber));
+            ->with(self::identicalTo($eventSubscriber));
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
         $this->context->setMetadata(new EntityMetadata());
         $this->context->setResult($data);
         $this->processor->process($this->context);
-        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
     public function testProcessForCustomEventSubscriberInjectedAsService()
@@ -449,7 +541,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $config = new EntityDefinitionConfig();
         $config->setFormEventSubscribers([$eventSubscriber]);
 
-        $this->formFactory->expects($this->once())
+        $this->formFactory->expects(self::once())
             ->method('createNamedBuilder')
             ->with(
                 null,
@@ -464,15 +556,15 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             )
             ->willReturn($formBuilder);
 
-        $formBuilder->expects($this->once())
+        $formBuilder->expects(self::once())
             ->method('addEventSubscriber')
-            ->with($this->identicalTo($eventSubscriber));
+            ->with(self::identicalTo($eventSubscriber));
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
         $this->context->setMetadata(new EntityMetadata());
         $this->context->setResult($data);
         $this->processor->process($this->context);
-        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 }

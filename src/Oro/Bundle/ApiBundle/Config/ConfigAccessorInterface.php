@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+/**
+ * An interface for classes that can be used to get the configuration of API resource outside of API processors.
+ */
 interface ConfigAccessorInterface
 {
     /**
-     * Gets configuration of an entity.
+     * Gets the configuration of an entity.
      *
      * @param string $className
      *
      * @return EntityDefinitionConfig|null
      */
-    public function getConfig($className);
+    public function getConfig(string $className): ?EntityDefinitionConfig;
 }

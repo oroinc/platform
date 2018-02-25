@@ -56,6 +56,12 @@ class AddParentEntityIdToQuery implements ProcessorInterface
             $parentPath = array_slice($path, 0, -$i);
             if (empty($parentPath)) {
                 $parentClassName = $context->getParentClassName();
+                if (!$this->doctrineHelper->isManageableEntityClass($parentClassName)) {
+                    $parentResourceClass = $parentConfig->getParentResourceClass();
+                    if ($parentResourceClass && $this->doctrineHelper->isManageableEntityClass($parentResourceClass)) {
+                        $parentClassName = $parentResourceClass;
+                    }
+                }
                 $isCollection = $context->isCollection();
             } else {
                 $parentFieldConfig = $parentConfig->findFieldByPath($parentPath, true);
