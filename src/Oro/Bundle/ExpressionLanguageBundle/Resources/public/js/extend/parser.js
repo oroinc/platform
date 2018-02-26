@@ -5,8 +5,11 @@ define(function(require) {
     var OriginalParser = require('oroexpressionlanguage/js/library/parser');
     var Token = require('oroexpressionlanguage/js/library/token');
 
-    function Parser() {
-        Parser.__super__.constructor.call(this);
+    /**
+     * @inheritdoc
+     */
+    function Parser(functions) {
+        Parser.__super__.constructor.call(this, functions);
     }
 
     Parser.prototype = Object.create(OriginalParser.prototype);
@@ -15,6 +18,9 @@ define(function(require) {
     Object.assign(Parser.prototype, {
         constructor: Parser,
 
+        /**
+         * @inheritdoc
+         */
         parseExpression: function(precedence) {
             precedence = precedence || 0;
             var expr = this.getPrimary();

@@ -1,21 +1,31 @@
-Expression editor
-=================
+# Expression editor
 
-<a name="util">ExpressionEditorUtil:</a>
---------------------
+## <a name="util">ExpressionEditorUtil</a>
+
 Source: [`oroform/js/expression-editor-util`](../../public/js/expression-editor-util.js)
 
 Implements core autocomplete and validate functionality for expressions.
-It uses `EntityStructureDataProvider` [[?]](../../../../EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js) (see [documentation](../../../../EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md)) for building autocomplete items from entity fields and validation of expression.
-You can configure allowed operations by options.
+Expression editor:
 
-Supports options:
+* Parses an expression with the extension of `ExpressionLanguage`
+[[?]](../../../../ExpressionLanguageBundle/Resources/public/js/extend/expression-language.js)
+(see [documentation](../../../../ExpressionLanguageBundle/Resources/doc/js/expression-language-extension.md)).
+
+* Validates an expression with the particular `ExpressionOperandTypeValidator` validator
+[[?]](../../public/js/expression-operand-type-validator.js).
+
+* Uses `EntityStructureDataProvider`
+[[?]](../../../../EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js)
+(see [documentation](../../../../EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md)) to build
+autocomplete items from the entity fields.
+
+You can configure the allowed operations with the following options:
 
 - `entityDataProvider` - instance of EntityStructureDataProvider (required)
 - `dataSourceNames` - array of entity aliases (or class names) that require a data source, it needs for validation,
 rendering and determine of correct cursor position
-- `itemLevelLimit` - used to prevent of creation infinile chain of entity fields, can be `2` or more. For instance,
-if you set it to 2, you can choose `product.id` but `product.category.id` wouldn't be allowed 
+- `itemLevelLimit` - used to prevent of creation infinite chain of entity fields, can be `2` or more. For instance,
+if you set it to 2, you can choose `product.id` but `product.category.id` would not be allowed 
 - `allowedOperations` - array containing names of operation groups
 - `operations` - object containing names of operation groups like keys and arrays of operation strings like values, e.g.
 
@@ -39,18 +49,30 @@ Contains public methods:
 - `updateAutocompleteItem` - puts new value into autocomplete data and updates cursor position to end of it
 - `updateDataSourceValue` - sets new data source value into autocomplete data
 - `validate` - validates expression syntax
+- `findFieldChain` - finds accesses to the entity fields in the expression and returns them like the info objects
 
-For validation the util transforms expression into safe native JS code and executes it. If there is no exeption - 
-expression is valid.
+For validation, the utility parses an expression with the `ExpressionLanguage` instance. If 
+the expression is parsed correctly it is also checked with the 
+`ExpressionOperandTypeValidator` (see below).
 
-For such transformation first of all util cleans expression from allowed and not allowed words and symbols, 
-see `regex.nativeReplaceAllowedBeforeTest` and `regex.nativeFindNotAllowed` properties. Then entity fields transforms 
-into their types (e.g. string, integer) and then transforms to appropriate primitive
-(e.g. integer => 0, string => '' etc.). Some operations that difference with js syntax are transformed as well 
-(e.g. and => &&). To transformation uses `itemToNativeJS` property.
+## <a name="validator">ExpressionOperandTypeValidator</a>
 
-<a name="view">ExpressionEditorView</a>
---------------------
+Source: [`oroform/js/expression-operand-type-validator`](../../public/js/expression-operand-type-validator.js)
+
+Uses `ASTNodeWrapper` [[?]](../../../../ExpressionLanguageBundle/Resources/public/js/ast-node-wrapper.js)
+(see [documentation](../../../../ExpressionLanguageBundle/Resources/doc/js/ast-node-wrapper.md)) to analyze the parsed expression.
+
+Constructor supports the following options:
+
+- `entities` - special objects that contain info about entity fields that can be used in expression
+- `itemLevelLimit` - determines how deep level fields of entity can be used in expression
+- `operations` - list of all allowed operations
+- `isConditionalNodeAllowed` - determines possibility to use in expression ternary operators
+
+It has only one public method, `expectValid`, that gets the parsed expression and throws `TypeError` if the expression is invalid.
+
+## <a name="view">ExpressionEditorView</a>
+
 Source: [`oroform/js/app/views/expression-editor-view`](../../public/js/app/views/expression-editor-view.js)
 
 Used `ExpressionEditorUtil` and `typeahead` widget to provide autocomplete and validate UI for text fields. 
@@ -69,8 +91,7 @@ or choose appropriate entity name. E.g. when option is
 
 and user type `email` in the editor
 
-How to Use
-----------
+## How to Use
 
 Create `ExpressionEditorView` and use its util instance for validation (assuming a provider instance was created before):
 
@@ -90,8 +111,7 @@ Create `ExpressionEditorView` and use its util instance for validation (assuming
 
 How to create a provider see into its [documentation](../../../../EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md).
 
-<a name="component">ExpressionEditorComponent</a>
--------------------------
+## <a name="component">ExpressionEditorComponent</a>
 
 Source: [`oroform/js/app/components/expression-editor-component`](../../public/js/app/components/expression-editor-component.js)
 
