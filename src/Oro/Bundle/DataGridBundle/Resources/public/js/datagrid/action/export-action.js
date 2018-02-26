@@ -37,6 +37,13 @@ define([
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function ExportAction() {
+            ExportAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * {@inheritdoc}
          */
         initialize: function(options) {

@@ -1,23 +1,31 @@
 define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
-], function(_, Backbone, AbstractWidget) {
+], function(_, Backbone, AbstractWidgetView) {
     'use strict';
 
     var $ = Backbone.$;
+    var ButtonsWidgetView;
 
     /**
      * @export  oro/buttons-widget
-     * @class   oro.ButtonsWidget
-     * @extends oroui.widget.AbstractWidget
+     * @class   oro.ButtonsWidgetView
+     * @extends oroui.widget.AbstractWidgetView
      */
-    return AbstractWidget.extend({
+    ButtonsWidgetView = AbstractWidgetView.extend({
         options: _.extend(
-            _.extend({}, AbstractWidget.prototype.options),
+            _.extend({}, AbstractWidgetView.prototype.options),
             {
                 cssClass: 'pull-left icons-holder',
                 type: 'buttons',
                 loadingMaskEnabled: false
             }
         ),
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ButtonsWidgetView() {
+            ButtonsWidgetView.__super__.constructor.apply(this, arguments);
+        },
 
         initialize: function(options) {
             options = options || {};
@@ -45,7 +53,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
                     this._showRemote();
                 }
             }
-            AbstractWidget.prototype.show.apply(this);
+            AbstractWidgetView.prototype.show.apply(this);
         },
 
         _showStatic: function() {
@@ -63,4 +71,6 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
             this.setElement(this.widget);
         }
     });
+
+    return ButtonsWidgetView;
 });

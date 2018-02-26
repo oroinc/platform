@@ -24,6 +24,13 @@ define([
         launchers: [],
 
         /**
+         * @inheritDoc
+         */
+        constructor: function ActionsPanel() {
+            ActionsPanel.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize view
          *
          * @param {Object} options

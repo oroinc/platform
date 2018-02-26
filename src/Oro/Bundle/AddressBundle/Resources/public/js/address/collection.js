@@ -5,14 +5,26 @@ define([
 ], function(_, Backbone, AddressModel) {
     'use strict';
 
+    var AddressCollection;
+
     /**
      * @export  oroaddress/js/address/collection
      * @class   oroaddress.address.Collection
      * @extends Backbone.Collection
      */
-    return Backbone.Collection.extend({
+    AddressCollection = Backbone.Collection.extend({
         model: AddressModel,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function AddressCollection() {
+            AddressCollection.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             this.on('change:active', this.onActiveChange, this);
         },
@@ -30,4 +42,6 @@ define([
             }
         }
     });
+
+    return AddressCollection;
 });

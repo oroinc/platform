@@ -36,6 +36,13 @@ define([
         windowSize: 0,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function PaginationInput() {
+            PaginationInput.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Apply change of pagination page input
          *
          * @param {Event} e

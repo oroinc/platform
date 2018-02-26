@@ -21,6 +21,16 @@ define([
 
         $el: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function Select2EmailRecipientsComponent() {
+            Select2EmailRecipientsComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.$el = options._sourceElement;
             Select2EmailRecipientsComponent.__super__.initialize.apply(this, arguments);

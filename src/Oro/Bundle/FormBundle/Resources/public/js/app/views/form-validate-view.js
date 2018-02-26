@@ -8,10 +8,21 @@ define(function(require) {
 
     FormValidateView = BaseView.extend({
         keepElement: true,
+
         autoRender: true,
 
         validationOptions: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function FormValidateView() {
+            FormValidateView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.extend(this, _.pick(options, 'validationOptions'));
             FormValidateView.__super__.initialize.call(this, options);

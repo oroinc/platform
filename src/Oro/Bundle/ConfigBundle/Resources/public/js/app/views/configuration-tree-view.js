@@ -11,6 +11,13 @@ define(function(require) {
     ConfigurationTreeView = BaseTreeView.extend({
         autoSelectFoundNode: true,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ConfigurationTreeView() {
+            ConfigurationTreeView.__super__.constructor.apply(this, arguments);
+        },
+
         isNodeHasHandler: function(node) {
             return node.children.length === 0;
         },

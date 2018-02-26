@@ -37,6 +37,13 @@ define(function(require) {
             return '<ul class="' + config.templateClassName + '" data-name="tabs-list"></ul>';
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function TabCollectionView() {
+            TabCollectionView.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             _.extend(this, _.defaults(_.pick(options, ['useDropdown']), this));
 

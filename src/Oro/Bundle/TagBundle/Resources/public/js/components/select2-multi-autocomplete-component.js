@@ -8,6 +8,17 @@ define(function(require) {
 
     Select2MultiAutocompleteComponent = Select2AutocompleteComponent.extend({
         oroTagCreateGranted: false,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function Select2MultiAutocompleteComponent() {
+            Select2MultiAutocompleteComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.oroTagCreateGranted = _.result(options, 'oro_tag_create_granted') || this.oroTagCreateGranted;
             Select2MultiAutocompleteComponent.__super__.initialize.call(this, options);

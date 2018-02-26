@@ -23,6 +23,13 @@ define([
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function BookmarkItemView() {
+            BookmarkItemView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Change active item after navigation request is completed
          */
         onPageUpdated: function() {

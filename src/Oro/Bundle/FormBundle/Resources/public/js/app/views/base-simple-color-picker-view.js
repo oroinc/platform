@@ -16,6 +16,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function BaseSimpleColorPickerView() {
+            BaseSimpleColorPickerView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @constructor
          * @param {Object} options
          */

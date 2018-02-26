@@ -92,6 +92,17 @@ define(function(require) {
     RelatedIdRelationEditorView = AbstractRelationEditorView.extend(/** @lends RelatedIdRelationEditorView.prototype */{
         DEFAULT_ID_PROPERTY: 'id',
         DEFAULT_TEXT_PROPERTY: 'text',
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function RelatedIdRelationEditorView() {
+            RelatedIdRelationEditorView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             RelatedIdRelationEditorView.__super__.initialize.apply(this, arguments);
             if (options.value_field_name || options.ignore_value_field_name) {

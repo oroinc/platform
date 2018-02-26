@@ -6,6 +6,16 @@ define(function(require) {
     var _ = require('underscore');
 
     Select2AclUserAutocompleteComponent = Select2Component.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function Select2AclUserAutocompleteComponent() {
+            Select2AclUserAutocompleteComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             var params = {
                 permission: options.configs.permission,

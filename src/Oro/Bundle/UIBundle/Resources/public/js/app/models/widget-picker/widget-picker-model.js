@@ -6,7 +6,6 @@ define(function(require) {
     var _ = require('underscore');
 
     WidgetPickerModel = BaseModel.extend({
-
         defaults: {
             dialogIcon: '',
             title: '',
@@ -14,6 +13,13 @@ define(function(require) {
             description: '',
             isNew: false,
             added: 0
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function WidgetPickerModel() {
+            WidgetPickerModel.__super__.constructor.apply(this, arguments);
         },
 
         /**

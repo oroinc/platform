@@ -20,6 +20,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function ToolbarMassActionComponent() {
+            ToolbarMassActionComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['collection', 'actions', 'grid']));
 

@@ -16,6 +16,13 @@ define(function(require) {
             'fieldName'
         ]),
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function MultipleEntityComponent() {
+            MultipleEntityComponent.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function() {
             MultipleEntityComponent.__super__.initialize.apply(this, arguments);
 

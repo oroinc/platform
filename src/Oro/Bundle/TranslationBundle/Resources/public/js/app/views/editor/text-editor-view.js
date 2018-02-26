@@ -7,10 +7,18 @@ define(function(require) {
     // TODO: will be removed after https://magecore.atlassian.net/browse/BAP-11905
     TextEditorView = BaseView.extend({
         template: require('tpl!../../../../templates/text-editor.html'),
+
         events: {
             'change [name=value]': 'onChange',
             'keyup [name=value]': 'onChange',
             'keydown [name=value]': 'onGenericKeydown'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function TextEditorView() {
+            TextEditorView.__super__.constructor.apply(this, arguments);
         },
 
         /**

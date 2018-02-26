@@ -28,6 +28,13 @@ define(function(require) {
     HiddenInitializationView = BaseView.extend(/** @lends HiddenInitializationView.prototype */{
         autoRender: true,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function HiddenInitializationView() {
+            HiddenInitializationView.__super__.constructor.apply(this, arguments);
+        },
+
         render: function() {
             this.$el.addClass('invisible');
             this.initLayout().done(_.bind(function() {

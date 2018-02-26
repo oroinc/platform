@@ -9,7 +9,6 @@ define(function(require) {
     var Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
 
     AttributeSelectComponent = Select2AutocompleteComponent.extend({
-
         /**
          * @property {Object}
          */
@@ -31,6 +30,13 @@ define(function(require) {
          * @property {String}
          */
         ftid: null,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function AttributeSelectComponent() {
+            AttributeSelectComponent.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * @inheritDoc

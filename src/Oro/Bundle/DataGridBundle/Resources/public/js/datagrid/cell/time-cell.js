@@ -14,7 +14,15 @@ define([
      */
     TimeCell = StringCell.extend({
         type: 'time',
-        className: 'time-cell'
+
+        className: 'time-cell',
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function TimeCell() {
+            TimeCell.__super__.constructor.apply(this, arguments);
+        }
     });
 
     return TimeCell;

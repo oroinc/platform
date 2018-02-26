@@ -19,6 +19,13 @@ define(function(require) {
             'change [data-role="changeUseDefault"]': 'onDefaultCheckboxChange'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function DefaultFieldValueView() {
+            DefaultFieldValueView.__super__.constructor.apply(this, arguments);
+        },
+
         render: function() {
             if (this.fieldSelector && this.$(this.checkboxSelector).is(':checked')) {
                 this.$(this.fieldSelector).prop('disabled', true);

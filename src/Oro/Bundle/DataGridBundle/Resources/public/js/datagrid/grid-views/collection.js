@@ -17,6 +17,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function GridViewsCollection() {
+            GridViewsCollection.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(models, options) {
             _.extend(this, _.pick(options, ['gridName']));
             GridViewsCollection.__super__.initialize.call(this, models, options);

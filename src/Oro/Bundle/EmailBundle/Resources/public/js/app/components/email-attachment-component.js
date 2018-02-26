@@ -46,6 +46,16 @@ define(function(require) {
          */
         $popupContentEl: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailAttachmentComponent() {
+            EmailAttachmentComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.popupCollection = new EmailAttachmentCollection(options.attachmentsAvailable || []);
             this.collection = new EmailAttachmentCollection(options.entityAttachments || []);

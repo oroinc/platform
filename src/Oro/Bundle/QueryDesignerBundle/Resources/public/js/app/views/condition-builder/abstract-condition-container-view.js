@@ -7,6 +7,7 @@ define(function(require) {
 
     AbstractConditionContainerView = BaseView.extend({
         tagName: 'li',
+
         className: 'condition controls',
 
         /**
@@ -43,7 +44,7 @@ define(function(require) {
             'click >.close': 'onCloseClick'
         },
 
-        constructor: function(options) {
+        constructor: function AbstractConditionContainerView(options) {
             _.extend(this, _.pick(options, this.requiredOptions));
             if (!this.criteria) {
                 throw new Error('Missing required option `criteria` of ConditionView');

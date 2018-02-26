@@ -14,6 +14,13 @@ define(function(require) {
             signature: undefined,
             email: null,
             bodyFooter: undefined
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailEditorModel() {
+            EmailEditorModel.__super__.constructor.apply(this, arguments);
         }
     });
 

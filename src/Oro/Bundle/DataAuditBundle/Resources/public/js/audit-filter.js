@@ -41,6 +41,13 @@ define(function(require) {
             return events;
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function AuditFilter() {
+            AuditFilter.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             _.extend(this, _.pick(options, 'auditFilterType'));
             AuditFilter.__super__.initialize.call(this, options);

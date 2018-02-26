@@ -18,6 +18,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function EmailNotificationFormComponent() {
+            EmailNotificationFormComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.defaults(_.pick(options, _.identity) || {}, this.options);
 

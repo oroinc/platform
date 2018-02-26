@@ -16,6 +16,13 @@ define(function(require) {
             'changed .condition.controls': 'onChanged'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function CollapsibleFormRowView() {
+            CollapsibleFormRowView.__super__.constructor.apply(this, arguments);
+        },
+
         render: function() {
             if (this.$el.hasClass('collapsed')) {
                 this.$('.controls').hide();

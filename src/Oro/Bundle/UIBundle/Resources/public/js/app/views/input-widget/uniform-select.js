@@ -16,6 +16,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function UniformSelectInputWidget() {
+            UniformSelectInputWidget.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initializeWidget: function() {
             // support for readonly attr
             this.$el.on('click mousedown', function(e) {

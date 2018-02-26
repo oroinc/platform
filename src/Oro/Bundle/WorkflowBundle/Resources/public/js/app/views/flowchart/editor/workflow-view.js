@@ -11,13 +11,22 @@ define(function(require) {
     var FlowchartEditorStepView = require('./step-view');
 
     FlowchartEditorWorkflowView = FlowchartViewerWorkflowView.extend({
-
         autoRender: true,
+
         isConnected: false,
 
         transitionOverlayView: FlowChartEditorTransitionOverlayView,
+
         stepView: FlowchartEditorStepView,
+
         className: 'workflow-flowchart-editor',
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function FlowchartEditorWorkflowView() {
+            FlowchartEditorWorkflowView.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * @type {function(): Object|Object}

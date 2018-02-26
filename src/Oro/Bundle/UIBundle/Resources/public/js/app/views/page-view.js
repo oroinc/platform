@@ -19,6 +19,13 @@ define([
             'page:error mediator': 'addErrorClass'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function PageView() {
+            PageView.__super__.constructor.apply(this, arguments);
+        },
+
         removeErrorClass: function() {
             this.$el.removeClass('error-page');
         },

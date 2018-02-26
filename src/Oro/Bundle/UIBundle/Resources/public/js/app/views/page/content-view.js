@@ -38,6 +38,13 @@ define([
     }
 
     PageContentView = PageRegionView.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function PageContentView() {
+            PageContentView.__super__.constructor.apply(this, arguments);
+        },
+
         template: function(data) {
             return data.content;
         },

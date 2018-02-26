@@ -28,6 +28,16 @@ define(function(require) {
             'change:canShowMessage': 'render'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function GoogleSyncCheckboxView() {
+            GoogleSyncCheckboxView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.$errorMessage = this.$el.find(options.errorMessage);
             this.$successMessage = this.$el.find(options.successMessage);

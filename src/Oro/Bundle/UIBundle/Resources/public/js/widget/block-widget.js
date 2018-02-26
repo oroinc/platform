@@ -1,16 +1,17 @@
 define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
-], function(_, Backbone, AbstractWidget) {
+], function(_, Backbone, AbstractWidgetView) {
     'use strict';
 
     var $ = Backbone.$;
+    var BlockWidgetView;
 
     /**
      * @export  oro/block-widget
-     * @class   oro.BlockWidget
-     * @extends oroui.widget.AbstractWidget
+     * @class   oro.BlockWidgetView
+     * @extends oroui.widget.AbstractWidgetView
      */
-    return AbstractWidget.extend({
-        options: _.extend({}, AbstractWidget.prototype.options, {
+    BlockWidgetView = AbstractWidgetView.extend({
+        options: _.extend({}, AbstractWidgetView.prototype.options, {
             type: 'block',
             cssClass: '',
             title: null,
@@ -28,6 +29,13 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
                 '<div class="row-fluid <%= contentClasses.join(\' \') %>"></div>' +
             '</div>')
         }),
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function BlockWidgetView() {
+            BlockWidgetView.__super__.constructor.apply(this, arguments);
+        },
 
         initialize: function(options) {
             options = options || {};
@@ -73,7 +81,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
          * Remove widget
          */
         remove: function() {
-            AbstractWidget.prototype.remove.call(this);
+            AbstractWidgetView.prototype.remove.call(this);
             this.widget.remove();
         },
 
@@ -86,7 +94,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
                 }
             }
             this.loadingElement = this.widgetContentContainer.parent();
-            AbstractWidget.prototype.show.apply(this);
+            AbstractWidgetView.prototype.show.apply(this);
         },
 
         _showStatic: function() {
@@ -103,7 +111,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
         },
 
         delegateEvents: function(events) {
-            AbstractWidget.prototype.delegateEvents.apply(this, arguments);
+            AbstractWidgetView.prototype.delegateEvents.apply(this, arguments);
             if (this.widget) {
                 this._delegateWidgetEvents(events);
             }
@@ -142,4 +150,6 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
             this.widget.off('.delegateWidgetEvents' + this.cid);
         }
     });
+
+    return BlockWidgetView;
 });

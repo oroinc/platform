@@ -17,6 +17,13 @@ define(function(require) {
         $fieldSelector: null,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function EntityTreeSelectFormTypeComponent() {
+            EntityTreeSelectFormTypeComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @param {Object} options
          */
         initialize: function(options) {

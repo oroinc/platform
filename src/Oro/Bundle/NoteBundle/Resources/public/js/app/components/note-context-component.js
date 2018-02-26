@@ -6,6 +6,13 @@ define(function(require) {
     var ActivityContextActivityView = require('oronote/js/app/views/note-context-component-view');
 
     ActivityContextComponent = BaseComponent.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActivityContextComponent() {
+            ActivityContextComponent.__super__.constructor.apply(this, arguments);
+        },
+
         initView: function() {
             var items = typeof this.options.contextTargets === 'undefined' ? false : this.options.contextTargets;
             var editable = typeof this.options.editable === 'undefined' ? false : this.options.editable;

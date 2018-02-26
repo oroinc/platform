@@ -63,6 +63,17 @@ define(function(require) {
 
     MultiSelectEditorView = SelectEditorView.extend(/** @lends MultiSelectEditorView.prototype */{
         className: 'multi-select-editor',
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function MultiSelectEditorView() {
+            MultiSelectEditorView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             options.ignore_value_field_name = true;
             this.maximumSelectionLength = options.maximumSelectionLength;

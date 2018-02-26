@@ -13,19 +13,35 @@ define(function(require) {
 
     CheckConnectionView = BaseView.extend({
         SUCCESS_MESSAGE_DELAY: 5000,
+
         route: 'oro_imap_connection_check',
+
         entity: 'user',
+
         entityId: 0,
+
         organization: '',
+
         formPrefix: '',
+
         requestPrefix: 'oro_imap_configuration',
+
         events: {
             'click [data-role=check-connection-btn]': 'requestAPI',
             'change .critical-field :input': 'clear'
         },
+
         attributes: {
             'data-layout': 'separate'
         },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function CheckConnectionView() {
+            CheckConnectionView.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             this._setAttributes(this.attributes);
             _.extend(this, _.pick(options, ['entity', 'entityId', 'organization', 'formPrefix']));

@@ -182,6 +182,13 @@ define(function(require) {
         autoUpdateRangeFilterType: true,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function DateFilter() {
+            DateFilter.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @param {Object} options
          * @param {Array.<string>=} options.dayFormats List of acceptable day formats
          * @inheritDoc

@@ -18,8 +18,19 @@ define([
      */
     ActivityContextActivityView = BaseView.extend({
         options: {},
+
         events: {},
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActivityContextActivityView() {
+            ActivityContextActivityView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 

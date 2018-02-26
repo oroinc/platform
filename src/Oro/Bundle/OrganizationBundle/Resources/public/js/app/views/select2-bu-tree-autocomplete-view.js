@@ -5,7 +5,16 @@ define(function(require) {
     var Select2AutocompleteView = require('oroform/js/app/views/select2-autocomplete-view');
 
     var Select2BuTreeAutocompleteView = Select2AutocompleteView.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function Select2BuTreeAutocompleteView() {
+            Select2BuTreeAutocompleteView.__super__.constructor.apply(this, arguments);
+        },
 
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             this.$el.on('input-widget:init', _.bind(this.setPlaceholder, this));
             this.$el.on('select2-blur', _.bind(this.setPlaceholder, this));

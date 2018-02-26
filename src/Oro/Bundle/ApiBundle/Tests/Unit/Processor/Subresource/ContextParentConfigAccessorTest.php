@@ -4,47 +4,64 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ContextParentConfigAccessor;
+use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 
 class ContextParentConfigAccessorTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $context;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|SubresourceContext */
+    private $context;
 
     /** @var ContextParentConfigAccessor */
-    protected $configAccessor;
+    private $configAccessor;
 
     protected function setUp()
     {
-        $this->context = $this->getMockBuilder('Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->context = $this->createMock(SubresourceContext::class);
 
         $this->configAccessor = new ContextParentConfigAccessor($this->context);
     }
 
     public function testGetConfigForContextParentClass()
     {
-        $className = 'Test\Entity';
+        $className = User::class;
         $config = new EntityDefinitionConfig();
 
-        $this->context->expects($this->once())
+        $this->context->expects(self::once())
             ->method('getParentClassName')
             ->willReturn($className);
-        $this->context->expects($this->once())
+        $this->context->expects(self::once())
             ->method('getParentConfig')
             ->willReturn($config);
 
-        $this->assertSame($config, $this->configAccessor->getConfig($className));
+        self::assertSame($config, $this->configAccessor->getConfig($className));
+    }
+
+    public function testGetConfigForContextParentClassForCaseWhenParentApiResourceIsBasedOnManageableEntity()
+    {
+        $className = User::class;
+        $config = new EntityDefinitionConfig();
+
+        $this->context->expects(self::once())
+            ->method('getParentClassName')
+            ->willReturn(UserProfile::class);
+        $this->context->expects(self::once())
+            ->method('getParentConfig')
+            ->willReturn($config);
+
+        self::assertSame($config, $this->configAccessor->getConfig($className));
     }
 
     public function testGetConfigForNotContextParentClass()
     {
-        $this->context->expects($this->once())
+        $this->context->expects(self::once())
             ->method('getParentClassName')
-            ->willReturn('Test\Entity1');
-        $this->context->expects($this->never())
+            ->willReturn(User::class);
+        $this->context->expects(self::never())
             ->method('getParentConfig');
 
-        $this->assertNull($this->configAccessor->getConfig('Test\Entity2'));
+        self::assertNull($this->configAccessor->getConfig(Product::class));
     }
 }

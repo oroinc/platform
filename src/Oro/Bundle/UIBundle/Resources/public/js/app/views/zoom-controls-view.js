@@ -20,6 +20,13 @@ define(function(require) {
             'change model': 'render'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ZoomControlsView() {
+            ZoomControlsView.__super__.constructor.apply(this, arguments);
+        },
+
         onZoomInClick: function(e) {
             e.preventDefault();
             this.model.zoomIn();

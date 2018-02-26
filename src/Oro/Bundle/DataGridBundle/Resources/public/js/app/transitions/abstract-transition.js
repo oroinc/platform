@@ -8,7 +8,10 @@ define(function(require) {
     var BaseClass = require('oroui/js/base-class');
 
     AbstractTransition = BaseClass.extend({
-        constructor: function(options) {
+        /**
+         * @inheritDoc
+         */
+        constructor: function AbstractTransition(options) {
             AbstractTransition.__super__.constructor.call(this, options);
             this.model = options.model;
             this.column = options.column;
@@ -16,6 +19,7 @@ define(function(require) {
             this.relativePosition = options.relativePosition;
             this.apiAccessor = options.apiAccessor;
         },
+
         /**
          * Function to override in child implementations
 

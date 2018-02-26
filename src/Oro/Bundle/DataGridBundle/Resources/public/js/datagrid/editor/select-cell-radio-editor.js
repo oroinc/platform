@@ -31,6 +31,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function SelectCellRadioEditor() {
+            SelectCellRadioEditor.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         save: function() {
             var model = this.model;
             var column = this.column;

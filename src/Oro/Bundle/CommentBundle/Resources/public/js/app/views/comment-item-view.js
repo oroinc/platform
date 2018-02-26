@@ -29,6 +29,13 @@ define(function(require) {
             }
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function CommentItemView() {
+            CommentItemView.__super__.constructor.apply(this, arguments);
+        },
+
         getTemplateData: function() {
             var data = CommentItemView.__super__.getTemplateData.apply(this, arguments);
             if (data.createdAt) {

@@ -8,6 +8,13 @@ define([
     var PinItemView;
 
     PinItemView = BookmarkItemView.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function PinItemView() {
+            PinItemView.__super__.constructor.apply(this, arguments);
+        },
+
         remove: function() {
             mediator.off('content-manager:content-outdated', this.outdatedContentHandler, this);
             PinItemView.__super__.remove.call(this);

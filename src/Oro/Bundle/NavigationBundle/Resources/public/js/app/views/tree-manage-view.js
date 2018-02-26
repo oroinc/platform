@@ -32,6 +32,13 @@ define(function(require) {
         context: {},
 
         /**
+         * @inheritDoc
+         */
+        constructor: function TreeManageView() {
+            TreeManageView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @param {Object} options
          */
         initialize: function(options) {

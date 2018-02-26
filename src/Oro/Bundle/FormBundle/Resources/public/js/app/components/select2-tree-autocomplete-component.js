@@ -9,6 +9,13 @@ define(function(require) {
     Select2TreeAutocompleteComponent = Select2AutocompleteComponent.extend({
         ViewType: Select2AutocompleteView,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function Select2TreeAutocompleteComponent() {
+            Select2TreeAutocompleteComponent.__super__.constructor.apply(this, arguments);
+        },
+
         preConfig: function(config) {
             config = Select2TreeAutocompleteComponent.__super__.preConfig.apply(this, arguments);
 

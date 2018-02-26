@@ -83,6 +83,13 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function ActionsView() {
+            ActionsView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize cell actions and launchers
          */
         initialize: function(options) {

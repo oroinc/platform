@@ -47,6 +47,13 @@ define([
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function GridViewsModel() {
+            GridViewsModel.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initializer.
          *
          * @param {Object} data

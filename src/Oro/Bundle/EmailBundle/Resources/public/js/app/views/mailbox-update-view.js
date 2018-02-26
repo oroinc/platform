@@ -7,10 +7,12 @@ define([
 ], function($, Backbone, _, __, mediator) {
     'use strict';
 
+    var MailboxUpdateView;
+
     /**
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    MailboxUpdateView = Backbone.View.extend({
         /**
          * @const
          */
@@ -18,6 +20,13 @@ define([
 
         events: {
             'change [name*="processType"]': 'changeHandler'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function MailboxUpdateView() {
+            MailboxUpdateView.__super__.constructor.apply(this, arguments);
         },
 
         /**
@@ -52,4 +61,6 @@ define([
             }
         }
     });
+
+    return MailboxUpdateView;
 });

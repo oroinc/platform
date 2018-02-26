@@ -6,7 +6,14 @@ define(function(require) {
     var BaseCollection = require('oroui/js/app/models/base/collection');
 
     ActivityContextCollection = BaseCollection.extend({
-        model: ActivityContextModel
+        model: ActivityContextModel,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActivityContextCollection() {
+            ActivityContextCollection.__super__.constructor.apply(this, arguments);
+        }
     });
 
     return ActivityContextCollection;

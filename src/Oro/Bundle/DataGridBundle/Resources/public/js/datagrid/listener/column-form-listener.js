@@ -25,6 +25,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function ColumnFormListener() {
+            ColumnFormListener.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             if (!_.has(options, 'selectors')) {
                 throw new Error('Field selectors is not specified');

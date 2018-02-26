@@ -82,7 +82,16 @@ define(function(require) {
     require('jquery.select2');
 
     RelatedIdSelectEditorView = SelectEditorView.extend(/** @lends RelatedIdSelectEditorView.prototype */{
+        /**
+         * @inheritDoc
+         */
+        constructor: function RelatedIdSelectEditorView() {
+            RelatedIdSelectEditorView.__super__.constructor.apply(this, arguments);
+        },
 
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             RelatedIdSelectEditorView.__super__.initialize.apply(this, arguments);
             if (options.value_field_name) {

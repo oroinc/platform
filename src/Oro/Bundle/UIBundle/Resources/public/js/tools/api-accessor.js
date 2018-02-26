@@ -73,6 +73,13 @@ define(function(require) {
         formName: void 0,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function ApiAccessor() {
+            ApiAccessor.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @param {Object} options passed to the constructor
          */
         initialize: function(options) {

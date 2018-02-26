@@ -32,6 +32,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function ReportChartDataSchemaView() {
+            ReportChartDataSchemaView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             var optionNames = _.keys(this.defaults);
             _.extend(this, _.defaults(_.pick(options, optionNames), this.defaults));

@@ -35,6 +35,13 @@ define([
             controls: '[data-toggle=dropdown]'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActionHeaderCell() {
+            ActionHeaderCell.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             ActionHeaderCell.__super__.initialize.apply(this, arguments);
 

@@ -22,6 +22,13 @@ define(function(require) {
             empty_selection: 'Please select items to edit.'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EditMassAction() {
+            EditMassAction.__super__.constructor.apply(this, arguments);
+        },
+
         /** @inheritdoc */
         initialize: function(options) {
             EditMassAction.__super__.initialize.apply(this, arguments);

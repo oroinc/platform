@@ -15,6 +15,13 @@ define(function(require) {
      */
     ActivityContextComponent = MultiGridComponent.extend({
         /**
+         * @inheritDoc
+         */
+        constructor: function ActivityContextComponent() {
+            ActivityContextComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Handles row selection on a grid
          *
          * @param {} gridWidget

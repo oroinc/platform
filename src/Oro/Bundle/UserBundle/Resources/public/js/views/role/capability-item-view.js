@@ -9,13 +9,24 @@ define(function(require) {
      */
     CapabilityItemView = BaseView.extend({
         className: 'role-capability__item',
+
         template: require('tpl!orouser/templates/role/capability-item.html'),
+
         autoRender: true,
+
         listen: {
             'change:access_level model': 'render'
         },
+
         events: {
             'change [type=checkbox]': 'onChange'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function CapabilityItemView() {
+            CapabilityItemView.__super__.constructor.apply(this, arguments);
         },
 
         getTemplateData: function() {

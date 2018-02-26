@@ -6,9 +6,9 @@ define([
 ], function(BaseCollection, ActivityModel, _, routing) {
     'use strict';
 
-    var ActivityCollection;
+    var ActivityListCollection;
 
-    ActivityCollection = BaseCollection.extend({
+    ActivityListCollection = BaseCollection.extend({
         model: ActivityModel,
         route: '',
         routeParameters: {},
@@ -26,6 +26,16 @@ define([
             action: null // 'next' or 'prev' or '' (refresh action)
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActivityListCollection() {
+            ActivityListCollection.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             this.pager = _.clone(this.defaultPager);
         },
@@ -117,7 +127,7 @@ define([
                 }
             }
 
-            return ActivityCollection.__super__.reset.call(this, models, options);
+            return ActivityListCollection.__super__.reset.call(this, models, options);
         },
 
         /**
@@ -147,5 +157,5 @@ define([
         }
     });
 
-    return ActivityCollection;
+    return ActivityListCollection;
 });

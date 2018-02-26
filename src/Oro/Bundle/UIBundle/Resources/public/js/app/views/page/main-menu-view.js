@@ -20,6 +20,16 @@ define([
 
         maxHeightModifier: 50,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function PageMainMenuView() {
+            PageMainMenuView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             // Array of search callback, that match route to menu item
             this.routeMatchSearchers = [];

@@ -46,6 +46,13 @@ define([
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function HeaderCell() {
+            HeaderCell.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize.
          *
          * Add listening "reset" event of collection to able catch situation when

@@ -12,6 +12,13 @@ define(function(require) {
             label: __('oro.ui.jstree.actions.collapse')
         }),
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function CollapseActionView() {
+            CollapseActionView.__super__.constructor.apply(this, arguments);
+        },
+
         onClick: function() {
             this.options.$tree.jstree('close_all');
         }

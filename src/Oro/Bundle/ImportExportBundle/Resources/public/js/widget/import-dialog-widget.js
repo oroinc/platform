@@ -13,6 +13,13 @@ define(function(require) {
      * @extends orowindows.widget.DialogWidget
      */
     ImportDialogWidget = BaseDialogView.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function ImportDialogWidget() {
+            ImportDialogWidget.__super__.constructor.apply(this, arguments);
+        },
+
         _onContentLoad: function(content) {
             if (_.has(content, 'success')) {
                 if (content.success) {

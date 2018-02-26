@@ -12,6 +12,13 @@ define(function(require) {
             label: __('oro.ui.jstree.actions.expand')
         }),
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ExpandActionView() {
+            ExpandActionView.__super__.constructor.apply(this, arguments);
+        },
+
         onClick: function() {
             var $tree = this.options.$tree;
             var settings = $tree.jstree().settings;

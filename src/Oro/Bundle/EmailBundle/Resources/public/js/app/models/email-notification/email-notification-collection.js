@@ -11,11 +11,19 @@ define(function(require) {
      */
     EmailNotificationCollection = RoutingCollection.extend({
         model: EmailNotificationModel,
+
         routeDefaults: {
             routeName: 'oro_email_last',
             routeQueryParameterNames: ['limit', 'folderId'],
             limit: 10,
             folderId: 0
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailNotificationCollection() {
+            EmailNotificationCollection.__super__.constructor.apply(this, arguments);
         },
 
         setRouteParams: function(params) {

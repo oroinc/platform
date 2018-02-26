@@ -30,6 +30,13 @@ define([
             empty_selection: 'Please, select item to remove.'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function AjaxdeleteAction() {
+            AjaxdeleteAction.__super__.constructor.apply(this, arguments);
+        },
+
         _doAjaxRequest: function() {
             mediator.trigger('datagrid:beforeRemoveRow:' + this.datagrid.name, this.model);
 

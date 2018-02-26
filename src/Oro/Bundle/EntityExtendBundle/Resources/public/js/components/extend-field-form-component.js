@@ -6,6 +6,16 @@ define(function(require) {
     var BaseComponent = require('oroui/js/app/components/base/component');
 
     ExtendFieldFormComponent = BaseComponent.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function ExtendFieldFormComponent() {
+            ExtendFieldFormComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             $('form select#' + options.typeId).on('change', function() {
                 var selectedOption = $(this).find('option:selected');

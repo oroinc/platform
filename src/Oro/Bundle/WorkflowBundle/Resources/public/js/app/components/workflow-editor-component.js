@@ -49,6 +49,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function WorkflowEditorComponent() {
+            WorkflowEditorComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initViews: function($el, flowchartOptions) {
             this._deferredInit();
             var providerOptions = {

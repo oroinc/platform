@@ -12,6 +12,16 @@ define(function(require) {
 
         addressBookSelector: '#address-book',
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function AddressBookComponent() {
+            AddressBookComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             this._createAddressBook();
         },

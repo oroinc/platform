@@ -11,6 +11,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function ShowComponentAction() {
+            ShowComponentAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         execute: function() {
             // do nothing
         }

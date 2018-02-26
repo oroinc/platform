@@ -36,6 +36,16 @@ define(function(require) {
             'set-focus': 'setFocus'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function WysiwygEditorView() {
+            WysiwygEditorView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             options = $.extend(true, {}, this.defaults, options);
             this.enabled = options.enabled;

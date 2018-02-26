@@ -29,7 +29,7 @@ define(function(require) {
             return events;
         },
 
-        constructor: function(options) {
+        constructor: function AbstractConditionView(options) {
             this.options = _.defaults({}, options, this.getDefaultOptions());
             _.extend(this, _.pick(options, 'value'));
             AbstractConditionView.__super__.constructor.call(this, options);

@@ -21,6 +21,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function JobQueueView() {
+            JobQueueView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['intervalUpdate']));
             this.intervalId = setInterval(_.bind(this.checkStatus, this), this.intervalUpdate);

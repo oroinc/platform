@@ -17,6 +17,16 @@ define(function(require) {
             'comment-load-more': 'onLoadMore'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function CommentsView() {
+            CommentsView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.canCreate = options.canCreate;
             CommentsView.__super__.initialize.apply(this, arguments);

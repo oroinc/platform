@@ -11,6 +11,13 @@ define(function(require) {
     ConditionsGroupView = AbstractConditionContainerView.extend({
         template: template,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ConditionsGroupView() {
+            ConditionsGroupView.__super__.constructor.apply(this, arguments);
+        },
+
         render: function() {
             ConditionsGroupView.__super__.render.call(this);
             _.each(this.subviews, function(view) {

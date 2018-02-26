@@ -8,6 +8,7 @@ define([
 ], function($, Backbone, routing, mediator, __, DeleteConfirmation) {
     'use strict';
 
+    var EmbeddedFormWatcher;
     var $formTypeField;
     var $cssField;
     var $successMessageField;
@@ -70,7 +71,17 @@ define([
             });
     }
 
-    return Backbone.View.extend({
+    EmbeddedFormWatcher = Backbone.View.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmbeddedFormWatcher() {
+            EmbeddedFormWatcher.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             $formTypeField = $('#' + options.formTypeFieldId);
             $cssField = $('#' + options.cssFieldId);
@@ -82,6 +93,7 @@ define([
 
             blockNextRequest = false;
         },
+
         startWatching: function(forceDataLoading) {
             $formTypeField.change(processFormTypeChange);
 
@@ -90,4 +102,6 @@ define([
             }
         }
     });
+
+    return EmbeddedFormWatcher;
 });

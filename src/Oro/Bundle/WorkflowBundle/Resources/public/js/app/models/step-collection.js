@@ -7,7 +7,15 @@ define(function(require) {
 
     StepCollection = BaseCollection.extend({
         model: StepModel,
-        comparator: 'order'
+
+        comparator: 'order',
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function StepCollection() {
+            StepCollection.__super__.constructor.apply(this, arguments);
+        }
     });
 
     return StepCollection;

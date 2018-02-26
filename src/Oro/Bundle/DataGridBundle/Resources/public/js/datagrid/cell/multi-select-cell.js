@@ -40,6 +40,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function MultiSelectCell() {
+            MultiSelectCell.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         render: function() {
             var value = this.model.get(this.column.get('name'));
             var choices = this.choices;

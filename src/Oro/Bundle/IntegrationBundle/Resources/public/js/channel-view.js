@@ -8,12 +8,14 @@ define([
 ], function($, Backbone, _, __, mediator, DeleteConfirmation) {
     'use strict';
 
+    var ChanelView;
+
     /**
      * @export  orointegration/js/channel-view
      * @class   orointegration.channelView
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    ChanelView = Backbone.View.extend({
         /**
          * @const
          */
@@ -29,6 +31,13 @@ define([
         },
 
         requiredOptions: ['transportTypeSelector', 'typeSelector', 'fieldsSets', 'formSelector'],
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ChanelView() {
+            ChanelView.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * @param options Object
@@ -143,4 +152,6 @@ define([
             $el.data('current', $el.val());
         }
     });
+
+    return ChanelView;
 });

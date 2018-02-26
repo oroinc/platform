@@ -15,6 +15,13 @@ define(function(require) {
             'submit form': 'onFormSubmit'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ExportConfigurableWidgetView() {
+            ExportConfigurableWidgetView.__super__.constructor.apply(this, arguments);
+        },
+
         onFormSubmit: function(e) {
             e.preventDefault();
             var currentTarget = e.currentTarget;

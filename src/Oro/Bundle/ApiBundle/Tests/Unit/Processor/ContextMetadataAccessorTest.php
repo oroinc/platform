@@ -3,48 +3,65 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\ContextMetadataAccessor;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 
 class ContextMetadataAccessorTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $context;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|Context */
+    private $context;
 
     /** @var ContextMetadataAccessor */
-    protected $metadataAccessor;
+    private $metadataAccessor;
 
     protected function setUp()
     {
-        $this->context = $this->getMockBuilder('Oro\Bundle\ApiBundle\Processor\Context')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->context = $this->createMock(Context::class);
 
         $this->metadataAccessor = new ContextMetadataAccessor($this->context);
     }
 
     public function testGetMetadataForContextClass()
     {
-        $className = 'Test\Entity';
+        $className = User::class;
         $metadata = new EntityMetadata();
 
-        $this->context->expects($this->once())
+        $this->context->expects(self::once())
             ->method('getClassName')
             ->willReturn($className);
-        $this->context->expects($this->once())
+        $this->context->expects(self::once())
             ->method('getMetadata')
             ->willReturn($metadata);
 
-        $this->assertSame($metadata, $this->metadataAccessor->getMetadata($className));
+        self::assertSame($metadata, $this->metadataAccessor->getMetadata($className));
+    }
+
+    public function testGetMetadataForContextClassForCaseWhenApiResourceIsBasedOnManageableEntity()
+    {
+        $className = User::class;
+        $metadata = new EntityMetadata();
+
+        $this->context->expects(self::once())
+            ->method('getClassName')
+            ->willReturn(UserProfile::class);
+        $this->context->expects(self::once())
+            ->method('getMetadata')
+            ->willReturn($metadata);
+
+        self::assertSame($metadata, $this->metadataAccessor->getMetadata($className));
     }
 
     public function testGetMetadataForNotContextClass()
     {
-        $this->context->expects($this->once())
+        $this->context->expects(self::once())
             ->method('getClassName')
-            ->willReturn('Test\Entity1');
-        $this->context->expects($this->never())
+            ->willReturn(User::class);
+        $this->context->expects(self::never())
             ->method('getMetadata');
 
-        $this->assertNull($this->metadataAccessor->getMetadata('Test\Entity2'));
+        self::assertNull($this->metadataAccessor->getMetadata(Product::class));
     }
 }

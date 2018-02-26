@@ -132,6 +132,13 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function FiltersManager() {
+            FiltersManager.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize filter list options
          *
          * @param {Object} options

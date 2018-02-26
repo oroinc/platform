@@ -9,8 +9,11 @@ define(function(require) {
 
     ColumnManagerView = BaseView.extend({
         template: template,
+
         autoRender: true,
+
         className: 'dropdown-menu',
+
         events: {
             'click [data-role="column-manager-select-all"]': 'onSelectAll',
             'click [data-role="column-manager-unselect-all"]': 'onunselectAll',
@@ -22,6 +25,16 @@ define(function(require) {
             'layout:reposition mediator': 'adjustListHeight'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ColumnManagerView() {
+            ColumnManagerView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             ColumnManagerView.__super__.initialize.call(this, options);
             this.filterer = _.bind(options.columnFilterModel.filterer, options.columnFilterModel);

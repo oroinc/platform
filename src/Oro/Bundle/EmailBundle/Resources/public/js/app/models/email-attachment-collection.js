@@ -9,7 +9,14 @@ define(function(require) {
      * @export  oroemail/js/app/models/email-template-collection
      */
     EmailAttachmentCollection = BaseCollection.extend({
-        model: EmailAttachmentModel
+        model: EmailAttachmentModel,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailAttachmentCollection() {
+            EmailAttachmentCollection.__super__.constructor.apply(this, arguments);
+        }
     });
 
     return EmailAttachmentCollection;

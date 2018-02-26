@@ -2,12 +2,13 @@ define(['underscore', 'backbone'
 ], function(_, Backbone) {
     'use strict';
 
+    var EntityFeildView;
     /**
      * @export  oroentity/js/entity-field-view
      * @class   oroentity.EntityFieldView
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    EntityFeildView = Backbone.View.extend({
         /** @property {Object} */
         options: {
             fieldsLabel: null,
@@ -19,6 +20,16 @@ define(['underscore', 'backbone'
         /** @property {Object} */
         util: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EntityFeildView() {
+            EntityFeildView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.util = this.$el.data('entity-field-util');
@@ -74,4 +85,6 @@ define(['underscore', 'backbone'
             return result;
         }
     });
+
+    return EntityFeildView;
 });

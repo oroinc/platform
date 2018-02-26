@@ -15,14 +15,26 @@ define(function(require) {
             isWysiwygEnabled: false, // true if 'type' is set to 'Html'
             emailVariableView: {} // link to app/views/email-variable-view
         },
+
         listen: {
             'email-variable-view:click-variable mediator': '_onVariableClick'
         },
+
         events: {
             'change input[name*=type]': '_onTypeChange',
             'click .dialog-form-renderer': '_onPreview'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailTemplateEditorView() {
+            EmailTemplateEditorView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             EmailTemplateEditorView.__super__.initialize.apply(this, arguments);
 

@@ -56,6 +56,13 @@ define(function(require) {
         autoUpdateRangeFilterType: true,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function NumberRangeFilter() {
+            NumberRangeFilter.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize.
          */
         initialize: function(options) {

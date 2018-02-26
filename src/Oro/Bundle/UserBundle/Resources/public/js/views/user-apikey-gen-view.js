@@ -16,16 +16,29 @@ define([
         events: {
             'submit form': 'onSubmit'
         },
+
         options: {
             formSelector: null,
             apiKeyElementSelector: null,
             responseMessage: null
         },
+
         responseMessage: 'Generate key was successful. New key:{{ new_api_key }}',
+
         requiredOptions: ['formSelector', 'apiKeyElementSelector'],
+
         $form: null,
+
         $apiKeyElement: null,
+
         $submitBtn: null,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function UserApiKeyGenView() {
+            UserApiKeyGenView.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * Initialize

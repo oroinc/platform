@@ -31,6 +31,13 @@ define([
         }, Backgrid.Column.prototype.defaults),
 
         /**
+         * @inheritDoc
+         */
+        constructor: function ActionColumn() {
+            ActionColumn.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * {@inheritDoc}
          */
         initialize: function(attributes) {

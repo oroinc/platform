@@ -44,6 +44,13 @@ define(function(require) {
         _preventFrontendUpdate: false,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function DatePickerView() {
+            DatePickerView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initializes view
          *  - creates front field
          *  - updates front field

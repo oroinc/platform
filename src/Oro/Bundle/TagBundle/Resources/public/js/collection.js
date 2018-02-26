@@ -2,13 +2,22 @@ define(['backbone', './model'
 ], function(Backbone, TagModel) {
     'use strict';
 
+    var TagCollection;
+
     /**
      * @export  orotag/js/collection
      * @class   orotag.Collection
      * @extends Backbone.Collection
      */
-    var TagCollection = Backbone.Collection.extend({
+    TagCollection = Backbone.Collection.extend({
         model: TagModel,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function TagCollection() {
+            TagCollection.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * Return filtered collection

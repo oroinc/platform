@@ -5,9 +5,9 @@ define([
 ], function($, _, BaseModel) {
     'use strict';
 
-    var ActivityModel;
+    var ActivityListModel;
 
-    ActivityModel = BaseModel.extend({
+    ActivityListModel = BaseModel.extend({
         defaults: {
             id: '',
 
@@ -41,11 +41,21 @@ define([
             targetEntityData: {}
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActivityListModel() {
+            ActivityListModel.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             this.once('change:contentHTML', function() {
                 this.set('is_loaded', true);
             });
-            ActivityModel.__super__.initialize.apply(this, arguments);
+            ActivityListModel.__super__.initialize.apply(this, arguments);
         },
 
         getRelatedActivityClass: function() {
@@ -55,11 +65,11 @@ define([
         /**
          * Compares current model to attributes. Returns true if models are same
          *
-         * @param model {Object|ActivityModel} attributes or model to compare
+         * @param model {Object|ActivityListModel} attributes or model to compare
          */
         isSameActivity: function(model) {
             var attrsToCompare;
-            attrsToCompare = model instanceof ActivityModel ? model.toJSON() : model;
+            attrsToCompare = model instanceof ActivityListModel ? model.toJSON() : model;
 
             if (attrsToCompare.id === this.get('id')) {
                 return true;
@@ -118,5 +128,5 @@ define([
         }
     });
 
-    return ActivityModel;
+    return ActivityListModel;
 });

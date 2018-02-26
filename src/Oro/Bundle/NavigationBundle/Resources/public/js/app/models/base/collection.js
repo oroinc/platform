@@ -4,9 +4,16 @@ define([
 ], function(mediator, BaseCollection) {
     'use strict';
 
-    var Collection;
+    var BaseNavigationItemCollection;
 
-    Collection = BaseCollection.extend({
+    BaseNavigationItemCollection = BaseCollection.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function BaseNavigationItemCollection() {
+            BaseNavigationItemCollection.__super__.constructor.apply(this, arguments);
+        },
+
         getCurrentModel: function() {
             var model = this.find(function(model) {
                 return mediator.execute('compareUrl', model.get('url'));
@@ -15,5 +22,5 @@ define([
         }
     });
 
-    return Collection;
+    return BaseNavigationItemCollection;
 });

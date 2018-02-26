@@ -28,6 +28,13 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function ConfigForm() {
+            ConfigForm.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @param options Object
          */
         initialize: function(options) {

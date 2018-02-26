@@ -21,6 +21,13 @@ define(function(require) {
             'page:afterChange mediator [data-name="field__use-date-group-filter"]': 'render'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function DateGroupingView() {
+            DateGroupingView.__super__.constructor.apply(this, arguments);
+        },
+
         render: function() {
             if (this.$(this.switcherCheckbox).is(':checked')) {
                 this.$(this.allowEmptyCheckbox).removeAttr('disabled');

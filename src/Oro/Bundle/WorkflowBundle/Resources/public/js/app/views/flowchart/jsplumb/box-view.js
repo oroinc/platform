@@ -19,6 +19,16 @@ define(function(require) {
             'change:position model': 'refreshPosition'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function FlowchartJsPlumbBoxView() {
+            FlowchartJsPlumbBoxView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             if (!(options.areaView instanceof FlowchartJsPlumbAreaView)) {
                 throw new Error('areaView options is required and must be a JsplumbAreaView');

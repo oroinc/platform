@@ -55,6 +55,16 @@ define(function(require) {
             }
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActivityListView() {
+            ActivityListView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 

@@ -20,6 +20,13 @@ define(function(require) {
             'mouseleave .filters-state': 'onMouseLeave'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function FiltersStateView() {
+            FiltersStateView.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             _.extend(this, _.pick(options, ['filters']));
 

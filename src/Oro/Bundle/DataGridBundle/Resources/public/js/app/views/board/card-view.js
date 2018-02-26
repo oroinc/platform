@@ -64,6 +64,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function CardView() {
+            CardView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             CardView.__super__.initialize.call(this, options);
             this.readonly = options.readonly;

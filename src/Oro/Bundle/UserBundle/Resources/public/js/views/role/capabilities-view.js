@@ -10,9 +10,18 @@ define(function(require) {
      */
     RoleCapabilitiesView = BaseCollectionView.extend({
         animationDuration: 0,
+
         itemView: CapabilityGroupView,
+
         listen: {
             visibilityChange: 'onVisibilityChange'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function RoleCapabilitiesView() {
+            RoleCapabilitiesView.__super__.constructor.apply(this, arguments);
         },
 
         onVisibilityChange: function() {

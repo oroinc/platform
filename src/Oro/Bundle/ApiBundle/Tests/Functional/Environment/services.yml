@@ -19,6 +19,12 @@ services:
             - '@oro_api.metadata_provider'
             - '@oro_api.resources_provider'
 
+    oro_api.tests.test_route_options_resolver:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestRouteOptionsResolver
+        public: false
+        tags:
+            - { name: routing.options_resolver }
+
     oro_api.tests.check_request_type:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\CheckRequestType
         tags:
@@ -33,3 +39,22 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: update_relationship, group: initialize, priority: 250 }
+
+    oro_api.tests.set_test_current_department_entity_id:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\SetTestCurrentDepartmentEntityId
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_input, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment }
+            - { name: oro.api.processor, action: update, group: normalize_input, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment, priority: 95 }
+
+    oro_api.tests.set_test_current_department_entity_id_for_subresource:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\SetTestCurrentDepartmentEntityIdForSubresource
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: normalize_input, parentClass: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment, priority: 220 }
+            - { name: oro.api.processor, action: get_relationship, group: normalize_input, parentClass: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment, priority: 220 }
+            - { name: oro.api.processor, action: update_relationship, group: normalize_input, parentClass: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment, priority: 220 }
+            - { name: oro.api.processor, action: add_relationship, group: normalize_input, parentClass: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment, priority: 220 }
+            - { name: oro.api.processor, action: delete_relationship, group: normalize_input, parentClass: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment, priority: 220 }

@@ -15,6 +15,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function EntityFieldsCollection() {
+            EntityFieldsCollection.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(models, options) {
             if (!options || !(options.dataProvider instanceof EntityStructureDataProvider)) {
                 throw new TypeError('Option "dataProvider" have to be instance of EntityStructureDataProvider');

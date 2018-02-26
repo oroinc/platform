@@ -24,6 +24,16 @@ define(function(require) {
             'component:parentResize': 'resizeEditor'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function WysiwygDialogView() {
+            WysiwygDialogView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['minimalWysiwygEditorHeight', 'editorComponentName']));
             WysiwygDialogView.__super__.initialize.apply(this, arguments);

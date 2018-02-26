@@ -1,6 +1,7 @@
 define(function(require) {
     'use strict';
 
+    var ManyToManyFilter;
     var ChoiceFilter = require('./choice-filter');
     var template = require('tpl!orofilter/templates/filter/many-to-many-filter.html');
     /**
@@ -8,7 +9,7 @@ define(function(require) {
      * @class   oro.filter.ManyToManyFilter
      * @extends oro.filter.ChoiceFilter
      */
-    return ChoiceFilter.extend({
+    ManyToManyFilter = ChoiceFilter.extend({
 
         /**
          * Template selector for filter criteria
@@ -16,6 +17,15 @@ define(function(require) {
          * @property
          */
         template: template,
-        templateSelector: '#many-to-many-filter-template'
+        templateSelector: '#many-to-many-filter-template',
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function CellPopupEditorComponent() {
+            CellPopupEditorComponent.__super__.constructor.apply(this, arguments);
+        }
     });
+
+    return ManyToManyFilter;
 });

@@ -23,6 +23,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function SelectCell() {
+            SelectCell.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             if (this.expanded && !this.multiple) {
                 this.editor = SelectCellRadioEditor;

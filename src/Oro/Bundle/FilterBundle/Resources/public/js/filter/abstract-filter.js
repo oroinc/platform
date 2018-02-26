@@ -118,6 +118,13 @@ define([
         renderMode: '',
 
         /**
+         * @inheritDoc
+         */
+        constructor: function AbstractFilter() {
+            AbstractFilter.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize.
          *
          * @param {Object} options

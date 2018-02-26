@@ -7,6 +7,12 @@ define(function(require) {
     var MultiCheckboxView = require('oroform/js/app/views/multi-checkbox-view');
 
     WeekDayPickerView = MultiCheckboxView.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function WeekDayPickerView() {
+            WeekDayPickerView.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * @constructor

@@ -16,6 +16,13 @@ define(function(require) {
         useButtonGroup: true,
         useCaret: true,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function DropdownSelectView() {
+            DropdownSelectView.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             _.extend(this,
                 _.pick(options, 'selectOptions', 'selectedValue', 'buttonClass', 'useButtonGroup', 'useCaret'));

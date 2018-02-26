@@ -73,6 +73,13 @@ define(function(require) {
             '<ul class="dropdown-menu-collection__list" data-name="list"></ul>'
         ].join('')),
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function DropdownMenuCollectionView() {
+            DropdownMenuCollectionView.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             _.extend(this, _.pick(options, ['loadingText', 'fallbackText', 'keysMap', 'dropdownMenuOptions']));
             if (options.keysMap) {

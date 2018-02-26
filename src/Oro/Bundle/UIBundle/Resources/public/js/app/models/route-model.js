@@ -52,6 +52,13 @@ define(function(require) {
 
         /**
          * @inheritDoc
+         */
+        constructor: function RouteModel() {
+            RouteModel.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
          * @member {Object}
          */
         defaults: function() {

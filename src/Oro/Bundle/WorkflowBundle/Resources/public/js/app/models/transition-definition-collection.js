@@ -6,7 +6,14 @@ define(function(require) {
     var TransitionDefinitionModel = require('./transition-definition-model');
 
     TransitionDefinitionCollection = BaseCollection.extend({
-        model: TransitionDefinitionModel
+        model: TransitionDefinitionModel,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function TransitionDefinitionCollection() {
+            TransitionDefinitionCollection.__super__.constructor.apply(this, arguments);
+        }
     });
 
     return TransitionDefinitionCollection;

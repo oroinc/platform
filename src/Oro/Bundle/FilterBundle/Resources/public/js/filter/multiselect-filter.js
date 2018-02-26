@@ -46,6 +46,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function MultiSelectFilter() {
+            MultiSelectFilter.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             if (_.isUndefined(this.emptyValue)) {
                 this.emptyValue = {

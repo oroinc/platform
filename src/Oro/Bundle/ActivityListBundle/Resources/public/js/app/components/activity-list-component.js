@@ -45,6 +45,16 @@ define(function(require) {
             'toView collection': 'onViewActivity'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActivityListComponent() {
+            ActivityListComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = options || {};
             this.processOptions();

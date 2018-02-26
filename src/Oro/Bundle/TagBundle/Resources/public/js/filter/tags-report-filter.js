@@ -24,6 +24,13 @@ define(
             /**
              * @inheritDoc
              */
+            constructor: function TagsReportFilter() {
+                TagsReportFilter.__super__.constructor.apply(this, arguments);
+            },
+
+            /**
+             * @inheritDoc
+             */
             initialize: function(options) {
                 this.entityClass = this.filterParams.entityClass.replace(/\\/g, '_');
                 TagsReportFilter.__super__.initialize.apply(this, arguments);

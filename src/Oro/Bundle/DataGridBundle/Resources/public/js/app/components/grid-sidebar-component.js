@@ -37,6 +37,13 @@ define(function(require) {
         gridCollection: {},
 
         /**
+         * @inheritDoc
+         */
+        constructor: function GridSidebarComponent() {
+            GridSidebarComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * {@inheritDoc}
          */
         initialize: function(options) {

@@ -44,6 +44,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function LoadingMaskView() {
+            LoadingMaskView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['loadingHint', 'hideDelay']));
             $(window).on(
