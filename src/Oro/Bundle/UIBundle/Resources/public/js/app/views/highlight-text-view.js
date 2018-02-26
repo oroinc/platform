@@ -269,12 +269,14 @@ define(function(require) {
         },
 
         /**
-         * Check hidden not highlighted items exists in the view
+         * Check is applicable switcher state
          *
          * @return {boolean}
          */
-        isViewHasHiddenItems: function() {
-            return this.$el.find(this.findNotFoundClass).length;
+        isApplicableSwitcher: function() {
+            var foundHighlight = this.$el.find(this.findHighlightClass);
+            var foundSiblings = this.$el.find(this.findFoundClass).siblings().not(this.findHighlightClass);
+            return foundHighlight.length && foundSiblings.length;
         },
 
         /**
@@ -378,7 +380,7 @@ define(function(require) {
          * @param {boolean} state
          */
         toggleHighlightSwitcher: function(state) {
-            state = state ? state : this.isViewHasHiddenItems();
+            state = state ? state : this.isApplicableSwitcher();
             this.$el.find(this.highlightSwitcherElement).toggleClass('hide', !state);
         },
 
