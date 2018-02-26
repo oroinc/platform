@@ -98,8 +98,8 @@ oro:
             move_node_error: "You can not move node {{ nodeText }} here."
             no_node_selected_error: "You didn't select any node"
             actions:
-                expand: 'Expand All'
-                collapse: 'Collapse All'
+                expand: 'Expand all'
+                collapse: 'Collapse all'
                 move: 'Move To'
                 subitems:
                     itemsLabel: 'Items'
