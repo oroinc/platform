@@ -533,7 +533,7 @@
 #}
 {% macro email_short_body(emailBody, length) %}
     {%- set length = length|default(150) -%}
-    {{ emailBody.textBody|oro_preg_replace('/\-{2,}/', '--')[:length]|replace({'--': '&mdash;'})|raw }}
+    {{ emailBody.textBody|striptags|oro_preg_replace('/\-{2,}/', '--')[:length]|replace({'--': '&mdash;'})|raw }}
 {% endmacro %}
 
 {#
