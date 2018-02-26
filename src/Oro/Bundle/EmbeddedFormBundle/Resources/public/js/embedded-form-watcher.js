@@ -57,7 +57,7 @@ define([
         }
 
         // TODO: To be fixed in BAP-16667
-        //mediator.execute('showLoading');
+        // mediator.execute('showLoading');
         var url = routing.generate('oro_embedded_form_default_data', {formType: formType});
         $.get(url)
             .done(function(data, code, response) {
@@ -69,7 +69,7 @@ define([
                 rememberedFormType = formType;
             }).always(function() {
                 // TODO: To be fixed in BAP-16667
-                //mediator.execute('hideLoading');
+                // mediator.execute('hideLoading');
             });
     }
 
