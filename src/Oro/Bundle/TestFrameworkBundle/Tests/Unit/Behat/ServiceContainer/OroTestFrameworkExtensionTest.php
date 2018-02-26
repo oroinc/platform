@@ -289,6 +289,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->getMock()
         );
+        $kernel->getContainer()->setParameter('kernel.secret', 'secret');
 
         $containerBuilder->set('symfony2_extension.kernel', $kernel);
         $containerBuilder->set('symfony2_extension.suite.generator', new SymfonySuiteGenerator($kernel));
