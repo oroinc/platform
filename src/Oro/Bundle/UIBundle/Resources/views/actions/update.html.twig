@@ -31,6 +31,12 @@
         'data-collect': 'true'
     }) %}
 
+    {% for key,value in formAttr %}
+        {% if value is iterable %}
+            {% set formAttr = formAttr|merge({(key): value|json_encode}) %}
+        {% endif %}
+    {% endfor %}
+
     {% if pageComponent is defined %}
         {% for key,value in pageComponent %}
             {% if key == 'layout' %}
