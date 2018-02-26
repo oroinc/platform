@@ -46,7 +46,13 @@ define(function(require) {
                 this.flowchartState = new FlowchartStateModel();
                 this.FlowchartWorkflowView = FlowchartViewerWorkflowView;
             }
-            this.initViews(options._sourceElement, flowchartOptions);
+            if (this.deferredInit) {
+                this.deferredInit.done(function() {
+                    this.initViews(options._sourceElement, flowchartOptions);
+                }.bind(this));
+            } else {
+                this.initViews(options._sourceElement, flowchartOptions);
+            }
         },
 
         /**

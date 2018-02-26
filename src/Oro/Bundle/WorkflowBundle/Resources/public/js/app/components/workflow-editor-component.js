@@ -56,34 +56,42 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        initViews: function($el, flowchartOptions) {
+        initialize: function(options) {
             this._deferredInit();
             var providerOptions = {
                 filterPreset: 'workflow'
             };
-            if ('entity' in this.options) {
-                providerOptions.rootEntity = _.result(this.options.entity, 'entity');
+            var entity = _.result(options, 'entity') || _.result(this.options, 'entity');
+            if (entity) {
+                providerOptions.rootEntity = _.result(entity, 'entity');
             }
             EntityStructureDataProvider.createDataProvider(providerOptions, this).then(function(provider) {
                 this.entityFieldsProvider = provider;
-                this.workflowManagementView = new WorkflowManagementView({
-                    autoRender: true,
-                    el: $el,
-                    stepsEl: '.workflow-definition-steps-list-container',
-                    model: this.model,
-                    entityFieldsProvider: provider
-                });
-                this.historyManager = new HistoryNavigationComponent({
-                    observedModel: this.model,
-                    _sourceElement: $el.find('.workflow-history-container')
-                });
-                if (this.flowchartEnabled) {
-                    this.FlowchartWorkflowView = FlowchartEditorWorkflowView;
-                }
                 this._resolveDeferredInit();
             }.bind(this));
 
-            WorkflowEditorComponent.__super__.initViews.apply(this, arguments);
+            WorkflowEditorComponent.__super__.initialize.call(this, options);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        initViews: function($el, flowchartOptions) {
+            this.workflowManagementView = new WorkflowManagementView({
+                autoRender: true,
+                el: $el,
+                stepsEl: '.workflow-definition-steps-list-container',
+                model: this.model,
+                entityFieldsProvider: this.entityFieldsProvider
+            });
+            this.historyManager = new HistoryNavigationComponent({
+                observedModel: this.model,
+                _sourceElement: $el.find('.workflow-history-container')
+            });
+            if (this.flowchartEnabled) {
+                this.FlowchartWorkflowView = FlowchartEditorWorkflowView;
+            }
+            WorkflowEditorComponent.__super__.initViews.call(this, $el, flowchartOptions);
         },
 
         /**
