@@ -83,3 +83,6 @@ services:
         class: Oro\Bundle\MigrationBundle\EventListener\ConsoleCommandListener
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
+
+    oro_migration.locator.fixture_path_locator:
+        class: Oro\Bundle\MigrationBundle\Locator\FixturePathLocator
