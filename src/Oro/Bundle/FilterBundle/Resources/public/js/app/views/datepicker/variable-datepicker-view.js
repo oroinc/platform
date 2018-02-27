@@ -70,6 +70,13 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function VariableDatePickerView() {
+            VariableDatePickerView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initializes variable-date-picker view
          * @param {Object} options
          */

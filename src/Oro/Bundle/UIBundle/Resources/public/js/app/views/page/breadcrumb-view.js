@@ -28,6 +28,13 @@ define([
         data: null,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function BreadcrumbView() {
+            BreadcrumbView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Handles menu update event
          *  - prepares data for breadcrumbs rendering
          *  - renders view

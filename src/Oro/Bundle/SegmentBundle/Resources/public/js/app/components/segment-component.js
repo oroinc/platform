@@ -62,6 +62,16 @@ define(function(require) {
          */
         columnFormView: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function SegmentComponent() {
+            SegmentComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             var providerPromise = EntityStructureDataProvider.createDataProvider({}, this);
             var modulesPromise = !options.extensions ? [] : tools.loadModules(options.extensions).then(function() {

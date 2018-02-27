@@ -35,6 +35,13 @@ define([
         hidden: false,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function PageSize() {
+            PageSize.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initializer.
          *
          * @param {Object} options

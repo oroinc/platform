@@ -5,6 +5,10 @@
 * Added a possibility to enable custom API. For details see [how_to.md](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#enable-custom-api).
 
 ### Removed
+#### UIBundle
+* Removed twig filter `oro_html_tag_trim` use `oro_html_escape` instead. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_escape).
+* Removed twig filter `oro_html_purify` use `oro_html_strip_tags` instead. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_strip_tags).
+
 #### WorkflowBundle
 * Removed cache provider `oro_workflow.cache.provider.workflow_definition`. Doctrine result cache is used instead of.
 
@@ -25,6 +29,9 @@
     | oro_rest_api_patch_relationship | OroApiBundle:RestApiRelationship:patch | oro_rest_api_relationship | OroApiBundle:RestApi:relationship |
     | oro_rest_api_post_relationship | OroApiBundle:RestApiRelationship:post | oro_rest_api_relationship | OroApiBundle:RestApi:relationship |
     | oro_rest_api_delete_relationship | OroApiBundle:RestApiRelationship:delete | oro_rest_api_relationship | OroApiBundle:RestApi:relationship |
+
+#### UIBundle
+* Twig filter `oro_tag_filter` was renamed to `oro_html_strip_tags`. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_strip_tags).
 
 #### UserBundle
 * The `oro_rest_api_get_user_profile` route was removed, use `oro_rest_api_user_profile` route instead.

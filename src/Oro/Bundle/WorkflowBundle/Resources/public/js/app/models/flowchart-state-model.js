@@ -7,6 +7,13 @@ define(function(require) {
     FlowchartStateModel = BaseModel.extend({
         defaults: {
             transitionLabelsVisible: true
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function FlowchartStateModel() {
+            FlowchartStateModel.__super__.constructor.apply(this, arguments);
         }
     });
 

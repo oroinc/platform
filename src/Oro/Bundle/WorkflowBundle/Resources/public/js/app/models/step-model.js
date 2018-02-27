@@ -18,6 +18,14 @@ define(function(require) {
             translateLinks: []
         },
 
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function StepModel() {
+            StepModel.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function() {
             this.workflow = null;
             this.allowedTransitions = null;

@@ -13,6 +13,13 @@ define(function(require) {
     var FieldChoiceView = require('oroentity/js/app/views/field-choice-view');
 
     FieldConditionView = AbstractConditionView.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function FieldConditionView() {
+            FieldConditionView.__super__.constructor.apply(this, arguments);
+        },
+
         getDefaultOptions: function() {
             var defaultOptions = FieldConditionView.__super__.getDefaultOptions.call(this);
             return _.extend({}, defaultOptions, {

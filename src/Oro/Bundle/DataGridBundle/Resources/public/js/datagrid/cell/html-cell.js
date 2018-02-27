@@ -21,6 +21,13 @@ define([
         formatter: new Backgrid.CellFormatter(),
 
         /**
+         * @inheritDoc
+         */
+        constructor: function HtmlCell() {
+            HtmlCell.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Render a text string in a table cell. The text is converted from the
          * model's raw value for this cell's column.
          */

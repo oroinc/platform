@@ -12,15 +12,33 @@ define(function(require) {
 
     ActionPermissionsReadonlyRowView = BaseView.extend({
         tagName: 'tr',
+
         className: 'collapsed',
+
         autoRender: false,
+
         animationDuration: 0,
+
         template: require('tpl!orouser/templates/datagrid/action-permissions-row-view.html'),
+
         permissionItemView: PermissionReadOnlyView,
+
         fieldItemView: ReadonlyFieldView,
+
         events: {
             'click .collapse-action': 'onFieldsSectionToggle'
         },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActionPermissionsReadonlyRowView() {
+            ActionPermissionsReadonlyRowView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             ActionPermissionsReadonlyRowView.__super__.initialize.call(this, options);
             var fields = this.model.get('fields');

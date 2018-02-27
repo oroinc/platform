@@ -82,8 +82,8 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         self::assertSame($job, $result);
         self::assertEquals(Job::STATUS_NEW, $job->getStatus());
-        self::assertEquals(new \DateTime(), $job->getCreatedAt(), '', 1);
-        self::assertEquals(new \DateTime(), $job->getStartedAt(), '', 1);
+        self::assertLessThanOrEqual(new \DateTime(), $job->getCreatedAt());
+        self::assertLessThanOrEqual(new \DateTime(), $job->getStartedAt());
         self::assertNull($job->getStoppedAt());
         self::assertEquals('job-name', $job->getName());
         self::assertEquals('owner-id', $job->getOwnerId());
@@ -267,7 +267,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         self::assertSame($job, $result);
         self::assertEquals(Job::STATUS_NEW, $job->getStatus());
-        self::assertEquals(new \DateTime(), $job->getCreatedAt(), '', 1);
+        self::assertLessThanOrEqual(new \DateTime(), $job->getCreatedAt());
         self::assertNull($job->getStartedAt());
         self::assertNull($job->getStoppedAt());
         self::assertEquals('job-name', $job->getName());
@@ -336,7 +336,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $this->jobProcessor->startChildJob($job);
 
         self::assertEquals(Job::STATUS_RUNNING, $job->getStatus());
-        self::assertEquals(new \DateTime(), $job->getStartedAt(), '', 1);
+        self::assertLessThanOrEqual(new \DateTime(), $job->getStartedAt());
     }
 
     public function testSuccessChildJobShouldThrowIfRootJob()
@@ -390,7 +390,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $this->jobProcessor->successChildJob($job);
 
         self::assertEquals(Job::STATUS_SUCCESS, $job->getStatus());
-        self::assertEquals(new \DateTime(), $job->getStoppedAt(), '', 1);
+        self::assertLessThanOrEqual(new \DateTime(), $job->getStoppedAt());
     }
 
     public function testFailChildJobShouldThrowIfRootJob()
@@ -444,7 +444,9 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $this->jobProcessor->failChildJob($job);
 
         self::assertEquals(Job::STATUS_FAILED, $job->getStatus());
-        self::assertEquals(new \DateTime(), $job->getStoppedAt(), '', 1);
+        $stoppedAt = $job->getStoppedAt();
+        self::assertInstanceOf(\DateTime::class, $stoppedAt);
+        self::assertLessThanOrEqual(new \DateTime(), $stoppedAt);
     }
 
     public function testCancelChildJobShouldThrowIfRootJob()
@@ -498,8 +500,8 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $this->jobProcessor->cancelChildJob($job);
 
         self::assertEquals(Job::STATUS_CANCELLED, $job->getStatus());
-        self::assertEquals(new \DateTime(), $job->getStoppedAt(), '', 1);
-        self::assertEquals(new \DateTime(), $job->getStartedAt(), '', 1);
+        self::assertLessThanOrEqual(new \DateTime(), $job->getStoppedAt());
+        self::assertLessThanOrEqual(new \DateTime(), $job->getStartedAt());
     }
 
     public function testInterruptRootJobShouldThrowIfNotRootJob()
@@ -543,7 +545,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $this->jobProcessor->interruptRootJob($rootJob, true);
 
         self::assertTrue($rootJob->isInterrupted());
-        self::assertEquals(new \DateTime(), $rootJob->getStoppedAt(), '', 1);
+        self::assertLessThanOrEqual(new \DateTime(), $rootJob->getStoppedAt());
         self::assertEquals($childJob->getStatus(), Job::STATUS_CANCELLED);
     }
 
@@ -627,7 +629,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $this->jobProcessor->interruptRootJob($rootJob, true);
 
         self::assertTrue($rootJob->isInterrupted());
-        self::assertEquals(new \DateTime(), $rootJob->getStoppedAt(), '', 1);
+        self::assertLessThanOrEqual(new \DateTime(), $rootJob->getStoppedAt());
     }
 
     public function testFailAndRedeliveryChildJob()

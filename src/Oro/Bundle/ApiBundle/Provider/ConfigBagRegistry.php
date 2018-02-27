@@ -55,7 +55,7 @@ class ConfigBagRegistry
         }
 
         $configBagServiceId = null;
-        foreach ($this->configBags as [$serviceId, $expression]) {
+        foreach ($this->configBags as list($serviceId, $expression)) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 $configBagServiceId = $serviceId;
                 break;

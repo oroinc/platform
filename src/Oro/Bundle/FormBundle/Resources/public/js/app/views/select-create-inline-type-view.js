@@ -8,18 +8,36 @@ define(function(require) {
     var routing = require('routing');
     var DialogWidget = require('oro/dialog-widget');
     var BaseView = require('oroui/js/app/views/base/view');
+
     SelectCreateInlineTypeView = BaseView.extend({
         autoRender: true,
+
         urlParts: null,
+
         inputSelector: null,
+
         select2QueryAdditionalParams: null,
+
         entityLabel: '',
+
         existingEntityGridId: null,
+
         dialogWidget: null,
+
         events: {
             'click .entity-select-btn': 'onSelect',
             'click .entity-create-btn': 'onCreate'
         },
+        /**
+         * @inheritDoc
+         */
+        constructor: function SelectCreateInlineTypeView() {
+            SelectCreateInlineTypeView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             SelectCreateInlineTypeView.__super__.initialize.apply(this, arguments);
             _.extend(this, _.pick(options, 'urlParts', 'entityLabel', 'existingEntityGridId', 'inputSelector'));
@@ -56,9 +74,11 @@ define(function(require) {
             this.dialogWidget.once('grid-row-select', _.bind(this.onGridRowSelect, this));
             this.dialogWidget.render();
         },
+
         onDialogClose: function() {
             this.$(this.inputSelector).off('.' + this.dialogWidget._wid);
         },
+
         onGridRowSelect: function(data) {
             var eventNamespace = this.dialogWidget._wid;
             var loadingStarted = false;
@@ -78,6 +98,7 @@ define(function(require) {
                 onSelect();
             }
         },
+
         onCreate: function(e) {
             e.preventDefault();
             var routeName = this.urlParts.create.route;
@@ -106,15 +127,19 @@ define(function(require) {
 
             this.dialogWidget.render();
         },
+
         getUrlParts: function() {
             return this.urlParts;
         },
+
         setUrlParts: function(newParts) {
             this.urlParts = newParts;
         },
+
         setSelection: function(value) {
             this.$(this.inputSelector).inputWidget('val', value);
         },
+
         getSelection: function() {
             return this.$(this.inputSelector).inputWidget('val');
         }

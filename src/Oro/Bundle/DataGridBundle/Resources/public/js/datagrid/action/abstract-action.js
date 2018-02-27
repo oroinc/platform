@@ -92,6 +92,13 @@ define(function(require) {
         configuration: {},
 
         /**
+         * @inheritDoc
+         */
+        constructor: function AbstractAction() {
+            AbstractAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize view
          *
          * @param {Object} options

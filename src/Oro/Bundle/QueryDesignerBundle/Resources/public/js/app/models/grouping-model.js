@@ -9,6 +9,13 @@ define(function(require) {
 
         defaults: {
             name: null
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ColumnModel() {
+            ColumnModel.__super__.constructor.apply(this, arguments);
         }
     });
 
