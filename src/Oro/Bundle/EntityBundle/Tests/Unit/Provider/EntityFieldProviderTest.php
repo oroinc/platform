@@ -178,15 +178,6 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
         $this->prepare($config);
-        $this->translator->expects($this->exactly(4))
-            ->method('trans')
-            ->withConsecutive(
-                ['C', [], null, null],
-                ['B', [], null, null],
-                ['A', [], null, null],
-                ['acme.entity.test.field4.label', [], null, null]
-            )
-            ->willReturnOnConsecutiveCalls('C', 'B', 'A', 'acme.entity.test.field4.label');
 
         $result = $this->provider->getFields('Acme:Test');
         $expected = [
@@ -224,16 +215,6 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldsWithRelations(array $expected)
     {
         $this->prepareWithRelations();
-        $this->translator->expects($this->exactly(5))
-            ->method('trans')
-            ->withConsecutive(
-                ['C', [], null, null],
-                ['B', [], null, null],
-                ['A', [], null, null],
-                ['acme.entity.test.field4.label', [], null, null],
-                ['Rel1', [], null, null]
-            )
-            ->willReturnOnConsecutiveCalls('C', 'B', 'A', 'acme.entity.test.field4.label', 'Rel1');
         $result = $this->provider->getFields('Acme:Test', true);
 
         $this->assertEquals($expected, $result);
@@ -290,16 +271,6 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldsWithRelationsAndDeepLevel(array $expected)
     {
         $this->prepareWithRelations();
-        $this->translator->expects($this->exactly(5))
-            ->method('trans')
-            ->withConsecutive(
-                ['C', [], null, null],
-                ['B', [], null, null],
-                ['A', [], null, null],
-                ['acme.entity.test.field4.label', [], null, null],
-                ['Rel1', [], null, null]
-            )
-            ->willReturnOnConsecutiveCalls('C', 'B', 'A', 'acme.entity.test.field4.label', 'Rel1');
         $result = $this->provider->getFields('Acme:Test', true, false, false, false, 1);
 
         $this->assertEquals($expected, $result);
@@ -354,26 +325,6 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldsWithRelationsAndDeepLevelAndEntityDetails(array $expected)
     {
         $this->prepareWithRelations();
-        $this->translator->expects($this->exactly(7))
-            ->method('trans')
-            ->withConsecutive(
-                ['C', [], null, null],
-                ['B', [], null, null],
-                ['A', [], null, null],
-                ['acme.entity.test.field4.label', [], null, null],
-                ['Rel1', [], null, null],
-                ['Test1 Label', [], null, null],
-                ['Test1 Plural Label', [], null, null]
-            )
-            ->willReturnOnConsecutiveCalls(
-                'C',
-                'B',
-                'A',
-                'acme.entity.test.field4.label',
-                'Rel1',
-                'Test1 Label',
-                'Test1 Plural Label'
-            );
         $result = $this->provider->getFields('Acme:Test', true, false, true, false, 1);
 
         $this->assertEquals($expected, $result);
@@ -431,16 +382,6 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldsWithRelationsAndDeepLevelAndLastLevelRelations(array $expected)
     {
         $this->prepareWithRelations();
-        $this->translator->expects($this->exactly(5))
-            ->method('trans')
-            ->withConsecutive(
-                ['C', [], null, null],
-                ['B', [], null, null],
-                ['A', [], null, null],
-                ['acme.entity.test.field4.label', [], null, null],
-                ['Rel1', [], null, null]
-            )
-            ->willReturnOnConsecutiveCalls('C', 'B', 'A', 'acme.entity.test.field4.label', 'Rel1');
         $result = $this->provider->getFields('Acme:Test', true, false, false, false, 1, true);
 
         $this->assertEquals($expected, $result);
@@ -495,26 +436,6 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldsWithRelationsAndDeepLevelAndLastLevelRelationsAndEntityDetails(array $expected)
     {
         $this->prepareWithRelations();
-        $this->translator->expects($this->exactly(7))
-            ->method('trans')
-            ->withConsecutive(
-                ['C', [], null, null],
-                ['B', [], null, null],
-                ['A', [], null, null],
-                ['acme.entity.test.field4.label', [], null, null],
-                ['Rel1', [], null, null],
-                ['Test1 Label', [], null, null],
-                ['Test1 Plural Label', [], null, null]
-            )
-            ->willReturnOnConsecutiveCalls(
-                'C',
-                'B',
-                'A',
-                'acme.entity.test.field4.label',
-                'Rel1',
-                'Test1 Label',
-                'Test1 Plural Label'
-            );
         $result = $this->provider->getFields('Acme:Test', true, false, true, false, 1, true);
 
         $this->assertEquals($expected, $result);
@@ -572,22 +493,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldsWithRelationsAndDeepLevelAndWithUnidirectional(array $expected)
     {
         $this->prepareWithRelations();
-        $this->translator->expects($this->exactly(5))
-            ->method('trans')
-            ->withConsecutive(
-                ['B', [], null, null],
-                ['A', [], null, null],
-                ['Rel11', [], null, null],
-                ['UniRel1', [], null, null],
-                ['Test22 Label', [], null, null]
-            )
-            ->willReturnOnConsecutiveCalls(
-                'B',
-                'A',
-                'Rel11',
-                'UniRel1',
-                'Test22 Label'
-            );
+
         $result = $this->provider->getFields('Acme:Test1', true, false, false, true, false);
 
         $this->assertEquals($expected, $result);
@@ -639,7 +545,41 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldsWithVirtualRelationsAndEnums(array $expected)
     {
         $className = 'Acme\Entity\Test';
-        $config = $this->getConfigFieldsVirtualRelationsAndEnums($className);
+
+        $config = [
+            $className => [
+                'config' => [
+                    'label' => 'Test Label',
+                    'plural_label' => 'Test Plural Label',
+                    'icon' => 'fa-test',
+                ],
+                'fields' => [
+                    'field1' => [
+                        'type' => 'integer',
+                        'identifier' => true,
+                        'config' => [
+                            'label' => 'Field 1',
+                        ]
+                    ],
+                ],
+                'relations' => [
+                    'rel1' => [
+                        'target_class' => 'Acme\EnumValue1',
+                        'type' => 'ref-one',
+                        'config' => [
+                            'label' => 'Enum Field',
+                        ]
+                    ],
+                    'rel2' => [
+                        'target_class' => 'Acme\EnumValue2',
+                        'type' => 'ref-many',
+                        'config' => [
+                            'label' => 'Multi Enum Field',
+                        ]
+                    ],
+                ]
+            ]
+        ];
         $this->prepare($config);
 
         $this->virtualFieldProvider->expects($this->once())
@@ -692,66 +632,10 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-        $this->translator->expects($this->exactly(4))
-            ->method('trans')
-            ->withConsecutive(
-                ['Field 1', [], null, null],
-                ['Enum Field', [], null, null],
-                ['Multi Enum Field', [], null, null],
-                ['acme.entity.test.virtual_relation.label', [], null, null]
-            )
-            ->willReturnOnConsecutiveCalls(
-                'Field 1',
-                'Enum Field',
-                'Multi Enum Field',
-                'acme.entity.test.virtual_relation.label'
-            );
+
         $result = $this->provider->getFields('Acme:Test', true, true);
 
         $this->assertEquals($expected, $result);
-    }
-
-    /**
-     * @param string $className
-     *
-     * @return array
-     */
-    protected function getConfigFieldsVirtualRelationsAndEnums($className)
-    {
-        return [
-            $className => [
-                'config' => [
-                    'label' => 'Test Label',
-                    'plural_label' => 'Test Plural Label',
-                    'icon' => 'fa-test',
-                ],
-                'fields' => [
-                    'field1' => [
-                        'type' => 'integer',
-                        'identifier' => true,
-                        'config' => [
-                            'label' => 'Field 1',
-                        ]
-                    ],
-                ],
-                'relations' => [
-                    'rel1' => [
-                        'target_class' => 'Acme\EnumValue1',
-                        'type' => 'ref-one',
-                        'config' => [
-                            'label' => 'Enum Field',
-                        ]
-                    ],
-                    'rel2' => [
-                        'target_class' => 'Acme\EnumValue2',
-                        'type' => 'ref-many',
-                        'config' => [
-                            'label' => 'Multi Enum Field',
-                        ]
-                    ],
-                ]
-            ]
-        ];
     }
 
     /**
@@ -946,6 +830,9 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                 }
             }
         }
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->will($this->returnArgument(0));
     }
 
     /**
@@ -1116,18 +1003,6 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetRelations(array $expected)
     {
         $this->prepareWithRelations();
-        $this->translator->expects($this->exactly(3))
-            ->method('trans')
-            ->withConsecutive(
-                ['Rel1', [], null, null],
-                ['Test1 Label', [], null, null],
-                ['Test1 Plural Label', [], null, null]
-            )
-            ->willReturnOnConsecutiveCalls(
-                'Rel1',
-                'Test1 Label',
-                'Test1 Plural Label'
-            );
         $result = $this->provider->getRelations('Acme:Test', true);
 
         $this->assertEquals($expected, $result);
