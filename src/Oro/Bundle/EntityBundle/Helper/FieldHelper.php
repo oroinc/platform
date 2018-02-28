@@ -422,7 +422,7 @@ class FieldHelper
     /**
      * @param string $locale
      */
-    public function translateUsingLocale($locale)
+    public function setLocale($locale)
     {
         $this->fieldProvider->setLocale($locale);
     }

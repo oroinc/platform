@@ -542,6 +542,6 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
             ->method('setLocale')
             ->with($locale);
 
-        $this->helper->translateUsingLocale($locale);
+        $this->helper->setLocale($locale);
     }
 }
