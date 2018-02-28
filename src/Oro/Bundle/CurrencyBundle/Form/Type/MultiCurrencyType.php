@@ -3,8 +3,8 @@
 namespace Oro\Bundle\CurrencyBundle\Form\Type;
 
 use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
+use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Form\DataTransformer\MoneyValueTransformer;
-use Oro\Bundle\CurrencyBundle\Rounding\RoundingServiceInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -16,19 +16,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class MultiCurrencyType extends PriceType
 {
     const NAME = 'oro_multicurrency';
-
-    /**
-     * @var RoundingServiceInterface
-     */
-    protected $roundingService;
-
-    /**
-     * @param RoundingServiceInterface $roundingService
-     */
-    public function __construct(RoundingServiceInterface $roundingService)
-    {
-        $this->roundingService = $roundingService;
-    }
 
     /**
      * @return string
@@ -60,9 +47,7 @@ class MultiCurrencyType extends PriceType
                 'number',
                 [
                     'required' => $isRequired,
-                    'scale' => $this->roundingService->getPrecision(),
-                    'rounding_mode' => $this->roundingService->getRoundType(),
-                    'attr' => ['data-scale' => $this->roundingService->getPrecision()],
+                    'scale' => Price::MAX_VALUE_PRECISION,
                     'constraints' => $options['value_constraints']
                 ]
             )

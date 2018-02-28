@@ -22,8 +22,6 @@ services:
 
     oro_currency.form.type.multicurrency:
         class: Oro\Bundle\CurrencyBundle\Form\Type\MultiCurrencyType
-        arguments:
-            - '@oro_currency.rounding.price_rounding_service'
         calls:
             - [setDataClass, [Oro\Bundle\CurrencyBundle\Entity\MultiCurrency]]
         tags:
