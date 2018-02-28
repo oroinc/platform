@@ -91,6 +91,7 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
             ParameterBag::DATAGRID_MODES_PARAMETER,
             [DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE]
         );
+        $body['parameters']['batchSize'] = $body['batchSize'];
         $body['parameters']['gridParameters'] = $contextParameters;
 
         $exportResult = $this->exportHandler->handle(

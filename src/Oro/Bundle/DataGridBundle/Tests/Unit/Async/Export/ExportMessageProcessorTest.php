@@ -1,8 +1,10 @@
 <?php
+
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Async\Export;
 
 use Oro\Bundle\DataGridBundle\Async\Export\ExportMessageProcessor;
 use Oro\Bundle\DataGridBundle\Async\Topics;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
@@ -55,8 +57,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with($this->equalTo($loggerMessage))
-        ;
+            ->with($this->equalTo($loggerMessage));
 
         $processor = new ExportMessageProcessor(
             $this->createJobRunnerMock(),
@@ -78,16 +79,14 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with($this->equalTo('Invalid format: "invalid_format"'))
-        ;
+            ->with($this->equalTo('Invalid format: "invalid_format"'));
 
         $writerChain = $this->createWriterChainMock();
         $writerChain
             ->expects($this->once())
             ->method('getWriter')
             ->with($this->equalTo('invalid_format'))
-            ->willReturn(null)
-        ;
+            ->willReturn(null);
 
         $processor = new ExportMessageProcessor(
             $this->createJobRunnerMock(),
@@ -116,8 +115,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('info')
-            ->with($this->equalTo('Export result. Success: Yes. ReadsCount: 10. ErrorsCount: 0'))
-        ;
+            ->with($this->equalTo('Export result. Success: Yes. ReadsCount: 10. ErrorsCount: 0'));
 
         $job = new Job();
 
@@ -128,14 +126,12 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo(1))
             ->will($this->returnCallback(function ($jobId, $callback) use ($jobRunner, $job) {
                 return $callback($jobRunner, $job);
-            }))
-        ;
+            }));
 
         $jobStorage = $this->createJobStorageMock();
         $jobStorage
             ->expects($this->once())
-            ->method('saveJob')
-        ;
+            ->method('saveJob');
 
         $fileStreamWriter = $this->createFileStreamWriterMock();
 
@@ -144,15 +140,10 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getWriter')
             ->with($this->equalTo('csv'))
-            ->willReturn($fileStreamWriter)
-        ;
+            ->willReturn($fileStreamWriter);
 
-        $exportHandler = $this->createExportHandlerMock();
-        $exportHandler
-            ->expects($this->once())
-            ->method('handle')
-            ->willReturn($exportResult)
-        ;
+        $connector = $this->createExportConnectorMock();
+        $exportProcessor = $this->createExportProcessorMock();
 
         $processor = new ExportMessageProcessor(
             $jobRunner,
@@ -160,15 +151,37 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $logger
         );
         $processor->setWriterChain($writerChain);
+        $processor->setExportProcessor($exportProcessor);
+        $processor->setExportConnector($connector);
+
+        $exportHandler = $this->createExportHandlerMock();
+        $exportHandler
+            ->expects($this->once())
+            ->method('handle')
+            ->with(
+                $connector,
+                $exportProcessor,
+                $fileStreamWriter,
+                [
+                    'gridName' => 'grid_name',
+                    'gridParameters' => new ParameterBag([
+                        '_datagrid_modes' => ['importexport']
+                    ]),
+                    'format_type' => 'excel',
+                    'batchSize' => 5000
+                ],
+                5000,
+                'csv'
+            )
+            ->willReturn($exportResult);
         $processor->setExportHandler($exportHandler);
-        $processor->setExportProcessor($this->createExportProcessorMock());
-        $processor->setExportConnector($this->createExportConnectorMock());
 
         $message = new NullMessage();
         $message->setBody(json_encode([
             'jobId' => 1,
             'parameters' => ['gridName' => 'grid_name'],
             'format' => 'csv',
+            'batchSize' => 5000
         ]));
 
         $result = $processor->process($message, $this->createSessionMock());
