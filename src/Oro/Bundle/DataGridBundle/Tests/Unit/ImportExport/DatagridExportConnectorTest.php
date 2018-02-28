@@ -6,8 +6,8 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Datagrid;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\ImportExportBundle\Context\Context;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class DatagridExportConnectorTest extends \PHPUnit_Framework_TestCase
 {

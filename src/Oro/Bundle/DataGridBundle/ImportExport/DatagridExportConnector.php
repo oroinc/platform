@@ -14,6 +14,10 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Component\DependencyInjection\ServiceLink;
 
+/**
+ * Datagrid export connector reads items from data grid with configured batch size.
+ *
+ */
 class DatagridExportConnector implements
     ItemReaderInterface,
     \Countable,
