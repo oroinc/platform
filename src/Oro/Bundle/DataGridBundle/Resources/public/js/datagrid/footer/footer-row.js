@@ -8,8 +8,17 @@ define([
 
     FooterRow = Chaplin.CollectionView.extend({
         tagName: 'tr',
+
         className: '',
+
         animationDuration: 0,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function FooterRow() {
+            FooterRow.__super__.constructor.apply(this, arguments);
+        },
 
         /** @property */
         footerCell: FooterCell,

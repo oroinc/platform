@@ -16,8 +16,15 @@ define(function(require) {
         template: _.template(chartTemplate),
 
         aspectRatio: 0.4,
+
         /**
-         *
+         * @inheritDoc
+         */
+        constructor: function BaseChartComponent() {
+            BaseChartComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @constructor
          * @param {Object} options
          */

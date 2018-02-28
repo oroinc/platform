@@ -1,6 +1,7 @@
 define(function(require) {
     'use strict';
 
+    var AddressRegionView;
     var _ = require('underscore');
     var $ = require('jquery');
     var RegionCollection = require('oroaddress/js/region/collection');
@@ -18,12 +19,20 @@ define(function(require) {
      * @class   oro.region.View
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    AddressRegionView = Backbone.View.extend({
         events: {
             change: 'selectionChanged'
         },
 
         switchState: config.switchState,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function AddressRegionView() {
+            AddressRegionView.__super__.constructor.apply(this, arguments);
+        },
+
         /**
          * Constructor
          *
@@ -154,4 +163,6 @@ define(function(require) {
             }
         }
     });
+
+    return AddressRegionView;
 });

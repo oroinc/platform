@@ -38,6 +38,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function WidgetComponent() {
+            WidgetComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             if (options.initialized) {
                 // widget is initialized from server, there's nothing to do

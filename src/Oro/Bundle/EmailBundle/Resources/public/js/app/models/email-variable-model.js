@@ -30,6 +30,13 @@ define(function(require) {
         path: [],
 
         /**
+         * @inheritDoc
+         */
+        constructor: function EmailVariableModel() {
+            EmailVariableModel.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @returns {string}
          */
         getEntityName: function() {

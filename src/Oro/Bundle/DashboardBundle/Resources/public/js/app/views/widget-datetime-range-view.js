@@ -6,6 +6,16 @@ define(function(require) {
     var AbstractWidgetDateRangeView = require('orodashboard/js/app/views/abstract-widget-date-range-view');
 
     WidgetDatetimeRangeView = AbstractWidgetDateRangeView.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function WidgetDatetimeRangeView() {
+            WidgetDatetimeRangeView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             WidgetDatetimeRangeView.__super__.initialize.apply(this, arguments);
 

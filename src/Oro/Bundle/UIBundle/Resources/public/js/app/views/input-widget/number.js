@@ -1,15 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var NumberInputWidget;
-    var AbstractInputWidget = require('oroui/js/app/views/input-widget/abstract');
+    var NumberInputWidgetView;
+    var AbstractInputWidgetView = require('oroui/js/app/views/input-widget/abstract');
     var localeSettings = require('orolocale/js/locale-settings');
     var _ = require('underscore');
     var $ = require('jquery');
 
     var decimalSeparator = localeSettings.getNumberFormats('decimal').decimal_separator_symbol;
 
-    NumberInputWidget = AbstractInputWidget.extend({
+    NumberInputWidgetView = AbstractInputWidgetView.extend({
         events: {
             input: '_normalizeNumberFieldValue',
             change: '_normalizeNumberFieldValue',
@@ -21,6 +21,13 @@ define(function(require) {
         type: null,
 
         pattern: null,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function NumberInputWidgetView() {
+            NumberInputWidgetView.__super__.constructor.apply(this, arguments);
+        },
 
         findContainer: function() {
             return this.$el;
@@ -34,7 +41,7 @@ define(function(require) {
 
         disposeWidget: function() {
             this._restoreAttr();
-            return NumberInputWidget.__super__.disposeWidget.apply(this, arguments);
+            return NumberInputWidgetView.__super__.disposeWidget.apply(this, arguments);
         },
 
         _setPrecision: function() {
@@ -149,5 +156,5 @@ define(function(require) {
             }
         }
     });
-    return NumberInputWidget;
+    return NumberInputWidgetView;
 });

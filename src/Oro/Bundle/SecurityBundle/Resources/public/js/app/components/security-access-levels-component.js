@@ -28,6 +28,13 @@ define(function(require) {
 
         options: {},
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function SecurityAccessLevelsComponent() {
+            SecurityAccessLevelsComponent.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             var self = this;
             this.dataCache = {};

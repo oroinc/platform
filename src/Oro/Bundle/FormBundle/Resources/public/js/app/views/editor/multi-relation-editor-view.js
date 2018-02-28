@@ -69,6 +69,14 @@ define(function(require) {
 
     MultiRelationEditorView = RelatedIdRelationEditorView.extend(/** @lends MultiRelationEditorView.prototype */{
         className: 'multi-relation-editor',
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function MultiRelationEditorView() {
+            MultiRelationEditorView.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             options.ignore_value_field_name = true;
             this.maximumSelectionLength = options.maximumSelectionLength;

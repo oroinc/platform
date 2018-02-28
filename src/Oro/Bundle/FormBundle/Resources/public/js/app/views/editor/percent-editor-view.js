@@ -63,6 +63,13 @@ define(function(require) {
     PercentEditorView = NumberEditorView.extend(/** @lends PercentEditorView.prototype */{
         className: 'number-editor',
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function PercentEditorView() {
+            PercentEditorView.__super__.constructor.apply(this, arguments);
+        },
+
         parseRawValue: function(value) {
             return parseFloat(value) * 100;
         },

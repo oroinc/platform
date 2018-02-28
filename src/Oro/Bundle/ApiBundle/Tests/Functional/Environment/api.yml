@@ -12,6 +12,9 @@ api:
         Extend\Entity\EV_Api_Enum2:
             alias: testapienum2
             plural_alias: testapienum2
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment:
+            alias: testapicurrentdepartment
+            plural_alias: testapicurrentdepartments
 
     entities:
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
@@ -134,3 +137,4 @@ api:
                     fieldCurrency: ~
         Extend\Entity\TestApiE1: ~
         Extend\Entity\TestApiE2: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment: ~

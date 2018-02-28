@@ -13,6 +13,13 @@ define(function(require) {
             first: '',
             className: '',
             gridName: ''
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActivityContextModel() {
+            ActivityContextModel.__super__.constructor.apply(this, arguments);
         }
     });
 

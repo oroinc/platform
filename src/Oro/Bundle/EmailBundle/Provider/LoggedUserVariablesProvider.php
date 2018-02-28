@@ -13,6 +13,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
+ * This class prepares email variables from current logged user
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
@@ -209,7 +211,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
                 $val = [
                     'type'  => 'string',
                     'label' => $this->translator->trans('oro.email.emailtemplate.siganture'),
-                    'filter' => 'oro_tag_filter',
+                    'filter' => 'oro_html_strip_tags',
                 ];
             }
             $result['userSignature'] = $val;

@@ -61,6 +61,13 @@ define([
         hideItemsCounter: true,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function Toolbar() {
+            Toolbar.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initializer.
          *
          * @param {Object} options

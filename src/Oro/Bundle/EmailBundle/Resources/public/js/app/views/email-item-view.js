@@ -23,6 +23,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function EmailItemView() {
+            EmailItemView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         render: function() {
             this._deferredRender();
             this.initLayout().done(_.bind(function() {

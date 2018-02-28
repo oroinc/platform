@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
@@ -83,10 +84,33 @@ class BuildFormBuilder implements ProcessorInterface
             $options = [];
         }
         if (!array_key_exists('data_class', $options)) {
-            $options['data_class'] = $context->getClassName();
+            $options['data_class'] = $this->getFormDataClass($context, $config);
         }
         $options[CustomizeFormDataExtension::API_CONTEXT] = $context;
 
         return $options;
+    }
+
+    /**
+     * @param FormContext            $context
+     * @param EntityDefinitionConfig $config
+     *
+     * @return string
+     */
+    protected function getFormDataClass(FormContext $context, EntityDefinitionConfig $config)
+    {
+        $dataClass = $context->getClassName();
+        $entity = $context->getResult();
+        if (is_object($entity)) {
+            $parentResourceClass = $config->getParentResourceClass();
+            if ($parentResourceClass) {
+                $entityClass = ClassUtils::getClass($entity);
+                if ($entityClass !== $dataClass && $entityClass === $parentResourceClass) {
+                    $dataClass = $parentResourceClass;
+                }
+            }
+        }
+
+        return $dataClass;
     }
 }

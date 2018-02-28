@@ -34,6 +34,13 @@ define(function(require) {
             'error model': 'onError'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function CommentFormView() {
+            CommentFormView.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             this.template = _.template($(options.template).html());
             CommentFormView.__super__.initialize.apply(this, arguments);

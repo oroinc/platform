@@ -5,6 +5,9 @@ namespace Oro\Bundle\UIBundle\Twig;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Twig extension with filters that helps prepare HTML for the output.
+ */
 class HtmlTagExtension extends \Twig_Extension
 {
     /** @var ContainerInterface */
@@ -32,20 +35,20 @@ class HtmlTagExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('oro_tag_filter', [$this, 'tagFilter'], ['is_safe' => ['all']]),
+            new \Twig_SimpleFilter('oro_html_strip_tags', [$this, 'htmlStripTags'], ['is_safe' => ['all']]),
             new \Twig_SimpleFilter('oro_attribute_name_purify', [$this, 'attributeNamePurify']),
-            new \Twig_SimpleFilter('oro_html_purify', [$this, 'htmlPurify']),
             new \Twig_SimpleFilter('oro_html_sanitize', [$this, 'htmlSanitize'], ['is_safe' => ['html']]),
-            new \Twig_SimpleFilter('oro_html_tag_trim', [$this, 'htmlTagTrim'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFilter('oro_html_escape', [$this, 'htmlEscape'], ['is_safe' => ['html']]),
         ];
     }
 
     /**
-     * @param string $string
+     * Remove all html elements
      *
+     * @param string $string
      * @return string
      */
-    public function tagFilter($string)
+    public function htmlStripTags($string)
     {
         return $this->getHtmlTagHelper()->stripTags($string);
     }
@@ -62,19 +65,9 @@ class HtmlTagExtension extends \Twig_Extension
     }
 
     /**
-     * Filter is intended to purify script, style etc tags and content of them
+     * Remove html elements except allowed
      *
      * @param string $string
-     * @return string
-     */
-    public function htmlPurify($string)
-    {
-        return $this->getHtmlTagHelper()->purify($string);
-    }
-
-    /**
-     * @param string $string
-     *
      * @return string
      */
     public function htmlSanitize($string)
@@ -83,18 +76,14 @@ class HtmlTagExtension extends \Twig_Extension
     }
 
     /**
-     * @param string $html
-     * @param array $tags
+     * Allow HTML tags all forbidden tags will be escaped
+     *
+     * @param $string
      * @return string
      */
-    public function htmlTagTrim($html, array $tags = [])
+    public function htmlEscape($string)
     {
-        foreach ($tags as $tag) {
-            $pattern = '/(<' . $tag . '[^>]*>)((.|\s)*?)(<\/' . $tag . '>)|(<' . $tag . '[^>]*>)/i';
-            $html = preg_replace($pattern, '', $html);
-        }
-
-        return $html;
+        return $this->getHtmlTagHelper()->escape($string);
     }
 
     /**

@@ -32,6 +32,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function DateTimeCell() {
+            DateTimeCell.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             DateTimeCell.__super__.initialize.apply(this, arguments);
             this.formatter = this.createFormatter();

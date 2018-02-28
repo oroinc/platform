@@ -29,6 +29,13 @@ define([
         backUrlParameter: 'back',
 
         /**
+         * @inheritDoc
+         */
+        constructor: function ModelAction() {
+            ModelAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize view
          *
          * @param {Object} options

@@ -17,9 +17,17 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function BoardDataCollection() {
+            BoardDataCollection.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(models, options) {
             BoardDataCollection.__super__.initialize.apply(this, arguments);
         },
+
         updateBoardItem: function(item, update) {
             item = this.get(item.get('id'));
             var itemIndex = this.indexOf(item);

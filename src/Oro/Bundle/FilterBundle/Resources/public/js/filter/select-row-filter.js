@@ -16,6 +16,12 @@ define([
      * @extends oro.filter.SelectFilter
      */
     SelectRowFilter = SelectFilter.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function SelectRowFilter() {
+            SelectRowFilter.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * Fetches raw format value on getting current value

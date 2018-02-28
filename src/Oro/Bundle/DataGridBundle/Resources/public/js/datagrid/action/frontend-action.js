@@ -17,6 +17,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function FrontendAction() {
+            FrontendAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         execute: function() {
             mediator.trigger('datagrid:frontend:execute:' + this.datagrid.name, this);
             if (!this.disposed) {

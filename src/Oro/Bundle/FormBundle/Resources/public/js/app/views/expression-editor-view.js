@@ -47,6 +47,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function ExpressionEditorView() {
+            ExpressionEditorView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.util = new ExpressionEditorUtil(options);
 
