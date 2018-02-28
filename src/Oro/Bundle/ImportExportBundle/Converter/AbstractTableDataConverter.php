@@ -35,7 +35,7 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     protected $configManager;
 
     /** @var bool */
-    protected $isTranslateUsingLocale = true;
+    protected $translateUsingLocale = true;
 
     /**
      * {@inheritDoc}
@@ -114,13 +114,13 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     /**
      * Set the variable to FALSE if you want to use default translation
      *
-     * @param bool $isTranslateUsingLocale
+     * @param bool $translateUsingLocale
      *
      * @return $this
      */
-    public function setIsTranslateUsingLocale($isTranslateUsingLocale)
+    public function setTranslateUsingLocale($translateUsingLocale)
     {
-        $this->isTranslateUsingLocale = $isTranslateUsingLocale;
+        $this->translateUsingLocale = $translateUsingLocale;
 
         return $this;
     }

@@ -129,8 +129,8 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     {
         if ($this->headerConversionRules === null) {
             $this->assertEntityName();
-            if ($this->isTranslateUsingLocale && $this->configManager) {
-                $this->fieldHelper->translateUsingLocale($this->configManager->get('oro_locale.language'));
+            if ($this->translateUsingLocale && $this->configManager) {
+                $this->fieldHelper->setLocale($this->configManager->get('oro_locale.language'));
             }
 
             $headerConversionRules = $this->getEntityRules(

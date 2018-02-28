@@ -4,6 +4,8 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Converter;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
 use Oro\Bundle\ImportExportBundle\Converter\RelationCalculator;
@@ -227,17 +229,17 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $configProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $fieldProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityFieldProvider')
+        $fieldProvider = $this->getMockBuilder(EntityFieldProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
         $fieldTypeHelper = new FieldTypeHelper([]);
 
         $this->fieldHelper = $this->getMockBuilder(FieldHelper::class)
             ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper])
-            ->setMethods(array('getConfigValue', 'getFields', 'processRelationAsScalar', 'translateUsingLocale'))
+            ->setMethods(array('getConfigValue', 'getFields', 'processRelationAsScalar', 'setLocale'))
             ->getMock();
 
         $this->relationCalculator = $this->createMock(RelationCalculator::class);
@@ -587,31 +589,31 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param bool $isTranslateUsingLocale
+     * @param bool $translateUsingLocale
      * @param string $locale
-     * @param int $getLocaleCalls
+     * @param int $expectedCallsToGetLocale
      * @param int $translateUsingLocaleCalls
      *
      * @dataProvider getImportWithTranslatedFieldsDataProvider
      */
     public function testImportWithTranslatedFields(
-        $isTranslateUsingLocale,
+        $translateUsingLocale,
         $locale,
-        $getLocaleCalls,
+        $expectedCallsToGetLocale,
         $translateUsingLocaleCalls
     ) {
-        $this->converter->setIsTranslateUsingLocale($isTranslateUsingLocale);
+        $this->converter->setTranslateUsingLocale($translateUsingLocale);
 
         /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
         $configManager = $this->createMock(ConfigManager::class);
-        $configManager->expects($this->exactly($getLocaleCalls))
+        $configManager->expects($this->exactly($expectedCallsToGetLocale))
             ->method('get')
             ->with('oro_locale.language', false, false, null)
             ->willReturn($locale);
         $this->converter->setConfigManager($configManager);
 
         $this->fieldHelper->expects($this->exactly($translateUsingLocaleCalls))
-            ->method('translateUsingLocale')
+            ->method('setLocale')
             ->with($locale);
 
         $this->prepareFieldHelper();
@@ -628,15 +630,15 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'fields should use locale' => [
-                'isTranslateUsingLocale' => true,
+                'translateUsingLocale' => true,
                 'locale' => 'it_IT',
-                'getLocaleCalls' => 1,
+                'expectedCallsToGetLocale' => 1,
                 'translateUsingLocaleCalls' => 1
             ],
             'fields should use default locale' => [
-                'isTranslateUsingLocale' => false,
+                'translateUsingLocale' => false,
                 'locale' => null,
-                'getLocaleCalls' => 0,
+                'expectedCallsToGetLocale' => 0,
                 'translateUsingLocaleCalls' => 0
             ]
         ];
