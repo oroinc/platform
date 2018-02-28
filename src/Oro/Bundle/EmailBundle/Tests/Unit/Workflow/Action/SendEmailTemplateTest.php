@@ -11,7 +11,7 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Workflow\Action\SendEmail;
 use Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Validator\Validator;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
 {
@@ -56,7 +56,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
     protected $emailTemplate;
 
     /**
-     * @var Validator|\PHPUnit_Framework_MockObject_MockObject
+     * @var ValidatorInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $validator;
 
@@ -87,7 +87,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         $this->renderer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->validator = $this->createMock('Symfony\Component\Validator\Validator\ValidatorInterface');
+        $this->validator = $this->createMock(ValidatorInterface::class);
         $this->objectManager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();

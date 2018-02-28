@@ -30,6 +30,7 @@ use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader;
+// TODO: change to Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface in scope of BAP-15236
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
@@ -306,6 +307,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      */
     public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory)
     {
+        // @TODO: remove this if statement and throwing an exception in scope of BAP-15236
         if (null !== $this->propertyAccessor) {
             throw new ValidatorException(
                 'You cannot set a validator factory after setting a custom property accessor. ' .
@@ -341,6 +343,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     /**
      * {@inheritdoc}
      *
+     * TODO: remove this method in scope of BAP-15236
      * @deprecated since version 2.5, to be removed in 3.0.
      *             The validator will function without a property accessor.
      */
