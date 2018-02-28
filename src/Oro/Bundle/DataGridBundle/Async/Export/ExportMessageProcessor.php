@@ -14,6 +14,9 @@ use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * Process data grid export async message.
+ */
 class ExportMessageProcessor extends ExportMessageProcessorAbstract
 {
     /**
