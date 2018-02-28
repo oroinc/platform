@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SyncBundle\EventListener;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
+use Psr\Log\LoggerInterface;
 
 class MaintenanceListener
 {

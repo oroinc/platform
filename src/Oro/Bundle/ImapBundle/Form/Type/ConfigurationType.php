@@ -2,23 +2,24 @@
 
 namespace Oro\Bundle\ImapBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraints\Valid;
-
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\EventListener\ApplySyncSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
+ * Used in System Configuration to set IMAP parameters in Email Configuration
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -355,13 +356,15 @@ class ConfigurationType extends AbstractType
                 $isSubmitted = $form->isSubmitted() === true;
                 if (($form->has('useImap') && $form->get('useImap')->getData() === true) || !$isSubmitted) {
                     $groups[] = 'Imap';
+
+                    if (!$form->getConfig()->getOption('skip_folders_validation')) {
+                        $groups[] = 'CheckFolderSelection';
+                    }
                 }
                 if (($form->has('useSmtp') && $form->get('useSmtp')->getData() === true) || !$isSubmitted) {
                     $groups[] = 'Smtp';
                 }
-                if (!$form->getConfig()->getOption('skip_folders_validation')) {
-                    $groups[] = 'CheckFolderSelection';
-                }
+
                 return $groups;
             },
         ]);

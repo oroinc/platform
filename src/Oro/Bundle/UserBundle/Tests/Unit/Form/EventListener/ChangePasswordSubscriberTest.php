@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\EventListener;
 
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber;
 
 class ChangePasswordSubscriberTest extends FormIntegrationTestCase
 {

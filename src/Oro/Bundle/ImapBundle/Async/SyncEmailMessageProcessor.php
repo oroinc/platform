@@ -1,14 +1,13 @@
 <?php
 namespace Oro\Bundle\ImapBundle\Async;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EmailBundle\Sync\EmailSynchronizerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerInterface;
 
 class SyncEmailMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {

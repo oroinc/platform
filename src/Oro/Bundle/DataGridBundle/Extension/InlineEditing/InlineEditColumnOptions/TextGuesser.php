@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 /**
  * Class TextGuesser

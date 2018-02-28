@@ -5,14 +5,14 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\EventListener;
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 use Akeneo\Bundle\BatchBundle\Item\ExecutionContext;
+use Oro\Bundle\EntityConfigBundle\EventListener\AttributesImportFinishNotificationListener;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Configuration\AttributeImportExportConfigurationProvider;
 use Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender;
+use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\SyncBundle\Content\SimpleTagGenerator;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 use Oro\Bundle\SyncBundle\Content\TopicSender;
-use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
-use Oro\Bundle\EntityConfigBundle\EventListener\AttributesImportFinishNotificationListener;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class AttributesImportFinishNotificationListenerTest extends \PHPUnit_Framework_TestCase

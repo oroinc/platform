@@ -1,15 +1,12 @@
 <?php
+
 namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UserMultiSelectType extends AbstractType
 {
@@ -30,25 +27,12 @@ class UserMultiSelectType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        // The event listener fixes transformation from empty string to array with empty string.
-        // The case is affected by Genemu\Bundle\FormBundle\Form\JQuery\DataTransformer::reverseTransform()
-        // Example: explode(',', '') => array(0=>'').
-        // @todo remove after vendor fixation
-        $builder->addEventListener(
-            FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) {
-                $value = $event->getData();
-                if (empty($value)) {
-                    $event->setData(array());
-                }
-            }
-        );
         $builder->addModelTransformer(
             new EntitiesToIdsTransformer($this->entityManager, $options['entity_class'])
         );
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(

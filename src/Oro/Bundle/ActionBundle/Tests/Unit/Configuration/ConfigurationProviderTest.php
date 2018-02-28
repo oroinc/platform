@@ -3,15 +3,12 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Configuration;
 
 use Doctrine\Common\Cache\CacheProvider;
-
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator;
 use Oro\Bundle\ActionBundle\Configuration\OperationListConfiguration;
 use Oro\Bundle\CacheBundle\Loader\ConfigurationLoader;
-
 use Oro\Component\Config\CumulativeResourceManager;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemResultDocument;
@@ -14,6 +10,8 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
 {
@@ -56,7 +54,7 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
 
         $documentBuilder->expects(self::once())
             ->method('setDataObject')
-            ->with(null);
+            ->with(null, $this->context->getRequestType());
         $documentBuilder->expects(self::never())
             ->method('getDocument');
 
@@ -81,7 +79,7 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
 
         $documentBuilder->expects(self::once())
             ->method('setDataObject')
-            ->with($result, $metadata);
+            ->with($result, $this->context->getRequestType(), $metadata);
         $documentBuilder->expects(self::never())
             ->method('getDocument');
 

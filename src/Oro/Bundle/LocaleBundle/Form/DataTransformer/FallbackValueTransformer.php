@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\DataTransformer;
 
-use Symfony\Component\Form\DataTransformerInterface;
-
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
+use Symfony\Component\Form\DataTransformerInterface;
 
 class FallbackValueTransformer implements DataTransformerInterface
 {

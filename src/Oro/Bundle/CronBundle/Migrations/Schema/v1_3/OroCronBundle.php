@@ -3,9 +3,8 @@
 namespace Oro\Bundle\CronBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Comparator;
-
+use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;

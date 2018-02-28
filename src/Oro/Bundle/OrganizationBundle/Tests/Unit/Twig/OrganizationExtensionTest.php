@@ -5,12 +5,12 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Twig;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
-use Oro\Bundle\OrganizationBundle\Twig\OrganizationExtension;
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\User;
+use Oro\Bundle\OrganizationBundle\Twig\OrganizationExtension;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 

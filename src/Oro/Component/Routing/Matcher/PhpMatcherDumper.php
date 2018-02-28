@@ -2,9 +2,9 @@
 
 namespace Oro\Component\Routing\Matcher;
 
+use Oro\Component\Routing\RouteCollectionUtil;
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper as BaseDumper;
 use Symfony\Component\Routing\RouteCollection;
-use Oro\Component\Routing\RouteCollectionUtil;
 
 class PhpMatcherDumper extends BaseDumper
 {

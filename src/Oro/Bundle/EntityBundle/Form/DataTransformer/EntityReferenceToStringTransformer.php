@@ -3,14 +3,11 @@
 namespace Oro\Bundle\EntityBundle\Form\DataTransformer;
 
 use Doctrine\Common\Util\ClassUtils;
-
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-
-use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class EntityReferenceToStringTransformer implements DataTransformerInterface
 {

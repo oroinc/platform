@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
+use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
-use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
-use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
-
+/**
+ * Configures Data API security firewalls.
+ */
 class SecurityFirewallCompilerPass implements CompilerPassInterface
 {
     /** @var array */

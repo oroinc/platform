@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Layput\DataProvider;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\TranslationBundle\Layout\DataProvider\TranslatorProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class TranslatorProviderTest extends \PHPUnit_Framework_TestCase
 {

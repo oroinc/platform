@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\SyncBundle;
 
+use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\ClankClientPingConfigurationPass;
+use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\ClankSessionHandlerConfigurationPass;
+use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\SkipTagTrackingPass;
+use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\TagGeneratorPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\ClankSessionHandlerConfigurationPass;
-use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\ClankClientPingConfigurationPass;
-use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\TagGeneratorPass;
-use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\SkipTagTrackingPass;
 
 class OroSyncBundle extends Bundle
 {

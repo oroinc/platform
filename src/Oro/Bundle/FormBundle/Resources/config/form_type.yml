@@ -189,6 +189,34 @@ services:
         tags:
             - { name: form.type, alias: oro_entity_changeset }
 
+    oro_form.type.select2:
+        class: Oro\Bundle\FormBundle\Form\Type\Select2Type
+        abstract: true
+
+    oro_form.type.select2_hidden:
+        parent: oro_form.type.select2
+        arguments:
+            - 'Symfony\Component\Form\Extension\Core\Type\HiddenType'
+            - 'oro_select2_hidden'
+        tags:
+            - { name: form.type, alias: oro_select2_hidden }
+
+    oro_form.type.oro_select2_choice:
+        parent: oro_form.type.select2
+        arguments:
+            - 'Symfony\Component\Form\Extension\Core\Type\ChoiceType'
+            - 'oro_select2_choice'
+        tags:
+            - { name: form.type, alias: oro_select2_choice }
+
+    oro_form.type.oro_select2_entity:
+        parent: oro_form.type.select2
+        arguments:
+            - 'Symfony\Bridge\Doctrine\Form\Type\EntityType'
+            - 'oro_select2_entity'
+        tags:
+            - { name: form.type, alias: oro_select2_entity }
+
     # Form extensions
     oro_form.extension.data_block:
         class: %oro_form.extension.data_block.class%
@@ -311,7 +339,6 @@ services:
         class: %oro_form.type.download_links.class%
         arguments:
             - '@assets.packages'
-        scope: request
         tags:
             - { name: form.type, alias: oro_download_links_type }
 
@@ -323,9 +350,8 @@ services:
 
     oro_form.form_handler.api:
         class: %oro_form.form_handler.api.class%
-        scope: request
         arguments:
-            - '@request'
+            - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
     oro_form.validator.entity_class:

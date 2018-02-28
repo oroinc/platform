@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Converter;
 
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
-
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterInterface;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 
 abstract class AbstractFormatConverterTestCase extends \PHPUnit_Framework_TestCase
 {

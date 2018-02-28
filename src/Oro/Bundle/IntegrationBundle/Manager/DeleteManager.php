@@ -3,7 +3,6 @@
 namespace Oro\Bundle\IntegrationBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 
 class DeleteManager

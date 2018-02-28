@@ -3,17 +3,15 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Handler;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
+use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
+use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
+use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
+use Oro\Bundle\UserBundle\Entity\AbstractRole;
+use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
-
-use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
-use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
-use Oro\Bundle\UserBundle\Entity\AbstractRole;
-use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
-use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
-use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 
 class AclRoleHandlerTest extends \PHPUnit_Framework_TestCase
 {

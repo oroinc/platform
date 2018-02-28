@@ -49,7 +49,7 @@ services:
 
     oro_address.extension.action.type.map:
         class: '%oro_address.extension.action.type.map.class%'
-        scope: prototype
+        shared: false
         tags:
             - { name: oro_datagrid.extension.action.type, type: map }
 

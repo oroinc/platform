@@ -2,19 +2,16 @@
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
-use Symfony\Component\Console\Input\InputOption;
+use Oro\Bundle\TranslationBundle\Provider\AbstractAPIAdapter;
+use Oro\Bundle\TranslationBundle\Provider\TranslationPackDumper;
+use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
+use Oro\Component\Log\OutputLogger;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
-use Oro\Component\Log\OutputLogger;
-
-use Oro\Bundle\TranslationBundle\Provider\AbstractAPIAdapter;
-use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
-use Oro\Bundle\TranslationBundle\Provider\TranslationPackDumper;
 
 class OroTranslationPackCommand extends ContainerAwareCommand
 {

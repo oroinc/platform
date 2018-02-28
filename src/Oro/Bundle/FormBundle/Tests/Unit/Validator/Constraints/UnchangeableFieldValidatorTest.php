@@ -9,11 +9,9 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Bundle\FormBundle\Validator\Constraints\UnchangeableField;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\FormBundle\Validator\Constraints\UnchangeableField;
 use Oro\Bundle\FormBundle\Validator\Constraints\UnchangeableFieldValidator;
-
 use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 
 class UnchangeableFieldValidatorTest extends AbstractConstraintValidatorTest

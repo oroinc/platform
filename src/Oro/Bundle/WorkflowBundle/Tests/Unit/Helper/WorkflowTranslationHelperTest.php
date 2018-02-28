@@ -5,9 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Helper\TranslationHelper;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
-
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;

@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Functional\DataFixtures;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
+use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LoadCommentData extends AbstractCommentFixture implements ContainerAwareInterface, DependentFixtureInterface
 {

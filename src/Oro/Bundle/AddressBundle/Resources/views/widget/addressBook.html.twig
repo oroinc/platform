@@ -2,8 +2,8 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% set addressBookOptions = {
-    view: {
-        view: 'oroaddress/js/app/views/address-book-widget-view',
+    module: 'oroaddress/js/app/components/address-book-widget-component',
+    options: {
         wid: app.request.get('_wid'),
         addresses: render(addressListUrl),
         addressListUrl: addressListUrl,

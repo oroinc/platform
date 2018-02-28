@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
-use Oro\Component\DoctrineUtils\ORM\QueryWalkerHintProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Component\DoctrineUtils\ORM\QueryWalkerHintProviderInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class CurrentUserWalkerHintProvider implements QueryWalkerHintProviderInterface
 {

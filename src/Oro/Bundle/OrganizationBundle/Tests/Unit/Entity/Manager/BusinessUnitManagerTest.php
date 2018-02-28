@@ -3,7 +3,6 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;

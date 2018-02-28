@@ -3,11 +3,9 @@
 namespace Oro\Bundle\ReportBundle\Migrations\Schema\v1_4;
 
 use Doctrine\DBAL\Platforms\PostgreSQL92Platform;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class UpdateReportJsonArrayQuery extends ParametrizedMigrationQuery
 {

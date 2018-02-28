@@ -3,20 +3,17 @@
 namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Schema\Schema;
-
-use Oro\Bundle\MigrationBundle\Migration\Migration;
-use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
-use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
-
+use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
-use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
-
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class OroUserBundle implements
     Migration,

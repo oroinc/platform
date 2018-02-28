@@ -2,15 +2,12 @@
 
 namespace Oro\Bundle\DistributionBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
-use Symfony\Component\HttpFoundation\Request;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
 use Oro\Bundle\DistributionBundle\Entity\Composer\Config;
 use Oro\Bundle\HelpBundle\Annotation\Help;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @Help(link="https://www.oroinc.com/doc/orocommerce/current/install-upgrade")

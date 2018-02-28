@@ -55,7 +55,11 @@ class AddIncludedEntitiesToResultDocumentTest extends FormProcessorTestCase
 
         $documentBuilder->expects(self::once())
             ->method('addIncludedObject')
-            ->with(self::identicalTo($normalizedData), self::identicalTo($metadata));
+            ->with(
+                self::identicalTo($normalizedData),
+                $this->context->getRequestType(),
+                self::identicalTo($metadata)
+            );
 
         $this->context->setIncludedData(['key' => 'value']);
         $this->context->setIncludedEntities($includedEntities);

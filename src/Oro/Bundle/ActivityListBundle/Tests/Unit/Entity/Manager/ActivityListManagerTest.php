@@ -3,10 +3,6 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
@@ -21,8 +17,10 @@ use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Oro\Bundle\WorkflowBundle\Helper\WorkflowDataHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowDataHelper;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
 {

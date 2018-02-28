@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
+use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
-use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractDateTypeTestCase;
 
 class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
@@ -58,7 +58,7 @@ class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
     /**
      * {@inheritDoc}
      */
-    public function setDefaultOptionsDataProvider()
+    public function configureOptionsDataProvider()
     {
         return array(
             array(

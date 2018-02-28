@@ -23,17 +23,17 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    protected $filterName = 'filter-name';
+    protected $filterName = 'filter_name';
 
     /**
      * @var string
      */
-    protected $dataName = 'field-name';
+    protected $dataName = 'field_name';
 
     /**
      * @var string
      */
-    protected $parameterName = 'parameter-name';
+    protected $parameterName = 'parameter_name';
 
     /**
      * @var FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -123,7 +123,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name >= 1',
+                    'where' => 'field_name >= 1',
                 ],
             ],
             'GREATER_THAN' => [
@@ -134,7 +134,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name > 2',
+                    'where' => 'field_name > 2',
                 ],
             ],
             'EQUAL' => [
@@ -145,7 +145,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name = 3',
+                    'where' => 'field_name = 3',
                 ],
             ],
             'NOT_EQUAL' => [
@@ -156,7 +156,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name <> 4',
+                    'where' => 'field_name <> 4',
                 ],
             ],
             'LESS_EQUAL' => [
@@ -167,7 +167,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name <= 5',
+                    'where' => 'field_name <= 5',
                 ],
             ],
             'LESS_THAN' => [
@@ -178,7 +178,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name < 6',
+                    'where' => 'field_name < 6',
                 ],
             ],
             'EMPTY' => [
@@ -189,7 +189,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name IS NULL',
+                    'where' => 'field_name IS NULL',
                 ],
             ],
             'NOT_EMPTY' => [
@@ -200,7 +200,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name IS NOT NULL',
+                    'where' => 'field_name IS NOT NULL',
                 ],
             ],
             'IN' => [
@@ -211,7 +211,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name IN(1,3,5)',
+                    'where' => 'field_name IN(1,3,5)',
                 ],
             ],
             'NOT IN' => [
@@ -222,7 +222,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name NOT IN(1,3,5)',
+                    'where' => 'field_name NOT IN(1,3,5)',
                 ],
             ],
         ];
@@ -242,7 +242,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name >= 100',
+                    'where' => 'field_name >= 100',
                 ],
             ],
             'GREATER_THAN' => [
@@ -253,7 +253,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name > 200',
+                    'where' => 'field_name > 200',
                 ],
             ],
             'EQUAL' => [
@@ -264,7 +264,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name = 300',
+                    'where' => 'field_name = 300',
                 ],
             ],
             'NOT_EQUAL' => [
@@ -275,7 +275,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name <> 400',
+                    'where' => 'field_name <> 400',
                 ],
             ],
             'LESS_EQUAL' => [
@@ -286,7 +286,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name <= 500',
+                    'where' => 'field_name <= 500',
                 ],
             ],
             'LESS_THAN' => [
@@ -297,7 +297,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name < 600',
+                    'where' => 'field_name < 600',
                 ],
             ],
             'EMPTY' => [
@@ -308,7 +308,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name IS NULL',
+                    'where' => 'field_name IS NULL',
                 ],
             ],
             'NOT_EMPTY' => [
@@ -319,7 +319,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'where' => 'field-name IS NOT NULL',
+                    'where' => 'field_name IS NOT NULL',
                 ],
             ],
         ];
@@ -379,10 +379,10 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
             ->willReturn([]);
 
         $expected = [
-            'name' => 'filter-name',
-            'label' => 'Filter-name',
+            'name' => 'filter_name',
+            'label' => 'Filter_name',
             'choices' => [],
-            'data_name' => 'field-name',
+            'data_name' => 'field_name',
             'options' => [],
             'lazy' => false,
             'formatterOptions' => [

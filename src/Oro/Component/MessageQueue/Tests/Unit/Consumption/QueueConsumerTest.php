@@ -1,16 +1,16 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption;
 
+use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Exception\StaleJobRuntimeException;
 use Oro\Component\MessageQueue\Tests\Unit\Consumption\Mock\BreakCycleExtension;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
-use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\QueueInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\NullLogger;

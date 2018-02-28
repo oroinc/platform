@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Extension\Pager;
 
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\Pager\IndexerPager;

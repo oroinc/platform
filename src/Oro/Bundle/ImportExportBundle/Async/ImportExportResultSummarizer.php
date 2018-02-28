@@ -2,15 +2,12 @@
 namespace Oro\Bundle\ImportExportBundle\Async;
 
 use Gaufrette\Exception\FileNotFound;
-
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Routing\Router;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\Router;
 
 class ImportExportResultSummarizer
 {

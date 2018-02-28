@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Handler;
 
+use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
-use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
 
 class WorkflowNotificationHandler extends EmailNotificationHandler

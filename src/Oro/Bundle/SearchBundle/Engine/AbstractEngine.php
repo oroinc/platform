@@ -3,11 +3,11 @@
 namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Bundle\SearchBundle\Entity\Query as QueryLog;
 use Oro\Bundle\SearchBundle\Event\BeforeSearchEvent;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Connector abstract class

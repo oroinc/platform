@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\FormBundle\Form\Type\DataChangesetType;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class DataChangesetTypeTest extends FormIntegrationTestCase
 {

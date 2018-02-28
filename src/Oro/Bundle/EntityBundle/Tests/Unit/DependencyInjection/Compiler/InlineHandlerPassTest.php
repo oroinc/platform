@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityFieldHandlerPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class InlineHandlerPassTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Model;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class Update implements UpdateInterface
 {

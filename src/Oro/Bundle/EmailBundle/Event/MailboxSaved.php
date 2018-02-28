@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Symfony\Component\EventDispatcher\Event;
 
 class MailboxSaved extends Event
 {

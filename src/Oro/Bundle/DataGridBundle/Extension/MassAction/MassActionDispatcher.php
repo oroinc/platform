@@ -9,7 +9,6 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\DTO\SelectedItems;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
-
 use Symfony\Component\HttpFoundation\Request;
 
 class MassActionDispatcher

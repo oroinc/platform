@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\SkipTagTrackingPass;
-
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 

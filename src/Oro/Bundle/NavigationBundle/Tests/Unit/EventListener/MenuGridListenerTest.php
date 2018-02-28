@@ -3,9 +3,9 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\PreBuild;
 use Oro\Bundle\NavigationBundle\EventListener\MenuGridListener;
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 
 class MenuGridListenerTest extends \PHPUnit_Framework_TestCase
 {

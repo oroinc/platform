@@ -30,7 +30,7 @@ Symfony\Component\HttpKernel\Bundle\Bundle
 Symfony\Component\HttpKernel\DependencyInjection\Extension
 Symfony\Component\Intl\Intl
 Symfony\Component\OptionsResolver\Options
-Symfony\Component\OptionsResolver\OptionsResolverInterface
+Symfony\Component\OptionsResolver\OptionsResolver
 Symfony\Component\PropertyAccess\PropertyAccess
 Symfony\Component\Validator\Validation
 Twig_SimpleFilter

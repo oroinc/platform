@@ -15,7 +15,16 @@ define(function(require) {
      */
     HistoryNavigationComponent = BaseComponent.extend(/** @lends HistoryNavigationComponent.prototype */{
         history: null,
+
         observedModel: null,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function HistoryNavigationComponent() {
+            HistoryNavigationComponent.__super__.constructor.apply(this, arguments);
+        },
+
         /**
          * @inheritDoc
          */

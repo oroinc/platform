@@ -4,7 +4,6 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Helper;
 
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait;
 
 class LocalizationQueryTraitTest extends \PHPUnit_Framework_TestCase

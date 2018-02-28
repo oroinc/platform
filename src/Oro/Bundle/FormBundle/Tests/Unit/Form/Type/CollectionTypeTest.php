@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 
 class CollectionTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,8 +35,10 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider buildViewDataProvider
+     * @param array $options
+     * @param array $expectedVars
      */
-    public function testBuildView($options, $expectedVars)
+    public function testBuildView(array $options, array $expectedVars)
     {
         $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $view = new FormView();
@@ -50,6 +51,9 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @return array
+     */
     public function buildViewDataProvider()
     {
         return [
@@ -96,17 +100,17 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
      * @expectedExceptionMessage The required option "type" is missing.
      */
-    public function testSetDefaultOptionsWithoutType()
+    public function testConfigureOptionsWithoutType()
     {
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
         $resolver->resolve([]);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
 
         $options = [
             'type' => 'test_type'
@@ -131,10 +135,10 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSetDefaultOptionsDisableAdd()
+    public function testConfigureOptionsDisableAdd()
     {
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
 
         $options = [
             'type'      => 'test_type',
@@ -160,10 +164,10 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSetDefaultOptionsDisableShowFormWhenEmpty()
+    public function testConfigureOptionsDisableShowFormWhenEmpty()
     {
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
 
         $options = [
             'type'                 => 'test_type',
@@ -189,10 +193,10 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSetDefaultOptionsCustomAddLabel()
+    public function testConfigureOptionsCustomAddLabel()
     {
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
 
         $options = [
             'type'                 => 'test_type',

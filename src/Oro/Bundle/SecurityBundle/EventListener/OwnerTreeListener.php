@@ -5,10 +5,8 @@ namespace Oro\Bundle\SecurityBundle\EventListener;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
-
-use Symfony\Component\Security\Core\Util\ClassUtils;
-
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 class OwnerTreeListener
 {

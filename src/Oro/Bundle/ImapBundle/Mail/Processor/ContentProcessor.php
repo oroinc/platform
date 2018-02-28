@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Processor;
 
+use Oro\Bundle\ImapBundle\Mail\Storage\Content;
 use Zend\Mail\Header\ContentType;
 use Zend\Mail\Storage\Part\PartInterface;
-
-use Oro\Bundle\ImapBundle\Mail\Storage\Content;
 
 class ContentProcessor
 {

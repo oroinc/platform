@@ -18,6 +18,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function WidgetPickerFilterView() {
+            WidgetPickerFilterView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.onSearch = _.debounce(this.onSearch, 100);
             WidgetPickerFilterView.__super__.initialize.apply(this, arguments);

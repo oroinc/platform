@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
@@ -17,6 +15,7 @@ use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerInterface;
 
 class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {

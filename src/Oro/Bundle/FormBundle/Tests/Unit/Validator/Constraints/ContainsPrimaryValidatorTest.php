@@ -3,7 +3,6 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Validator\Constraints;
 
 use Doctrine\Common\Collections\AbstractLazyCollection;
-
 use Oro\Bundle\FormBundle\Validator\Constraints\ContainsPrimaryValidator;
 
 class ContainsPrimaryValidatorTest extends \PHPUnit_Framework_TestCase

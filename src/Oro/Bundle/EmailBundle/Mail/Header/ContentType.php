@@ -9,7 +9,6 @@ namespace Oro\Bundle\EmailBundle\Mail\Header;
 
 use \Zend\Mail\Header\ContentType as BaseContentType;
 use \Zend\Mail\Header\Exception\InvalidArgumentException;
-
 use Oro\Bundle\EmailBundle\Mail\Headers;
 
 class ContentType extends BaseContentType

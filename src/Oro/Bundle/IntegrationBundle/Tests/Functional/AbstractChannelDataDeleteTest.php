@@ -3,11 +3,9 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Functional;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class AbstractChannelDataDeleteTest extends WebTestCase
 {

@@ -3,20 +3,16 @@
 namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
-
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
-
+use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
-
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class DatagridExportConnector implements
     ItemReaderInterface,
@@ -24,6 +20,8 @@ class DatagridExportConnector implements
     ContextAwareInterface,
     ClosableInterface
 {
+    const DEFAULT_PAGE_SIZE = 500;
+
     /**
      * @var ServiceLink
      */
@@ -75,7 +73,6 @@ class DatagridExportConnector implements
     public function __construct(ServiceLink $gridManagerLink)
     {
         $this->gridManagerLink = $gridManagerLink;
-        $this->pageSize        = BufferedIdentityQueryResultIterator::DEFAULT_BUFFER_SIZE;
     }
 
     /**
@@ -164,11 +161,24 @@ class DatagridExportConnector implements
             }
 
             $this->page       = 1;
+            $this->pageSize   = $this->getPageSize();
             $gridData         = $this->getGridData();
             $this->totalCount = $gridData->getTotalRecords();
             $this->sourceData = $gridData->getData();
             $this->offset     = 0;
         }
+    }
+
+    /**
+     * @return int
+     */
+    protected function getPageSize()
+    {
+        if ($this->getContext()->hasOption('pageSize')) {
+            return $this->getContext()->getOption('pageSize');
+        }
+
+        return self::DEFAULT_PAGE_SIZE;
     }
 
     /**

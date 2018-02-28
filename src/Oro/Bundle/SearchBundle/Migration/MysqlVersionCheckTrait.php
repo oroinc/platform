@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\SearchBundle\Migration;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-
 use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 trait MysqlVersionCheckTrait
 {

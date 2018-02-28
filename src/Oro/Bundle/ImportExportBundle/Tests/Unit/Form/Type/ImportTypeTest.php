@@ -5,7 +5,6 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
 use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;

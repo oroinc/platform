@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Form\DataTransformer;
 
-use Symfony\Component\Form\DataTransformerInterface;
-
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
+use Symfony\Component\Form\DataTransformerInterface;
 
 class EntityFieldFallbackTransformer implements DataTransformerInterface
 {

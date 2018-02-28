@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\EventListener;
 
-use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Test\TypeTestCase;
-
 use Oro\Bundle\ApiBundle\Form\EventListener\CreateListener;
 use Oro\Bundle\ApiBundle\Form\Type\BooleanType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Form\EventListener\Fixtures as Entity;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class CreateListenerTest extends TypeTestCase
 {

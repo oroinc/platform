@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ExecutionContextInterface;
-
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Validator\Constraints\NameOrOrganization;
 use Oro\Bundle\AddressBundle\Validator\Constraints\NameOrOrganizationValidator;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ExecutionContextInterface;
 
 class NameOrOrganizationValidatorTest extends \PHPUnit_Framework_TestCase
 {

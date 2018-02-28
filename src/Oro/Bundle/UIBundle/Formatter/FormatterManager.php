@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UIBundle\Formatter;
 
-use Oro\Bundle\UIBundle\Exception\InvalidFormatterException;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\UIBundle\Exception\InvalidFormatterException;
 
 class FormatterManager
 {

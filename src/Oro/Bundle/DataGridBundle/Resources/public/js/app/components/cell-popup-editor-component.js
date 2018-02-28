@@ -51,6 +51,16 @@ define(function(require) {
             cancelAndEditPrevRowAction: 'editPrevRowCell'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function CellPopupEditorComponent() {
+            CellPopupEditorComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = options || {};
             if (!this.options.plugin) {

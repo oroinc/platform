@@ -26,19 +26,17 @@ services:
             - { name: form.type}
 
     oro_segment.form.segment:
-        class:           Symfony\Component\Form\Form
-        factory_method:  createNamed
-        factory_service: form.factory
+        class: Symfony\Component\Form\Form
+        factory: ['@form.factory', createNamed]
         arguments:
             - "oro_segment_form"
             - "oro_segment"
 
     oro_segment.form.handler.segment:
         class: %oro_segment.form.handler.segment.class%
-        scope: request
         arguments:
             - '@oro_segment.form.segment'
-            - '@request'
+            - '@request_stack'
             - '@doctrine'
             - '@oro_segment.static_segment_manager'
 

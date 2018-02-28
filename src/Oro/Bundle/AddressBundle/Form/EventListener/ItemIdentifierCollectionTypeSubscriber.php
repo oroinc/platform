@@ -3,10 +3,9 @@
 namespace Oro\Bundle\AddressBundle\Form\EventListener;
 
 use Doctrine\Common\Collections\Collection;
-
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 

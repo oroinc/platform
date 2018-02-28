@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Doctrine\Common\Inflector\Inflector;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;

@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\DetailedLogsHandlerPass;
+use Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\DetailedLogsHandlerPass;
-use Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler;
 
 class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
 {

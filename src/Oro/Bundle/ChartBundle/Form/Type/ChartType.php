@@ -4,11 +4,7 @@ namespace Oro\Bundle\ChartBundle\Form\Type;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ChartType extends ConfigProviderAwareType
 {
@@ -81,7 +77,7 @@ class ChartType extends ConfigProviderAwareType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setOptional(['chart_filter']);
         $resolver->setAllowedTypes(['chart_filter' => 'callable']);

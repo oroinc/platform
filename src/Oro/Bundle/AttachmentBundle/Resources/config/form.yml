@@ -42,7 +42,6 @@ services:
 
     oro_attachment.form.handler.attachment:
         class: %oro_attachment.form.handler.attachment.class%
-        scope: request
         arguments:
-            - '@request'
+            - '@request_stack'
             - '@doctrine.orm.entity_manager'

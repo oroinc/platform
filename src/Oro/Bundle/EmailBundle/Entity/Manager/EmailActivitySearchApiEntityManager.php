@@ -2,20 +2,19 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\Common\Persistence\ObjectManager;
-
-use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
-use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
-use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
+use Oro\Bundle\SearchBundle\Query\Query as SearchQueryBuilder;
 use Oro\Bundle\SearchBundle\Query\Result as SearchResult;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
-use Oro\Bundle\SearchBundle\Query\Query as SearchQueryBuilder;
-use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 
 class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
 {
@@ -122,16 +121,15 @@ class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
             ->addSelect('entityClass', 'entity')
             ->addSelect('entityTitle', 'title');
         foreach ($this->getAssociatedEntitiesFilters($searchResult) as $entityClass => $ids) {
-            $subQb = $em->getRepository($entityClass)->createQueryBuilder('e')
+            $subQb = $em->getRepository($entityClass)->createQueryBuilder('e');
+            $subQb
                 ->select(
-                    sprintf(
-                        'e.id AS id, \'%s\' AS entityClass, %s AS entityTitle',
-                        $entityClass,
-                        $this->entityNameResolver->prepareNameDQL(
-                            $this->entityNameResolver->getNameDQL($entityClass, 'e'),
-                            true
-                        )
-                    )
+                    'e.id AS id',
+                    (string)$subQb->expr()->literal($entityClass) . ' AS entityClass',
+                    $this->entityNameResolver->prepareNameDQL(
+                        $this->entityNameResolver->getNameDQL($entityClass, 'e'),
+                        true
+                    ) . ' AS entityTitle'
                 );
             $subQb->where($subQb->expr()->in('e.id', $ids));
             $qb->addSubQuery($subQb->getQuery());

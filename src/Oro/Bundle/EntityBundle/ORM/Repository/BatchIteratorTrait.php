@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityBundle\ORM\Repository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Internal\Hydration\IterableResult;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\EntityBundle\ORM\SingleObjectIterableResultDecorator;
 
 trait BatchIteratorTrait

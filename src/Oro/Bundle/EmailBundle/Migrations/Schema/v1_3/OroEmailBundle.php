@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Schema\Schema;
-
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\SecurityBundle\Migrations\Schema\UpdateOwnershipTypeQuery;

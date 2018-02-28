@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\Context;
+use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * This class implements a resettable extension and it is used to wrap a specific extension

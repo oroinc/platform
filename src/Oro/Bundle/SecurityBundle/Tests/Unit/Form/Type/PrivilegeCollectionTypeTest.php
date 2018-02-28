@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\SecurityBundle\Form\Type\PrivilegeCollectionType;
+use Symfony\Component\Form\FormView;
 
 class PrivilegeCollectionTypeTest extends \PHPUnit_Framework_TestCase
 {

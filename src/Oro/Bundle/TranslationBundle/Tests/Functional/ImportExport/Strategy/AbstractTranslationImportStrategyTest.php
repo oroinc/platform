@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\ImportExport\Strategy;
 
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\AbstractImportStrategy;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;

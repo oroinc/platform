@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Action;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionFactory;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ActionFactoryTest extends \PHPUnit_Framework_TestCase
 {

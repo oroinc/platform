@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectChoiceType;
+use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectChoiceType;
-use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
 
 class AutoResponseRuleType extends AbstractQueryDesignerType
 {

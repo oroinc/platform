@@ -1,8 +1,6 @@
 <?php
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Async\Export;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\DataGridBundle\Async\Export\ExportMessageProcessor;
 use Oro\Bundle\DataGridBundle\Async\Topics;
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
@@ -15,6 +13,7 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
 
 class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,16 +3,14 @@
 namespace Oro\Bundle\EmailBundle\Acl\Voter;
 
 use Doctrine\Common\Util\ClassUtils;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
-
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class EmailVoter implements VoterInterface
 {
@@ -42,6 +40,7 @@ class EmailVoter implements VoterInterface
 
     /**
      * {@inheritDoc}
+     * TODO: change public to protected in scope of BAP-15236
      */
     public function supportsAttribute($attribute)
     {
@@ -50,6 +49,7 @@ class EmailVoter implements VoterInterface
 
     /**
      * {@inheritDoc}
+     * TODO: change public to protected in scope of BAP-15236
      */
     public function supportsClass($class)
     {

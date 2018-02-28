@@ -3,17 +3,15 @@
 namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Monolog\Logger;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
+use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * The goal of this class is to send an email directly, not using a mail spool
@@ -319,7 +317,7 @@ class DirectMailer extends \Swift_Mailer
         if (php_sapi_name() === 'cli') {
             return;
         }
-        $host = $this->container->get('request')->server->get('HTTP_HOST');
+        $host = $this->container->get('request_stack')->getCurrentRequest()->server->get('HTTP_HOST');
         // fix local domain when wild-card vhost is used and auto-detection fails
         if (0 === strpos($transport->getLocalDomain(), '*') && !empty($host)) {
             $transport->setLocalDomain($host);

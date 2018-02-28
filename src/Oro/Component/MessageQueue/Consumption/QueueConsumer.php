@@ -2,12 +2,11 @@
 
 namespace Oro\Component\MessageQueue\Consumption;
 
-use Psr\Log\NullLogger;
-
 use Oro\Component\MessageQueue\Consumption\Exception\ConsumptionInterruptedException;
+use Oro\Component\MessageQueue\Consumption\Exception\RejectMessageExceptionInterface;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
-use Oro\Component\MessageQueue\Consumption\Exception\RejectMessageExceptionInterface;
+use Psr\Log\NullLogger;
 
 /**
  * @SuppressWarnings(PHPMD.NPathComplexity)

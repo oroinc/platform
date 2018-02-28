@@ -3,14 +3,12 @@
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
 use Doctrine\ORM\Event\PreUpdateEventArgs;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowActivationException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowRemoveException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class WorkflowDefinitionEntityListener
 {

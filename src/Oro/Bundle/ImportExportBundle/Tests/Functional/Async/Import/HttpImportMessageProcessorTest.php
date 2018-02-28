@@ -67,11 +67,11 @@ class HttpImportMessageProcessorTest extends WebTestCase
                     'counts'     => [],
                 ])
             ;
-         /**
-          * For rewrite services in container.
-          * without "reset" in the ChunkHttpImportMessageProcessor still there is ImportHandler
-          * instead Mock of ImportHandler.
-         */
+        /**
+         * For rewrite services in container.
+         * without "reset" in the ChunkHttpImportMessageProcessor still there is ImportHandler
+         * instead Mock of ImportHandler.
+        */
         $this->getContainer()->reset();
         $this->getContainer()->set('oro_importexport.handler.import.http', $importHandler);
         $processor = $this->getChunkHttpImportMessageProcessor();

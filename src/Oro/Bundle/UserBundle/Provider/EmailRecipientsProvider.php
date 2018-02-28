@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Provider;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;

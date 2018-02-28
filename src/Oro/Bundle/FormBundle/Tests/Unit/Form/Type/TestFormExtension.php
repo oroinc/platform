@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Symfony\Component\Form\AbstractExtension;
-use Genemu\Bundle\FormBundle\Form\JQuery\Type;
 
 class TestFormExtension extends AbstractExtension
 {
     protected function loadTypes()
     {
         return array(
-            new Type\Select2Type('hidden'),
+            new Select2Type('Symfony\Component\Form\Extension\Core\Type\HiddenType', 'oro_select2_hidden')
         );
     }
 }

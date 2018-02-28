@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\EventListener;
 
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener;
+use Symfony\Component\HttpFoundation\Request;
 
 class SecurityFirewallExceptionListener extends ExceptionListener
 {

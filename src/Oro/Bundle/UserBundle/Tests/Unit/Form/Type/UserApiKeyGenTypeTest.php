@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenKeyType;
 use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenType;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class UserApiKeyGenTypeTest extends FormIntegrationTestCase
 {

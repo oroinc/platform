@@ -4,9 +4,6 @@ namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
-
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
@@ -17,6 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Symfony\Component\Routing\RouterInterface;
 
 class ActivityContextApiEntityManager extends ApiEntityManager
 {

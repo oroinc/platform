@@ -3,16 +3,14 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Handler;
 
 use Monolog\Logger;
-
+use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
+use Oro\Bundle\MessageQueueBundle\Log\Handler\ConsoleHandler;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command;
-
-use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
-use Oro\Bundle\MessageQueueBundle\Log\Handler\ConsoleHandler;
 
 class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
 {

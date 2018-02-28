@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
+use Oro\Bundle\EntityExtendBundle\Model\EnumValue as EnumValueEntity;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-
-use Oro\Bundle\EntityExtendBundle\Model\EnumValue as EnumValueEntity;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumValueValidator extends ConstraintValidator
 {

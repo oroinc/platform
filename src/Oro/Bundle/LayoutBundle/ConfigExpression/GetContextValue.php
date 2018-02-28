@@ -3,10 +3,9 @@
 
 namespace Oro\Bundle\LayoutBundle\ConfigExpression;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Component\ConfigExpression\Exception;
 use Oro\Component\ConfigExpression\Func\AbstractFunction;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class GetContextValue extends AbstractFunction
 {

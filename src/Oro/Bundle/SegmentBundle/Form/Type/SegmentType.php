@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SegmentBundle\Form\Type;
 
+use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
 
 class SegmentType extends AbstractQueryDesignerType
 {

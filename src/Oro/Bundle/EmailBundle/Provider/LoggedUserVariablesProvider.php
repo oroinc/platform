@@ -2,18 +2,19 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\LocaleBundle\Model\LastNameInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
+ * This class prepares email variables from current logged user
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
@@ -210,7 +211,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
                 $val = [
                     'type'  => 'string',
                     'label' => $this->translator->trans('oro.email.emailtemplate.siganture'),
-                    'filter' => 'oro_tag_filter',
+                    'filter' => 'oro_html_strip_tags',
                 ];
             }
             $result['userSignature'] = $val;

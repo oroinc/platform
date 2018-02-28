@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\EventListener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigValueRepository;

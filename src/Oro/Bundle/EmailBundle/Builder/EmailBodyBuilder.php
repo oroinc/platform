@@ -3,10 +3,10 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
-use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 
 /**

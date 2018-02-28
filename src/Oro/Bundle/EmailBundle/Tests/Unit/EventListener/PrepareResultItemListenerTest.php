@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
-use Symfony\Component\Routing\Router;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\EventListener\PrepareResultItemListener;
-use Oro\Bundle\SearchBundle\Query\Result\Item;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
+use Oro\Bundle\SearchBundle\Query\Result\Item;
+use Symfony\Component\Routing\Router;
 
 class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
 {

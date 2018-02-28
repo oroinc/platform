@@ -2,9 +2,8 @@
 
 namespace Oro\Component\Layout\Extension\Theme\PathProvider;
 
-use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextAwareInterface;
-
+use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 

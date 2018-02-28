@@ -3,11 +3,9 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
 use Doctrine\Common\Cache\ArrayCache;
-
-use Symfony\Component\Translation\MessageCatalogue;
-
 use Oro\Bundle\TranslationBundle\Translation\CachingTranslationLoader;
 use Oro\Bundle\TranslationBundle\Translation\OrmTranslationResource;
+use Symfony\Component\Translation\MessageCatalogue;
 
 class CachingTranslationLoaderTest extends \PHPUnit_Framework_TestCase
 {

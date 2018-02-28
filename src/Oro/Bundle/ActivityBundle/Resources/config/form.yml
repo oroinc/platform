@@ -21,8 +21,7 @@ services:
             - '@oro_activity.manager'
             - '@oro_entity.entity_alias_resolver'
             - '@oro_entity.routing_helper'
-        calls:
-            - [setRequest, ["@?request="]]
+            - '@request_stack'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
+use Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
-
-use Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension;
 
 /**
  * Unfortunately we have to use inheritance instead of aggregation because there are

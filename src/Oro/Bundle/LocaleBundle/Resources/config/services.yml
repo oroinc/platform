@@ -85,7 +85,7 @@ services:
 
     # Calendar
     oro_locale.calendar:
-        scope: prototype
+        shared: false
         class: %oro_locale.calendar.class%
 
     oro_locale.calendar_factory:

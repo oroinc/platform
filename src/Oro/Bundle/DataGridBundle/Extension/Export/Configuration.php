@@ -8,6 +8,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     const XLSX_MAX_EXPORT_RECORDS = 10000;
+    const OPTION_PAGE_SIZE = 'page_size';
 
     /**
      * {@inheritDoc}
@@ -40,6 +41,8 @@ class Configuration implements ConfigurationInterface
                     ->booleanNode('show_max_export_records_dialog')
                     ->end()
                     ->integerNode('max_export_records')
+                    ->end()
+                    ->integerNode(self::OPTION_PAGE_SIZE)
                     ->end()
                 ->end()
             ->end();

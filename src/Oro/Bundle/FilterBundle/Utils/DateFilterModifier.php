@@ -1,12 +1,11 @@
 <?php
 namespace Oro\Bundle\FilterBundle\Utils;
 
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Class DateFilterModifier

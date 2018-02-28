@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+use Psr\Log\LoggerInterface;
 
 class ProcessLogger
 {

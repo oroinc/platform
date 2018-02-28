@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
-use Doctrine\ORM\UnitOfWork;
 use Doctrine\Common\Util\ClassUtils;
-
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
-use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 
 /**

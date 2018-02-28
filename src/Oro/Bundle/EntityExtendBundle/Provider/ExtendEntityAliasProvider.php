@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Provider;
 
 use Doctrine\Common\Inflector\Inflector;
-
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag;

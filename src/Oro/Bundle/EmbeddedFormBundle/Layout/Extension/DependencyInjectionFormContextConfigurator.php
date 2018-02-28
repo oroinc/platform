@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Layout\Extension;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\DependencyInjectionFormAccessor;
-
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\ContextInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Adds FormAccessor to Context by name of form type

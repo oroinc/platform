@@ -4,17 +4,14 @@ namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-
 use Knp\Menu\ItemInterface;
-
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface;
 use Oro\Bundle\NavigationBundle\Entity\Repository\NavigationRepositoryInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class NavigationItemBuilder implements BuilderInterface, FeatureToggleableInterface
 {

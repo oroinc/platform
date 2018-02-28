@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Security;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class SecurityProviderTest extends \PHPUnit_Framework_TestCase
 {

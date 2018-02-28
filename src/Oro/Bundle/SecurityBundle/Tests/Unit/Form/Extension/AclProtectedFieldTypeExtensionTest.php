@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension;
 
+use Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension;
+use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
@@ -13,10 +16,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
-
-use Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension;
-use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 
 class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 {

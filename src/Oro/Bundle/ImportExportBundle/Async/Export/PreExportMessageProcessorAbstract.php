@@ -1,11 +1,6 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -15,6 +10,9 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 abstract class PreExportMessageProcessorAbstract implements MessageProcessorInterface, TopicSubscriberInterface
 {

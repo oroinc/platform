@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\organizationBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;

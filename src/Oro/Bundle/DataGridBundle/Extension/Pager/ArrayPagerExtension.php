@@ -6,9 +6,9 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ArrayDatasource\ArrayDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException;
+use Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension;
 use Oro\Bundle\DataGridBundle\Extension\Pager\ArrayDatasource\ArrayPager;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
-use Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension;
 
 class ArrayPagerExtension extends AbstractPagerExtension
 {

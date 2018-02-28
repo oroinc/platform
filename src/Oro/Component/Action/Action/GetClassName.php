@@ -3,10 +3,8 @@
 namespace Oro\Component\Action\Action;
 
 use Doctrine\Common\Util\ClassUtils;
-
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
 use Oro\Component\Action\Exception\InvalidParameterException;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class GetClassName extends AbstractAction
 {

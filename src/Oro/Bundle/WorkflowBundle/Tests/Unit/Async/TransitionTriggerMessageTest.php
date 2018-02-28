@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Async;
 
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
-
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 use Oro\Component\Testing\Unit\EntityTrait;
 

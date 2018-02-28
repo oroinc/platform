@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\ActionBundle\Form\Type;
 
+use Oro\Bundle\ActionBundle\Form\EventListener\RequiredAttributesListener;
+use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\ActionBundle\Form\EventListener\RequiredAttributesListener;
-use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\Attribute;
-use Oro\Bundle\ActionBundle\Model\Operation;
-
-use Oro\Component\ConfigExpression\ContextAccessor;
 
 class OperationType extends AbstractType
 {

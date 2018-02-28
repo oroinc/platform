@@ -3,21 +3,19 @@
 namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
+use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
-use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
-use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroJquerySelect2HiddenType extends AbstractType
 {
@@ -56,7 +54,7 @@ class OroJquerySelect2HiddenType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $defaultConfig = [
             'placeholder'        => 'oro.form.choose_value',
@@ -120,9 +118,9 @@ class OroJquerySelect2HiddenType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    protected function setConverterNormalizer(OptionsResolverInterface $resolver)
+    protected function setConverterNormalizer(OptionsResolver $resolver)
     {
         $resolver->setNormalizers(
             [
@@ -149,10 +147,10 @@ class OroJquerySelect2HiddenType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      * @param array                    $defaultConfig
      */
-    protected function setConfigsNormalizer(OptionsResolverInterface $resolver, array $defaultConfig)
+    protected function setConfigsNormalizer(OptionsResolver $resolver, array $defaultConfig)
     {
         $resolver->setNormalizers(
             [
@@ -241,7 +239,7 @@ class OroJquerySelect2HiddenType extends AbstractType
      */
     public function getParent()
     {
-        return 'genemu_jqueryselect2_hidden';
+        return 'oro_select2_hidden';
     }
 
     /**

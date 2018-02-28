@@ -3,19 +3,17 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Validator\Validation;
-
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Processor\FormContext;
-use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
-use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class FormProcessorTestCase extends \PHPUnit_Framework_TestCase
 {

@@ -29,9 +29,9 @@ class ExecutionFailedException extends \RuntimeException
         $this->group       = $group;
         $this->processorId = $processorId;
 
-        $message = sprintf('Processor failed: "%s".', $processorId);
+        $message = \sprintf('Processor failed: "%s".', $processorId);
         if (null !== $previous) {
-            $message .= sprintf(' Reason: %s', $previous->getMessage());
+            $message .= \sprintf(' Reason: %s', $previous->getMessage());
         }
 
         parent::__construct($message, 0, $previous);

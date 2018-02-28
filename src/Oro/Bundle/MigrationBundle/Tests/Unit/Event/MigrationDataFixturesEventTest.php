@@ -3,7 +3,6 @@
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Event;
 
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutorInterface;
 

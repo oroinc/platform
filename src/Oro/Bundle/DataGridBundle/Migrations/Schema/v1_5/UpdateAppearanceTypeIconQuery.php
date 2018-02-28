@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Migrations\Schema\v1_5;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class UpdateAppearanceTypeIconQuery extends ParametrizedMigrationQuery
 {

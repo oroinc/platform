@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\SearchBundle\Query\Result\Item;
+use Symfony\Component\EventDispatcher\Event;
 
 class PrepareResultItemEvent extends Event
 {
@@ -48,13 +47,5 @@ class PrepareResultItemEvent extends Event
     public function getEntity()
     {
         return $this->entityObject;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::EVENT_NAME;
     }
 }

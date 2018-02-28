@@ -2,13 +2,10 @@
 
 namespace Oro\Bundle\SyncBundle\EventListener;
 
-use Psr\Log\LoggerInterface;
-
 use Guzzle\Http\Message\RequestInterface;
-
 use JDare\ClankBundle\Event\ClientEvent;
-
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider;
+use Psr\Log\LoggerInterface;
 
 /**
  * Authenticate WAMP connection by Sync authentication ticket.

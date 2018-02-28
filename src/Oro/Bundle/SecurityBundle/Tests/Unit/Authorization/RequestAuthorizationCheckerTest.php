@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authorization;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Oro\Component\DependencyInjection\ServiceLink;
-use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class RequestAuthorizationCheckerTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,18 +3,17 @@
 namespace Oro\Bundle\EntityMergeBundle\Form\Type;
 
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\OptionsResolver\Options;
-
-use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
-use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class MergeFieldType extends AbstractType
 {
@@ -47,6 +46,7 @@ class MergeFieldType extends AbstractType
                 'choices'                 => $options['entities'],
                 'multiple'                => false,
                 'expanded'                => true,
+                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
                 'choices_as_values'       => true,
                 'ownership_disabled'      => true,
                 'dynamic_fields_disabled' => true,
@@ -120,7 +120,7 @@ class MergeFieldType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(
             array(

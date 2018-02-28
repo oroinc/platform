@@ -10,6 +10,7 @@ The Oro Platform version holder, maintenance mode support, lazy services functio
  - [Add application configuration settings from any bundle](#add-application-configuration-settings-from-any-bundle)
  - [Optional Doctrine listeners](#optional-doctrine-listeners)
  - [Lazy Doctrine listeners](#lazy-doctrine-listeners)
+ - [Global options for console commands](#global-options-for-console-commands)
 
 
 ## Maintenance mode
@@ -141,4 +142,60 @@ services:
         class: AppBundle\EventListener\DoctrineEntityListener
         tags:
             - { name: doctrine.orm.entity_listener, entity: AppBundle\Entity\MyEntity, event: postPersist, lazy: false }
+```
+
+## Global options for console commands ##
+
+Global options - options which can be used for all console commands in application.
+By default there is two set of global options in OroPlatform:
+* `--disabled-listeners`
+* `--current-user`, `--current-organization`
+
+This options added by `Oro\Bundle\PlatformBundle\Provider\Console\OptionalListenersGlobalOptionsProvider`
+and `Oro\Bundle\SecurityBundle\Provider\Console\ConsoleContextGlobalOptionsProvider` providers respectively.
+
+Registry `Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderRegistry` provide possibility to add custom global options to application.
+For adding your own global options you should create a new provider class, which implements `Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderInterface` interface.
+For example:
+
+``` php
+
+namespace Acme\Bundle\AcmeBundle\Provider\Console;
+
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+
+class MyNewGlobalOptionsProvider implements GlobalOptionsProviderInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function addGlobalOptions(Command $command)
+    {
+        // Create a new option and add it to the definitions
+        $option = new InputOption('new-option');
+        $command->getApplication()->getDefinition()->addOption($option);
+        $command->getDefinition()->addOption($option);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resolveGlobalOptions(InputInterface $input)
+    {
+        // Get the option's value and do something with it
+        $option = $input->getOption('new-option');
+        ...
+    }
+
+```
+And register this provider as a service with tag `oro_platform.console.global_options_provider`:
+
+``` yaml
+services:
+    acme.provider.console.my_new_global_options_provider:
+        class: Acme\Bundle\AcmeBundle\Provider\Console\MyNewGlobalOptionsProvider
+        tags:
+            - { name: oro_platform.console.global_options_provider }
 ```

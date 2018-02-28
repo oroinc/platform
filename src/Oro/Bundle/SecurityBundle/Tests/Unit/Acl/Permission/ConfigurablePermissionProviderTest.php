@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Permission;
 
 use Doctrine\Common\Cache\CacheProvider;
-
 use Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider;
 use Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;

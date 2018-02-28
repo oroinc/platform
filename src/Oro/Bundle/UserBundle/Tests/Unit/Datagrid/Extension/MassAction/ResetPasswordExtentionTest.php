@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Datagrid\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordExtension;
 

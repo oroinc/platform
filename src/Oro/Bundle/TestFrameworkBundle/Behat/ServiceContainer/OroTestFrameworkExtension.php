@@ -160,6 +160,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $kernel = $container->get(Symfony2Extension::KERNEL_ID);
         $container->setParameter('kernel.log_dir', $kernel->getLogDir());
         $container->setParameter('kernel.root_dir', $kernel->getRootDir());
+        $container->setParameter('kernel.secret', $kernel->getContainer()->getParameter('kernel.secret'));
     }
 
     /**

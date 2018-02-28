@@ -2,8 +2,18 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
-
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
+use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
+use Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
@@ -13,18 +23,6 @@ use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Validator;
-use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
-use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
-use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
-use Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class FieldTypeTest extends TypeTestCase
 {
@@ -163,7 +161,10 @@ class FieldTypeTest extends TypeTestCase
             new DefaultTranslator()
         );
 
-        $select2ChoiceType = new Select2Type('choice');
+        $select2ChoiceType = new Select2Type(
+            'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+            'oro_select2_choice'
+        );
 
         return [
             new PreloadedExtension(

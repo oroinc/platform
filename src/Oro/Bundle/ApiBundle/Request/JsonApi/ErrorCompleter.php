@@ -20,6 +20,9 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
+/**
+ * The error completer for REST API response conforms JSON.API specification.
+ */
 class ErrorCompleter extends AbstractErrorCompleter
 {
     /** @var ValueNormalizer */
@@ -40,25 +43,26 @@ class ErrorCompleter extends AbstractErrorCompleter
     /**
      * {@inheritdoc}
      */
-    public function complete(Error $error, EntityMetadata $metadata = null)
+    public function complete(Error $error, RequestType $requestType, EntityMetadata $metadata = null)
     {
         $this->completeStatusCode($error);
         $this->completeCode($error);
         $this->completeTitle($error);
         $this->completeDetail($error);
-        $this->completeSource($error, $metadata);
+        $this->completeSource($error, $requestType, $metadata);
     }
 
     /**
      * @param Error               $error
+     * @param RequestType         $requestType
      * @param EntityMetadata|null $metadata
      */
-    public function completeSource(Error $error, EntityMetadata $metadata = null)
+    private function completeSource(Error $error, RequestType $requestType, EntityMetadata $metadata = null)
     {
         $source = $error->getSource();
         if (null === $source && $this->isConfigFilterConstraintViolation($error)) {
             $error->setSource(
-                ErrorSource::createByParameter($this->getConfigFilterConstraintParameter($error))
+                ErrorSource::createByParameter($this->getConfigFilterConstraintParameter($error, $requestType))
             );
         } elseif (null !== $source && !$source->getPointer() && $source->getPropertyPath()) {
             $propertyPath = $source->getPropertyPath();
@@ -138,11 +142,12 @@ class ErrorCompleter extends AbstractErrorCompleter
     }
 
     /**
-     * @param Error $error
+     * @param Error       $error
+     * @param RequestType $requestType
      *
      * @return string
      */
-    private function getConfigFilterConstraintParameter(Error $error)
+    private function getConfigFilterConstraintParameter(Error $error, RequestType $requestType)
     {
         /** @var NotSupportedConfigOperationException $e */
         $e = ExceptionUtil::getProcessorUnderlyingException($error->getInnerException());
@@ -150,7 +155,10 @@ class ErrorCompleter extends AbstractErrorCompleter
             return AddIncludeFilter::FILTER_KEY;
         }
         if (FilterFieldsConfigExtra::NAME === $e->getOperation()) {
-            return sprintf(AddFieldsFilter::FILTER_KEY_TEMPLATE, $this->getEntityType($e->getClassName()));
+            return sprintf(
+                AddFieldsFilter::FILTER_KEY_TEMPLATE,
+                $this->getEntityType($e->getClassName(), $requestType)
+            );
         }
 
         throw new \LogicException(sprintf(
@@ -160,16 +168,17 @@ class ErrorCompleter extends AbstractErrorCompleter
     }
 
     /**
-     * @param string $entityClass
+     * @param string      $entityClass
+     * @param RequestType $requestType
      *
-     * @return string
+     * @return string|null
      */
-    private function getEntityType($entityClass)
+    private function getEntityType($entityClass, RequestType $requestType)
     {
         return ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,
             $entityClass,
-            new RequestType([RequestType::JSON_API]),
+            $requestType,
             false
         );
     }

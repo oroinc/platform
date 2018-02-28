@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Oro\Bundle\DataAuditBundle\Model\ExtendAuditField;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 

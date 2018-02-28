@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\PlatformBundle\EventListener\Console;
 
+use Oro\Bundle\PlatformBundle\Maintenance\Events;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Oro\Bundle\PlatformBundle\Maintenance\Events;
 
 class DriverLockCommandListener
 {

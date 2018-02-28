@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\DeleteRelationship;
 
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-
 use Oro\Bundle\ApiBundle\Form\DataMapper\RemoveRelationshipMapper;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildFormBuilder as BaseBuildFormBuilder;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Builds the form builder based on the parent entity metadata and configuration

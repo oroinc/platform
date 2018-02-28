@@ -6,14 +6,12 @@ use Doctrine\ORM\Event\OnClearEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
-use Symfony\Component\PropertyAccess\PropertyAccessor;
-
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\EventListener\IndexListener;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class IndexListenerTest extends \PHPUnit_Framework_TestCase
 {

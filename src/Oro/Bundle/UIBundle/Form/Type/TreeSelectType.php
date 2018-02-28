@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\UIBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\EntityTreeSelectType;
+use Oro\Bundle\UIBundle\Model\TreeItem;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Form\Type\EntityTreeSelectType;
-use Oro\Bundle\UIBundle\Model\TreeItem;
 
 class TreeSelectType extends AbstractType
 {

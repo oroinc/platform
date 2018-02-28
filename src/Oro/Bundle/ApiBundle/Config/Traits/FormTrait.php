@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Traits;
 
-use Symfony\Component\Validator\Constraint;
-
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Symfony\Component\Validator\Constraint;
 
 /**
  * @property array $items

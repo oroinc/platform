@@ -3,9 +3,9 @@
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
-use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Sequence;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\Visitor\AbstractVisitor;
 
 /**

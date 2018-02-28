@@ -4,17 +4,16 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-
-use Oro\Bundle\FilterBundle\Filter\DictionaryFilter;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
-use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
 use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmManyRelationBuilder;
+use Oro\Bundle\FilterBundle\Filter\DictionaryFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
+use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 
 class DictionaryTest extends OrmTestCase
 {

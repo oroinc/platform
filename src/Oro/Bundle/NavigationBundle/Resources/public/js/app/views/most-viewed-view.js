@@ -10,6 +10,13 @@ define([
         pageItems: [],
         dataItems: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function MostViewedView() {
+            MostViewedView.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             this.dataItems = options.dataItems || 'mostviewed';
             this.pageItems = [this.dataItems];

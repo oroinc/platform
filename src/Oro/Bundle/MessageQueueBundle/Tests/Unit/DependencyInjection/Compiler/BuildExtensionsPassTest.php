@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtension;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionWrapper;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildExtensionsPass;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class BuildExtensionsPassTest extends \PHPUnit_Framework_TestCase
 {

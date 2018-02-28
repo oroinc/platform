@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\ListenerExcludeConfigConnectionPass;
-
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ListenerExcludeConfigConnectionPassTest extends \PHPUnit_Framework_TestCase

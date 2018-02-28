@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\AddressBundle\Form\Type\RegionType;
+use Symfony\Component\Form\FormView;
 
 class RegionTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,18 +23,18 @@ class RegionTypeTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
     }
 
     public function testGetParent()
     {
-        $this->assertEquals('genemu_jqueryselect2_translatable_entity', $this->type->getParent());
+        $this->assertEquals('oro_select2_translatable_entity', $this->type->getParent());
     }
 
     public function testGetName()

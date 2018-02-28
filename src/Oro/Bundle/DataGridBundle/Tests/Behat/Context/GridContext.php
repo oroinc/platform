@@ -4,25 +4,23 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
-
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridInterface;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolBarTools;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridInterface;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolBarTools;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
-use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
-
 use Symfony\Component\DomCrawler\Crawler;
 
 /**

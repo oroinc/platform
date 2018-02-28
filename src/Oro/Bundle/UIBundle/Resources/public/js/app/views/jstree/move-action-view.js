@@ -18,6 +18,13 @@ define(function(require) {
             routeParams: {}
         }),
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function MoveActionView() {
+            MoveActionView.__super__.constructor.apply(this, arguments);
+        },
+
         onClick: function() {
             var $tree = this.options.$tree;
             var selectedIds = $tree.jstree('get_checked');

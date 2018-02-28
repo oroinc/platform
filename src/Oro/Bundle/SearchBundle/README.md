@@ -7,6 +7,7 @@ Search bundle creates search index for entities and allows to perform search usi
 
  - [Configuration](Resources/doc/configuration.md)
  - [Console commands](Resources/doc/console_commands.md)
+ - [Reindexation during platform update](Resources/doc/platform_update.md)
  - [API simple search](Resources/doc/simple_search.md)
  - [API advanced search](Resources/doc/advanced_search.md)
  - [Query builder](Resources/doc/query_builder.md)

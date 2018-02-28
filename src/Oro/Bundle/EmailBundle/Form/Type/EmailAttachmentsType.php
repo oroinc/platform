@@ -3,13 +3,11 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Doctrine\Common\Collections\Collection;
-
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-
-use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 
 class EmailAttachmentsType extends AbstractType
 {

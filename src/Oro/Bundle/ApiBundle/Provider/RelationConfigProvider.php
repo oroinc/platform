@@ -2,19 +2,22 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\RelationConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
+/**
+ * Provides the configuration for an entity that can be uses as a part of other Data API resources.
+ */
 class RelationConfigProvider extends AbstractConfigProvider
 {
     /** @var ActionProcessorInterface */
-    protected $processor;
+    private $processor;
 
     /** @var array */
-    protected $cache = [];
+    private $cache = [];
 
     /**
      * @param ActionProcessorInterface $processor
@@ -34,8 +37,12 @@ class RelationConfigProvider extends AbstractConfigProvider
      *
      * @return Config
      */
-    public function getRelationConfig($className, $version, RequestType $requestType, array $extras = [])
-    {
+    public function getRelationConfig(
+        string $className,
+        string $version,
+        RequestType $requestType,
+        array $extras = []
+    ): Config {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty.');
         }
@@ -61,7 +68,7 @@ class RelationConfigProvider extends AbstractConfigProvider
     /**
      * Removes all already built configs from the internal cache.
      */
-    public function clearCache()
+    public function clearCache(): void
     {
         $this->cache = [];
     }
@@ -69,7 +76,7 @@ class RelationConfigProvider extends AbstractConfigProvider
     /**
      * {@inheritdoc}
      */
-    protected function buildConfigKey($className, array $extras)
+    protected function buildConfigKey(string $className, array $extras): string
     {
         return 'relation|' . parent::buildConfigKey($className, $extras);
     }

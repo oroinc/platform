@@ -3,11 +3,6 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
@@ -17,6 +12,8 @@ use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\ActionBundle\Provider\Event\OnButtonsMatched;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 use Oro\Bundle\TestFrameworkBundle\Test\Stub\CallableStub;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ButtonProviderTest extends \PHPUnit_Framework_TestCase
 {

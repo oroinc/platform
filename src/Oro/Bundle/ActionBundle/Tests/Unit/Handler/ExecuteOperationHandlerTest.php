@@ -2,25 +2,21 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Handler;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\Common\Collections\Collection;
-
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\Exception\AlreadySubmittedException;
-use Symfony\Component\Form\FormInterface;
-
-use Oro\Component\Action\Exception\InvalidConfigurationException;
-
 use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
+use Oro\Bundle\ActionBundle\Handler\ExecuteOperationHandler;
+use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
-use Oro\Bundle\ActionBundle\Helper\ContextHelper;
-use Oro\Bundle\ActionBundle\Handler\ExecuteOperationHandler;
 use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
+use Oro\Component\Action\Exception\InvalidConfigurationException;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Form\Exception\AlreadySubmittedException;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class ExecuteOperationHandlerTest extends \PHPUnit_Framework_TestCase
 {

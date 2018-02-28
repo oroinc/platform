@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Functional\OriginSyncCredentials\Driver;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\DBAL\Connection;
-
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\Driver\DbalWrongCredentialsOriginsDriver;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Psr\Log\LoggerInterface;
 
 /**
  * @dbIsolationPerTest

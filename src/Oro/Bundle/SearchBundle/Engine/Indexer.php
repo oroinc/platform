@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\SearchBundle\Query\Expression\Lexer;
 use Oro\Bundle\SearchBundle\Query\Expression\Parser as ExpressionParser;
 use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
-
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ActionBundle\Configuration;
 
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-
-use Oro\Bundle\ActionBundle\Model\OperationDefinition;
+use Symfony\Component\Config\Definition\Processor;
 
 class OperationListConfiguration implements ConfigurationDefinitionInterface
 {

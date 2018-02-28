@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ActivityBundle\Form\Type;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType as BaseMultipleAssociationChoiceType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 class MultipleAssociationChoiceType extends BaseMultipleAssociationChoiceType
 {

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\Datagrid\Extension;
 
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Security\Core\Util\ClassUtils;
-
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\TwigTemplateProperty;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 class SearchResultProperty extends TwigTemplateProperty
 {

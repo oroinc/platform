@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class LocalizedNumberProperty extends AbstractLocalizedProperty
 {

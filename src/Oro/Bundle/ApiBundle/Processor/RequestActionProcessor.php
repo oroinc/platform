@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Component\ChainProcessor\ProcessorBagInterface;
 
 /**
  * The base processor for API actions that works with defined type of a resource.

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\TypeTestCase;
-
 use Oro\Bundle\ApiBundle\Form\Type\NumberType;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class NumberTypeTest extends TypeTestCase
 {

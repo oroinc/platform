@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type;
 
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Util\BlockUtils;
 
 class EmbedFormEndType extends AbstractFormType

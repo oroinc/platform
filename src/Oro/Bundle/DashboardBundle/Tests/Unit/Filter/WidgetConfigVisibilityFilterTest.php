@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Filter;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class WidgetConfigVisibilityFilterTest extends \PHPUnit_Framework_TestCase
 {

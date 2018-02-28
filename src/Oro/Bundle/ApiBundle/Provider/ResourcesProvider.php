@@ -2,24 +2,28 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
+/**
+ * Provides a list of all registered Data API resources
+ * and information which of entities are accesible via Data API.
+ */
 class ResourcesProvider
 {
     /** @var ActionProcessorInterface */
-    protected $processor;
+    private $processor;
 
     /** @var ResourcesCache */
-    protected $resourcesCache;
+    private $resourcesCache;
 
-    /** @var array */
-    protected $accessibleResources;
+    /** @var array [request cache key => [entity class => accessible flag]] */
+    private $accessibleResources = [];
 
-    /** @var array */
-    protected $excludedActions;
+    /** @var array [request cache key => [entity class => [action name, ...]]] */
+    private $excludedActions = [];
 
     /**
      * @param ActionProcessorInterface $processor
@@ -39,7 +43,7 @@ class ResourcesProvider
      *
      * @return ApiResource[]
      */
-    public function getResources($version, RequestType $requestType)
+    public function getResources($version, RequestType $requestType): array
     {
         $resources = $this->resourcesCache->getResources($version, $requestType);
         if (null !== $resources) {
@@ -72,7 +76,7 @@ class ResourcesProvider
      *
      * @return string[] The list of class names
      */
-    public function getAccessibleResources($version, RequestType $requestType)
+    public function getAccessibleResources($version, RequestType $requestType): array
     {
         $result = [];
         $accessibleResources = $this->loadAccessibleResources($version, $requestType);
@@ -94,7 +98,7 @@ class ResourcesProvider
      *
      * @return bool
      */
-    public function isResourceAccessible($entityClass, $version, RequestType $requestType)
+    public function isResourceAccessible($entityClass, $version, RequestType $requestType): bool
     {
         $accessibleResources = $this->loadAccessibleResources($version, $requestType);
 
@@ -112,7 +116,7 @@ class ResourcesProvider
      *
      * @return bool
      */
-    public function isResourceKnown($entityClass, $version, RequestType $requestType)
+    public function isResourceKnown($entityClass, $version, RequestType $requestType): bool
     {
         $accessibleResources = $this->loadAccessibleResources($version, $requestType);
 
@@ -128,7 +132,7 @@ class ResourcesProvider
      *
      * @return string[]
      */
-    public function getResourceExcludeActions($entityClass, $version, RequestType $requestType)
+    public function getResourceExcludeActions($entityClass, $version, RequestType $requestType): array
     {
         $excludedActions = $this->loadExcludedActions($version, $requestType);
 
@@ -140,10 +144,10 @@ class ResourcesProvider
     /**
      * Removes all entries from the cache.
      */
-    public function clearCache()
+    public function clearCache(): void
     {
-        $this->accessibleResources = null;
-        $this->excludedActions = null;
+        $this->accessibleResources = [];
+        $this->excludedActions = [];
         $this->resourcesCache->clear();
     }
 
@@ -153,17 +157,22 @@ class ResourcesProvider
      *
      * @return array [entity class => accessible flag]
      */
-    protected function loadAccessibleResources($version, RequestType $requestType)
+    private function loadAccessibleResources($version, RequestType $requestType): array
     {
-        if (null === $this->accessibleResources) {
-            $this->accessibleResources = $this->resourcesCache->getAccessibleResources($version, $requestType);
-            if (null === $this->accessibleResources) {
+        $cacheIndex = $this->getCacheKeyIndex($version, $requestType);
+        if (!array_key_exists($cacheIndex, $this->accessibleResources)) {
+            $accessibleResourcesForRequest = $this->resourcesCache->getAccessibleResources($version, $requestType);
+            if (null === $accessibleResourcesForRequest) {
                 $this->getResources($version, $requestType);
-                $this->accessibleResources = $this->resourcesCache->getAccessibleResources($version, $requestType);
+                $accessibleResourcesForRequest = $this->resourcesCache->getAccessibleResources($version, $requestType);
             }
+
+            $this->accessibleResources[$cacheIndex] = $accessibleResourcesForRequest;
+        } else {
+            $accessibleResourcesForRequest = $this->accessibleResources[$cacheIndex];
         }
 
-        return $this->accessibleResources;
+        return $accessibleResourcesForRequest;
     }
 
     /**
@@ -172,16 +181,32 @@ class ResourcesProvider
      *
      * @return array [entity class => [action name, ...]]
      */
-    protected function loadExcludedActions($version, RequestType $requestType)
+    private function loadExcludedActions($version, RequestType $requestType): array
     {
-        if (null === $this->excludedActions) {
-            $this->excludedActions = $this->resourcesCache->getExcludedActions($version, $requestType);
-            if (null === $this->excludedActions) {
+        $cacheIndex = $this->getCacheKeyIndex($version, $requestType);
+        if (!array_key_exists($cacheIndex, $this->excludedActions)) {
+            $excludedActionsForRequest = $this->resourcesCache->getExcludedActions($version, $requestType);
+            if (null === $excludedActionsForRequest) {
                 $this->getResources($version, $requestType);
-                $this->excludedActions = $this->resourcesCache->getExcludedActions($version, $requestType);
+                $excludedActionsForRequest = $this->resourcesCache->getExcludedActions($version, $requestType);
             }
+
+            $this->excludedActions[$cacheIndex] = $excludedActionsForRequest;
+        } else {
+            $excludedActionsForRequest = $this->excludedActions[$cacheIndex];
         }
 
-        return $this->excludedActions;
+        return $excludedActionsForRequest;
+    }
+
+    /**
+     * @param string      $version
+     * @param RequestType $requestType
+     *
+     * @return string
+     */
+    private function getCacheKeyIndex($version, RequestType $requestType): string
+    {
+        return $version . (string)$requestType;
     }
 }

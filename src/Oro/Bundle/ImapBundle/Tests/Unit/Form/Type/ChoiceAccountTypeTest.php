@@ -2,20 +2,19 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\Type;
 
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
-use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
-use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
 use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
+use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
+use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ChoiceAccountTypeTest extends FormIntegrationTestCase
 {

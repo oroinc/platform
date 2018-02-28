@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Entity;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class RecipientListTest extends \PHPUnit_Framework_TestCase
 {

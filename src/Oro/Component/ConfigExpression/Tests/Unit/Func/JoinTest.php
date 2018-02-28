@@ -3,11 +3,9 @@
 namespace Oro\Component\ConfigExpression\Tests\Unit\Func;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Func;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class JoinTest extends \PHPUnit_Framework_TestCase
 {

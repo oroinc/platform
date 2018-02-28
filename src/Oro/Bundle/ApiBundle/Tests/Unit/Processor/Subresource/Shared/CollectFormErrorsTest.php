@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
-use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
-use Symfony\Component\Validator\Constraints;
-
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\CollectFormErrors;
+use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipTestCase;
+use Symfony\Component\Validator\Constraints;
 
 class CollectFormErrorsTest extends ChangeRelationshipTestCase
 {

@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\PageNumberFilter;
 use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * A base class that can be used to create a processor to set default paging for different kind of requests.
@@ -44,8 +44,10 @@ abstract class SetDefaultPaging implements ProcessorInterface
      */
     protected function addPageNumberFilter(FilterCollection $filters)
     {
-        // "page number" filter must be added after "page size" filter because it depends on this filter
-        // @see Oro\Bundle\ApiBundle\Filter\PageNumberFilter::apply
+        /**
+         * "page number" filter must be added after "page size" filter because it depends on this filter
+         * @see \Oro\Bundle\ApiBundle\Filter\PageNumberFilter::apply
+         */
         $pageNumberFilterKey = $this->getPageNumberFilterKey();
         if (!$filters->has($pageNumberFilterKey)) {
             $filters->add(

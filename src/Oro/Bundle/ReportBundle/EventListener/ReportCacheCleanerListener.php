@@ -4,7 +4,6 @@ namespace Oro\Bundle\ReportBundle\EventListener;
 
 use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-
 use Oro\Bundle\ReportBundle\Entity\Report;
 
 /**

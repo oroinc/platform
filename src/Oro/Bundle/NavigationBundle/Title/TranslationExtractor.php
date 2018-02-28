@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\NavigationBundle\Title;
 
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\Extractor\ExtractorInterface;
-
 use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\Extractor\ExtractorInterface;
+use Symfony\Component\Translation\MessageCatalogue;
 
 class TranslationExtractor implements ExtractorInterface
 {

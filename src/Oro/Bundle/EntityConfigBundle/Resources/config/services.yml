@@ -193,7 +193,6 @@ services:
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.attributes-grid, method: onResultAfter }
 
     oro_entity_config.form.handler.config_helper_handler:
-        scope: request
         class: 'Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler'
         arguments:
             - '@form.factory'
@@ -236,7 +235,6 @@ services:
 
     oro_entity_config.form.handler.create_update_config_field_handler:
         class: Oro\Bundle\EntityConfigBundle\Form\Handler\CreateUpdateConfigFieldHandler
-        scope: request
         arguments:
             - '@oro_entity_config.form.handler.config_helper_handler'
             - '@oro_entity_config.config_manager'
@@ -465,3 +463,10 @@ services:
         arguments:
             - '@oro_wamp.publisher'
             - '@oro_security.token_accessor'
+
+    oro_entity_config.provider.entity_field_state_checker:
+        class: 'Oro\Bundle\EntityConfigBundle\Provider\EntityFieldStateChecker'
+        public: false
+        arguments:
+            - '@oro_entity_config.config_manager'
+            - '@form.factory'

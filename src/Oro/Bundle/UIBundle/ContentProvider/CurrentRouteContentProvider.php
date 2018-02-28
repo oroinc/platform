@@ -2,23 +2,21 @@
 
 namespace Oro\Bundle\UIBundle\ContentProvider;
 
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CurrentRouteContentProvider extends AbstractContentProvider
 {
     /**
-     * @var Request
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
-     * @param Request|null $request
+     * @param RequestStack $requestStack
      */
-    public function setRequest(Request $request = null)
+    public function __construct(RequestStack $requestStack)
     {
-        if (!is_null($request)) {
-            $this->request = $request;
-        }
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -26,8 +24,9 @@ class CurrentRouteContentProvider extends AbstractContentProvider
      */
     public function getContent()
     {
-        if ($this->request) {
-            return $this->request->attributes->get('_master_request_route');
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request) {
+            return $request->attributes->get('_master_request_route');
         }
 
         return null;

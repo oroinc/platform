@@ -3,9 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\PropertyAccess\PropertyAccessor;
-
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
@@ -16,6 +13,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowNotificationHandler;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\EmailNotificationStub;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,15 +3,12 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Request\ParamConverter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Request\ParamConverter\DoctrineParamConverter;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\HttpFoundation\Request;
 
 class DoctrineParamConverterTest extends \PHPUnit_Framework_TestCase
 {

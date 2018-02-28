@@ -3,7 +3,6 @@
 namespace Oro\Bundle\IntegrationBundle\Form\Choice;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\SecurityBundle\Form\ChoiceList\AclProtectedQueryBuilderLoader;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 

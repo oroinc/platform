@@ -4,10 +4,8 @@ namespace Oro\Bundle\EntityExtendBundle\Migration\Query;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 abstract class AbstractEntityConfigQuery extends ParametrizedMigrationQuery
 {

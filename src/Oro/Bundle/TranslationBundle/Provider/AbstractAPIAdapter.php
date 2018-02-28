@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
+use Guzzle\Http\Client;
+use Guzzle\Http\Exception\BadResponseException;
+use Guzzle\Http\Message\Request;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
-
-use Guzzle\Http\Exception\BadResponseException;
-use Guzzle\Http\Client;
-use Guzzle\Http\Message\Request;
 
 abstract class AbstractAPIAdapter implements APIAdapterInterface
 {

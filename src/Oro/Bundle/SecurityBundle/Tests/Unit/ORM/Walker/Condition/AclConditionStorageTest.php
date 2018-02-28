@@ -2,8 +2,8 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker\Condition;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
-use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAclCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage;
+use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAclCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage;
 
 class AclConditionStorageTest extends \PHPUnit_Framework_TestCase

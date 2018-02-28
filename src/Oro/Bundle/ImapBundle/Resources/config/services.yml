@@ -66,7 +66,7 @@ services:
             - { name: oro_email.email_flag_manager_loader }
 
     oro_imap.email_synchronizer:
-        scope: prototype
+        shared: false
         class: %oro_imap.email_synchronizer.class%
         arguments:
             - '@doctrine'
@@ -85,7 +85,7 @@ services:
     oro_imap.email_sync_processor_factory:
         class: %oro_imap.email_sync_processor_factory.class%
         public: false
-        scope: prototype
+        shared: false
         arguments:
             - '@doctrine'
             - '@oro_email.email.entity.builder'
@@ -145,8 +145,8 @@ services:
     oro_imap.manager.clear:
         class: %oro_imap.imap_clear_manager.class%
         arguments:
-            - '@doctrine'
-            - '@oro_entity.event_listener.entity_modify_created_updated_properties_listener'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_search.async.indexer'
         calls:
             - [setLogger, ['@logger']]
 
@@ -172,7 +172,6 @@ services:
 
     oro_imap.manager.controller.connection:
         class: %oro_imap.manager.connection_controller_manager.class%
-        scope: request
         arguments:
             - '@form.factory'
             - '@oro_security.encoder.mcrypt'
@@ -202,7 +201,7 @@ services:
             - { name: 'oro_message_queue.client.message_processor' }
 
     oro_imap.async.sync_email:
-        scope: prototype
+        shared: false
         class: 'Oro\Bundle\ImapBundle\Async\SyncEmailMessageProcessor'
         arguments:
             - '@oro_imap.email_synchronizer'
@@ -211,7 +210,7 @@ services:
             - { name: 'oro_message_queue.client.message_processor' }
 
     oro_imap.async.sync_emails:
-        scope: prototype
+        shared: false
         class: 'Oro\Bundle\ImapBundle\Async\SyncEmailsMessageProcessor'
         arguments:
             - '@oro_message_queue.client.message_producer'

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Job\Step;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-
 use Oro\Bundle\ImportExportBundle\Job\Context\SelectiveContextAggregator;
 
 /**

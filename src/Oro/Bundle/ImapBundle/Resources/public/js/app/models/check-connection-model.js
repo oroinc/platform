@@ -8,6 +8,13 @@ define(function(require) {
         defaults: {
             imap: {},
             smtp: {}
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function CheckConnectionModel() {
+            CheckConnectionModel.__super__.constructor.apply(this, arguments);
         }
     });
     return CheckConnectionModel;

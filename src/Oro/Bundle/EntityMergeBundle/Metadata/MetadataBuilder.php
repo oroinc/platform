@@ -4,9 +4,6 @@ namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -16,6 +13,7 @@ use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MetadataBuilder
 {

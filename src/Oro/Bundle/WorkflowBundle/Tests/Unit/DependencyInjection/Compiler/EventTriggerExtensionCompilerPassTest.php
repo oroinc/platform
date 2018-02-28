@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\EventTriggerExtensionCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\EventTriggerExtensionCompilerPass;
 
 class EventTriggerExtensionCompilerPassTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Form\DataMapper;
 
 use Doctrine\Common\Collections\Collection;
-
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 

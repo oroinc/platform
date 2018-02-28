@@ -3,9 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Placeholder;
 
 use Doctrine\Common\Util\ClassUtils;
-
-use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\EmailBundle\Entity\Email;
 
 class SendEmailPlaceholderFilter
 {

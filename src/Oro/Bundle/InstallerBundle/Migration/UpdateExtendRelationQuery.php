@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\InstallerBundle\Migration;
 
-use Psr\Log\LoggerInterface;
-
-use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
-use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class UpdateExtendRelationQuery extends ParametrizedMigrationQuery
 {

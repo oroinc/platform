@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\WindowsBundle\Tests\Manager;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\WindowsBundle\Entity\WindowsState;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManager;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class WindowsStateManagerTest extends \PHPUnit_Framework_TestCase
 {

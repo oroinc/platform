@@ -8,7 +8,6 @@ oro_behat_extension:
     OroInstallerBundle:
       contexts:
         - OroInstallerBundle::FeatureContext
-        - OroHelpBundle::FeatureContext
         - Behat\MinkExtension\Context\MinkContext
       paths:
         - '@OroInstallerBundle/Tests/Behat/Features'

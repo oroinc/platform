@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Oro\Component\ChainProcessor\ParameterBag;
-use Oro\Component\ChainProcessor\ParameterBagInterface;
 use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
@@ -24,6 +22,8 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\ChainProcessor\ParameterBag;
+use Oro\Component\ChainProcessor\ParameterBagInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

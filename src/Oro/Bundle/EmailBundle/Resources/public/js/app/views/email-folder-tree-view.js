@@ -11,6 +11,7 @@ define(function(require) {
         dataInputSelector: null,
 
         checkAllSelector: null,
+
         relatedCheckboxesSelector: null,
 
         requiredOptions: [
@@ -19,6 +20,16 @@ define(function(require) {
             'relatedCheckboxesSelector'
         ],
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailFolderTreeView() {
+            EmailFolderTreeView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.each(this.requiredOptions, function(optionName) {
                 if (!_.has(options, optionName)) {

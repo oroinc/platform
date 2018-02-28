@@ -3,11 +3,10 @@
 namespace Oro\Bundle\BatchBundle\Step;
 
 use Akeneo\Bundle\BatchBundle\Item\AbstractConfigurableStepElement;
-use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
-use Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface;
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
-
+use Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface;
+use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
+use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 
 class StepExecutor

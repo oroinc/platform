@@ -4,7 +4,6 @@ namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
-
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 

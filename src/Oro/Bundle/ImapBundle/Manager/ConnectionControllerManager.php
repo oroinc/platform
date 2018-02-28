@@ -4,20 +4,18 @@ namespace Oro\Bundle\ImapBundle\Manager;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\ImapBundle\Connector\ImapConfig;
+use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
+use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
+use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-
-use Oro\Bundle\EmailBundle\Entity\Mailbox;
-use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
-use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
-use Oro\Bundle\ImapBundle\Connector\ImapConfig;
-use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
-use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Class ConnectionManager

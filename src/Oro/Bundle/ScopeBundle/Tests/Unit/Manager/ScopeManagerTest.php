@@ -487,6 +487,11 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
                 'criteriaContext' => [StubScopeCriteriaProvider::STUB_FIELD => 'unexpected_value'],
                 'scopeFieldValue' => null
             ],
+            'scope dont match criteria with different objects' => [
+                'expectedResult' => false,
+                'criteriaContext' => [StubScopeCriteriaProvider::STUB_FIELD => new \stdClass()],
+                'scopeFieldValue' => new \stdClass()
+            ],
         ];
     }
 }

@@ -14,6 +14,16 @@ define(function(require) {
             }
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function CustomsetFieldChoiceView() {
+            CustomsetFieldChoiceView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             options = $.extend(true, {}, this.defaultOptions, options);
             this.select2Config = this._prepareSelect2Options(options);

@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\DataAuditBundle\Form\Type\FilterType as AuditFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Validator\ConstraintViolationList;
-
-use Oro\Bundle\DataAuditBundle\Form\Type\FilterType as AuditFilterType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 
 class FilterTypeTest extends \PHPUnit_Framework_TestCase
 {

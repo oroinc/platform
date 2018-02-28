@@ -5,13 +5,11 @@ namespace Oro\Bundle\ImapBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class LoadOriginData extends AbstractFixture implements DependentFixtureInterface
 {

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class DateTimeFormatter
 {

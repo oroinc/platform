@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\ActionGroup;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Bundle\ActionBundle\Model\ActionGroup\PropertyMapper;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
-
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class PropertyMapperTest extends \PHPUnit_Framework_TestCase
 {

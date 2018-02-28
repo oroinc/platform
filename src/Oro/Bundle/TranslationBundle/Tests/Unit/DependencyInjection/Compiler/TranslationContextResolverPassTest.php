@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationContextResolverPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class TranslationContextResolverPassTest extends \PHPUnit_Framework_TestCase
 {

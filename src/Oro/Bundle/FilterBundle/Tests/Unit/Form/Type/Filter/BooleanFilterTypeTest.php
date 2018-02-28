@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
+use Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 
 class BooleanFilterTypeTest extends AbstractTypeTestCase
 {
@@ -54,7 +54,7 @@ class BooleanFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    public function setDefaultOptionsDataProvider()
+    public function configureOptionsDataProvider()
     {
         return array(
             array(

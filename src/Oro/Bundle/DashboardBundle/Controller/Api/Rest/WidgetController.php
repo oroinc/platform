@@ -3,20 +3,16 @@
 namespace Oro\Bundle\DashboardBundle\Controller\Api\Rest;
 
 use Doctrine\Common\Persistence\ObjectManager;
-
-use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-
+use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\DashboardBundle\Model\Manager;
-
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Rest\RouteResource("dashboard_widget")
@@ -25,6 +21,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 class WidgetController extends FOSRestController implements ClassResourceInterface
 {
     /**
+     * @param Request $request
      * @param integer $dashboardId
      * @param integer $widgetId
      *
@@ -54,7 +51,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      * )
      * @return Response
      */
-    public function putAction($dashboardId, $widgetId)
+    public function putAction(Request $request, $dashboardId, $widgetId)
     {
         $dashboard = $this->getDashboardManager()->findDashboardModel($dashboardId);
         $widget = $this->getDashboardManager()->findWidgetModel($widgetId);
@@ -68,11 +65,11 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
         }
 
         $widget->setExpanded(
-            $this->getRequest()->get('isExpanded', $widget->isExpanded())
+            $request->get('isExpanded', $widget->isExpanded())
         );
 
         $widget->setLayoutPosition(
-            $this->getRequest()->get('layoutPosition', $widget->getLayoutPosition())
+            $request->get('layoutPosition', $widget->getLayoutPosition())
         );
 
         $this->getEntityManager()->flush();
@@ -111,6 +108,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
     }
 
     /**
+     * @param Request $request
      * @param integer $dashboardId
      *
      * @Rest\QueryParam(
@@ -128,7 +126,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      *
      * @return Response
      */
-    public function putPositionsAction($dashboardId)
+    public function putPositionsAction(Request $request, $dashboardId)
     {
         $dashboard = $this->getDashboardManager()->findDashboardModel($dashboardId);
 
@@ -136,7 +134,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
             return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
         }
 
-        $layoutPositions = $this->getRequest()->get('layoutPositions', []);
+        $layoutPositions = $request->get('layoutPositions', []);
 
         foreach ($layoutPositions as $widgetId => $layoutPosition) {
             if ($widget = $this->getDashboardManager()->findWidgetModel($widgetId)) {
@@ -167,13 +165,14 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      *      resource=true
      * )
      * @AclAncestor("oro_dashboard_update")
+     * @param Request $request
      * @return Response
      */
-    public function postAddWidgetAction()
+    public function postAddWidgetAction(Request $request)
     {
-        $dashboardId = $this->getRequest()->get('dashboardId');
-        $widgetName = $this->getRequest()->get('widgetName');
-        $targetColumn = (int)$this->getRequest()->get('targetColumn', 0);
+        $dashboardId = $request->get('dashboardId');
+        $widgetName = $request->get('widgetName');
+        $targetColumn = (int)$request->get('targetColumn', 0);
 
         $dashboard = $this->getDashboardManager()->findDashboardModel($dashboardId);
 

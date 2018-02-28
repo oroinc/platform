@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormattingSelectType extends AbstractType
 {

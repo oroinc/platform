@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\ActivityListBundle\Controller;
 
+use Oro\Bundle\ActivityListBundle\Event\ActivityConditionOptionsLoadEvent;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\ActivityListBundle\Event\ActivityConditionOptionsLoadEvent;
 
 /**
  * @Route("/activity-list/segment")

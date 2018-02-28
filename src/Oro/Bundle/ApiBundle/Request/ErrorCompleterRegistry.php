@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The registry that allows to get the error completer for a specific request type.
  * The implementation of this registry assumes that all error completers
  * are declared in DIC as public services.
- * @see \Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ErrorCompleterConfigurationCompilerPass
+ * @see \Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ErrorCompleterCompilerPass
  */
 class ErrorCompleterRegistry
 {

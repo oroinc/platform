@@ -2,12 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authentication;
 
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Role\RoleInterface;
-
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ImpersonationToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
@@ -15,6 +11,8 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenSerializer;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Role\RoleInterface;
 
 class TokenSerializerTest extends \PHPUnit_Framework_TestCase
 {

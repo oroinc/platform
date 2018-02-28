@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Security;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
+use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
+use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriverFactory;
+use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\DriverFactoryInterface;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
-use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
-use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriverFactory;
-use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class SecurityAwareDriverFactoryTest extends \PHPUnit_Framework_TestCase
 {

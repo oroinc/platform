@@ -16,6 +16,13 @@ define([
      */
     CollectionFiltersManager = FiltersManager.extend({
         /**
+         * @inheritDoc
+         */
+        constructor: function CollectionFiltersManager() {
+            CollectionFiltersManager.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize filter list options
          *
          * @param {Object} options

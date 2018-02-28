@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\Rest;
 
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Rest\RestDocumentBuilder;
 use Oro\Bundle\ApiBundle\Tests\Unit\Request\DocumentBuilderTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -10,10 +11,15 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class RestDocumentBuilderTest extends DocumentBuilderTestCase
 {
     /** @var RestDocumentBuilder */
-    protected $documentBuilder;
+    private $documentBuilder;
+
+    /** @var RequestType */
+    private $requestType;
 
     protected function setUp()
     {
+        $this->requestType = new RequestType([RequestType::REST]);
+
         $this->documentBuilder = new RestDocumentBuilder();
     }
 
@@ -24,8 +30,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             'name' => 'Name',
         ];
 
-        $this->documentBuilder->setDataObject($object);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType);
+        self::assertEquals(
             [
                 'id'   => 123,
                 'name' => 'Name',
@@ -42,8 +48,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             '__class__' => 'Test\Class'
         ];
 
-        $this->documentBuilder->setDataObject($object);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType);
+        self::assertEquals(
             [
                 'id'     => 123,
                 'name'   => 'Name',
@@ -60,8 +66,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             'name' => 'Name',
         ];
 
-        $this->documentBuilder->setDataCollection([$object]);
-        $this->assertEquals(
+        $this->documentBuilder->setDataCollection([$object], $this->requestType);
+        self::assertEquals(
             [
                 [
                     'id'   => 123,
@@ -80,8 +86,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             '__class__' => 'Test\Class'
         ];
 
-        $this->documentBuilder->setDataCollection([$object]);
-        $this->assertEquals(
+        $this->documentBuilder->setDataCollection([$object], $this->requestType);
+        self::assertEquals(
             [
                 [
                     'id'     => 123,
@@ -95,8 +101,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
 
     public function testSetDataCollectionOfScalarsWithoutMetadata()
     {
-        $this->documentBuilder->setDataCollection(['val1', null, 'val3']);
-        $this->assertEquals(
+        $this->documentBuilder->setDataCollection(['val1', null, 'val3'], $this->requestType);
+        self::assertEquals(
             ['val1', null, 'val3'],
             $this->documentBuilder->getDocument()
         );
@@ -136,8 +142,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $metadata->addAssociation($this->createAssociationMetadata('roles', 'Test\Role', true));
         $metadata->getAssociation('roles')->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'id'         => 123,
                 'name'       => 'Name',
@@ -191,8 +197,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $metadata->addAssociation($this->createAssociationMetadata('roles', 'Test\Role', true));
         $metadata->getAssociation('roles')->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
-        $this->documentBuilder->setDataCollection([$object], $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataCollection([$object], $this->requestType, $metadata);
+        self::assertEquals(
             [
                 [
                     'id'         => 123,
@@ -220,8 +226,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $metadata->addField($this->createFieldMetadata('id'));
         $metadata->addField($this->createFieldMetadata('name'));
 
-        $this->documentBuilder->setDataCollection(['val1', null, 'val3'], $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataCollection(['val1', null, 'val3'], $this->requestType, $metadata);
+        self::assertEquals(
             ['val1', null, 'val3'],
             $this->documentBuilder->getDocument()
         );
@@ -249,8 +255,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             $this->createMetaPropertyMetadata(ConfigUtil::CLASS_NAME)
         );
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'id'         => 123,
                 'categories' => [
@@ -292,8 +298,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             $this->createMetaPropertyMetadata(ConfigUtil::CLASS_NAME)
         );
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'id'         => 123,
                 'categories' => [
@@ -327,8 +333,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             $association->setDataType('array');
         }
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'id'            => 123,
                 'missingToOne'  => null,
@@ -356,8 +362,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $association->setDataType('object');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'id'       => 123,
                 'category' => $expected
@@ -404,8 +410,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $association->setDataType('array');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'id'         => 123,
                 'categories' => $expected
@@ -455,8 +461,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
         $association->setDataType('scalar');
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                     'id'       => 123,
                     'category' => $expected
@@ -492,8 +498,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
         $association->setDataType('array');
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'id'         => 123,
                 'categories' => $expected
@@ -539,8 +545,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $association->getTargetMetadata()->removeField('id');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'id'       => 123,
                 'category' => $expected
@@ -585,8 +591,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $association->getTargetMetadata()->removeField('id');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'id'         => 123,
                 'categories' => $expected
@@ -660,8 +666,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $associationMetadata->setTargetMetadata($targetMetadata);
         $associationMetadata->setDataType('array');
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'association' => [
                     'id'            => 123,
@@ -694,7 +700,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $error->setDetail('some error details');
 
         $this->documentBuilder->setErrorObject($error);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 [
                     'code'   => 'errCode',
@@ -715,7 +721,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $error->setDetail('some error details');
 
         $this->documentBuilder->setErrorCollection([$error]);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 [
                     'code'   => 'errCode',
@@ -739,8 +745,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'))
             ->setResultName('resultMeta1');
 
-        $this->documentBuilder->setDataObject($object, $metadata);
-        $this->assertEquals(
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
             [
                 'id'          => '123',
                 'resultMeta1' => 'Meta1',

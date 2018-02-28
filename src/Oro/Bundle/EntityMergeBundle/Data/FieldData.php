@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Data;
 
-use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
 class FieldData
 {

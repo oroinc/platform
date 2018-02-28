@@ -4,9 +4,9 @@ namespace Oro\Bundle\SecurityBundle\Owner;
 
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class OwnershipQueryHelper
 {
@@ -111,7 +111,7 @@ class OwnershipQueryHelper
      */
     private function getIdentityExpr($entityAlias, $fieldName, $fieldAlias)
     {
-        return sprintf('IDENTITY(%s.%s) AS %s', $entityAlias, $fieldName, $fieldAlias);
+        return QueryBuilderUtil::sprintf('IDENTITY(%s.%s) AS %s', $entityAlias, $fieldName, $fieldAlias);
     }
 
     /**

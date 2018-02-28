@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActionBundle\Configuration;
 
 use Doctrine\Common\Collections\Collection;
-
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 interface ConfigurationProviderInterface

@@ -3,7 +3,8 @@
 namespace Oro\Bundle\NavigationBundle\Form\Type;
 
 use Knp\Menu\ItemInterface;
-
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -12,9 +13,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
-
-use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 
 class MenuUpdateType extends AbstractType
 {

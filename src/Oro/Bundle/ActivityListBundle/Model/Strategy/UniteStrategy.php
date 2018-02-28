@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model\Strategy;
 
-use Symfony\Component\Security\Core\Util\ClassUtils;
-
-use Oro\Component\PhpUtils\ArrayUtil;
-
-use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Model\MergeModes;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
+use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
+use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 class UniteStrategy implements StrategyInterface
 {

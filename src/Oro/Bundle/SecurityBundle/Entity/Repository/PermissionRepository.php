@@ -4,7 +4,6 @@ namespace Oro\Bundle\SecurityBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
-
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 
 class PermissionRepository extends EntityRepository

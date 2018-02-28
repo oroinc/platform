@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\NotificationBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
+use Symfony\Component\EventDispatcher\Event;
 
 class NotificationSentEvent extends Event
 {

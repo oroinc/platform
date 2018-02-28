@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config;
 
-use Oro\Component\ChainProcessor\ActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\RelationConfigContext;
+use Oro\Component\ChainProcessor\ActionProcessor;
 
 class RelationConfigProcessor extends ActionProcessor
 {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_10;
 
 use Doctrine\DBAL\Schema\Schema;
-
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigIndexFieldValueQuery;
 use Oro\Bundle\MigrationBundle\Migration\Migration;

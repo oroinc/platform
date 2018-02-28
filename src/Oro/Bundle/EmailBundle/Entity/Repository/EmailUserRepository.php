@@ -4,14 +4,17 @@ namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Doctrine repository for EmailUser entity
+ */
 class EmailUserRepository extends EntityRepository
 {
     /**
@@ -110,6 +113,26 @@ class EmailUserRepository extends EntityRepository
         }
 
         return $ids;
+    }
+
+    /**
+     * @param EmailOrigin $origin
+     * @return array
+     */
+    public function getIdsFromOrigin(EmailOrigin $origin)
+    {
+        $qb = $this->createQueryBuilder('eu');
+
+        $result = $qb->resetDQLPart('select')
+            ->select('eu.id')
+            ->where(
+                $qb->expr()->eq('eu.origin', ':originId')
+            )
+            ->setParameter('originId', $origin->getId())
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_column($result, 'id');
     }
 
     /**

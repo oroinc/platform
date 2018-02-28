@@ -3,10 +3,8 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\EmailBundle\Async\AutoResponseMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topics;
-
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;

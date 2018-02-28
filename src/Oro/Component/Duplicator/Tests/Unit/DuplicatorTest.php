@@ -9,9 +9,7 @@ use DeepCopy\Filter\SetNullFilter;
 use DeepCopy\Matcher\PropertyMatcher;
 use DeepCopy\Matcher\PropertyNameMatcher;
 use DeepCopy\Matcher\PropertyTypeMatcher;
-
 use Doctrine\Common\Collections\Collection;
-
 use Oro\Component\Duplicator\Duplicator;
 use Oro\Component\Duplicator\Filter\FilterFactory;
 use Oro\Component\Duplicator\Filter\ReplaceValueFilter;

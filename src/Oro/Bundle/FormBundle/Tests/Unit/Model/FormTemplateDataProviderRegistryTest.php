@@ -4,7 +4,6 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Model;
 
 use Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
-
 use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
 use Oro\Component\DependencyInjection\ServiceLinkRegistry;
 

@@ -3,12 +3,10 @@
 namespace Oro\Bundle\SoapBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\SoapBundle\Provider\EntityMetadataProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\SoapBundle\Provider\EntityMetadataProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class EntityMetadataProviderTest extends \PHPUnit_Framework_TestCase
 {

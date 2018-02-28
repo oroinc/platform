@@ -49,7 +49,7 @@ class CreateListener implements EventSubscriberInterface
                 if (null !== $value && is_scalar($value)) {
                     /**
                      * as Symfony Form treats false as NULL due to checkboxes
-                     * @see Symfony\Component\Form\Form::submit
+                     * @see \Symfony\Component\Form\Form::submit
                      * we have to convert false to its string representation here
                      */
                     if (false === $value) {

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\UIBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 
 class ConstantsPass implements CompilerPassInterface
 {

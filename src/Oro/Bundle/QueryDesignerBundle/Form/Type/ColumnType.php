@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Form\Type;
 
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\AbstractType;
 
 class ColumnType extends AbstractType
 {

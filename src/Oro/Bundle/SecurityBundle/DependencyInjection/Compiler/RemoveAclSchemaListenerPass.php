@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * The "security.acl.dbal.schema_listener" is not needed in the Platform because

@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
-use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\AttributeAssembler;
 use Oro\Component\Action\Exception\AssemblerException;
+use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
 {

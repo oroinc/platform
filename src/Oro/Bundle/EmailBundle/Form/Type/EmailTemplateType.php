@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailTemplateType extends AbstractType
 {
@@ -137,7 +136,7 @@ class EmailTemplateType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(

@@ -4,7 +4,6 @@ namespace Oro\Bundle\SearchBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\UnitOfWork;
-
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
 
 /**

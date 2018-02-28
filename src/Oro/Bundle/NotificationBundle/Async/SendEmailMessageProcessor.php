@@ -3,9 +3,6 @@
 namespace Oro\Bundle\NotificationBundle\Async;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
@@ -16,6 +13,7 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerInterface;
 
 class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {

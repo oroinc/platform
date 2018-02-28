@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\RequireJSBundle\Provider;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Templating\TemplateReferenceInterface;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-
 use Doctrine\Common\Cache\CacheProvider;
-
 use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Templating\TemplateReferenceInterface;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @deprecated Added for backwards compatibility,

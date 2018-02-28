@@ -2,14 +2,19 @@
 
 namespace Oro\Component\ChainProcessor;
 
+/**
+ * A base class for check whether a value of a specific processor attribute
+ * is matched a corresponding value from the execution context.
+ */
 abstract class AbstractMatcher
 {
-    const OPERATOR_AND = '&';
-    const OPERATOR_OR  = '|';
-    const OPERATOR_NOT = '!';
+    public const OPERATOR_AND = '&';
+    public const OPERATOR_OR  = '|';
+    public const OPERATOR_NOT = '!';
 
     /**
-     * Checks if a value of a processor attribute matches a corresponding value from the context
+     * Checks if a value of a processor attribute matches a corresponding value
+     * from the execution context.
      *
      * @param mixed  $value        Array or Scalar
      * @param mixed  $contextValue Array or Scalar
@@ -23,7 +28,7 @@ abstract class AbstractMatcher
             return $this->isMatchAnyInArray($value, $contextValue->toArray(), $name);
         }
 
-        return is_array($contextValue)
+        return \is_array($contextValue)
             ? $this->isMatchAnyInArray($value, $contextValue, $name)
             : $this->isMatchAnyWithScalar($value, $contextValue, $name);
     }
@@ -37,16 +42,16 @@ abstract class AbstractMatcher
      */
     protected function isMatchAnyInArray($value, $contextValue, $name)
     {
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             return $this->isMatchScalarInArray($value, $contextValue, $name);
         }
 
-        switch (key($value)) {
+        switch (\key($value)) {
             case self::OPERATOR_NOT:
-                return !$this->isMatchScalarInArray(current($value), $contextValue, $name);
+                return !$this->isMatchScalarInArray(\current($value), $contextValue, $name);
             case self::OPERATOR_AND:
                 $result = true;
-                foreach (current($value) as $val) {
+                foreach (\current($value) as $val) {
                     if (!$this->isMatchScalarWithArray($val, $contextValue, $name)) {
                         $result = false;
                         break;
@@ -56,7 +61,7 @@ abstract class AbstractMatcher
                 return $result;
             case self::OPERATOR_OR:
                 $result = false;
-                foreach (current($value) as $val) {
+                foreach (\current($value) as $val) {
                     if ($this->isMatchScalarWithArray($val, $contextValue, $name)) {
                         $result = true;
                         break;
@@ -78,12 +83,12 @@ abstract class AbstractMatcher
      */
     protected function isMatchScalarWithArray($value, $contextValue, $name)
     {
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             return $this->isMatchScalarInArray($value, $contextValue, $name);
         }
 
-        return self::OPERATOR_NOT === key($value)
-            ? !$this->isMatchScalarInArray(current($value), $contextValue, $name)
+        return self::OPERATOR_NOT === \key($value)
+            ? !$this->isMatchScalarInArray(\current($value), $contextValue, $name)
             : false;
     }
 
@@ -96,7 +101,7 @@ abstract class AbstractMatcher
      */
     protected function isMatchScalarInArray($value, $contextValue, $name)
     {
-        return in_array($value, $contextValue, true);
+        return \in_array($value, $contextValue, true);
     }
 
     /**
@@ -108,16 +113,16 @@ abstract class AbstractMatcher
      */
     protected function isMatchAnyWithScalar($value, $contextValue, $name)
     {
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             return $this->isMatchScalars($value, $contextValue, $name);
         }
 
         switch (key($value)) {
             case self::OPERATOR_NOT:
-                return !$this->isMatchScalars(current($value), $contextValue, $name);
+                return !$this->isMatchScalars(\current($value), $contextValue, $name);
             case self::OPERATOR_AND:
                 $result = true;
-                foreach (current($value) as $val) {
+                foreach (\current($value) as $val) {
                     if (!$this->isMatchScalarWithScalar($val, $contextValue, $name)) {
                         $result = false;
                         break;
@@ -127,7 +132,7 @@ abstract class AbstractMatcher
                 return $result;
             case self::OPERATOR_OR:
                 $result = false;
-                foreach (current($value) as $val) {
+                foreach (\current($value) as $val) {
                     if ($this->isMatchScalarWithScalar($val, $contextValue, $name)) {
                         $result = true;
                         break;
@@ -149,12 +154,12 @@ abstract class AbstractMatcher
      */
     protected function isMatchScalarWithScalar($value, $contextValue, $name)
     {
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             return $this->isMatchScalars($value, $contextValue, $name);
         }
 
-        return self::OPERATOR_NOT === key($value)
-            ? !$this->isMatchScalars(current($value), $contextValue, $name)
+        return self::OPERATOR_NOT === \key($value)
+            ? !$this->isMatchScalars(\current($value), $contextValue, $name)
             : false;
     }
 

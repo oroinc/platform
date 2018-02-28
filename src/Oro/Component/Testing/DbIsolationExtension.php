@@ -4,9 +4,9 @@ namespace Oro\Component\Testing;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Event\ConnectionEventArgs;
 use Doctrine\ORM\EntityManagerInterface;
+use Oro\Component\Testing\Doctrine\Events;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
-use Oro\Component\Testing\Doctrine\Events;
 
 trait DbIsolationExtension
 {

@@ -2,9 +2,8 @@
 
 namespace Oro\Component\PropertyAccess\Tests\Unit;
 
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-
 use Oro\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 abstract class PropertyAccessorArrayAccessTest extends \PHPUnit_Framework_TestCase
 {

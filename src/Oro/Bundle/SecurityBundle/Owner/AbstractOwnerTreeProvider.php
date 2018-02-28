@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Owner;
 
 use Doctrine\Common\Cache\CacheProvider;
-
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
 
 abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface

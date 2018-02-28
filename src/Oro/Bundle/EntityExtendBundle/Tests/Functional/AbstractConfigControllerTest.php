@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 
-use Symfony\Component\DomCrawler\Field\ChoiceFormField;
-
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
 abstract class AbstractConfigControllerTest extends WebTestCase
 {

@@ -27,14 +27,14 @@ services:
     oro_api.collect_resources.load_from_config_bag:
         class: Oro\Bundle\ApiBundle\Processor\CollectResources\LoadFromConfigBag
         arguments:
-            - '@oro_api.config_bag'
+            - '@oro_api.config_bag_registry'
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -50 }
 
     oro_api.collect_resources.remove_excluded_entities:
         class: Oro\Bundle\ApiBundle\Processor\CollectResources\RemoveExcludedEntities
         arguments:
-            - '@oro_api.entity_exclusion_provider'
+            - '@oro_api.entity_exclusion_provider_registry'
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -100 }
 
@@ -42,7 +42,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\CollectResources\AddExcludedActions
         arguments:
             - '@oro_api.config_loader_factory'
-            - '@oro_api.config_bag'
+            - '@oro_api.config_bag_registry'
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -110 }
 

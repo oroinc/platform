@@ -3,7 +3,6 @@
 namespace Oro\Bundle\FilterBundle\Expression\Date;
 
 use Carbon\Carbon;
-
 use Oro\Bundle\FilterBundle\Expression\Exception\ExpressionDenied;
 use Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;

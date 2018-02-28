@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Command;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
+use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtension;
+use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 use Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand;
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
-
-use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtension;
-use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class TransportConsumeMessagesCommand extends ConsumeMessagesCommand
 {

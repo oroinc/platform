@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
-use Oro\Bundle\WorkflowBundle\Model\ProcessFactory;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-
+use Oro\Bundle\WorkflowBundle\Model\ProcessFactory;
 use Oro\Component\Action\Action\ActionAssembler;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 

@@ -37,8 +37,21 @@ define(function(require) {
 
     DataGridComponent = BaseComponent.extend({
         currentApperanceKey: 'grid',
+
         currentApperanceId: void 0,
+
         changeAppearanceEnabled: false,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function DataGridComponent() {
+            DataGridComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.pluginManager = new PluginManager(this);
             this.changeAppearanceEnabled = 'appearanceData' in options.metadata.state;

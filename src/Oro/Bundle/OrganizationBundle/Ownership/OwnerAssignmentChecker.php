@@ -4,6 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Ownership;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Default implementation of check owner assignment algorithm
@@ -36,7 +37,7 @@ class OwnerAssignmentChecker implements OwnerAssignmentCheckerInterface
         return $em->getRepository($entityClassName)
             ->createQueryBuilder('entity')
             ->select('owner.id')
-            ->innerJoin(sprintf('entity.%s', $ownerFieldName), 'owner')
+            ->innerJoin(QueryBuilderUtil::getField('entity', $ownerFieldName), 'owner')
             ->where('owner.id = :ownerId')
             ->setParameter('ownerId', $ownerId)
             ->setMaxResults(1);

@@ -8,6 +8,13 @@ define([
 
     BarCollectionView = BaseCollectionView.extend({
         /**
+         * @inheritDoc
+         */
+        constructor: function BarCollectionView() {
+            BarCollectionView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Goes across subviews and check if item-view related to corresponded model is visible
          *
          * @param {Chaplin.Model} model

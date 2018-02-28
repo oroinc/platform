@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
+use Oro\Bundle\DashboardBundle\Model\Manager;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DashboardSelectType extends AbstractType
 {
@@ -35,7 +34,7 @@ class DashboardSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(

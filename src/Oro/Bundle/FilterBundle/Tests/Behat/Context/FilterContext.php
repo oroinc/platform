@@ -3,7 +3,6 @@
 namespace Oro\Bundle\FilterBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
-
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -37,10 +36,7 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
     public function dragFilterToConditionBuilder($filter)
     {
         $filterElement = $this->getPage()
-                              ->find(
-                                  'xpath',
-                                  "//li[contains(., '{$filter}')]"
-                              );
+            ->find('xpath', "//li[contains(., '{$filter}')]");
         $dropZone = $this->createElement('FiltersConditionBuilder');
         $filterElement->dragTo($dropZone);
     }
@@ -55,11 +51,8 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
         $lastConditionItem = $this->createElement('Last condition item');
         $lastConditionItem->click();
         $this->getPage()
-             ->find(
-                 'xpath',
-                 "//div[@id='select2-drop']/div/input"
-             )
-             ->setValue($column);
+            ->find('xpath', "//div[@id='select2-drop']/div/input")
+            ->setValue($column);
         $this->waitForAjax();
 
         $searchResult = $this->spin(function (FilterContext $context) use ($column) {

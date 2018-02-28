@@ -1,95 +1,28 @@
 {% form_theme form with 'OroFormBundle:Form:fields.html.twig' %}
-<div class="widget-content">
-    {% if saved %}
-        <script type="text/javascript">
-        require([
-            'orotranslation/js/translator',
-            'oroui/js/widget-manager',
-            'oroui/js/messenger',
-            'oroui/js/mediator'
-        ],
-        function(__, widgetManager, messenger, mediator) {
-            widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
-                messenger.notificationFlashMessage('success', __('oro.user.change_password.flash.success'));
-                mediator.trigger('widget_success:' + widget.getAlias());
-                mediator.trigger('widget_success:' + widget.getWid());
-                widget.remove();
-                mediator.execute('refreshPage');
-            });
-        });
-        </script>
-    {% else %}
-        <script type="text/javascript">
-        require([
-            'jquery',
-            'orotranslation/js/translator'
-        ],
-        function($, __) {
-            var $passwordInput= $('[data-ftid=oro_set_password_form_password]');
-            $passwordInput.after(
-                    '<span class="fa-eye-slash" id="show-hide-pass" style="cursor: pointer; font-size: 16px;" ' +
-                    ' title="' + __("oro.user.show_hide_password.label") + '"/>'
-            );
-            $passwordInput.parent().after(
-                '<div class="controls" style="margin-top: 5px;">' +
-                    '<a href="#" id="generate-pass">' + __("oro.user.suggest_password.label") + '</a>' +
-                '</div>'
-            );
 
-            $('#generate-pass').on('click', function(e){
-                e.preventDefault();
-                var getRnd = function(n) {
-                    return Math.floor(Math.random() * (n + 1));
-                };
-                var requireLength = $passwordInput.data('suggest-length') || 1;
-                var requirements = $passwordInput.data('suggest-rules') || '';
-                var length = Math.max(requireLength, 8);
-                var charsets = {
-                    'lower_case': 'abcdefghijklmnopqrstuvwxyz',
-                    'upper_case':'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-                    'numbers':'0123456789',
-                    'special_chars':' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
-                };
-                var rules = requirements.split(',');
-                var pass = '';
+{% if saved %}
+    {% set widgetResponse = {
+        widget: {
+            message: 'oro.user.password.reset_password.flash.success'|trans,
+            triggerSuccess: true,
+            trigger: [{
+                eventFunction: 'execute',
+                name: 'refreshPage',
+            }],
+            remove: true
+        }
+    } %}
 
-                // make sure we have at least one symbol for each rule, shuffle them later
-                rules.forEach(function(rule) {
-                    if (charsets.hasOwnProperty(rule)) {
-                        pass += charsets[rule].charAt(getRnd(charsets[rule].length));
-                    }
-                });
+    {{ widgetResponse|json_encode|raw }}
+{% else %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-                // create a pool for picking random chars that is reasonably strong
-                var charset = charsets['lower_case'] + charsets['upper_case'] + charsets['numbers'];
-
-                // fill up to the minLength with random symbols
-                for (var i = pass.length; i < length; ++i) {
-                    pass = pass + charset.charAt(getRnd(charset.length));
-                }
-
-                // shuffle the password
-                pass = pass.split('').sort(function() {
-                    return 0.5 - Math.random()
-                }).join('');
-
-                $passwordInput.val(pass);
-            });
-
-            $('#show-hide-pass').on('click', function(e){
-                var target = e.target || window.event.target;
-                if($(target).hasClass('fa-eye')) {
-                    $passwordInput.attr('type', 'password');
-                    $(target).removeClass('fa-eye');
-                    $(target).addClass('fa-eye-slash');
-                } else {
-                    $passwordInput.attr('type', 'text');
-                    $(target).removeClass('fa-eye-slash');
-                    $(target).addClass('fa-eye');
-                }
-            });
-        });
-        </script>
+    <div class="widget-content" {{ UI.renderPageComponentAttributes({
+        view: 'orouser/js/app/views/user-reset-password-view',
+        options: {
+            passwordInputSelector: '[data-ftid=oro_set_password_form_password]'
+        }
+    }) }}>
         <div class="form-container">
             <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" method="post" class="change-password-form">
                 <fieldset class="form form-horizontal">
@@ -112,5 +45,5 @@
             </form>
             {{ oro_form_js_validation(form) }}
         </div>
-    {% endif %}
-</div>
+    </div>
+{% endif %}

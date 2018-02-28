@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Functional\Layout\DataProvider\Stubs;
 
+use Oro\Bundle\LayoutBundle\Layout\DataProvider\AbstractFormProvider;
+use Oro\Component\Testing\Unit\Form\Type\Stub\FormStub;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-
-use Oro\Bundle\LayoutBundle\Layout\DataProvider\AbstractFormProvider;
-
-use Oro\Component\Testing\Unit\Form\Type\Stub\FormStub;
 
 class FormProviderStub extends AbstractFormProvider
 {

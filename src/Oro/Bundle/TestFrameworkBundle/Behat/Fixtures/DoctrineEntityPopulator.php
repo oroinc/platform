@@ -90,11 +90,11 @@ class DoctrineEntityPopulator implements MethodInterface
         return $this->kernel->getContainer()->get('doctrine')->getManager();
     }
 
-     /**
-     * @param string|object $class
-     *
-     * @return boolean
-     */
+    /**
+    * @param string|object $class
+    *
+    * @return boolean
+    */
     private function isEntity($class)
     {
         if (is_object($class)) {

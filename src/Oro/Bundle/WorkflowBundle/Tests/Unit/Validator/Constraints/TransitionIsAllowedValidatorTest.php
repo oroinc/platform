@@ -3,10 +3,10 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
-use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowedValidator;
-use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed;
+use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowedValidator;
 
 class TransitionIsAllowedValidatorTest extends \PHPUnit_Framework_TestCase
 {

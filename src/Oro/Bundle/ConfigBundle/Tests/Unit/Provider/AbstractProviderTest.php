@@ -2,35 +2,34 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Provider;
 
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Form\Forms;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Config\Definition\Processor;
-
-use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
-use Oro\Bundle\ConfigBundle\Provider\AbstractProvider;
-use Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\Tree\AbstractNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
-use Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
+use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
+use Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
 use Oro\Bundle\ConfigBundle\Form\Type\FormType;
 use Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox;
+use Oro\Bundle\ConfigBundle\Provider\AbstractProvider;
+use Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider;
 use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
-use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)

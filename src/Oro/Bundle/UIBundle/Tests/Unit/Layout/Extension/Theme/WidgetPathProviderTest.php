@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Extension\Theme;
 
-use Oro\Component\Layout\LayoutContext;
 use Oro\Bundle\UIBundle\Layout\Extension\Theme\WidgetPathProvider;
+use Oro\Component\Layout\LayoutContext;
 
 class WidgetPathProviderTest extends \PHPUnit_Framework_TestCase
 {

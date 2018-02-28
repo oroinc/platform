@@ -5,7 +5,6 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Entity;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestUser;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class AttachmentTest extends \PHPUnit_Framework_TestCase

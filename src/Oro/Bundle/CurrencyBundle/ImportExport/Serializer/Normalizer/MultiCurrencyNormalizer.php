@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\CurrencyBundle\ImportExport\Serializer\Normalizer;
 
-use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
-use Oro\Bundle\CurrencyBundle\Formatter\NumberFormatter;
 use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
+use Oro\Bundle\CurrencyBundle\Formatter\NumberFormatter;
+use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 
 class MultiCurrencyNormalizer implements NormalizerInterface
 {

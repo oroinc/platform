@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\ActivityBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\Get;
-
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityTargetApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("activity_target")
@@ -66,6 +64,7 @@ class ActivityTargetController extends RestGetController
     /**
      * Get activities for the specified entity.
      *
+     * @param Request $request
      * @param string $entity The type of the target entity.
      * @param mixed  $id     The id of the target entity.
      *
@@ -91,13 +90,13 @@ class ActivityTargetController extends RestGetController
      *
      * @return Response
      */
-    public function getActivitiesAction($entity, $id)
+    public function getActivitiesAction(Request $request, $entity, $id)
     {
         $manager = $this->getManager();
         $manager->setClass($manager->resolveEntityClass($entity, true));
 
-        $page  = (int)$this->getRequest()->get('page', 1);
-        $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $page  = (int)$request->get('page', 1);
+        $limit = (int)$request->get('limit', self::ITEMS_PER_PAGE);
 
         $criteria = $this->buildFilterCriteria(['id' => ['=', $id]], [], ['id' => 'target.id']);
 

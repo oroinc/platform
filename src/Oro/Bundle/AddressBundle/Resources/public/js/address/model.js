@@ -3,12 +3,14 @@ define([
 ], function(Backbone) {
     'use strict';
 
+    var AddressModel;
+
     /**
      * @export  oroaddress/js/address/model
      * @class   oroaddress.address.Model
      * @extends Backbone.Model
      */
-    return Backbone.Model.extend({
+    AddressModel = Backbone.Model.extend({
         defaults: {
             label: '',
             namePrefix: '',
@@ -30,6 +32,13 @@ define([
             primary: false,
             types: [],
             active: false
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function AddressModel() {
+            AddressModel.__super__.constructor.apply(this, arguments);
         },
 
         getSearchableString: function() {
@@ -57,4 +66,6 @@ define([
             return address;
         }
     });
+
+    return AddressModel;
 });

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -11,8 +12,6 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverIn
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-
-use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
 
 class SecurityFirewallExceptionListenerTest extends \PHPUnit_Framework_TestCase
 {

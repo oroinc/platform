@@ -63,3 +63,22 @@ datagrids:
                     type: integer
             default:
                 id: ASC
+
+    items-grid-with-export-page-size:
+        source:
+            type: orm
+            query:
+                select:
+                    - item.id
+                    - item.stringValue
+                from:
+                    - { table: %oro_test.entity.item.class%, alias: item }
+        columns:
+            id:
+                label: id
+            stringValue:
+                label: stringValue
+        options:
+            export:
+                csv:
+                    page_size: 499

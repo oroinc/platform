@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
-use Symfony\Component\Form\FormRegistry;
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\ActionBundle\Model\AbstractGuesser;
 use Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Symfony\Component\Form\FormRegistry;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class AbstractGuesserTest extends \PHPUnit_Framework_TestCase
 {

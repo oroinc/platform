@@ -3,15 +3,13 @@
 namespace Oro\Bundle\ActivityBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
-
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EntityBundle\ORM\EntityIdAccessor;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ActivityWidgetProvider implements WidgetProviderInterface
 {

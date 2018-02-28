@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
+use Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
-
-use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
-use Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox;
 
 class FormFieldTypeTest extends TypeTestCase
 {

@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToStringTransformer;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\FormBundle\Form\EventListener\FixArrayToStringListener;
 use Oro\Bundle\FormBundle\Form\Exception\FormException;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EntityIdentifierType extends AbstractType
 {
@@ -70,7 +68,7 @@ class EntityIdentifierType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(

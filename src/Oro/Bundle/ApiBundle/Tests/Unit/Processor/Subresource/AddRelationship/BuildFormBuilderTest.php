@@ -2,11 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\AddRelationship;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\DataMapper\AppendRelationshipMapper;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
@@ -14,6 +9,10 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\AddRelationship\BuildFormBuilder;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 {

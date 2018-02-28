@@ -8,13 +8,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator;
 
-use Symfony\Component\Validator\ValidatorBuilderInterface;
-use Symfony\Component\Validator\ConstraintValidatorFactory;
-use Symfony\Component\Validator\MetadataFactoryInterface;
-use Symfony\Component\Validator\ObjectInitializerInterface;
-use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
-use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
-
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
@@ -22,6 +15,8 @@ use Doctrine\Common\Cache\ArrayCache;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\ConstraintValidatorFactory;
+use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\ValidatorException;
@@ -29,12 +24,16 @@ use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
+use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader;
+use Symfony\Component\Validator\MetadataFactoryInterface;
+use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
+use Symfony\Component\Validator\ValidatorBuilderInterface;
 
 /**
  * This class is mostly a copy of {@see Symfony\Component\Validator\ValidatorBuilder},

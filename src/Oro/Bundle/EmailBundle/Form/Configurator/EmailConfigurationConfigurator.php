@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Configurator;
 
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\DependencyInjection\Configuration as Config;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 class EmailConfigurationConfigurator
 {

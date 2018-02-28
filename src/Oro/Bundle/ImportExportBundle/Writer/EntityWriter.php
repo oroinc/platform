@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-
-use Symfony\Component\Security\Core\Util\ClassUtils;
-
+use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
 {

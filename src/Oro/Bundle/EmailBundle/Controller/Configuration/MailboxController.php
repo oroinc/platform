@@ -3,19 +3,16 @@
 namespace Oro\Bundle\EmailBundle\Controller\Configuration;
 
 use FOS\RestBundle\Controller\Annotations\Delete;
-
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-
-use Oro\Bundle\EmailBundle\Entity\Mailbox;
-use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
 
 /**
  * Class MailboxController

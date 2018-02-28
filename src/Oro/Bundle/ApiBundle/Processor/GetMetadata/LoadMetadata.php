@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetMetadata;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\AssociationMetadataLoader;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityMetadataLoader;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataLoader;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Loads metadata for an entity.

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
-use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
@@ -10,6 +9,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 class ConfigProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,9 +30,9 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage $className must not be empty.
      */
-    public function testShouldThrowExceptionIfNoClassName()
+    public function testShouldThrowExceptionIfClassNameIsEmpty()
     {
-        $this->configProvider->getConfig(null, '1.2', new RequestType([]));
+        $this->configProvider->getConfig('', '1.2', new RequestType([]));
     }
 
     public function testShouldBuildConfig()

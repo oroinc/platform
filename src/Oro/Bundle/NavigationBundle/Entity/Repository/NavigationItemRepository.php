@@ -4,7 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
@@ -19,28 +18,22 @@ class NavigationItemRepository extends EntityRepository implements NavigationRep
     {
         $qb = $this->_em->createQueryBuilder();
 
-        $qb->add(
-            'select',
-            new Expr\Select(
-                array(
-                    'ni.id',
-                    'ni.url',
-                    'ni.title',
-                    'ni.type'
-                )
-            )
+        $qb->select(
+            'ni.id',
+            'ni.url',
+            'ni.title',
+            'ni.type'
         )
-        ->add('from', new Expr\From($this->_entityName, 'ni'))
-        ->add(
-            'where',
-            $qb->expr()->andx(
+        ->from($this->_entityName, 'ni')
+        ->where(
+            $qb->expr()->andX(
                 $qb->expr()->eq('ni.user', ':user'),
                 $qb->expr()->eq('ni.type', ':type'),
                 $qb->expr()->eq('ni.organization', ':organization')
             )
         )
-        ->add('orderBy', new Expr\OrderBy('ni.position', 'ASC'))
-        ->setParameters(array('user' => $user, 'type' => $type, 'organization' => $organization));
+        ->orderBy('ni.position', 'ASC')
+        ->setParameters(['user' => $user, 'type' => $type, 'organization' => $organization]);
 
         return $qb->getQuery()->getArrayResult();
     }

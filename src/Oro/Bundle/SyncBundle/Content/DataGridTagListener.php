@@ -3,8 +3,8 @@
 namespace Oro\Bundle\SyncBundle\Content;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
-use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 
 class DataGridTagListener

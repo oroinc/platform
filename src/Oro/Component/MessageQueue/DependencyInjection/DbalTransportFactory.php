@@ -2,16 +2,15 @@
 
 namespace Oro\Component\MessageQueue\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalCliProcessManager;
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalPidFileManager;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessagesDbalExtension;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RejectMessageOnExceptionDbalExtension;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class DbalTransportFactory implements TransportFactoryInterface
 {

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
+use Symfony\Component\Form\FormView;
 
 class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,9 +35,9 @@ class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolverInterface')
+        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->getMock();
         $resolver->expects($this->once())
             ->method('setOptional')
@@ -54,7 +53,7 @@ class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
             );
 
         $extension = new TooltipFormExtension($this->configProvider, $this->translator);
-        $extension->setDefaultOptions($resolver);
+        $extension->configureOptions($resolver);
     }
 
     public function testBuildView()

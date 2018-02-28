@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
+use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
+use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
+use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
-use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
-use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 
 /**
  * Sets initial value for all configuration sections which are not loaded yet.

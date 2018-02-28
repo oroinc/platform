@@ -9,6 +9,13 @@ define(function(require) {
             'click [data-name="field__types"] input': 'onClicked'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function AddressCollectionView() {
+            AddressCollectionView.__super__.constructor.apply(this, arguments);
+        },
+
         onClicked: function(e) {
             var currentTarget = e.currentTarget;
 

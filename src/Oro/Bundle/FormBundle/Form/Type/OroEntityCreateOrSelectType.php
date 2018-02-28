@@ -2,20 +2,19 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreateOrSelectTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreateOrSelectTransformer;
 
 class OroEntityCreateOrSelectType extends AbstractType
 {
@@ -156,7 +155,7 @@ class OroEntityCreateOrSelectType extends AbstractType
      *
      * {@inheritDoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(
             array(

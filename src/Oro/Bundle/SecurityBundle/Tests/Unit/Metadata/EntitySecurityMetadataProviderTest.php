@@ -3,9 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -13,6 +10,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider as Provider;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
 {

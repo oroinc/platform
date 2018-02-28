@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
-
 use Oro\Bundle\ApiBundle\Config\ActionConfig;
 use Oro\Bundle\ApiBundle\Config\ActionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodeConfig;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 class ActionsConfiguration extends AbstractConfigurationSection
 {

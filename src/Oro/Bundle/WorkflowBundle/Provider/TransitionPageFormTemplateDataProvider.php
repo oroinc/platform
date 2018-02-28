@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Provider;
 
+use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-
-use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
 
 class TransitionPageFormTemplateDataProvider implements FormTemplateDataProviderInterface
 {

@@ -8,8 +8,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator;
 
-use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorBuilderInterface;
+use Symfony\Component\Validator\ValidatorInterface;
 
 /**
  * @todo: This class should be removed after https://github.com/symfony/symfony/issues/18930

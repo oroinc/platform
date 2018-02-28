@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\AsseticBundle;
 
+use Oro\Bundle\AsseticBundle\DependencyInjection\Compiler\AsseticFilterPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-use Oro\Bundle\AsseticBundle\DependencyInjection\Compiler\AsseticFilterPass;
 
 class OroAsseticBundle extends Bundle
 {

@@ -1,11 +1,12 @@
 define(function(require) {
     'use strict';
 
+    var FolderTreeComponent;
     var _ = require('underscore');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var EmailFolderTreeView = require('oroemail/js/app/views/email-folder-tree-view');
 
-    return BaseComponent.extend({
+    FolderTreeComponent = BaseComponent.extend({
         emailFolderTreeView: null,
 
         requiredOptions: [
@@ -14,6 +15,16 @@ define(function(require) {
             'relatedCheckboxesSelector'
         ],
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function FolderTreeComponent() {
+            FolderTreeComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.each(this.requiredOptions, function(optionName) {
                 if (!_.has(options, optionName)) {
@@ -29,4 +40,6 @@ define(function(require) {
             });
         }
     });
+
+    return FolderTreeComponent;
 });

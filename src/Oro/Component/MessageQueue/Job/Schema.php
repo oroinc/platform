@@ -1,8 +1,8 @@
 <?php
 namespace Oro\Component\MessageQueue\Job;
 
-use Doctrine\DBAL\Schema\Schema as BaseSchema;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\Schema as BaseSchema;
 
 class Schema extends BaseSchema
 {

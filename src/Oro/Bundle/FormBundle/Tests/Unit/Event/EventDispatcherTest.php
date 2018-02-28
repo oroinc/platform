@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Event;
 
+use Oro\Bundle\FormBundle\Event\EventDispatcher;
 use Oro\Bundle\FormBundle\Event\FormHandler\FormProcessEvent;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Oro\Bundle\FormBundle\Event\EventDispatcher;
 use Symfony\Component\Form\FormInterface;
 
 class EventDispatcherTest extends \PHPUnit_Framework_TestCase

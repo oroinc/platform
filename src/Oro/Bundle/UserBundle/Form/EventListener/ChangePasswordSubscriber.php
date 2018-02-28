@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Form\EventListener;
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-
-use Oro\Bundle\UserBundle\Entity\User;
 
 class ChangePasswordSubscriber extends UserSubscriber
 {

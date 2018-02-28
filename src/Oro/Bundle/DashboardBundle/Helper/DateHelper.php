@@ -3,13 +3,11 @@
 namespace Oro\Bundle\DashboardBundle\Helper;
 
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Bridge\Doctrine\RegistryInterface;
-
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -180,6 +178,7 @@ class DateHelper
         QueryBuilder $qb,
         $entityField
     ) {
+        QueryBuilderUtil::checkField($entityField);
         switch ($this->getFormatStrings($start, $end)['viewType']) {
             case 'year':
                 $qb->addSelect(sprintf(

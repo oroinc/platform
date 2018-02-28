@@ -5,26 +5,23 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Query;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\Form\Forms;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
-
-use Oro\Component\DependencyInjection\ServiceLink;
-
 use Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverter;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\PreloadedExtension;
 
 class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
 {

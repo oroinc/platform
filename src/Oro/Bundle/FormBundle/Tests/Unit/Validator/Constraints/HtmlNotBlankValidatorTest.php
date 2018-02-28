@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\Validator\ExecutionContext;
-
 use Oro\Bundle\FormBundle\Validator\Constraints\HtmlNotBlank;
 use Oro\Bundle\FormBundle\Validator\Constraints\HtmlNotBlankValidator;
+use Symfony\Component\Validator\ExecutionContext;
 
 class HtmlNotBlankValidatorTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,10 +3,8 @@
 namespace Oro\Bundle\AsseticBundle\Twig;
 
 use Assetic\Factory\AssetFactory;
-
-use Symfony\Bundle\AsseticBundle\Twig\AsseticNode;
-
 use Oro\Bundle\AsseticBundle\AssetsConfiguration;
+use Symfony\Bundle\AsseticBundle\Twig\AsseticNode;
 
 class AsseticTokenParser extends \Twig_TokenParser
 {

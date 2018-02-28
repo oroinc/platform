@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\ArrayDatasource\ArrayDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
@@ -13,13 +14,12 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\DTO\SelectedItems;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\IterableResultFactoryRegistry;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHelper;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionParametersParser;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponseInterface;
-use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
 use Symfony\Component\HttpFoundation\Request;
 

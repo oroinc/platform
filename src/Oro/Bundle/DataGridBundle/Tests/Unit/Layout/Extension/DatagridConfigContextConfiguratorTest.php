@@ -5,7 +5,6 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Layout\Extension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Layout\Extension\DatagridConfigContextConfigurator;
-
 use Oro\Component\Layout\LayoutContext;
 
 class DatagridConfigContextConfiguratorTest extends \PHPUnit_Framework_TestCase

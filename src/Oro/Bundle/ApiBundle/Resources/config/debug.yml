@@ -1,15 +1,114 @@
 services:
     oro_api.profiler.logger:
-        public: false
         class: Oro\Component\ChainProcessor\Debug\TraceLogger
+        public: false
         arguments:
             - 'data_api'
             - '@?debug.stopwatch'
 
     oro_api.profiler.data_collector:
-        public: false
         class: Oro\Component\ChainProcessor\Debug\ActionProcessorDataCollector
+        public: false
         arguments:
             - '@oro_api.profiler.logger'
         tags:
             - { name: data_collector, template: OroApiBundle:Collector:api.html.twig, id: data_api }
+
+    oro_api.profiler.processor_factory:
+        class: Oro\Component\ChainProcessor\Debug\TraceableProcessorFactory
+        public: false
+        decorates: oro_api.processor_factory
+        decoration_priority: -255 # should be at the top of the decoration chain
+        arguments:
+            - '@oro_api.profiler.processor_factory.inner'
+            - '@oro_api.profiler.logger'
+
+    oro_api.profiler.processor_applicable_checker_factory:
+        class: Oro\Component\ChainProcessor\Debug\TraceableProcessorApplicableCheckerFactory
+        public: false
+        decorates: oro_api.processor_applicable_checker_factory
+        decoration_priority: -255 # should be at the top of the decoration chain
+        arguments:
+            - '@oro_api.profiler.processor_applicable_checker_factory.inner'
+            - '@oro_api.profiler.logger'
+
+    oro_api.profiler.processor_applicable_checker_factory.ungrouped:
+        class: Oro\Component\ChainProcessor\Debug\TraceableProcessorApplicableCheckerFactory
+        public: false
+        decorates: oro_api.processor_applicable_checker_factory.ungrouped
+        decoration_priority: -255 # should be at the top of the decoration chain
+        arguments:
+            - '@oro_api.profiler.processor_applicable_checker_factory.ungrouped.inner'
+            - '@oro_api.profiler.logger'
+
+    oro_api.profiler.collect_resources.processor:
+        class: Oro\Component\ChainProcessor\Debug\TraceableActionProcessor
+        public: false
+        decorates: oro_api.collect_resources.processor
+        decoration_priority: -255 # should be at the top of the decoration chain
+        arguments:
+            - '@oro_api.profiler.collect_resources.processor.inner'
+            - '@oro_api.profiler.logger'
+
+    oro_api.profiler.collect_subresources.processor:
+        class: Oro\Component\ChainProcessor\Debug\TraceableActionProcessor
+        public: false
+        decorates: oro_api.collect_subresources.processor
+        decoration_priority: -255 # should be at the top of the decoration chain
+        arguments:
+            - '@oro_api.profiler.collect_subresources.processor.inner'
+            - '@oro_api.profiler.logger'
+
+    oro_api.profiler.customize_loaded_data.processor:
+        class: Oro\Component\ChainProcessor\Debug\TraceableActionProcessor
+        public: false
+        decorates: oro_api.customize_loaded_data.processor
+        decoration_priority: -255 # should be at the top of the decoration chain
+        arguments:
+            - '@oro_api.profiler.customize_loaded_data.processor.inner'
+            - '@oro_api.profiler.logger'
+
+    oro_api.profiler.customize_form_data.processor:
+        class: Oro\Component\ChainProcessor\Debug\TraceableActionProcessor
+        public: false
+        decorates: oro_api.customize_form_data.processor
+        decoration_priority: -255 # should be at the top of the decoration chain
+        arguments:
+            - '@oro_api.profiler.customize_form_data.processor.inner'
+            - '@oro_api.profiler.logger'
+
+    oro_api.profiler.get_config.processor:
+        class: Oro\Component\ChainProcessor\Debug\TraceableActionProcessor
+        public: false
+        decorates: oro_api.get_config.processor
+        decoration_priority: -255 # should be at the top of the decoration chain
+        arguments:
+            - '@oro_api.profiler.get_config.processor.inner'
+            - '@oro_api.profiler.logger'
+
+    oro_api.profiler.get_relation_config.processor:
+        class: Oro\Component\ChainProcessor\Debug\TraceableActionProcessor
+        public: false
+        decorates: oro_api.get_relation_config.processor
+        decoration_priority: -255 # should be at the top of the decoration chain
+        arguments:
+            - '@oro_api.profiler.get_relation_config.processor.inner'
+            - '@oro_api.profiler.logger'
+
+    oro_api.profiler.get_metadata.processor:
+        class: Oro\Component\ChainProcessor\Debug\TraceableActionProcessor
+        public: false
+        decorates: oro_api.get_metadata.processor
+        decoration_priority: -255 # should be at the top of the decoration chain
+        arguments:
+            - '@oro_api.profiler.get_metadata.processor.inner'
+            - '@oro_api.profiler.logger'
+
+    oro_api.profiler.normalize_value.processor:
+        class: Oro\Component\ChainProcessor\Debug\TraceableActionProcessor
+        public: false
+        decorates: oro_api.normalize_value.processor
+        decoration_priority: -255 # should be at the top of the decoration chain
+        arguments:
+            - '@oro_api.profiler.normalize_value.processor.inner'
+            - '@oro_api.profiler.logger'

@@ -2,8 +2,8 @@
 namespace Oro\Component\MessageQueue\Transport\Null;
 
 use Oro\Component\MessageQueue\Transport\DestinationInterface;
-use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
 
 class NullMessageConsumer implements MessageConsumerInterface
 {

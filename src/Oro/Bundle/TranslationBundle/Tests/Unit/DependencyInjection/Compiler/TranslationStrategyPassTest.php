@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationStrategyPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class TranslationStrategyPassTest extends \PHPUnit_Framework_TestCase
 {

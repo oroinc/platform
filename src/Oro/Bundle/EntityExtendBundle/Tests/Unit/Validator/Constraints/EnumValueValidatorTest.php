@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ExecutionContextInterface;
-
 use Oro\Bundle\EntityExtendBundle\Model\EnumValue;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ExecutionContextInterface;
 
 class EnumValueValidatorTest extends \PHPUnit_Framework_TestCase
 {

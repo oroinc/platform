@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Doctrine\DBAL\Driver\PDOException;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;

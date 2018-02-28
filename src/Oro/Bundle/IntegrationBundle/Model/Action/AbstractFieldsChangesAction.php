@@ -3,7 +3,6 @@
 namespace Oro\Bundle\IntegrationBundle\Model\Action;
 
 use Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager;
-
 use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
 

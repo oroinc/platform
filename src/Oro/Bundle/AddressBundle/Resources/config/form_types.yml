@@ -78,9 +78,8 @@ services:
 
     # Addresses forms
     oro_address.form.address:
-        class:           Symfony\Component\Form\Form
-        factory_method:  createNamed
-        factory_service: form.factory
+        class: Symfony\Component\Form\Form
+        factory: ['@form.factory', createNamed]
         arguments:
             - "oro_address_form"
             - "oro_address"
@@ -89,8 +88,7 @@ services:
     # Addresses form handlers
     oro_address.form.handler.address:
         class: %oro_address.form.handler.address.class%
-        scope: request
         arguments:
             - '@oro_address.form.address'
-            - '@request'
+            - '@request_stack'
             - '@doctrine.orm.entity_manager'

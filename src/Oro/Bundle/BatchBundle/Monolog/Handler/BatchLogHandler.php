@@ -3,7 +3,6 @@
 namespace Oro\Bundle\BatchBundle\Monolog\Handler;
 
 use Akeneo\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler as AkeneoBatchLogHandler;
-
 use Monolog\Logger;
 
 /**

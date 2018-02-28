@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Mailer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;

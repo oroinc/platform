@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
+use Oro\Bundle\UserBundle\Form\Type\ResetType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Form\Type\ResetType;
-use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 
 class ResetTypeTest extends FormIntegrationTestCase
 {
@@ -65,7 +64,7 @@ class ResetTypeTest extends FormIntegrationTestCase
         $this->type->buildForm($builder, []);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|OptionsResolver $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
@@ -78,7 +77,7 @@ class ResetTypeTest extends FormIntegrationTestCase
                 'dynamic_fields_disabled' => true
             ]);
 
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
     }
 
     public function testName()

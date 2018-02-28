@@ -6,17 +6,14 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
-use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\PreloadedExtension;
-
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 use Oro\Bundle\TranslationBundle\Entity\Language;
-
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\PreloadedExtension;
 
 class LanguageSelectTypeTest extends FormIntegrationTestCase
 {

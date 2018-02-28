@@ -5,10 +5,10 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\DataAuditBundle\Model\AdditionalEntityChangesToAuditStorage;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-use Oro\Bundle\WorkflowBundle\EventListener\SendWorkflowStepChangesToAuditListener;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
+use Oro\Bundle\WorkflowBundle\EventListener\SendWorkflowStepChangesToAuditListener;
 
 class SendWorkflowStepChangesToAuditListenerTest extends \PHPUnit_Framework_TestCase
 {

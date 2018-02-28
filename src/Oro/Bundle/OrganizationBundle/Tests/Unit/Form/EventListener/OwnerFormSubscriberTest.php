@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\EventListener;
 
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-
 use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 class OwnerFormSubscriberTest extends \PHPUnit_Framework_TestCase
 {

@@ -19,7 +19,7 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
     public function testGetParent()
     {
         $this->assertEquals(
-            'genemu_jqueryselect2_translatable_entity',
+            'oro_select2_translatable_entity',
             $this->type->getParent()
         );
     }
@@ -69,13 +69,17 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
     }
 
     /**
-     * @dataProvider setDefaultOptionsProvider
+     * @dataProvider configureOptionsProvider
+     * @param boolean $multiple
+     * @param boolean $expanded
+     * @param mixed $expectedEmptyValue
+     * @param mixed $expectedEmptyData
      */
-    public function testSetDefaultOptions($multiple, $expanded, $expectedEmptyValue, $expectedEmptyData)
+    public function testConfigureOptions($multiple, $expanded, $expectedEmptyValue, $expectedEmptyData)
     {
         $resolver = $this->getOptionsResolver();
 
-        $resolvedOptions = $this->doTestSetDefaultOptions(
+        $resolvedOptions = $this->doTestConfigureOptions(
             $this->type,
             $resolver,
             'test_enum',
@@ -98,7 +102,10 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
         );
     }
 
-    public function setDefaultOptionsProvider()
+    /**
+     * @return array
+     */
+    public function configureOptionsProvider()
     {
         return [
             [false, false, '', null],
@@ -108,13 +115,13 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
         ];
     }
 
-    public function testSetDefaultOptionsWithOverrideConfigs()
+    public function testConfigureOptionsWithOverrideConfigs()
     {
         $newPlaceholder = 'Test Placeholder';
 
         $resolver = $this->getOptionsResolver();
 
-        $resolvedOptions = $this->doTestSetDefaultOptions(
+        $resolvedOptions = $this->doTestConfigureOptions(
             $this->type,
             $resolver,
             'test_enum',

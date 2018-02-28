@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Provider;
 
+use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Component\PhpUtils\ArrayUtil;
 
 class SystemAwareResolver implements ContainerAwareInterface
 {

@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Layout\Block\Type;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
-use Oro\Bundle\DataGridBundle\Layout\Block\Type\DatagridType;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
+use Oro\Bundle\DataGridBundle\Layout\Block\Type\DatagridType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
-
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class DatagridTypeTest extends BlockTypeTestCase
 {
@@ -274,7 +272,7 @@ class DatagridTypeTest extends BlockTypeTestCase
      * @param array $options
      * @param array $expectedOptions
      */
-    public function testSetDefaultOptions(array $options, array $expectedOptions)
+    public function testConfigureOptions(array $options, array $expectedOptions)
     {
         $datagridType = new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker);
         $resolver = new OptionsResolver();

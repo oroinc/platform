@@ -39,7 +39,7 @@ class SimpleProcessorFactory implements ProcessorFactoryInterface
         }
 
         $processor = $this->processors[$processorId];
-        if (!is_object($processor)) {
+        if (!\is_object($processor)) {
             $processor = new $processor();
 
             $this->processors[$processorId] = $processor;

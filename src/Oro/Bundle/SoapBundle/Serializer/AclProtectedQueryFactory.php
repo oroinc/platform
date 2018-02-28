@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SoapBundle\Serializer;
 
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Component\EntitySerializer\DoctrineHelper;

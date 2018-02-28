@@ -58,7 +58,6 @@ services:
 
     oro_notification.form.handler.email_notification:
         class: %oro_notification.form.handler.email_notification.class%
-        scope: request
         arguments:
             - '@doctrine'
         tags:

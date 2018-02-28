@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 
 class NumberRangeFilterType extends AbstractType implements NumberRangeFilterTypeInterface
 {

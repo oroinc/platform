@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Symfony\Component\Form\FormFactoryInterface;
 
 abstract class AbstractDateFilter extends AbstractFilter
 {
@@ -228,6 +228,8 @@ abstract class AbstractDateFilter extends AbstractFilter
         $endDateParameterName,
         $fieldName
     ) {
+        QueryBuilderUtil::checkField($fieldName);
+
         switch ($type) {
             case DateRangeFilterType::TYPE_MORE_THAN:
                 return $this->buildFilterLessMore(

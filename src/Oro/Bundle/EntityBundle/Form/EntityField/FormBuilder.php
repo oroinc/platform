@@ -7,7 +7,6 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException;
-
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 

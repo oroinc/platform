@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
-use Symfony\Component\PropertyAccess\PropertyAccessor;
-
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class SimpleFilterFactoryTest extends \PHPUnit_Framework_TestCase
 {

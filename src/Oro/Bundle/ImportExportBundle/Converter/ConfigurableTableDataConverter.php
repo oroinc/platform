@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
-use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.NPathComplexity)

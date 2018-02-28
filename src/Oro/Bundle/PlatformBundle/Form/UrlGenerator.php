@@ -3,7 +3,6 @@
 namespace Oro\Bundle\PlatformBundle\Form;
 
 use Doctrine\Common\Cache\CacheProvider;
-
 use Oro\Bundle\PlatformBundle\Provider\PackageProvider;
 
 class UrlGenerator

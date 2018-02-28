@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Datagrid;
 
-use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 
 class EntityPaginationExtension extends AbstractExtension
 {

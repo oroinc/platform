@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
 
 class TransitionIsAllowedValidator extends ConstraintValidator
 {

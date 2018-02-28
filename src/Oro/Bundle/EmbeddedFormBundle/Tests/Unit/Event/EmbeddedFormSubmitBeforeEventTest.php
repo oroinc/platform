@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Event;
 
-use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitBeforeEvent;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
+use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitBeforeEvent;
 
 class EmbeddedFormSubmitBeforeEventTest extends \PHPUnit_Framework_TestCase
 {

@@ -11,6 +11,13 @@ define(function(require) {
         defaults: {
             count: 0,
             ids: []
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function UnreadEmailsStateModel() {
+            UnreadEmailsStateModel.__super__.constructor.apply(this, arguments);
         }
     });
 

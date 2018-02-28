@@ -5,19 +5,17 @@ namespace Oro\Bundle\ImportExportBundle\Handler;
 use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Akeneo\Bundle\BatchBundle\Job\Job;
-
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\BatchBundle\Step\ItemStep;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\File\BatchFileManager;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\File\FileSystemOperator;
+use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\ReaderChain;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class AbstractHandler
 {

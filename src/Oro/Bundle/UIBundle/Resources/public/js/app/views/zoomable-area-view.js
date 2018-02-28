@@ -29,6 +29,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function ZoomAreaView() {
+            ZoomAreaView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             ZoomAreaView.__super__.initialize.apply(this, arguments);
             this.$zoomedElement = this.$el.find('>*:first');

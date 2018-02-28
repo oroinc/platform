@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Oro\Bundle\ImportExportBundle\Utils\ArrayUtil;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\FormatConversionEvent;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use Oro\Bundle\ImportExportBundle\Utils\ArrayUtil;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 abstract class AbstractTableDataConverter extends DefaultDataConverter
 {

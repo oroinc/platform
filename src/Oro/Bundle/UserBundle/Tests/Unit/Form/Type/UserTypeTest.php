@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
+use Oro\Bundle\FormBundle\Form\Type\OroBirthdayType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Oro\Bundle\UserBundle\Form\Type\UserType;
-use Oro\Bundle\FormBundle\Form\Type\OroBirthdayType;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class UserTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -126,7 +126,9 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
             ->with('inviteUser', 'checkbox')
             ->will($this->returnValue($builder));
 
-        $type = new UserType($this->authorizationChecker, $this->tokenAccessor, $request, $this->optionsProvider);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $type = new UserType($this->authorizationChecker, $this->tokenAccessor, $requestStack, $this->optionsProvider);
         $type->buildForm($builder, []);
     }
 
@@ -219,17 +221,19 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->disableOriginalConstructor()
             ->getMock();
         $resolver->expects($this->once())
             ->method('setDefaults');
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request());
         $type = new UserType(
             $this->authorizationChecker,
             $this->tokenAccessor,
-            new Request(),
+            $requestStack,
             $this->optionsProvider
         );
         $type->configureOptions($resolver);

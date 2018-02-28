@@ -3,10 +3,8 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Doctrine\Common\Cache\Cache;
-
-use Oro\Bundle\LayoutBundle\Layout\Extension\LastModifiedDateContextConfigurator;
 use Oro\Bundle\LayoutBundle\Layout\Extension\ActionContextConfigurator;
-
+use Oro\Bundle\LayoutBundle\Layout\Extension\LastModifiedDateContextConfigurator;
 use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;
 use Oro\Component\Layout\LayoutContext;
 

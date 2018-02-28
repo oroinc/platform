@@ -9,10 +9,13 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilder\AssociationToArrayAttributeConv
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessor;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessorInterface;
 
+/**
+ * A base class for different kind of response document builders.
+ */
 abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
 {
-    const DATA   = 'data';
-    const ERRORS = 'errors';
+    public const DATA   = 'data';
+    public const ERRORS = 'errors';
 
     /** @var ObjectAccessorInterface */
     protected $objectAccessor;
@@ -47,26 +50,26 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setDataObject($object, EntityMetadata $metadata = null)
+    public function setDataObject($object, RequestType $requestType, EntityMetadata $metadata = null)
     {
         $this->assertNoData();
 
         $this->result[self::DATA] = null;
         if (null !== $object) {
-            $this->result[self::DATA] = $this->convertObjectToArray($object, $metadata);
+            $this->result[self::DATA] = $this->convertObjectToArray($object, $requestType, $metadata);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDataCollection($collection, EntityMetadata $metadata = null)
+    public function setDataCollection($collection, RequestType $requestType, EntityMetadata $metadata = null)
     {
         $this->assertNoData();
 
         $this->result[self::DATA] = [];
         if (is_array($collection) || $collection instanceof \Traversable) {
-            $this->result[self::DATA] = $this->convertCollectionToArray($collection, $metadata);
+            $this->result[self::DATA] = $this->convertCollectionToArray($collection, $requestType, $metadata);
         } else {
             throw $this->createUnexpectedValueException('array or \Traversable', $collection);
         }
@@ -75,14 +78,14 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function addIncludedObject($object, EntityMetadata $metadata = null)
+    public function addIncludedObject($object, RequestType $requestType, EntityMetadata $metadata = null)
     {
         if (!array_key_exists(self::DATA, $this->result)) {
             throw new \InvalidArgumentException('A primary data should be set.');
         }
 
         if (null !== $object) {
-            $this->addRelatedObject($this->convertObjectToArray($object, $metadata));
+            $this->addRelatedObject($this->convertObjectToArray($object, $requestType, $metadata));
         }
     }
 
@@ -112,15 +115,19 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
 
     /**
      * @param array|\Traversable  $collection
+     * @param RequestType         $requestType
      * @param EntityMetadata|null $metadata
      *
      * @return array
      */
-    protected function convertCollectionToArray($collection, EntityMetadata $metadata = null)
-    {
+    protected function convertCollectionToArray(
+        $collection,
+        RequestType $requestType,
+        EntityMetadata $metadata = null
+    ) {
         $result = [];
         foreach ($collection as $object) {
-            $result[] = $this->convertObjectToArray($object, $metadata);
+            $result[] = $this->convertObjectToArray($object, $requestType, $metadata);
         }
 
         return $result;
@@ -128,11 +135,16 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
 
     /**
      * @param mixed               $object
+     * @param RequestType         $requestType
      * @param EntityMetadata|null $metadata
      *
      * @return array
      */
-    abstract protected function convertObjectToArray($object, EntityMetadata $metadata = null);
+    abstract protected function convertObjectToArray(
+        $object,
+        RequestType $requestType,
+        EntityMetadata $metadata = null
+    );
 
     /**
      * @param Error $error
@@ -142,42 +154,45 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     abstract protected function convertErrorToArray(Error $error);
 
     /**
-     * @param string $entityClass
-     * @param bool   $throwException
+     * @param string      $entityClass
+     * @param RequestType $requestType
+     * @param bool        $throwException
      *
      * @return string|null
      */
-    abstract protected function convertToEntityType($entityClass, $throwException = true);
+    abstract protected function convertToEntityType($entityClass, RequestType $requestType, $throwException = true);
 
     /**
      * @param mixed               $object
+     * @param RequestType         $requestType
      * @param EntityMetadata|null $metadata
      *
      * @return string
      */
-    protected function getEntityTypeForObject($object, EntityMetadata $metadata)
+    protected function getEntityTypeForObject($object, RequestType $requestType, EntityMetadata $metadata)
     {
         $className = $this->objectAccessor->getClassName($object);
 
         return $className
-            ? $this->getEntityType($className, $metadata->getClassName())
-            : $this->getEntityType($metadata->getClassName());
+            ? $this->getEntityType($className, $requestType, $metadata->getClassName())
+            : $this->getEntityType($metadata->getClassName(), $requestType);
     }
 
     /**
      * @param string      $entityClass
+     * @param RequestType $requestType
      * @param string|null $fallbackEntityClass
      *
      * @return string
      */
-    protected function getEntityType($entityClass, $fallbackEntityClass = null)
+    protected function getEntityType($entityClass, RequestType $requestType, $fallbackEntityClass = null)
     {
         if (null === $fallbackEntityClass) {
-            $entityType = $this->convertToEntityType($entityClass);
+            $entityType = $this->convertToEntityType($entityClass, $requestType);
         } else {
-            $entityType = $this->convertToEntityType($entityClass, false);
+            $entityType = $this->convertToEntityType($entityClass, $requestType, false);
             if (!$entityType) {
-                $entityType = $this->convertToEntityType($fallbackEntityClass);
+                $entityType = $this->convertToEntityType($fallbackEntityClass, $requestType);
             }
         }
 
@@ -231,13 +246,18 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
 
     /**
      * @param array               $data
+     * @param RequestType         $requestType
      * @param string              $associationName
      * @param AssociationMetadata $association
      *
      * @return mixed
      */
-    public function getRelationshipValue(array $data, $associationName, AssociationMetadata $association)
-    {
+    protected function getRelationshipValue(
+        array $data,
+        RequestType $requestType,
+        $associationName,
+        AssociationMetadata $association
+    ) {
         $result = null;
         $isCollection = $association->isCollection();
         if (array_key_exists($associationName, $data)) {
@@ -249,8 +269,8 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
                         : $this->getArrayAttributeConverter()->convertObjectToArray($val, $association);
                 } else {
                     $result = $isCollection
-                        ? $this->processRelatedCollection($val, $association)
-                        : $this->processRelatedObject($val, $association);
+                        ? $this->processRelatedCollection($val, $requestType, $association)
+                        : $this->processRelatedObject($val, $requestType, $association);
                 }
             }
         }
@@ -263,15 +283,19 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
 
     /**
      * @param array|\Traversable  $collection
+     * @param RequestType         $requestType
      * @param AssociationMetadata $associationMetadata
      *
      * @return array
      */
-    public function processRelatedCollection($collection, AssociationMetadata $associationMetadata)
-    {
+    protected function processRelatedCollection(
+        $collection,
+        RequestType $requestType,
+        AssociationMetadata $associationMetadata
+    ) {
         $result = [];
         foreach ($collection as $object) {
-            $result[] = $this->processRelatedObject($object, $associationMetadata);
+            $result[] = $this->processRelatedObject($object, $requestType, $associationMetadata);
         }
 
         return $result;
@@ -279,11 +303,16 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
 
     /**
      * @param mixed               $object
+     * @param RequestType         $requestType
      * @param AssociationMetadata $associationMetadata
      *
      * @return mixed
      */
-    abstract protected function processRelatedObject($object, AssociationMetadata $associationMetadata);
+    abstract protected function processRelatedObject(
+        $object,
+        RequestType $requestType,
+        AssociationMetadata $associationMetadata
+    );
 
     /**
      * @param array $object

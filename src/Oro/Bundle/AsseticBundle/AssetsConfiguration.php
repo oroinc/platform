@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\AsseticBundle;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\AsseticBundle\Event\Events;
 use Oro\Bundle\AsseticBundle\Event\LoadCssEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class AssetsConfiguration
 {

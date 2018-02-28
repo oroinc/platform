@@ -9,7 +9,7 @@ class TimezoneTypeTest extends \PHPUnit_Framework_TestCase
     public function testFormTypeWithoutCache()
     {
         $type = new TimezoneType();
-        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolverInterface')
+        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->disableOriginalConstructor()
             ->getMock();
         $resolver->expects($this->once())
@@ -17,7 +17,7 @@ class TimezoneTypeTest extends \PHPUnit_Framework_TestCase
             ->with($this->isType('array'));
         $this->assertEquals('choice', $type->getParent(), 'Unexpected parent');
         $this->assertEquals('oro_locale_timezone', $type->getName(), 'Unexpected form type name');
-        $type->setDefaultOptions($resolver);
+        $type->configureOptions($resolver);
     }
 
     /**
@@ -50,13 +50,13 @@ class TimezoneTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($timezones));
 
         $type = new TimezoneType($cache);
-        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolverInterface')
+        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->disableOriginalConstructor()
             ->getMock();
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(array('choices' => $timezones));
-        $type->setDefaultOptions($resolver);
+        $type->configureOptions($resolver);
     }
 
     /**
@@ -74,13 +74,13 @@ class TimezoneTypeTest extends \PHPUnit_Framework_TestCase
             ->with('timezones', $this->isType('array'));
 
         $type = new TimezoneType($cache);
-        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolverInterface')
+        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->disableOriginalConstructor()
             ->getMock();
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));
-        $type->setDefaultOptions($resolver);
+        $type->configureOptions($resolver);
     }
 
     public function testGetTimezones()

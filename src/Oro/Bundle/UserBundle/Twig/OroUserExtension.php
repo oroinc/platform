@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Oro\Bundle\UserBundle\Provider\GenderProvider;
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class OroUserExtension extends \Twig_Extension
 {

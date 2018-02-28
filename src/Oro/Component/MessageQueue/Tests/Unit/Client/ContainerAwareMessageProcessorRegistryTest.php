@@ -2,10 +2,9 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
-use Symfony\Component\DependencyInjection\Container;
-
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Client\ContainerAwareMessageProcessorRegistry;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Symfony\Component\DependencyInjection\Container;
 
 class ContainerAwareMessageProcessorRegistryTest extends \PHPUnit_Framework_TestCase
 {

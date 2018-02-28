@@ -3,12 +3,10 @@
 namespace Oro\Bundle\OrganizationBundle\Validator\Constraints;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
-use Symfony\Component\Validator\Constraint;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
+use Symfony\Component\Validator\Constraint;
 
 class OrganizationUniqueEntityValidator extends UniqueEntityValidator
 {

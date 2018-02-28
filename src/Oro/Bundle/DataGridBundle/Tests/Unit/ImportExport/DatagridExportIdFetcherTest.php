@@ -2,15 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\ImportExport;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
@@ -20,6 +17,7 @@ use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)

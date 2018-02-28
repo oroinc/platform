@@ -5,7 +5,14 @@ define([
 
     var CommandWithArgsFilter;
 
-    CommandWithArgsFilter = ChoiceFilter.extend({});
+    CommandWithArgsFilter = ChoiceFilter.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function CommandWithArgsFilter() {
+            CommandWithArgsFilter.__super__.constructor.apply(this, arguments);
+        }
+    });
 
     return CommandWithArgsFilter;
 });

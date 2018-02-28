@@ -3,7 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub;
 
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PercentTypeStub extends PercentType
 {
@@ -20,9 +20,9 @@ class PercentTypeStub extends PercentType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::setDefaultOptions($resolver);
+        parent::configureOptions($resolver);
 
         $resolver->setDefaults(['validation_groups' => ['Default']]);
     }

@@ -6,7 +6,6 @@ use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider;
 use Oro\Bundle\ConfigBundle\Tests\Unit\Provider\AbstractProviderTest;
 use Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider;
-
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;

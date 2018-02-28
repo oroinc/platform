@@ -4,23 +4,21 @@ namespace Oro\Bundle\QueryDesignerBundle\Validator;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\ORMException;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Grid\BuilderAwareInterface;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryConstraint;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
 
 class QueryValidator extends ConstraintValidator
 {

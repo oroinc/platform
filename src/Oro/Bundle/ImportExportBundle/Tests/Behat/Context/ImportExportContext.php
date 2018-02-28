@@ -18,10 +18,10 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element as OroElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element as OroElement;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -158,8 +158,9 @@ class ImportExportContext extends OroFeatureContext implements
 
     /**
      * @param string $processor
+     * @param array $options
      */
-    public function downloadTemplateFileByProcessor($processor)
+    public function downloadTemplateFileByProcessor($processor, $options = [])
     {
         $this->openImportModalAndReturnImportSubmitButton();
 
@@ -168,7 +169,10 @@ class ImportExportContext extends OroFeatureContext implements
 
         $url = $this->locatePath($this->getContainer()->get('router')->generate(
             'oro_importexport_export_template',
-            ['processorAlias' => $processor]
+            [
+                'processorAlias' => $processor,
+                'options' => $options
+            ]
         ));
         $this->template = tempnam(
             $this->getKernel()->getRootDir().DIRECTORY_SEPARATOR.'import_export',

@@ -5,7 +5,6 @@ namespace Oro\Bundle\BatchBundle\ORM\QueryBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\BatchBundle\Event\CountQueryOptimizationEvent;
 use Oro\Bundle\EntityBundle\Helper\RelationHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;

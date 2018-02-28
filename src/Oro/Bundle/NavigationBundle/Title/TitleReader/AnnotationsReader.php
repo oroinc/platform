@@ -4,10 +4,8 @@ namespace Oro\Bundle\NavigationBundle\Title\TitleReader;
 
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Cache\Cache;
-
-use Symfony\Component\Routing\Router;
-
 use Oro\Bundle\NavigationBundle\Annotation\TitleTemplate;
+use Symfony\Component\Routing\Router;
 
 class AnnotationsReader implements ReaderInterface
 {

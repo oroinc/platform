@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Migration\Schema;
 
 use Doctrine\DBAL\Types\Type;
-
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Schema\Column;

@@ -4,7 +4,6 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\QueryDesigner;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAdapter;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FilterProcessor;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;

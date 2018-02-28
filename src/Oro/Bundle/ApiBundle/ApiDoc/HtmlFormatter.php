@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
+use Nelmio\ApiDocBundle\Formatter\AbstractFormatter;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Templating\EngineInterface;
-
-use Nelmio\ApiDocBundle\Formatter\AbstractFormatter;
 
 /**
  * Base HTML formatter that can be used for all types of REST API views.
@@ -24,7 +23,7 @@ class HtmlFormatter extends AbstractFormatter
     /** @var string */
     protected $endpoint;
 
-    /** @var boolean */
+    /** @var bool */
     protected $enableSandbox;
 
     /** @var array */
@@ -51,19 +50,20 @@ class HtmlFormatter extends AbstractFormatter
     /** @var string */
     protected $motdTemplate;
 
-    /** @var boolean */
+    /** @var bool */
     protected $defaultSectionsOpened;
+
+    /** @var bool */
+    protected $enableFormatParameter = true;
 
     /** @var string */
     protected $documentationPath;
 
-    /**
-     * @param string $documentationPath
-     */
-    public function setDocumentationPath($documentationPath)
-    {
-        $this->documentationPath = $documentationPath;
-    }
+    /** @var string */
+    protected $rootRoute = 'nelmio_api_doc_index';
+
+    /** @var array */
+    protected $views;
 
     /**
      * @param FileLocatorInterface $fileLocator
@@ -98,7 +98,7 @@ class HtmlFormatter extends AbstractFormatter
     }
 
     /**
-     * @param boolean $enableSandbox
+     * @param bool $enableSandbox
      */
     public function setEnableSandbox($enableSandbox)
     {
@@ -170,11 +170,43 @@ class HtmlFormatter extends AbstractFormatter
     }
 
     /**
-     * @param boolean $defaultSectionsOpened
+     * @param bool $defaultSectionsOpened
      */
     public function setDefaultSectionsOpened($defaultSectionsOpened)
     {
         $this->defaultSectionsOpened = $defaultSectionsOpened;
+    }
+
+    /**
+     * @param bool $enableFormatParameter
+     */
+    public function setEnableFormatParameter($enableFormatParameter)
+    {
+        $this->enableFormatParameter = $enableFormatParameter;
+    }
+
+    /**
+     * @param string $documentationPath
+     */
+    public function setDocumentationPath($documentationPath)
+    {
+        $this->documentationPath = $documentationPath;
+    }
+
+    /**
+     * @param string $rootRoute
+     */
+    public function setRootRoute($rootRoute)
+    {
+        $this->rootRoute = $rootRoute;
+    }
+
+    /**
+     * @param array $views
+     */
+    public function setViews(array $views)
+    {
+        $this->views = $views;
     }
 
     /**
@@ -225,7 +257,11 @@ class HtmlFormatter extends AbstractFormatter
             'js'                    => $this->getJs(),
             'motdTemplate'          => $this->motdTemplate,
             'defaultSectionsOpened' => $this->defaultSectionsOpened,
-            'documentationPath'     => $this->documentationPath
+            'enableFormatParameter' => $this->enableFormatParameter,
+            'documentationPath'     => $this->documentationPath,
+            'rootRoute'             => $this->rootRoute,
+            'views'                 => $this->views,
+            'defaultView'           => $this->getDefaultView()
         ];
     }
 
@@ -259,5 +295,21 @@ class HtmlFormatter extends AbstractFormatter
     protected function getFileContent($path)
     {
         return file_get_contents($this->fileLocator->locate($path));
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDefaultView()
+    {
+        $result = '';
+        foreach ($this->views as $name => $view) {
+            if (isset($view['default']) && $view['default']) {
+                $result = $name;
+                break;
+            }
+        }
+
+        return $result;
     }
 }

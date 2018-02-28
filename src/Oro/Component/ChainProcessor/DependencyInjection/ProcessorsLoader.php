@@ -2,9 +2,8 @@
 
 namespace Oro\Component\ChainProcessor\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Component\ChainProcessor\ExpressionParser;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ProcessorsLoader
 {

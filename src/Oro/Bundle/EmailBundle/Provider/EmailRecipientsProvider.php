@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class EmailRecipientsProvider
 {

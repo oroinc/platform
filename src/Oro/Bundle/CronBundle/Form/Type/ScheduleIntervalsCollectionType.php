@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\CronBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 
 /**
  * Form type for schedule intervals collection.

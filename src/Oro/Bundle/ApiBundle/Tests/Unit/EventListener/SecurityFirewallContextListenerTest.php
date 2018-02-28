@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\EventListener;
 
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
-
-use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
 
 class SecurityFirewallContextListenerTest extends \PHPUnit_Framework_TestCase
 {

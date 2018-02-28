@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-
-use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
-use Oro\Bundle\EmailBundle\Model\FolderType;
+use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
+use Oro\Bundle\EmailBundle\Model\FolderType;
+use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LoadEmailThreadedData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {

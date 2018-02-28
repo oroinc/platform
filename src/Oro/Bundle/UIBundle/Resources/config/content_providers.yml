@@ -5,9 +5,8 @@ parameters:
 services:
     oro_ui.content_provider.current_route:
         class: %oro_ui.content_provider.current_route.class%
-        synchronized: true
-        calls:
-            - [setRequest, ["@?request="]]
+        arguments:
+            - '@request_stack'
         tags:
             - { name: oro_ui.content_provider }
 

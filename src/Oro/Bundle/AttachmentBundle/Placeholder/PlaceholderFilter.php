@@ -3,7 +3,6 @@
 namespace Oro\Bundle\AttachmentBundle\Placeholder;
 
 use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 

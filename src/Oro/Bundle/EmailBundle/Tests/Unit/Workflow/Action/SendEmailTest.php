@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Workflow\Action;
 
-use Psr\Log\LoggerInterface;
-
-use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Workflow\Action\SendEmail;
+use Psr\Log\LoggerInterface;
 
 class SendEmailTest extends \PHPUnit_Framework_TestCase
 {

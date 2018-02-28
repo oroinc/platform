@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Type;
 
-use Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\ConfigurableBlockTestCase;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\ConfigurableType;
+use Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\ConfigurableBlockTestCase;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 

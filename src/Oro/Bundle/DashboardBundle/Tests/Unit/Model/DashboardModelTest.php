@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 
 /**

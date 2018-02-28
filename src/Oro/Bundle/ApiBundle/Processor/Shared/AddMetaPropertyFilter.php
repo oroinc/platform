@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\MetaPropertyFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Adds "meta" filter.
@@ -37,7 +37,7 @@ class AddMetaPropertyFilter implements ProcessorInterface
          * this filter has descriptive nature and it should be added to the list of filters
          * only if descriptions are requested
          * actually a filtering by this filter is performed by
-         * @see Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleIncludeFilter
+         * @see \Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleIncludeFilter
          */
         /*
         if (!$context->hasConfigExtra(DescriptionsConfigExtra::NAME)) {

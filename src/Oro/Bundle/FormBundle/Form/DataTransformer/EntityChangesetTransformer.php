@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-
-use Doctrine\Common\Collections\ArrayCollection;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class EntityChangesetTransformer implements DataTransformerInterface
 {

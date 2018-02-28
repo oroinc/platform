@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Security;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
+use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * The message consumption extension that replaces a current security token with the token

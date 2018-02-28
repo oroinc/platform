@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Functional\Form\Type\Filter;
 
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class DateRangeFilterTypeTest extends WebTestCase
 {

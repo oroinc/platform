@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Form\EventListener;
 
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 /**
  * This file is inspired by Symfony ResizeFormListener
- * @see Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener
+ * @see \Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener
  */
 class CollectionListener implements EventSubscriberInterface
 {

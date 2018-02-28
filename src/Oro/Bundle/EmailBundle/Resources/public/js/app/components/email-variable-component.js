@@ -12,6 +12,13 @@ define(function(require) {
 
     EmailVariableComponent = BaseComponent.extend({
         /**
+         * @inheritDoc
+         */
+        constructor: function EmailVariableComponent() {
+            EmailVariableComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @constructor
          * @param {Object} options
          */

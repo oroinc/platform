@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Entity;
 
-use Symfony\Component\Validator\ExecutionContext;
-
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
+use Symfony\Component\Validator\ExecutionContext;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)

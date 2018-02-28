@@ -2,21 +2,19 @@
 
 namespace Oro\Bundle\EntityBundle\Controller\Api\Rest;
 
-use Symfony\Component\HttpFoundation\Response;
-
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Util\Codes;
-use FOS\RestBundle\Controller\Annotations as Rest;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
+use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("entity")
@@ -35,12 +33,12 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
      *      description="Get entities",
      *      resource=true
      * )
-     *
+     * @param Request $request
      * @return Response
      */
-    public function cgetAction()
+    public function cgetAction(Request $request)
     {
-        $applyExclusions = filter_var($this->getRequest()->get('apply-exclusions'), FILTER_VALIDATE_BOOLEAN);
+        $applyExclusions = filter_var($request->get('apply-exclusions'), FILTER_VALIDATE_BOOLEAN);
 
         /** @var EntityProvider $provider */
         $provider = $this->get('oro_entity.entity_provider');
@@ -69,14 +67,15 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
      *      resource=true
      * )
      *
+     * @param Request $request
      * @return Response
      */
-    public function fieldsAction()
+    public function fieldsAction(Request $request)
     {
-        $withRelations      = filter_var($this->getRequest()->get('with-relations'), FILTER_VALIDATE_BOOLEAN);
-        $withUnidirectional = filter_var($this->getRequest()->get('with-unidirectional'), FILTER_VALIDATE_BOOLEAN);
-        $withVirtualFields  = filter_var($this->getRequest()->get('with-virtual-fields'), FILTER_VALIDATE_BOOLEAN);
-        $applyExclusions    = filter_var($this->getRequest()->get('apply-exclusions'), FILTER_VALIDATE_BOOLEAN);
+        $withRelations      = filter_var($request->get('with-relations'), FILTER_VALIDATE_BOOLEAN);
+        $withUnidirectional = filter_var($request->get('with-unidirectional'), FILTER_VALIDATE_BOOLEAN);
+        $withVirtualFields  = filter_var($request->get('with-virtual-fields'), FILTER_VALIDATE_BOOLEAN);
+        $applyExclusions    = filter_var($request->get('apply-exclusions'), FILTER_VALIDATE_BOOLEAN);
 
         /** @var EntityWithFieldsProvider $provider */
         $provider = $this->get('oro_entity.entity_field_list_provider');

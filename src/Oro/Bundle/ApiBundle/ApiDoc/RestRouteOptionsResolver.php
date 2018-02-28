@@ -2,29 +2,32 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
-
-use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
-use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
+use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
+/**
+ * Adds all REST API routes to REST API Sandbox based on the current ApiDoc view and Data API configuration.
+ */
 class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 {
-    const ROUTE_GROUP = 'rest_api';
+    public const ENTITY_ATTRIBUTE        = 'entity';
+    public const ENTITY_PLACEHOLDER      = '{entity}';
+    public const ASSOCIATION_ATTRIBUTE   = 'association';
+    public const ASSOCIATION_PLACEHOLDER = '{association}';
+    public const ACTION_ATTRIBUTE        = '_action';
+    public const GROUP_OPTION            = 'group';
+    public const OVERRIDE_PATH_OPTION    = 'override_path';
 
-    const ENTITY_ATTRIBUTE        = 'entity';
-    const ENTITY_PLACEHOLDER      = '{entity}';
-    const ASSOCIATION_ATTRIBUTE   = 'association';
-    const ASSOCIATION_PLACEHOLDER = '{association}';
-    const ACTION_ATTRIBUTE        = '_action';
-    const GROUP_OPTION            = 'group';
-    const OVERRIDE_PATH_OPTION    = 'override_path';
+    /** @var string The group of routes that should be processed by this resolver */
+    private $routeGroup;
 
     /** @var RestDocViewDetector */
     private $docViewDetector;
@@ -48,24 +51,27 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     private $overrides = [];
 
     /**
+     * @param string               $routeGroup
+     * @param RestActionMapper     $actionMapper
      * @param RestDocViewDetector  $docViewDetector
      * @param ResourcesProvider    $resourcesProvider
      * @param SubresourcesProvider $subresourcesProvider
      * @param ValueNormalizer      $valueNormalizer
-     * @param RestActionMapper     $actionMapper
      */
     public function __construct(
+        string $routeGroup,
+        RestActionMapper $actionMapper,
         RestDocViewDetector $docViewDetector,
         ResourcesProvider $resourcesProvider,
         SubresourcesProvider $subresourcesProvider,
-        ValueNormalizer $valueNormalizer,
-        RestActionMapper $actionMapper
+        ValueNormalizer $valueNormalizer
     ) {
+        $this->routeGroup = $routeGroup;
+        $this->actionMapper = $actionMapper;
         $this->docViewDetector = $docViewDetector;
         $this->resourcesProvider = $resourcesProvider;
         $this->subresourcesProvider = $subresourcesProvider;
         $this->valueNormalizer = $valueNormalizer;
-        $this->actionMapper = $actionMapper;
     }
 
     /**
@@ -78,7 +84,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
             $routes->remove($routes->getName($route));
             return;
         }
-        if ($group !== self::ROUTE_GROUP
+        if ($group !== $this->routeGroup
             || $this->docViewDetector->getRequestType()->isEmpty()
         ) {
             return;
@@ -119,22 +125,38 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     private function resolveOverrideRoute(Route $route, RouteCollectionAccessor $routes, $overridePath)
     {
-        $this->overrides[$this->getCacheKey()][$overridePath] = true;
-        $methods = $route->getMethods();
-        if (!empty($methods)) {
-            return;
+        if (0 !== strpos($overridePath, '/')) {
+            $overridePath = '/' . $overridePath;
         }
+        $this->overrides[$this->getCacheKey()][$overridePath] = true;
         $entityType = $route->getDefault(self::ENTITY_ATTRIBUTE);
-        if (!$entityType) {
-            return;
+        $methods = $route->getMethods();
+        if (!$entityType || !empty($methods)) {
+            throw new \LogicException(sprintf(
+                'The route "%s" with option "%s" must have "%s" default value and do not have "methods" property.',
+                $routes->getName($route),
+                self::OVERRIDE_PATH_OPTION,
+                self::ENTITY_ATTRIBUTE
+            ));
         }
         $resource = $this->getResource($entityType);
         if (null === $resource) {
-            return;
+            throw new \LogicException(sprintf(
+                'The route "%s" has default value "%s" equals to "%s" that is unknown entity type.',
+                $routes->getName($route),
+                self::ENTITY_ATTRIBUTE,
+                $entityType
+            ));
         }
         $actions = $this->getOverrideRouteActions($routes, $overridePath, $entityType);
         if (empty($actions)) {
-            return;
+            throw new \LogicException(sprintf(
+                'The route "%s" has option "%s" equals to "%s",'
+                . ' but a list of allowed API actions for this path is empty.',
+                $routes->getName($route),
+                self::OVERRIDE_PATH_OPTION,
+                $overridePath
+            ));
         }
 
         $this->adjustRoutes($routes->getName($route), $route, $routes, [$entityType => $resource], $actions);

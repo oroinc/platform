@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\NavigationBundle\EventListener;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class NavigationListener
 {
@@ -38,7 +37,12 @@ class NavigationListener
         }
 
         $manageMenusItem = MenuUpdateUtils::findMenuItem($event->getMenu(), 'menu_list_default');
-        if (null !== $manageMenusItem && !$this->authorizationChecker->isGranted('oro_config_system')) {
+        if (null !== $manageMenusItem
+            && (
+                !$this->authorizationChecker->isGranted('oro_config_system')
+                || !$this->authorizationChecker->isGranted('oro_navigation_manage_menus')
+            )
+        ) {
             $manageMenusItem->setDisplay(false);
         }
     }

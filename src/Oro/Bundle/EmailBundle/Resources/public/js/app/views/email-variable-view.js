@@ -39,6 +39,13 @@ define(function(require) {
         lastElement: null,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function EmailVariableView() {
+            EmailVariableView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Constructor
          *
          * @param {Object} options

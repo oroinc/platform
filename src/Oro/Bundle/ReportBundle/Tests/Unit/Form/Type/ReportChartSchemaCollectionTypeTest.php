@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\QueryDesignerBundle\Form\Type\FieldChoiceType;
+use Oro\Bundle\ReportBundle\Form\Type\ReportChartSchemaCollectionType;
+use Oro\Bundle\ReportBundle\Form\Type\ReportChartSchemaType;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
-use Oro\Bundle\ReportBundle\Form\Type\ReportChartSchemaType;
-use Oro\Bundle\ReportBundle\Form\Type\ReportChartSchemaCollectionType;
-use Oro\Bundle\QueryDesignerBundle\Form\Type\FieldChoiceType;
 
 class ReportChartSchemaCollectionTypeTest extends FormIntegrationTestCase
 {

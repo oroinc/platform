@@ -10,6 +10,7 @@ use Oro\Bundle\ImportExportBundle\Tests\Unit\Fixtures\TestEntity;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Fixtures\TestOrganization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -77,9 +78,7 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEST_CLASS)
             ->will($this->returnValue($this->repository));
 
-        $fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fieldHelper = $this->createMock(ServiceLink::class);
         $this->fieldHelperService = $this->getMockBuilder('Oro\Bundle\EntityBundle\Helper\FieldHelper')
             ->disableOriginalConstructor()
             ->getMock('getService');
@@ -89,10 +88,7 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
-        $ownershipMetadataProviderLink = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ownershipMetadataProviderLink = $this->createMock(ServiceLink::class);
         $this->ownershipMetadataProvider = $this
             ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
             ->disableOriginalConstructor()

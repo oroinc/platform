@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\ConfigBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
-
-use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormFieldType extends AbstractType
 {

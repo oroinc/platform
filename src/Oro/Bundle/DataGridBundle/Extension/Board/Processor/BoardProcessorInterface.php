@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Board\Processor;
 
-use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 
 interface BoardProcessorInterface
 {

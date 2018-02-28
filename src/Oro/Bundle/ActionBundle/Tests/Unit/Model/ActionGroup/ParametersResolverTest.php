@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\ActionGroup;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;

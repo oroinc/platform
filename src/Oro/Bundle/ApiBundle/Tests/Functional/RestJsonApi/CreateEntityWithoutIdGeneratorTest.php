@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestWithoutIdGenerator;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @dbIsolationPerTest

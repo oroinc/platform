@@ -14,6 +14,13 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function FieldsGroupsCollectionView() {
+            FieldsGroupsCollectionView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Allows only 1 primary checkbox|radiobutton to be checked.
          * This logic convert checkbox logic to logic used in radiobutton
          *

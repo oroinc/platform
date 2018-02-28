@@ -2,12 +2,11 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Client\Meta;
 
+use Oro\Component\MessageQueue\Client\Meta\TopicMeta;
+use Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry;
+use Oro\Component\MessageQueue\Client\Meta\TopicsCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
-
-use Oro\Component\MessageQueue\Client\Meta\TopicMeta;
-use Oro\Component\MessageQueue\Client\Meta\TopicsCommand;
-use Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry;
 
 class TopicsCommandTest extends \PHPUnit_Framework_TestCase
 {

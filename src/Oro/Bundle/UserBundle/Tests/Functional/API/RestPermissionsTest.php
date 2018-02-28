@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData;

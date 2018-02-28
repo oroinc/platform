@@ -3,9 +3,8 @@
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ScopeBundle\Form\DataTransformer\ScopeTransformer;
-use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\ScopeBundle\Form\Type\ScopeType;
-
+use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;

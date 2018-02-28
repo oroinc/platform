@@ -2,20 +2,19 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
-use Oro\Bundle\UIBundle\Event\Events;
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
+use Oro\Bundle\UIBundle\Event\Events;
 use Oro\Bundle\UIBundle\Provider\UserAgentProviderInterface;
 use Oro\Bundle\UIBundle\Twig\Template;
 use Oro\Bundle\UIBundle\Twig\UiExtension;
 use Oro\Bundle\UIBundle\View\ScrollData;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class UiExtensionTest extends \PHPUnit_Framework_TestCase
 {

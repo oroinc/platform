@@ -380,13 +380,13 @@ services:
 
     oro_entity_extend.datagrid.action.type.ajaxdeletefield:
         class: %oro_entity_extend.datagrid.action.type.ajaxdeletefield.class%
-        scope: prototype
+        shared: false
         tags:
             - { name: oro_datagrid.extension.action.type, type: ajaxdeletefield }
 
     oro_entity_extend.datagrid.action.type.ajaxrestorefield:
         class: Oro\Bundle\EntityExtendBundle\Grid\Action\AjaxRestoreFieldAction
-        scope: prototype
+        shared: false
         tags:
             - { name: oro_datagrid.extension.action.type, type: ajaxrestorefield }
 

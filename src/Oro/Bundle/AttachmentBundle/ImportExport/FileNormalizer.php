@@ -3,12 +3,11 @@
 namespace Oro\Bundle\AttachmentBundle\ImportExport;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
-
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
+use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
-use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 
 class FileNormalizer implements DenormalizerInterface, NormalizerInterface
 {

@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\HttpFoundation\Response;
-
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * A base class for processors responsible to build a response using the response document builder
@@ -86,7 +84,8 @@ abstract class BuildResultDocument implements ProcessorInterface
     {
         $context->setResponseStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         $error = Error::createByException($e);
-        $this->errorCompleterRegistry->getErrorCompleter($context->getRequestType())->complete($error);
+        $this->errorCompleterRegistry->getErrorCompleter($context->getRequestType())
+            ->complete($error, $context->getRequestType());
         $documentBuilder->clear();
         $documentBuilder->setErrorObject($error);
 
