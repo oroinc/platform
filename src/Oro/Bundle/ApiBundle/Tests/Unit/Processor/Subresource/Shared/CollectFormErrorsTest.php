@@ -54,8 +54,8 @@ class CollectFormErrorsTest extends ChangeRelationshipTestCase
                 $associationName,
                 'collection',
                 [
-                    'type'      => 'text',
-                    'options'   => ['constraints' => [new Constraints\NotBlank()]],
+                    'entry_type'      => 'text',
+                    'entry_options'   => ['constraints' => [new Constraints\NotBlank()]],
                     'allow_add' => true
                 ]
             )

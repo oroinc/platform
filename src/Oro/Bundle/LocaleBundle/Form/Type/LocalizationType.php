@@ -32,7 +32,7 @@ class LocalizationType extends AbstractType
                 [
                     'required' => true,
                     'label' => 'oro.locale.localization.title.label',
-                    'options' => [
+                    'entry_options' => [
                         'constraints' => [new NotBlank(['message' => 'oro.locale.localization.titles.blank'])],
                         StripTagsExtension::OPTION_NAME => true,
                     ]

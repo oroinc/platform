@@ -33,7 +33,7 @@ class PrivilegeCollectionTypeTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $privilegesConfig = array('permissions' => array('VIEW', 'CREATE'));
         $options = array(
-            'options' => array(
+            'entry_options' => array(
                 'privileges_config' => $privilegesConfig
             ),
             'page_component_module' => 'component_name',
