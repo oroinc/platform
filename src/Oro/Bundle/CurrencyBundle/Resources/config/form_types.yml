@@ -15,8 +15,6 @@ services:
 
     oro_currency.form.type.price:
         class: %oro_currency.form.type.price.class%
-        arguments:
-            - '@oro_currency.rounding.price_rounding_service'
         calls:
             - [setDataClass, [%oro_currency.price.model%]]
         tags:

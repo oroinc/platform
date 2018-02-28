@@ -4,7 +4,6 @@ namespace Oro\Bundle\CurrencyBundle\Form\Type;
 
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Form\DataTransformer\PriceTransformer;
-use Oro\Bundle\CurrencyBundle\Rounding\RoundingServiceInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -20,19 +19,6 @@ class PriceType extends AbstractType
      * @var string
      */
     protected $dataClass;
-
-    /**
-     * @var RoundingServiceInterface
-     */
-    protected $roundingService;
-
-    /**
-     * @param RoundingServiceInterface $roundingService
-     */
-    public function __construct(RoundingServiceInterface $roundingService)
-    {
-        $this->roundingService = $roundingService;
-    }
 
     /**
      * @param string $dataClass
