@@ -9,11 +9,14 @@ define(function(require) {
     var el;
 
     beforeEach(function() {
-        window.setFixtures('<input id="input" type="number" data-precision="0"/>');
+        window.setFixtures(
+            '<input id="input" type="number" data-precision="0"/>'
+        );
 
         $el = $('#input');
         el = $el[0];
         $el.inputWidget('create');
+        $el.data('inputWidget').allowZero = false;
     });
 
     var testValue = function(val, expected, cursorToStart) {
@@ -81,6 +84,33 @@ define(function(require) {
                 testValue('.12', '0.12');
                 testValue('12.', '12.000');
                 testValue('12.', '12.', true);
+            });
+        });
+
+        describe('check allow zero property', function() {
+            it('prevent multiple zeros on beginning value', function() {
+                $el.data('inputWidget').allowZero = true;
+
+                testValue('0', '0');
+                testValue('0000', '0');
+                testValue('0111', '0');
+                testValue('123', '123');
+
+                $el
+                    .data('precision', 3)
+                    .inputWidget('refresh');
+                $el.data('inputWidget').allowZero = true;
+
+                testValue('.', '0.');
+                testValue('.12', '0.12');
+                testValue('12.', '12.000');
+                testValue('12.', '12.', true);
+            });
+
+            it('disable allow zero', function() {
+                testValue('0', '');
+                testValue('000', '');
+                testValue('0123', '123');
             });
         });
     });
