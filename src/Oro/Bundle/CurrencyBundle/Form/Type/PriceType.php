@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CurrencyBundle\Form\Type;
 
+use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Form\DataTransformer\PriceTransformer;
 use Oro\Bundle\CurrencyBundle\Rounding\RoundingServiceInterface;
 use Symfony\Component\Form\AbstractType;
@@ -72,9 +73,7 @@ class PriceType extends AbstractType
                 'number',
                 [
                     'required' => $isRequiredPrice,
-                    'scale' => $this->roundingService->getPrecision(),
-                    'rounding_mode' => $this->roundingService->getRoundType(),
-                    'attr' => ['data-scale' => $this->roundingService->getPrecision()]
+                    'scale' => Price::MAX_VALUE_PRECISION
                 ]
             )
             ->add('currency', $currencyType, $currencyOptions);
