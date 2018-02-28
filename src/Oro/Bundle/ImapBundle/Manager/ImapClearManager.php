@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 
 use Psr\Log\LoggerAwareInterface;
@@ -10,11 +9,7 @@ use Psr\Log\LoggerAwareTrait;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
-use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
-use Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
@@ -24,22 +19,25 @@ class ImapClearManager implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
+    const BATCH_SIZE = 50;
+
     /** @var RegistryInterface */
     protected $registry;
+
+    /** @var EntityManager */
+    protected $em;
 
     /** @var OptionalListenerInterface */
     protected $listener;
 
-    /** @var array[] */
-    private $deleteBuffer = [];
-
     /**
-     * @param RegistryInterface $registry
+     * @param RegistryInterface         $registry
      * @param OptionalListenerInterface $listener
      */
     public function __construct(RegistryInterface $registry, OptionalListenerInterface $listener)
     {
         $this->registry = $registry;
+        $this->em = $registry->getEntityManagerForClass(ImapEmail::class);
         /**
          * @info This listener should be disabled because it does unnecessary work during removing.
          *       It updates date in entities which will be deleted in method clearFolder().
@@ -60,7 +58,6 @@ class ImapClearManager implements LoggerAwareInterface
 
             return false;
         }
-
         foreach ($origins as $origin) {
             $this->logger->info(sprintf('Clearing origin: %s, %s', $origin->getId(), $origin));
 
@@ -80,7 +77,7 @@ class ImapClearManager implements LoggerAwareInterface
      */
     protected function getOriginsToClear($originId)
     {
-        $originRepository = $this->registry->getRepository(UserEmailOrigin::class);
+        $originRepository = $this->em->getRepository('OroImapBundle:UserEmailOrigin');
 
         if ($originId !== null) {
             /** @var UserEmailOrigin $origin */
@@ -106,31 +103,33 @@ class ImapClearManager implements LoggerAwareInterface
     {
         $this->listener->setEnabled(false);
 
-        $folders = $origin->getFolders();
-
-        foreach ($this->getImapEmailFolders($folders) as $imapFolder) {
-            $folder = $imapFolder->getFolder();
-            if ($imapFolder && !$origin->isActive()) {
-                $this->clearFolder($imapFolder);
-
-                $this->addToDeleteBuffer($imapFolder);
-            } elseif ($imapFolder && !$folder->isSyncEnabled()) {
-                $this->clearFolder($imapFolder);
-                $folder->setSynchronizedAt(null);
-            }
-        }
+        $folders          = $origin->getFolders();
+        $folderRepository = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
 
         foreach ($folders as $folder) {
+            $imapFolder = $folderRepository->findOneBy(['folder' => $folder]);
+            if ($imapFolder && !$origin->isActive()) {
+                $this->clearFolder($imapFolder);
+                $this->em->remove($imapFolder);
+                $this->logger->info(sprintf('ImapFolder with ID %s removed', $imapFolder->getId()));
+            } elseif ($imapFolder && !$folder->isSyncEnabled()) {
+                $this->clearFolder($imapFolder);
+                $imapFolder->getFolder()->setSynchronizedAt(null);
+            }
+        }
+        foreach ($folders as $folder) {
             if (!$origin->isActive()) {
-                $this->addToDeleteBuffer($folder);
+                $this->em->remove($folder);
+                $this->logger->info(sprintf('Folder with ID %s removed', $folder->getId()));
             }
         }
 
         if (!$origin->isActive()) {
-            $this->addToDeleteBuffer($origin);
+            $this->em->remove($origin);
+            $this->logger->info(sprintf('Origin with ID %s removed', $origin->getId()));
         }
 
-        $this->cleanUp();
+        $this->em->flush();
 
         $this->listener->setEnabled(true);
     }
@@ -141,26 +140,45 @@ class ImapClearManager implements LoggerAwareInterface
     protected function clearFolder($imapFolder)
     {
         $folder = $imapFolder->getFolder();
+        $limit  = self::BATCH_SIZE;
+        $offset = 0;
+        $i      = 0;
 
-        /** @var EmailUserRepository $repository */
-        $repository = $this->registry->getRepository(EmailUser::class);
-        $emailUserIterator = new BufferedQueryResultIterator($repository->getEmailUserByFolder($folder));
+        while ($result = $this->em->getRepository('OroEmailBundle:EmailUser')
+            ->getEmailUserByFolder($folder, $limit, $offset)->getQuery()->getResult()
+        ) {
+            foreach ($result as $emailUser) {
+                /** @var EmailUser $emailUser */
+                $emailUser->removeFolder($folder);
+                $email = $emailUser->getEmail();
+                if ($emailUser->getFolders()->isEmpty()) {
+                    $this->em->remove($emailUser);
+                }
 
-        /** @var EmailUser $item */
-        foreach ($emailUserIterator as $emailUser) {
-            /** @var EmailUser $emailUser */
-            $emailUser->removeFolder($folder);
-            $email = $emailUser->getEmail();
-
-            $imapEmailsIterator = $this->getImapEmails($email, $imapFolder);
-            foreach ($imapEmailsIterator as $imapEmail) {
-                $this->addToDeleteBuffer($imapEmail);
+                $imapEmails = $this->em->getRepository('OroImapBundle:ImapEmail')->findBy([
+                    'email'      => $email,
+                    'imapFolder' => $imapFolder
+                ]);
+                foreach ($imapEmails as $imapEmail) {
+                    $this->em->remove($imapEmail);
+                }
+                ++$i;
             }
-
-            if ($emailUser->getFolders()->isEmpty()) {
-                $this->addToDeleteBuffer($emailUser);
-            }
+            $this->em->flush();
+            $this->cleanUp();
         }
+        if ($i > 0) {
+            $this->logger->info(
+                sprintf(
+                    'ImapFolder with ID %s cleared. Removed %d emails.',
+                    $imapFolder->getId(),
+                    $i
+                )
+            );
+        }
+
+        $this->em->flush();
+        $this->cleanUp();
     }
 
     /**
@@ -169,88 +187,27 @@ class ImapClearManager implements LoggerAwareInterface
     protected function entitiesToClear()
     {
         return [
-            ImapEmail::class,
-            EmailUser::class,
-            ImapEmailFolder::class,
-            EmailFolder::class,
-            UserEmailOrigin::class,
+            'Oro\Bundle\EmailBundle\Entity\EmailUser',
+            'Oro\Bundle\EmailBundle\Entity\Email',
+            'Oro\Bundle\EmailBundle\Entity\EmailRecipient',
+            'Oro\Bundle\ImapBundle\Entity\ImapEmail',
+            'Oro\Bundle\EmailBundle\Entity\EmailBody',
+            'Oro\Bundle\ActivityListBundle\Entity\ActivityList',
+            'Oro\Bundle\ActivityListBundle\Entity\ActivityOwner',
+            'Oro\Bundle\EmailBundle\Entity\EmailThread',
+            'Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger',
+            'Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition',
+            'OroEntityProxy\OroEmailBundle\EmailAddressProxy',
         ];
     }
 
     /**
-     * Remove entities from buffer
+     * clean up
      */
     protected function cleanUp()
     {
-        foreach ($this->entitiesToClear() as $className) {
-            if (!array_key_exists($className, $this->deleteBuffer)) {
-                continue;
-            }
-
-            $buffer = $this->deleteBuffer[$className];
-
-            /** @var EntityManager $entityManager */
-            $entityManager = $this->registry->getManagerForClass($className);
-            foreach ($buffer as $item) {
-                $entityManager->remove($item);
-                $this->logger->info(sprintf('%s with ID %s removed', $className, $item->getId()));
-            }
-            $entityManager->flush($buffer);
-        }
-
-        $this->deleteBuffer = [];
-    }
-
-    /**
-     * @param Collection $folders
-     *
-     * @return ImapEmailFolder[]
-     */
-    private function getImapEmailFolders(Collection $folders)
-    {
-        $repository = $this->registry->getRepository(ImapEmailFolder::class);
-
-        $qb = $repository->createQueryBuilder('ief');
-        $qb->innerJoin('ief.folder', 'ef');
-        $qb->where($qb->expr()->in('ief.folder', ':folders'));
-        $qb->setParameter('folders', $folders);
-
-        return $qb->getQuery()->getResult();
-    }
-
-    /**
-     * @param Email $email
-     * @param ImapEmailFolder $imapFolder
-     *
-     * @return BufferedQueryResultIterator
-     */
-    private function getImapEmails(Email $email, ImapEmailFolder $imapFolder)
-    {
-        $repository = $this->registry->getRepository(ImapEmail::class);
-
-        $qb = $repository->createQueryBuilder('ie');
-        $qb->where($qb->expr()->andX(
-            $qb->expr()->eq('ie.email', ':email'),
-            $qb->expr()->eq('ie.imapFolder', ':imapFolder')
-        ));
-
-        $qb->setParameters([
-            'email' => $email,
-            'imapFolder' => $imapFolder,
-        ]);
-
-        return new BufferedQueryResultIterator($qb);
-    }
-
-    /**
-     * @param ImapEmail|EmailUser|ImapEmailFolder|EmailFolder|UserEmailOrigin $entity
-     */
-    private function addToDeleteBuffer($entity)
-    {
         foreach ($this->entitiesToClear() as $entityClass) {
-            if (is_a($entity, $entityClass)) {
-                $this->deleteBuffer[$entityClass][] = $entity;
-            }
+            $this->em->clear($entityClass);
         }
     }
 }

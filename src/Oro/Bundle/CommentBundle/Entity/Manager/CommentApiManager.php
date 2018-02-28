@@ -24,6 +24,7 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class CommentApiManager extends ApiEntityManager
@@ -53,6 +54,9 @@ class CommentApiManager extends ApiEntityManager
 
     /** @var ConfigManager */
     protected $configManager;
+
+    /** @var HtmlTagHelper */
+    protected $htmlTagHelper;
 
     /**
      * @param Registry                      $doctrine
@@ -85,6 +89,14 @@ class CommentApiManager extends ApiEntityManager
         parent::__construct(Comment::ENTITY_NAME, $this->em);
 
         $this->setEventDispatcher($eventDispatcher);
+    }
+
+    /**
+     * @param HtmlTagHelper $htmlTagHelper
+     */
+    public function setHtmlTagHelper(HtmlTagHelper $htmlTagHelper)
+    {
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**
@@ -209,7 +221,7 @@ class CommentApiManager extends ApiEntityManager
             'owner_id'      => $ownerId,
             'editor'        => $editorName,
             'editor_id'     => $editorId,
-            'message'       => $entity->getMessage(),
+            'message'       => $this->htmlTagHelper->sanitize($entity->getMessage()),
             'relationClass' => $entityClass,
             'relationId'    => $entityId,
             'createdAt'     => $entity->getCreatedAt()->format('c'),

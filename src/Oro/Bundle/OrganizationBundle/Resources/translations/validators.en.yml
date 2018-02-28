@@ -1,1 +1,3 @@
 "The given value {{ value }} cannot be set as {{ owner }} for given entity for security reason.": The given value {{ value }} cannot be set as {{ owner }} for given entity for security reason.
+"Business Unit can't set self as Parent.": Business Unit can't set self as Parent.
+"Business Unit cannot have a child as a Parent Business Unit.": Business Unit cannot have a child as a Parent Business Unit.

@@ -13,8 +13,7 @@ use Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTreeTransformer;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 
 /**
- * Class BusinessUnitSelectAutocomplete
- * @package Oro\Bundle\OrganizationBundle\Form\Type
+ * Select business unit with autocomplete form type.
  */
 class BusinessUnitSelectAutocomplete extends AbstractType
 {
@@ -84,6 +83,7 @@ class BusinessUnitSelectAutocomplete extends AbstractType
                     'component'   => 'tree-autocomplete',
                     'placeholder' => 'oro.dashboard.form.choose_business_unit',
                     'allowClear'  => true,
+                    'entity_id'   => null
                 ]
             ]
         );

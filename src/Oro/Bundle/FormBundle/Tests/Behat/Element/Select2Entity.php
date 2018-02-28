@@ -210,14 +210,19 @@ class Select2Entity extends Element implements ClearableInterface
     }
 
     /**
+     * @param bool $force
      * @return UiDialog
      */
-    public function openSelectEntityPopup()
+    public function openSelectEntityPopup($force = false)
     {
         $entitySelectButton = $this->getParent()->getParent()->find('css', '.entity-select-btn');
         $entitySelectButton->focus();
         if ($entitySelectButton->isVisible()) {
-            $entitySelectButton->click();
+            if ($force) {
+                $this->getDriver()->executeJsOnXpath($entitySelectButton->getXpath(), '{{ELEMENT}}.click()');
+            } else {
+                $entitySelectButton->click();
+            }
             $this->getDriver()->waitForAjax();
 
             return $this->elementFactory->createElement('UiDialog');
