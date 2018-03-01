@@ -76,7 +76,7 @@ class PriceType extends AbstractType
                 'number',
                 [
                     'required' => $isRequiredPrice,
-                    'scale' => Price::MAX_VALUE_PRECISION
+                    'scale' => Price::MAX_VALUE_SCALE
                 ]
             )
             ->add('currency', $currencyType, $currencyOptions);

@@ -48,7 +48,7 @@ class MultiCurrencyType extends PriceType
                 'number',
                 [
                     'required' => $isRequired,
-                    'scale' => Price::MAX_VALUE_PRECISION,
+                    'scale' => Price::MAX_VALUE_SCALE,
                     'constraints' => $options['value_constraints']
                 ]
             )
