@@ -229,12 +229,8 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $configProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $fieldProvider = $this->getMockBuilder(EntityFieldProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $fieldProvider = $this->createMock(EntityFieldProvider::class);
         $fieldTypeHelper = new FieldTypeHelper([]);
 
         $this->fieldHelper = $this->getMockBuilder(FieldHelper::class)

@@ -183,22 +183,22 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'name' => 'field3',
                 'type' => 'string',
-                'label' => 'A',
+                'label' => 'A Translated',
             ],
             [
                 'name' => 'field4',
                 'type' => 'string',
-                'label' => 'acme.entity.test.field4.label',
+                'label' => 'acme.entity.test.field4.label Translated',
             ],
             [
                 'name' => 'field2',
                 'type' => 'string',
-                'label' => 'B',
+                'label' => 'B Translated',
             ],
             [
                 'name' => 'field1',
                 'type' => 'integer',
-                'label' => 'C',
+                'label' => 'C Translated',
                 'identifier' => true
             ],
         ];
@@ -232,28 +232,28 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                     [
                         'name' => 'field3',
                         'type' => 'string',
-                        'label' => 'A',
+                        'label' => 'A Translated',
                     ],
                     [
                         'name' => 'field4',
                         'type' => 'string',
-                        'label' => 'acme.entity.test.field4.label',
+                        'label' => 'acme.entity.test.field4.label Translated',
                     ],
                     [
                         'name' => 'field2',
                         'type' => 'string',
-                        'label' => 'B',
+                        'label' => 'B Translated',
                     ],
                     [
                         'name' => 'field1',
                         'type' => 'integer',
-                        'label' => 'C',
+                        'label' => 'C Translated',
                         'identifier' => true
                     ],
                     [
                         'name' => 'rel1',
                         'type' => 'ref-many',
-                        'label' => 'Rel1',
+                        'label' => 'Rel1 Translated',
                         'relation_type' => 'ref-many',
                         'related_entity_name' => 'Acme\Entity\Test1'
                     ],
@@ -286,28 +286,28 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                     [
                         'name' => 'field3',
                         'type' => 'string',
-                        'label' => 'A',
+                        'label' => 'A Translated',
                     ],
                     [
                         'name' => 'field4',
                         'type' => 'string',
-                        'label' => 'acme.entity.test.field4.label',
+                        'label' => 'acme.entity.test.field4.label Translated',
                     ],
                     [
                         'name' => 'field2',
                         'type' => 'string',
-                        'label' => 'B',
+                        'label' => 'B Translated',
                     ],
                     [
                         'name' => 'field1',
                         'type' => 'integer',
-                        'label' => 'C',
+                        'label' => 'C Translated',
                         'identifier' => true
                     ],
                     [
                         'name' => 'rel1',
                         'type' => 'ref-many',
-                        'label' => 'Rel1',
+                        'label' => 'Rel1 Translated',
                         'relation_type' => 'ref-many',
                         'related_entity_name' => 'Acme\Entity\Test1',
                     ],
@@ -340,32 +340,32 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                     [
                         'name' => 'field3',
                         'type' => 'string',
-                        'label' => 'A',
+                        'label' => 'A Translated',
                     ],
                     [
                         'name' => 'field4',
                         'type' => 'string',
-                        'label' => 'acme.entity.test.field4.label',
+                        'label' => 'acme.entity.test.field4.label Translated',
                     ],
                     [
                         'name' => 'field2',
                         'type' => 'string',
-                        'label' => 'B',
+                        'label' => 'B Translated',
                     ],
                     [
                         'name' => 'field1',
                         'type' => 'integer',
-                        'label' => 'C',
+                        'label' => 'C Translated',
                         'identifier' => true
                     ],
                     [
                         'name' => 'rel1',
                         'type' => 'ref-many',
-                        'label' => 'Rel1',
+                        'label' => 'Rel1 Translated',
                         'relation_type' => 'ref-many',
                         'related_entity_name' => 'Acme\Entity\Test1',
-                        'related_entity_label' => 'Test1 Label',
-                        'related_entity_plural_label' => 'Test1 Plural Label',
+                        'related_entity_label' => 'Test1 Label Translated',
+                        'related_entity_plural_label' => 'Test1 Plural Label Translated',
                         'related_entity_icon' => 'fa-test1',
                     ],
                 ]
@@ -397,28 +397,28 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                     [
                         'name' => 'field3',
                         'type' => 'string',
-                        'label' => 'A',
+                        'label' => 'A Translated',
                     ],
                     [
                         'name' => 'field4',
                         'type' => 'string',
-                        'label' => 'acme.entity.test.field4.label',
+                        'label' => 'acme.entity.test.field4.label Translated',
                     ],
                     [
                         'name' => 'field2',
                         'type' => 'string',
-                        'label' => 'B',
+                        'label' => 'B Translated',
                     ],
                     [
                         'name' => 'field1',
                         'type' => 'integer',
-                        'label' => 'C',
+                        'label' => 'C Translated',
                         'identifier' => true
                     ],
                     [
                         'name' => 'rel1',
                         'type' => 'ref-many',
-                        'label' => 'Rel1',
+                        'label' => 'Rel1 Translated',
                         'relation_type' => 'ref-many',
                         'related_entity_name' => 'Acme\Entity\Test1',
                     ],
@@ -451,32 +451,32 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                     [
                         'name' => 'field3',
                         'type' => 'string',
-                        'label' => 'A',
+                        'label' => 'A Translated',
                     ],
                     [
                         'name' => 'field4',
                         'type' => 'string',
-                        'label' => 'acme.entity.test.field4.label',
+                        'label' => 'acme.entity.test.field4.label Translated',
                     ],
                     [
                         'name' => 'field2',
                         'type' => 'string',
-                        'label' => 'B',
+                        'label' => 'B Translated',
                     ],
                     [
                         'name' => 'field1',
                         'type' => 'integer',
-                        'label' => 'C',
+                        'label' => 'C Translated',
                         'identifier' => true
                     ],
                     [
                         'name' => 'rel1',
                         'type' => 'ref-many',
-                        'label' => 'Rel1',
+                        'label' => 'Rel1 Translated',
                         'relation_type' => 'ref-many',
                         'related_entity_name' => 'Acme\Entity\Test1',
-                        'related_entity_label' => 'Test1 Label',
-                        'related_entity_plural_label' => 'Test1 Plural Label',
+                        'related_entity_label' => 'Test1 Label Translated',
+                        'related_entity_plural_label' => 'Test1 Plural Label Translated',
                         'related_entity_icon' => 'fa-test1',
                     ],
                 ]
@@ -509,25 +509,25 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                     [
                         'name' => 'Test1field2',
                         'type' => 'string',
-                        'label' => 'A'
+                        'label' => 'A Translated'
                     ],
                     [
                         'name' => 'id',
                         'type' => 'integer',
-                        'label' => 'B',
+                        'label' => 'B Translated',
                         'identifier' => true
                     ],
                     [
                         'name' => 'rel1',
                         'type' => 'ref-one',
-                        'label' => 'Rel11',
+                        'label' => 'Rel11 Translated',
                         'relation_type' => 'ref-one',
                         'related_entity_name' => 'Acme\Entity\Test11',
                     ],
                     [
                         'name' => 'Acme\Entity\Test22::uni_rel1',
                         'type' => 'ref-one',
-                        'label' => 'UniRel1 (Test22 Label)',
+                        'label' => 'UniRel1 Translated (Test22 Label Translated)',
                         'relation_type' => 'ref-one',
                         'related_entity_name' => 'Acme\Entity\Test22',
                     ]
@@ -648,25 +648,25 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                     [
                         'name' => 'rel1',
                         'type' => 'enum',
-                        'label' => 'Enum Field',
+                        'label' => 'Enum Field Translated',
                         'related_entity_name' => 'Acme\EnumValue1'
                     ],
                     [
                         'name' => 'field1',
                         'type' => 'integer',
-                        'label' => 'Field 1',
+                        'label' => 'Field 1 Translated',
                         'identifier' => true
                     ],
                     [
                         'name' => 'rel2',
                         'type' => 'multiEnum',
-                        'label' => 'Multi Enum Field',
+                        'label' => 'Multi Enum Field Translated',
                         'related_entity_name' => 'Acme\EnumValue2'
                     ],
                     [
                         'name' => 'virtual_relation',
                         'type' => 'oneToMany',
-                        'label' => 'acme.entity.test.virtual_relation.label',
+                        'label' => 'acme.entity.test.virtual_relation.label Translated',
                         'relation_type' => 'oneToMany',
                         'related_entity_name' => 'OtherEntity'
                     ]
@@ -831,7 +831,13 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
         }
         $this->translator->expects($this->any())
             ->method('trans')
-            ->will($this->returnArgument(0));
+            ->will(
+                $this->returnCallback(
+                    function ($messageId) {
+                        return $messageId . ' Translated';
+                    }
+                )
+            );
     }
 
     /**
@@ -1020,11 +1026,11 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                     'rel1' => [
                         'name' => 'rel1',
                         'type' => 'ref-many',
-                        'label' => 'Rel1',
+                        'label' => 'Rel1 Translated',
                         'relation_type' => 'ref-many',
                         'related_entity_name' => 'Acme\Entity\Test1',
-                        'related_entity_label' => 'Test1 Label',
-                        'related_entity_plural_label' => 'Test1 Plural Label',
+                        'related_entity_label' => 'Test1 Label Translated',
+                        'related_entity_plural_label' => 'Test1 Plural Label Translated',
                         'related_entity_icon' => 'fa-test1'
                     ],
                 ]
@@ -1093,12 +1099,19 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                 'locale' => 'it_IT',
                 'transCalls' => 1
             ],
-            'not translated' => [
+            'with translate = false' => [
                 'translate' => false,
                 'fieldLabel' => 'C',
                 'fieldLabelTranslated' => 'C',
                 'locale' => null,
                 'transCalls' => 0
+            ],
+            'default translation' => [
+                'translate' => true,
+                'fieldLabel' => 'C',
+                'fieldLabelTranslated' => 'C Default',
+                'locale' => null,
+                'transCalls' => 1
             ]
         ];
     }
