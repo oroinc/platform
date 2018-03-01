@@ -115,7 +115,7 @@ class ChannelType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class'         => 'Oro\\Bundle\\IntegrationBundle\\Entity\\Channel',
-                'intention'          => 'channel',
+                'csrf_token_id'      => 'channel',
                 'cascade_validation' => true,
             ]
         );

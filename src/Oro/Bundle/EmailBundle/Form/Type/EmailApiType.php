@@ -139,7 +139,7 @@ class EmailApiType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class'           => 'Oro\Bundle\EmailBundle\Form\Model\EmailApi',
-                'intention'            => 'email',
+                'csrf_token_id'        => 'email',
                 'csrf_protection'      => false
             ]
         );

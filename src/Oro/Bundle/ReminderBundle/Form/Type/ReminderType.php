@@ -37,7 +37,7 @@ class ReminderType extends AbstractType
         $resolver->setDefaults(
             array(
                 'data_class'           => 'Oro\\Bundle\\ReminderBundle\\Entity\\Reminder',
-                'intention'            => 'reminder',
+                'csrf_token_id'        => 'reminder',
                 'error_bubbling'       => false,
             )
         );

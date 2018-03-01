@@ -43,7 +43,7 @@ class TaxonomyType extends AbstractType
         $resolver->setDefaults(
             array(
                 'data_class' => 'Oro\Bundle\TagBundle\Entity\Taxonomy',
-                'intention'  => 'taxonomy',
+                'csrf_token_id' => 'taxonomy',
                 'grid_name' => 'taxonomy-grid',
             )
         );

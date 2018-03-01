@@ -52,7 +52,7 @@ class EmailAttachmentTypeTest extends \PHPUnit_Framework_TestCase
             ->with(
                 [
                     'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\EmailAttachment',
-                    'intention'          => 'email_attachment',
+                    'csrf_token_id'      => 'email_attachment',
                 ]
             );
 

@@ -46,7 +46,7 @@ class AclRoleTypeTest extends \PHPUnit_Framework_TestCase
             ->with(
                 array(
                     'data_class' => 'Oro\Bundle\UserBundle\Entity\Role',
-                    'intention'  => 'role'
+                    'csrf_token_id' => 'role'
                 )
             );
         $this->formType->configureOptions($resolver);

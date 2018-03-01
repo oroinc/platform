@@ -122,6 +122,9 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
                 $config['auto_initialize'] = false;
             }
 
+            //@TODO Remove in scope BAP-15236
+            unset($config['csrf_provider']);
+
             $form->add(
                 $this->factory->createNamed(
                     'region',
