@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 use Oro\Bundle\CurrencyBundle\Form\DataTransformer\MoneyValueTransformer;
 use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
+use Oro\Bundle\CurrencyBundle\Entity\Price;
 
 class MultiCurrencyType extends PriceType
 {
@@ -47,9 +48,7 @@ class MultiCurrencyType extends PriceType
                 'number',
                 [
                     'required' => $isRequired,
-                    'scale' => $this->roundingService->getPrecision(),
-                    'rounding_mode' => $this->roundingService->getRoundType(),
-                    'attr' => ['data-scale' => $this->roundingService->getPrecision()],
+                    'scale' => Price::MAX_VALUE_SCALE,
                     'constraints' => $options['value_constraints']
                 ]
             )
