@@ -121,6 +121,7 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
                 FormatterProvider::FORMAT_TYPE => 'excel',
             ],
         ], $body);
+        $body['parameters']['pageSize'] = $body['batchSize'];
 
         if (! isset($body['jobId'], $body['parameters']['gridName'], $body['format'])) {
             $this->logger->critical('Got invalid message');

@@ -24,6 +24,8 @@ class DatagridExportConnector implements
     ContextAwareInterface,
     ClosableInterface
 {
+    const DEFAULT_PAGE_SIZE = 500;
+
     /**
      * @var ServiceLink
      */
@@ -164,11 +166,23 @@ class DatagridExportConnector implements
             }
 
             $this->page       = 1;
+            $this->pageSize   = $this->getPageSize();
             $gridData         = $this->getGridData();
             $this->totalCount = $gridData->getTotalRecords();
             $this->sourceData = $gridData->getData();
             $this->offset     = 0;
         }
+    }
+
+    /**
+     * @return int
+     */
+    protected function getPageSize()
+    {
+        if ($this->getContext()->hasOption('pageSize')) {
+            return $this->getContext()->getOption('pageSize');
+        }
+        return self::DEFAULT_PAGE_SIZE;
     }
 
     /**
