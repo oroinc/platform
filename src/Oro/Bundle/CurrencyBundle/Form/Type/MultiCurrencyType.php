@@ -13,6 +13,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * Builds multi currency select with value and currency inputs, handles constraints assigning depending on default value
+ */
 class MultiCurrencyType extends PriceType
 {
     const NAME = 'oro_multicurrency';

@@ -5,6 +5,7 @@ namespace Oro\Bundle\CurrencyBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * Represents entity which stores value and currency as price item
  * @ORM\Embeddable()
  */
 class Price implements CurrencyAwareInterface, \JsonSerializable
