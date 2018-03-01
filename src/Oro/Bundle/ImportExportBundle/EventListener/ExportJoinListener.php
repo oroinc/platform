@@ -11,6 +11,7 @@ use Oro\Bundle\ImportExportBundle\Event\AfterEntityPageLoadedEvent;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
+ * @deprecated
  * This listener join entity associations for decreasing count of queries during entity export
  */
 class ExportJoinListener
