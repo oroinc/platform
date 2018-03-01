@@ -10,6 +10,9 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\ElementValueInterface;
 use WebDriver\Element;
 use WebDriver\Key;
 
+/**
+ * Contains overrides of some Selenium2Driver methods as well as new methods related to selenium driver functionality
+ */
 class OroSelenium2Driver extends Selenium2Driver
 {
     use AssertTrait;
