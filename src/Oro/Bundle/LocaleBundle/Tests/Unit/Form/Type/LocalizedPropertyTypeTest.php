@@ -82,7 +82,7 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
     {
         return [
             'text with null data' => [
-                'options' => ['type' => 'text'],
+                'options' => ['entry_type' => 'text'],
                 'defaultData' => null,
                 'viewData' => [
                     LocalizedPropertyType::FIELD_DEFAULT => null,
@@ -101,7 +101,7 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
                 ],
             ],
             'percent with full data' => [
-                'options' => ['type' => PercentTypeStub::NAME, 'options' => ['type' => 'integer']],
+                'options' => ['entry_type' => PercentTypeStub::NAME, 'entry_options' => ['type' => 'integer']],
                 'defaultData' => [
                     null => 5,
                     1    => 10,

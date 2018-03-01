@@ -46,7 +46,7 @@ class AttributeGroupType extends AbstractType
             [
                 'label' => 'oro.entity_config.attribute_group.labels.label',
                 'required' => true,
-                'options' => [
+                'entry_options' => [
                     'constraints' => [
                         new NotBlank(['message' => 'oro.entity_config.validator.attribute_family.labels.blank'])
                     ],

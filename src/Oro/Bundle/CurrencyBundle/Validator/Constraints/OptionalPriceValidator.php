@@ -19,7 +19,9 @@ class OptionalPriceValidator extends ConstraintValidator
     {
         if ($price->getValue() && !$price->getCurrency()) {
             /* @var $constraint Constraints\OptionalPrice */
-            $this->context->addViolationAt('currency', $constraint->message);
+            $this->context->buildViolation($constraint->message)
+                ->atPath('currency')
+                ->addViolation();
         }
     }
 }

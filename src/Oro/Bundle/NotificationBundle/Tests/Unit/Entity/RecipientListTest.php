@@ -4,6 +4,7 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 class RecipientListTest extends \PHPUnit_Framework_TestCase
 {
@@ -131,8 +132,16 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
         $context->expects($this->once())
             ->method('getPropertyPath')
             ->will($this->returnValue('testPath'));
+
+        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
         $context->expects($this->once())
-            ->method('addViolationAt');
+            ->method('buildViolation')
+            ->willReturn($builder);
+        $builder->expects($this->once())
+            ->method('atPath')
+            ->willReturnSelf();
+        $builder->expects($this->once())
+            ->method('addViolation');
 
         $this->entity->isValid($context);
     }
@@ -148,7 +157,7 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
         $context->expects($this->never())
             ->method('getPropertyPath');
         $context->expects($this->never())
-            ->method('addViolationAt');
+            ->method('buildViolation');
 
         // Only users
         $this->entity->addUser($user);

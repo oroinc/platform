@@ -135,14 +135,14 @@ class EmailType extends AbstractType
                 ]
             )
             ->add('attachments', 'oro_email_attachments', [
-                'type' => 'oro_email_attachment',
+                'entry_type' => 'oro_email_attachment',
                 'required' => false,
                 'allow_add' => true,
                 'prototype' => false,
                 'constraints' => [
                     new Valid()
                 ],
-                'options' => [
+                'entry_options' => [
                     'required' => false,
                 ],
             ])

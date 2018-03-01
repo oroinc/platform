@@ -6,6 +6,7 @@ use Doctrine\DBAL\Platforms\Keywords\MySQLKeywords;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeyword;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeywordValidator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class NotSqlKeywordValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,7 +18,7 @@ class NotSqlKeywordValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->context = $this->createMock('Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context = $this->createMock(ExecutionContextInterface::class);
 
         $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()

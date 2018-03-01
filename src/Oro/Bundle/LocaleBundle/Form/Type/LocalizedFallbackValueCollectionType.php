@@ -52,11 +52,11 @@ class LocalizedFallbackValueCollectionType extends AbstractType
         $builder->add(
             self::FIELD_VALUES,
             LocalizedPropertyType::NAME,
-            ['type' => $options['type'], 'options' => $options['options']]
+            ['entry_type' => $options['entry_type'], 'entry_options' => $options['entry_options']]
         )->add(
             self::FIELD_IDS,
             'collection',
-            ['type' => 'hidden']
+            ['entry_type' => 'hidden']
         );
 
         $builder->addViewTransformer(
@@ -70,9 +70,9 @@ class LocalizedFallbackValueCollectionType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'field'   => 'string', // field used to store data - string or text
-            'type'    => 'text',   // value form type
-            'options' => [],       // value form options
+            'field' => 'string', // field used to store data - string or text
+            'entry_type' => 'text',   // value form type
+            'entry_options' => [],       // value form options
         ]);
     }
 }
