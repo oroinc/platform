@@ -56,7 +56,7 @@ class RecipientListType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' => 'Oro\Bundle\NotificationBundle\Entity\RecipientList',
-                'intention' => 'recipientlist',
+                'csrf_token_id' => 'recipientlist',
             ]
         );
     }

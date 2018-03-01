@@ -300,7 +300,7 @@ services:
     oro_datagrid.cache.datagrid_configuration_cache_warmer:
         class: Oro\Bundle\DataGridBundle\Cache\DatagridConfigurationCacheWarmer
         arguments:
-            - @oro_datagrid.configuration.provider
+            - '@oro_datagrid.configuration.provider'
         tags:
             - { name: kernel.cache_warmer }
 

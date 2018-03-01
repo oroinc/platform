@@ -57,7 +57,7 @@ class ReportType extends AbstractQueryDesignerType
             $this->getDefaultOptions(),
             array(
                 'data_class'         => 'Oro\Bundle\ReportBundle\Entity\Report',
-                'intention'          => 'report',
+                'csrf_token_id'      => 'report',
                 'query_type'         => 'report',
             )
         );

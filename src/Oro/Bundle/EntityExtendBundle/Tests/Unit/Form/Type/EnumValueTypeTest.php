@@ -14,12 +14,13 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
+use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
-use Symfony\Component\Validator\Validator;
+use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 class EnumValueTypeTest extends TypeTestCase
 {
@@ -40,10 +41,10 @@ class EnumValueTypeTest extends TypeTestCase
 
     protected function getExtensions()
     {
-        $validator = new Validator(
+        $validator = new RecursiveValidator(
+            new ExecutionContextFactory(new IdentityTranslator()),
             new LazyLoadingMetadataFactory(new LoaderChain([])),
-            new ConstraintValidatorFactory(),
-            new IdentityTranslator()
+            new ConstraintValidatorFactory()
         );
 
         return [
@@ -349,7 +350,7 @@ class EnumValueTypeTest extends TypeTestCase
     }
 
     /**
-     * @return Validator
+     * @return RecursiveValidator
      */
     protected function getValidator()
     {
@@ -362,10 +363,10 @@ class EnumValueTypeTest extends TypeTestCase
                 $this->loadMetadata($meta);
             }));
 
-        $validator = new Validator(
+        $validator = new RecursiveValidator(
+            new ExecutionContextFactory(new IdentityTranslator()),
             new LazyLoadingMetadataFactory($loader),
-            $this->getConstraintValidatorFactory(),
-            new IdentityTranslator()
+            $this->getConstraintValidatorFactory()
         );
 
         return $validator;

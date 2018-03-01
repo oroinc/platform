@@ -22,6 +22,8 @@ define(function(require) {
 
         pattern: null,
 
+        allowZero: true,
+
         /**
          * @inheritDoc
          */
@@ -116,8 +118,13 @@ define(function(require) {
                 return;
             }
 
+            // Prevent multi zero value
+            if (this.allowZero) {
+                field.value = field.value.replace(/^0(\d)*/g, '0');
+            }
+
             // filter value start
-            if (this.precision === 0) {
+            if (this.precision === 0 && !this.allowZero) {
                 field.value = field.value.replace(/^0*/g, '');
             }
 

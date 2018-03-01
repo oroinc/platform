@@ -130,7 +130,7 @@ class EnumValueCollectionTypeTest extends TypeTestCase
                     'allow_add'         => true,
                     'allow_delete'      => true,
                     'validation_groups' => true,
-                    'options'           => [
+                    'options'     => [
                         'allow_multiple_selection' => false
                     ]
                 ]
@@ -147,7 +147,7 @@ class EnumValueCollectionTypeTest extends TypeTestCase
                     'allow_add'         => true,
                     'allow_delete'      => true,
                     'validation_groups' => true,
-                    'options'           => [
+                    'options'     => [
                         'allow_multiple_selection' => false
                     ]
                 ]

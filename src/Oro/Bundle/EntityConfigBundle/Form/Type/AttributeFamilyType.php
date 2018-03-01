@@ -52,7 +52,7 @@ class AttributeFamilyType extends AbstractType
                 'label' => 'oro.entity_config.attribute_family.labels.label',
                 'block' => 'settings',
                 'required' => true,
-                'options' => [
+                'entry_options' => [
                     'constraints' => [
                         new NotBlank(['message' => 'oro.entity_config.validator.attribute_family.labels.blank'])
                     ]
@@ -86,7 +86,7 @@ class AttributeFamilyType extends AbstractType
                 'label' => 'oro.entity_config.attribute_family.attribute_groups.label',
                 'block' => 'attributes',
                 'required' => false,
-                'options' => [
+                'entry_options' => [
                     'attributeEntityClass' => $options['attributeEntityClass'],
                     'data_class' => AttributeGroup::class
                 ],

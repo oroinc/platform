@@ -95,7 +95,7 @@ class OrganizationType extends AbstractType
         $resolver->setDefaults(
             array(
                 'data_class'         => 'Oro\Bundle\OrganizationBundle\Entity\Organization',
-                'intention'          => 'organization',
+                'csrf_token_id'      => 'organization',
             )
         );
     }

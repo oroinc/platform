@@ -98,7 +98,7 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
                     'column_column_choice_type'   => 'hidden',
                     'filter_column_choice_type'   => 'oro_entity_field_select',
                     'data_class'                  => 'Oro\Bundle\SegmentBundle\Entity\Segment',
-                    'intention'                   => 'segment',
+                    'csrf_token_id'               => 'segment',
                     'query_type'                  => 'segment',
                 ]
             );

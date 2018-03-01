@@ -71,7 +71,7 @@ class GroupType extends AbstractType
         $resolver->setDefaults(
             array(
                 'data_class' => 'Oro\Bundle\UserBundle\Entity\Group',
-                'intention'  => 'group',
+                'csrf_token_id' => 'group',
             )
         );
     }

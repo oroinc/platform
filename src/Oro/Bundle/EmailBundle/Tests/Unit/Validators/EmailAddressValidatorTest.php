@@ -6,6 +6,8 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Validator\Constraints\EmailAddress;
 use Oro\Bundle\EmailBundle\Validator\EmailAddressValidator;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 class EmailAddressValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,7 +23,7 @@ class EmailAddressValidatorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->constraint = new EmailAddress();
-        $this->context = $this->createMock('Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context = $this->createMock(ExecutionContextInterface::class);
         $this->emailAddressHelper = new EmailAddressHelper();
     }
 
@@ -71,9 +73,21 @@ class EmailAddressValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->any())
             ->method('getViolations')
             ->will($this->returnValue($violationList));
+
+        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
         $this->context->expects($this->any())
-            ->method('addViolation')
-            ->with($this->constraint->message);
+            ->method('buildViolation')
+            ->with($this->constraint->message)
+            ->willReturn($builder);
+        $builder->expects($this->any())
+            ->method('setParameter')
+            ->willReturnSelf();
+        $builder->expects($this->any())
+            ->method('setCode')
+            ->willReturnSelf();
+        $builder->expects($this->any())
+            ->method('addViolation');
+
         $this->context->expects($this->any())
             ->method('getPropertyPath')
             ->will($this->returnValue('cc'));

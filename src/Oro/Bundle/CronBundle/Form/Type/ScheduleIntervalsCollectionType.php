@@ -27,7 +27,7 @@ class ScheduleIntervalsCollectionType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'type' => ScheduleIntervalType::NAME,
+            'entry_type' => ScheduleIntervalType::NAME,
             'required' => false,
             'by_reference' => false
         ]);

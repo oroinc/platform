@@ -62,7 +62,7 @@ class UserApiKeyGenTypeTest extends FormIntegrationTestCase
         $expected   = [
             'data_class' => UserApi::class,
             'csrf_protection' => ['enabled' => true, 'fieild_name' => 'apikey_token'],
-            'intention'   => UserApiKeyGenType::NAME,
+            'csrf_token_id' => UserApiKeyGenType::NAME,
             'apiKeyElementId' => 'user-apikey-gen-elem'
         ];
         $form       = $this->factory->create($this->type, null, []);

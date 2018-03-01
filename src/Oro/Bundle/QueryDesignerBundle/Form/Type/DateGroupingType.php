@@ -58,7 +58,7 @@ class DateGroupingType extends AbstractType
             [
                 'entity' => null,
                 'data_class' => DateGrouping::class,
-                'intention' => 'query_designer_date_grouping',
+                'csrf_token_id' => 'query_designer_date_grouping',
                 'column_choice_type' => 'oro_entity_field_select',
             ]
         );
