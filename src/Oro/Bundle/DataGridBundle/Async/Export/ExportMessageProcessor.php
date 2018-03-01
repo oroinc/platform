@@ -94,7 +94,6 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
             ParameterBag::DATAGRID_MODES_PARAMETER,
             [DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE]
         );
-        $body['parameters']['batchSize'] = $body['batchSize'];
         $body['parameters']['gridParameters'] = $contextParameters;
 
         $exportResult = $this->exportHandler->handle(
@@ -125,6 +124,7 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
                 FormatterProvider::FORMAT_TYPE => 'excel',
             ],
         ], $body);
+        $body['parameters']['pageSize'] = $body['batchSize'];
 
         if (! isset($body['jobId'], $body['parameters']['gridName'], $body['format'])) {
             $this->logger->critical('Got invalid message');

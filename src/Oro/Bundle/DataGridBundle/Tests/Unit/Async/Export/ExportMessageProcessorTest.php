@@ -168,7 +168,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
                         '_datagrid_modes' => ['importexport']
                     ]),
                     'format_type' => 'excel',
-                    'batchSize' => 5000
+                    'pageSize' => 5000
                 ],
                 5000,
                 'csv'
