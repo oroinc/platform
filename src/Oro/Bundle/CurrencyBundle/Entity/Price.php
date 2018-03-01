@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Price implements CurrencyAwareInterface, \JsonSerializable
 {
-    const MAX_VALUE_PRECISION = 4;
+    const MAX_VALUE_SCALE = 4;
 
     use CurrencyAwareTrait;
 
