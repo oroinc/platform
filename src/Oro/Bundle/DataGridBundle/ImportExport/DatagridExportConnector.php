@@ -125,10 +125,6 @@ class DatagridExportConnector implements
     {
         $this->context = $context;
 
-        if ($context->hasOption('batchSize')) {
-            $this->pageSize = (int)$context->getOption('batchSize');
-        }
-
         if ($context->hasOption('gridName')) {
             $this->grid = $this->gridManagerLink
                 ->getService()
