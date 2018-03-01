@@ -14,6 +14,16 @@ define(function(require) {
 
         valueConfig: {start: '', end: ''},
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function AbstractWidgetDateCompareView() {
+            AbstractWidgetDateCompareView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             this.valueConfig = _.clone(this.valueConfig);
 

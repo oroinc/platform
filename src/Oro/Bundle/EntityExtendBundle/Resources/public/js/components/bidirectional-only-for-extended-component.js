@@ -7,6 +7,16 @@ define(function(require) {
     var BaseComponent = require('oroui/js/app/components/base/component');
 
     BidirectionalOnlyForExtendedComponent = BaseComponent.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function BidirectionalOnlyForExtendedComponent() {
+            BidirectionalOnlyForExtendedComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             var targetEntityField = $('[data-name="field__target-entity"]');
             var bidirectionalField = $('[data-name="field__bidirectional"]');

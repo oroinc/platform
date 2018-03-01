@@ -71,6 +71,13 @@ define([
         }),
 
         /**
+         * @inheritDoc
+         */
+        constructor: function DashboardItemWidget() {
+            DashboardItemWidget.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize
          *
          * @param {Object} options

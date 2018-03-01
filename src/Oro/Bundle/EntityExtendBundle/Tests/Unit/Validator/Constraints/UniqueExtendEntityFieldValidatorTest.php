@@ -11,6 +11,7 @@ use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityFieldV
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class UniqueExtendEntityFieldValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -65,7 +66,7 @@ class UniqueExtendEntityFieldValidatorTest extends \PHPUnit_Framework_TestCase
         $field  = new FieldConfigModel($fieldName);
         $entity->addField($field);
 
-        $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
+        $context = $this->createMock(ExecutionContextInterface::class);
         $this->validator->initialize($context);
 
         $constraint = new UniqueExtendEntityField();

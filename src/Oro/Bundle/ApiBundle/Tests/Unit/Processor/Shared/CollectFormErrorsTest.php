@@ -256,8 +256,8 @@ class CollectFormErrorsTest extends FormProcessorTestCase
                 'field1',
                 'collection',
                 [
-                    'type'      => 'text',
-                    'options'   => ['constraints' => [new Constraints\NotBlank()]],
+                    'entry_type'      => 'text',
+                    'entry_options'   => ['constraints' => [new Constraints\NotBlank()]],
                     'allow_add' => true
                 ]
             )
@@ -289,8 +289,8 @@ class CollectFormErrorsTest extends FormProcessorTestCase
                 'collection',
                 [
                     'property_path' => '[field1]',
-                    'type'          => 'text',
-                    'options'       => ['constraints' => [new Constraints\NotBlank()]],
+                    'entry_type'          => 'text',
+                    'entry_options'       => ['constraints' => [new Constraints\NotBlank()]],
                     'allow_add'     => true
                 ]
             )
@@ -321,8 +321,8 @@ class CollectFormErrorsTest extends FormProcessorTestCase
                 'field1',
                 'collection',
                 [
-                    'type'      => new NameValuePairType(),
-                    'options'   => [
+                    'entry_type'      => new NameValuePairType(),
+                    'entry_options'   => [
                         'name_options' => ['constraints' => [new Constraints\NotBlank()]]
                     ],
                     'allow_add' => true
@@ -359,8 +359,8 @@ class CollectFormErrorsTest extends FormProcessorTestCase
                 'field1',
                 'collection',
                 [
-                    'type'      => new NameValuePairType(),
-                    'options'   => [
+                    'entry_type'      => new NameValuePairType(),
+                    'entry_options'   => [
                         'name_options' => [
                             'constraints'    => [new Constraints\NotBlank()],
                             'error_bubbling' => true

@@ -31,6 +31,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function ViewportComponent() {
+            ViewportComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.extend({}, this.options, _.pick(options, ['viewport', 'component']));
             this.options.componentOptions = _.omit(options, _.keys(this.options));

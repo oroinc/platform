@@ -27,7 +27,7 @@ class EmailAttachmentContent
      * @var EmailAttachment
      *
      * @ORM\OneToOne(targetEntity="EmailAttachment", inversedBy="attachmentContent")
-     * @ORM\JoinColumn(name="attachment_id", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="attachment_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      * @JMS\Exclude
      */
     protected $emailAttachment;

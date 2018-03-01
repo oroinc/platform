@@ -7,6 +7,13 @@ define(function(require) {
     var FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
 
     AggregatedFieldConditionView = FieldConditionView.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function AggregatedFieldConditionView() {
+            AggregatedFieldConditionView.__super__.constructor.apply(this, arguments);
+        },
+
         getDefaultOptions: function() {
             var defaultOptions = AggregatedFieldConditionView.__super__.getDefaultOptions.call(this);
             return _.extend({}, defaultOptions, {

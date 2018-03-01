@@ -27,7 +27,7 @@ class MenuUpdateType extends AbstractType
             [
                 'required' => true,
                 'label' => 'oro.navigation.menuupdate.title.label',
-                'options' => ['constraints' => [new NotBlank()]]
+                'entry_options' => ['constraints' => [new NotBlank()]]
             ]
         );
 
@@ -77,7 +77,7 @@ class MenuUpdateType extends AbstractType
             [
                 'required' => false,
                 'label' => 'oro.navigation.menuupdate.description.label',
-                'type' => 'textarea',
+                'entry_type' => 'textarea',
                 'field' => 'text',
             ]
         );

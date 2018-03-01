@@ -8,12 +8,12 @@ use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
- * EmailThread
+ * Entity that represents a chain(thread) of emails
  *
  * @ORM\Table(
  *      name="oro_email_thread"
  * )
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailThreadRepository")
  * @ORM\HasLifecycleCallbacks
  */
 class EmailThread

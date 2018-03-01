@@ -131,7 +131,7 @@ class EmailNotificationType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' => EmailNotification::class,
-                'intention' => self::NAME
+                'csrf_token_id' => self::NAME
             ]
         );
     }

@@ -43,4 +43,24 @@
   &-not-found {
     display: none;
   }
+
+  &-items-switcher {
+    &__control {
+      &:last-child {
+        display: none;
+      }
+    }
+
+    &.highlighted-only & {
+      &__control {
+        &:first-child {
+          display: none;
+        }
+
+        &:last-child {
+          display: block;
+        }
+      }
+    }
+  }
 }

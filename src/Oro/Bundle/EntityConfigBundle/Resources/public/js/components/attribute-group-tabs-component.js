@@ -9,6 +9,13 @@ define(function(require) {
 
     AttributeGroupTabsComponent = BaseComponent.extend({
         /**
+         * @inheritDoc
+         */
+        constructor: function AttributeGroupTabsComponent() {
+            AttributeGroupTabsComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @param {Object} options
          */
         initialize: function(options) {

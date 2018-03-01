@@ -32,7 +32,7 @@ class UserApiKeyGenType extends AbstractType
             [
                 'data_class' => UserApi::class,
                 'csrf_protection' => ['enabled' => true, 'fieild_name' => 'apikey_token'],
-                'intention'   => self::NAME,
+                'csrf_token_id' => self::NAME,
                 'apiKeyElementId' => 'user-apikey-gen-elem'
             ]
         );

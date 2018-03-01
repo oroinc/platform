@@ -65,6 +65,16 @@ define(function(require) {
     NumberEditorView = TextEditorView.extend(/** @lends NumberEditorView.prototype */{
         className: 'number-editor',
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function NumberEditorView() {
+            NumberEditorView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.formatter = new NumberFormatter(options);
             NumberEditorView.__super__.initialize.apply(this, arguments);

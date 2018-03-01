@@ -43,6 +43,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function ActionManagerView() {
+            ActionManagerView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = $.extend(true, {}, this.options, options);
             this.options.$tree = this.$el.closest(this.elements.wrapper)

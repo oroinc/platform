@@ -7,6 +7,13 @@ define(function(require) {
     FlowchartViewerTransitionOverlayView = FlowchartJsPlumbOverlayView.extend({
         template: require('tpl!oroworkflow/templates/flowchart/viewer/transition.html'),
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function FlowchartViewerTransitionOverlayView() {
+            FlowchartViewerTransitionOverlayView.__super__.constructor.apply(this, arguments);
+        },
+
         className: function() {
             var classNames = [FlowchartViewerTransitionOverlayView.__super__.className.call(this)];
             classNames.push('workflow-transition-overlay');

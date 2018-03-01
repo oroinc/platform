@@ -57,12 +57,13 @@ class CompleteCustomAssociationHelper
     ) {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            $this->completeCustomAssociation($entityClass, $fieldName, $field, $version, $requestType);
+            $this->completeCustomAssociation($entityClass, $definition, $fieldName, $field, $version, $requestType);
         }
     }
 
     /**
      * @param string                      $entityClass
+     * @param EntityDefinitionConfig      $definition
      * @param string                      $fieldName
      * @param EntityDefinitionFieldConfig $field
      * @param string                      $version
@@ -70,6 +71,7 @@ class CompleteCustomAssociationHelper
      */
     protected function completeCustomAssociation(
         $entityClass,
+        EntityDefinitionConfig $definition,
         $fieldName,
         EntityDefinitionFieldConfig $field,
         $version,
@@ -80,7 +82,7 @@ class CompleteCustomAssociationHelper
             if (DataType::isNestedObject($dataType)) {
                 $this->associationHelper->completeNestedObject($fieldName, $field);
             } elseif (DataType::isNestedAssociation($dataType)) {
-                $this->associationHelper->completeNestedAssociation($field, $version, $requestType);
+                $this->associationHelper->completeNestedAssociation($definition, $field, $version, $requestType);
             } elseif (DataType::isExtendedAssociation($dataType)) {
                 $this->completeExtendedAssociation($entityClass, $fieldName, $field, $version, $requestType);
             }

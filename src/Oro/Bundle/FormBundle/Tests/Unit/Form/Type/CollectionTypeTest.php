@@ -98,7 +98,7 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @expectedExceptionMessage The required option "type" is missing.
+     * @expectedExceptionMessage The required option "entry_type" is missing.
      */
     public function testConfigureOptionsWithoutType()
     {
@@ -113,12 +113,12 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
         $this->type->configureOptions($resolver);
 
         $options = [
-            'type' => 'test_type'
+            'entry_type' => 'test_type'
         ];
         $resolvedOptions = $resolver->resolve($options);
         $this->assertEquals(
             [
-                'type'                 => 'test_type',
+                'entry_type'           => 'test_type',
                 'allow_add'            => true,
                 'allow_delete'         => true,
                 'by_reference'         => false,
@@ -141,13 +141,13 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
         $this->type->configureOptions($resolver);
 
         $options = [
-            'type'      => 'test_type',
+            'entry_type' => 'test_type',
             'allow_add' => false
         ];
         $resolvedOptions = $resolver->resolve($options);
         $this->assertEquals(
             [
-                'type'                 => 'test_type',
+                'entry_type'           => 'test_type',
                 'allow_add'            => false,
                 'allow_delete'         => true,
                 'by_reference'         => false,
@@ -170,13 +170,13 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
         $this->type->configureOptions($resolver);
 
         $options = [
-            'type'                 => 'test_type',
+            'entry_type'           => 'test_type',
             'show_form_when_empty' => false
         ];
         $resolvedOptions = $resolver->resolve($options);
         $this->assertEquals(
             [
-                'type'                 => 'test_type',
+                'entry_type'           => 'test_type',
                 'allow_add'            => true,
                 'allow_delete'         => true,
                 'by_reference'         => false,
@@ -199,13 +199,13 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
         $this->type->configureOptions($resolver);
 
         $options = [
-            'type'                 => 'test_type',
+            'entry_type'           => 'test_type',
             'add_label'            => 'Test Label'
         ];
         $resolvedOptions = $resolver->resolve($options);
         $this->assertEquals(
             [
-                'type'                 => 'test_type',
+                'entry_type'           => 'test_type',
                 'allow_add'            => true,
                 'allow_delete'         => true,
                 'by_reference'         => false,

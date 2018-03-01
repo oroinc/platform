@@ -16,6 +16,13 @@ define(function(require) {
             'change:index model': 'render'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function HistoryNavigationView() {
+            HistoryNavigationView.__super__.constructor.apply(this, arguments);
+        },
+
         onUndo: function() {
             var index = this.model.get('index');
             this.trigger('navigate', index - 1);

@@ -63,18 +63,20 @@
                 </div>
 
                 <div class="form-container">
-                    <form method="post"
-                          data-nohash="true"
-                          id="{{ form.vars.id }}"
-                          name="{{ form.vars.name }}"
-                          action="{{ path('oro_importexport_import_validate_export_template_form', {
-                              entity: config.entityClass,
-                              importJob: config.importJobName,
-                              importValidateJob: config.importValidationJobName,
-                              alias: alias
-                          }) }}"
-                          class="form-horizontal" {{ form_enctype(form) }}
-                    >
+                    {{ form_start(form, {
+                        'action': path('oro_importexport_import_validate_export_template_form', {
+                            entity: config.entityClass,
+                            importJob: config.importJobName,
+                            importValidateJob: config.importValidationJobName,
+                            alias: alias
+                        }),
+                        'attr': {
+                            'id': form.vars.id,
+                            'data-nohash': 'true',
+                            'class': 'form-horizontal'
+                        }
+                    }) }}
+
                         {% for key, option in options %}
                             <input type="hidden" name="options[{{ key }}]" value="{{ option }}" />
                         {% endfor %}
@@ -149,7 +151,7 @@
                                 </div>
                             </div>
                         </fieldset>
-                    </form>
+                    {{ form_end(form) }}
                     {{ oro_form_js_validation(form) }}
                 </div>
             </div>

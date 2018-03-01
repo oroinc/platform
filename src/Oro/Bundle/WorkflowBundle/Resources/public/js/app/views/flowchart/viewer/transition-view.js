@@ -30,6 +30,16 @@ define(function(require) {
             };
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function FlowchartViewerTransitionView() {
+            FlowchartViewerTransitionView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.connections = [];
 

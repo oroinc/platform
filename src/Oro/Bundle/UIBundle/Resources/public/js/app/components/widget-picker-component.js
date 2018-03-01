@@ -14,6 +14,12 @@ define(function(require) {
      * @class oroui.app.components.WidgetPickerComponent
      */
     WidgetPickerComponent = BaseComponent.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function WidgetPickerComponent() {
+            WidgetPickerComponent.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * @inheritDoc

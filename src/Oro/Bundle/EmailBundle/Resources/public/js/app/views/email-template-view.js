@@ -17,6 +17,16 @@ define(function(require) {
             change: 'selectionChanged'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailTemplateView() {
+            EmailTemplateView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             this.template = _.template($('#emailtemplate-chooser-template').html());
 

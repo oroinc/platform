@@ -31,6 +31,16 @@ define([
         /** @property {String} */
         token: '',
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function MassAction() {
+            MassAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             MassAction.__super__.initialize.apply(this, arguments);
 

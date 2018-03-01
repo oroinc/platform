@@ -25,9 +25,15 @@ class NameOrOrganizationValidator extends ConstraintValidator
         }
         if ((!$entity->getFirstName() || !$entity->getLastName()) && !$entity->getOrganization()) {
             // organization or (first name and last name) should be filled
-            $this->context->addViolationAt('firstName', $constraint->firstNameMessage);
-            $this->context->addViolationAt('lastName', $constraint->lastNameMessage);
-            $this->context->addViolationAt('organization', $constraint->organizationMessage);
+            $this->context->buildViolation($constraint->firstNameMessage)
+                ->atPath('firstName')
+                ->addViolation();
+            $this->context->buildViolation($constraint->lastNameMessage)
+                ->atPath('lastName')
+                ->addViolation();
+            $this->context->buildViolation($constraint->organizationMessage)
+                ->atPath('organization')
+                ->addViolation();
         }
     }
 }

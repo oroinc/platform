@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\Common;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration;
+use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 
 class DatagridConfigurationTest extends \PHPUnit_Framework_TestCase
 {
@@ -315,6 +316,23 @@ class DatagridConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($configArray['columns']);
         $this->assertEmpty($configArray['sorters']['columns']);
         $this->assertEmpty($configArray['filters']['columns']);
+    }
+
+    public function testIsDatagridExtendedFrom()
+    {
+        self::assertFalse($this->configuration->isDatagridExtendedFrom('some-datagrid-name'));
+
+        $this->configuration->offsetSet(SystemAwareResolver::KEY_EXTENDED_FROM, null);
+        self::assertFalse($this->configuration->isDatagridExtendedFrom('some-datagrid-name'));
+
+        $this->configuration->offsetSet(SystemAwareResolver::KEY_EXTENDED_FROM, ['some-other-datagrid-name']);
+        self::assertFalse($this->configuration->isDatagridExtendedFrom('some-datagrid-name'));
+
+        $this->configuration->offsetSet(SystemAwareResolver::KEY_EXTENDED_FROM, [
+            'some-datagrid-name',
+            'some-other-datagrid-name'
+        ]);
+        self::assertTrue($this->configuration->isDatagridExtendedFrom('some-datagrid-name'));
     }
 
     /**

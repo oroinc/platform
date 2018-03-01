@@ -69,7 +69,7 @@ class CommentTypeApiTest extends \PHPUnit_Framework_TestCase
             ->method('setDefaults')
             ->with([
                 'data_class'      => Comment::ENTITY_NAME,
-                'intention'       => 'comment',
+                'csrf_token_id'   => 'comment',
                 'csrf_protection' => false,
             ]);
 

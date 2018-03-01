@@ -118,6 +118,7 @@ class FileSubscriber implements EventSubscriberInterface
                 $error = new FormError(
                     $violation->getMessage(),
                     $violation->getMessageTemplate(),
+                    // TODO: change to ::getParameters() method in scope of BAP-15236
                     $violation->getMessageParameters()
                 );
                 $fileField->addError($error);

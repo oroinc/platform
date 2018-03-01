@@ -11,6 +11,13 @@ define(function(require) {
             'click [data-role="status-toggle"]': 'onStatusToggle'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ProcessStatusToggleBtnView() {
+            ProcessStatusToggleBtnView.__super__.constructor.apply(this, arguments);
+        },
+
         onStatusToggle: function(e) {
             e.preventDefault();
 

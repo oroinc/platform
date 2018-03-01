@@ -9,6 +9,13 @@ define(['underscore', 'oroui/js/app/views/base/view', 'jquery.simplecolorpicker'
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function SimpleColorChoiceView() {
+            SimpleColorChoiceView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @constructor
          * @param {Object} options
          */

@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\EventListener\DefaultUserSystemConfigListener;
 use Oro\Bundle\UserBundle\Provider\DefaultUserProvider;
@@ -21,12 +23,18 @@ class DefaultUserSystemConfigListenerTest extends \PHPUnit_Framework_TestCase
     private $listener;
 
     /**
+     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $doctrineHelper;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
         $this->defaultUserProvider = $this->createMock(DefaultUserProvider::class);
-        $this->listener = new DefaultUserSystemConfigListener($this->defaultUserProvider);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->listener = new DefaultUserSystemConfigListener($this->defaultUserProvider, $this->doctrineHelper);
         $this->listener->setAlias('alias');
         $this->listener->setConfigKey('config_key');
     }
@@ -36,6 +44,59 @@ class DefaultUserSystemConfigListenerTest extends \PHPUnit_Framework_TestCase
         $id = 1;
         $key = $this->getConfigKey();
         $owner = new User();
+
+        $userRepository = $this->getUserRepository($id, $owner);
+
+        $this->doctrineHelper
+            ->expects($this->once())
+            ->method('getEntityRepositoryForClass')
+            ->with(User::class)
+            ->willReturn($userRepository);
+
+        $this->defaultUserProvider
+            ->expects($this->never())
+            ->method('getDefaultUser');
+
+        $event = $this->getEvent([$key => ['value' => $id]]);
+        $this->listener->onFormPreSetData($event);
+
+        $this->assertEquals([$key => ['value' => $owner]], $event->getSettings());
+    }
+
+    public function testOnFormPreSetDataWhenNotSet()
+    {
+        $key = $this->getConfigKey();
+        $owner = new User();
+
+        $this->doctrineHelper
+            ->expects($this->never())
+            ->method('getEntityRepositoryForClass');
+
+        $this->defaultUserProvider
+            ->expects($this->once())
+            ->method('getDefaultUser')
+            ->with('alias', 'config_key')
+            ->willReturn($owner);
+
+        $event = $this->getEvent([$key => ['value' => null]]);
+        $this->listener->onFormPreSetData($event);
+
+        $this->assertEquals([$key => ['value' => $owner]], $event->getSettings());
+    }
+
+    public function testOnFormPreSetDataWhenUserNotFound()
+    {
+        $id = 1;
+        $key = $this->getConfigKey();
+        $owner = new User();
+
+        $userRepository = $this->getUserRepository($id, null);
+
+        $this->doctrineHelper
+            ->expects($this->once())
+            ->method('getEntityRepositoryForClass')
+            ->with(User::class)
+            ->willReturn($userRepository);
 
         $this->defaultUserProvider
             ->expects($this->once())
@@ -100,5 +161,23 @@ class DefaultUserSystemConfigListenerTest extends \PHPUnit_Framework_TestCase
     private function getConfigKey()
     {
         return TreeUtils::getConfigKey('alias', 'config_key', ConfigManager::SECTION_VIEW_SEPARATOR);
+    }
+
+    /**
+     * @param int       $id
+     * @param User|null $user
+     *
+     * @return EntityRepository|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getUserRepository(int $id, User $user = null)
+    {
+        $userRepository = $this->createMock(EntityRepository::class);
+        $userRepository
+            ->expects($this->once())
+            ->method('findOneBy')
+            ->with(['id' => $id])
+            ->willReturn($user);
+
+        return $userRepository;
     }
 }
