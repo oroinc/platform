@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ScopeBundle\Manager\ScopeCriteriaProviderInterface;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item2;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\TestActivityScopeProvider;
@@ -149,7 +150,8 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
         $this->assertInternalType('array', $result);
         $this->assertGreaterThanOrEqual(1, count($result));
         $this->assertContains(WorkflowAwareEntity::class, $result);
-        $this->assertNotContains(Item::class, $result);
+        $this->assertContains(Item::class, $result);
+        $this->assertNotContains(Item2::class, $result);
     }
 
     public function testInvalidateCache()
