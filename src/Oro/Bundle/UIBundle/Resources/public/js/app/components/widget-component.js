@@ -92,7 +92,7 @@ define(function(require) {
             this.$element.on(eventName + '.' + this.cid, handler);
 
             mediator.on('widget_dialog:stateChange', _.bind(function(widget, data) {
-                if (this.previousWidgetData.id === widget.getWid()) {
+                if (this.previousWidgetData && this.previousWidgetData.id === widget.getWid()) {
                     this.previousWidgetData.open = data.state === 'minimized';
                     this.previousWidgetData.widget = widget;
                 }
