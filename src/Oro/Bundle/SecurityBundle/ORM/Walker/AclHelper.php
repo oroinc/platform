@@ -24,7 +24,6 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Class ACLHelper
  * This class analyse input query for acl and mark it with ORO_ACL_WALKER if it need to be ACL protected.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

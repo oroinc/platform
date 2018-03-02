@@ -11,6 +11,9 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 
+/**
+ * Abstract class for providers which provide ownership metadata for entities
+ */
 abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataProviderInterface
 {
     /** @var ConfigManager */

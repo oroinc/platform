@@ -11,6 +11,9 @@ use Oro\Bundle\SecurityBundle\EventListener\SearchListener;
 use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
+/**
+ * Applies ACL check to search index queries
+ */
 class AclHelper
 {
     /** @var SearchMappingProvider */
