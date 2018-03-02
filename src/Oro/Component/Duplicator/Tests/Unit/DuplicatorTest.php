@@ -36,7 +36,8 @@ class DuplicatorTest extends \PHPUnit_Framework_TestCase
             [['setNull'], ['propertyName', ['id']]],
             [['keep'], ['propertyName', ['entity']]],
             [['replaceValue', $now], ['property', [Entity1::class, 'createdAt']]],
-            [['replaceValue', true], ['property', [Entity1::class, 'bool']]],
+            [['replaceValue', false], ['property', [Entity1::class, 'bool']]],
+            [['replaceValue', ''], ['property', [Entity1::class, 'string']]],
             [['setNull'], ['property', [EntityItem1::class, 'id']]],
             [['shallowCopy'], ['property', [EntityItem2::class, 'childEntity']]],
         ];
@@ -53,8 +54,10 @@ class DuplicatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($entity->getEmail(), $entityCopy->getEmail());
         $this->assertSame($entity->getEntity(), $entityCopy->getEntity());
         $this->assertSame($entity->getEntity()->getTitle(), $entityCopy->getEntity()->getTitle());
-        $this->assertSame(false, $entity->getBool());
-        $this->assertSame(true, $entityCopy->getBool());
+        $this->assertSame(true, $entity->getBool());
+        $this->assertSame(false, $entityCopy->getBool());
+        $this->assertSame('some string', $entity->getString());
+        $this->assertSame('', $entityCopy->getString());
 
         $this->assertNotSame($entityCopy->getItems(), $entity->getItems());
         $this->assertEquals($entityCopy->getItems(), $entity->getItems());
