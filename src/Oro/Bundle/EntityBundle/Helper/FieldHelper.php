@@ -418,4 +418,12 @@ class FieldHelper
 
         return $this->propertyAccessor;
     }
+
+    /**
+     * @param string $locale
+     */
+    public function setLocale($locale)
+    {
+        $this->fieldProvider->setLocale($locale);
+    }
 }

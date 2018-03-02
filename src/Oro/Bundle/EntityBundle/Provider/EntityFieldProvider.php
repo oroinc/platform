@@ -57,6 +57,9 @@ class EntityFieldProvider
     /** @var array */
     protected $hiddenFields;
 
+    /** @var string|null The locale or null to use the default */
+    protected $locale = null;
+
     /**
      * Constructor
      *
@@ -389,7 +392,7 @@ class EntityFieldProvider
         $field = [
             'name'  => $name,
             'type'  => $type,
-            'label' => $translate ? $this->translator->trans($label) : $label
+            'label' => $this->getLocalizedValue($label, $translate)
         ];
         if ($isIdentifier) {
             $field['identifier'] = true;
@@ -481,13 +484,16 @@ class EntityFieldProvider
                 continue;
             }
 
-            $labelKey     = $this->entityConfigProvider->getConfig($relatedClassName, $fieldName)->get('label');
+            $labelKey     = $this->getLocalizedValue(
+                $this->entityConfigProvider->getConfig($relatedClassName, $fieldName)->get('label'),
+                $translate
+            );
             $labelType    = ($mapping['type'] & ClassMetadataInfo::TO_ONE) ? 'label' : 'plural_label';
-            $labelTypeKey = $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType);
-            if ($translate) {
-                $labelKey = $this->translator->trans($labelKey);
-                $labelTypeKey = $this->translator->trans($labelTypeKey);
-            }
+            $labelTypeKey = $this->getLocalizedValue(
+                $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType),
+                $translate
+            );
+
             $label = sprintf('%s (%s)', $labelKey, $labelTypeKey);
 
             $fieldType = $this->getRelationFieldType($relatedClassName, $fieldName);
@@ -571,9 +577,7 @@ class EntityFieldProvider
         if ($translateLabel === null) {
             $translateLabel = $translate;
         }
-        if ($translateLabel) {
-            $label = $this->translator->trans($label);
-        }
+        $label = $this->getLocalizedValue($label, $translateLabel);
 
         $relation = [
             'name'                => $name,
@@ -786,5 +790,30 @@ class EntityFieldProvider
                 return strcasecmp($a['label'], $b['label']);
             }
         );
+    }
+
+    /**
+     * @param string $locale
+     */
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+    }
+
+    /**
+     * Translates the given message according to the set or default locale
+     *
+     * @param string $messageId
+     * @param bool   $translate
+     *
+     * @return string The translated string
+     */
+    protected function getLocalizedValue($messageId, $translate)
+    {
+        if ($translate) {
+            return $this->translator->trans($messageId, [], null, $this->locale);
+        }
+
+        return $messageId;
     }
 }
