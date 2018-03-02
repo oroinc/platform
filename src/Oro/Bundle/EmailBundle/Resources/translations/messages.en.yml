@@ -24,7 +24,7 @@ oro:
         recent_emails_widget:
             no_subject: "no subject"
         form:
-            choose_template:                     ""
+            choose_template:                     Choose a Template
             add_signature:                       Add Signature
             attach_file:                         Attach file
             from_record:                         From record

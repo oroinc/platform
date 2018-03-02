@@ -39,9 +39,8 @@ class DbalTransportFactory implements TransportFactoryInterface
                 ->scalarNode('pid_file_dir')->defaultValue($pidFileDir)->cannotBeEmpty()->end()
                 ->integerNode('consumer_process_pattern')
                     ->defaultValue(':consume')
-                    ->cannotBeEmpty()
                     ->end()
-                ->integerNode('polling_interval')->min(50)->defaultValue(1000)->cannotBeEmpty()->end()
+                ->integerNode('polling_interval')->min(50)->defaultValue(1000)->end()
         ;
     }
 
