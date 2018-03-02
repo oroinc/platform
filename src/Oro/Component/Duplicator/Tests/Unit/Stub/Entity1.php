@@ -34,7 +34,12 @@ class Entity1
     /**
      * @var bool
      */
-    protected $bool = false;
+    protected $bool = true;
+
+    /**
+     * @var string
+     */
+    protected $string = 'some string';
 
     /**
      * @param int $id
@@ -116,5 +121,13 @@ class Entity1
     public function getBool()
     {
         return $this->bool;
+    }
+
+    /**
+     * @return string
+     */
+    public function getString()
+    {
+        return $this->string;
     }
 }
