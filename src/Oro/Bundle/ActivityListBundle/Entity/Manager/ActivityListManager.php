@@ -24,8 +24,8 @@ use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowDataHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
