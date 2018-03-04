@@ -7,26 +7,36 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Adds request types for all registered API views to the Data API resources cache warmer.
+ * Sets the default view to RestDocUrlGenerator service.
  */
-class ResourcesCacheWarmerCompilerPass implements CompilerPassInterface
+class RestDocUrlGeneratorCompilerPass implements CompilerPassInterface
 {
-    private const RESOURCES_CACHE_WARMER_SERVICE = 'oro_api.resources.cache_warmer';
-
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        $requestTypes = [];
+        $container->getDefinition('oro_api.rest.doc_url_generator')
+            ->replaceArgument(2, $this->getDefaultView($container));
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @return string|null
+     */
+    private function getDefaultView(ContainerBuilder $container): ?string
+    {
+        $defaultView = null;
         $views = $this->getApiDocViews($container);
-        foreach ($views as $view) {
-            if (!empty($view['request_type'])) {
-                $requestTypes[] = $view['request_type'];
+        foreach ($views as $name => $view) {
+            if (\array_key_exists('default', $view) && $view['default']) {
+                $defaultView = $name;
+                break;
             }
         }
-        $container->getDefinition(self::RESOURCES_CACHE_WARMER_SERVICE)
-            ->replaceArgument(3, $requestTypes);
+
+        return $defaultView;
     }
 
     /**

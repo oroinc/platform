@@ -8,6 +8,10 @@
     div.motd { padding-top: 10px; }
     div.motd div.documentation { padding: 3px 0; overflow: hidden; }
     div.motd div.documentation a { font-size: 1.2em; text-decoration: none; }
+    #sandbox_configuration { padding-top: 16px; padding-bottom: 5px; }
+    #sandbox_configuration .account-info { position: absolute; top: 7px; right: 16px; }
+    #sandbox_configuration .account-info em { padding-left: 1em; color: #2c4300; }
+    #sandbox_configuration .account-info a { padding-left: 2em; color: #2c4300; text-decoration: underline; }
 </style>
 <script type="text/javascript">
     handleResourceLinks = function ($el, apiPrefix) {
@@ -54,14 +58,16 @@
         return false;
     };
     $(function() {
-        {% set user = get_current_user() %}
-        var userName = {{ user ? user.username|json_encode|raw : 'null' }},
-            apiKey = {{ user and user.apiKeys|first ? (user.apiKeys|first).apiKey|json_encode|raw : 'null' }},
-            sessionAllowed = userName ? true : false,
+        var userName = {{ userName|json_encode|raw }},
+            apiKey = {{ apiKey|json_encode|raw }},
+            loginUrl = {{ loginRoute ? path(loginRoute)|json_encode|raw : 'null' }},
+            logoutUrl = {{ logoutRoute ? path(logoutRoute)|json_encode|raw : 'null' }},
+            sessionAllowed = {{ hasSecurityToken|json_encode|raw }},
             wsseAllowed = userName && apiKey,
             serverTime = {{ 'now'|date('c', 'UTC')|json_encode|raw }},
             clientTime = new Date(),
             serverTimeOffset = Date.parse(serverTime) - clientTime,
+            $motd = $('.motd').first(),
             $apiDocLink = $('#header a').first(),
             apiType = window.location.pathname.substr('{{ rootPath }}'.length + 1) || '{{ defaultView }}',
             apiPrefix = '',
@@ -115,7 +121,7 @@
         $apiDocLink.attr('href', '{{ rootPath }}');
 
         /**
-         * Add the ApiDoc view selector
+         * Add the API view selector
          */
         {% if views is defined and views and views|length > 1 -%}
         $apiDocLink.after('<div id="api_type">type:' +
@@ -132,6 +138,23 @@
         {% endif %}
 
         /**
+         * Add the documentation link
+         */
+        {% if views is defined and views -%}
+        var documentationUrl = null;
+        {% for name, view in views -%}
+        {% if view.sandbox and view.documentation_path -%}
+            if (apiType === '{{ name }}') { documentationUrl = '{{ asset(view.documentation_path) }}'; }
+        {% endif -%}
+        {%- endfor -%}
+        if (documentationUrl) {
+            $motd.append('<div class="documentation">' +
+                '<a href="' + documentationUrl + '" target="_blank">The documentation</a>' +
+                '</div>');
+        }
+        {% endif %}
+
+        /**
          * Add the authentication type selector
          */
         $('#sandbox_configuration').prepend(
@@ -144,11 +167,27 @@
             '<select id="authentication_type">' +
                 '<option value=""' + (!wsseAllowed && !sessionAllowed ? ' selected=""' : '') + '>None</option>' +
                 '<option value="wsse"' + (wsseAllowed ? ' selected=""' : ' disabled=""') + '>WSSE</option>' +
-                '<option value="session"' + (sessionAllowed && !wsseAllowed? ' selected=""' : ' disabled=""') + '>Session</option>' +
+                '<option value="session"' + (!sessionAllowed ? ' disabled=""' : (!wsseAllowed ? ' selected=""' : '')) + '>Session</option>' +
             '</select>'
         );
         if (!wsseAllowed && !sessionAllowed) {
-            $('#header').css('background-color', '#F7FE2E');
+            $('#header').css('background-color', '#f7fe2e');
+        }
+
+        /**
+         * Add loggin and logout links
+         */
+        var accountInfo = '';
+        if (userName) {
+            accountInfo = '<em>signed in as: ' + userName + '</em>';
+            if (logoutUrl) {
+                accountInfo += '<a href="' + logoutUrl + '?_api_view=' + apiType + '">sign out</a>'
+            }
+        } else if (loginUrl) {
+            accountInfo = '<a href="' + loginUrl + '?_api_view=' + apiType + '">sign in</a>'
+        }
+        if (accountInfo) {
+            $('#sandbox_configuration').append('<span class="account-info">' + accountInfo + '</span>');
         }
 
         /**
@@ -419,10 +458,4 @@
     });
 </script>
 
-{% if documentationPath is defined and documentationPath %}
-    <div class="motd">
-        <div class="documentation">
-            <a href="{{ asset(documentationPath) }}" target="_blank">The documentation</a>
-        </div>
-    </div>
-{% endif %}
+<div class="motd"></div>
