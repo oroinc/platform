@@ -54,6 +54,9 @@ define(function(require) {
             paste: 'debouncedValidate'
         },
 
+        /**
+         * @inheritDoc
+         */
         constructor: function ExpressionEditorView(options) {
             this.debouncedAutocomplete = _.debounce(function(e) {
                 if (!this.disposed) {
@@ -66,13 +69,6 @@ define(function(require) {
                 }
             }.bind(this), this.delay);
             ExpressionEditorView.__super__.constructor.call(this, options);
-        },
-
-        /**
-         * @inheritDoc
-         */
-        constructor: function ExpressionEditorView() {
-            ExpressionEditorView.__super__.constructor.apply(this, arguments);
         },
 
         /**
