@@ -18,6 +18,7 @@ use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+// TODO: change to Symfony\Component\Validator\Validator\ValidatorInterface in scope of BAP-15236
 use Symfony\Component\Validator\ValidatorInterface;
 
 class ImportStrategyHelper
@@ -164,6 +165,7 @@ class ImportStrategyHelper
      */
     public function validateEntity($entity, $groups = null)
     {
+        // TODO: change to $violations = $this->validator->validate($entity, null, $groups); in scope of BAP-15236
         $violations = $this->validator->validate($entity, $groups);
         if (count($violations)) {
             $errors = [];

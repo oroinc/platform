@@ -74,7 +74,7 @@ class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
     {
         $existingEntity = new AttributeGroup();
         $existingEntity->addLabel($this->createLocalizedValue('Group1 Label 1'));
-        $options = ['options' =>
+        $options = ['entry_options' =>
             [
                 'attributeEntityClass' => 'EnityClass',
                 'data_class' => AttributeGroup::class

@@ -11,6 +11,9 @@ use Symfony\Component\Templating\EngineInterface;
  */
 class HtmlFormatter extends AbstractFormatter
 {
+    /** @var SecurityContextInterface */
+    protected $securityContext;
+
     /** @var FileLocatorInterface */
     protected $fileLocator;
 
@@ -57,13 +60,18 @@ class HtmlFormatter extends AbstractFormatter
     protected $enableFormatParameter = true;
 
     /** @var string */
-    protected $documentationPath;
-
-    /** @var string */
-    protected $rootRoute = 'nelmio_api_doc_index';
+    protected $rootRoute;
 
     /** @var array */
     protected $views;
+
+    /**
+     * @param SecurityContextInterface $securityContext
+     */
+    public function setSecurityContext(SecurityContextInterface $securityContext)
+    {
+        $this->securityContext = $securityContext;
+    }
 
     /**
      * @param FileLocatorInterface $fileLocator
@@ -186,14 +194,6 @@ class HtmlFormatter extends AbstractFormatter
     }
 
     /**
-     * @param string $documentationPath
-     */
-    public function setDocumentationPath($documentationPath)
-    {
-        $this->documentationPath = $documentationPath;
-    }
-
-    /**
      * @param string $rootRoute
      */
     public function setRootRoute($rootRoute)
@@ -258,10 +258,14 @@ class HtmlFormatter extends AbstractFormatter
             'motdTemplate'          => $this->motdTemplate,
             'defaultSectionsOpened' => $this->defaultSectionsOpened,
             'enableFormatParameter' => $this->enableFormatParameter,
-            'documentationPath'     => $this->documentationPath,
-            'rootRoute'             => $this->rootRoute,
+            'rootRoute'             => $this->rootRoute ?? RestDocUrlGenerator::ROUTE,
             'views'                 => $this->views,
-            'defaultView'           => $this->getDefaultView()
+            'defaultView'           => $this->getDefaultView(),
+            'hasSecurityToken'      => $this->securityContext->hasSecurityToken(),
+            'userName'              => $this->securityContext->getUserName(),
+            'apiKey'                => $this->securityContext->getApiKey(),
+            'loginRoute'            => $this->securityContext->getLoginRoute(),
+            'logoutRoute'           => $this->securityContext->getLogoutRoute()
         ];
     }
 

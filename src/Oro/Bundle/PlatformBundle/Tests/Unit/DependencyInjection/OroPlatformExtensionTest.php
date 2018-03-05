@@ -48,7 +48,7 @@ class OroPlatformExtensionTest extends \PHPUnit_Framework_TestCase
                         'pattern' => '^/',
                         'provider' => 'chain_provider',
                         'organization-form-login' => [
-                            'csrf_provider' => 'form.csrf_provider',
+                            'csrf_token_generator' => 'security.csrf.token_manager',
                             'check_path' => 'oro_user_security_check',
                             'login_path' => 'oro_user_security_login',
                         ],

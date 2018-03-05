@@ -18,6 +18,13 @@ define(function(require) {
         narrowScreen: false,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function MultilineChartComponent() {
+            MultilineChartComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Draw chart
          *
          * @overrides

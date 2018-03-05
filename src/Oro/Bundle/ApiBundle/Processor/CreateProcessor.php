@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 
+/**
+ * The main processor for "create" action.
+ */
 class CreateProcessor extends RequestActionProcessor
 {
     /**

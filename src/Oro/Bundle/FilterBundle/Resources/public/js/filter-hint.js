@@ -61,6 +61,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function FilterHint() {
+            FilterHint.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             var opts = _.pick(options || {}, 'filter');
             _.extend(this, opts);

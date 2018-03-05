@@ -33,8 +33,10 @@ class EnumValueValidator extends ConstraintValidator
         $valueId = ExtendHelper::buildEnumValueId($entity['label'], false);
 
         if (empty($valueId)) {
-            $this->context
-                ->addViolationAt('[label]', $constraint->message, ['{{ value }}' => $entity['label']]);
+            $this->context->buildViolation($constraint->message)
+                ->atPath('[label]')
+                ->setParameters(['{{ value }}' => $entity['label']])
+                ->addViolation();
         }
     }
 }

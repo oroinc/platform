@@ -17,7 +17,7 @@ class AddressCollectionType extends AbstractType
     {
         $resolver->setNormalizers(
             array(
-                'options' => function (Options $options, $values) {
+                'entry_options' => function (Options $options, $values) {
                     if (!$values) {
                         $values = array();
                     }

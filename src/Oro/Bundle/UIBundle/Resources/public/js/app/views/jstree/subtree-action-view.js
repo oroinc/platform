@@ -20,6 +20,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function SubTreeActionView() {
+            SubTreeActionView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             SubTreeActionView.__super__.initialize.apply(this, arguments);
             this.options.selectLabel = __(this.options.selectLabel, {

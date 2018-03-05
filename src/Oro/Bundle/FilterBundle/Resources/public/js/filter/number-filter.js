@@ -17,6 +17,13 @@ define([
         wrapHintValue: false,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function NumberFilter() {
+            NumberFilter.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize.
          *
          * @param {Object} options

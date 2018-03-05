@@ -9,6 +9,9 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
+/**
+ * Abstract class for providers which provide ownership metadata for entities
+ */
 abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataProviderInterface
 {
     /** @var ConfigManager */

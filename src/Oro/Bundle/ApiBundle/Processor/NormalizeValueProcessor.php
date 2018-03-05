@@ -8,6 +8,9 @@ use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * The main processor for "normalize_value" action.
+ */
 class NormalizeValueProcessor extends ActionProcessor
 {
     /**

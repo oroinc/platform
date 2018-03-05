@@ -46,6 +46,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function AutocompleteComponent() {
+            AutocompleteComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             AutocompleteComponent.__super__.initialize.apply(this, arguments);
 

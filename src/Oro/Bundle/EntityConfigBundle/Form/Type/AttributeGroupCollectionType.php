@@ -18,8 +18,8 @@ class AttributeGroupCollectionType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'type' => AttributeGroupType::NAME,
-                'options' => [
+                'entry_type' => AttributeGroupType::NAME,
+                'entry_options' => [
                     'data_class' => AttributeGroup::class,
                 ],
                 'attr' => [

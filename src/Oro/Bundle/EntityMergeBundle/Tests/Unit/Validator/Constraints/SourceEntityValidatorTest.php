@@ -4,7 +4,9 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Validator\Constraints;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldData;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
+use Oro\Bundle\EntityMergeBundle\Validator\Constraints\SourceEntity;
 use Oro\Bundle\EntityMergeBundle\Validator\Constraints\SourceEntityValidator;
+use Symfony\Component\Validator\Context\ExecutionContext;
 
 class SourceEntityValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -88,15 +90,12 @@ class SourceEntityValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidate($entityData, $addViolation, $sourceEntity)
     {
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(ExecutionContext::class);
 
         $context->expects($this->$addViolation())
             ->method('addViolation');
 
-        $constraint = $this
-            ->createMock('Oro\Bundle\EntityMergeBundle\Validator\Constraints\SourceEntity');
+        $constraint = $this->createMock(SourceEntity::class);
         $this->validator->initialize($context);
 
         $entityData

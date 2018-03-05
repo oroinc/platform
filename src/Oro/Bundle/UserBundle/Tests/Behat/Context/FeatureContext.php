@@ -107,4 +107,17 @@ class FeatureContext extends OroFeatureContext implements
         $this->getSession('system_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
     }
+
+    /**
+     * Click on button "Reset" in modal window and skip wait ajax
+     *
+     * @When /^(?:|I )confirm reset password$/
+     */
+    public function iConfirmResetPassword()
+    {
+        $this->oroMainContext->pressButtonInModalWindow('Reset');
+
+        // need to be skiped ajax wait, because we have redirect to login page and no ajax requests
+        $this->oroMainContext->applySkipWait();
+    }
 }

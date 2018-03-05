@@ -15,6 +15,13 @@ define(function(require) {
 
         activeFunctionGroupKey: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function FunctionChoiceView() {
+            FunctionChoiceView.__super__.constructor.apply(this, arguments);
+        },
+
         render: function() {
             this.$el.inputWidget('create');
             this._disable(true);

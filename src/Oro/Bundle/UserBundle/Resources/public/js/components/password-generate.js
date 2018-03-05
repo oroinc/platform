@@ -7,6 +7,13 @@ define(function(require) {
     var _ = require('underscore');
 
     PasswordGenerateComponent = BaseComponent.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function PasswordGenerateComponent() {
+            PasswordGenerateComponent.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             this.$el = $(options.checkbox);
             this.passwordInput = $(options.passwordInput);

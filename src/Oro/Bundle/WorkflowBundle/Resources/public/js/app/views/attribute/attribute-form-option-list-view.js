@@ -20,6 +20,16 @@ define(function(require) {
 
         requiredOptions: ['fieldsChoiceView', 'workflow', 'entityFieldsProvider'],
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function AttributeFormOptionListView() {
+            AttributeFormOptionListView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             options = options || {};
             var requiredMissed = this.requiredOptions.filter(function(option) {

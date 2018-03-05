@@ -90,13 +90,16 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedData, $form->getData());
     }
 
+    /**
+     * @return array
+     */
     public function submitDataProvider()
     {
         return [
             'percent with value' => [
                 'options' => [
-                    'type'    => 'percent',
-                    'options' => ['type' => 'integer'],
+                    'entry_type'    => 'percent',
+                    'entry_options' => ['type' => 'integer'],
                     'group_fallback_fields' => null
                 ],
                 'defaultData'   => 25,
@@ -107,7 +110,7 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
             ],
             'text with fallback' => [
                 'options' => [
-                    'type'              => TextTypeStub::NAME,
+                    'entry_type'              => TextTypeStub::NAME,
                     'enabled_fallbacks' => [FallbackType::PARENT_LOCALIZATION],
                     'group_fallback_fields' => false
                 ],
@@ -123,7 +126,7 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
             ],
             'integer as null' => [
                 'options' => [
-                    'type' => 'integer',
+                    'entry_type' => 'integer',
                     'group_fallback_fields' => true
                 ],
                 'defaultData'   => null,
@@ -134,7 +137,7 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
             ],
             'richtext with fallback' => [
                 'options' => [
-                    'type'              => OroRichTextTypeStub::NAME,
+                    'entry_type'              => OroRichTextTypeStub::NAME,
                     'enabled_fallbacks' => [FallbackType::PARENT_LOCALIZATION],
                     'group_fallback_fields' => null
                 ],

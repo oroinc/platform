@@ -3,8 +3,14 @@
 namespace Oro\Bundle\ImapBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
+/**
+ * Doctrine repository for UserEmailOrigin entity
+ */
 class UserEmailOriginRepository extends EntityRepository
 {
     /**
@@ -42,5 +48,51 @@ class UserEmailOriginRepository extends EntityRepository
             ->setParameter('ids', $originIds)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @param UserEmailOrigin $origin
+     * @param null|bool $syncEnabled
+     * @return int
+     */
+    public function deleteRelatedEmails(UserEmailOrigin $origin, $syncEnabled = null)
+    {
+        $em = $this->getEntityManager();
+
+        $subQb = $em->createQueryBuilder();
+
+        $params = ['originId' => $origin->getId()];
+
+        if ($syncEnabled !== null) {
+            $params['syncEnabled'] = $syncEnabled;
+
+            $subQb->select('ie')
+                ->from(ImapEmail::class, 'ie')
+                ->join('ie.imapFolder', 'ief')
+                ->join('ief.folder', 'ef')
+                ->where(
+                    $subQb->expr()->eq('ie.email', 'e'),
+                    $subQb->expr()->eq('ef.origin', ':originId'),
+                    $subQb->expr()->eq('ef.syncEnabled', ':syncEnabled')
+                );
+        } else {
+            $subQb->select('eu')
+                ->from(EmailUser::class, 'eu')
+                ->where(
+                    $subQb->expr()->eq('eu.origin', ':originId'),
+                    $subQb->expr()->eq('eu.email', 'e')
+                );
+        }
+
+        $qb = $em->createQueryBuilder();
+
+        return $qb->delete(Email::class, 'e')
+            ->where(
+                $qb->expr()->exists(
+                    $subQb->getQuery()->getDQL()
+                )
+            )
+            ->getQuery()
+            ->execute($params);
     }
 }

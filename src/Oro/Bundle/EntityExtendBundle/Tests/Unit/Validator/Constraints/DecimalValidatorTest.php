@@ -4,11 +4,12 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\Decimal;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\DecimalValidator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class DecimalValidatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|\Symfony\Component\Validator\ExecutionContextInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContextInterface
      */
     protected $context;
 
@@ -22,20 +23,20 @@ class DecimalValidatorTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->context   = $this->createMock('Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context   = $this->createMock(ExecutionContextInterface::class);
         $this->validator = new DecimalValidator();
 
         $this->validator->initialize($this->context);
     }
 
     /**
-     * @param $options
-     * @param $value
-     * @param $violation
+     * @param array $options
+     * @param float $value
+     * @param bool $violation
      *
      * @dataProvider validateDataProvider
      */
-    public function testValidate($options, $value, $violation)
+    public function testValidate(array $options, $value, $violation)
     {
         $this->context->expects(($violation ? $this->once() : $this->never()))
             ->method('addViolation');
@@ -51,6 +52,7 @@ class DecimalValidatorTest extends \PHPUnit_Framework_TestCase
     public function validateDataProvider()
     {
         return [
+            [['precision' => 10,    'scale' => 4  ], 171.9,       false],
             [['precision' => 4,    'scale' => 2   ], 42,          false],
             [['precision' => 4,    'scale' => 2   ], 142,         true ],
             [['precision' => 4,    'scale' => 2   ], 42.42,       false],

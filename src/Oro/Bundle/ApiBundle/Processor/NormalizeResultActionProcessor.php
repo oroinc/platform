@@ -18,9 +18,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * The base processor for actions with "normalize_result" group.
+ * Processors from this group are intended to prepare valid response ant they are executed
+ * regardless whether an error occurred or not.
+ */
 class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAwareInterface
 {
-    const NORMALIZE_RESULT_GROUP = 'normalize_result';
+    public const NORMALIZE_RESULT_GROUP = 'normalize_result';
 
     /** @var LoggerInterface */
     protected $logger;

@@ -10,6 +10,16 @@ define(function(require) {
     var BaseComponent = require('oroui/js/app/components/base/component');
 
     SidebarComponent = BaseComponent.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function SidebarComponent() {
+            SidebarComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             SidebarComponent.__super__.initialize.call(this, options);
 

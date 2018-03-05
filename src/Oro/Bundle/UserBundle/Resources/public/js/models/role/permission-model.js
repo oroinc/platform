@@ -7,6 +7,16 @@ define(function(require) {
     PermissionModel = BaseModel.extend({
         _initialAccessLevel: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function PermissionModel() {
+            PermissionModel.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             this._initialAccessLevel = this.get('access_level');
             PermissionModel.__super__.initialize.apply(this, arguments);

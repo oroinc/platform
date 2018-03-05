@@ -13,7 +13,13 @@ define(function(require) {
      */
     PieChartComponent = BaseChartComponent.extend({
         /**
-         *
+         * @inheritDoc
+         */
+        constructor: function PieChartComponent() {
+            PieChartComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @overrides
          * @param {Object} options
          */

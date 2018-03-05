@@ -12,7 +12,19 @@ define(function(require) {
 
     ActionPermissionsRowView = ActionPermissionsReadonlyRowView.extend({
         permissionItemView: PermissionView,
+
         fieldItemView: FieldView,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActionPermissionsRowView() {
+            ActionPermissionsRowView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             ActionPermissionsRowView.__super__.initialize.call(this, options);
             var fields = this.model.get('fields');

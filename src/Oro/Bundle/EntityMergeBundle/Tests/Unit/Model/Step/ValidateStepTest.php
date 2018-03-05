@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Step;
 
 use Oro\Bundle\EntityMergeBundle\Model\Step\ValidateStep;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ValidateStepTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,7 +25,7 @@ class ValidateStepTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->validator = $this
-            ->createMock('Symfony\Component\Validator\ValidatorInterface');
+            ->createMock(ValidatorInterface::class);
 
         $this->constraintViolation = $this
             ->getMockBuilder('Symfony\Component\Validator\ConstraintViolationList')

@@ -22,6 +22,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function StringCell() {
+            StringCell.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         render: function() {
             var render = StringCell.__super__.render.apply(this, arguments);
 

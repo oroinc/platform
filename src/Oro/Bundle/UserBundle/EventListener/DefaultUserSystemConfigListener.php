@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\EventListener;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\DefaultUserProvider;
 
@@ -19,12 +20,17 @@ class DefaultUserSystemConfigListener
     /** @var string */
     private $configKey;
 
+    /** @var DoctrineHelper*/
+    private $doctrineHelper;
+
     /**
      * @param DefaultUserProvider $defaultUserProvider
+     * @param DoctrineHelper      $doctrineHelper
      */
-    public function __construct(DefaultUserProvider $defaultUserProvider)
+    public function __construct(DefaultUserProvider $defaultUserProvider, DoctrineHelper $doctrineHelper)
     {
         $this->defaultUserProvider = $defaultUserProvider;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -59,8 +65,16 @@ class DefaultUserSystemConfigListener
         $settingsKey = $this->getSettingsKey();
         $settings = $event->getSettings();
 
-        $settings[$settingsKey]['value'] = $this->defaultUserProvider
-            ->getDefaultUser($this->alias, $this->configKey);
+        $owner = null;
+        if (isset($settings[$settingsKey]['value'])) {
+            $owner = $this->getUserById($settings[$settingsKey]['value']);
+        }
+
+        if (!$owner) {
+            $owner = $this->defaultUserProvider->getDefaultUser($this->alias, $this->configKey);
+        }
+
+        $settings[$settingsKey]['value'] = $owner;
 
         $event->setSettings($settings);
     }
@@ -92,5 +106,17 @@ class DefaultUserSystemConfigListener
     private function getSettingsKey()
     {
         return TreeUtils::getConfigKey($this->alias, $this->configKey, ConfigManager::SECTION_VIEW_SEPARATOR);
+    }
+
+    /**
+     * @param int $userId
+     *
+     * @return User|null
+     */
+    private function getUserById(int $userId)
+    {
+        return $this->doctrineHelper
+            ->getEntityRepositoryForClass(User::class)
+            ->findOneBy(['id' => $userId]);
     }
 }

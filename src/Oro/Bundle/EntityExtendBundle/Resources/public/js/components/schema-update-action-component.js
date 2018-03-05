@@ -11,12 +11,18 @@ define(function(require) {
     var BaseComponent = require('oroui/js/app/components/base/component');
 
     ShemaUpdateActionComponent = BaseComponent.extend({
-
         /**
          * @property {Object}
          */
         options: {
             delimiter: ';'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ShemaUpdateActionComponent() {
+            ShemaUpdateActionComponent.__super__.constructor.apply(this, arguments);
         },
 
         /**

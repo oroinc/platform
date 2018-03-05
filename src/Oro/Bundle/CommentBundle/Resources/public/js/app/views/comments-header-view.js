@@ -20,6 +20,13 @@ define(function(require) {
             'click a.load-more': 'onLoadMoreClick'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function CommentsHeaderView() {
+            CommentsHeaderView.__super__.constructor.apply(this, arguments);
+        },
+
         onLoadMoreClick: function(e) {
             e.stopImmediatePropagation();
             this.$el.trigger('comment-load-more');

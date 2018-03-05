@@ -251,10 +251,9 @@ class RecipientList
 
         if ($notValid) {
             $propertyPath = $context->getPropertyPath() . '.recipientList';
-            $context->addViolationAt(
-                $propertyPath,
-                'oro.notification.validators.recipient_list.empty.message'
-            );
+            $context->buildViolation('oro.notification.validators.recipient_list.empty.message')
+                ->atPath($propertyPath)
+                ->addViolation();
         }
     }
 

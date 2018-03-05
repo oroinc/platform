@@ -30,6 +30,14 @@ define([
             error: 'Not removed.',
             empty_selection: 'Please, select item to remove.'
         },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function AjaxdeletefieldAction() {
+            AjaxdeletefieldAction.__super__.constructor.apply(this, arguments);
+        },
+
         _onAjaxSuccess: function(data) {
             mediator.execute('refreshPage');
         }

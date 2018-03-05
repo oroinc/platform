@@ -24,7 +24,7 @@ oro:
         recent_emails_widget:
             no_subject: "no subject"
         form:
-            choose_template:                     ""
+            choose_template:                     Choose a Template
             add_signature:                       Add Signature
             attach_file:                         Attach file
             from_record:                         From record
@@ -173,7 +173,7 @@ oro:
             current_datetime:    Current date & time
             current_date:        Current date
             current_time:        Current time
-            siganture:           Signature (|oro_tag_filter should be removed to allow usage of it's html view)
+            siganture:           Signature (|oro_html_strip_tags should be removed to allow usage of it's html view)
 
         attachment:
             copy_to_record: Copy to Record

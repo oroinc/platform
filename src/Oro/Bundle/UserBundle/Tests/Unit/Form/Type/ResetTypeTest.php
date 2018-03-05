@@ -73,7 +73,7 @@ class ResetTypeTest extends FormIntegrationTestCase
             ->method('setDefaults')
             ->with([
                 'data_class' => User::class,
-                'intention'  => 'reset',
+                'csrf_token_id' => 'reset',
                 'dynamic_fields_disabled' => true
             ]);
 

@@ -136,5 +136,52 @@ define(function(require) {
                 expect(this.view.findText).toEqual(/Grou\#\$p 2\.Field 2\*\.1/gi);
             });
         });
+
+        describe('check toggle trigger for changing state', function() {
+            beforeEach(function() {
+                this.view = createView({
+                    highlightSelectors: ['.settings-title', '.group', '.field'],
+                    toggleSelectors: {
+                        '.field': '.fields',
+                        '.group': '.settings-content'
+                    },
+                    highlightSwitcherContainer: '.toggle',
+                    highlightStateStorageKey: 'show-all-configuration-items-on-search'
+                });
+
+                this.view.setHighlightSwitcherState(false);
+            });
+
+            afterEach(function() {
+                window.localStorage.removeItem('show-all-configuration-items-on-search');
+            });
+
+            it('append toggle button container', function() {
+                expect(this.view.$(this.view.highlightSwitcherElement).length).toEqual(1);
+            });
+
+            it('show all items', function() {
+                mediator.trigger(':highlight-text:update', 'Group 2.Field 1');
+                expect(this.view.isElementContentHighlighted(this.view.$el)).toBeTruthy();
+                expect(this.view.$(':contains("Group 1")').hasClass(this.view.notFoundClass)).toBeTruthy();
+                expect(this.view.$(':contains("Group 1.Field 1")').hasClass(this.view.notFoundClass)).toBeFalsy();
+                expect(this.view.$(':contains("Group 1.Field 2")').hasClass(this.view.notFoundClass)).toBeFalsy();
+                expect(this.view.$(':contains("Group 2")').hasClass(this.view.foundClass)).toBeTruthy();
+                expect(this.view.$(':contains("Group 2.Field 1")').hasClass(this.view.foundClass)).toBeTruthy();
+                expect(this.view.$(':contains("Group 2.Field 2")').hasClass(this.view.notFoundClass)).toBeTruthy();
+
+                this.view.$(this.view.highlightSwitcherElement).trigger('click');
+
+                expect(this.view.$(':contains("Group 1")').hasClass(this.view.notFoundClass)).toBeFalsy();
+                expect(this.view.$(':contains("Group 1.Field 1")').hasClass(this.view.notFoundClass)).toBeFalsy();
+                expect(this.view.$(':contains("Group 1.Field 2")').hasClass(this.view.notFoundClass)).toBeFalsy();
+                expect(this.view.$(':contains("Group 2")').hasClass(this.view.foundClass)).toBeTruthy();
+                expect(this.view.$(':contains("Group 2.Field 1")').hasClass(this.view.foundClass)).toBeTruthy();
+                expect(this.view.$(':contains("Group 2.Field 2")').hasClass(this.view.notFoundClass)).toBeFalsy();
+
+                expect(window.localStorage.getItem('show-all-configuration-items-on-search')).toEqual('true');
+                this.view.setHighlightSwitcherState(false);
+            });
+        });
     });
 });

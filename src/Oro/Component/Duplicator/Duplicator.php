@@ -8,6 +8,10 @@ use DeepCopy\Matcher\Matcher;
 use Oro\Component\Duplicator\Filter\FilterFactory;
 use Oro\Component\Duplicator\Matcher\MatcherFactory;
 
+/**
+ * Makes a copy of passed object in accordance with specified options.
+ * To change values of a copied object used different filters.
+ */
 class Duplicator implements DuplicatorInterface
 {
     /**
@@ -51,7 +55,15 @@ class Duplicator implements DuplicatorInterface
     {
         $filterName = $filterOptions[0];
         $filterParameters = isset($filterOptions[1]) ? $filterOptions[1] : null;
-        return $this->filterFactory->create($filterName, array_filter([$filterParameters]));
+        return $this->filterFactory->create(
+            $filterName,
+            array_filter(
+                [$filterParameters],
+                function ($value) {
+                    return $value !== null;
+                }
+            )
+        );
     }
 
     /**

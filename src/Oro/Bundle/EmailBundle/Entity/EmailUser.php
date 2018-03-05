@@ -11,7 +11,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * EmailUser
+ * Entity that represents a emails that are accessible to a certain user
  *
  * @ORM\Table(
  *      name="oro_email_user",
@@ -116,10 +116,10 @@ class EmailUser
     protected $seen = false;
 
     /**
-     * @var EmailOrigin
+     * @var EmailOrigin|null
      *
      * @ORM\ManyToOne(targetEntity="EmailOrigin", inversedBy="emailUsers")
-     * @ORM\JoinColumn(name="origin_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="origin_id", referencedColumnName="id", onDelete="SET NULL", nullable=true)
      * @JMS\Exclude
      */
     protected $origin;
@@ -377,7 +377,7 @@ class EmailUser
     /**
      * Get email user origin
      *
-     * @return EmailOrigin
+     * @return EmailOrigin|null
      */
     public function getOrigin()
     {

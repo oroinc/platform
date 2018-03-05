@@ -19,6 +19,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * This controller covers basic CRUD functionality for User entity.
+ * Also includes user profile management functionality.
+ */
 class UserController extends Controller
 {
     /**
@@ -30,6 +34,9 @@ class UserController extends Controller
      *      class="OroUserBundle:User",
      *      permission="VIEW"
      * )
+     *
+     * @param User $user
+     * @return array
      */
     public function viewAction(User $user)
     {
@@ -42,6 +49,7 @@ class UserController extends Controller
     /**
      * @Route("/profile/view", name="oro_user_profile_view")
      * @Template("OroUserBundle:User:view.html.twig")
+     * @AclAncestor("oro_user_user_view")
      */
     public function viewProfileAction()
     {
@@ -61,6 +69,9 @@ class UserController extends Controller
     /**
      * @Route("/apigen/{id}", name="oro_user_apigen", requirements={"id"="\d+"})
      * @Method({"GET","POST"})
+     *
+     * @param User $user
+     * @return JsonResponse|Response
      */
     public function apigenAction(User $user)
     {
@@ -126,6 +137,9 @@ class UserController extends Controller
      *      class="OroUserBundle:User",
      *      permission="EDIT"
      * )
+     *
+     * @param User $entity
+     * @return array|RedirectResponse
      */
     public function updateAction(User $entity)
     {
@@ -144,9 +158,9 @@ class UserController extends Controller
      */
     public function indexAction()
     {
-        return array(
+        return [
             'entity_class' => $this->container->getParameter('oro_user.entity.class')
-        );
+        ];
     }
 
     /**
@@ -183,7 +197,7 @@ class UserController extends Controller
     {
         // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
         // completely delete an owner and related entities or reassign related entities to another owner before
-        
+
         return [
             'entity' => $entity,
             'allow_delete' => $this->isUserDeleteAllowed($entity),
@@ -216,11 +230,11 @@ class UserController extends Controller
             throw new AccessDeniedException();
         }
 
-        return array(
+        return [
             'entity'      => $user,
             'userApi'     => $this->getUserApi($user),
             'viewProfile' => $isViewProfile
-        );
+        ];
     }
 
     /**

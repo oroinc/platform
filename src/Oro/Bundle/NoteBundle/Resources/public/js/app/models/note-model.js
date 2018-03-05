@@ -22,6 +22,13 @@ define([
             updatedBy_id: null,
             updatedBy_viewable: false,
             updatedBy_avatar: null
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function NoteModel() {
+            NoteModel.__super__.constructor.apply(this, arguments);
         }
     });
 

@@ -39,7 +39,7 @@ class TagType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' => 'Oro\Bundle\TagBundle\Entity\Tag',
-                'intention'  => 'tag',
+                'csrf_token_id' => 'tag',
             ]
         );
     }

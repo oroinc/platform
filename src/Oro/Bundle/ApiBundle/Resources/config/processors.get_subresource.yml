@@ -59,6 +59,10 @@ services:
             - { name: oro.api.processor, action: get_subresource, group: load_data, collection: false }
 
     #
+    # data_security_check
+    #
+
+    #
     # normalize_data
     #
 
