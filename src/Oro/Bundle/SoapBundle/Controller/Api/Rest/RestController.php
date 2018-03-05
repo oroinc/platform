@@ -9,7 +9,7 @@ use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Util\ClassUtils;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 abstract class RestController extends RestGetController implements
     FormAwareInterface,
