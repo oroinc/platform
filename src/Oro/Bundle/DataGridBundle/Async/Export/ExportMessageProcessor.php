@@ -14,6 +14,9 @@ use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * Process data grid export async message.
+ */
 class ExportMessageProcessor extends ExportMessageProcessorAbstract
 {
     /**
@@ -121,6 +124,7 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
                 FormatterProvider::FORMAT_TYPE => 'excel',
             ],
         ], $body);
+        $body['parameters']['pageSize'] = $body['batchSize'];
 
         if (! isset($body['jobId'], $body['parameters']['gridName'], $body['format'])) {
             $this->logger->critical('Got invalid message');

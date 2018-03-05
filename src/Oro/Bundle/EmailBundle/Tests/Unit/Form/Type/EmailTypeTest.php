@@ -328,7 +328,7 @@ class EmailTypeTest extends TypeTestCase
             ->with(
                 [
                     'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\Email',
-                    'intention'          => 'email',
+                    'csrf_token_id'      => 'email',
                     'csrf_protection'    => true,
                 ]
             );

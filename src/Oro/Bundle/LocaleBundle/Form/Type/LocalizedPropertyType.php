@@ -35,8 +35,8 @@ class LocalizedPropertyType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $formType    = $options['type'];
-        $formOptions = $options['options'];
+        $formType    = $options['entry_type'];
+        $formOptions = $options['entry_options'];
 
         $builder
             ->add(
@@ -45,7 +45,7 @@ class LocalizedPropertyType extends AbstractType
                 array_merge($formOptions, ['label' => 'oro.locale.fallback.value.default'])
             )
             ->add(self::FIELD_LOCALIZATIONS, LocalizationCollectionType::NAME, [
-                'type' => $formType, 'options' => $formOptions
+                'entry_type' => $formType, 'entry_options' => $formOptions
             ]);
 
         $builder->addViewTransformer(new MultipleValueTransformer(self::FIELD_DEFAULT, self::FIELD_LOCALIZATIONS));
@@ -57,11 +57,11 @@ class LocalizedPropertyType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired([
-            'type',
+            'entry_type',
         ]);
 
         $resolver->setDefaults([
-            'options' => [],
+            'entry_options' => [],
         ]);
     }
 }

@@ -58,6 +58,13 @@ define(function(require) {
             'hideTimepicker input': '_preventClickOutsideCriteria'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function DatetimeFilter() {
+            DatetimeFilter.__super__.constructor.apply(this, arguments);
+        },
+
         _getPickerConstructor: function() {
             return tools.isMobile() || !this.dateWidgetOptions.showDatevariables ? DateTimePickerView :
                 VariableDateTimePickerView;

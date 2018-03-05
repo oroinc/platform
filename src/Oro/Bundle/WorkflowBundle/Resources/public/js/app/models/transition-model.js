@@ -23,6 +23,16 @@ define(function(require) {
             translateLinks: []
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function TransitionModel() {
+            TransitionModel.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             this.workflow = null;
 

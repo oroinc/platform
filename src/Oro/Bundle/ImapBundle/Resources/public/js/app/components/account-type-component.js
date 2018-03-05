@@ -13,6 +13,13 @@ define(function(require) {
         ViewType: accountTypeView,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function AccountTypeComponent() {
+            AccountTypeComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @constructor
          * @param {Object} options
          */

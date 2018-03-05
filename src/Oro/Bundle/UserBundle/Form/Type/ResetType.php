@@ -54,7 +54,7 @@ class ResetType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => $this->class,
-            'intention'  => 'reset',
+            'csrf_token_id' => 'reset',
             'dynamic_fields_disabled' => true
         ]);
     }

@@ -10,7 +10,6 @@ define(function(require) {
     require('../../../../tools/jsplumb-smartline');
 
     FlowchartJsPlumbAreaView = FlowchartJsPlumbBaseView.extend({
-
         /**
          * @type {JsPlumbManager}
          */
@@ -59,6 +58,13 @@ define(function(require) {
                     }]
                 ]
             };
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function FlowchartJsPlumbAreaView() {
+            FlowchartJsPlumbAreaView.__super__.constructor.apply(this, arguments);
         },
 
         /**

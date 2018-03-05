@@ -139,6 +139,7 @@ class TestDepartment implements TestFrameworkEntityInterface
     {
         if (!$this->staff->contains($person)) {
             $this->staff->add($person);
+            $person->setDepartment($this);
         }
 
         return $this;
@@ -153,6 +154,7 @@ class TestDepartment implements TestFrameworkEntityInterface
     {
         if ($this->staff->contains($person)) {
             $this->staff->removeElement($person);
+            $person->setDepartment(null);
         }
 
         return $this;

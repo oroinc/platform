@@ -53,6 +53,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
+            - '@oro_security.acl.group_provider.chain'
             - CREATE
         tags:
             - { name: oro.api.processor, action: create, group: security_check, priority: 10 }
@@ -76,6 +77,10 @@ services:
             - '@oro_api.entity_id_helper'
         tags:
             - { name: oro.api.processor, action: create, group: load_data, priority: -20 }
+
+    #
+    # data_security_check
+    #
 
     #
     # transform_data

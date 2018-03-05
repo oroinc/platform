@@ -13,6 +13,7 @@ define([
         },
 
         data: null,
+
         pageItems: [],
 
         /**
@@ -20,6 +21,13 @@ define([
          * helps to notify environment that the view has updated its content
          */
         deferredRender: null,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function PageRegionView() {
+            PageRegionView.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * Handles page load event

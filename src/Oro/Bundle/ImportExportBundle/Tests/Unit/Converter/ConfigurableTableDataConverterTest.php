@@ -2,8 +2,13 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Converter;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
+use Oro\Bundle\ImportExportBundle\Converter\RelationCalculator;
 
 class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
 {
@@ -212,11 +217,30 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
      */
     protected $converter;
 
+    /**
+     * @var FieldHelper|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $fieldHelper;
+
+    /**
+     * @var RelationCalculator|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $relationCalculator;
+
     protected function setUp()
     {
-        $fieldHelper = $this->prepareFieldHelper();
-        $relationCalculator = $this->prepareRelationCalculator();
-        $this->converter = new ConfigurableTableDataConverter($fieldHelper, $relationCalculator);
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $fieldProvider = $this->createMock(EntityFieldProvider::class);
+        $fieldTypeHelper = new FieldTypeHelper([]);
+
+        $this->fieldHelper = $this->getMockBuilder(FieldHelper::class)
+            ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper])
+            ->setMethods(array('getConfigValue', 'getFields', 'processRelationAsScalar', 'setLocale'))
+            ->getMock();
+
+        $this->relationCalculator = $this->createMock(RelationCalculator::class);
+
+        $this->converter = new ConfigurableTableDataConverter($this->fieldHelper, $this->relationCalculator);
     }
 
     /**
@@ -396,6 +420,8 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function testExport($entityName, array $input, array $expected)
     {
+        $this->prepareFieldHelper();
+        $this->prepareRelationCalculator();
         $this->converter->setEntityName($entityName);
         $this->assertSame($expected, $this->converter->convertToExportFormat($input));
     }
@@ -540,6 +566,8 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function testImport($entityName, array $input, array $expected)
     {
+        $this->prepareFieldHelper();
+        $this->prepareRelationCalculator();
         $this->converter->setEntityName($entityName);
         $this->assertSame($expected, $this->converter->convertToImportFormat($input));
     }
@@ -547,6 +575,8 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldHeaderWithRelation()
     {
         $fieldName = 'name';
+        $this->prepareFieldHelper();
+        $this->prepareRelationCalculator();
         $simpleFieldValue = $this->converter->getFieldHeaderWithRelation('SingleRelationEntity', $fieldName);
         $this->assertEquals($simpleFieldValue, ucfirst($fieldName));
 
@@ -555,23 +585,67 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param bool $translateUsingLocale
+     * @param string $locale
+     * @param int $expectedCallsToGetLocale
+     * @param int $translateUsingLocaleCalls
+     *
+     * @dataProvider getImportWithTranslatedFieldsDataProvider
+     */
+    public function testImportWithTranslatedFields(
+        $translateUsingLocale,
+        $locale,
+        $expectedCallsToGetLocale,
+        $translateUsingLocaleCalls
+    ) {
+        $this->converter->setTranslateUsingLocale($translateUsingLocale);
+
+        /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
+        $configManager = $this->createMock(ConfigManager::class);
+        $configManager->expects($this->exactly($expectedCallsToGetLocale))
+            ->method('get')
+            ->with('oro_locale.language', false, false, null)
+            ->willReturn($locale);
+        $this->converter->setConfigManager($configManager);
+
+        $this->fieldHelper->expects($this->exactly($translateUsingLocaleCalls))
+            ->method('setLocale')
+            ->with($locale);
+
+        $this->prepareFieldHelper();
+        $this->prepareRelationCalculator();
+
+        $this->converter->setEntityName('EntityName');
+        $this->converter->convertToImportFormat(['field1' => 'Field1 name']);
+    }
+
+    /**
+     * @return array
+     */
+    public function getImportWithTranslatedFieldsDataProvider()
+    {
+        return [
+            'fields should use locale' => [
+                'translateUsingLocale' => true,
+                'locale' => 'it_IT',
+                'expectedCallsToGetLocale' => 1,
+                'translateUsingLocaleCalls' => 1
+            ],
+            'fields should use default locale' => [
+                'translateUsingLocale' => false,
+                'locale' => null,
+                'expectedCallsToGetLocale' => 0,
+                'translateUsingLocaleCalls' => 0
+            ]
+        ];
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     protected function prepareFieldHelper()
     {
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $fieldProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityFieldProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $fieldTypeHelper = new FieldTypeHelper([]);
-
-        $fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Helper\FieldHelper')
-            ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper])
-            ->setMethods(array('getConfigValue', 'getFields', 'processRelationAsScalar'))
-            ->getMock();
-        $fieldHelper->expects($this->any())->method('getConfigValue')
+        $this->fieldHelper->expects($this->any())->method('getConfigValue')
             ->will(
                 $this->returnCallback(
                     function ($entityName, $fieldName, $parameter, $default = null) {
@@ -581,7 +655,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
-        $fieldHelper->expects($this->any())->method('getFields')->with($this->isType('string'), true)
+        $this->fieldHelper->expects($this->any())->method('getFields')->with($this->isType('string'), true)
             ->will(
                 $this->returnCallback(
                     function ($entityName) {
@@ -589,18 +663,11 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
-        return $fieldHelper;
     }
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
     protected function prepareRelationCalculator()
     {
-        $relationCalculator = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Converter\RelationCalculator')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $relationCalculator->expects($this->any())->method('getMaxRelatedEntities')
+        $this->relationCalculator->expects($this->any())->method('getMaxRelatedEntities')
             ->will(
                 $this->returnCallback(
                     function ($entityName, $fieldName) {
@@ -610,7 +677,5 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
-
-        return $relationCalculator;
     }
 }

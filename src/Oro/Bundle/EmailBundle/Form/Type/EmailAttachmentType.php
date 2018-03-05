@@ -57,7 +57,7 @@ class EmailAttachmentType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\EmailAttachment',
-            'intention'          => 'email_attachment',
+            'csrf_token_id'      => 'email_attachment',
         ]);
     }
 

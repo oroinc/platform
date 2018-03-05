@@ -49,7 +49,7 @@ class NoteApiType extends NoteType
         $resolver->setDefaults(
             [
                 'data_class'         => Note::ENTITY_NAME,
-                'intention'          => 'note',
+                'csrf_token_id'      => 'note',
                 'csrf_protection'    => false
             ]
         );

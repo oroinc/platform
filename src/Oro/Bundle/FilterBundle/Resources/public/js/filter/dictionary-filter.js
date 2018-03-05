@@ -86,6 +86,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function DictionaryFilter() {
+            DictionaryFilter.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             if (this.filterParams) {
                 this.dictionaryClass = this.filterParams.class.replace(/\\/g, '_');
@@ -130,7 +137,12 @@ define(function(require) {
          */
         loadValuesById: function(successEventName) {
             var self = this;
+
             if (this.select2ConfigData === null) {
+                var $container = self.$(self.elementSelector).parent();
+
+                $container.addClass('loading');
+
                 $.ajax({
                     url: routing.generate(
                         self.dictionaryValueRoute,
@@ -142,6 +154,8 @@ define(function(require) {
                         keys: this.value.value
                     },
                     success: function(response) {
+                        $container.removeClass('loading');
+
                         self.trigger(successEventName, response);
                     }
                 });
@@ -258,8 +272,8 @@ define(function(require) {
                 });
             }
             select2element.inputWidget('data', values);
-
             this._criteriaRenderd = true;
+
             this._alignCriteria();
         },
 

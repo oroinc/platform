@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityMergeBundle\Model\Step;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Exception\ValidationException;
-use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ValidateStep implements MergeStepInterface
 {

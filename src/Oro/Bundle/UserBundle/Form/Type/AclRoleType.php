@@ -76,7 +76,7 @@ class AclRoleType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' => 'Oro\Bundle\UserBundle\Entity\Role',
-                'intention'  => 'role',
+                'csrf_token_id' => 'role',
             ]
         );
     }

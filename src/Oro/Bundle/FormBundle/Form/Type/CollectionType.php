@@ -63,7 +63,7 @@ class CollectionType extends AbstractType
                 'row_count_initial'    => 1,
             ]
         );
-        $resolver->setRequired(['type']);
+        $resolver->setRequired(['entry_type']);
         $resolver->setNormalizer('show_form_when_empty', function (Options $options, $value) {
             return !$options['allow_add'] ? false : $value;
         });

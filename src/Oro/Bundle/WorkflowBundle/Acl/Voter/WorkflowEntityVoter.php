@@ -29,6 +29,7 @@ class WorkflowEntityVoter extends AbstractEntityVoter
 
     /**
      * {@inheritdoc}
+     * TODO: change public to protected in scope of BAP-15236
      */
     public function supportsClass($class)
     {

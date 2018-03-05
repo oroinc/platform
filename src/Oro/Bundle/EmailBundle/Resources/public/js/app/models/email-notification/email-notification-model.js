@@ -9,14 +9,29 @@ define(function(require) {
      */
     EmailNotificationModel = BaseModel.extend({
         replyRoute: '',
+
         replyAllRoute: '',
+
         forwardRoute: '',
+
         id: '',
+
         seen: '',
+
         subject: '',
+
         bodyContent: '',
+
         fromName: '',
-        linkFromName: ''
+
+        linkFromName: '',
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailNotificationModel() {
+            EmailNotificationModel.__super__.constructor.apply(this, arguments);
+        }
     });
 
     return EmailNotificationModel;

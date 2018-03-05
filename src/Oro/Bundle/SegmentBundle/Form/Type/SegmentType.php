@@ -60,7 +60,7 @@ class SegmentType extends AbstractQueryDesignerType
             $this->getDefaultOptions(),
             [
                 'data_class'         => 'Oro\Bundle\SegmentBundle\Entity\Segment',
-                'intention'          => 'segment',
+                'csrf_token_id'      => 'segment',
                 'query_type'         => 'segment',
             ]
         );

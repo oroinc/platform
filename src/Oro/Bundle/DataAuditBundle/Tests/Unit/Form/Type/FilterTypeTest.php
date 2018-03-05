@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FilterTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +17,7 @@ class FilterTypeTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $validator = $this->createMock('Symfony\Component\Validator\ValidatorInterface');
+        $validator = $this->createMock(ValidatorInterface::class);
         $validator->method('validate')->will($this->returnValue(new ConstraintViolationList()));
 
         $this->factory = Forms::createFormFactoryBuilder()

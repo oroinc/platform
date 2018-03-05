@@ -12,11 +12,13 @@ define(function(require) {
     var _ = require('underscore');
 
     CellIterator = BaseClass.extend({
-        constructor: function(grid, cell) {
+        constructor: function CellIterator(grid, cell) {
             this.current = cell;
             this.grid = grid;
             this.columns = grid.columns;
             this.rows = grid.collection;
+
+            constructor.__super__.constructor.apply(this, arguments);
         },
 
         toResolvedPromise: function(result) {

@@ -41,6 +41,16 @@ define(function(require) {
             });
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActivityConditionView() {
+            ActivityConditionView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             ActivityConditionView.__super__.initialize.call(this, options);
             _.extend(this.options.fieldChoice, {

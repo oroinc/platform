@@ -22,6 +22,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function AbstractGridChangeListener() {
+            AbstractGridChangeListener.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         dispose: function() {
             if (this.disposed) {
                 return;

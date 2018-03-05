@@ -29,11 +29,11 @@ class AclPrivilegeType extends AbstractType
             'permissions',
             PermissionCollectionType::NAME,
             array(
-                'type' => new AclPermissionType(),
+                'entry_type' => new AclPermissionType(),
                 'allow_add' => true,
                 'prototype' => false,
                 'allow_delete' => false,
-                'options' => array(
+                'entry_options' => array(
                     'privileges_config' => $options['privileges_config']
                 ),
             )

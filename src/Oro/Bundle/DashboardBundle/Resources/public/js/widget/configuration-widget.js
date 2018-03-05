@@ -3,6 +3,16 @@ define(['orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'undersc
     'use strict';
 
     var ConfigurationWidget = DialogWidget.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function ConfigurationWidget() {
+            ConfigurationWidget.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             if (typeof options.widget === 'undefined') {
                 throw new Error('Option "widget" was not specified.');

@@ -83,6 +83,7 @@ class LoadNormalizedEntity implements ProcessorInterface
             $getContext->setResult($context->getResult());
         }
         $getContext->skipGroup('security_check');
+        $getContext->skipGroup('data_security_check');
         $getContext->skipGroup(NormalizeResultActionProcessor::NORMALIZE_RESULT_GROUP);
         $getContext->setSoftErrorsHandling(true);
 

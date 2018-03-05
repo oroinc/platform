@@ -8,6 +8,14 @@ define(function(require) {
 
     WorkflowActionPermissionsRowView = ActionPermissionsRowView.extend({
         fieldItemView: FieldView,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function WorkflowActionPermissionsRowView() {
+            WorkflowActionPermissionsRowView.__super__.constructor.apply(this, arguments);
+        },
+
         onAccessLevelChange: function(model) {
             // override to prevent marking 'Entity' permissions grid tabs as changed
             mediator.trigger('securityAccessLevelsComponent:link:click', {

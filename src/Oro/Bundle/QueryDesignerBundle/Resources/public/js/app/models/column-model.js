@@ -12,6 +12,13 @@ define(function(require) {
             label: null,
             func: null,
             sorting: null
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function GroupingModel() {
+            GroupingModel.__super__.constructor.apply(this, arguments);
         }
     });
 

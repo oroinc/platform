@@ -14,6 +14,13 @@ define(function(require) {
             'change [data-field="is_displayable"]': 'onChange'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function DisplayablePriorityView() {
+            DisplayablePriorityView.__super__.constructor.apply(this, arguments);
+        },
+
         render: function() {
             this._setPriorityDisabledStateByElement($('input[data-field="is_displayable"]'));
 

@@ -10,11 +10,23 @@ define(function(require) {
      */
     ActivityContextActivityCollection = BaseCollection.extend({
         route: null,
+
         routeId: null,
+
         includeNonEntity: false,
+
         includeSystemTemplates: true,
+
         url: null,
-        model: ActivityContextActivityModel
+
+        model: ActivityContextActivityModel,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActivityContextActivityCollection() {
+            ActivityContextActivityCollection.__super__.constructor.apply(this, arguments);
+        }
     });
 
     return ActivityContextActivityCollection;

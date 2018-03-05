@@ -33,7 +33,6 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->integerNode(self::CSRF_TOKEN_LIFETIME)
                     ->info('The number of seconds the CSRF token should live for.')
-                    ->cannotBeEmpty()
                     ->min(1)
                     ->defaultValue(3600)
                 ->end()

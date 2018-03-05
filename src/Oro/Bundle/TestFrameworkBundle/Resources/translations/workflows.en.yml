@@ -1,0 +1,16 @@
+oro:
+    workflow:
+        oro_test_workflow:
+            label: 'Oro Test Workflow'
+            step:
+                first:
+                    label: 'First Step'
+                second:
+                    label: 'Second Step'
+            transition:
+                __start__:
+                    label: 'Start transition'
+                    warning_message: ''
+                to_second_transition:
+                    label: 'To Second Step'
+                    warning_message: ''

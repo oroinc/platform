@@ -29,6 +29,12 @@ class FormUtils
         $config  = $form->get($fieldName)->getConfig();
         $options = $config->getOptions();
 
+        //@TODO replace in scope BAP-15236
+        unset($options['options']);
+
+        //@TODO Remove in scope BAP-15236
+        unset($options['csrf_provider']);
+
         if (array_key_exists('auto_initialize', $options)) {
             $options['auto_initialize'] = false;
         }

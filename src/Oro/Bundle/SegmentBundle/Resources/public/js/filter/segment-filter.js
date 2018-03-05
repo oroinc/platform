@@ -59,6 +59,13 @@ define([
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function SegmentFilter() {
+            SegmentFilter.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize.
          *
          * @param {Object} options

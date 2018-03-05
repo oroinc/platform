@@ -18,6 +18,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function JqueryWidgetComponent() {
+            JqueryWidgetComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.$el = options._sourceElement;
             var subPromises = _.values(options._subPromises);

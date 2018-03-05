@@ -34,8 +34,7 @@ use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
- * Class OroEmailBundleInstaller
- * @package Oro\Bundle\EmailBundle\Migrations\Schema
+ * ORO installer for EmailBundle
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
@@ -46,7 +45,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_32';
+        return 'v1_33';
     }
 
     /**

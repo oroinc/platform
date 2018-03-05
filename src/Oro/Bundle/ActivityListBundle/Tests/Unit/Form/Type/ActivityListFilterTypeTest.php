@@ -11,6 +11,7 @@ use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ActivityListFilterTypeTest extends TypeTestCase
 {
@@ -18,7 +19,7 @@ class ActivityListFilterTypeTest extends TypeTestCase
     {
         parent::setUp();
 
-        $validator = $this->createMock('Symfony\Component\Validator\ValidatorInterface');
+        $validator = $this->createMock(ValidatorInterface::class);
         $validator->method('validate')->will($this->returnValue(new ConstraintViolationList()));
 
         $this->factory = Forms::createFormFactoryBuilder()

@@ -24,6 +24,13 @@ define(function(require) {
             'click .workflow-step-delete': 'triggerRemoveStep'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function FlowchartEditorStepView() {
+            FlowchartEditorStepView.__super__.constructor.apply(this, arguments);
+        },
+
         connect: function() {
             var instance = this.areaView.jsPlumbInstance;
             // add element as source to jsPlumb

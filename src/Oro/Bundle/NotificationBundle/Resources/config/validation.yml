@@ -12,5 +12,4 @@ Oro\Bundle\NotificationBundle\Entity\RecipientList:
         email:
             - Email: ~
     constraints:
-        - Callback:
-            methods:   [isValid]
+        - Callback: isValid

@@ -140,6 +140,15 @@ class PriceTypeTest extends FormIntegrationTestCase
                 ],
                 'expectedData'  => (new Price())->setValue(100)->setCurrency('USD')
             ],
+            'price with precision' => [
+                'isValid'       => true,
+                'defaultData'   => new Price(),
+                'submittedData' => [
+                    'value' => 100.1234,
+                    'currency' => 'USD'
+                ],
+                'expectedData'  => (new Price())->setValue(100.1234)->setCurrency('USD')
+            ],
             'hidden price' => [
                 'isValid'       => true,
                 'defaultData'   => new Price(),

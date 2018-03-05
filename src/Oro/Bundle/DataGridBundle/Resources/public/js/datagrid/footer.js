@@ -39,6 +39,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function Footer() {
+            Footer.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['themeOptions']));
             var state;

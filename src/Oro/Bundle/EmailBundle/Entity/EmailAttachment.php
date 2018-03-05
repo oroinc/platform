@@ -57,7 +57,7 @@ class EmailAttachment implements FileExtensionInterface
      * @var EmailBody
      *
      * @ORM\ManyToOne(targetEntity="EmailBody", inversedBy="attachments")
-     * @ORM\JoinColumn(name="body_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="body_id", referencedColumnName="id", onDelete="CASCADE")
      * @JMS\Exclude
      */
     protected $emailBody;

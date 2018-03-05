@@ -20,6 +20,13 @@ define(function(require) {
         autoRender: true,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function Select2View() {
+            Select2View.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @constructor
          *
          * @param {Object} options

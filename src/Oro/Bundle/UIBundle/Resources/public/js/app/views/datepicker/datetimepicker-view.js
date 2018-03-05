@@ -13,6 +13,13 @@ define(function(require) {
         defaults: _.extend({}, DatePickerView.prototype.defaults, dateTimePickerViewMixin.defaults),
 
         /**
+         * @inheritDoc
+         */
+        constructor: function DateTimePickerView() {
+            DateTimePickerView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Returns supper prototype for datetime picker view mixin
          *
          * @returns {Object}

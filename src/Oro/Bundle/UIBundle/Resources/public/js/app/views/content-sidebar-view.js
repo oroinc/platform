@@ -48,6 +48,13 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function ContentSidebarView() {
+            ContentSidebarView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * {@inheritDoc}
          */
         initialize: function(options) {
