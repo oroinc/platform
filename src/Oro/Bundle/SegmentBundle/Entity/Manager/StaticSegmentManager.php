@@ -128,7 +128,7 @@ class StaticSegmentManager
         $segment = $this->em->merge($segment);
         $segment->setLastRun(new \DateTime('now', new \DateTimeZone('UTC')));
         $this->em->persist($segment);
-        $this->em->flush();
+        $this->em->flush($segment);
     }
 
     /**
