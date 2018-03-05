@@ -243,6 +243,7 @@ class Grid extends Table implements GridInterface
      */
     public function clickActionLink($content, $action)
     {
+        /** @var GridRow $row */
         $row = $this->getRowByContent($content);
         $link = $row->getActionLink($action);
         $link->click();
