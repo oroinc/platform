@@ -38,7 +38,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     /** resource link to a .md file that will be used to retrieve a documentation */
     const DOCUMENTATION_RESOURCE = 'documentation_resource';
 
-    /** the name of ACL resource */
+    /** the name of ACL resource that should be used to protect the entity */
     const ACL_RESOURCE = 'acl_resource';
 
     /** the default page size */
