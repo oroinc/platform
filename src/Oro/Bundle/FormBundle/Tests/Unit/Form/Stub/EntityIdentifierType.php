@@ -20,9 +20,9 @@ class EntityIdentifierType extends EntityType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+        parent::configureOptions($resolver);
         $resolver->setDefaults(
             [
-                'choice_list' => $this->choiceList,
                 'class' => '',
             ]
         );

@@ -10,6 +10,7 @@ use Oro\Bundle\FormBundle\Form\EventListener\MultipleEntitySubscriber;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener\Stub\ChildEntity;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener\Stub\ParentEntity;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 class MultipleEntitySubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,8 +18,8 @@ class MultipleEntitySubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             [
-                'form.post_set_data' => 'postSet',
-                'form.post_bind'     => 'postSubmit'
+                FormEvents::POST_SET_DATA => 'postSet',
+                FormEvents::POST_SUBMIT => 'postSubmit'
             ],
             MultipleEntitySubscriber::getSubscribedEvents()
         );

@@ -83,7 +83,7 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
         $form       = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()->getMock();
-        $choiceList = $this->getMockBuilder('Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList')
+        $choiceList = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ArrayChoiceList')
             ->disableOriginalConstructor()->getMock();
         $options    = ['configs' => [], 'choice_list' => $choiceList];
 
