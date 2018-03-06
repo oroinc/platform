@@ -37,7 +37,7 @@ parameters:
 
 services:
     oro_search.index:
-        class:                        %oro_search.index.class%
+        class:                        '%oro_search.index.class%'
         arguments:
             - '@oro_search.search.engine'
             - '@oro_search.mapper'
@@ -46,20 +46,20 @@ services:
             - '@event_dispatcher'
 
     oro_search.security_provider:
-        class:                        %oro_search.security_provider.class%
+        class:                        '%oro_search.security_provider.class%'
         public:                       false
         arguments:
             - "@security.authorization_checker"
             - "@oro_security.entity_security_metadata_provider"
 
     oro_search.index_listener:
-        class:                        %oro_search.index_listener.class%
+        class:                        '%oro_search.index_listener.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_search.async.indexer'
             - '@property_accessor'
         calls:
-            - [setEntitiesConfig, [%oro_search.entities_config%]]
+            - [setEntitiesConfig, ['%oro_search.entities_config%']]
             - [setMappingProvider,  ['@oro_search.provider.search_mapping']]
         tags:
             - { name: doctrine.event_listener, event: onFlush }
@@ -74,7 +74,7 @@ services:
 
     oro_search.mapper:
         class: 'Oro\Bundle\SearchBundle\Engine\ObjectMapper'
-        arguments: ['@event_dispatcher', %oro_search.entities_config%]
+        arguments: ['@event_dispatcher', '%oro_search.entities_config%']
         calls:
             - [setMappingProvider, ['@oro_search.provider.search_mapping']]
             - [setPropertyAccessor, ['@property_accessor']]
@@ -85,7 +85,7 @@ services:
         class: 'Oro\Bundle\SearchBundle\Engine\TextFilteredObjectMapper'
 
     oro_search.provider.result_statistics_provider:
-        class:                        %oro_search.provider.result_statistics_provider.class%
+        class:                        '%oro_search.provider.result_statistics_provider.class%'
         arguments:
             - '@oro_search.index'
             - '@oro_entity_config.config_manager'
@@ -93,7 +93,7 @@ services:
         lazy: true
 
     oro_search.formatter.result_formatter:
-        class:                        %oro_search.formatter.result_formatter.class%
+        class:                        '%oro_search.formatter.result_formatter.class%'
         arguments:                    ["@doctrine.orm.entity_manager"]
 
     oro_search.formatter.datetime_formatter:
@@ -101,7 +101,7 @@ services:
         public: false
 
     oro_search.prepare_result_item.listener:
-        class:                        %oro_search.prepare_result_item.listener.class%
+        class:                        '%oro_search.prepare_result_item.listener.class%'
         arguments:
             - '@router'
             - '@oro_search.mapper'
@@ -111,17 +111,17 @@ services:
             - { name: kernel.event_listener, event: oro_search.prepare_result_item, method: process }
 
     oro_search.extension.formatter.property.search_result_property:
-        class: %oro_search.extension.formatter.property.search_result_property.class%
+        class: '%oro_search.extension.formatter.property.search_result_property.class%'
         arguments:
             - '@twig'
-            - %oro_search.entities_config%
+            - '%oro_search.entities_config%'
         calls:
             - [setMappingProvider,  ['@oro_search.provider.search_mapping']]
         tags:
             - { name:  oro_datagrid.extension.formatter.property, type: search-result }
 
     oro_search.extension.search_results:
-        class: %oro_search.extension.search_results.class%
+        class: '%oro_search.extension.search_results.class%'
         arguments:
             - '@oro_search.formatter.result_formatter'
             - '@oro_search.mapper'
@@ -130,17 +130,17 @@ services:
             - { name: oro_datagrid.extension }
 
     oro_search.event_listener.search_results_grid_listener:
-        class: %oro_search.event_listener.search_results_grid_listener.class%
+        class: '%oro_search.event_listener.search_results_grid_listener.class%'
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.search-grid, method: onBuildAfter }
 
     oro_search.query_factory:
-        class: %oro_search.query_factory.class%
+        class: '%oro_search.query_factory.class%'
         arguments:
             - '@oro_search.index'
 
     oro_search.datasource.search:
-        class: %oro_search.datasource.search.class%
+        class: '%oro_search.datasource.search.class%'
         arguments:
             - '@oro_search.query_factory'
             - '@oro_datagrid.event.dispatcher'
@@ -148,10 +148,10 @@ services:
             - { name: oro_datagrid.datasource, type: search }
 
     oro_search.extension.pager.orm.pager:
-        class: %oro_search.extension.pager.search.pager.class%
+        class: '%oro_search.extension.pager.search.pager.class%'
 
     oro_search.extension.search_pager:
-        class: %oro_search.extension.orm_pager.class%
+        class: '%oro_search.extension.orm_pager.class%'
         arguments:
             - '@oro_search.extension.pager.orm.pager'
         tags:
@@ -165,14 +165,14 @@ services:
 
     # services used only for ORM search engine
     oro_search.fulltext_index_manager:
-        class: %oro_search.fulltext_index_manager.class%
+        class: '%oro_search.fulltext_index_manager.class%'
         arguments:
             - '@doctrine.dbal.default_connection'
             - '%oro_search.drivers%'
             - 'oro_search_index_text'
 
     oro_search.event_listener.orm.fulltext_index_listener:
-        class: %oro_search.event_listener.orm.fulltext_index_listener.class%
+        class: '%oro_search.event_listener.orm.fulltext_index_listener.class%'
         arguments:
             - 'oro_search_index_text'
             - '@doctrine.dbal.default_connection'
@@ -199,18 +199,18 @@ services:
             - [ setNamespace, [ 'doctrine_metadata_search' ] ]
 
     oro_search.entity.repository.search_index:
-        class: %oro_search.entity.repository.search_index.class%
+        class: '%oro_search.entity.repository.search_index.class%'
         parent: oro_entity.abstract_repository
         arguments:
-            - %oro_search.entity.item.class%
+            - '%oro_search.entity.item.class%'
             - 'search'
         calls:
             - [setRegistry,  ['@doctrine']]
-            - [setDriversClasses, [%oro_search.drivers%]]
+            - [setDriversClasses, ['%oro_search.drivers%']]
         lazy: true
 
     oro_search.cache.search_mapping_cache:
-        class: %oro_search.cache.search_mapping_cache.class%
+        class: '%oro_search.cache.search_mapping_cache.class%'
         arguments:
             - '@oro_search.provider.search_mapping'
         tags:
@@ -275,7 +275,7 @@ services:
             - '@oro_search.transformer.message'
 
     oro_search.extension.search_filter:
-        class: %oro_search.extension.search_filter.class%
+        class: '%oro_search.extension.search_filter.class%'
         arguments:
             - '@oro_datagrid.configuration.provider'
             - '@translator'
@@ -283,7 +283,7 @@ services:
             - { name: oro_datagrid.extension }
 
     oro_search.extension.search_sorter:
-        class: %oro_search.extension.search_sorter.class%
+        class: '%oro_search.extension.search_sorter.class%'
         tags:
             - { name: oro_datagrid.extension }
 

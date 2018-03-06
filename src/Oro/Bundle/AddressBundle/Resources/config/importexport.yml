@@ -6,21 +6,21 @@ parameters:
 
 services:
     oro_address.importexport.template_fixture.country:
-        class: %oro_address.importexport.template_fixture.country.class%
+        class: '%oro_address.importexport.template_fixture.country.class%'
         tags:
             - { name: oro_importexport.template_fixture }
 
     oro_address.importexport.template_fixture.region:
-        class: %oro_address.importexport.template_fixture.region.class%
+        class: '%oro_address.importexport.template_fixture.region.class%'
         tags:
             - { name: oro_importexport.template_fixture }
 
     oro_address.importexport.template_fixture.address:
-        class: %oro_address.importexport.template_fixture.address.class%
+        class: '%oro_address.importexport.template_fixture.address.class%'
         tags:
             - { name: oro_importexport.template_fixture }
 
     oro_address.importexport.template_fixture.address_type:
-        class: %oro_address.importexport.template_fixture.address_type.class%
+        class: '%oro_address.importexport.template_fixture.address_type.class%'
         tags:
             - { name: oro_importexport.template_fixture }

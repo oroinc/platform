@@ -7,7 +7,7 @@ datagrids:
                 select:
                     - j
                 from:
-                    - { table: OroMessageQueueBundle:Job, alias:j }
+                    - { table: OroMessageQueueBundle:Job, alias: j }
                 where:
                     and:
                         - j.rootJob IS NULL
@@ -126,7 +126,7 @@ datagrids:
                 select:
                     - j
                 from:
-                    - { table: OroMessageQueueBundle:Job, alias:j }
+                    - { table: OroMessageQueueBundle:Job, alias: j }
                 where:
                     and:
                         - j.rootJob = :root_job_id

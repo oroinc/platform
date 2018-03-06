@@ -10,14 +10,14 @@ parameters:
 
 services:
     oro_embedded_form.form_type.available_embedded_form:
-        class: %oro.embedded_form.form_type.available_form.class%
+        class: '%oro.embedded_form.form_type.available_form.class%'
         arguments:
             - '@oro_embedded_form.manager'
         tags:
             - { name: form.type, alias: oro_available_embedded_forms }
 
     oro_embedded_form.manager:
-        class: %oro_embedded_form.manager.class%
+        class: '%oro_embedded_form.manager.class%'
         arguments:
             - '@service_container'
             - '@form.factory'
@@ -31,7 +31,7 @@ services:
             - { name: twig.extension }
 
     oro_embedded_form.form_type:
-        class: %oro_embedded_form.form_type.class%
+        class: '%oro_embedded_form.form_type.class%'
         tags:
             - { name: form.type, alias: embedded_form }
 
@@ -42,7 +42,7 @@ services:
         synthetic: true
 
     oro_embedded_form.embed_form_layout_manager:
-        class: %oro_embedded_form.embed_form_layout_manager.class%
+        class: '%oro_embedded_form.embed_form_layout_manager.class%'
         arguments:
             - '@oro_embedded_form.layout_manager'
             - '@oro_embedded_form.manager'

@@ -1,6 +1,6 @@
 datagrids:
     reports-grid:
-        extended_entity_name: %oro_report.report.entity.class%
+        extended_entity_name: '%oro_report.report.entity.class%'
         acl_resource: oro_report_view
         features:
             entity_class_name_path: r.entity
@@ -13,7 +13,7 @@ datagrids:
                     - r.entity
                     - type.label as reportType
                 from:
-                    - { table: %oro_report.report.entity.class%, alias: r }
+                    - { table: '%oro_report.report.entity.class%', alias: r }
                 join:
                     left:
                         - { join: r.type, alias: type }
@@ -50,7 +50,7 @@ datagrids:
                 name:
                     data_name: r.name
             default:
-                name: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+                name: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
         filters:
             columns:
                 name:

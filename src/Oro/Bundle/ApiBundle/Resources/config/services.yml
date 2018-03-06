@@ -15,7 +15,7 @@ services:
         arguments:
             - '@oro_api.processor_bag_config_provider'
             - '@oro_api.processor_factory'
-            - %kernel.debug%
+            - '%kernel.debug%'
             - '@oro_api.processor_applicable_checker_factory'
             - '@oro_api.processor_iterator_factory'
             - '@oro_api.processor_applicable_checker_factory.ungrouped'
@@ -408,7 +408,7 @@ services:
         class: Oro\Bundle\ApiBundle\Request\ExceptionTextExtractor
         public: false
         arguments:
-            - %kernel.debug%
+            - '%kernel.debug%'
             -
                 - '\InvalidArgumentException'
                 - '\UnexpectedValueException'

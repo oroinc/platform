@@ -1,6 +1,6 @@
 datagrids:
     users-grid:
-        extended_entity_name: %oro_user.entity.class%
+        extended_entity_name: '%oro_user.entity.class%'
         views_list: "@oro_user.user.datagrid_view_list"
         options:
             entityHint: users
@@ -23,7 +23,7 @@ datagrids:
                     - u.enabled
                     - au.id as auth_status
                 from:
-                    - { table: %oro_user.entity.class%, alias: u }
+                    - { table: '%oro_user.entity.class%', alias: u }
                 join:
                     left:
                         - { join: u.auth_status, alias: au }
@@ -100,7 +100,7 @@ datagrids:
                 auth_status:
                     data_name: au.priority
             default:
-                username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+                username: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
 
         filters:
             columns:
@@ -164,7 +164,7 @@ datagrids:
         action_configuration: ['@oro_user.datagrid.action_checker', checkActions]
 
     groups-grid:
-        extended_entity_name: %oro_user.group.entity.class%
+        extended_entity_name: '%oro_user.group.entity.class%'
         options:
             entityHint: groups
             entity_pagination: true
@@ -176,7 +176,7 @@ datagrids:
                     - g.id
                     - g.name
                 from:
-                    - { table: %oro_user.group.entity.class%, alias: g }
+                    - { table: '%oro_user.group.entity.class%', alias: g }
         columns:
             name:
                 label: oro.user.group.name.label
@@ -215,7 +215,7 @@ datagrids:
                 name:
                     data_name: g.name
             default:
-                name: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+                name: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
 
         filters:
             columns:
@@ -224,7 +224,7 @@ datagrids:
                     data_name: g.name
 
     roles-grid:
-        extended_entity_name: %oro_user.role.entity.class%
+        extended_entity_name: '%oro_user.role.entity.class%'
         options:
             entityHint: roles
             entity_pagination: true
@@ -239,7 +239,7 @@ datagrids:
                     - r.role
                     - r.label
                 from:
-                    - { table: %oro_user.role.entity.class%, alias: r }
+                    - { table: '%oro_user.role.entity.class%', alias: r }
                 where:
                     and:
                         - r.role <> '%oro_user.entity.class%::ROLE_ANONYMOUS'
@@ -291,7 +291,7 @@ datagrids:
                 label:
                     data_name: r.label
             default:
-                label: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+                label: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
 
         filters:
             columns:
@@ -387,7 +387,7 @@ datagrids:
         sorters:
             multiple_sorting: true
             default:
-                lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+                lastName: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
 
     role-users-grid:
         extends: user-relation-grid
@@ -458,8 +458,8 @@ datagrids:
                     data_name: has_role
 
             default:
-                has_role: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
-                lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+                has_role: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                lastName: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
         options:
             rowSelection:
                 dataField: id
@@ -572,8 +572,8 @@ datagrids:
                 has_group:
                     data_name: has_group
             default:
-                has_group: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
-                lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+                has_group: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                lastName: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
 
         options:
             rowSelection:
@@ -584,7 +584,7 @@ datagrids:
                     excluded: '#groupRemoveUsers'
 
     users-select-grid:
-        extended_entity_name: %oro_user.entity.class%
+        extended_entity_name: '%oro_user.entity.class%'
         options:
             entityHint: users
         acl_resource: oro_user_user_view
@@ -599,7 +599,7 @@ datagrids:
                     - u.lastName
                     - u.enabled
                 from:
-                    - { table: %oro_user.entity.class%, alias: u }
+                    - { table: '%oro_user.entity.class%', alias: u }
         columns:
             firstName:
                 label: oro.user.first_name.label
@@ -631,7 +631,7 @@ datagrids:
                 enabled:
                     data_name: u.enabled
             default:
-                username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+                username: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
         filters:
             columns:
                 firstName:
@@ -656,7 +656,7 @@ datagrids:
                                 1: Enabled
 
     owner-users-select-grid:
-        extended_entity_name: %oro_user.entity.class%
+        extended_entity_name: '%oro_user.entity.class%'
         options:
             entityHint: users
         source:
@@ -671,7 +671,7 @@ datagrids:
                     - u.lastName
                     - u.enabled
                 from:
-                    - { table: %oro_user.entity.class%, alias: u }
+                    - { table: '%oro_user.entity.class%', alias: u }
                 where:
                     and:
                         - u.enabled=true
@@ -698,7 +698,7 @@ datagrids:
                 username:
                     data_name: u.username
             default:
-                username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+                username: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
         filters:
             columns:
                 firstName:
@@ -723,7 +723,7 @@ datagrids:
                         - u.id != @oro_security.token_accessor->getUserId
 
     users-for-context-grid:
-        extended_entity_name: %oro_user.entity.class%
+        extended_entity_name: '%oro_user.entity.class%'
         options:
             entityHint: users
             entity_pagination: true
@@ -743,7 +743,7 @@ datagrids:
                     - u.lastName
                     - u.enabled
                 from:
-                    - { table: %oro_user.entity.class%, alias: u }
+                    - { table: '%oro_user.entity.class%', alias: u }
                 where:
                     and:
                         - u.id != @oro_security.token_accessor->getUserId
@@ -777,7 +777,7 @@ datagrids:
                 enabled:
                     data_name: u.enabled
             default:
-                username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+                username: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
 
         filters:
             columns:
