@@ -42,14 +42,8 @@ class ExtendedContainerBuilder extends ContainerBuilder
     ) {
         $passConfig = $this->getCompilerPassConfig();
 
-        $propName = $type . 'Passes';
-        $class    = new \ReflectionClass($passConfig);
-        if (!$class->hasProperty($propName)) {
-            throw new InvalidArgumentException(sprintf('Invalid compiler pass type "%s".', $type));
-        }
-        $prop = $class->getProperty($propName);
-        $prop->setAccessible(true);
-        $passes = $prop->getValue($passConfig);
+        $getterName = 'get' . ucwords($type) . 'Passes';
+        $passes = $passConfig->$getterName();
 
         $resultPasses    = [];
         $srcPass         = null;
@@ -86,7 +80,8 @@ class ExtendedContainerBuilder extends ContainerBuilder
                 throw new InvalidArgumentException(sprintf('Unknown compiler pass "%s".', $targetPassClassName));
             }
             $resultPasses[$targetPassIndex] = $srcPass;
-            $prop->setValue($passConfig, $resultPasses);
+            $setterName = 'set' . ucwords($type) . 'Passes';
+            $passConfig->$setterName($resultPasses);
         }
     }
 }
