@@ -9,7 +9,6 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var ResizableAreaPlugin = require('oroui/js/app/plugins/plugin-resizable-area');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
-    var SwipeActionsManager = require('oroui/js/swipe-action-manager');
     var config = require('module').config();
 
     config = _.extend({
