@@ -25,7 +25,6 @@ class FormFieldType extends AbstractType
                 'use_parent_field_options' => [],
                 'target_field_type'    => 'text',
                 'resettable'           => true,
-                'cascade_validation'   => true,
                 'parent_checkbox_label' => ''
             ]
         );

@@ -38,6 +38,10 @@ class FormUtils
         if (array_key_exists('auto_initialize', $options)) {
             $options['auto_initialize'] = false;
         }
+
+        //@TODO Remove in scope BAP-15236
+        unset($options['cascade_validation']);
+
         $options = array_merge($options, $modifyOptions);
         $options = array_diff_key($options, array_flip($unsetOptions));
         $form->add($fieldName, $config->getType()->getName(), $options);
