@@ -10,6 +10,9 @@ config:
         'jquery.simplecolorpicker':
             deps:
                 - 'jquery'
+        'jquery-touchswipe':
+            deps:
+                - 'jquery'
         'jquery.minicolors':
             deps:
                 - 'jquery'
@@ -133,6 +136,7 @@ config:
         'jquery.numeric': 'bundles/bowerassets/jquery.numeric/jquery.numeric.js'
         'jquery.uniform': 'bundles/npmassets/jquery.uniform/src/js/jquery.uniform.js'
         'jquery.select2': 'bundles/bowerassets/select2/select2.js'
+        'jquery-touchswipe': 'bundles/npmassets/jquery-touchswipe/jquery.touchSwipe.js'
         'jquery.multiselect': 'bundles/bowerassets/jquery-ui-multiselect-widget/src/jquery.multiselect.min.js'
         'jquery.multiselect.filter': 'bundles/bowerassets/jquery-ui-multiselect-widget/src/jquery.multiselect.filter.min.js'
         'jquery.simplecolorpicker': 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.js'
@@ -190,6 +194,7 @@ config:
         'oroui/js/app/modules/init-lightgallery': 'bundles/oroui/js/app/modules/init-lightgallery.js'
         'oroui/js/app/modules/component-shortcuts-module': 'bundles/oroui/js/app/modules/component-shortcuts-module.js'
         'oroui/js/app/modules/resizable-area-module': 'bundles/oroui/js/app/modules/resizable-area-module.js'
+        'oroui/js/app/modules/swipe-actions-module': 'bundles/oroui/js/app/modules/swipe-actions-module.js'
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/services/registry': 'bundles/oroui/js/app/services/registry.js'
@@ -288,6 +293,8 @@ config:
         'oroui/js/app/views/jstree/collapse-action-view': 'bundles/oroui/js/app/views/jstree/collapse-action-view.js'
         'oroui/js/app/views/jstree/subtree-action-view': 'bundles/oroui/js/app/views/jstree/subtree-action-view.js'
         'oroui/js/app/views/jstree/move-action-view': 'bundles/oroui/js/app/views/jstree/move-action-view.js'
+
+        'oroui/js/swipe-action-manager': 'bundles/oroui/swipe-action-manager.js'
     appmodules:
         - oroui/js/app/modules/init-layout
         - oroui/js/app/modules/init-lightgallery
@@ -301,6 +308,7 @@ config:
         - oroui/js/app/modules/component-shortcuts-module
         - oroui/js/app/modules/viewport-module
         - oroui/js/app/modules/resizable-area-module
+        - oroui/js/app/modules/swipe-actions-module
 
 build:
     paths:

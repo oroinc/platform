@@ -9,6 +9,7 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var ResizableAreaPlugin = require('oroui/js/app/plugins/plugin-resizable-area');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
+    var SwipeActionsManager = require('oroui/js/swipe-action-manager');
     var config = require('module').config();
 
     config = _.extend({
@@ -62,8 +63,10 @@ define(function(require) {
                 this.initResizableSidebar();
             }
             ContentSidebarView.__super__.initialize.call(this, arguments);
-        },
 
+            mediator.on('swipe-action-left', this.minimize, this);
+            mediator.on('swipe-action-right', this.maximize, this);
+        },
 
         /**
          * {@inheritDoc}
