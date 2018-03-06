@@ -66,9 +66,9 @@ Feature: Application search
   Scenario: View entity from search suggestion
     Given I follow "Search"
     And I select "All" from search types
-    And I type "John" in "search"
+    And I type "Alice2" in "search"
     And I should see 1 search suggestion
-    And I follow "John Doe User"
+    And I follow "Alice2 Williams2"
     And I should be on User View page
 
   Scenario: No results search
