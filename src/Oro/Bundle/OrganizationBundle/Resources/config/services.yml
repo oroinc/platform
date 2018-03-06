@@ -97,11 +97,6 @@ services:
         tags:
             - { name: twig.extension }
 
-    oro_organization.link.security_context:
-        deprecated: The "%service_id%" service is deprecated since 2.3.
-        tags:
-            - { name: oro_service_link,  service: security.context }
-
     #
     # Listeners / Subscribers
     #

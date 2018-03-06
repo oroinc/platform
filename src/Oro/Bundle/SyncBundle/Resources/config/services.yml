@@ -90,11 +90,6 @@ services:
         tags:
             - { name: oro_sync.tag_generator }
 
-    oro_sync.content.security.context.link:
-        deprecated: The "%service_id%" service is deprecated since 2.3.
-        tags:
-            - { name: oro_service_link, service: security.context }
-
     oro_sync.content.tag_generator_chain.link:
         tags:
             - { name: oro_service_link, service: oro_sync.content.tag_generator_chain }

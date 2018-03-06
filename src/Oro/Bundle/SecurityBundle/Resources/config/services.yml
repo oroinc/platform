@@ -123,11 +123,6 @@ services:
         tags:
             - { name: oro_service_link, service: oro_entity.orm.entity_class_resolver }
 
-    security.context.link:
-        deprecated: The "%service_id%" service is deprecated since 2.3.
-        tags:
-            - { name: oro_service_link,  service: security.context }
-
     oro_security.security_facade.link:
         deprecated: The "%service_id%" service is deprecated since 2.3.
         tags:
