@@ -11,7 +11,7 @@ At first the package should be registered. You can use `Resources/config/oro/app
 
 ```yaml
 framework:
-    templating:
+    assets:
         packages:
             acme:
                 version: %assets_version%

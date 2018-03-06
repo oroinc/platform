@@ -1,5 +1,5 @@
 framework:
-    templating:
+    assets:
         packages:
             translations:
                 version: %assets_version%
