@@ -10,22 +10,23 @@ use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\HttpUtils;
 
 class SecurityFirewallExceptionListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var array */
-    protected $sessionOptions = ['name' => 'OROID'];
+    private const SESSION_NAME = 'TEST_SESSION_ID';
 
-    public function testSetSessionOptions()
+    public function testSetSessionName()
     {
-        /** @var SecurityFirewallExceptionListener $listener */
         $listener = $this->createSecurityFirewallExceptionListener();
-        $listener->setSessionOptions($this->sessionOptions);
+        $listener->setSessionName(self::SESSION_NAME);
 
-        $this->assertObjectHasAttribute('sessionOptions', $listener);
-        $this->assertAttributeEquals($this->sessionOptions, 'sessionOptions', $listener);
+        self::assertObjectHasAttribute('sessionName', $listener);
+        self::assertAttributeEquals(self::SESSION_NAME, 'sessionName', $listener);
     }
 
     /**
@@ -35,29 +36,17 @@ class SecurityFirewallExceptionListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetTargetPathShouldCallParentWithCookie(\Exception $exception)
     {
-        /**
-         * Prepare
-         */
         $event = $this->createEvent($exception);
-        $event->getRequest()->cookies->add(['OROID' => 'o595fqdg5214u4e4nfcs3uc923']);
+        $event->getRequest()->cookies->add([self::SESSION_NAME => 'o595fqdg5214u4e4nfcs3uc923']);
 
-        /**
-         * Set expectations
-         */
-        /** @var Session|\PHPUnit_Framework_MockObject_MockObject $session */
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $session->expects($this->once())
+        $session = $this->createMock(Session::class);
+        $session->expects(self::once())
             ->method('set')
             ->with('_security.key.target_path', 'http://localhost/');
         $event->getRequest()->setSession($session);
 
-        /**
-         * Execute
-         */
         $listener = $this->createSecurityFirewallExceptionListener(true);
-        $listener->setSessionOptions($this->sessionOptions);
+        $listener->setSessionName(self::SESSION_NAME);
         $listener->onKernelException($event);
     }
 
@@ -68,26 +57,14 @@ class SecurityFirewallExceptionListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetTargetPathShouldNotCallParentWithoutCookie(\Exception $exception)
     {
-        /**
-         * Prepare
-         */
         $event = $this->createEvent($exception);
 
-        /**
-         * Set expectations
-         */
-        /** @var Session|\PHPUnit_Framework_MockObject_MockObject $session */
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $session->expects($this->never())->method('set');
+        $session = $this->createMock(Session::class);
+        $session->expects(self::never())->method('set');
         $event->getRequest()->setSession($session);
 
-        /**
-         * Execute
-         */
         $listener = $this->createSecurityFirewallExceptionListener(true);
-        $listener->setSessionOptions($this->sessionOptions);
+        $listener->setSessionName(self::SESSION_NAME);
         $listener->onKernelException($event);
     }
 
@@ -107,39 +84,27 @@ class SecurityFirewallExceptionListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createSecurityFirewallExceptionListener($fullSetup = false)
     {
-        /** @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject $tokenStorage */
-        $tokenStorage = $this->createMock(
-            'Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface'
-        );
-        /** @var AuthenticationTrustResolverInterface|\PHPUnit_Framework_MockObject_MockObject $trustResolver */
-        $trustResolver = $this->createMock(
-            'Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface'
-        );
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $trustResolver = $this->createMock(AuthenticationTrustResolverInterface::class);
         $authenticationEntryPoint = null;
 
         if ($fullSetup) {
-            $tokenStorage
-                ->expects($this->once())->method('getToken')
-                ->will($this->returnValue(
-                    $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
-                ));
-            $trustResolver
-                ->expects($this->once())
+            $tokenStorage->expects(self::once())
+                ->method('getToken')
+                ->willReturn($this->createMock(TokenInterface::class));
+            $trustResolver->expects(self::once())
                 ->method('isFullFledged')
-                ->will($this->returnValue(false));
-            $authenticationEntryPoint = $this->createMock(
-                'Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface'
-            );
-            $authenticationEntryPoint
-                ->expects($this->once())
+                ->willReturn(false);
+            $authenticationEntryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
+            $authenticationEntryPoint->expects(self::once())
                 ->method('start')
-                ->will($this->returnValue(new Response('OK')));
+                ->willReturn(new Response('OK'));
         }
 
         return new SecurityFirewallExceptionListener(
             $tokenStorage,
             $trustResolver,
-            $this->createMock('Symfony\Component\Security\Http\HttpUtils'),
+            $this->createMock(HttpUtils::class),
             'key',
             $authenticationEntryPoint,
             null,
@@ -152,10 +117,10 @@ class SecurityFirewallExceptionListenerTest extends \PHPUnit_Framework_TestCase
      *
      * @return GetResponseForExceptionEvent
      */
-    protected function createEvent(\Exception $exception)
+    private function createEvent(\Exception $exception)
     {
         return new GetResponseForExceptionEvent(
-            $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
+            $this->createMock(HttpKernelInterface::class),
             Request::create('/'),
             HttpKernelInterface::MASTER_REQUEST,
             $exception

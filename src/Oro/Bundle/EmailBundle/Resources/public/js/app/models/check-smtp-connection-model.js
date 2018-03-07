@@ -11,6 +11,13 @@ define(function(require) {
             encryption: null,
             username: '',
             password: ''
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function CheckSmtpConnectionModel() {
+            CheckSmtpConnectionModel.__super__.constructor.apply(this, arguments);
         }
     });
     return CheckSmtpConnectionModel;

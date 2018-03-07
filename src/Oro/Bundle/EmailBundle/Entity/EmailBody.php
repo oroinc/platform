@@ -10,7 +10,7 @@ use JMS\Serializer\Annotation as JMS;
  * Email Body
  *
  * @ORM\Table(name="oro_email_body")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailBodyRepository")
  * @ORM\HasLifecycleCallbacks
  */
 class EmailBody

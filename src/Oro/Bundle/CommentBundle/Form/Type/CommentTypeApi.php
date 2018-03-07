@@ -66,7 +66,7 @@ class CommentTypeApi extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class'      => Comment::ENTITY_NAME,
-                'intention'       => 'comment',
+                'csrf_token_id'   => 'comment',
                 'csrf_protection' => false,
             ]
         );

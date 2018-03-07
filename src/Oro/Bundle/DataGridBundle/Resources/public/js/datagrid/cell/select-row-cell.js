@@ -34,6 +34,13 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function SelectRowCell() {
+            SelectRowCell.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initializer. If the underlying model triggers a `select` event, this cell
          * will change its checked value according to the event's `selected` value.
          *

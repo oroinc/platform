@@ -47,6 +47,13 @@ define([
         emptyValue: {value: [FILTER_EMPTY_VALUE]},
 
         /**
+         * @inheritDoc
+         */
+        constructor: function MultiSelectOriginFolder() {
+            MultiSelectOriginFolder.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
         * Initialize.
         *
         * @param {Object} options

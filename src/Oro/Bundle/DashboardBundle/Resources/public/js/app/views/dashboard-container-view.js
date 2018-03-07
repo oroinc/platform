@@ -46,6 +46,13 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function DashboardContainerView() {
+            DashboardContainerView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize dashboard
          *
          * @param {Object} options

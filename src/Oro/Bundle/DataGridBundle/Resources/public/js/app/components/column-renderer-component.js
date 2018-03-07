@@ -19,6 +19,13 @@ define(function(Chaplin) {
         /**
          * @inheritDoc
          */
+        constructor: function ColumnRendererComponent() {
+            ColumnRendererComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             ColumnRendererComponent.__super__.initialize.apply(this, arguments);
         },

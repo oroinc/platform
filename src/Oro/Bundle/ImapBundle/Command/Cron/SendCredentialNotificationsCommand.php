@@ -22,7 +22,7 @@ class SendCredentialNotificationsCommand extends ContainerAwareCommand implement
      */
     public function getDefaultDefinition()
     {
-        return '0 * * * *';
+        return '0 4 * * *';
     }
 
     /**

@@ -3,7 +3,9 @@
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\AddressBundle\Entity\AddressType;
+use Oro\Bundle\AddressBundle\Validator\Constraints\UniqueAddressTypes;
 use Oro\Bundle\AddressBundle\Validator\Constraints\UniqueAddressTypesValidator;
+use Symfony\Component\Validator\Context\ExecutionContext;
 
 class UniqueAddressTypesValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,13 +39,11 @@ class UniqueAddressTypesValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateValid(array $addresses)
     {
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(ExecutionContext::class);
         $context->expects($this->never())
             ->method('addViolation');
 
-        $constraint = $this->createMock('Oro\Bundle\AddressBundle\Validator\Constraints\UniqueAddressTypes');
+        $constraint = $this->createMock(UniqueAddressTypes::class);
         $validator = new UniqueAddressTypesValidator();
         $validator->initialize($context);
 
@@ -90,14 +90,12 @@ class UniqueAddressTypesValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateInvalid($addresses, $types)
     {
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(ExecutionContext::class);
         $context->expects($this->once())
             ->method('addViolation')
             ->with('Several addresses have the same type {{ types }}.', array('{{ types }}' => $types));
 
-        $constraint = $this->createMock('Oro\Bundle\AddressBundle\Validator\Constraints\UniqueAddressTypes');
+        $constraint = $this->createMock(UniqueAddressTypes::class);
         $validator = new UniqueAddressTypesValidator();
         $validator->initialize($context);
 

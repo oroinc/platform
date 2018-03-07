@@ -16,6 +16,13 @@ define(function(require) {
             'change [data-ftid="emailnotification_entityName"]': 'onEntityNameChange'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailNotificationFormView() {
+            EmailNotificationFormView.__super__.constructor.apply(this, arguments);
+        },
+
         onEntityNameChange: function() {
             var that = this;
             var $form = $(this.elements.form);

@@ -5,10 +5,10 @@ parameters:
     assetic.config_cache.class: Oro\Bundle\AsseticBundle\Cache\ConfigCache
 services:
     oro_assetic.configuration:
-          class: %oro_assetic.configuration.class%
+          class: '%oro_assetic.configuration.class%'
           arguments:
               - '@event_dispatcher'
-              - %oro_assetic.raw_configuration%
+              - '%oro_assetic.raw_configuration%'
 
     oro_assetic.twig.extension:
           class: Oro\Bundle\AsseticBundle\Twig\AsseticExtension

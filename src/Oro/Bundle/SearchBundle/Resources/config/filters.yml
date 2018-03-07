@@ -3,7 +3,7 @@ parameters:
 
 services:
     oro_search.string_filter:
-        class: %oro_search.string_filter.class%
+        class: '%oro_search.string_filter.class%'
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'

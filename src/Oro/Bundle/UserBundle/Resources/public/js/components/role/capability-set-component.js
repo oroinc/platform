@@ -18,6 +18,13 @@ define(function(require) {
         tabIds: null,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function CapabilitySetComponent() {
+            CapabilitySetComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @param {Object} options
          * @param {Array<Object>} options.data collection of grouped capabilities
          * @param {string=} options.currentCategoryId by default it is 'all' category

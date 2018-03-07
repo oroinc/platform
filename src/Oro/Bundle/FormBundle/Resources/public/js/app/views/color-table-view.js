@@ -4,6 +4,13 @@ define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-v
 
     var ColorTableView = BaseSimpleColorPickerView.extend({
         /**
+         * @inheritDoc
+         */
+        constructor: function ColorTableView() {
+            ColorTableView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @constructor
          * @param {object} options
          */

@@ -6,7 +6,7 @@ parameters:
 
     oro_layout.default_active_theme:    ~
     oro_layout.debug:    ~
-    oro_layout.cache_dir:               %kernel.cache_dir%/layouts
+    oro_layout.cache_dir:               '%kernel.cache_dir%/layouts'
 
 services:
     oro_layout.dependency_initializer:
@@ -16,11 +16,11 @@ services:
             - '@service_container'
 
     oro_layout.theme_factory:
-        class:  %oro_layout.theme_factory.class%
+        class:  '%oro_layout.theme_factory.class%'
         public: false
 
     oro_layout.theme_manager:
-        class:  %oro_layout.theme_manager.class%
+        class:  '%oro_layout.theme_manager.class%'
         public: false
         arguments:
             - '@oro_layout.theme_factory'
@@ -38,16 +38,16 @@ services:
         public: false
         arguments:
             - '@oro_layout.layout_update_generator.php'
-            - %kernel.debug%
-            - %oro_layout.cache_dir%
+            - '%kernel.debug%'
+            - '%oro_layout.cache_dir%'
 
     oro_layout.loader.yaml_driver:
         class:  Oro\Component\Layout\Loader\Driver\YamlDriver
         public: false
         arguments:
             - '@oro_layout.layout_update_generator.config'
-            - %kernel.debug%
-            - %oro_layout.cache_dir%
+            - '%kernel.debug%'
+            - '%oro_layout.cache_dir%'
 
     oro_layout.loader.path_provider:
         class:  Oro\Component\Layout\Extension\Theme\PathProvider\ChainPathProvider
@@ -69,7 +69,7 @@ services:
             - { name: layout.context_configurator, priority: -100 }
 
     oro_layout.theme_extension:
-        class: %oro_layout.theme_extension.class%
+        class: '%oro_layout.theme_extension.class%'
         arguments:
             - '@oro_layout.loader'
             - '@oro_layout.dependency_initializer'
@@ -141,7 +141,7 @@ services:
         public: false
 
     oro_layout.request.listener.theme:
-        class: %oro_layout.request.listener.theme.class%
+        class: '%oro_layout.request.listener.theme.class%'
         arguments:
             - '%oro_layout.default_active_theme%'
         calls:

@@ -3,7 +3,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 
 use Oro\Bundle\UserBundle\Form\Type\GenderType;
 use Oro\Bundle\UserBundle\Model\Gender;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class GenderTypeTest extends FormIntegrationTestCase

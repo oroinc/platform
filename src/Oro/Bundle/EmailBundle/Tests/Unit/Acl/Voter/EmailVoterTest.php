@@ -38,48 +38,6 @@ class EmailVoterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $attribute
-     * @param $isSupported
-     * @dataProvider attributeProvider
-     */
-    public function testSupportsAttribute($attribute, $isSupported)
-    {
-        $this->assertEquals($isSupported, $this->emailVoter->supportsAttribute($attribute));
-    }
-
-    public function attributeProvider()
-    {
-        return [
-            ['VIEW', true],
-            ['EDIT', true],
-            ['CREATE', false],
-            ['DELETE', false],
-        ];
-    }
-
-    /**
-     * @param $class
-     * @param $isSupported
-     * @dataProvider classProvider
-     */
-    public function testSupportsClass($class, $isSupported)
-    {
-        $this->assertEquals($isSupported, $this->emailVoter->supportsClass($class));
-    }
-
-    public function classProvider()
-    {
-        return [
-            ['Oro\Bundle\EmailBundle\Entity\Email', true],
-            ['Oro\Bundle\EmailBundle\Entity\EmailBody', true],
-            ['Oro\Bundle\EmailBundle\Entity\EmailAttachment', true],
-            [EmailBody::CLASS_NAME, true],
-            [EmailAttachment::CLASS_NAME, true],
-            ['Some\Unsupported\Class', false]
-        ];
-    }
-
-    /**
      * @param boolean $atLeastOneGranted
      * @dataProvider voteProvider
      */

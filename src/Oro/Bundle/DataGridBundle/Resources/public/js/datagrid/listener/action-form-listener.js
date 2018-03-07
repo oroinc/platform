@@ -16,6 +16,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function ActionFormListener() {
+            ActionFormListener.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             mediator.on('datagrid:frontend:execute:' + options.gridName, this.onFrontAction, this);
             mediator.on('datagrid:mass:frontend:execute:' + options.gridName, this.onFrontMassAction, this);

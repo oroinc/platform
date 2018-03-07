@@ -5,7 +5,7 @@ parameters:
 
 services:
     oro_currency.form.type.currency_selection:
-        class: %oro_currency.form.type.currency_selection.class%
+        class: '%oro_currency.form.type.currency_selection.class%'
         arguments:
             - '@oro_currency.config.currency'
             - '@oro_locale.settings'
@@ -14,18 +14,14 @@ services:
             - { name: form.type, alias: oro_currency_selection }
 
     oro_currency.form.type.price:
-        class: %oro_currency.form.type.price.class%
-        arguments:
-            - '@oro_currency.rounding.price_rounding_service'
+        class: '%oro_currency.form.type.price.class%'
         calls:
-            - [setDataClass, [%oro_currency.price.model%]]
+            - [setDataClass, ['%oro_currency.price.model%']]
         tags:
             - { name: form.type, alias: oro_currency_price }
 
     oro_currency.form.type.multicurrency:
         class: Oro\Bundle\CurrencyBundle\Form\Type\MultiCurrencyType
-        arguments:
-            - '@oro_currency.rounding.price_rounding_service'
         calls:
             - [setDataClass, [Oro\Bundle\CurrencyBundle\Entity\MultiCurrency]]
         tags:

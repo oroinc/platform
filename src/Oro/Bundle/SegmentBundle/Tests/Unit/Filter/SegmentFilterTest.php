@@ -94,7 +94,7 @@ class SegmentFilterTest extends OrmTestCase
                         []
                     ),
                     new CsrfExtension(
-                        $this->createMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface')
+                        $this->createMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')
                     )
                 ]
             )

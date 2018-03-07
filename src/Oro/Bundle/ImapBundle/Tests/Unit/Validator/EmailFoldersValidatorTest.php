@@ -29,8 +29,7 @@ class EmailFoldersValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->constraint = new EmailFolders();
 
-        $this->context = $this
-            ->createMock('Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context = $this->createMock(ExecutionContextInterface::class);
 
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
             ->disableOriginalConstructor()

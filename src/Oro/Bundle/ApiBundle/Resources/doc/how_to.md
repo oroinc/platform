@@ -240,10 +240,6 @@ api:
                             property_path: sourceEntityClass
                         id:
                             property_path: sourceEntityId
-                sourceEntityClass:
-                    exclude: true
-                sourceEntityId:
-                    exclude: true
 ```
 
 Here is an example of how the nested association looks in JSON.API:
@@ -262,6 +258,8 @@ Here is an example of how the nested association looks in JSON.API:
   }
 }
 ```
+
+Please note that fields used in a nested association, in this example `sourceEntityClass` and `sourceEntityId`, are automatically excluded from the result and you do not need to mark them with `exclude` option. Moreover, they will be excluded even if you mark them with `exclude: false` in a configuration file.
 
 ## Configure an Extended Many-To-One Association
 

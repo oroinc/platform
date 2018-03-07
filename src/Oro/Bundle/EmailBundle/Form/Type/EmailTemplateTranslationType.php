@@ -44,8 +44,7 @@ class EmailTemplateTranslationType extends AbstractType
         $resolver->setDefaults(
             [
                 'translatable_class'   => 'Oro\\Bundle\\EmailBundle\\Entity\\EmailTemplate',
-                'intention'            => 'emailtemplate_translation',
-                'cascade_validation'   => true,
+                'csrf_token_id'        => 'emailtemplate_translation',
                 'labels'               => [],
                 'content_options'      => [],
                 'subject_options'      => [],

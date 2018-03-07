@@ -13,6 +13,13 @@ define(function(require) {
      */
     BarChartComponent = BaseChartComponent.extend({
         /**
+         * @inheritDoc
+         */
+        constructor: function BarChartComponent() {
+            BarChartComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Draw chart
          *
          * @overrides

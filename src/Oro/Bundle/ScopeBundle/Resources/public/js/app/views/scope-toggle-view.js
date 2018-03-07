@@ -33,6 +33,13 @@ define(function(require) {
         $scopeFields: null,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function ScopeToggleView() {
+            ScopeToggleView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @inheritdoc
          */
         initialize: function(options) {

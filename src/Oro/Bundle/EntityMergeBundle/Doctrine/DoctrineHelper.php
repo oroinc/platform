@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
-use Symfony\Component\Security\Core\Util\ClassUtils;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 class DoctrineHelper
 {

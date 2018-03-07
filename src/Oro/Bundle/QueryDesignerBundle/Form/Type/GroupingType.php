@@ -53,7 +53,7 @@ class GroupingType extends AbstractType
             array(
                 'entity'             => null,
                 'data_class'         => 'Oro\Bundle\QueryDesignerBundle\Model\Grouping',
-                'intention'          => 'query_designer_grouping',
+                'csrf_token_id'      => 'query_designer_grouping',
                 'column_choice_type' => 'oro_entity_field_select'
             )
         );

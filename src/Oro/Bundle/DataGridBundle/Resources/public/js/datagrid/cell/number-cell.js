@@ -24,6 +24,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function NumberCell() {
+            NumberCell.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.extend(this, options);
             NumberCell.__super__.initialize.apply(this, arguments);

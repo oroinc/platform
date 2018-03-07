@@ -83,6 +83,16 @@ define(function(require) {
             'change:visibility': 'autoSize'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function TagsEditorView() {
+            TagsEditorView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             TagsEditorView.__super__.initialize.apply(this, arguments);
             this.listenTo(this.autocompleteApiAccessor, 'cache:clear', this.onCacheClear);

@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeys;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeysValidator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class UniqueKeysValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,7 +20,7 @@ class UniqueKeysValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->context = $this->createMock('Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context = $this->createMock(ExecutionContextInterface::class);
 
         $this->validator = new UniqueKeysValidator();
         $this->validator->initialize($this->context);

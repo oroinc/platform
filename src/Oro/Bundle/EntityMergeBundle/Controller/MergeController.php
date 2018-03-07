@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
+// TODO: change to Symfony\Component\Validator\Validator\ValidatorInterface in scope of BAP-15236
 use Symfony\Component\Validator\ValidatorInterface;
 
 /**
@@ -74,6 +75,7 @@ class MergeController extends Controller
             $className = $entityData->getClassName();
         }
 
+        // TODO: change to $this->getValidator()->validate($entityData, null, ['validateCount']) in scope of BAP-15236
         $constraintViolations = $this->getValidator()->validate($entityData, ['validateCount']);
         if ($constraintViolations->count()) {
             foreach ($constraintViolations as $violation) {

@@ -78,6 +78,16 @@ define(function(require) {
          */
         within: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function InlineEditorErrorHolderView() {
+            InlineEditorErrorHolderView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             if (!options.within) {
                 throw new Error('Option "within" is required');

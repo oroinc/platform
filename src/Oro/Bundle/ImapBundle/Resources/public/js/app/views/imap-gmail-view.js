@@ -14,13 +14,27 @@ define(function(require) {
         },
 
         $googleErrorMessage: null,
+
         errorMessage: '',
+
         type: '',
+
         html: '',
+
         accessToken: '',
+
         refreshToken: '',
+
         expiredAt: '',
+
         email: '',
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ImapGmailView() {
+            ImapGmailView.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * @constructor

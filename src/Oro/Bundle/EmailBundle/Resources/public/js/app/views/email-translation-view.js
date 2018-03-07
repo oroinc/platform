@@ -10,6 +10,13 @@ define(function(require) {
             'show [data-role="change-language"]': 'onChangeLanguage'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailTranslationView() {
+            EmailTranslationView.__super__.constructor.apply(this, arguments);
+        },
+
         onChangeLanguage: function(e) {
             var $target = $(e.target || window.event.target);
             var dataRelated = $target.attr('data-related');

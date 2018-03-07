@@ -189,7 +189,7 @@ class UserType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class'           => 'Oro\Bundle\UserBundle\Entity\User',
-                'intention'            => 'user',
+                'csrf_token_id'        => 'user',
                 'validation_groups'    => ['Roles', 'Default'],
                 'ownership_disabled'   => $this->isMyProfilePage
             ]

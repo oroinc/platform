@@ -46,6 +46,13 @@ define([
         allowOk: true,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function DeleteMassAction() {
+            DeleteMassAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * As in this action we need to send POST request to get data for confirm message
          * we set this.confirmation = false at initialization to prevent opening confirm window.
          *

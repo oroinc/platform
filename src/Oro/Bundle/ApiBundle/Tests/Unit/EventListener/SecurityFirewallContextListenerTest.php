@@ -6,111 +6,87 @@ use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
 
 class SecurityFirewallContextListenerTest extends \PHPUnit_Framework_TestCase
 {
+    private const SESSION_NAME = 'TEST_SESSION_ID';
+    private const AJAX_HEADER  = 'X-CSRF-Header';
+
     public function testHandleShouldBeCalledWithCookie()
     {
-        $sessionOptions = ['name' => 'OROID'];
-
         $event = $this->createMasterRequestEvent();
-        $event->getRequest()->cookies->add(['OROID' => 'o595fqdg5214u4e4nfcs3uc923']);
-        $event->getRequest()->headers->add(['X-CSRF-Header' => true]);
+        $event->getRequest()->cookies->add([self::SESSION_NAME => 'o595fqdg5214u4e4nfcs3uc923']);
+        $event->getRequest()->headers->add([self::AJAX_HEADER => true]);
 
-        /** @var ContextListener|\PHPUnit_Framework_MockObject_MockObject $innerListener */
-        $innerListener = $this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ContextListener')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $tokenStorage = $this
-            ->createMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
-        $tokenStorage->expects($this->once())
+        $innerListener = $this->createMock(ContextListener::class);
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+
+        $tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn(null);
-
-        $innerListener
-            ->expects($this->once())
+        $innerListener->expects(self::once())
             ->method('handle')
             ->with($event);
 
-        $listener = new SecurityFirewallContextListener($innerListener, $sessionOptions, $tokenStorage);
+        $listener = new SecurityFirewallContextListener($innerListener, self::SESSION_NAME, $tokenStorage);
         $listener->handle($event);
     }
 
     public function testHandleWithExistingToken()
     {
-        $sessionOptions = ['name' => 'OROID'];
         $event = $this->createMasterRequestEvent();
-        $event->getRequest()->cookies->add(['OROID' => 'o595fqdg5214u4e4nfcs3uc923']);
-        $event->getRequest()->headers->add(['X-CSRF-Header' => true]);
+        $event->getRequest()->cookies->add([self::SESSION_NAME => 'o595fqdg5214u4e4nfcs3uc923']);
+        $event->getRequest()->headers->add([self::AJAX_HEADER => true]);
 
-        /** @var ContextListener|\PHPUnit_Framework_MockObject_MockObject $innerListener */
-        $innerListener = $this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ContextListener')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $tokenStorage = $this
-            ->createMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $innerListener = $this->createMock(ContextListener::class);
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
 
-        $tokenStorage->expects($this->once())
+        $tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn(new UsernamePasswordToken('user', 'password', 'test'));
-
-        $innerListener
-            ->expects($this->never())
+        $innerListener->expects(self::never())
             ->method('handle');
 
-        $listener = new SecurityFirewallContextListener($innerListener, $sessionOptions, $tokenStorage);
+        $listener = new SecurityFirewallContextListener($innerListener, self::SESSION_NAME, $tokenStorage);
         $listener->handle($event);
     }
 
     public function testHandleWithNonAjaxRequest()
     {
-        $sessionOptions = ['name' => 'OROID'];
         $event = $this->createMasterRequestEvent();
-        $event->getRequest()->cookies->add(['OROID' => 'o595fqdg5214u4e4nfcs3uc923']);
+        $event->getRequest()->cookies->add([self::SESSION_NAME => 'o595fqdg5214u4e4nfcs3uc923']);
 
-        /** @var ContextListener|\PHPUnit_Framework_MockObject_MockObject $innerListener */
-        $innerListener = $this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ContextListener')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $tokenStorage = $this
-            ->createMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $innerListener = $this->createMock(ContextListener::class);
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
 
-        $tokenStorage->expects($this->once())
+        $tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn(null);
-
-        $innerListener
-            ->expects($this->never())
+        $innerListener->expects(self::never())
             ->method('handle');
 
-        $listener = new SecurityFirewallContextListener($innerListener, $sessionOptions, $tokenStorage);
+        $listener = new SecurityFirewallContextListener($innerListener, self::SESSION_NAME, $tokenStorage);
         $listener->handle($event);
     }
 
     public function testHandleWithoutSessionCookie()
     {
-        $sessionOptions = ['name' => 'OROID'];
         $event = $this->createMasterRequestEvent();
-        $event->getRequest()->headers->add(['X-CSRF-Header' => true]);
+        $event->getRequest()->headers->add([self::AJAX_HEADER => true]);
 
-        /** @var ContextListener|\PHPUnit_Framework_MockObject_MockObject $innerListener */
-        $innerListener = $this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ContextListener')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $tokenStorage = $this
-            ->createMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $innerListener = $this->createMock(ContextListener::class);
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
 
-        $tokenStorage->expects($this->once())
+        $tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn(null);
-
-        $innerListener
-            ->expects($this->never())
+        $innerListener->expects(self::never())
             ->method('handle');
 
-        $listener = new SecurityFirewallContextListener($innerListener, $sessionOptions, $tokenStorage);
+        $listener = new SecurityFirewallContextListener($innerListener, self::SESSION_NAME, $tokenStorage);
         $listener->handle($event);
     }
 
@@ -119,10 +95,9 @@ class SecurityFirewallContextListenerTest extends \PHPUnit_Framework_TestCase
      *
      * @return GetResponseEvent
      */
-    protected function createMasterRequestEvent($route = 'foo')
+    private function createMasterRequestEvent($route = 'foo')
     {
-        /** @var HttpKernelInterface|\PHPUnit_Framework_MockObject_MockObject $kernel */
-        $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel = $this->createMock(HttpKernelInterface::class);
 
         return new GetResponseEvent(
             $kernel,

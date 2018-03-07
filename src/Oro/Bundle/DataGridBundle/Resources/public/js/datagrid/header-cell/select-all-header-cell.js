@@ -35,6 +35,13 @@ define([
         selectState: null,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function SelectAllHeaderCell() {
+            SelectAllHeaderCell.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initializer.
          * Subscribers on events listening
          *

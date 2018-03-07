@@ -4,8 +4,6 @@ namespace Oro\Component\Testing\Unit\Form\Type\Stub;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -13,14 +11,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EntityType extends AbstractType
 {
-    /** @var ChoiceList */
-    protected $choiceList = [];
-
     /** @var string */
     protected $name;
 
     /** @var array|null */
     protected $options;
+
+    /** @var array|null */
+    protected $choices;
 
     /**
      * @param array $choices
@@ -31,28 +29,7 @@ class EntityType extends AbstractType
     {
         $this->name = $name;
         $this->options = $options;
-
-        $keys = array_map('strval', array_keys($choices));
-        $values = array_values($choices);
-
-        $this->choiceList = new ChoiceList([], []);
-
-        $keysReflection = new \ReflectionProperty(get_class($this->choiceList), 'values');
-        $keysReflection->setAccessible(true);
-        $keysReflection->setValue($this->choiceList, $keys);
-
-        $valuesReflection = new \ReflectionProperty(get_class($this->choiceList), 'choices');
-        $valuesReflection->setAccessible(true);
-        $valuesReflection->setValue($this->choiceList, $values);
-
-        $remainingViews = [];
-        foreach ($choices as $key => $value) {
-            $remainingViews[] = new ChoiceView($value, $key, $key);
-        }
-
-        $valuesReflection = new \ReflectionProperty(get_class($this->choiceList), 'remainingViews');
-        $valuesReflection->setAccessible(true);
-        $valuesReflection->setValue($this->choiceList, $remainingViews);
+        $this->choices = $choices;
     }
 
     /**
@@ -61,7 +38,8 @@ class EntityType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $defaultOptions = [
-            'choice_list' => $this->choiceList,
+            'choice_loader' => new ChoiceLoaderStub($this->choices),
+            'choice_label' => null,
             'query_builder' => null,
             'create_enabled' => false,
             'class' => null,

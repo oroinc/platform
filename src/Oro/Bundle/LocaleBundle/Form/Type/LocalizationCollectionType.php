@@ -69,11 +69,11 @@ class LocalizationCollectionType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired([
-            'type',
+            'entry_type',
         ]);
 
         $resolver->setDefaults([
-            'options'               => [],
+            'entry_options'               => [],
             'fallback_type'         => FallbackPropertyType::NAME,
             'enabled_fallbacks'     => [],
             'value_type'            => FallbackValueType::NAME,
@@ -100,8 +100,8 @@ class LocalizationCollectionType extends AbstractType
                 $options['value_type'],
                 [
                     'label' => $localization->getName(),
-                    'type' => $options['type'],
-                    'options' => $options['options'],
+                    'entry_type' => $options['entry_type'],
+                    'entry_options' => $options['entry_options'],
                     'fallback_type' => $options['fallback_type'],
                     'fallback_type_localization' => $localization->getName(),
                     'fallback_type_parent_localization' => $parent,

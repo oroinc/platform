@@ -87,7 +87,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                     'data_type' => NumberFilterType::DATA_INTEGER
                 ),
                 'customOptions' => array(
-                    'field_options' => array('grouping' => true, 'precision' => 2)
+                    'field_options' => array('grouping' => true, 'scale' => 2)
                 ),
             ),
             'formatted number'     => array(
@@ -100,7 +100,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                     'data_type' => NumberFilterType::DATA_INTEGER
                 ),
                 'customOptions' => array(
-                    'field_options' => array('grouping' => true, 'precision' => 2)
+                    'field_options' => array('grouping' => true, 'scale' => 2)
                 ),
             ),
             'integer'              => array(

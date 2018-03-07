@@ -38,7 +38,7 @@ class PageStateType extends AbstractType
         $resolver->setDefaults(
             array(
                 'data_class'      => 'Oro\Bundle\NavigationBundle\Entity\AbstractPageState',
-                'intention'       => 'pagestate',
+                'csrf_token_id'   => 'pagestate',
                 'csrf_protection' => false,
             )
         );

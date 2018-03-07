@@ -3,6 +3,6 @@ parameters:
 
 services:
     oro_form.importexport.primary_item_collection_normalizer:
-        class: %oro_form.importexport.primary_item_collection_normalizer.class%
+        class: '%oro_form.importexport.primary_item_collection_normalizer.class%'
         tags:
             - { name: oro_importexport.normalizer, priority: -5 }

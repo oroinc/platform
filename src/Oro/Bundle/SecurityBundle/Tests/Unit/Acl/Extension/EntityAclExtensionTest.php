@@ -30,7 +30,7 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Tests\Unit\TestHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Core\Util\ClassUtils;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)

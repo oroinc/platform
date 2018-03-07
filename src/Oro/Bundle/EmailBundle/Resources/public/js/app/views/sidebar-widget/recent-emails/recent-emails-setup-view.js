@@ -16,6 +16,16 @@ define(function(require) {
 
         foldersData: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function RecentEmailsContentView() {
+            RecentEmailsContentView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             RecentEmailsContentView.__super__.initialize.apply(this, arguments);
             $.getJSON(routing.generate('oro_email_emailorigin_list'),

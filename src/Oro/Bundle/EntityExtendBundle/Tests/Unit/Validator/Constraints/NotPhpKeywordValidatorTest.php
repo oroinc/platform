@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotPhpKeyword;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotPhpKeywordValidator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class NotPhpKeywordValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -15,7 +16,7 @@ class NotPhpKeywordValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->context = $this->createMock('Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context = $this->createMock(ExecutionContextInterface::class);
 
         $this->validator = new NotPhpKeywordValidator();
         $this->validator->initialize($this->context);

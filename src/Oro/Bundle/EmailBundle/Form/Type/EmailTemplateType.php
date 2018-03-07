@@ -141,7 +141,7 @@ class EmailTemplateType extends AbstractType
         $resolver->setDefaults(
             array(
                 'data_class'           => 'Oro\Bundle\EmailBundle\Entity\EmailTemplate',
-                'intention'            => 'emailtemplate',
+                'csrf_token_id'        => 'emailtemplate',
             )
         );
     }

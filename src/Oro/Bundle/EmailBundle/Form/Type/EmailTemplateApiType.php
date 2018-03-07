@@ -25,7 +25,7 @@ class EmailTemplateApiType extends EmailTemplateType
         $resolver->setDefaults(
             array(
                 'data_class'      => 'Oro\Bundle\EmailBundle\Entity\EmailTemplate',
-                'intention'       => 'emailtemplate',
+                'csrf_token_id'   => 'emailtemplate',
                 'csrf_protection' => false,
             )
         );

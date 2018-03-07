@@ -19,6 +19,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function BaseSetupView() {
+            BaseSetupView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         render: function() {
             BaseSetupView.__super__.render.call(this);
             // bind validation rules and init validator

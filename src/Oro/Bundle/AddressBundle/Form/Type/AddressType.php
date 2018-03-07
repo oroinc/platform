@@ -107,7 +107,7 @@ class AddressType extends AbstractType
         $resolver->setDefaults(
             array(
                 'data_class' => 'Oro\Bundle\AddressBundle\Entity\Address',
-                'intention' => 'address',
+                'csrf_token_id' => 'address',
                 'single_form' => true,
                 'region_route' => 'oro_api_country_get_regions',
                 'validation_groups' => [Constraint::DEFAULT_GROUP, self::ABSTRACT_ADDRESS_GROUP],

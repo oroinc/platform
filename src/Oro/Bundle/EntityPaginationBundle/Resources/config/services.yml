@@ -9,19 +9,19 @@ parameters:
 
 services:
     oro_entity_pagination.datagrid.extension.orm_entity_pagination:
-        class: %oro_entity_pagination.datagrid.extension.entity_pagination.class%
+        class: '%oro_entity_pagination.datagrid.extension.entity_pagination.class%'
         tags:
             - { name: oro_datagrid.extension }
 
     oro_entity_pagination.storage:
-        class: %oro_entity_pagination.storage.class%
+        class: '%oro_entity_pagination.storage.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity_pagination.manager'
             - '@request_stack'
 
     oro_entity_pagination.storage.data_collector:
-        class: %oro_entity_pagination.storage.data_collector.class%
+        class: '%oro_entity_pagination.storage.data_collector.class%'
         arguments:
             - '@oro_datagrid.datagrid.manager.link'
             - '@oro_entity.doctrine_helper'
@@ -29,12 +29,12 @@ services:
             - '@oro_entity_pagination.manager'
 
     oro_entity_pagination.manager:
-        class: %oro_entity_pagination.manager.class%
+        class: '%oro_entity_pagination.manager.class%'
         arguments:
             - '@oro_config.user'
 
     oro_entity_pagination.message_manager:
-        class: %oro_entity_pagination.message_manager.class%
+        class: '%oro_entity_pagination.message_manager.class%'
         arguments:
             - '@session'
             - '@translator'
@@ -42,14 +42,14 @@ services:
             - '@oro_entity_pagination.storage'
 
     oro_entity_pagination.navigation:
-        class: %oro_entity_pagination.navigation.class%
+        class: '%oro_entity_pagination.navigation.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@security.authorization_checker'
             - '@oro_entity_pagination.storage'
 
     oro_entity_pagination.event_listener.entity_pagination:
-        class: %oro_entity_pagination.event_listener.entity_pagination.class%
+        class: '%oro_entity_pagination.event_listener.entity_pagination.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity_pagination.storage'

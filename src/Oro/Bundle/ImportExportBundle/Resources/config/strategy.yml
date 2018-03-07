@@ -4,7 +4,7 @@ parameters:
 
 services:
     oro_importexport.strategy.import.helper:
-        class: %oro_importexport.strategy.import.helper.class%
+        class: '%oro_importexport.strategy.import.helper.class%'
         arguments:
             - '@doctrine'
             - '@validator'
@@ -25,7 +25,7 @@ services:
             - '@oro_importexport.field.database_helper'
 
     oro_importexport.strategy.configurable_add_or_replace:
-        class: %oro_importexport.strategy.configurable_add_or_replace.class%
+        class: '%oro_importexport.strategy.configurable_add_or_replace.class%'
         abstract: true
         arguments:
             - '@event_dispatcher'

@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Adds all REST API routes to REST API Sandbox based on the current ApiDoc view and Data API configuration.
+ * Adds all REST API routes to API sandbox based on the current API view and Data API configuration.
  */
 class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 {

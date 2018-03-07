@@ -12,6 +12,13 @@ define(function(require) {
 
         nameErrorTemplate: nameErrorTemplate,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ViewNameModal() {
+            ViewNameModal.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             options = options || {};
 

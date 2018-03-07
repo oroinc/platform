@@ -15,6 +15,14 @@ define(function(require) {
             id: '',
             name: ''
         },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActivityContextActivityModel() {
+            ActivityContextActivityModel.__super__.constructor.apply(this, arguments);
+        },
+
         url: function() {
             var param = {
                 activity: this.get('activityClassAlias'),

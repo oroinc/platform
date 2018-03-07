@@ -11,7 +11,7 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EmailBundle\Processor\VariableProcessorRegistry;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\Security\Core\Util\ClassUtils;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class EmailRenderer extends \Twig_Environment

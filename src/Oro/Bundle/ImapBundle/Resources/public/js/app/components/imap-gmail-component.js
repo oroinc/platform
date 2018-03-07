@@ -17,6 +17,13 @@ define(function(require) {
         scopes: ['https://mail.google.com/', 'https://www.googleapis.com/auth/userinfo.email'],
 
         /**
+         * @inheritDoc
+         */
+        constructor: function ImapGmailComponent() {
+            ImapGmailComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @constructor
          * @param {Object} options
          */

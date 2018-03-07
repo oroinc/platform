@@ -10,7 +10,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
-use Symfony\Component\Security\Core\Util\ClassUtils;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 class ReplaceStrategy implements StrategyInterface
 {

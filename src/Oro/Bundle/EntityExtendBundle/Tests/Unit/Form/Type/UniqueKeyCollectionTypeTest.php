@@ -8,11 +8,12 @@ use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
-use Symfony\Component\Validator\DefaultTranslator;
-use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
+use Symfony\Component\Validator\Context\ExecutionContextFactory;
+use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
-use Symfony\Component\Validator\Validator;
+use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 class UniqueKeyCollectionTypeTest extends TypeTestCase
 {
@@ -42,10 +43,10 @@ class UniqueKeyCollectionTypeTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $validator = new Validator(
-            new ClassMetadataFactory(new LoaderChain([])),
-            new ConstraintValidatorFactory(),
-            new DefaultTranslator()
+        $validator = new RecursiveValidator(
+            new ExecutionContextFactory(new IdentityTranslator()),
+            new LazyLoadingMetadataFactory(new LoaderChain([])),
+            new ConstraintValidatorFactory()
         );
 
         $this->factory = Forms::createFormFactoryBuilder()

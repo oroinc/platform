@@ -12,6 +12,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
@@ -60,8 +61,8 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $this->extension->buildForm($builder, $options);
         $listeners = $dispatcher->getListeners();
         $this->assertCount(2, $listeners);
-        $this->assertTrue(array_key_exists('form.pre_bind', $listeners));
-        $this->assertTrue(array_key_exists('form.post_bind', $listeners));
+        $this->assertTrue(array_key_exists(FormEvents::PRE_SUBMIT, $listeners));
+        $this->assertTrue(array_key_exists(FormEvents::POST_SUBMIT, $listeners));
     }
 
     public function testBuildFormWithoutDataClassInOptions()

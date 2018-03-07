@@ -29,24 +29,24 @@ parameters:
 services:
     # Placeholder services
     oro_ui.placeholder.provider:
-        class: %oro_ui.placeholder.provider.class%
+        class: '%oro_ui.placeholder.provider.class%'
         arguments:
-            - %oro_ui.placeholders%
+            - '%oro_ui.placeholders%'
             - '@oro_ui.placeholder.resolver'
             - '@security.authorization_checker'
             - '@oro_featuretoggle.checker.feature_checker'
 
     oro_ui.placeholder.resolver:
-        class: %oro_ui.placeholder.resolver.class%
+        class: '%oro_ui.placeholder.resolver.class%'
         arguments:
             - '@service_container'
 
     oro_ui.placeholder.filter:
-        class: %oro_ui.placeholder.filter.class%
+        class: '%oro_ui.placeholder.filter.class%'
 
     # Other services
     oro_ui.router:
-        class: %oro_ui.router.class%
+        class: '%oro_ui.router.class%'
         arguments:
             - '@request_stack'
             - '@router'
@@ -78,12 +78,12 @@ services:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
     oro_ui.config_settings.listener:
-        class: %oro_ui.config_settings.listener.class%
+        class: '%oro_ui.config_settings.listener.class%'
         tags:
             - { name: kernel.event_listener, event: oro_config.settings_before_save.oro_ui.application_url, method: onBeforeSave }
 
     oro_ui.format_converter.date_time.jquery_ui:
-        class: %oro_ui.format_converter.date_time.jquery_ui.class%
+        class: '%oro_ui.format_converter.date_time.jquery_ui.class%'
         arguments:
             - '@oro_locale.formatter.date_time'
             - '@translator'
@@ -92,48 +92,48 @@ services:
 
     oro_ui.label_provider.action_button.abstract:
         abstract: true
-        class: %oro_ui.label_provider.action_button.class%
+        class: '%oro_ui.label_provider.action_button.class%'
         arguments:
             - '@translator'
 
     oro_ui.label_provider.action_button_group:
-        class: %oro_ui.label_provider.action_button_group.class%
+        class: '%oro_ui.label_provider.action_button_group.class%'
         arguments:
             - '@translator'
 
     oro_ui.widget_provider.action_button.abstract:
         abstract: true
-        class: %oro_ui.widget_provider.action_button.class%
+        class: '%oro_ui.widget_provider.action_button.class%'
         arguments:
             - '@oro_ui.placeholder.provider'
 
     oro_ui.widget_provider.view_actions:
-        class: %oro_ui.widget_provider.view_actions.class%
+        class: '%oro_ui.widget_provider.view_actions.class%'
         arguments:
             - '@oro_ui.label_provider.action_button_group'
             - '@event_dispatcher'
-            - %oro_ui.widget_provider.view_actions.page_type%
+            - '%oro_ui.widget_provider.view_actions.page_type%'
 
     oro_ui.widget_provider.update_actions:
-        class: %oro_ui.widget_provider.update_actions.class%
+        class: '%oro_ui.widget_provider.update_actions.class%'
         arguments:
             - '@oro_ui.label_provider.action_button_group'
             - '@event_dispatcher'
-            - %oro_ui.widget_provider.update_actions.page_type%
+            - '%oro_ui.widget_provider.update_actions.page_type%'
 
     oro_ui.content_provider.manager:
-        class: %oro_ui.content_provider.manager.class%
+        class: '%oro_ui.content_provider.manager.class%'
 
     oro_ui.provider.widget_context:
-        class: %oro_ui.provider.widget_context.class%
+        class: '%oro_ui.provider.widget_context.class%'
         arguments:
             - '@request_stack'
 
     oro_ui.html_tag_helper:
-        class: %oro_ui.html_tag_helper.class%
+        class: '%oro_ui.html_tag_helper.class%'
         arguments:
             - '@oro_form.provider.html_tag_provider'
-            - %kernel.cache_dir%
+            - '%kernel.cache_dir%'
 
     oro_ui.flash_message_helper:
         class: 'Oro\Bundle\UIBundle\Tools\FlashMessageHelper'
@@ -143,12 +143,12 @@ services:
             - '@oro_ui.html_tag_helper'
 
     oro_ui.user_agent_provider:
-        class: %oro_ui.user_agent_provider.class%
+        class: '%oro_ui.user_agent_provider.class%'
         arguments:
             - '@request_stack'
 
     oro_ui.formatter:
-        class: %oro_ui.formatter.class%
+        class: '%oro_ui.formatter.class%'
 
     oro_ui.config_extension.feature:
         class: 'Oro\Bundle\UIBundle\Configuration\FeatureConfigurationExtension'

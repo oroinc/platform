@@ -11,7 +11,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStri
 class PercentToLocalizedStringTransformer extends BaseTransformer
 {
     /** @var int|null */
-    private $precision;
+    private $scale;
 
     /** @var string|null */
     private $type;
@@ -19,10 +19,10 @@ class PercentToLocalizedStringTransformer extends BaseTransformer
     /**
      * {@inheritDoc}
      */
-    public function __construct($precision = null, $type = null)
+    public function __construct($scale = null, $type = null)
     {
-        parent::__construct($precision, $type);
-        $this->precision = $precision;
+        parent::__construct($scale, $type);
+        $this->scale = $scale;
         $this->type = $type;
     }
 
@@ -45,8 +45,8 @@ class PercentToLocalizedStringTransformer extends BaseTransformer
     protected function getNumberFormatter()
     {
         $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
-        if (null !== $this->precision) {
-            $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->precision);
+        if (null !== $this->scale) {
+            $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->scale);
         }
 
         return $formatter;
