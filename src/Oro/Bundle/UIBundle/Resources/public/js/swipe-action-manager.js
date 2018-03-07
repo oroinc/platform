@@ -14,6 +14,7 @@ define(function(require) {
     };
 
     /**
+     * Swipe actions on mobile devices
      *
      * @param {String} elementSelector
      * @param {Object} options
@@ -37,19 +38,35 @@ define(function(require) {
     };
 
     SwipeActionsManager.prototype = {
+        /**
+         * Initialize, merge options
+         *
+         * @param {Object} options
+         */
         swipeInitialize: function(options) {
             _.extend(this, _.defaults(_.pick(options,
                 ['minDistanceXAxis', 'maxDistanceYAxis', 'maxAllowedTime']
             ), DEFAULT_OPTIONS));
+
             this._bindEvents();
         },
 
+        /**
+         * Bind touch events
+         * @private
+         */
         _bindEvents: function() {
             this.$el.on('touchstart', _.bind(this._swipeStart, this));
             this.$el.on('touchmove', _.bind(this._swipeMove, this));
             this.$el.on('touchend', _.bind(this._swipeEnd, this));
         },
 
+        /**
+         * Handler for start touch
+         *
+         * @param {jQuery.Event} event
+         * @private
+         */
         _swipeStart: function(event) {
             event = ('changedTouches' in event) ? event.changedTouches[0] : event;
 
@@ -61,10 +78,22 @@ define(function(require) {
             this.startTime = new Date().getTime();
         },
 
+        /**
+         * Handler for start move
+         *
+         * @param {jQuery.Event} event
+         * @private
+         */
         _swipeMove: function(event) {
             event.preventDefault();
         },
 
+        /**
+         * Handler for end touch and fire external mediator event
+         *
+         * @param {jQuery.Event} event
+         * @private
+         */
         _swipeEnd: function(event) {
             event = ('changedTouches' in event) ? event.changedTouches[0] : event;
 
