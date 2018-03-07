@@ -9,6 +9,9 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 
+/**
+ * Corresponds for reading csv file line by line using context passed
+ */
 class CsvFileReader extends AbstractFileReader
 {
     /**

@@ -18,6 +18,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * Handles export logic such as getting export result, merging exported files, etc.
+ */
 class ExportHandler extends AbstractHandler
 {
     /**

@@ -9,6 +9,10 @@ use Gaufrette\Stream;
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * Handles file manipulation logic and all related stuff such as creating path, etc.
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class FileManager
 {
     /** @var Filesystem */
