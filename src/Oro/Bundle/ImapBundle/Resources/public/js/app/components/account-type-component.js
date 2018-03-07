@@ -22,6 +22,7 @@ define(function(require) {
 
             var viewConfig = this.prepareViewOptions(options);
             this.view = new this.ViewType(viewConfig);
+            this.view.render();
 
             this.listenTo(this.view, 'imapConnectionChangeType', this.onChangeAccountType);
             this.listenTo(mediator, 'imapGmailConnectionSetToken', this.onIMapGotToken);
