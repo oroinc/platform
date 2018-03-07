@@ -22,8 +22,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function CellPopupEditorComponent() {
-            CellPopupEditorComponent.__super__.constructor.apply(this, arguments);
+        constructor: function ManyToManyFilter() {
+            ManyToManyFilter.__super__.constructor.apply(this, arguments);
         }
     });
 

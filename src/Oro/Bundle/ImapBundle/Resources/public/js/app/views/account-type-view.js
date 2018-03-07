@@ -28,7 +28,11 @@ define(function(require) {
         initialize: function(options) {},
 
         render: function() {
-            this.$el.html(this.html).find('.control-group.switchable-field').hide();
+            if (this.html.length) {
+                this.$el.html(this.html).find('.control-group.switchable-field').hide();
+                this.html = '';
+            }
+
             this._deferredRender();
             this.initLayout().done(_.bind(this._resolveDeferredRender, this));
         },
