@@ -210,7 +210,8 @@ class ExportHandler extends AbstractHandler
 
         try {
             foreach ($files as $file) {
-                $localFiles[] = $this->fileManager->writeToTmpLocalStorage($file);
+                $tmpPath = $this->fileManager->writeToTmpLocalStorage($file);
+                $localFiles[] = $this->fileManager->fixNewLines($tmpPath);
             }
             $this->batchFileManager->mergeFiles($localFiles, $localFilePath);
 
