@@ -6,9 +6,8 @@ define(function(require) {
      * Init layout's handlers and listeners
      */
     BaseController.loadBeforeAction([
-        'jquery-touchswipe',
         'oroui/js/swipe-action-manager'
-    ], function(jqueryTouchswipe, SwipeActionsManager) {
-        new SwipeActionsManager();
+    ], function(SwipeActionsManager) {
+        new SwipeActionsManager('body');
     });
 });

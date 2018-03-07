@@ -3,35 +3,54 @@ define(function(require) {
 
     var SwipeActionsManager;
     var $ = require('jquery');
+    var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
+    var error = require('oroui/js/error');
 
-    SwipeActionsManager = function() {
-        this.touchStartCoords = {x: -1, y: -1};
-        this.touchEndCoords = {x: -1, y: -1};
-        this.direction = undefined;
-        this.minDistanceXAxis = 30;
-        this.maxDistanceYAxis = 30;
-        this.maxAllowedTime = 1000;
-        this.startTime = 0;
+    var DEFAULT_OPTIONS = {
+        minDistanceXAxis: 30,
+        maxDistanceYAxis: 30,
+        maxAllowedTime: 1000
+    };
+
+    /**
+     *
+     * @param {String} elementSelector
+     * @param {Object} options
+     * @returns {*}
+     * @constructor
+     */
+    SwipeActionsManager = function(elementSelector, options) {
+        if (!elementSelector) {
+            return error.showErrorInConsole('"elementSelector" should be defined');
+        }
+
+        this.direction = null;
+        this.touchStartCoords = null;
+        this.touchEndCoords = null;
         this.elapsedTime = 0;
-        this.$el = $('body');
+        this.startTime = 0;
 
-        this.swipeInitialize();
+        this.$el = $(elementSelector);
+
+        this.swipeInitialize(options);
     };
 
     SwipeActionsManager.prototype = {
-        swipeInitialize: function() {
+        swipeInitialize: function(options) {
+            _.extend(this, _.defaults(_.pick(options,
+                ['minDistanceXAxis', 'maxDistanceYAxis', 'maxAllowedTime']
+            ), DEFAULT_OPTIONS));
             this._bindEvents();
         },
 
         _bindEvents: function() {
-            this.$el.on('mousedown touchstart', _.bind(this._swipeStart, this));
-            this.$el.on('mousemove touchmove', _.bind(this._swipeMove, this));
-            this.$el.on('mouseup touchend', _.bind(this._swipeEnd, this));
+            this.$el.on('touchstart', _.bind(this._swipeStart, this));
+            this.$el.on('touchmove', _.bind(this._swipeMove, this));
+            this.$el.on('touchend', _.bind(this._swipeEnd, this));
         },
 
         _swipeStart: function(event) {
-            event = event ? event : window.event;
             event = ('changedTouches' in event) ? event.changedTouches[0] : event;
 
             this.touchStartCoords = {
@@ -43,12 +62,10 @@ define(function(require) {
         },
 
         _swipeMove: function(event) {
-            event = event ? event : window.event;
             event.preventDefault();
         },
 
         _swipeEnd: function(event) {
-            event = event ? event : window.event;
             event = ('changedTouches' in event) ? event.changedTouches[0] : event;
 
             this.touchEndCoords = {
