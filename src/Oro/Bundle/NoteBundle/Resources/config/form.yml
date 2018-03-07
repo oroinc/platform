@@ -6,12 +6,12 @@ parameters:
 
 services:
     oro_note.form.type.note:
-        class: %oro_note.form.type.note.class%
+        class: '%oro_note.form.type.note.class%'
         tags:
             - { name: form.type, alias: oro_note }
 
     oro_note.form.type.note_api:
-        class: %oro_note.form.type.note_api.class%
+        class: '%oro_note.form.type.note_api.class%'
         arguments:
             - '@oro_entity_config.config_manager'
         tags:
@@ -32,7 +32,7 @@ services:
             - 'oro_note_api'
 
     oro_note.form.handler.note:
-        class: %oro_note.form.handler.note.class%
+        class: '%oro_note.form.handler.note.class%'
         arguments:
             - '@oro_note.form.note'
             - '@request_stack'
@@ -40,7 +40,7 @@ services:
             - '@oro_activity.manager'
 
     oro_note.form.handler.note_api:
-        class: %oro_note.form.handler.note_api.class%
+        class: '%oro_note.form.handler.note_api.class%'
         arguments:
             - '@oro_note.form.note.api'
             - '@request_stack'

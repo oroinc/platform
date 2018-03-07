@@ -24,7 +24,7 @@ services:
             - ['addFactory', ['@oro_entity_merge.mass_action.iterable_result_factory']]
 
     oro_entity_merge.mass_action.dispatcher:
-        class: %oro_datagrid.mass_action.dispatcher.class%
+        class: '%oro_datagrid.mass_action.dispatcher.class%'
         arguments:
             - '@oro_datagrid.datagrid.manager'
             - '@oro_datagrid.mass_action.helper'

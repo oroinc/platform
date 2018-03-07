@@ -5,6 +5,9 @@
 * Added a possibility to enable custom API. For details see [how_to.md](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#enable-custom-api).
 
 ### Removed
+#### ApiBundle
+* Removed deprecated class `Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataContext`
+* Removed deprecated class `Oro\Bundle\ApiBundle\Model\EntityDescriptor`
 
 #### ImportExportBundle
 * Removed class `Oro\Bundle\ImportExportBundle\EventListener\ExportJoinListener` and corresponding service `oro_importexport.event_listener.export_join_listener`

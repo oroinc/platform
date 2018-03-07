@@ -26,7 +26,7 @@ entity_config:
                         type:               integer
                         options:
                             label:          oro.importexport.entity_config.order.label
-                            precision:      0
+                            scale:          0
                             empty_data:     ''
                             required:       false
                             block:          import_export

@@ -27,7 +27,7 @@ services:
         public: false
         class: Oro\Bundle\EntityBundle\Cache\LoggingHydratorWarmer
         arguments:
-            - %oro_entity.orm.hydrators%
+            - '%oro_entity.orm.hydrators%'
         tags:
             - { name: kernel.cache_warmer, priority: 30 }
 
@@ -35,7 +35,7 @@ services:
         public: false
         class: Oro\Bundle\EntityBundle\DataCollector\OrmLogger
         arguments:
-            - %oro_entity.orm.hydrators%
+            - '%oro_entity.orm.hydrators%'
             - '@doctrine'
             - "@?debug.stopwatch"
 

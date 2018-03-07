@@ -1,6 +1,6 @@
 parameters:
     oro_platform.composer.local_repo_factory.class: Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory
-    oro_platform.composer.installed_json:           %kernel.root_dir%/../vendor/composer/installed.json
+    oro_platform.composer.installed_json:           '%kernel.root_dir%/../vendor/composer/installed.json'
 
     oro_platform.composer.version_helper.class:     Oro\Bundle\PlatformBundle\Composer\VersionHelper
 
@@ -19,23 +19,23 @@ services:
             - { name: twig.extension }
 
     oro_platform.maintenance:
-        class:                                %oro_platform.maintenance.class%
+        class:                                '%oro_platform.maintenance.class%'
         arguments:
             - "@lexik_maintenance.driver.factory"
             - "@event_dispatcher"
 
     oro_platform.event_listener.driver_lock:
-        class: %oro_platform.event_listener.driver_lock.class%
+        class: '%oro_platform.event_listener.driver_lock.class%'
         arguments:
             - "@event_dispatcher"
         tags:
             - { name: kernel.event_listener, event: console.terminate, method: afterExecute }
 
     oro_platform.composer.local_repo_factory:
-        class: %oro_platform.composer.local_repo_factory.class%
+        class: '%oro_platform.composer.local_repo_factory.class%'
         arguments:
             - '@filesystem'
-            - %oro_platform.composer.installed_json%
+            - '%oro_platform.composer.installed_json%'
 
     oro_platform.version.cache:
         parent: oro.cache.abstract
@@ -48,7 +48,7 @@ services:
             - [ setNamespace, [ 'oro_platform_url' ] ]
 
     oro_platform.composer.version_helper:
-        class: %oro_platform.composer.version_helper.class%
+        class: '%oro_platform.composer.version_helper.class%'
         calls:
             - [ setCache, [ '@oro_platform.version.cache' ] ]
         arguments:
@@ -74,7 +74,7 @@ services:
             - { name: twig.extension }
 
     oro_platform.optional_listeners.manager:
-        class: %oro_platform.optional_listeners.manager.class%
+        class: '%oro_platform.optional_listeners.manager.class%'
         arguments:
            - []
            - '@service_container'

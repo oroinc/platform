@@ -4,28 +4,28 @@ parameters:
     oro_installer.script_manager.class:               Oro\Bundle\InstallerBundle\ScriptManager
 services:
     oro_installer.scenario:
-        class: %oro_installer.scenario.class%
+        class: '%oro_installer.scenario.class%'
         calls:
           - [ setContainer, ["@service_container"] ]
         tags:
           - { name: sylius.process.scenario, alias: oro_installer }
 
     oro_installer.yaml_persister:
-        class: %oro_installer.yaml_persister.class%
+        class: '%oro_installer.yaml_persister.class%'
         arguments:
-            - %kernel.root_dir%/config
-            - %kernel.environment%
+            - '%kernel.root_dir%/config'
+            - '%kernel.environment%'
 
     kernel.listener.install.event:
         class: Oro\Bundle\InstallerBundle\EventListener\RequestListener
         arguments:
-            - %installed%
-            - %kernel.debug%
+            - '%installed%'
+            - '%kernel.debug%'
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onRequest, priority: 10 }
 
     oro_installer.script_manager:
-        class: %oro_installer.script_manager.class%
+        class: '%oro_installer.script_manager.class%'
         arguments:
             - '@kernel'
 

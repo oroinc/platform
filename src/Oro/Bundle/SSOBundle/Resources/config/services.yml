@@ -6,7 +6,7 @@ parameters:
 
 services:
     oro_sso.oauth_provider:
-        class:     %oro_sso.oauth_provider.class%
+        class:     '%oro_sso.oauth_provider.class%'
         arguments: ['@oro_user.manager', '@oro_config.global']
 
     oro_sso.event_listener.user_email_change_listener:
@@ -15,4 +15,4 @@ services:
             - { name: doctrine.orm.entity_listener, entity: '%oro_user.entity.class%', event: preUpdate }
 
     oro_sso.token.factory.oauth:
-        class: %oro_sso.token.factory.oauth.class%
+        class: '%oro_sso.token.factory.oauth.class%'

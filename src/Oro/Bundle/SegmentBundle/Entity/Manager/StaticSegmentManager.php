@@ -14,6 +14,9 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
 
+/**
+ * Runs static repository restriction query and stores it state into snapshot entity
+ */
 class StaticSegmentManager
 {
     /** @var EntityManager */
@@ -43,7 +46,6 @@ class StaticSegmentManager
     }
 
     /**
-     * Runs static repository restriction query and stores it state into snapshot entity
      * Doctrine does not supports insert in DQL. To increase the speed of query here uses plain sql query.
      *
      * @param Segment $segment
@@ -127,7 +129,7 @@ class StaticSegmentManager
         $segment = $this->em->merge($segment);
         $segment->setLastRun(new \DateTime('now', new \DateTimeZone('UTC')));
         $this->em->persist($segment);
-        $this->em->flush();
+        $this->em->flush($segment);
     }
 
     /**

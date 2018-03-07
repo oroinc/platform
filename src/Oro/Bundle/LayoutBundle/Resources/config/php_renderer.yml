@@ -8,26 +8,26 @@ parameters:
 services:
     oro_layout.php.renderer:
         public: false
-        class: %oro_layout.php.renderer.class%
+        class: '%oro_layout.php.renderer.class%'
         arguments:
             - '@oro_layout.php.renderer.engine'
 
     oro_layout.php.renderer.engine:
         public: false
-        class: %oro_layout.php.renderer.engine.class%
+        class: '%oro_layout.php.renderer.engine.class%'
         arguments:
             - '@templating.engine.php'
-            - %oro_layout.php.resources%
+            - '%oro_layout.php.resources%'
 
     oro_layout.php.layout_renderer:
         public: false
-        class: %oro_layout.php.layout_renderer.class%
+        class: '%oro_layout.php.layout_renderer.class%'
         arguments:
             - '@oro_layout.php.renderer'
             - '@templating.form.engine'
 
     oro_layout.php.templating.helper:
-        class: %oro_layout.php.templating.helper.class%
+        class: '%oro_layout.php.templating.helper.class%'
         arguments:
             - '@oro_layout.php.renderer'
             - '@oro_layout.text.helper'
@@ -36,6 +36,6 @@ services:
              - { name: templating.helper, alias: layout }
 
     oro_layout.templating.form.engine:
-        class: %oro_layout.templating.form.engine.class%
+        class: '%oro_layout.templating.form.engine.class%'
         decorates: 'templating.form.engine'
         parent: 'templating.form.engine'

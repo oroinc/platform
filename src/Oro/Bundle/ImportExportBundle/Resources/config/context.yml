@@ -3,4 +3,4 @@ parameters:
 
 services:
     oro_importexport.context_registry:
-        class: %oro_importexport.context_registry.class%
+        class: '%oro_importexport.context_registry.class%'

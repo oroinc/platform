@@ -5,7 +5,7 @@ namespace Oro\Bundle\TagBundle\Grid\Formatter;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\SearchResultProperty;
-use Symfony\Component\Security\Core\Util\ClassUtils;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 class TagSearchResultProperty extends SearchResultProperty
 {

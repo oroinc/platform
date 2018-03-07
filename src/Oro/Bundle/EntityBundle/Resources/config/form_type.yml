@@ -10,19 +10,19 @@ parameters:
 
 services:
     oro_entity.form.type.custom_entity:
-        class: %oro_entity.form.type.custom_entity.class%
+        class: '%oro_entity.form.type.custom_entity.class%'
         tags:
             - { name: form.type, alias: custom_entity_type }
 
     oro_entity.form.type.entity_choice:
-        class: %oro_entity.form.type.entity_choice.class%
+        class: '%oro_entity.form.type.entity_choice.class%'
         arguments:
             - '@oro_entity.entity_provider'
         tags:
             - { name: form.type, alias: oro_entity_choice }
 
     oro_entity.form.type.entity_field_choice:
-        class: %oro_entity.form.type.entity_field_choice.class%
+        class: '%oro_entity.form.type.entity_field_choice.class%'
         arguments:
             - '@oro_entity.entity_provider'
             - '@oro_entity.entity_field_provider'
@@ -31,7 +31,7 @@ services:
             - { name: form.type, alias: oro_entity_field_choice }
 
     oro_entity.form.type.entity_field_select:
-        class: %oro_entity.form.type.entity_field_select.class%
+        class: '%oro_entity.form.type.entity_field_select.class%'
         arguments:
             - '@oro_entity.entity_provider'
             - '@oro_entity.entity_field_provider'
@@ -40,14 +40,14 @@ services:
             - { name: form.type, alias: oro_entity_field_select }
 
     oro_entity.form.type.entity_select:
-        class: %oro_entity.form.type.entity_select.class%
+        class: '%oro_entity.form.type.entity_select.class%'
         arguments:
             - '@oro_entity_config.config_manager'
         tags:
             - { name: form.type, alias: oro_entity_select }
 
     oro_entity.form.handler.entity_select:
-        class: %oro_entity.form.handler.entity_select.class%
+        class: '%oro_entity.form.handler.entity_select.class%'
         calls:
             - [initDoctrinePropertiesByManagerRegistry, ["@doctrine"]]
             - [setAclHelper, ["@oro_security.acl_helper"]]
@@ -55,7 +55,7 @@ services:
             - { name: oro_form.autocomplete.search_handler, alias: entity_select, acl_resource: oro_search }
 
     oro_entity.form.guesser.form_config:
-        class: %oro_entity.form.guesser.form_config.class%
+        class: '%oro_entity.form.guesser.form_config.class%'
         arguments:
             - '@doctrine'
             - '@oro_entity_config.provider.entity'
@@ -64,7 +64,7 @@ services:
             - { name: form.type_guesser, priority: 20 }
 
     oro_entity.form.guesser.doctrine_type:
-        class: %oro_entity.form.guesser.doctrine_type.class%
+        class: '%oro_entity.form.guesser.doctrine_type.class%'
         arguments:
             - '@doctrine'
             - '@oro_entity_config.provider.entity'
