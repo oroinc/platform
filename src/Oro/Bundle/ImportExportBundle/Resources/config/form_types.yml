@@ -5,7 +5,7 @@ parameters:
 
 services:
     oro_importexport.form.type.import:
-        class: %oro_importexport.form.type.import.class%
+        class: '%oro_importexport.form.type.import.class%'
         arguments: ['@oro_importexport.processor.registry']
         tags:
             - { name: form.type, alias: oro_importexport_import }

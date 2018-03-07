@@ -7,7 +7,7 @@ services:
             - { name: oro_service_link, service: oro_entity.helper.field_helper }
 
     oro_importexport.field.database_helper:
-        class: %oro_importexport.field.database_helper.class%
+        class: '%oro_importexport.field.database_helper.class%'
         arguments:
             - '@doctrine'
             - '@oro_entity.doctrine_helper'

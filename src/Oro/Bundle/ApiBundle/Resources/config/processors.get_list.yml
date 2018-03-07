@@ -50,6 +50,10 @@ services:
             - { name: oro.api.processor, action: get_list, group: load_data, priority: -30 }
 
     #
+    # data_security_check
+    #
+
+    #
     # normalize_data
     #
 

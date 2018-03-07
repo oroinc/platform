@@ -4,6 +4,8 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
@@ -23,6 +25,9 @@ class EntityTypeSecurityCheck implements ProcessorInterface
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
+    /** @var AclGroupProviderInterface */
+    protected $aclGroupProvider;
+
     /** @var string */
     protected $permission;
 
@@ -32,17 +37,20 @@ class EntityTypeSecurityCheck implements ProcessorInterface
     /**
      * @param DoctrineHelper                $doctrineHelper
      * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param AclGroupProviderInterface     $aclGroupProvider
      * @param string                        $permission
      * @param bool                          $forcePermissionUsage
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         AuthorizationCheckerInterface $authorizationChecker,
+        AclGroupProviderInterface $aclGroupProvider,
         $permission,
         $forcePermissionUsage = false
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->authorizationChecker = $authorizationChecker;
+        $this->aclGroupProvider = $aclGroupProvider;
         $this->permission = $permission;
         $this->forcePermissionUsage = $forcePermissionUsage;
     }
@@ -88,7 +96,10 @@ class EntityTypeSecurityCheck implements ProcessorInterface
 
         return $this->authorizationChecker->isGranted(
             $this->permission,
-            new ObjectIdentity('entity', $entityClass)
+            new ObjectIdentity(
+                'entity',
+                ObjectIdentityHelper::buildType($entityClass, $this->aclGroupProvider->getGroup())
+            )
         );
     }
 }

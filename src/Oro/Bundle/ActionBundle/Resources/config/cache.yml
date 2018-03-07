@@ -16,7 +16,7 @@ services:
             - [ setNamespace, [ 'oro_action_groups' ] ]
 
     oro_action.cache.clearer:
-        class: %oro_action.cache.clearer.class%
+        class: '%oro_action.cache.clearer.class%'
         public: false
         calls:
             - [addProvider, ['@oro_action.configuration.provider.operations']]
@@ -25,7 +25,7 @@ services:
             - { name: kernel.cache_clearer }
 
     oro_action.cache.warmer:
-        class: %oro_action.cache.warmer.class%
+        class: '%oro_action.cache.warmer.class%'
         public: false
         calls:
             - [addProvider, ['@oro_action.configuration.provider.operations']]

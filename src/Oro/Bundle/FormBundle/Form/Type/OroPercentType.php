@@ -40,7 +40,8 @@ class OroPercentType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array('precision' => null));
+        $resolver->setAllowedTypes('scale', ['null', 'int']);
+        $resolver->setDefaults(array('scale' => null));
     }
 
     /**
@@ -50,7 +51,7 @@ class OroPercentType extends AbstractType
     {
         $builder->resetViewTransformers()
             ->addViewTransformer(
-                new PercentToLocalizedStringTransformer($options['precision'], $options['type'])
+                new PercentToLocalizedStringTransformer($options['scale'], $options['type'])
             );
     }
 }

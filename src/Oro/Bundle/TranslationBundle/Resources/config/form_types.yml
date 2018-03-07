@@ -4,7 +4,7 @@ parameters:
 
 services:
     oro_translation.form.type.translatable_entity:
-        class: %oro_translation.form.type.translatable_entity.class%
+        class: '%oro_translation.form.type.translatable_entity.class%'
         arguments: ["@doctrine"]
         tags:
             - { name: form.type, alias: translatable_entity }
@@ -18,7 +18,7 @@ services:
             - { name: form.type, alias: oro_select2_translatable_entity }
 
     oro_translation.form.extension.translatable_choice:
-        class: %oro_translation.form.extension.translatable_choice.class%
+        class: '%oro_translation.form.extension.translatable_choice.class%'
         tags:
             - { name: form.type_extension, alias: choice }
 

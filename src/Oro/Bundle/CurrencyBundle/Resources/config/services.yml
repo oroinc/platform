@@ -80,10 +80,10 @@ services:
             - '@oro_locale.calendar_factory'
             - '@oro_currency.provider.view_type'
         calls:
-            - [addNameFormats, [%oro_locale.format.name%]]
-            - [addAddressFormats, [%oro_locale.format.address%]]
-            - [addLocaleData, [%oro_locale.locale_data%]]
-            - [addCurrencyData, [%oro_locale.currency_data%]]
+            - [addNameFormats, ['%oro_locale.format.name%']]
+            - [addAddressFormats, ['%oro_locale.format.address%']]
+            - [addLocaleData, ['%oro_locale.locale_data%']]
+            - [addCurrencyData, ['%oro_locale.currency_data%']]
 
     oro_currency.converter.currency_to_string:
         class: Oro\Bundle\CurrencyBundle\Converter\CurrencyToString

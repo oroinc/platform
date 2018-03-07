@@ -6,6 +6,7 @@ use Doctrine\ORM\Query\AST\PathExpression;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
@@ -94,7 +95,10 @@ class OwnershipConditionDataBuilder extends AbstractOwnershipConditionDataBuilde
         if ($this->aclGroupProvider) {
             $group = $this->aclGroupProvider->getGroup();
             if ($group) {
-                $groupedEntityClassName = sprintf('%s@%s', $this->aclGroupProvider->getGroup(), $entityClassName);
+                $groupedEntityClassName = ObjectIdentityHelper::buildType(
+                    $entityClassName,
+                    $this->aclGroupProvider->getGroup()
+                );
             }
         }
 

@@ -116,7 +116,6 @@ class ChannelType extends AbstractType
             [
                 'data_class'         => 'Oro\\Bundle\\IntegrationBundle\\Entity\\Channel',
                 'csrf_token_id'      => 'channel',
-                'cascade_validation' => true,
             ]
         );
     }

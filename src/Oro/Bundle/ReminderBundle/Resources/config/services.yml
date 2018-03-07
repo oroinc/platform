@@ -11,7 +11,7 @@ parameters:
 
 services:
     oro_reminder.entity.manager:
-        class: %oro_reminder.entity.manager.class%
+        class: '%oro_reminder.entity.manager.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
 
@@ -25,25 +25,25 @@ services:
             - { name: doctrine.event_listener, event: postPersist, lazy: false }
 
     oro_reminder.sender:
-        class: %oro_reminder.sender.class%
+        class: '%oro_reminder.sender.class%'
         arguments:
             - '@oro_reminder.send_processor_registry'
         lazy: true
 
     oro_reminder.send_processor_registry:
-        class: %oro_reminder.send_processor_registry.class%
+        class: '%oro_reminder.send_processor_registry.class%'
         arguments:
             - []
 
     oro_reminder.model.email_notification:
-        class: %oro_reminder.model.email_notification.class%
+        class: '%oro_reminder.model.email_notification.class%'
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_entity_config.provider.reminder'
             - '@oro_entity.entity_name_resolver'
 
     oro_reminder.send_processor.email:
-        class: %oro_reminder.send_processor.email.class%
+        class: '%oro_reminder.send_processor.email.class%'
         arguments:
             - '@oro_notification.manager.email_notification'
             - '@oro_reminder.model.email_notification'
@@ -52,7 +52,7 @@ services:
             - { name: oro_reminder.send_processor }
 
     oro_reminder.send_processor.web_socket:
-        class: %oro_reminder.send_processor.web_socket.class%
+        class: '%oro_reminder.send_processor.web_socket.class%'
         arguments:
             - '@oro_wamp.publisher'
             - '@oro_reminder.web_socket.message_params_provider'
@@ -61,7 +61,7 @@ services:
 
     #Message params providers
     oro_reminder.web_socket.message_params_provider:
-        class: %oro_reminder.web_socket.message_params_provider.class%
+        class: '%oro_reminder.web_socket.message_params_provider.class%'
         arguments:
             - '@translator'
             - '@oro_locale.formatter.date_time'
@@ -69,7 +69,7 @@ services:
             - '@oro_entity_config.provider.reminder'
 
     oro_reminder.url_provider:
-        class: %oro_reminder.url_provider.class%
+        class: '%oro_reminder.url_provider.class%'
         arguments:
             - '@oro_entity_config.config_manager'
             - '@router'

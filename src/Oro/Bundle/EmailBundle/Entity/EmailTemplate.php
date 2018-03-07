@@ -162,7 +162,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      *     mappedBy="object",
      *     cascade={"persist", "remove"}
      * )
-     * @Assert\Valid(deep = true)
+     * @Assert\Valid()
      */
     protected $translations;
 

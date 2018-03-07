@@ -3,7 +3,7 @@ parameters:
 
 services:
     oro_workflow.validator.transition_is_allowed:
-        class: %oro_workflow.validator.transition_is_allowed.class%
+        class: '%oro_workflow.validator.transition_is_allowed.class%'
         arguments:
             - '@oro_workflow.registry'
         tags:

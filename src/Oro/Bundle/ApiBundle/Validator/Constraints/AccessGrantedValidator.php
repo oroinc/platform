@@ -7,6 +7,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * The validator for AccessGranted constraint.
+ */
 class AccessGrantedValidator extends ConstraintValidator
 {
     /** @var AuthorizationCheckerInterface */

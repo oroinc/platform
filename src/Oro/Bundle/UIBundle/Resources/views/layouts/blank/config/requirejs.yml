@@ -9,6 +9,7 @@ config:
             exports: 'Select2'
         'bootstrap-popover':
             deps:
+                - 'jquery'
                 - 'bootstrap-tooltip'
         'jquery.datepair':
             deps:
@@ -44,9 +45,6 @@ config:
             deps:
                 - 'jquery'
         'bootstrap-modal':
-            deps:
-                - 'jquery'
-        'bootstrap-popover':
             deps:
                 - 'jquery'
         'bootstrap-scrollspy':

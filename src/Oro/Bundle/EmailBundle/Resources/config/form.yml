@@ -32,24 +32,24 @@ parameters:
 
 services:
     oro_email.form.subscriber.emailtemplate:
-        class: %oro_email.form.subscriber.emailtemplate.class%
+        class: '%oro_email.form.subscriber.emailtemplate.class%'
         arguments:
             - '@security.token_storage'
 
     oro_email.form.subscriber.autoresponserule:
-        class: %oro_email.form.subscriber.autoresponserule.class%
+        class: '%oro_email.form.subscriber.autoresponserule.class%'
         arguments:
             - '@oro_security.token_accessor'
 
     oro_email.form.type.autoresponserule:
-        class: %oro_email.form.type.autoresponserule.class%
+        class: '%oro_email.form.type.autoresponserule.class%'
         arguments:
             - '@oro_email.form.subscriber.autoresponserule'
         tags:
             - { name: form.type, alias: oro_email_autoresponserule }
 
     oro_email.form.type.autoresponse_template:
-        class: %oro_email.form.type.autoresponse_template.class%
+        class: '%oro_email.form.type.autoresponse_template.class%'
         arguments:
             - '@oro_config.global'
             - '@oro_config.user'
@@ -59,7 +59,7 @@ services:
             - { name: form.type, alias: oro_email_autoresponse_template }
 
     oro_email.form.type.autoresponse_template_choice:
-        class: %oro_email.form.type.autoresponse_template_choice.class%
+        class: '%oro_email.form.type.autoresponse_template_choice.class%'
         arguments:
             - '@oro_security.token_accessor'
             - '@translator'
@@ -67,7 +67,7 @@ services:
             - { name: form.type, alias: oro_email_autoresponse_template_choice }
 
     oro_email.form.extension.mailbox_unbound_rules:
-        class: %oro_email.form.extension.mailbox_unbound_rules.class%
+        class: '%oro_email.form.extension.mailbox_unbound_rules.class%'
         arguments:
             - '@doctrine'
         tags:
@@ -79,7 +79,7 @@ services:
         arguments: ["oro_email_emailtemplate", "oro_email_emailtemplate", null]
 
     oro_email.form.type.emailtemplate:
-        class: %oro_email.form.type.emailtemplate.class%
+        class: '%oro_email.form.type.emailtemplate.class%'
         arguments:
             - '@oro_config.user'
             - '@oro_locale.settings'
@@ -87,7 +87,7 @@ services:
             - { name: form.type, alias: oro_email_emailtemplate }
 
     oro_email.form.type.emailtemplate_translation:
-        class: %oro_email.form.type.emailtemplate_translation.class%
+        class: '%oro_email.form.type.emailtemplate_translation.class%'
         arguments:
             - '@oro_config.user'
         tags:
@@ -99,29 +99,29 @@ services:
             - { name: form.type, alias: oro_email_template_rich_text }
 
     oro_email.form.type.emailtemplate_select:
-        class: %oro_email.form.type.emailtemplate_select.class%
+        class: '%oro_email.form.type.emailtemplate_select.class%'
         tags:
             - { name: form.type, alias: oro_email_template_list }
 
     oro_email.form.type.system_emailtemplate_select:
-        class: %oro_email.form.type.system_emailtemplate_select.class%
+        class: '%oro_email.form.type.system_emailtemplate_select.class%'
         arguments:
             - '@doctrine.orm.entity_manager'
         tags:
             - { name: form.type, alias: oro_email_system_template_list }
 
     oro_email.form.handler.emailtemplate:
-        class: %oro_email.form.handler.emailtemplate.class%
+        class: '%oro_email.form.handler.emailtemplate.class%'
         arguments:
             - '@oro_email.form.emailtemplate'
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
             - '@translator'
         calls:
-            - [setDefaultLocale, [%stof_doctrine_extensions.default_locale%]]
+            - [setDefaultLocale, ['%stof_doctrine_extensions.default_locale%']]
 
     oro_email.form.handler.email:
-        class: %oro_email.form.handler.email.class%
+        class: '%oro_email.form.handler.email.class%'
         arguments:
             - '@oro_email.form.email'
             - '@request_stack'
@@ -134,7 +134,7 @@ services:
         arguments: ["oro_email_email", "oro_email_email", null]
 
     oro_email.form.type.email:
-        class: %oro_email.form.type.email.class%
+        class: '%oro_email.form.type.email.class%'
         arguments:
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
@@ -145,7 +145,7 @@ services:
             - { name: form.type, alias: oro_email_email }
 
     oro_email.form.handler.email.api:
-        class: %oro_email.form.handler.email.api.class%
+        class: '%oro_email.form.handler.email.api.class%'
         arguments:
             - '@oro_email.form.email.api'
             - '@request_stack'
@@ -164,27 +164,27 @@ services:
             - 'oro_email_email_api'
 
     oro_email.form.type.email.api:
-        class: %oro_email.form.type.email.api.class%
+        class: '%oro_email.form.type.email.api.class%'
         tags:
             - { name: form.type, alias: oro_email_email_api }
 
     oro_email.form.type.email_folder.api:
-        class: %oro_email.form.type.email_folder.api.class%
+        class: '%oro_email.form.type.email_folder.api.class%'
         tags:
             - { name: form.type, alias: oro_email_email_folder_api }
 
     oro_email.form.type.email_address:
-        class: %oro_email.form.type.email_address.class%
+        class: '%oro_email.form.type.email_address.class%'
         tags:
             - { name: form.type, alias: oro_email_email_address }
 
     oro_email.form.type.email_address.api:
-        class: %oro_email.form.type.email_address.api.class%
+        class: '%oro_email.form.type.email_address.api.class%'
         tags:
             - { name: form.type, alias: oro_email_email_address_api }
 
     oro_email.form.type.attachment:
-        class: %oro_email.form.type.attachment.class%
+        class: '%oro_email.form.type.attachment.class%'
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_email.email_attachment_transformer'
@@ -192,22 +192,22 @@ services:
             - { name: form.type, alias: oro_email_attachment }
 
     oro_email.form.type.attachments:
-        class: %oro_email.form.type.attachments.class%
+        class: '%oro_email.form.type.attachments.class%'
         tags:
             - { name: form.type, alias: oro_email_attachments }
 
     oro_email.form.type.email_link_to_scope:
-        class: %oro_email.form.type.email_link_to_scope.class%
+        class: '%oro_email.form.type.email_link_to_scope.class%'
         tags:
             - { name: form.type, alias: oro_email_link_to_scope }
 
     oro_email.form.type.mailbox_grid:
-        class: %oro_email.form.type.mailbox_grid.class%
+        class: '%oro_email.form.type.mailbox_grid.class%'
         tags:
             - { name: form.type, alias: oro_email_mailbox_grid }
 
     oro_email.form.type.mailbox:
-        class: %oro_email.form.type.mailbox.class%
+        class: '%oro_email.form.type.mailbox.class%'
         arguments:
             - '@oro_email.mailbox.process_storage'
             - '@oro_security.encoder.mcrypt'
@@ -216,7 +216,7 @@ services:
             - { name: form.type, alias: oro_email_mailbox }
 
     oro_email.form.handler.mailbox:
-        class: %oro_email.form.handler.mailbox.class%
+        class: '%oro_email.form.handler.mailbox.class%'
         arguments:
             - '@form.factory'
             - '@request_stack'
@@ -235,21 +235,21 @@ services:
             - '@oro_security.encoder.mcrypt'
 
     oro_email.form.factory:
-        class: %oro_email.form.factory.class%
+        class: '%oro_email.form.factory.class%'
 
     oro_email.form.type.email_folder_tree:
-        class: %oro_email.form.type.email_folder_tree.class%
+        class: '%oro_email.form.type.email_folder_tree.class%'
         tags:
             - { name: form.type, alias: oro_email_email_folder_tree }
 
     oro_email.form.type.filter.originfolder:
-        class: %oro_email.form.type.filter.originfolder.class%
+        class: '%oro_email.form.type.filter.originfolder.class%'
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_originfolder_filter }
 
     oro_email.form.type.email_address_from:
-        class: %oro_email.form.type.email_address_from.class%
+        class: '%oro_email.form.type.email_address_from.class%'
         arguments:
             - '@oro_security.token_accessor'
             - '@oro_email.related_emails.provider'
@@ -270,7 +270,7 @@ services:
             - { name: form.type, alias: oro_email_email_origin_from }
 
     oro_email.form.type.email_address_recipients:
-        class: %oro_email.form.type.email_address_recipients.class%
+        class: '%oro_email.form.type.email_address_recipients.class%'
         arguments:
             - '@oro_config.global'
         tags:

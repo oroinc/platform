@@ -7,13 +7,12 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker\Factory;
 use Faker\ORM\Doctrine\ColumnTypeGuesser;
 use Nelmio\Alice\Instances\Collection as AliceCollection;
-use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\Security\Core\Util\ClassUtils;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 class EntitySupplement
 {

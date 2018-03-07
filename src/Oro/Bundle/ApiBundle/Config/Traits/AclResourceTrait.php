@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Config\Traits;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 
 /**
+ * Adds ACL resource related methods to a configuration class.
+ *
  * @property array $items
  */
 trait AclResourceTrait
@@ -20,7 +22,7 @@ trait AclResourceTrait
     }
 
     /**
-     * Gets the name of ACL resource.
+     * Gets the name of ACL resource that should be used to protect the entity.
      *
      * @return string|null
      */
@@ -34,7 +36,7 @@ trait AclResourceTrait
     }
 
     /**
-     * Sets the name of ACL resource.
+     * Sets the name of ACL resource that should be used to protect the entity.
      *
      * @param string|null $aclResource
      */

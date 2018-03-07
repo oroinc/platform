@@ -14,7 +14,6 @@ class RelatedEntityCollectionApiType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'cascade_validation' => true,
                 'allow_add'          => true,
                 'type'               => 'oro_related_entity_api'
             ]

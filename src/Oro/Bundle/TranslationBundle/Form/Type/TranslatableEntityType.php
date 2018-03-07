@@ -11,6 +11,7 @@ use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 use Oro\Bundle\TranslationBundle\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
@@ -89,6 +90,7 @@ class TranslatableEntityType extends AbstractType
 
             if (null !== $options['choices']) {
                 return new ObjectChoiceList($options['choices'], $options['property'], array(), null, $idField);
+                return new ArrayChoiceList($options['choices'], $options['property'], $idField);
             }
 
             // get query builder

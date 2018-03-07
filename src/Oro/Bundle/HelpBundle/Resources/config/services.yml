@@ -9,7 +9,7 @@ services:
             - [ setNamespace, [ 'oro_help_link' ] ]
 
     oro_help.model.help_link_provider:
-        class: %oro_help.model.help_link_provider.class%
+        class: '%oro_help.model.help_link_provider.class%'
         calls:
             - [ setCache, [ '@oro_help.help_link.cache' ] ]
         arguments:
@@ -25,7 +25,7 @@ services:
             - { name: twig.extension }
 
     oro_help.listener.help_link:
-        class: %oro_help.listener.help_link.class%
+        class: '%oro_help.listener.help_link.class%'
         arguments:
             - '@service_container'
         tags:

@@ -6,15 +6,15 @@ parameters:
 
 services:
     oro_workflow.prototype.step_manager:
-        class: %oro_workflow.prototype.step_manager.class%
+        class: '%oro_workflow.prototype.step_manager.class%'
         shared: false
 
     oro_workflow.prototype.attribute_manager:
-        class: %oro_workflow.prototype.attribute_manager.class%
+        class: '%oro_workflow.prototype.attribute_manager.class%'
         shared: false
 
     oro_workflow.prototype.transition_manager:
-        class: %oro_workflow.prototype.transition_manager.class%
+        class: '%oro_workflow.prototype.transition_manager.class%'
         shared: false
 
     oro_workflow.prototype.variable_manager:
@@ -24,7 +24,7 @@ services:
             - ['setVariableAssembler', ['@oro_workflow.variable_assembler']]
 
     oro_workflow.prototype.workflow:
-        class: %oro_workflow.prototype.workflow.class%
+        class: '%oro_workflow.prototype.workflow.class%'
         shared: false
         arguments:
             - '@oro_entity.doctrine_helper'

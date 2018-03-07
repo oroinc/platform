@@ -184,6 +184,6 @@ datagrids:
                 loggedAt:
                     data_name: a.loggedAt
             default:
-                loggedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+                loggedAt: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
 
         filters: ~

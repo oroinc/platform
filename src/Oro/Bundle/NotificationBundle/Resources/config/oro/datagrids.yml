@@ -88,7 +88,7 @@ datagrids:
             entityHint: transactional emails
             entity_pagination: true
         acl_resource: oro_notification_emailnotification_view
-        extended_entity_name: %oro_notification.emailnotification.entity.class%
+        extended_entity_name: '%oro_notification.emailnotification.entity.class%'
         source:
             type: orm
             query:

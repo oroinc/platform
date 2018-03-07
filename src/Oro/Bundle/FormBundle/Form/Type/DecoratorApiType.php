@@ -63,7 +63,6 @@ class DecoratorApiType extends AbstractType
 
         $resolver->setDefaults(
             [
-                'cascade_validation' => true,
                 'csrf_protection'    => false
             ]
         );

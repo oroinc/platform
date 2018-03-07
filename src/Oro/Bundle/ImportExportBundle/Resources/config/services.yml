@@ -6,17 +6,17 @@ parameters:
 
 services:
     oro_importexport.template_fixture.entity_registry:
-        class: %oro_importexport.template_fixture.entity_registry.class%
+        class: '%oro_importexport.template_fixture.entity_registry.class%'
         calls:
             - [setDispatcher, ['@event_dispatcher']]
 
     oro_importexport.template_fixture.manager:
-        class: %oro_importexport.template_fixture.manager.class%
+        class: '%oro_importexport.template_fixture.manager.class%'
         arguments:
             - '@oro_importexport.template_fixture.entity_registry'
 
     oro_importexport.action.execute_job:
-        class: %oro_importexport.action.execute_job.class%
+        class: '%oro_importexport.action.execute_job.class%'
         arguments:
             - '@oro_action.expression.context_accessor'
             - '@oro_importexport.job_executor'

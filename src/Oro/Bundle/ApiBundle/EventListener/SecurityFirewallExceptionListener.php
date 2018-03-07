@@ -5,25 +5,30 @@ namespace Oro\Bundle\ApiBundle\EventListener;
 use Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Prevents usage of Session in case it the request does not have session identifier in cookies.
+ * This is required because API can work in two modes, stateless and statefull.
+ * The statefull mode is used when API is called internally from web pages as AJAX request.
+ */
 class SecurityFirewallExceptionListener extends ExceptionListener
 {
-    /** @var array */
-    protected $sessionOptions;
+    /** @var string */
+    private $sessionName;
 
     /**
-     * @param array $sessionOptions
+     * @param string $sessionName
      */
-    public function setSessionOptions(array $sessionOptions)
+    public function setSessionName(string $sessionName): void
     {
-        $this->sessionOptions = $sessionOptions;
+        $this->sessionName = $sessionName;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function setTargetPath(Request $request)
+    protected function setTargetPath(Request $request): void
     {
-        if ($request->cookies->has($this->sessionOptions['name'])) {
+        if ($request->cookies->has($this->sessionName)) {
             parent::setTargetPath($request);
         }
     }

@@ -7,7 +7,7 @@ datagrids:
                     - item.id
                     - item.stringValue
                 from:
-                    - { table: %oro_test.entity.item.class%, alias: item }
+                    - { table: '%oro_test.entity.item.class%', alias: item }
         columns:
             id:
                 label: id
@@ -23,7 +23,7 @@ datagrids:
                 select:
                     - itemValue.id
                 from:
-                    - { table: %oro_test.entity.item_value.class%, alias: itemValue }
+                    - { table: '%oro_test.entity.item_value.class%', alias: itemValue }
         columns:
             id:
                 label: id
@@ -72,7 +72,7 @@ datagrids:
                     - item.id
                     - item.stringValue
                 from:
-                    - { table: %oro_test.entity.item.class%, alias: item }
+                    - { table: '%oro_test.entity.item.class%', alias: item }
         columns:
             id:
                 label: id

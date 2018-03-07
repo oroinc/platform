@@ -3,6 +3,6 @@ parameters:
 
 services:
     oro_activity_list.form.type.activity_list_filter:
-        class: %oro_activity_list.form.type.activity_list_filter.class%
+        class: '%oro_activity_list.form.type.activity_list_filter.class%'
         tags:
             - { name: form.type, alias: oro_type_activity_list_filter }
