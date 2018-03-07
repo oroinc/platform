@@ -56,6 +56,8 @@ class ExtendedContainerBuilder extends ContainerBuilder
         $srcPass = null;
         $targetPassIndex = -1;
         $targetPassPriority = -1;
+        // We need to traverse array in order defined by priorities
+        krsort($passes);
         foreach ($passes as $priority => $passesGroup) {
             foreach ($passesGroup as $i => $pass) {
                 switch (\get_class($pass)) {

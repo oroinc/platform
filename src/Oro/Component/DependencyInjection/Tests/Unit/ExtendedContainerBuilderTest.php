@@ -173,4 +173,76 @@ class ExtendedContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder->addCompilerPass($srcPass);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
     }
+
+    public function testMoveCompilerPassBeforeWhenTargetPassHasLowerPriority()
+    {
+        [$resolveClassPass, $resolveInstanceOfConditionalsPass] =
+            $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
+
+        $srcPass    = new CompilerPass1();
+        $targetPass = new CompilerPass2();
+        $this->builder->addCompilerPass($srcPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
+        $this->builder->addCompilerPass($targetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 5);
+        $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
+        $this->assertSame(
+            [$resolveClassPass, $resolveInstanceOfConditionalsPass, $srcPass, $targetPass],
+            $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
+        );
+    }
+
+    public function testMoveCompilerPassBeforeWhenTargetPassHasHigherPriority()
+    {
+        [$resolveClassPass, $resolveInstanceOfConditionalsPass] =
+            $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
+
+        $srcPass    = new CompilerPass1();
+        $targetPass = new CompilerPass2();
+        $this->builder->addCompilerPass($srcPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 5);
+        $this->builder->addCompilerPass($targetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
+        $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
+        $this->assertSame(
+            [$resolveClassPass, $resolveInstanceOfConditionalsPass, $srcPass, $targetPass],
+            $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
+        );
+    }
+
+    public function testAddCompilerPassAfterTargetPass()
+    {
+        [$resolveClassPass, $resolveInstanceOfConditionalsPass] =
+            $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
+
+        $srcPass    = new CompilerPass1();
+        $targetPass = new CompilerPass2();
+        $this->builder->addCompilerPass($srcPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 5);
+        $this->builder->addCompilerPass($targetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
+        $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
+
+        $beforeTargetPass = new CompilerPass3();
+        $this->builder->addCompilerPass($beforeTargetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 17);
+
+        $this->assertSame(
+            [$resolveClassPass, $resolveInstanceOfConditionalsPass, $beforeTargetPass, $srcPass, $targetPass],
+            $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
+        );
+    }
+
+    public function testAddCompilerPassBeforeTargetPass()
+    {
+        [$resolveClassPass, $resolveInstanceOfConditionalsPass] =
+            $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
+
+        $srcPass    = new CompilerPass1();
+        $targetPass = new CompilerPass2();
+        $this->builder->addCompilerPass($srcPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 5);
+        $this->builder->addCompilerPass($targetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
+        $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
+
+        $afterTargetPass = new CompilerPass3();
+        $this->builder->addCompilerPass($afterTargetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 7);
+
+        $this->assertSame(
+            [$resolveClassPass, $resolveInstanceOfConditionalsPass, $srcPass, $targetPass, $afterTargetPass],
+            $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
+        );
+    }
 }
