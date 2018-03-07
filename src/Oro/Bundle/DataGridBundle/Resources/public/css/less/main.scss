@@ -1,0 +1,10 @@
+@import "oroui/css/less/mixins";
+@import "grid-views";
+@import "oro-grid";
+@import "actions-panel";
+@import "column-manager";
+@import "grid-actions-panel";
+@import "tables";
+
+/* mobile version */
+@import "mobile/main";

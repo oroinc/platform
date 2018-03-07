@@ -1,0 +1,18 @@
+.scrollable-container .btn-primary,
+.btn-primary {
+  #gradient > .vertical(#4e8af9, #2b6add);
+  border: 1px solid;
+  border-color: #527ac0;
+  text-shadow: 0px 1px 0px #386e9f;
+  color: #fff;
+  font-weight: bold;
+  &:hover {
+    #gradient > .vertical(#2b6add, #4e8af9);
+    color: #fff;
+  }
+  &:active,
+  &:focus {
+    #gradient > .vertical(#2b6add, #4e8af9);
+    color: #fff;
+  }
+}

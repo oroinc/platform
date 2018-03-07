@@ -1,0 +1,17 @@
+.sortable-wrapper {
+  .sortable-handle {
+    display: inline-block;
+    padding-top: 5px;
+    i {
+      color: #808080;
+    }
+  }
+
+  .removeRow {
+    padding-top: 7px;
+    margin-left: -24px;
+    border: none;
+    background: none;
+    color: #808080;
+  }
+}

@@ -1,0 +1,202 @@
+.filter-box {
+  background-color: inherit;
+  border-bottom-width: 0;
+  padding: 10px;
+  & > .dropdown {
+    margin-left: auto;
+    margin-right: auto;
+    /* width: 300px; was need recheck for ipad1*/
+    width: 100%;
+  }
+  .dropdown > .dropdown-toggle {
+    text-align: center;
+    width: 100%;
+  }
+  .dropdown > .dropdown-toggle:before {
+    content: "\f0b0";
+    font-family: FontAwesome;
+    margin: 0 7px 0 -7px;
+    width: 10px;
+    display: inline-block;
+  }
+  .dropdown > .dropdown-menu {
+    padding: 10px;
+    margin: 10px auto 0;
+    max-width: 506px;
+    width: 100%;
+    @media only screen and (min-width: 527px) {
+      left: 50%;
+      margin-left: -253px;
+    }
+  }
+  .dropdown > .dropdown-menu:before {
+    border-bottom: 8px solid rgba(0, 0, 0, 0.2);
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    content: "";
+    display: inline-block;
+    left: 50%;
+    margin-left: -8px;
+    position: absolute;
+    top: -8px;
+  }
+  .dropdown > .dropdown-menu:after {
+    border-bottom: 7px solid #fff;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    content: "";
+    display: inline-block;
+    left: 50%;
+    margin-left: -7px;
+    position: absolute;
+    top: -7px;
+  }
+  .filter-container {
+    padding: 0;
+    .reset-filter-button {
+      padding: 6px 0 4px 6px;
+      position: absolute;
+      right: 10px;
+    }
+    .filter-item {
+      margin: 0 0 10px 0;
+      width: 100%;
+      white-space: normal;
+      &:last-child {
+        margin-bottom: 0;
+      }
+      .btn-group {
+        margin-bottom: 0;
+      }
+    }
+    .filter-criteria {
+      font-size: smaller;
+      left: 0;
+      width: 100%;
+      padding: 8px;
+    }
+  }
+  .oro-open {
+    @mixin open(),
+  }
+  .filter-criteria-selector {
+    text-align: left,
+    width: 100%,
+    display: inline-block,
+    text-overflow: ellipsis,
+    white-space: nowrap,
+    overflow: hidden,
+    vertical-align: bottom,
+    padding-right: 43px,
+    position: relative,
+    .filter-criteria-hint {
+      display: inline,
+    }
+    .caret {
+      position: absolute,
+      right: 8px,
+    }
+
+    &:not(.filter-default-value) {
+      .reset-filter {
+        position: absolute;
+        border-left: 1px solid rgba(0,0,0,0.1);
+        display: block;
+        width: 29px;
+        height: 29px;
+        right: -1px;
+        top: -1px;
+        text-align: center;
+        padding: 0;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        #gradient > .vertical(#fdfdfd, #efefef);
+      }
+      [class^="fa-"].hide-text:before {
+        color: #666;
+        font-size: 12px;
+      }
+      .caret {
+        right: 35px;
+      }
+    }
+    &.filter-default-value {
+      .caret {
+        position: absolute;
+        right: 8px;
+      }
+    }
+  }
+  .filter-list, .select-filter-widget {
+    margin: 0 0 5px -5px;
+  }
+  .filter-criteria {
+    &.empty-type{
+      width: auto;
+    }
+    input[type=date] {
+      width: 96px;
+    }
+    input[type=time] {
+      width: 94px;
+    }
+    .btn {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+    .value-field-frame {
+      .select2-container,
+      input[type=text] {
+        width: 100% !important;
+      }
+    }
+  }
+  .filter-select-oro-wrapper {
+    display: inline-block;
+    position: relative;
+    margin-bottom: 10px;
+    #gradient > .vertical(#fdfdfd, #efefef);
+    @include border-radius($baseBtnBorderRadius);
+    &:before {
+      content:'';
+      position: absolute;
+      display: block;
+      #gradient > .vertical(#fdfdfd, #efefef);
+      border-top-right-radius: $baseBtnBorderRadius;
+      border-bottom-right-radius: $baseBtnBorderRadius;
+      width: 20px;
+      top: 1px;
+      bottom: 1px;
+      right: 1px;
+      pointer-events:none;
+    }
+    &:after {
+      content:'';
+      position: absolute;
+      display: block;
+      top: 50%;
+      margin-top: -2px;
+      right: 8px;
+      height: 0;
+      width: 0;
+      border-top: 4px solid #000;
+      border-right: 4px solid transparent;
+      border-left: 4px solid transparent;
+      pointer-events:none;
+    }
+    select.filter-select-oro {
+      background-color: transparent;
+      border-color: #ccc;
+      margin-bottom: 0 !important;
+      height: 20px
+    }
+  }
+}
+
+.form-horizontal .filter-box {
+  border-top: none;
+}
+
+.ui-multiselect-menu.multiselect-filter-widget {
+  display: none;
+}

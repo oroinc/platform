@@ -1,0 +1,44 @@
+.grid-toolbar {
+  .pagination-container {
+    margin: 0 auto;
+    width: 270px;
+    @include forScreen(600px, margin, 0);
+    @include forScreen(600px, width, auto);
+    .page-size {
+      margin-left: 16px;
+      label {
+        display: inline-block;
+        @include forScreen(600px, display, none);
+      }
+    }
+    .pagination {
+      .fa-chevron-left:before, .fa-chevron-right:before {
+        line-height: 18px;
+      }
+      @include forScreen(600px, margin, 0);
+      .dib {
+        @include forScreen(600px, display, none);
+      }
+    }
+  }
+  .actions-panel {
+    margin-left: 16px;
+    .action.btn {
+      height: 32px;
+      margin-right: 5px;
+      padding: 0 7px;
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+    a.action.btn {
+      @include forScreen(400px, display, none);
+      i {
+        &:before {
+          font-size: 14px;
+          line-height: 30px;
+        }
+      }
+    }
+  }
+}

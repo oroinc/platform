@@ -1,0 +1,77 @@
+.oro-item-collection {
+  input[type="email"], input[type="text"] {
+    width: 261px;
+  }
+  .input-append, .input-prepend {
+    input[type="email"], input[type="text"] {
+      width: 235px;
+    }
+  }
+  .input-append-sortable, .input-prepend-sortable {
+    input[type="email"], input[type="text"] {
+      width: 204px;
+    }
+  }
+  .collection-element-other {
+    margin-bottom: 5px;
+    input[type='email'],
+    input[type='text'],
+    textarea {
+      width: 259px;
+    }
+    select,
+    .selector {
+      width: 262px;
+      margin-left: 0;
+    }
+    .select2-container {
+      width: 271px;
+    }
+  }
+}
+.select2-container {
+  .select2-choice {
+    .select2-arrow {
+      top: 6px;
+    }
+    .select2-search-choice-close {
+      width: 15px;
+      height: 15px;
+      &:before{
+        content: "\f00d";
+        font: normal 11px FontAwesome;
+        right: 3px;
+        top: 2px;
+        color: #444;
+        line-height: 1em;
+      }
+      &:hover:before{
+        color: #666;
+      }
+    }
+  }
+}
+.oro-item-collection.not-removable {
+  input[type="email"], input[type="text"] {
+    width: 280px;
+  }
+  .input-append, .input-prepend {
+    input[type="email"], input[type="text"] {
+      width: 257px;
+    }
+  }
+  .input-append-sortable, .input-prepend-sortable {
+    input[type="email"], input[type="text"] {
+      width: 226px;
+    }
+  }
+}
+.oro-address-collection.oro-item-collection {
+  input[type="email"], input[type="text"] {
+    width: 280px;
+  }
+}
+
+input[type=text].hasDatepicker {
+  min-width: 95px;
+}

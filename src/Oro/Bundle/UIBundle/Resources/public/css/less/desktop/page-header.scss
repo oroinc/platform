@@ -1,0 +1,45 @@
+.container-fluid.page-title {
+  padding-right: 0;
+  .navbar-extra > .row {
+    > .pull-right {
+      max-width: calc('100% - 180px');
+      > .title-buttons-container {
+        text-align: right;
+        > .pull-left, > .btn-group {
+          text-align: left;
+          display: inline-block;
+          margin-bottom: 4px;
+          vertical-align: top;
+        }
+        > .pinned-dropdown > .btn-group {
+          text-align: left;
+        }
+      }
+      .separator-btn {
+        margin-top: 2px;
+      }
+    }
+    > .pull-left + .pull-right {
+      max-width: none;
+    }
+  }
+  .page-title-center.under-left-block {
+    clear: left;
+    position: relative;
+    top: 8px;
+  }
+}
+.customer-info {
+  h1 {
+    margin: 0 0 3px;
+
+    &.user-name {
+      margin-right: 5px;
+    }
+  }
+  .sub-title {
+    a{
+      color: #006ACC;
+    }
+  }
+}

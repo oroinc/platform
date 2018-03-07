@@ -1,0 +1,123 @@
+.controls{
+  .selector{
+    select{
+      width: 100% !important;
+      box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+    }
+  }
+
+  select,
+  input[type="text"],
+  input[type="date"],
+  input[type="time"],
+  input[type="number"],
+  input[type="search"],
+  input[type="email"]{
+    width: 100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    height: 30px;
+  }
+  textarea, .mce-tinymce {
+    width: 100% !important;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+  }
+  .fields-row {
+    .input-small {
+      width: 140px !important;
+    }
+  }
+  > input[type=checkbox]:only-child {
+    margin-top: 7px;
+  }
+}
+.form-horizontal{
+  & > .span6 {
+    max-width: 100%;
+  }
+  .control-group {
+    max-width: initial;
+    margin: 0 0 7px;
+    .control-label {
+      float: none;
+      width: auto;
+      padding-left: 0;
+      text-align: left;
+    }
+    .controls {
+      margin-left: 0;
+      .control-label {
+        padding-top: 6px;
+      }
+    }
+  }
+  .control-group-checkbox {
+    position: relative;
+    display: inline-block;
+    padding-right: 16px;
+    .control-label {
+      width: auto;
+      margin-right: 2px;
+    }
+    label.control-label {
+      line-height: 18px;
+    }
+    .controls {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+  }
+  .select2-container{
+    width: 100%;
+    max-width: 100%;
+  }
+}
+.select2-container.select2-allowclear{
+  .select2-arrow{
+    right: 36px;
+  }
+  .select2-search-choice-close{
+    border-left: 1px solid #CCC;
+    height: 28px;
+    width: 28px;
+    top: 0;
+    right: 0;
+    color: #666;
+    &:before{
+      content: "\f00d";
+      font: normal 12px FontAwesome;
+      top: 8px;
+      right: 8px;
+    }
+  }
+}
+.select2-container-multi .select2-choices li {
+  float: none;
+  margin-right: 5px;
+}
+.oro-item-collection {
+  input[type="email"],
+  input[type="text"]{
+    width: 225px;
+  }
+}
+.oro-address-collection.oro-item-collection {
+  &>div {
+    padding: 10px 15px 0;
+  }
+}
+h5.user-fieldset {
+  margin: 7px 0;
+}
+.well {
+  margin-bottom: 7px;
+}
+.tags-overlay .well {
+  margin-bottom: 0;
+}

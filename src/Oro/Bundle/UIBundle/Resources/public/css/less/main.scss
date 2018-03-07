@@ -1,0 +1,17 @@
+// add all lib
+@import "mixins";
+@import "layout";
+@import "uniform";
+@import "oro";
+@import "font-awesome";
+@import "drag-and-drop-support";
+@import "oro/main";
+
+// desktop resolution
+@import "desktop/main";
+
+// mobile resolution
+@import "mobile/main";
+
+// printing rules
+@import "print/main";

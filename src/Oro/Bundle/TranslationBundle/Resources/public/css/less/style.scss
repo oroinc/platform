@@ -1,0 +1,53 @@
+.oro-translation-languages {
+  .translation-completeness {
+    min-width: 200px;
+
+    b {
+      display: block;
+      margin-top: -36px;
+      text-align: center;
+    }
+  }
+
+  .translation-status {
+    .status-up-to-date {
+      color: #5eb95e;
+    }
+    .status-available-update {
+      color: #f89406;
+    }
+    .status-available-install {
+      color: #5eb95e;
+    }
+  }
+}
+.oro-translation-translations {
+  .grid-header-cell {
+    min-width: 100px;
+  }
+}
+
+#main {
+  .oro-translation-translations {
+    label {
+      text-transform: none;
+    }
+  }
+}
+
+.no-english-translation {
+  font-size: 11px;
+  line-height: 99%;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  display: inline-block;
+  border-radius: 3px;
+  color: #333333;
+  border-color: #cccccc;
+  background-color: #cccccc;
+  min-width: 87px;
+  margin: 0;
+  padding: 3px 5px 2px;
+}

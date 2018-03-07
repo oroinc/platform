@@ -1,0 +1,497 @@
+@import "oroui/css/less/mixins";
+.ui-multiselect-checkboxes{
+    overflow-x: visible;
+}
+.filter-item {
+    margin-right: 8px;
+    margin-bottom: 7px;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    white-space: nowrap;
+
+    .loader-frame {
+        padding-left: 36px;
+    }
+}
+.filter-item .reset-filter:hover [class^="fa-"]:before {
+    color: #666;
+}
+.filter-item .reset-filter {
+    margin-left: 2px;
+    display: inline-block;
+    width: 12px;
+    line-height: 25px;
+    vertical-align: top;
+}
+.filter-item .filter-default-value .reset-filter {
+    display: none;
+}
+.filter-select.filter-default-value .multiselect-filter-widget {
+    display: inline-block;
+}
+
+.filter-box .btn-group [class^="fa-"] {
+  padding-top:2px;
+  vertical-align:middle;
+}
+.filter-box .filter-item .disable-filter {
+    background-color: #F5F5F5;
+    border-bottom-right-radius: 4px;
+    border-color: #CCCCCC #CCCCCC #B3B3B3;
+    border-style: solid;
+    border-top-right-radius: 4px;
+    border-width: 1px 1px 1px 0;
+    display: inline-block;
+    font-size: 18px;
+    height: 29px;
+    line-height: 29px;
+    padding: 2px;
+    vertical-align: top;
+}
+
+.filter-box .filter-select {
+    height: 29px;
+}
+
+.filter-box .filter-select .disable-filter {
+    margin-left: 3px;
+}
+
+.filter-box .filter-item .filter-criteria {
+    position: absolute;
+    font-size: 12px;
+    background-color: #ffffff;
+    padding: 8px 8px 2px 8px;
+    border: 1px solid #d3d3d3;
+    display: block;
+    visibility: hidden;
+    z-index: $oroZindexDropdown;
+    margin-top: 7px;
+    top: auto;
+}
+.filter-box .filter-item .filter-criteria select,
+.filter-box .filter-item .filter-criteria textarea,
+.filter-box .filter-item .filter-criteria input[type="text"],
+.filter-box .filter-item .filter-criteria input[type="password"],
+.filter-box .filter-item .filter-criteria input[type="datetime"],
+.filter-box .filter-item .filter-criteria input[type="datetime-local"],
+.filter-box .filter-item .filter-criteria input[type="date"],
+.filter-box .filter-item .filter-criteria input[type="month"],
+.filter-box .filter-item .filter-criteria input[type="time"],
+.filter-box .filter-item .filter-criteria input[type="week"],
+.filter-box .filter-item .filter-criteria input[type="number"],
+.filter-box .filter-item .filter-criteria input[type="email"],
+.filter-box .filter-item .filter-criteria input[type="url"],
+.filter-box .filter-item .filter-criteria input[type="search"],
+.filter-box .filter-item .filter-criteria input[type="tel"],
+.filter-box .filter-item .filter-criteria input[type="color"],
+.filter-box .filter-item .filter-criteria .uneditable-input {
+    margin-bottom: 10px;
+
+}
+.filter-box {
+  .filter-item {
+    .filter-criteria {
+      input[type="text"],
+      input[type="datetime"],
+      input[type="date"] {
+        & + .dropdown-menu-calendar {
+          margin-top: -11px;
+        }
+      }
+    }
+  }
+}
+.filter-box .filter-item .filter-criteria .input-append input,
+.filter-box .filter-item .filter-criteria .input-prepend input,
+.filter-box .filter-item .filter-criteria .input-append select,
+.filter-box .filter-item .filter-criteria .input-prepend select,
+.filter-box .filter-item .filter-criteria .input-append .uneditable-input,
+.filter-box .filter-item .filter-criteria .input-prepend .uneditable-input {
+    margin-bottom: 0;
+}
+.filter-select .select-filter-widget {
+    &, &.ui-multiselect {
+      font-weight: bold;
+      color: #333333;
+      padding: 0 0 2px 0;
+      background: none;
+      border: none;
+      margin-left: 0;
+    }
+}
+
+.filters-state {
+  color: #aaa;
+  font-size: 13px;
+  padding: 0 20px;
+  line-height: 31px;
+  min-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  .fa-filter {
+    margin-right: 8px;
+    vertical-align: text-bottom;
+    &:before {
+      color: #aaa;
+      font-size: 13px;
+    }
+  }
+  .page-title-center & {
+    text-align: center;
+    padding-left: 50px;
+    padding-right: 50px;
+    height: 31px;
+  }
+  .under-left-block & {
+    padding-left: 20px;
+    text-align: left;
+  }
+}
+
+.filters-state-popover {
+  max-width: 100%;
+}
+
+.filter-select .select-filter-widget .ui-icon {
+    margin-top: 2px;
+}
+
+.ui-multiselect-menu.select-filter-widget {
+    padding: 2px;
+}
+
+.ui-multiselect-menu.select-filter-widget ul {
+    max-height: 170px;
+}
+
+.ui-multiselect-menu.select-filter-widget .ui-multiselect-close {
+    display: none;
+}
+
+.ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes label span {
+    white-space: nowrap;
+}
+
+.ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes li {
+    padding: 0;
+    &:after {
+      content: '';
+      display: block;
+      clear: both;
+    }
+    &.hidden-item {
+      height: 0;
+    }
+}
+.ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes label {
+    white-space: nowrap;
+    margin: 0;
+    float: left;
+}
+
+.ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes.fixed-li label{
+    float: none;
+}
+.ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes label.ui-state-hover {
+    background-image: none;
+    background-color: #EFEFEF;
+}
+
+.ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes label.ui-state-active {
+    background-image: none;
+    background-color: #3875d7;
+    color: #ffffff;
+}
+.ui-multiselect-single .ui-multiselect-checkboxes label {
+  line-height:20px;
+}
+.ui-multiselect-menu.select-filter-widget {
+    padding: 0 0 2px 0;
+}
+.ui-multiselect-menu.select-filter-widget input[type="search"] {
+    margin: 0;
+}
+
+.ui-multiselect.select-filter-widget span.caret {
+    margin-top: 8px;
+    margin-right: 8px;
+}
+.ui-multiselect.select-filter-widget .add-filter-button span.caret {
+    border-top-color: #006ACC;
+}
+.ui-multiselect.select-filter-widget .add-filter-button:hover{
+    text-decoration: none;
+}
+.ui-multiselect-menu.select-filter-widget .ui-multiselect-header {
+    padding: 4px 4px 0 4px;
+    margin: 0;
+}
+
+.ui-multiselect-menu.select-filter-widget .ui-multiselect-header > div {
+    padding: 4px 4px 6px 4px;
+}
+
+.ui-multiselect-menu.select-filter-widget .ui-multiselect-header .ui-helper-reset {
+    display: none;
+}
+
+.ui-multiselect-menu.select-filter-widget .ui-multiselect-footer {
+    display: none;
+}
+
+.ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes input[type="checkbox"] {
+    margin: 0 6px 5px 5px;
+}
+
+.ui-multiselect.select-filter-widget:hover .add-filter-button span.caret {
+    border-top-color: #005099; /* $linkColorHover; */
+}
+
+.ui-multiselect.select-filter-widget:hover a {
+    color: #005099; /* $linkColorHover; */
+}
+
+.ui-multiselect.select-filter-widget span.caret {
+    margin-top: 5px;
+}
+
+.ui-multiselect.filter-list.ui-state-hover {
+    color: #032D67;
+    text-decoration: underline;
+}
+button.ui-multiselect.select-filter-widget.ui-state-hover{
+    text-decoration: none;
+}
+.date-visual-element {
+    width: 95px;
+}
+.filter-criteria .dropdown-menu a {
+    color:#444;
+}
+.filter-criteria .dropdown-menu li a:hover {
+    background:#3875d7;
+    color:#fff;
+    outline: none !important;
+}
+.filter-criteria .nav-tabs-oro a:hover,
+.filter-criteria .nav-tabs-oro a:focus{
+    background: #efefef;
+    color: #444;
+}
+.filter-criteria .nav-tabs-oro .active a:hover,
+.filter-criteria .nav-tabs-oro .active a:focus{
+    background: #fff;
+    color: #6d6d6d;
+}
+.filter-criteria .tab-content a:not(.ui-slider-handle):hover,
+.filter-criteria .tab-content a:not(.ui-slider-handle):focus{
+    background: transparent;
+}
+.filter-criteria .datetime-visual-element {
+    width: 100px;
+}
+.fields-row {
+  .datefilter + .timepicker-input {
+    margin-left: 5px;
+  }
+}
+.filter-criteria:focus {
+    outline: none;
+}
+
+.ui-multiselect.select-filter-widget {
+    width: auto !important;
+}
+
+.filter-item-simple .choice-filter > .dropdown,
+.filter-item-simple .filter-select {
+    display: inline-block;
+}
+.filter-item-simple .caret {
+    display: none;
+}
+.active-filter .dropdown:after,
+.active-filter .dropup:after {
+    display: inline-block;
+}
+.active-filter .field-select {
+    display: block;
+}
+.ui-multiselect.multiselect-filter-widget span,
+.filter-item .filter-criteria-hint {
+    max-width: 250px;
+    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    vertical-align: bottom;
+}
+
+.filter-item .filter-update-empty {
+    margin-left: -2px;
+}
+
+.filter-criteria {
+  .choice-filter {
+    .btn-group.btn-block{
+      width: auto;
+      float: left;
+      .dropdown-toggle {
+        -webkit-border-radius: 3px 0 0 3px;
+        -moz-border-radius: 3px 0 0 3px;
+        border-radius: 3px 0 0 3px;
+      }
+    }
+    .value-field-frame {
+      position: relative;
+      vertical-align: top;
+      width: auto;
+
+      input[type=text] {
+        max-width: 100%;
+        width: 280px;
+        height: 29px;
+        box-sizing: border-box;
+        border-left-width: 0;
+        border-right-width: 0;
+        margin-bottom: 0;
+      }
+      .select2-container {
+        border: 0 none;
+        background: transparent;
+        .select2-choices {
+          border-left: 0;
+          border-right: 0;
+          border-radius: 0;
+          min-height: 29px;
+        }
+        .select2-search-choice {
+          line-height: 15px;
+        }
+      }
+      .filter-update {
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+    }
+  }
+}
+
+.condition-item .select2-container.dictionary-filter{
+  display: block;
+  max-width: none;
+}
+.dictionary-filter {
+
+  ul {
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    color: #555555;
+    font-size: 13px;
+    height: 20px;
+    line-height: 20px;
+    margin-bottom: 10px;
+    padding: 4px 6px;
+    vertical-align: middle;
+  }
+}
+.filter-item.choice-tree-filter {
+  margin-right: 0;
+  margin-bottom: 0;
+  max-width: 300px;
+  min-width: 180px;
+  .select2-container {
+    margin-bottom: 8px;
+  }
+  .choice-tree-filter-search{
+    width: calc("100% - 14px");
+  }
+  .buttons {
+    margin-bottom: 5px;
+    span {
+      cursor: pointer;
+      color: #006acc;
+    }
+    span.active {
+      color: rgb(68, 68, 68);
+      cursor: default;
+    }
+  }
+  .list {
+    max-height: 200px;
+    overflow: auto;
+    margin-bottom: 10px;
+    ul:first-child{
+      margin-left: 0;
+    }
+    ul {
+      list-style-type: none;
+      input {
+        margin-right: 5px;
+        margin-top: 0;
+        margin-left: -18px;
+      }
+      label {
+        padding-left: 20px;
+        &.search-result {
+          color: #000000;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+  input[name="value"] {
+    display: none;
+  }
+}
+
+.filter-container {
+    position: relative;
+}
+.filter-items > :empty {
+  display: none;
+}
+.filter-items-hint {
+    padding-right: 80px;
+    position: relative;
+
+    .reset-filter-button {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+}
+
+.filter-criteria .choice-filter .value-field-frame .dictionary-filter {
+  width: 200px;
+}
+
+.filter-criteria .choice-filter .value-field-frame .select2-search-field input[type=text] {
+  height: 25px;
+  padding: 5px;
+}
+
+.filter-criteria .choice-filter .select2-container-multi .select2-choices .select2-search-choice {
+  margin: 2px 0 2px 5px;
+  padding: 3px 20px 3px 7px;
+}
+.select-field-date-popover {
+  top: 3px;
+  right: 3px;
+  position: absolute;
+}
+.select-field-date-popover .popover{
+  min-width: 350px;
+}
+.field-condition-date-popover {
+  display: inline-block;
+
+  i {
+    cursor: pointer;
+  }
+}

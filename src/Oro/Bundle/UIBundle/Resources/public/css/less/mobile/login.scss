@@ -1,0 +1,56 @@
+&.login-page {
+  height: 100%;
+  position: absolute;
+  #page {
+    height: 100%;
+  }
+  #top-page {
+    padding-top: 0;
+    height: 100%;
+  }
+}
+.form-signin {
+  max-width: 320px;
+  fieldset {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .add-on {
+    & + input[type="text"],
+    & + input[type="email"],
+    & + input[type="password"] {
+      width: 152px;
+    }
+    & + select {
+      width: 174px;
+      height: 36px;
+      box-sizing: border-box;
+    }
+  }
+  .oro-forgot-password {
+    input {
+      width: 256px;
+    }
+  }
+  .oro-hint,
+  .alert {
+    width: 278px;
+  }
+  span.validation-failed {
+    font-size: 13px;
+  }
+}
+
+.form-reset {
+  max-width: 320px !important;
+  .add-on {
+    width: 120px;
+    font-size: 12px;
+
+    & + input[type="text"],
+    & + input[type="email"],
+    & + input[type="password"] {
+      width: 138px;
+    }
+  }
+}
