@@ -18,9 +18,6 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Abstract form type for building extended currency selection types.
- */
 abstract class AbstractCurrencySelectionType extends AbstractType
 {
     /**
@@ -90,8 +87,18 @@ abstract class AbstractCurrencySelectionType extends AbstractType
         ]);
 
         $resolver->setNormalizer('choice_label', function (Options $options, $value) {
-            return function ($currencyCode) use ($options) {
-                return $this->getCurrencyLabel($currencyCode, $options);
+            $viewType = null;
+
+            if ($options['full_currency_name']) {
+                $viewType = ViewTypeProviderInterface::VIEW_TYPE_FULL_NAME;
+            }
+
+            if ($options['compact']) {
+                $viewType = ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE;
+            }
+
+            return function ($currencyCode) use ($viewType) {
+                return $this->currencyNameHelper->getCurrencyName($currencyCode, $viewType);
             };
         });
     }
@@ -216,25 +223,5 @@ abstract class AbstractCurrencySelectionType extends AbstractType
     private function isMissedCurrency($currencyCode, array $options)
     {
         return (empty($options['choices']) || !isset($options['choices'][$currencyCode]));
-    }
-
-    /**
-     * @param string $currencyCode
-     * @param \ArrayAccess  $options
-     *
-     * @return string
-     */
-    protected function getCurrencyLabel(string $currencyCode, \ArrayAccess $options)
-    {
-        $viewType = null;
-
-        if ($options['full_currency_name']) {
-            $viewType = ViewTypeProviderInterface::VIEW_TYPE_FULL_NAME;
-        }
-
-        if ($options['compact']) {
-            $viewType = ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE;
-        }
-        return $this->currencyNameHelper->getCurrencyName($currencyCode, $viewType);
     }
 }
