@@ -3,9 +3,10 @@ define(function(require) {
 
     var _ = require('underscore');
     var ASTNodeWrapper = require('oroexpressionlanguage/js/ast-node-wrapper');
-    var ConditionalNode = require('oroexpressionlanguage/js/library/node/conditional-node');
-    var GetAttrNode = require('oroexpressionlanguage/js/library/node/get-attr-node');
-    var NameNode = require('oroexpressionlanguage/js/library/node/name-node');
+    var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
+    var ConditionalNode = ExpressionLanguageLibrary.ConditionalNode;
+    var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
+    var NameNode = ExpressionLanguageLibrary.NameNode;
 
     /**
      * @typedef {Object} EntityInfo

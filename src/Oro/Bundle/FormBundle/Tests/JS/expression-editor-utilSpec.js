@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     var _ = require('underscore');
-    var Token = require('oroexpressionlanguage/js/extend/token');
+    var Token = require('oroexpressionlanguage/js/expression-language-library').Token;
     var ExpressionEditorUtil = require('oroform/js/expression-editor-util');
     var DataProviderMock = require('./Fixture/entity-structure-data-provider-mock.js');
 

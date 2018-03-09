@@ -2,17 +2,18 @@ define(function(require) {
     'use strict';
 
     var _ = require('underscore');
-    var ParsedExpression = require('oroexpressionlanguage/js/library/parsed-expression');
     var ExpressionOperandTypeValidator = require('oroform/js/expression-operand-type-validator');
     var DataProviderMock = require('./Fixture/entity-structure-data-provider-mock.js');
     var entitiesData = JSON.parse(require('text!./Fixture/entities-data.json'));
-    var BinaryNode = require('oroexpressionlanguage/js/library/node/binary-node');
-    var GetAttrNode = require('oroexpressionlanguage/js/library/node/get-attr-node');
-    var ConstantNode = require('oroexpressionlanguage/js/library/node/constant-node');
-    var NameNode = require('oroexpressionlanguage/js/library/node/name-node');
-    var ArgumentsNode = require('oroexpressionlanguage/js/library/node/arguments-node');
-    var ConditionalNode = require('oroexpressionlanguage/js/library/node/conditional-node');
-    var ArrayNode = require('oroexpressionlanguage/js/library/node/array-node');
+    var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
+    var ParsedExpression = ExpressionLanguageLibrary.ParsedExpression;
+    var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
+    var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
+    var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
+    var NameNode = ExpressionLanguageLibrary.NameNode;
+    var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
+    var ConditionalNode = ExpressionLanguageLibrary.ConditionalNode;
+    var ArrayNode = ExpressionLanguageLibrary.ArrayNode;
 
     // pre-calculated object to using in `createValidatorOptions` function only
     var _operationsValidatorOption = _.object(_.map(

@@ -4,9 +4,10 @@ define(function(require) {
     var ExpressionEditorUtil;
     var _ = require('underscore');
     var BaseClass = require('oroui/js/base-class');
-    var Token = require('oroexpressionlanguage/js/extend/token');
-    var ExpressionLanguage = require('oroexpressionlanguage/js/extend/expression-language');
     var ExpressionOperandTypeValidator = require('oroform/js/expression-operand-type-validator');
+    var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
+    var Token = ExpressionLanguageLibrary.Token;
+    var ExpressionLanguage = ExpressionLanguageLibrary.ExpressionLanguage;
 
     /**
      * @typedef {Object} AutocompleteData

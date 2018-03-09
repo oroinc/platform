@@ -20,6 +20,8 @@ config:
         'oroquerydesigner/js/app/modules/entity-filter-preset-module': 'bundles/oroquerydesigner/js/app/modules/entity-filter-preset-module.js'
         'oroquerydesigner/js/validator/not-blank-filters': 'bundles/oroquerydesigner/js/validator/not-blank-filters.js'
 
+        'oroquerydesigner/js/query-type-converter/condition-to-expression/field-id-translator': 'bundles/oroquerydesigner/js/query-type-converter/condition-to-expression/field-id-translator.js'
+
     appmodules:
         - oroquerydesigner/js/app/modules/validator-constraints-module
         - oroquerydesigner/js/app/modules/entity-filter-preset-module
