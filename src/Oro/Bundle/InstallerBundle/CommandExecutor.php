@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
+/**
+ * The class that contains a set of methods to simplify execution of console commands.
+ */
 class CommandExecutor
 {
     const DEFAULT_TIMEOUT = 300;
@@ -148,7 +151,11 @@ class CommandExecutor
             $this->lastCommandLine = '';
 
             $this->application->setAutoExit(false);
-            $this->lastCommandExitCode = $this->application->run(new ArrayInput($params), $this->output);
+            try {
+                $this->lastCommandExitCode = $this->application->run(new ArrayInput($params), $this->output);
+            } finally {
+                $this->application->setAutoExit(true);
+            }
         }
 
         $this->processResult($ignoreErrors);
