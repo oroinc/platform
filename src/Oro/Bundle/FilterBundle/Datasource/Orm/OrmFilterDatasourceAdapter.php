@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Datasource\Orm;
 
+use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
@@ -57,7 +58,9 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
      */
     public function addRestriction($restriction, $condition, $isComputed = false)
     {
-        $restriction = $this->qbTools->replaceAliasesWithFields($restriction);
+        if (!($isComputed && $this->getDatabasePlatform() instanceof MySqlPlatform)) {
+            $restriction = $this->qbTools->replaceAliasesWithFields($restriction);
+        }
 
         if ($condition === FilterUtility::CONDITION_OR) {
             if ($isComputed) {
