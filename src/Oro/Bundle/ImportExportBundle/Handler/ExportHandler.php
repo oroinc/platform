@@ -18,6 +18,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * Handles export logic such as getting export result, merging exported files, etc.
+ */
 class ExportHandler extends AbstractHandler
 {
     /**
@@ -210,7 +213,8 @@ class ExportHandler extends AbstractHandler
 
         try {
             foreach ($files as $file) {
-                $localFiles[] = $this->fileManager->writeToTmpLocalStorage($file);
+                $tmpPath = $this->fileManager->writeToTmpLocalStorage($file);
+                $localFiles[] = $this->fileManager->fixNewLines($tmpPath);
             }
             $this->batchFileManager->mergeFiles($localFiles, $localFilePath);
 
