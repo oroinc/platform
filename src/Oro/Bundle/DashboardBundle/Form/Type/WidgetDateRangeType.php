@@ -105,12 +105,12 @@ class WidgetDateRangeType extends AbstractType
             ]
         );
 
-        $resolver->setNormalizers([
-            'operator_choices' =>
-                function (Options $options) {
-                    return $this->getOperatorChoices($options);
-                }
-        ]);
+        $resolver->setNormalizer(
+            'operator_choices',
+            function (Options $options) {
+                return $this->getOperatorChoices($options);
+            }
+        );
     }
 
     /**

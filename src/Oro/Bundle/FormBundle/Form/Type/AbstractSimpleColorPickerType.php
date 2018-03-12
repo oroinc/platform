@@ -87,21 +87,23 @@ abstract class AbstractSimpleColorPickerType extends AbstractType
                     'picker_delay'      => 0
                 ]
             )
-            ->setNormalizers(
-                [
-                    'color_schema' => function (Options $options, $colorSchema) {
-                        return $colorSchema ?: 'custom';
-                    },
-                    'translatable' => function (Options $options, $translatable) {
-                        if (isset(static::$colorSchema[$options['color_schema']])
-                            && static::$colorSchema[$options['color_schema']]['translatable']
-                        ) {
-                            $translatable = true;
-                        }
-
-                        return $translatable;
+            ->setNormalizer(
+                'color_schema',
+                function (Options $options, $colorSchema) {
+                    return $colorSchema ?: 'custom';
+                }
+            )
+            ->setNormalizer(
+                'translatable',
+                function (Options $options, $translatable) {
+                    if (isset(static::$colorSchema[$options['color_schema']])
+                        && static::$colorSchema[$options['color_schema']]['translatable']
+                    ) {
+                        $translatable = true;
                     }
-                ]
+
+                    return $translatable;
+                }
             );
     }
 

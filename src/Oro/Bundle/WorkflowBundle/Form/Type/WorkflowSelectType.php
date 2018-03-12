@@ -78,9 +78,9 @@ class WorkflowSelectType extends AbstractType
                 }
 
                 $entityClass = $options['entity_class'];
-                if (!$entityClass && $options->has('config_id')) {
+                if (!$entityClass && isset($options['config_id'])) {
                     $configId = $options['config_id'];
-                    if ($configId && $configId instanceof ConfigIdInterface) {
+                    if ($configId instanceof ConfigIdInterface) {
                         $entityClass = $configId->getClassName();
                     }
                 }

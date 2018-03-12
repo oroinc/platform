@@ -857,7 +857,7 @@ class LinkExtension extends AbstractBlockTypeExtension
     {
         // this operation better to use on finishView but if you are really sure you can write like this
         if ($options->isExistsAndNotEmpty('image')) {
-            $view->vars['image'] = $options->get('image', false);
+            $view->vars['image'] = $options['image'] ?? false;
         }
     }
 
@@ -941,7 +941,7 @@ class ContainerExtension extends AbstractBlockTypeExtension
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(['type']);
+        $resolver->setDefined(['type']);
     }
 
     /**
@@ -1583,7 +1583,7 @@ class ImageType extends AbstractType
 
         // this operation better to use on finishView but if you are really sure you can write like this
         if ($options->isExistsAndNotEmpty('alt')) {
-            $view->vars['alt'] = $options->get('alt', false);
+            $view->vars['alt'] = $options['alt'] ?? false;
         }
     }
 

@@ -59,7 +59,7 @@ class AttributeGroupType extends AbstractContainerType
     public function buildBlock(BlockBuilderInterface $builder, Options $options)
     {
         /** @var AttributeFamily $attributeFamily */
-        $attributeFamily = $options->get('attribute_family');
+        $attributeFamily = $options['attribute_family'];
         $code = $options['group'];
         $entityValue = $options->get('entity', false);
         $attributeGroup = $attributeFamily->getAttributeGroup($code);
@@ -100,7 +100,7 @@ class AttributeGroupType extends AbstractContainerType
                         'fieldName' => $attribute->getFieldName(),
                         'className' => $attribute->getEntity()->getClassName()
                     ],
-                    $options->get('attribute_options')->toArray()
+                    $options['attribute_options']->toArray()
                 )
             );
         }

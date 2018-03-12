@@ -37,6 +37,6 @@ class ApplicationContextConfigurator implements ContextConfiguratorInterface
                     }
                 ]
             )
-            ->setAllowedTypes(['debug' => 'bool']);
+            ->setAllowedTypes('debug', 'bool');
     }
 }

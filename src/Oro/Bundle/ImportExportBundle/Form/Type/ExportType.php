@@ -98,10 +98,9 @@ class ExportType extends AbstractType
             'processorAlias' => null
         ]);
         $resolver->setRequired(['entityName']);
-        $resolver->setAllowedTypes([
-            'entityName' => 'string',
-            'processorAlias' => ['string', 'array', 'null']
-        ]);
+
+        $resolver->setAllowedTypes('entityName', 'string');
+        $resolver->setAllowedTypes('processorAlias', ['string', 'array', 'null']);
     }
 
     /**

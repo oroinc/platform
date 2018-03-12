@@ -49,12 +49,11 @@ class OroDateType extends AbstractType
         );
 
         // remove buggy 'placeholder' normalizer. The placeholder must be a string if 'widget' === 'single_text'
-        $resolver->setNormalizers(
-            [
-                'placeholder' => function (Options $options, $placeholder) {
-                    return $placeholder;
-                }
-            ]
+        $resolver->setNormalizer(
+            'placeholder',
+            function (Options $options, $placeholder) {
+                return $placeholder;
+            }
         );
 
         $resolver->setAllowedTypes('minDate', ['string', 'null']);

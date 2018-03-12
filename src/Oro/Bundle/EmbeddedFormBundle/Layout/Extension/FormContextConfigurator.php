@@ -34,7 +34,7 @@ class FormContextConfigurator implements ContextConfiguratorInterface
     {
         $context->getResolver()
             ->setDefined(['form'])
-            ->setAllowedTypes(['form' => ['null', 'Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface']]);
+            ->setAllowedTypes('form', ['null', 'Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface']);
 
         $form = $context->getOr('form');
         if (null === $form || $form instanceof FormAccessorInterface) {

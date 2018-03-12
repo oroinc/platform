@@ -74,13 +74,9 @@ class OperationType extends AbstractType
             ]
         );
 
-        $resolver->setAllowedTypes(
-            [
-                'operation' => 'Oro\Bundle\ActionBundle\Model\Operation',
-                'attribute_fields' => 'array',
-                'attribute_default_values' => 'array'
-            ]
-        );
+        $resolver->setAllowedTypes('operation', 'Oro\Bundle\ActionBundle\Model\Operation');
+        $resolver->setAllowedTypes('attribute_fields', 'array');
+        $resolver->setAllowedTypes('attribute_default_values', 'array');
     }
 
     /**

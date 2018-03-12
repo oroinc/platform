@@ -14,6 +14,6 @@ class ActionContextConfigurator implements ContextConfiguratorInterface
     {
         $context->getResolver()
             ->setDefaults(['action' => ''])
-            ->setAllowedTypes(['action' => 'string']);
+            ->setAllowedTypes('action', 'string');
     }
 }

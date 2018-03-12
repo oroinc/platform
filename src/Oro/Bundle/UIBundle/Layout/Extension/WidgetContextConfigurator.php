@@ -42,7 +42,7 @@ class WidgetContextConfigurator implements ContextConfiguratorInterface
                     }
                 ]
             )
-            ->setAllowedTypes(['widget_container' => ['string', 'null']]);
+            ->setAllowedTypes('widget_container', ['string', 'null']);
 
         $context->data()->setDefault(
             'widget_id',

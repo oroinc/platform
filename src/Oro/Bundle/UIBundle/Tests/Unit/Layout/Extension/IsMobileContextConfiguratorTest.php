@@ -47,7 +47,7 @@ class IsMobileContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $optionResolver->expects($this->once())
             ->method('setAllowedTypes')
-            ->with(['is_mobile' => ['boolean']])
+            ->with('is_mobile', ['boolean'])
             ->willReturn($optionResolver);
 
         /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject $context */

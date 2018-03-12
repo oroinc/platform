@@ -45,7 +45,7 @@ class QuarterType extends AbstractType
             ]
         );
 
-        $resolver->setAllowedValues(['input' => ['array']]);
+        $resolver->setAllowedValues('input', ['array']);
     }
 
     /**

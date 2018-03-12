@@ -24,14 +24,13 @@ class EnumChoiceType extends AbstractEnumType
             ]
         );
 
-        $resolver->setNormalizers(
-            [
-                'empty_value' => function (Options $options, $value) {
-                    return (null === $value) && !$options['expanded'] && !$options['multiple']
-                        ? 'oro.form.choose_value'
-                        : $value;
-                }
-            ]
+        $resolver->setNormalizer(
+            'empty_value',
+            function (Options $options, $value) {
+                return (null === $value) && !$options['expanded'] && !$options['multiple']
+                    ? 'oro.form.choose_value'
+                    : $value;
+            }
         );
     }
 

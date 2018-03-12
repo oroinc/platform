@@ -46,11 +46,7 @@ class WorkflowTransitionType extends AbstractType
     {
         $resolver->setRequired(array('workflow_item', 'transition_name'));
 
-        $resolver->setAllowedTypes(
-            array(
-                'transition_name' => 'string',
-            )
-        );
+        $resolver->setAllowedTypes('transition_name', 'string');
 
         $resolver->setNormalizer(
             'constraints',
