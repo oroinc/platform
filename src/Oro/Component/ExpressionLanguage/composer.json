@@ -8,7 +8,7 @@
         "php": "7.1.*",
         "symfony/expression-language": "2.8.*",
         "doctrine/inflector": "1.1.*",
-        "oro/property-access": "1.x-dev"
+        "oro/property-access": "3.0.x-dev"
     },
     "autoload": {
         "psr-0": { "Oro\\Component\\ExpressionLanguage": "" }
