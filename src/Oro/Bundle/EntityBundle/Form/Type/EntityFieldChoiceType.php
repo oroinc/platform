@@ -69,7 +69,7 @@ class EntityFieldChoiceType extends AbstractType
                 'choice_attr'          => function ($choice) {
                     return $this->getChoiceAttributes($choice);
                 },
-                'empty_value'          => '',
+                'placeholder'          => '',
                 'skip_load_entities'   => false,
                 'skip_load_data'       => false,
                 'configs'              => $defaultConfigs,

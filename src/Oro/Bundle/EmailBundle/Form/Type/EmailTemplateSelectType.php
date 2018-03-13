@@ -51,7 +51,7 @@ class EmailTemplateSelectType extends AbstractType
                 'selectedEntity'          => null,
                 'choices'                 => $choices,
                 'configs'                 => $defaultConfigs,
-                'empty_value'             => '',
+                'placeholder'             => '',
                 'empty_data'              => null,
                 'required'                => true,
                 'data_route'              => 'oro_api_get_emailtemplates',

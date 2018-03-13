@@ -73,7 +73,6 @@ class ContextsExtension extends AbstractTypeExtension
             'label'          => 'oro.activity.contexts.label',
             'tooltip'        => 'oro.activity.contexts.tooltip',
             'required'       => false,
-            'read_only'      => false,
             'mapped'         => false,
             'error_bubbling' => false,
             'configs'   => [
@@ -82,6 +81,9 @@ class ContextsExtension extends AbstractTypeExtension
                     'activity' => $alias,
                     'name'     => $alias
                 ],
+            ],
+            'attr' => [
+                'readonly' => false
             ]
         ];
 

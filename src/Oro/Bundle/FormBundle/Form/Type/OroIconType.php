@@ -65,7 +65,7 @@ class OroIconType extends AbstractType
             [
                 'placeholder' => 'oro.form.choose_value',
                 'choices'     => $choices,
-                'empty_value' => '',
+                'placeholder' => '',
                 'configs'     => [
                     'placeholder'             => 'oro.form.choose_value',
                     'result_template_twig'    => 'OroFormBundle:Autocomplete:icon/result.html.twig',

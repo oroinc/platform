@@ -23,7 +23,7 @@ class SegmentType extends AbstractQueryDesignerType
                     'class'       => 'OroSegmentBundle:SegmentType',
                     'property'    => 'label',
                     'required'    => true,
-                    'empty_value' => 'oro.segment.form.choose_segment_type',
+                    'placeholder' => 'oro.segment.form.choose_segment_type',
                     'tooltip'     => 'oro.segment.type.tooltip_text'
                 ]
             )

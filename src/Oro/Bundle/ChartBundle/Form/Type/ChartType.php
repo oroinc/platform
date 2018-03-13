@@ -47,7 +47,7 @@ class ChartType extends ConfigProviderAwareType
                         },
                         $chartConfigs
                     ),
-                    'empty_value' => 'oro.chart.form.chart_empty_value'
+                    'placeholder' => 'oro.chart.form.chart_empty_value'
                 ]
             )
             ->add(
