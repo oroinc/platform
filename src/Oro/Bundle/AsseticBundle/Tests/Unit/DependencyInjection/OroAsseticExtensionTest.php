@@ -11,6 +11,11 @@ class OroAsseticExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider loadDataProvider
+     * @param array $configs
+     * @param array $expectedBundles
+     * @param array $expectedConfiguration
+     * @param array $asseticBundles
+     * @param array $expectedAsseticBundles
      */
     public function testLoad(
         array $configs,
