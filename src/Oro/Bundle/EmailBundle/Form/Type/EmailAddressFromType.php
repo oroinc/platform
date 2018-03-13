@@ -55,7 +55,6 @@ class EmailAddressFromType extends AbstractType
 
             return $value;
         });
-
     }
 
     /**
