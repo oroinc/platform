@@ -20,7 +20,7 @@
             width: 9px;
             margin-right: 5px;
 
-            font-family: 'FontAwesome';
+            font-family: FontAwesome;
             font-size: 9px;
             font-weight: normal;
             font-style: normal;
@@ -31,7 +31,7 @@
         }
     }
 
-    &.expanded &__label::before {
+    &.expanded &__label:before {
         content: '\f054';
     }
 
@@ -53,7 +53,7 @@
     }
 
     .jstree {
-        margin: 0 -$contentPadding -$contentPadding;
+        margin: 0 -#{$contentPadding} -#{$contentPadding};
         outline: none;
 
         .search-no-results {

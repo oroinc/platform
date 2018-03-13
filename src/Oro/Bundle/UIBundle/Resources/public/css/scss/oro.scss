@@ -727,7 +727,7 @@ footer {
 .left-panel {
     float: left;
     width: $widthClosePanel;
-    margin: 0 0 0 -$widthClosePanel;
+    margin: 0 0 0 -#{$widthClosePanel};
     display: inline;
 }
 
@@ -778,7 +778,7 @@ footer {
     position: relative;
     width: $widthLeftPanel;
     padding: 10px 0;
-    margin: 0 0 0 -$widthLeftPanel;
+    margin: 0 0 0 -#{$widthLeftPanel};
 
     .nav-title {
         background: none;
@@ -873,7 +873,7 @@ footer {
     display: inline;
     float: right;
     width: $widthClosePanel;
-    margin: 0 -$widthClosePanel 0 0;
+    margin: 0 -#{$widthClosePanel} 0 0;
     background-position: 0 0;
     padding: 0 0 18px 5px;
 
@@ -969,7 +969,7 @@ footer {
     position: relative;
     width: $widthLeftPanel;
     padding: 10px 0;
-    margin: 0 -$widthLeftPanel 0 0;
+    margin: 0 -#{$widthLeftPanel} 0 0;
 
     .bar-tools > li {
         margin: 0 0 0 5px;
@@ -2763,7 +2763,9 @@ div.selector {
     height: 30px;
     width: 235px;
     border: 1px solid #ddd;
-    background: linear-gradient(#fff, #f3f3f3);
+    background-color: #fafafa;
+    background-image: linear-gradient(#fff, #f3f3f3);
+    background-repeat: repeat-x;
     border-radius: 3px;
 
     option {

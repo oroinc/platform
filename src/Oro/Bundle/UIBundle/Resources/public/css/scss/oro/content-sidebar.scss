@@ -132,7 +132,7 @@ $sidebarContentMinWidth: 288px;
         }
 
         .responsive-section {
-            margin: 0 -$contentPadding;
+            margin: 0 -#{$contentPadding};
             padding-right: $contentPadding;
 
             .form-horizontal {

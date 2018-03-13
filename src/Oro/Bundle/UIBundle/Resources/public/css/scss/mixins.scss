@@ -116,11 +116,11 @@
     }
 
     &:before {
-        top: calc("25% + 1px");
+        top: calc(25% + 1px);
     }
 
     &:after {
-        bottom: calc("25% + 1px");
+        bottom: calc(25% + 1px);
     }
 }
 
@@ -250,16 +250,16 @@
 
         @if ($enable-safe-area) {
             @if (strip-units($value) == 0) {
-                /* iOS 11 */
+                // iOS 11
                 #{$property}: constant(safe-area-inset-left);
 
-                /* iOS 11.2+ */
+                // iOS 11.2+
                 #{$property}: env(safe-area-inset-left);
             } @else {
-                /* iOS 11 */
+                // iOS 11
                 #{$property}: calc(constant(safe-area-inset-left) + #{$value});
 
-                /* iOS 11.2+ */
+                // iOS 11.2+
                 #{$property}: calc(env(safe-area-inset-left) + #{$value});
             }
         }
@@ -275,16 +275,16 @@
 
         @if ($enable-safe-area) {
             @if (strip-units($value) == 0) {
-                /* iOS 11 */
+                // iOS 11
                 #{$property}: constant(safe-area-inset-right);
 
-                /* iOS 11.2+ */
+                // iOS 11.2+
                 #{$property}: env(safe-area-inset-right);
             } @else {
-                /* iOS 11 */
+                // iOS 11
                 #{$property}: calc(constant(safe-area-inset-right) + #{$value});
 
-                /* iOS 11.2+ */
+                // iOS 11.2+
                 #{$property}: calc(env(safe-area-inset-right) + #{$value});
             }
         }
