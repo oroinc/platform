@@ -63,3 +63,13 @@ The next code must be added in main template:
     {% endoro_css %}
 ```
 These tag is the same as AsseticBundle's "stylesheet" tag but without list of files.
+
+## Excluding bundles from assetic
+By default all bundles are included into assetic unless whitelist is defined with `assetic.bundles` configuration.
+Oro Assetic bundle provide ability to exclude only specific bundles with `oro_assetic.excluded_bundles`
+
+```yaml
+oro_assetic:
+    excluded_bundles:
+        - DoctrineBundle
+```
