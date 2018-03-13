@@ -1,6 +1,6 @@
 .editable {
   span.validation-failed {
-    #floating-validation-message();
+    @include floating-validation-message();
     display: block;
     white-space: nowrap;
     position: absolute;

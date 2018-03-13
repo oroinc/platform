@@ -64,7 +64,7 @@
 .page-title + [data-bound-component="orodatagrid/js/app/components/datagrid-component"],
 .page-title + .product-container,
 .page-title + .layout-content {
-  @include safe-area-padding(0);
+  @include safe-area-offset(padding, 0);
 }
 .layout-content .responsive-section{
   padding: 0;

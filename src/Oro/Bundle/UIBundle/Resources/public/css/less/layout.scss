@@ -159,7 +159,7 @@ body.backdrop {
   }
 }
 
-.oro-page-menu-items {
+@mixin oro-page-menu-items {
   list-style: none;
   margin: 0;
   line-height: 21px;
@@ -187,10 +187,16 @@ body.backdrop {
     }
   }
 }
+
+.oro-page-menu-items {
+  @include oro-page-menu-items;
+}
+
 .oro-page {
   border-top: 1px solid $pageBorderColor;
   background: $pageSidebarBackgroundColor;
   border-bottom: 1px solid $pageBorderColor;
+
   .oro-page-sidebar {
     width: 236px;
     margin-right: -1px;
@@ -199,6 +205,7 @@ body.backdrop {
     border-bottom: 1px solid $pageBorderColor;
     background: $pageSidebarBackgroundColor;
   }
+
   .oro-page-body {
     float: right;
     width: calc("100% - 235px");
@@ -207,13 +214,17 @@ body.backdrop {
     background-color: #ffffff;
     overflow: hidden;
   }
+
   &.collapsible-sidebar {
     .oro-page-sidebar {
+
       > .dropdown-toggle {
         display: none;
       }
+
       > .dropdown-menu {
         @include oro-page-menu-items;
+
         top: none;
         left: none;
         position: relative;

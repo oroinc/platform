@@ -1,5 +1,5 @@
 assets:
     css:
         'orosecurity':
-            - 'bundles/orosecurity/css/selector.less'
+            - 'bundles/orosecurity/css/selector.scss'
             - 'bundles/orosecurity/css/field-acl.css'

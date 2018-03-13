@@ -2,22 +2,30 @@
   .pagination-container {
     margin: 0 auto;
     width: 270px;
-    @include forScreen(600px, margin, 0);
-    @include forScreen(600px, width, auto);
+    @media only screen and (max-width: 600px) {
+      margin: 0;
+      width: auto;
+    }
     .page-size {
       margin-left: 16px;
       label {
         display: inline-block;
-        @include forScreen(600px, display, none);
+        @media only screen and (max-width: 600px) {
+          display: none;
+        }
       }
     }
     .pagination {
       .fa-chevron-left:before, .fa-chevron-right:before {
         line-height: 18px;
       }
-      @include forScreen(600px, margin, 0);
+      @media only screen and (max-width: 600px) {
+        margin: 0;
+      }
       .dib {
-        @include forScreen(600px, display, none);
+        @media only screen and (max-width: 600px) {
+          display: none;
+        }
       }
     }
   }
@@ -32,7 +40,9 @@
       }
     }
     a.action.btn {
-      @include forScreen(400px, display, none);
+      @media only screen and (max-width: 400px) {
+        display: none;
+      }
       i {
         &:before {
           font-size: 14px;

@@ -73,7 +73,7 @@
   z-index: 900;
   width: 50%;
 
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   padding: 0 10px;
   opacity: 0.9;
 }

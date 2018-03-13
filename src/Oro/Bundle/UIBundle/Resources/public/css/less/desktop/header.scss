@@ -9,7 +9,7 @@
     line-height: 26px;
     float: left;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.25);
-    #gradient > .vertical($baseGradientColorStart, $baseGradientColorEnd);
+    background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
     &:before {
       width: 0px;
       height: 0px;
@@ -82,12 +82,12 @@
         font-weight: bold;
       }
     }
-    #gradient > .vertical($baseGradientColorStart, $baseGradientColorEnd);
+    background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
     border-left: 1px solid $baseGradientColorBorder;
     a.help:hover,
     .dropdown > .dropdown-toggle:hover,
     .dropdown > .oro-dropdown-toggle:hover{
-      #gradient > .vertical(lighten($baseGradientColorStart, 3%), lighten($baseGradientColorEnd, 3%));
+      background: linear-gradient(lighten($baseGradientColorStart, 3%), lighten($baseGradientColorEnd, 3%));
     }
     .dropdown {
       > .dropdown-menu {
@@ -99,7 +99,7 @@
     }
   }
   .nav.top-search {
-    #gradient > .vertical($baseGradientColorStart, $baseGradientColorEnd);
+    background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
     padding: 0 10px 0 5px;
     border-right: 1px solid $baseGradientColorBorder;
     .dropdown {
@@ -118,7 +118,7 @@
           }
         }
         &:hover > [class^="fa-"] {
-          #gradient > .vertical(lighten($baseGradientColorStart, 3%), lighten($baseGradientColorEnd, 3%));
+          background: linear-gradient(lighten($baseGradientColorStart, 3%), lighten($baseGradientColorEnd, 3%));
         }
       }
       > .dropdown-menu {

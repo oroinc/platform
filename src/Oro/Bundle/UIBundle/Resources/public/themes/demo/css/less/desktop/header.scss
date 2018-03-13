@@ -1,42 +1,50 @@
 #oroplatform-header {
-  .logo {
-    #gradient > .vertical($baseGradientColorStart, $baseGradientColorEnd);
-    padding: 0;
-    &:before {
-      display: none;
-    }
-    &:after {
-      display: none;
-    }
-  }
-  .nav.user-menu {
-    #gradient > .vertical($baseGradientColorStart, $baseGradientColorEnd);
-    border-left-color: $baseGradientColorBorder;
-    a.help:before{
-      background-color: $baseGradientColorBorder;
-    }
-    a.help:hover,
-    .dropdown > .dropdown-toggle:hover,
-    .dropdown > .oro-dropdown-toggle:hover{
-      #gradient > .vertical(lighten($baseGradientColorStart, 3%), lighten($baseGradientColorEnd, 3%));
-    }
-  }
-  .nav.top-search {
-    #gradient > .vertical($baseGradientColorStart, $baseGradientColorEnd);
-    padding: 0 10px 0 5px;
-    .dropdown {
-      > .dropdown-toggle {
-        &:hover > [class^="fa-"] {
-          #gradient > .vertical(lighten($baseGradientColorStart, 3%), lighten($baseGradientColorEnd, 3%));
+    .logo {
+        background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
+        padding: 0;
+
+        &:before {
+            display: none;
         }
-      }
+
+        &:after {
+            display: none;
+        }
     }
-  }
-  .navbar-inner{
-    .nav {
-      > li > a {
-        color: $headerTextColor;
-      }
+
+    .nav.user-menu {
+        background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
+        border-left-color: $baseGradientColorBorder;
+
+        a.help:before {
+            background-color: $baseGradientColorBorder;
+        }
+
+        a.help:hover,
+        .dropdown > .dropdown-toggle:hover,
+        .dropdown > .oro-dropdown-toggle:hover {
+            background: linear-gradient(lighten($baseGradientColorStart, 3%), lighten($baseGradientColorEnd, 3%));
+        }
     }
-  }
+
+    .nav.top-search {
+        background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
+        padding: 0 10px 0 5px;
+
+        .dropdown {
+            > .dropdown-toggle {
+                &:hover > [class^="fa-"] {
+                    background: linear-gradient(lighten($baseGradientColorStart, 3%), lighten($baseGradientColorEnd, 3%));
+                }
+            }
+        }
+    }
+
+    .navbar-inner {
+        .nav {
+            > li > a {
+                color: $headerTextColor;
+            }
+        }
+    }
 }

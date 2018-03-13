@@ -73,7 +73,9 @@
     text-align: center;
     height: 0;
     overflow: hidden;
-    @include forScreen(430px, height, 32px);
+    @media only screen and (max-width: 430px) {
+      height: 32px;
+    }
   }
 }
 .oro-datagrid:first-child > .toolbar:first-child > .grid-toolbar {

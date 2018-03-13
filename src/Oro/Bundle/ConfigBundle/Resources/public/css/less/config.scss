@@ -18,7 +18,7 @@
       & > .content {
         margin-left: 335px;
         padding: 15px 15px 0;
-        @include box-sizing(border-box);
+        box-sizing: border-box;
       }
     }
   }

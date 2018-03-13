@@ -25,12 +25,12 @@
 .btn.disabled:active,
 .btn[disabled]:active,
 .ui-datepicker .ui-datepicker-buttonpane button {
-  @include border-radius($baseBtnBorderRadius);
+  border-radius: $baseBtnBorderRadius;
   padding: 0 12px;
   font-weight:bold;
   background-repeat: none;
   display: inline-block;
-  #gradient > .vertical(#fdfdfd, #efefef);
+  background: linear-gradient(#fdfdfd, #efefef);
   color: #666;
   box-shadow: none;
 }
@@ -43,10 +43,10 @@
   -o-transition: none;
   transition: none;
   color: #666;
-  #gradient > .vertical(#fdfdfd, #f5f5f5);
+  background: linear-gradient(#fdfdfd, #f5f5f5);
 }
 .btn:active {
-  #gradient > .vertical(#e7e7e7, #f2f2f2);
+  background: linear-gradient(#e7e7e7, #f2f2f2);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 .input-append,
@@ -56,7 +56,7 @@
   }
   .add-on.btn.disabled:active,
   .add-on.btn[disabled]:active {
-    #gradient > .vertical(#fdfdfd, #efefef);
+    background: linear-gradient(#fdfdfd, #efefef);
   }
 }
 .btn-small {
@@ -86,24 +86,24 @@
   text-transform: uppercase;
 }
 .btn-primary {
-  @include border-radius(4px);
+  border-radius: 4px;
   border: 1px solid;
   border-color: #5e7eb0 #546d92 #485670 #546d92;
   text-shadow: 0px 1px 0px #386e9f;
   font-weight: bold;
   &, &:focus {
-    @include box-shadow(inset 0 1px 0 0 #9cbcf1);
-    #gradient > .vertical(#80a8e7, #5281cc);
+    box-shadow: inset 0 1px 0 0 #9cbcf1;
+    background: linear-gradient(#80a8e7, #5281cc);
     color: #fff;
   }
   &:hover {
-    #gradient > .vertical(#739cdc, #5281cc);
-    @include box-shadow(inset 0 1px 0 0 #7fa6e5);
+    background: linear-gradient(#739cdc, #5281cc);
+    box-shadow: inset 0 1px 0 0 #7fa6e5;
     color: #fff;
   }
   &:active {
-    #gradient > .vertical(#739cdc, #3061af);
-    @include box-shadow(inset 0 1px 4px 0 #3962a3);
+    background: linear-gradient(#739cdc, #3061af);
+    box-shadow: inset 0 1px 4px 0 #3962a3;
     color: #fff;
   }
   &[disabled] {
@@ -114,7 +114,7 @@
       background-color: #0044cc;
       color: #fff;
       background-image: none;
-      @include box-shadow(none);
+      box-shadow: none;
     }
   }
 }
@@ -128,13 +128,13 @@
   border-color: #222 #222 #000000;
   &, &:focus {
     color: #fff;
-    #gradient > .vertical(#444, #222);
+    background: linear-gradient(#444, #222);
   }
   &:hover, &:active {
     color: #fff;
     border-color: #444 #444 #000000;
     background-color: #363636;
-    #gradient > .vertical(#222, #444);
+    background: linear-gradient(#222, #444);
   }
 
 }
@@ -145,17 +145,17 @@
   text-shadow: none;
   &, &:focus {
     background-color: #f35e3c;
-    #gradient > .vertical(#f35e3c, #d42f13);
+    background: linear-gradient(#f35e3c, #d42f13);
     color:#fff;
   }
   &:hover {
     background-color: #f66952;
-    #gradient > .vertical(#f66952, #e53d20);
+    background: linear-gradient(#f66952, #e53d20);
     color: #fff;
   }
   &:active {
     background-color: #c22b11;
-    #gradient > .vertical(#c22b11, #f35d3b);
+    background: linear-gradient(#c22b11, #f35d3b);
     border-color: #9c220d #c2270d #c2270d;
     color: #fff;
   }
@@ -167,17 +167,17 @@
   text-shadow:0 1px 0 #3b8d1c;
   &, &:focus {
     background-color: #4fae0d;
-    #gradient > .vertical(#82ce20, #57ac0b);
+    background: linear-gradient(#82ce20, #57ac0b);
     color:#fff;
   }
   &:hover {
     background-color: #8cd42f;
-    #gradient > .vertical(#8cd42f, #49982b);
+    background: linear-gradient(#8cd42f, #49982b);
     color: #fff;
   }
   &:active {
     background-color: #369511;
-    #gradient > .vertical(#369511, #55ad34);
+    background: linear-gradient(#369511, #55ad34);
     color: #fff;
   }
 }
@@ -188,17 +188,17 @@
   text-shadow: none;
   &, &:focus {
     background-color: #ffb322;
-    #gradient > .vertical(#ffb322, #d7920b);
+    background: linear-gradient(#ffb322, #d7920b);
     color: #fff;
   }
   &:hover {
     background-color: #fdc247;
-    #gradient > .vertical(#fdc247, #f88f1d);
+    background: linear-gradient(#fdc247, #f88f1d);
     color: #fff;
   }
   &:active {
     background-color: #e47c0a;
-    #gradient > .vertical(#e47c0a, #f9a913);
+    background: linear-gradient(#e47c0a, #f9a913);
     border-color: #c56a09 #d7920b #d7920b;
     color: #fff;
   }
@@ -209,30 +209,30 @@
   border-color: #5bc0de #5bc0de #2f96b4;
   &, &:focus {
     background-color: #5bc0de;
-    #gradient > .vertical(#5bc0de, #2f96b4);
+    background: linear-gradient(#5bc0de, #2f96b4);
     color: #fff;
   }
   &:hover {
     background-color: #2f96b4;
-    #gradient > .vertical(#2f96b4, #5bc0de);
+    background: linear-gradient(#2f96b4, #5bc0de);
     color: #fff;
   }
   &:active {
     background-color: #2f96b4;
-    #gradient > .vertical(#2f96b4, #5bc0de);
+    background: linear-gradient(#2f96b4, #5bc0de);
     border-color: #2f96b4 #5bc0de #5bc0de;
     color: #fff;
   }
 }
 
 .btn-group.open .btn-primary.dropdown-toggle {
-  #gradient > .vertical(#5680c2, #6b94d4);
+  background: linear-gradient(#5680c2, #6b94d4);
   border-color: #3f5e8e #527ac0 #527ac0;
 }
 
 /* .btn-link */
 .btn.btn-link {
-  @include border-radius(0);
+  border-radius: 0;
   border:none;
   background:none;
   padding:0;
@@ -294,12 +294,10 @@
   .btn-group {
     > .btn {
       &[data-action^=save] {
-        @include border-radius(0);
-        @include border-left-radius(3px);
+        border-radius: 3px 0 0 3px;
       }
       &[data-toggle=dropdown] {
-        @include border-radius(0);
-        @include border-right-radius(3px);
+        border-radius: 0 3px 3px 0;
 
         &.disabled .caret {
           border-top-color: #666;

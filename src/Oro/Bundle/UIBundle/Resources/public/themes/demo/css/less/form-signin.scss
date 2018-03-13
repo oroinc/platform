@@ -1,5 +1,5 @@
 .form-signin {
     .title-box {
-        #gradient > .vertical($titleBackgroundStart, $titleBackgroundEnd);
+        background: linear-gradient($titleBackgroundStart, $titleBackgroundEnd);
     }
 }

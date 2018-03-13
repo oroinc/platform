@@ -21,7 +21,7 @@ input[type=text].hasDatepicker.ui-datepicker-dialog-is-below:focus,
 .controls.select2-drop-below .select2-container,
 .controls .selector.focus {
   + span.validation-failed {
-    #floating-validation-message();
+    @include floating-validation-message();
   }
 }
 .loading > .input-append {

@@ -24,7 +24,7 @@ $sidebarContentMinWidth: 288px;
         .resizable-area {
             position: absolute;
             top: 0;
-            right: 0px;
+            right: 0;
 
             width: 10px;
             height: 100%;
@@ -112,13 +112,15 @@ $sidebarContentMinWidth: 288px;
     }
 
     &--content {
-        width: calc(100% "-" $sidebarWidth);
+        width: calc(100% - #{$sidebarWidth});
         flex: 1 1 auto;
 
-        @include forScreen(992px, width, calc(100% "-" $sidebarMinimizedWidth));
+        @media only screen and (max-width: 992px) {
+            width: calc(100% - #{$sidebarMinimizedWidth});
+        }
 
         &.content-sidebar-minimized {
-            width: calc(100% "-" $sidebarMinimizedWidth);
+            width: calc(100% - #{$sidebarMinimizedWidth});
         }
 
         .placeholder {
@@ -144,18 +146,19 @@ $sidebarContentMinWidth: 288px;
             padding: 0 $sidebarHorizontalPadding;
         }
     }
-
 }
 
 .mobile-version .content-with-sidebar {
     &--container {
         margin-top: -10px;
-        @include safe-area-padding(0);
+
+        @include safe-area-offset(padding, 0);
 
         .scrollspy.container-fluid {
             margin-top: 0;
         }
     }
+
     &--sidebar {
         max-width: $sidebarWidth;
         min-height: $sidebarMinHeight;

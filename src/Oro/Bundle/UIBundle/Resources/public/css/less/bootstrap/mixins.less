@@ -1,3 +1,8 @@
+@import "bowerassets/bootstrap/less/variables";
+@import "bowerassets/bootstrap/less/mixins";
+
+@import "variables";
+
 .box-sizing(@sizing: content-box ) {
   -webkit-box-sizing: @sizing;
   -moz-box-sizing: @sizing;
@@ -258,10 +263,10 @@
 
 .safe-area-padding-left(@value) when not (@value = 0) {
   /* iOS 11 */
-  padding-left: calc(constant(safe-area-inset-left) + @value);
+  padding-left: calc(constant(safe-area-inset-left) ~"+" @value);
 
   /* iOS 11.2+ */
-  padding-left: calc(env(safe-area-inset-left) + @value);
+  padding-left: calc(env(safe-area-inset-left) ~"+" @value);
 }
 
 .safe-area-padding-left(@value) when (@value = 0) {
@@ -274,10 +279,10 @@
 
 .safe-area-padding-right(@value) when not (@value = 0) {
   /* iOS 11 */
-  padding-right: calc(constant(safe-area-inset-right) + @value);
+  padding-right: calc(constant(safe-area-inset-right) ~"+" @value);
 
   /* iOS 11.2+ */
-  padding-right: calc(env(safe-area-inset-right) + @value);
+  padding-right: calc(env(safe-area-inset-right) ~"+" @value);
 }
 
 .safe-area-padding-right(@value) when (@value = 0) {
@@ -288,13 +293,10 @@
   padding-right: env(safe-area-inset-right);
 }
 
-.keyframe(@animation-name, @rules) {
-  @-webkit-keyframes @animation-name {
-    @rules();
-  }
-
-  @keyframes @animation-name {
-    @rules();
+#grid {
+  .core {
+    .span(@gridColumns) {
+      width: (@gridColumnWidth * @gridColumns) + (@gridGutterWidth * (@gridColumns - 1));
+    }
   }
 }
-

@@ -1,144 +1,178 @@
 .navbar-extra-right {
-  padding-right: 0px;
+    padding-right: 0;
 }
+
 .pull-left-extra {
-  float: left;
+    float: left;
 }
+
 .breadcrumb-pin,
-.container-fluid.page-title, .navbar-extra {
-  background-color: #f1f1f1;
-  padding-right: 0;
-  padding-left: 0;
-}
-.container-fluid.page-title {
-  margin-bottom: 10px;
-  @mixin safe-area-padding(0),
-}
+.container-fluid.page-title,
 .navbar-extra {
-  & > .row > [class^=span] {
-    margin: 0,
-    width: auto,
-  }
-  .user-info-state {
-    display: none,
-  }
-  .user-info-state + .title-buttons-container:not(:empty) {
-    margin-top: 10px;
-  }
-  .pull-left-extra{
-    margin-left: 0;
-  }
-  .oro-subtitle {
-    text-align: left;
-    white-space: normal;
-    padding-right: 13px;
-  }
-  .grid-views {
-    margin-left: 0;
-    .views-group {
-      margin-right: 12px;
-      vertical-align: baseline;
-      & > .dropdown-toggle {
-        height: auto;
-        vertical-align: baseline;
-      }
-      &.open .btn.dropdown-toggle .caret, .caret {
-        margin: 0 -13px 0 5px;
-        vertical-align: baseline;
-        display: inline;
-        line-height: initial;
-        font-size: 4px;
-      }
+    background-color: #f1f1f1;
+    padding-right: 0;
+    padding-left: 0;
+}
+
+.container-fluid.page-title {
+    margin-bottom: 10px;
+
+    @include safe-area-offset(padding, 0);
+}
+
+.navbar-extra {
+    & > .row > [class^='span'] {
+        margin: 0;
+        width: auto;
     }
-    .actions-group {
-      margin-left: 0;
-      vertical-align: baseline;
+
+    .user-info-state {
+        display: none;
     }
-    .edited-label,
-    .actions-group .dropdown-toggle {
-      vertical-align: baseline;
-      &:after {
-        content: '';
-        font-size: 20px;
-      }
+
+    .user-info-state + .title-buttons-container:not(:empty) {
+        margin-top: 10px;
     }
-  }
+
+    .pull-left-extra {
+        margin-left: 0;
+    }
+
+    .oro-subtitle {
+        text-align: left;
+        white-space: normal;
+        padding-right: 13px;
+    }
+
+    .grid-views {
+        margin-left: 0;
+
+        .views-group {
+            margin-right: 12px;
+            vertical-align: baseline;
+
+            & > .dropdown-toggle {
+                height: auto;
+                vertical-align: baseline;
+            }
+
+            .caret,
+            &.open .btn.dropdown-toggle .caret {
+                margin: 0 -13px 0 5px;
+                vertical-align: baseline;
+                display: inline;
+                line-height: initial;
+                font-size: 4px;
+            }
+        }
+
+        .actions-group {
+            margin-left: 0;
+            vertical-align: baseline;
+        }
+
+        .edited-label,
+        .actions-group .dropdown-toggle {
+            vertical-align: baseline;
+
+            &:after {
+                content: '';
+                font-size: 20px;
+            }
+        }
+    }
 }
 
 .page-title {
-  h1 {
-    font-size: $baseFontSize * 1.75;
-    margin: 0;
-    line-height: $baseFontSize * 2.5;
-    display: block;
-  }
-  .sub-title {
-    float: none;
-    font-size: $fontSizeSmall;
-    & + .separator{
-      display: none;
+    h1 {
+        font-size: $baseFontSize * 1.75;
+        margin: 0;
+        line-height: $baseFontSize * 2.5;
+        display: block;
     }
-    a{
-      color: #006ACC;
+
+    .sub-title {
+        float: none;
+        font-size: $fontSizeSmall;
+
+        & + .separator {
+            display: none;
+        }
+
+        a {
+            color: #006acc;
+        }
     }
-  }
-  ul.inline li {
-    line-height: 18px;
-    display: block;
-    font-size: $fontSizeSmall;
-    padding: 0;
-    border: 0;
-  }
-  .status-enabled {
-    margin-bottom: 10px;
-    margin-left: 0;
-  }
+
+    ul.inline li {
+        line-height: 18px;
+        display: block;
+        font-size: $fontSizeSmall;
+        padding: 0;
+        border: 0;
+    }
+
+    .status-enabled {
+        margin-bottom: 10px;
+        margin-left: 0;
+    }
 }
 
-.title-buttons-container, .ui-dialog-buttonpane .widget-actions {
-  .btn [class*="fa-"].hide-text,
-  .btn-group > .dropdown-menu li [class^="fa-"] {
-    width: 20px;
-    text-align: center;
-    &:before {
-      font-size: $fontSizeLarge;
+.title-buttons-container,
+.ui-dialog-buttonpane .widget-actions {
+    .btn [class*="fa-"].hide-text,
+    .btn-group > .dropdown-menu li [class^="fa-"] {
+        width: 20px;
+        text-align: center;
+
+        &:before {
+            font-size: $fontSizeLarge;
+        }
     }
-  }
-  .dropdown-toggle{
-    .caret {
-      margin-left: 5px;
+
+    .dropdown-toggle {
+        .caret {
+            margin-left: 5px;
+        }
     }
-  }
-  .btn {
-    font-size: $fontSizeLarge;
-    line-height: $fontSizeLarge * 2;
-    height: 34px;
-    padding-left: 10px;
-    padding-right: 10px;
-    .caret {
-      border-top-color: #666;
-      margin-top: 16px;
+
+    .btn {
+        font-size: $fontSizeLarge;
+        line-height: $fontSizeLarge * 2;
+        height: 34px;
+        padding-left: 10px;
+        padding-right: 10px;
+
+        .caret {
+            border-top-color: #666;
+            margin-top: 16px;
+        }
+
+        [class^="fa-"].hide-text:before {
+            margin: 0 0 0 -9px;
+            line-height: 35px;
+        }
+
+        &:active {
+            [class^="fa-"]:before,
+            .caret {
+                color: #444;
+            }
+        }
     }
-    [class^="fa-"].hide-text:before {
-      margin: 0 0 0 -9px;
-      line-height: 35px;
+
+    .btn-group > .dropdown-menu {
+        li a,
+        li button {
+            font-size: $fontSizeLarge;
+            line-height: $fontSizeLarge * 1.8;
+            padding: 1px 26px 1px 30px;
+            color: #666;
+
+            [class^="fa-"] {
+                margin-left: -25px;
+                margin-right: 5px;
+            }
+        }
     }
-    &:active {
-      [class^="fa-"]:before, .caret {
-        color: #444;
-      }
-    }
-  }
-  .btn-group > .dropdown-menu {
-    li a, li button {
-      font-size: $fontSizeLarge;
-      line-height: $fontSizeLarge * 1.8;
-      padding: 1px 26px 1px 30px;
-      color: #666;
-      [class^="fa-"] {
-        margin-left: -25px;
-        margin-right: 5px;
-      }
-    }
-  }
 }

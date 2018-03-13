@@ -14,8 +14,8 @@
 .launchpad-widget-content {
   & > div {
     height: auto;
-    @include box-shadow(none);
-    @include border-radius(3px);
+    box-shadow: none;
+    border-radius: 3px;
   }
   .image-wrap, .list-wrap {
     float: none;
@@ -44,7 +44,7 @@
 .box-type1 {
   margin: 0 $contentPadding $contentPadding;
   /*border: 1px solid #b6b6b6;*/
-  @include border-radius(3px);
+  border-radius: 3px;
   .title{
     padding: $contentPadding $contentPadding $contentPadding 0;
   }

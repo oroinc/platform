@@ -14,13 +14,13 @@
     width: 0px;
 }
 
-@keyframes dots {
+@-webkit-keyframes dots {
   to {
     width: 1.25em;
   }
 }
 
-$-webkit-keyframes dots {
+@keyframes dots {
   to {
     width: 1.25em;
   }
