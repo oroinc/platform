@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
+use Doctrine\DBAL\Driver\AbstractDriverException;
 use Doctrine\DBAL\Driver\PDOException;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
@@ -27,9 +27,15 @@ class DatabaseExceptionHelperTest extends \PHPUnit_Framework_TestCase
         $this->databaseExceptionHelper = new DatabaseExceptionHelper($this->registry);
     }
 
-    public function testIsDeadlockMySQL()
+    /**
+     * @dataProvider deadlockDataProvider
+     * @param string $sqlState
+     * @param string $code
+     */
+    public function testIsDeadlockMySQL($sqlState, $code)
     {
-        $exception = new PDOException(new \PDOException('Exception message', 1213));
+        $pdoException = new PDOException(new \PDOException('Exception message', $code));
+        $pdoException->errorInfo = [0 => $sqlState, 1 => $code];
 
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
@@ -43,13 +49,24 @@ class DatabaseExceptionHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getConnection')
             ->willReturn($connection);
 
-        $this->assertTrue($this->databaseExceptionHelper->isDeadlock($exception));
+        $this->assertTrue($this->databaseExceptionHelper->isDeadlock($pdoException));
+    }
+
+    /**
+     * @return array
+     */
+    public function deadlockDataProvider()
+    {
+        return [
+            'deadlock' => ['40001', '1213'],
+            'lock timeout' => ['HY000', '1205']
+        ];
     }
 
     public function testIsDeadlockPostgreSQL()
     {
         $pdoException = new \PDOException();
-        $pdoException->errorInfo = [1 => '40P01'];
+        $pdoException->errorInfo = [0 => '40P01'];
         $exception = new PDOException($pdoException);
 
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
@@ -84,5 +101,24 @@ class DatabaseExceptionHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn($connection);
 
         $this->assertFalse($this->databaseExceptionHelper->isDeadlock($exception));
+    }
+
+    public function testGetDriverExceptionNotDriverException()
+    {
+        $exception = new \Exception();
+        $this->assertNull($this->databaseExceptionHelper->getDriverException($exception));
+    }
+
+    public function testGetDriverException()
+    {
+        $exception = $this->createMock(AbstractDriverException::class);
+        $this->assertSame($exception, $this->databaseExceptionHelper->getDriverException($exception));
+    }
+
+    public function testGetDriverExceptionFromPdoException()
+    {
+        $driverException = $this->createMock(AbstractDriverException::class);
+        $exception = new \Doctrine\DBAL\Exception\DriverException('Exception', $driverException);
+        $this->assertSame($driverException, $this->databaseExceptionHelper->getDriverException($exception));
     }
 }
