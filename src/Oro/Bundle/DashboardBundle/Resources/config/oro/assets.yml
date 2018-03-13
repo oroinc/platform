@@ -1,4 +1,4 @@
 assets:
     css:
         'orodashboard':
-            - 'bundles/orodashboard/css/less/main.scss'
+            - 'bundles/orodashboard/css/scss/main.scss'

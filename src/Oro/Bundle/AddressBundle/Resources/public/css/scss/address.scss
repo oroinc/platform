@@ -1,0 +1,95 @@
+@import "oroui/css/scss/mixins";
+
+.map-box {
+  .map-address-list {
+    width: 40%;
+    height: 420px;
+    float: left;
+    overflow: hidden;
+  }
+  .map-address-list:hover {
+    overflow: auto;
+  }
+  .map-visual-frame {
+    float: left;
+    width: 60%;
+    height: 420px;
+    .alert, .loader-overlay {
+      width: auto;
+      margin: 0 15px 0 10px;
+    }
+  }
+  .responsive-small & {
+    .map-address-list, .map-visual-frame {
+      width: 100%;
+      height: auto;
+    }
+    .map-visual-frame, .map-visual {
+      max-height: 50vh;
+    }
+    .map-visual-frame {
+      .alert, .loader-overlay {
+        margin: 10px 0;
+      }
+    }
+    .map-visual {
+      margin: 10px 0;
+    }
+  }
+  .map-visual {
+    height: 420px;
+    margin: 0 15px 0 10px;
+    img {
+      max-width:none;
+    }
+  }
+  .map-unknown {
+    line-height: 420px;
+    text-align: center;
+  }
+  .map-item {
+    &:not(.active) {
+      cursor: pointer;
+    }
+    address {
+      margin-bottom:0;
+      line-height:1.5em;
+    }
+    &.active {
+      background-color: #ecf1f9;
+    }
+    .inline {
+      clear:left;
+      margin-bottom:2px;
+      li {
+        padding:0;
+        .label {
+          background:none;
+          padding:0;
+          text-shadow:none;
+          color:#999;
+          font-weight:normal;
+          font-size:11px;
+          &:not(.label-info):after {
+            content:", "
+          }
+        }
+        &:last-of-type {
+          .label:after {
+            content:"";
+          }
+        }
+        .label-info {
+          background:#6891cf;
+          color:#fff;
+          font-weight:bold;
+          padding:2px 4px;
+        }
+      }
+    }
+  }
+  .title-item {
+    font: bold 14px/18px $baseFontFamily;
+    float: left;
+  }
+}

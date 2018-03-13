@@ -27,6 +27,6 @@ assets:
             - 'bundles/oroui/css/mcustomscrollbar/jquery.mCustomScrollbar-custome.css'
 
             # custom styles
-            - 'bundles/oroui/css/less/main.scss'
+            - 'bundles/oroui/css/scss/main.scss'
             - 'bundles/oroui/css/all.css'
-            - 'bundles/oroui/css/widget-picker/less/style.scss'
+            - 'bundles/oroui/css/widget-picker/scss/style.scss'
