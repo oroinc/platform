@@ -126,15 +126,15 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
                 'multiple' => false,
                 'options' => ['expanded' => false],
                 'expectedOptions' => [
-                    'empty_value' => 'oro.form.choose_value',
+                    'placeholder' => 'oro.form.choose_value',
                     'empty_data' => null,
                 ]
             ],
-            'not multiple, not expanded, not null "empty_value"' => [
+            'not multiple, not expanded, not null "placeholder"' => [
                 'multiple' => false,
-                'options' => ['expanded' => false, 'empty_value' => false],
+                'options' => ['expanded' => false, 'placeholder' => false],
                 'expectedOptions' => [
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'empty_data' => null,
                 ]
             ],
@@ -142,7 +142,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
                 'multiple' => true,
                 'options' => ['expanded' => false],
                 'expectedOptions' => [
-                    'empty_value' => null,
+                    'placeholder' => null,
                     'empty_data' => null,
                 ]
             ],
@@ -150,7 +150,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
                 'multiple' => false,
                 'options' => ['expanded' => true],
                 'expectedOptions' => [
-                    'empty_value' => null,
+                    'placeholder' => null,
                     'empty_data' => null,
                 ]
             ],
@@ -158,7 +158,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
                 'multiple' => true,
                 'options' => ['expanded' => true],
                 'expectedOptions' => [
-                    'empty_value' => null,
+                    'placeholder' => null,
                     'empty_data' => null,
                 ]
             ],
@@ -166,11 +166,11 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
                 'multiple' => true,
                 'options' => [
                     'expanded' => true,
-                    'empty_value' => 'test',
+                    'placeholder' => 'test',
                     'empty_data' => '123',
                 ],
                 'expectedOptions' => [
-                    'empty_value' => 'test',
+                    'placeholder' => 'test',
                     'empty_data' => '123',
                 ]
             ],

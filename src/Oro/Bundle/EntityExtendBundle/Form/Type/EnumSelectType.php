@@ -40,7 +40,7 @@ class EnumSelectType extends AbstractEnumType
 
         $resolver->setDefaults(
             [
-                'empty_value' => null,
+                'placeholder' => null,
                 'empty_data'  => null,
                 'configs'     => $defaultConfigs,
                 'disabled_values' => [],
@@ -52,7 +52,7 @@ class EnumSelectType extends AbstractEnumType
         $resolver->setAllowedTypes('excluded_values', ['array', 'callable']);
 
         $resolver->setNormalizer(
-            'empty_value',
+            'placeholder',
             function (Options $options, $value) {
                 return !$options['expanded'] && !$options['multiple']
                     ? ''
