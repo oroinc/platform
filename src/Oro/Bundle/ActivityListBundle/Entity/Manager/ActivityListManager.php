@@ -28,6 +28,7 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
+ * This class is a service class for application-layer manipulations on entities with activities
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ActivityListManager
@@ -390,6 +391,7 @@ class ActivityListManager
             'workflowsData'        => $workflowsData,
             'targetEntityData'     => $targetEntityData,
             'is_head'              => $isHead,
+            'routes'               => $entityProvider->getRoutes($activity)
         ];
 
         return $result;

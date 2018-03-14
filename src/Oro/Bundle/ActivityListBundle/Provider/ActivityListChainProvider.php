@@ -20,6 +20,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
+ * This class represents chain of ActivityListProviderInterface
+ * that provides an activity-related information about entities
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -316,7 +318,6 @@ class ActivityListChainProvider
                 'icon'         => $entityConfig->get('icon'),
                 'label'        => $this->translator->trans($entityConfig->get('label')),
                 'template'     => $template,
-                'routes'       => $provider->getRoutes(),
                 'has_comments' => $hasComment,
             ];
         }

@@ -15,6 +15,9 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ActivityListChainProvider */
@@ -290,9 +293,6 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
                     'icon'     => 'test_icon',
                     'label'    => 'test_label',
                     'template' => 'test_template.js.twig',
-                    'routes'   => [
-                        'delete' => 'test_delete_route'
-                    ],
                     'has_comments' => true,
                 ]
             ],

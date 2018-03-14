@@ -14,6 +14,9 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Component\DependencyInjection\ServiceLink;
 
+/**
+ * This provider provides additional activity-related information for Note entity
+ */
 class NoteActivityListProvider implements
     ActivityListProviderInterface,
     CommentProviderInterface,
@@ -68,7 +71,7 @@ class NoteActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getRoutes()
+    public function getRoutes($activityEntity)
     {
         return [
             'itemView'   => 'oro_note_widget_info',

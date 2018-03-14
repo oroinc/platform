@@ -7,6 +7,9 @@ use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * A provider that should provide additional activity-related information for entities with activities
+ */
 interface ActivityListProviderInterface
 {
     /**
@@ -82,9 +85,10 @@ interface ActivityListProviderInterface
      *      'itemDelete => 'item_delete_route'
      * ]
      *
+     * @param object $activityEntity
      * @return array
      */
-    public function getRoutes();
+    public function getRoutes($activityEntity);
 
     /**
      * returns a class name of entity for which we monitor changes

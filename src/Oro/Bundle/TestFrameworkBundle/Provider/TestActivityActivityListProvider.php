@@ -9,6 +9,9 @@ use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 
+/**
+ * Activity provider for test purposes
+ */
 class TestActivityActivityListProvider implements ActivityListProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity';
@@ -98,7 +101,7 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getRoutes()
+    public function getRoutes($activityEntity)
     {
         return [
             'itemView'   => '',
