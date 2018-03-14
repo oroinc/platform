@@ -2,7 +2,9 @@ define(function(require) {
     'use strict';
 
     var $ = require('jquery');
+    var _ = require('underscore');
     var Chaplin = require('chaplin');
+    var BaseView = require('oroui/js/app/views/base/view');
     var BaseController;
     var reuses;
     var promiseLoads;
@@ -22,6 +24,7 @@ define(function(require) {
 
             return $.when.apply($, promiseLoads).then(function() {
                 var i;
+                var $el;
                 // if it's first time route
                 if (!route.previous) {
                     // initializes page cache
@@ -29,6 +32,16 @@ define(function(require) {
                 }
                 // compose global instances
                 for (i = 0; i < reuses.length; i += 1) {
+                    if (
+                        _.isObject(reuses[i][2])
+                        && reuses[i][2].el
+                        && !(($el = BaseView.resolveElOption(reuses[i][2].el)) && $el.length)
+                    ) {
+                        // temporary fix for BAP-16640 issue
+                        // solid fix will be applied in OPA-92
+                        // skip initialization if the element does not exist
+                        continue;
+                    }
                     self.reuse.apply(self, reuses[i]);
                 }
             });
