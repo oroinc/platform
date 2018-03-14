@@ -349,7 +349,7 @@ class ImportExportContext extends OroFeatureContext implements
      * Example: When I download Data Template file
      *          And I see Account Customer name column
      *
-     * @Then /^(?:|I )see (?P<column>([\w\s.]+)) column$/
+     * @Then /^(?:|I )see (?P<column>([\w\s.+\/]+)) column$/
      */
     public function iSeeColumn($column)
     {

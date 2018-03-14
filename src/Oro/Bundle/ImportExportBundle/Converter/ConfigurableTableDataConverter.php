@@ -514,7 +514,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     {
         $fieldHeader = $this->fieldHelper->getConfigValue($entityName, $field['name'], 'header', $field['label']);
 
-        return $fieldHeader;
+        return $fieldHeader ?: $field['label'];
     }
 
     /**
