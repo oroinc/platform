@@ -54,7 +54,7 @@ class EnumSelectType extends AbstractEnumType
         $resolver->setNormalizer(
             'placeholder',
             function (Options $options, $value) {
-                return !$options['expanded'] && !$options['multiple']
+                return (null === $value) && !$options['expanded'] && !$options['multiple']
                     ? ''
                     : $value;
             }
