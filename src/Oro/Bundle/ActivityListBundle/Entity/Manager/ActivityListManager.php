@@ -390,6 +390,7 @@ class ActivityListManager
             'workflowsData'        => $workflowsData,
             'targetEntityData'     => $targetEntityData,
             'is_head'              => $isHead,
+            'routes'               => $entityProvider->getRoutes($activity)
         ];
 
         return $result;

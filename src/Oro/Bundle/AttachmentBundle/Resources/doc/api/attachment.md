@@ -10,14 +10,14 @@ Retrieve a specific attachment record.
 
 ### get_list
 
-Retrieve a collection of attachment records.
+Retrieve a set of attachment records.
 
 {@inheritdoc}
 
 ### create
 
 Create a new attachment record.
-The created record is returned in the response.
+The created record is returned in the response body.
 
 {@inheritdoc}
 
@@ -122,8 +122,8 @@ Delete a specific attachment record.
 
 ### delete_list
 
-Delete a collection of attachment records.
-The list of records that will be deleted, could be limited by filters.
+Delete a set of attachment records.
+The list of records to be deleted can be limited by filters.
 
 {@inheritdoc}
 
@@ -155,7 +155,7 @@ The list of records that will be deleted, could be limited by filters.
 
 ### target
 
-A record to which the attachment record belongs to.
+A record which the attachment record belongs to.
 
 #### create
 
@@ -173,7 +173,7 @@ Retrieve the file record assigned to a specific attachment record.
 
 #### get_relationship
 
-Retrieves the ID of the file assigned to a specific attachment record.
+Retrieve the ID of the file assigned to a specific attachment record.
 
 #### update_relationship
 
@@ -198,7 +198,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the record of the organization a specific attachment record belongs to.
+Retrieve the record of the organization that a specific attachment record belongs to.
 
 #### get_relationship
 
@@ -206,7 +206,7 @@ Retrieve the ID of the organization record that a specific attachment record bel
 
 #### update_relationship
 
-Replace the organization a specific attachment record belongs to.
+Replace the organization that a specific attachment record belongs to.
 
 {@request:json_api}
 Example:
@@ -227,7 +227,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the record of the user who is the owner of a specific attachment record.
+Retrieve the record of a user who is the owner of a specific attachment record.
 
 #### get_relationship
 
@@ -256,15 +256,15 @@ Example:
 
 #### get_subresource
 
-Retrieve a record to which the attachment belongs to.
+Retrieve the record which the attachment belongs to.
 
 #### get_relationship
 
-Retrieve the ID of a record to which the attachment belongs to.
+Retrieve the ID of a record which the attachment belongs to.
 
 #### update_relationship
 
-Replace a record to which the attachment belongs to.
+Replace the record which the attachment belongs to.
 
 {@request:json_api}
 Example:
