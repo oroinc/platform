@@ -339,3 +339,7 @@ services:
            - '@oro_translation.service_provider'
            - '@oro_translation.helper.language'
            - '@oro_entity.doctrine_helper'
+
+    oro_translation.strategy.provider_link:
+        tags:
+            - { name: oro_service_link, service: oro_translation.strategy.provider }
