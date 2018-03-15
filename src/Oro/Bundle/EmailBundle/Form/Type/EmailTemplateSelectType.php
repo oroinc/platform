@@ -58,11 +58,7 @@ class EmailTemplateSelectType extends AbstractType
                 'data_route_parameter'    => 'entityName'
             )
         );
-        $resolver->setNormalizers(
-            array(
-                'configs' => $configsNormalizer
-            )
-        );
+        $resolver->setNormalizer('configs', $configsNormalizer);
     }
 
     /**

@@ -23,14 +23,13 @@ class OroSimpleColorChoiceType extends AbstractSimpleColorPickerType
                     'choices' => []
                 ]
             )
-            ->setNormalizers(
-                [
-                    'choices' => function (Options $options, $choices) {
-                        return $options['color_schema'] === 'custom'
-                            ? $choices
-                            : $this->getColors($options['color_schema']);
-                    }
-                ]
+            ->setNormalizer(
+                'choices',
+                function (Options $options, $choices) {
+                    return $options['color_schema'] === 'custom'
+                        ? $choices
+                        : $this->getColors($options['color_schema']);
+                }
             );
     }
 

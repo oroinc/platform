@@ -53,7 +53,7 @@ Here, we the *visible* option depends on the context value. The following is an 
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         // this operation better to use on finishView but if you are really sure you can write like this
-        $view->vars['visible'] =  $options->get('visible', false);
+        $view->vars['visible'] =  $options['visible'] ?? false;
     }
     
     public function finishView(BlockView $view, BlockInterface $block)

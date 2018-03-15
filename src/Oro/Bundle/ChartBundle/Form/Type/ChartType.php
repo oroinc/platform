@@ -79,8 +79,8 @@ class ChartType extends ConfigProviderAwareType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(['chart_filter']);
-        $resolver->setAllowedTypes(['chart_filter' => 'callable']);
+        $resolver->setDefined(['chart_filter']);
+        $resolver->setAllowedTypes('chart_filter', 'callable');
     }
 
     /**

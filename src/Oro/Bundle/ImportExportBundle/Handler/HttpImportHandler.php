@@ -6,6 +6,9 @@ use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 
+/**
+ * Handles import, checks whatever job was successful otherwise fills appropriate errors array
+ */
 class HttpImportHandler extends AbstractImportHandler
 {
     /**
@@ -104,6 +107,7 @@ class HttpImportHandler extends AbstractImportHandler
             'errors'     => $errors,
             'counts'     => $counts,
             'postponedRows' => $jobResult->getContext()->getPostponedRows(),
+            'deadlockDetected' => $jobResult->getContext()->getValue('deadlockDetected')
         ];
     }
 }

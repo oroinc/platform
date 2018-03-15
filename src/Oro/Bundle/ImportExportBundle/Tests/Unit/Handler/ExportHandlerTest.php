@@ -90,7 +90,7 @@ class ExportHandlerTest extends \PHPUnit_Framework_TestCase
         $jobName = 'job-name';
         $processorType = 'export';
         $outputFormat = 'csv';
-        $files = [];
+        $files = ['test1.csv', 'test2.csv'];
 
         $writer = $this->createMock(FileStreamWriter::class);
         $this->writerChain
@@ -103,6 +103,26 @@ class ExportHandlerTest extends \PHPUnit_Framework_TestCase
             ->expects(self::once())
             ->method('getReader')
             ->willReturn($reader);
+
+        $this->fileManager->expects($this->at(0))
+            ->method('writeToTmpLocalStorage')
+            ->with('test1.csv')
+            ->willReturn('test1.csv');
+
+        $this->fileManager->expects($this->at(1))
+            ->method('fixNewLines')
+            ->with('test1.csv')
+            ->willReturn('test1.csv');
+
+        $this->fileManager->expects($this->at(2))
+            ->method('writeToTmpLocalStorage')
+            ->with('test2.csv')
+            ->willReturn('test2.csv');
+
+        $this->fileManager->expects($this->at(3))
+            ->method('fixNewLines')
+            ->with('test2.csv')
+            ->willReturn('test2.csv');
 
         $exceptionMessage = 'Exception message';
         $exception = new \Exception($exceptionMessage);

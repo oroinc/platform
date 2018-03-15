@@ -46,10 +46,8 @@ class WidgetItemsType extends AbstractType
             'item_label',
         ]);
 
-        $resolver->setAllowedTypes([
-            'widget_name' => 'string',
-            'item_label'  => 'string',
-        ]);
+        $resolver->setAllowedTypes('widget_name', 'string');
+        $resolver->setAllowedTypes('item_label', 'string');
     }
 
     /**

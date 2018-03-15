@@ -76,15 +76,18 @@ class EntityFieldChoiceType extends AbstractType
                 'translatable_options' => false
             ]
         );
-        $resolver->setNormalizers(
-            [
-                'configs' => function (Options $options, $configs) use ($defaultConfigs) {
-                    return $this->configsNormalizer($options, $configs, $defaultConfigs);
-                },
-                'attr'    => function (Options $options, $attr) {
-                    return $this->attrNormalizer($options, $attr);
-                }
-            ]
+
+        $resolver->setNormalizer(
+            'configs',
+            function (Options $options, $configs) use ($defaultConfigs) {
+                return $this->configsNormalizer($options, $configs, $defaultConfigs);
+            }
+        )
+        ->setNormalizer(
+            'attr',
+            function (Options $options, $attr) {
+                return $this->attrNormalizer($options, $attr);
+            }
         );
     }
 

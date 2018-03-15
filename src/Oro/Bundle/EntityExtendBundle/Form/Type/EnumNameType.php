@@ -85,16 +85,21 @@ class EnumNameType extends AbstractType
             return $constraints;
         };
 
-        $resolver->setNormalizers(
-            [
-                'constraints'       => $constraintsNormalizer,
-                'disabled'          => function (Options $options, $value) {
-                    return $this->isReadOnly($options) ? true : $value;
-                },
-                'validation_groups' => function (Options $options, $value) {
-                    return $options['disabled'] ? false : $value;
-                }
-            ]
+        $resolver->setNormalizer(
+            'constraints',
+            $constraintsNormalizer
+        )
+        ->setNormalizer(
+            'disabled',
+            function (Options $options, $value) {
+                return $this->isReadOnly($options) ? true : $value;
+            }
+        )
+        ->setNormalizer(
+            'validation_groups',
+            function (Options $options, $value) {
+                return $options['disabled'] ? false : $value;
+            }
         );
     }
 

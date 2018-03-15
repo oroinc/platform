@@ -92,12 +92,9 @@ class ImportType extends AbstractType
             ]
         );
         $resolver->setRequired(['entityName']);
-        $resolver->setAllowedTypes(
-            [
-                'entityName' => 'string',
-                'processorAliasOptions' => 'array',
-            ]
-        );
+
+        $resolver->setAllowedTypes('entityName', 'string');
+        $resolver->setAllowedTypes('processorAliasOptions', 'array');
     }
 
     /**

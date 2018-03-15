@@ -16,6 +16,9 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Process async import message
+ */
 class ImportMessageProcessor implements MessageProcessorInterface
 {
     /**
@@ -148,6 +151,9 @@ class ImportMessageProcessor implements MessageProcessorInterface
             $body['options']
         );
 
+        if (!empty($result['deadlockDetected'])) {
+            throw new JobRedeliveryException();
+        }
         if (!empty($result['postponedRows'])) {
             $fileName = $this
                 ->postponedRowsHandler->writeRowsToFile($result['postponedRows'], $body['fileName']);

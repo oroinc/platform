@@ -145,7 +145,7 @@ class EmailActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getRoutes()
+    public function getRoutes($activityEntity)
     {
         return [
             'itemView'  => 'oro_email_view',

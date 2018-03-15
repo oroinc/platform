@@ -79,12 +79,9 @@ class EntityFieldSelectType extends AbstractType
                 'configs'                   => $defaultConfigs,
             ]
         );
-        $resolver->setNormalizers(
-            [
-                'configs' => $configsNormalizer,
-                'attr'    => $attrNormalizer,
-            ]
-        );
+
+        $resolver->setNormalizer('configs', $configsNormalizer)
+            ->setNormalizer('attr', $attrNormalizer);
     }
 
     /**

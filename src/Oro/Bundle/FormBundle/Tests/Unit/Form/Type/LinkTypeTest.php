@@ -38,7 +38,7 @@ class LinkTypeTest extends \PHPUnit_Framework_TestCase
 
         $resolver
             ->expects($this->once())
-            ->method('setOptional')
+            ->method('setDefined')
             ->with($this->isType('array'))
             ->will($this->returnSelf());
 
@@ -49,9 +49,8 @@ class LinkTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
 
         $resolver
-            ->expects($this->once())
+            ->expects($this->exactly(3))
             ->method('setAllowedTypes')
-            ->with($this->isType('array'))
             ->will($this->returnSelf());
 
         $this->type->configureOptions($resolver);

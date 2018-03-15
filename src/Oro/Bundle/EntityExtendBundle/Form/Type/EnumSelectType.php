@@ -47,22 +47,25 @@ class EnumSelectType extends AbstractEnumType
                 'excluded_values' => [],
             ]
         );
-        $resolver->setAllowedTypes([
-            'disabled_values' => ['array', 'callable'],
-            'excluded_values' => ['array', 'callable'],
-        ]);
-        $resolver->setNormalizers(
-            [
-                'empty_value' => function (Options $options, $value) {
-                    return !$options['expanded'] && !$options['multiple']
-                        ? ''
-                        : $value;
-                },
-                // this normalizer allows to add/override config options outside
-                'configs' => function (Options $options, $value) use (&$defaultConfigs) {
-                    return array_merge($defaultConfigs, $value);
-                }
-            ]
+
+        $resolver->setAllowedTypes('disabled_values', ['array', 'callable']);
+        $resolver->setAllowedTypes('excluded_values', ['array', 'callable']);
+
+        $resolver->setNormalizer(
+            'empty_value',
+            function (Options $options, $value) {
+                return !$options['expanded'] && !$options['multiple']
+                    ? ''
+                    : $value;
+            }
+        );
+
+        // this normalizer allows to add/override config options outside
+        $resolver->setNormalizer(
+            'configs',
+            function (Options $options, $value) use (&$defaultConfigs) {
+                return array_merge($defaultConfigs, $value);
+            }
         );
     }
 

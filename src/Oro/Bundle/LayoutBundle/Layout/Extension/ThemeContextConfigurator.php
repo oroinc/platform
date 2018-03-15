@@ -38,6 +38,6 @@ class ThemeContextConfigurator implements ContextConfiguratorInterface
                     }
                 ]
             )
-            ->setAllowedTypes(['theme' => ['string', 'null']]);
+            ->setAllowedTypes('theme', ['string', 'null']);
     }
 }

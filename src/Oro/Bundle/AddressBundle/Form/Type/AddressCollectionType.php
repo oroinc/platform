@@ -15,17 +15,16 @@ class AddressCollectionType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setNormalizers(
-            array(
-                'entry_options' => function (Options $options, $values) {
-                    if (!$values) {
-                        $values = array();
-                    }
-                    $values['single_form'] = false;
-
-                    return $values;
+        $resolver->setNormalizer(
+            'entry_options',
+            function (Options $options, $values) {
+                if (!$values) {
+                    $values = [];
                 }
-            )
+                $values['single_form'] = false;
+
+                return $values;
+            }
         );
     }
 

@@ -20,12 +20,8 @@ class ExpressionContextConfigurator implements ContextConfiguratorInterface
                 ]
             )
             ->setDefined(['expressions_encoding'])
-            ->setAllowedTypes(
-                [
-                    'expressions_evaluate' => 'bool',
-                    'expressions_evaluate_deferred' => 'bool',
-                    'expressions_encoding' => ['string', 'null']
-                ]
-            );
+            ->setAllowedTypes('expressions_evaluate', 'bool')
+            ->setAllowedTypes('expressions_evaluate_deferred', 'bool')
+            ->setAllowedTypes('expressions_encoding', ['string', 'null']);
     }
 }

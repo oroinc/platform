@@ -32,11 +32,7 @@ class ChartSettingsCollectionType extends AbstractType
     {
         $resolver->setRequired(['chart_configs']);
 
-        $resolver->setAllowedTypes(
-            [
-                'chart_configs' => 'array'
-            ]
-        );
+        $resolver->setAllowedTypes('chart_configs', 'array');
     }
 
     /**

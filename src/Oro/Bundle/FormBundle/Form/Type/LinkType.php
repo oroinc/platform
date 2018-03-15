@@ -17,7 +17,7 @@ class LinkType extends AbstractType
         // @todo remove 'isPath', 'class' options after BAP-4696 implementation
         $resolver
             ->setRequired(['route', 'acl', 'title'])
-            ->setOptional([
+            ->setDefined([
                 'routeParameters',
                 'isPath',
                 'class'
@@ -27,13 +27,9 @@ class LinkType extends AbstractType
                 'isPath'          => false,
                 'class'           => ''
             ])
-            ->setAllowedTypes(
-                [
-                    'route' => 'string',
-                    'acl'   => 'string',
-                    'title' => 'string',
-                ]
-            );
+            ->setAllowedTypes('route', 'string')
+            ->setAllowedTypes('acl', 'string')
+            ->setAllowedTypes('title', 'string');
     }
 
     /**

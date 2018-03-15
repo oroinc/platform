@@ -188,7 +188,10 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
                 'commentable'          => '',
                 'targetEntityData'     => [],
                 'is_head'              => false,
-                'workflowsData'        => null
+                'workflowsData'        => null,
+                'routes'               => [
+                    'delete' => 'test_delete_route'
+                ]
             ],
             $this->activityListManager->getItem(105)
         );

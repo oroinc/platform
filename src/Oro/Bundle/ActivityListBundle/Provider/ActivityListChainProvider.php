@@ -316,7 +316,6 @@ class ActivityListChainProvider
                 'icon'         => $entityConfig->get('icon'),
                 'label'        => $this->translator->trans($entityConfig->get('label')),
                 'template'     => $template,
-                'routes'       => $provider->getRoutes(),
                 'has_comments' => $hasComment,
             ];
         }

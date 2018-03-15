@@ -60,6 +60,6 @@ class BusinessUnitTreeTypeTest extends \PHPUnit_Framework_TestCase
         $resolver = new OptionsResolver();
         $this->formType->configureOptions($resolver);
         $resolver->resolve();
-        $this->assertTrue($resolver->isKnown('choices'));
+        $this->assertTrue($resolver->isDefined('choices'));
     }
 }
