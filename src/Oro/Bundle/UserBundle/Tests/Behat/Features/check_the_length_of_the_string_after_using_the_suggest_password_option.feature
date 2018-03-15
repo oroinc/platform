@@ -27,5 +27,4 @@ Feature: Check the length of the string after using the "Suggest password" optio
     And I click "Suggest password"
     And I should not see "The password must be at least 8 characters long"
     And I click "Save"
-    #   And I should see "The password has been changed" flash message
-    #   this step blocked by BAP-16561  - "The password has been changed" flash message shown very quickly
+    And I should see "Reset password email has been sent to user" flash message
