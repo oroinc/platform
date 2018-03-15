@@ -804,7 +804,13 @@ define(function(require) {
                     message = {type: 'success', text: message};
                 }
 
-                messenger.notificationFlashMessage(message.type, message.text);
+                if (_.has(widgetResponse, 'messageAfterPageChange') && widgetResponse.messageAfterPageChange === true) {
+                    mediator.once('page:afterChange', function() {
+                        messenger.notificationFlashMessage(message.type, message.text);
+                    });
+                } else {
+                    messenger.notificationFlashMessage(message.type, message.text);
+                }
             }
 
             if (_.has(widgetResponse, 'trigger')) {

@@ -7,7 +7,13 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Date time entity for search index
  *
- * @ORM\Table(name="oro_search_index_datetime")
+ * @ORM\Table(
+ *      name="oro_search_index_datetime",
+ *      indexes={
+ *          @ORM\Index(name="oro_search_index_datetime_field_idx", columns={"field"}),
+ *          @ORM\Index(name="oro_search_index_datetime_item_field_idx", columns={"item_id", "field"})
+ *      }
+ * )
  * @ORM\Entity
  */
 class IndexDatetime extends AbstractIndexDatetime
