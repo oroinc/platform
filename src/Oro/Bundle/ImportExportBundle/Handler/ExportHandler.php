@@ -11,42 +11,20 @@ use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Reader\BatchIdsReaderInterface;
-use Oro\Bundle\ImportExportBundle\Reader\ReaderChain;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
-use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * Export handler, prepare and return data
+ */
 class ExportHandler extends AbstractHandler
 {
     /**
      * @var MimeTypeGuesser
      */
     protected $mimeTypeGuesser;
-
-    /**
-     * @var ReaderChain
-     */
-    protected $readerChain;
-
-    /**
-     * @var FileManager
-     */
-    protected $fileManager;
-
-    /**
-     * @var WriterChain
-     */
-    protected $writerChain;
-    
-    /**
-     * @param FileManager $fileManager
-     */
-    public function setFileManager(FileManager $fileManager)
-    {
-        $this->fileManager = $fileManager;
-    }
 
     /**
      * @param MimeTypeGuesser $mimeTypeGuesser
@@ -56,21 +34,6 @@ class ExportHandler extends AbstractHandler
         $this->mimeTypeGuesser = $mimeTypeGuesser;
     }
 
-    /**
-     * @param ReaderChain $readerChain
-     */
-    public function setReaderChain(ReaderChain $readerChain)
-    {
-        $this->readerChain = $readerChain;
-    }
-
-    /**
-     * @param WriterChain $writerChain
-     */
-    public function setWriterChain(WriterChain $writerChain)
-    {
-        $this->writerChain = $writerChain;
-    }
     /**
      * Get export result
      *
