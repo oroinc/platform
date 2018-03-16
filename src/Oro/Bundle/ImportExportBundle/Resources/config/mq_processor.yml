@@ -56,7 +56,7 @@ services:
             - '@oro_importexport.file.file_manager'
             - '@oro_importexport.handler.import.cli'
             - '@oro_importexport.writer.writer_chain'
-            - '%oro_importexport.export.size_of_batch%'
+            - '%oro_importexport.import.size_of_batch%'
         calls:
             - [setConfigManager, ['@oro_config.user']]
         tags:
@@ -72,7 +72,7 @@ services:
             - '@oro_importexport.file.file_manager'
             - '@oro_importexport.handler.import.http'
             - '@oro_importexport.writer.writer_chain'
-            - '%oro_importexport.export.size_of_batch%'
+            - '%oro_importexport.import.size_of_batch%'
         calls:
             - [setConfigManager, ['@oro_config.user']]
             - [setManagerRegistry, ['@doctrine']]

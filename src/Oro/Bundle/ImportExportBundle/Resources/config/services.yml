@@ -2,7 +2,8 @@ parameters:
     oro_importexport.template_fixture.entity_registry.class:  Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry
     oro_importexport.template_fixture.manager.class:          Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager
     oro_importexport.action.execute_job.class:                Oro\Bundle\ImportExportBundle\Model\Action\ExecuteJobAction
-    oro_importexport.export.size_of_batch:                    5000
+    oro_importexport.import.size_of_batch: 100
+    oro_importexport.export.size_of_batch: 5000
 
 services:
     oro_importexport.template_fixture.entity_registry:
@@ -70,10 +71,22 @@ services:
         arguments:
           - '@knp_gaufrette.filesystem_map'
 
-    oro_importexport.file.batch_file_manager:
+    oro_importexport.file.batch_file_manager.abstract:
         class: 'Oro\Bundle\ImportExportBundle\File\BatchFileManager'
+        abstract: true
         arguments:
           - '@oro_importexport.file.file_manager'
+
+    oro_importexport.file.batch_file_manager.import:
+        parent: oro_importexport.file.batch_file_manager.abstract
+        public: false
+        arguments:
+          - '%oro_importexport.import.size_of_batch%'
+
+    oro_importexport.file.batch_file_manager.export:
+        parent: oro_importexport.file.batch_file_manager.abstract
+        public: false
+        arguments:
           - '%oro_importexport.export.size_of_batch%'
 
     oro_importexport.job.context.aggregator_registry:
