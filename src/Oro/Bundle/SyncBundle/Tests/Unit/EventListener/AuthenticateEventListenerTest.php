@@ -32,7 +32,7 @@ class AuthenticateEventListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->markTestSkipped();
+        $this->markTestSkipped('Should be unskipped in scope of BAP-16769');
         $this->ticketProvider = $this->createMock(TicketProvider::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 

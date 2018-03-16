@@ -33,6 +33,7 @@ services:
     # this service is used to broadcast messages to clients to prevent connection loose
     # by default, the connection could be closed if no data were transmitted between client and server
     # for more details see http://nginx.org/en/docs/http/websocket.html
+    # TODO: should be uncommented in scope of BAP-16769, see https://github.com/laboro/dev/pull/16599/files for details
 #    oro_wamp.client.ping:
 #        class: Oro\Bundle\SyncBundle\Wamp\ClientPing
 #        arguments:
@@ -111,6 +112,7 @@ services:
             - '@logger'
             - '%secret%'
 
+    # TODO: should be uncommented in scope of BAP-16769, see https://github.com/laboro/dev/pull/16599/files for details
 #    oro_sync.authentication.topic_handler:
 #        class: Oro\Bundle\SyncBundle\Authentication\AuthenticationTopicHandler
 #        decorates: jdare_clank.clank_handler_topic

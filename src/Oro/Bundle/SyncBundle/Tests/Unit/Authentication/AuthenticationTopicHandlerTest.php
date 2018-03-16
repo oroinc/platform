@@ -29,7 +29,7 @@ class AuthenticationTopicHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->markTestSkipped();
+        $this->markTestSkipped('Should be unskipped in scope of BAP-16769');
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->innerTopicHandler = $this->createMock(TopicHandler::class);
 
