@@ -215,13 +215,13 @@ define(function(require) {
                         var type = parseInt(value.type);
                         // if only one value is filled, replace filter type to less than or more than
                         if (value.value_end) {
-                            value.type = type === this.typeValues.between ?
-                                this.fallbackTypeValues.lessThan : this.fallbackTypeValues.moreThan;
+                            value.type = type === this.typeValues.between
+                                ? this.fallbackTypeValues.lessThan : this.fallbackTypeValues.moreThan;
                             value.value = value.value_end;
                             value.value_end = '';
                         } else {
-                            value.type = type === this.typeValues.between ?
-                                this.fallbackTypeValues.moreThan : this.fallbackTypeValues.lessThan;
+                            value.type = type === this.typeValues.between
+                                ? this.fallbackTypeValues.moreThan : this.fallbackTypeValues.lessThan;
                         }
                     }
                 }

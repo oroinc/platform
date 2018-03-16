@@ -505,9 +505,9 @@ define(function(require) {
             if (this.valueIsLoaded(value.value)) {
                 var self = this;
 
-                var hintRawValue = _.isObject(_.first(value.value)) ?
-                    _.map(value.value, _.property('text')) :
-                    _.chain(value.value)
+                var hintRawValue = _.isObject(_.first(value.value))
+                    ? _.map(value.value, _.property('text'))
+                    : _.chain(value.value)
                         .map(function(id) {
                             var item = _.find(self.selectedData, function(item) {
                                 return item.id.toString() === id.toString();

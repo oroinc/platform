@@ -165,18 +165,16 @@ define(function(require) {
                     this.column = options.column;
                     Cell.apply(this, arguments);
                 },
-                className: _.isFunction(oldClassName) ?
-                    function() {
+                className: _.isFunction(oldClassName)
+                    ? function() {
                         var calculatedClassName = oldClassName.call(this);
-                        var addClassName = inlineEditingPlugin.isEditable(this) ?
-                            'editable view-mode prevent-text-selection-on-dblclick' :
-                            '';
+                        var addClassName = inlineEditingPlugin.isEditable(this)
+                            ? 'editable view-mode prevent-text-selection-on-dblclick' : '';
                         return (calculatedClassName ? calculatedClassName + ' ' : '') + addClassName;
-                    } :
-                    function() {
-                        var addClassName = inlineEditingPlugin.isEditable(this) ?
-                            'editable view-mode prevent-text-selection-on-dblclick' :
-                            '';
+                    }
+                    : function() {
+                        var addClassName = inlineEditingPlugin.isEditable(this)
+                            ? 'editable view-mode prevent-text-selection-on-dblclick' : '';
                         return (oldClassName ? oldClassName + ' ' : '') + addClassName;
                     },
                 events: splitEventsList.generateDeclaration(),
@@ -236,10 +234,10 @@ define(function(require) {
             if (fullRestriction) {
                 return false;
             }
-            return columnMetadata.inline_editing && columnMetadata.inline_editing.enable ?
-                this.getCellEditorOptions(cell)
-                    .save_api_accessor.validateUrlParameters(cell.model.toJSON()) :
-                false;
+            return columnMetadata.inline_editing && columnMetadata.inline_editing.enable
+                ? this.getCellEditorOptions(cell)
+                    .save_api_accessor.validateUrlParameters(cell.model.toJSON())
+                : false;
         },
 
         getCellEditorOptions: function(cell) {

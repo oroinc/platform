@@ -58,8 +58,8 @@ define([], function() {
             if (!rgb) {
                 return '#000000';
             }
-            return (this.colorDifference(rgb, black) * blackPreference > this.colorDifference(rgb, white)) ?
-                '#000000' : '#FFFFFF';
+            return (this.colorDifference(rgb, black) * blackPreference > this.colorDifference(rgb, white))
+                ? '#000000' : '#FFFFFF';
         }
     };
 });

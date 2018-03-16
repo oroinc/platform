@@ -154,8 +154,8 @@ define(['./interval1d', './interval2d', './point2d'], function(Interval1d, Inter
     Rectangle.prototype.intersection = function(box) {
         var horizontalInterval = this.horizontalInterval.intersection(box.horizontalInterval);
         var verticalInterval = this.verticalInterval.intersection(box.verticalInterval);
-        return horizontalInterval === null || verticalInterval === null ? null :
-            new Rectangle(horizontalInterval, verticalInterval);
+        return horizontalInterval === null || verticalInterval === null ? null
+            : new Rectangle(horizontalInterval, verticalInterval);
     };
 
     /**
