@@ -4,15 +4,13 @@ namespace Oro\Bundle\ImapBundle\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
-
-use Zend\Mail\Storage\Exception as MailException;
-
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Form\Model\EmailFolderModel;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
+use Zend\Mail\Storage\Exception as MailException;
 
 /**
  * Class ImapEmailFolderManager

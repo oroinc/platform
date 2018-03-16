@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\ImportExport\Serializer;
 
 use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;

@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Operation\Execution;
 
+use Oro\Bundle\ActionBundle\Form\Type\OperationExecutionType;
+use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-
-use Oro\Bundle\ActionBundle\Form\Type\OperationExecutionType;
-use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
-use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\Operation;
 
 class FormProviderTest extends \PHPUnit_Framework_TestCase
 {

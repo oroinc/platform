@@ -44,6 +44,39 @@ define(['underscore', 'asap'], function(_, asap) {
          */
         haveEqualSet: function(firstArray, secondArray) {
             return firstArray.length === secondArray.length && _.difference(firstArray, secondArray).length === 0;
+        },
+
+        /**
+         * The Number.isSafeInteger() method determines whether the provided value is a number that is a safe integer.
+         * @param number {testValue}
+         * @return {boolean}
+         */
+        isSafeInteger: function(number) {
+            // 0. Try use native API
+            if (Number.isSafeInteger) {
+                return Number.isSafeInteger(number);
+            }
+
+            // 1. If Type(number) is not Number, return false.
+            if (typeof(number) !== 'number') {
+                return false;
+            }
+            // 2. If number is NaN, +∞, or -∞, return false.
+            if (this.isNaN(number) || number === Infinity || number === -Infinity) {
+                return false;
+            }
+            // 3. Let integer.
+            var integer = parseInt(number);
+            // 4. If integer is not equal to number, return false.
+            if (integer !== number) {
+                return false;
+            }
+            // 5. If abs(integer) ≤ 2^53-1, return true.
+            if (Math.abs(integer) <= (Math.pow(2, 53) - 1)) {
+                return true;
+            }
+            // 6. Otherwise, return false.
+            return false;
         }
     });
 

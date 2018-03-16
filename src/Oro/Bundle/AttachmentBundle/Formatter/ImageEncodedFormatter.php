@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\AttachmentBundle\Formatter;
 
-use Symfony\Component\Config\FileLocatorInterface;
-
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\UIBundle\Formatter\FormatterInterface;
+use Symfony\Component\Config\FileLocatorInterface;
 
 class ImageEncodedFormatter implements FormatterInterface
 {

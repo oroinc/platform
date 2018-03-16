@@ -102,6 +102,13 @@ define(function(require) {
         adjustDocumentTitle: true,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function GridViewsView() {
+            GridViewsView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initializer.
          *
          * @param {Object} options

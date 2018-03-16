@@ -4,12 +4,12 @@ parameters:
 
 services:
     oro_theme.registry:
-        class: %oro_theme.registry.class%
+        class: '%oro_theme.registry.class%'
         arguments:
-            - %oro_theme.settings%
+            - '%oro_theme.settings%'
 
     oro_theme.event_listener.load_css:
-        class: %oro_theme.event_listener.load_css.class%
+        class: '%oro_theme.event_listener.load_css.class%'
         arguments:
             - '@oro_theme.registry'
         tags:

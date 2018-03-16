@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\NotificationBundle\Form\EventListener;
 
+use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
+use Oro\Bundle\NotificationBundle\Provider\ContactInformationEmailsProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-
-use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\NotificationBundle\Provider\ContactInformationEmailsProvider;
 
 class ContactInformationEmailsSubscriber implements EventSubscriberInterface
 {

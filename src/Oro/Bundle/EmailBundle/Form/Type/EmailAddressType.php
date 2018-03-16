@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\EmailBundle\Form\DataTransformer\EmailAddressTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\EmailBundle\Form\DataTransformer\EmailAddressTransformer;
 
 class EmailAddressType extends AbstractType
 {

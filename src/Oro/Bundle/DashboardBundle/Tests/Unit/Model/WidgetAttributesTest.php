@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 {
@@ -71,7 +72,8 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
             $this->valueProvider,
             $this->translator,
             $this->eventDispatcher,
-            $widgetConfigVisibilityFilter
+            $widgetConfigVisibilityFilter,
+            new RequestStack()
         );
     }
 

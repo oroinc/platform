@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Datagrid\Filter;
 
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class WorkflowFilter extends EntityFilter
 {

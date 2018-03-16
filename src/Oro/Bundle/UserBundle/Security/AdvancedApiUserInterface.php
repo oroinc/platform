@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Security;
 
 use Doctrine\Common\Collections\Collection;
-
 use Oro\Bundle\UserBundle\Entity\UserApi;
 
 /**

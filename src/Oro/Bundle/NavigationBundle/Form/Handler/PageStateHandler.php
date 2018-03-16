@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\NavigationBundle\Form\Handler;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\NavigationBundle\Entity\AbstractPageState;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class PageStateHandler
 {
@@ -18,9 +16,9 @@ class PageStateHandler
     protected $form;
 
     /**
-     * @var Request
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * @var ObjectManager
@@ -35,18 +33,18 @@ class PageStateHandler
     /**
      *
      * @param FormInterface         $form
-     * @param Request               $request
+     * @param RequestStack          $requestStack
      * @param ObjectManager         $manager
      * @param TokenStorageInterface $tokenStorage
      */
     public function __construct(
         FormInterface $form,
-        Request $request,
+        RequestStack $requestStack,
         ObjectManager $manager,
         TokenStorageInterface $tokenStorage
     ) {
         $this->form = $form;
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->manager = $manager;
         $this->tokenStorage = $tokenStorage;
     }
@@ -65,8 +63,9 @@ class PageStateHandler
 
         $this->form->setData($entity);
 
-        if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $this->form->submit($this->request);
+        $request = $this->requestStack->getCurrentRequest();
+        if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
+            $this->form->submit($request);
 
             if ($this->form->isValid()) {
                 $this->onSuccess($entity);

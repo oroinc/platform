@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Controller;
 
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Oro\Bundle\ApiBundle\Request\Rest\RequestHandler;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Oro\Bundle\ApiBundle\Request\Rest\RequestHandler;
 
 class RestApiController extends Controller
 {

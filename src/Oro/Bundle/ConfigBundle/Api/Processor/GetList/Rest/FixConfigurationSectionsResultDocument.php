@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ConfigBundle\Api\Processor\GetList\Rest;
 
+use Oro\Bundle\ApiBundle\Processor\ListContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\ListContext;
 
 /**
  * Makes the result for "configuration" resource is compatible with old REST API:

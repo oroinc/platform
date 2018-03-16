@@ -2,6 +2,9 @@
 
 namespace Oro\Component\ChainProcessor;
 
+/**
+ * A base implementation for containers of key/value pairs.
+ */
 abstract class AbstractParameterBag implements ParameterBagInterface
 {
     /**
@@ -17,7 +20,7 @@ abstract class AbstractParameterBag implements ParameterBagInterface
      */
     public function count()
     {
-        return count($this->toArray());
+        return \count($this->toArray());
     }
 
     /**

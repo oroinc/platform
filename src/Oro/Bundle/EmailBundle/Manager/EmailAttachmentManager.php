@@ -4,21 +4,19 @@ namespace Oro\Bundle\EmailBundle\Manager;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\HttpFoundation\File\File as ComponentFile;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
-
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\HttpFoundation\File\File as ComponentFile;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class EmailAttachmentManager
 {

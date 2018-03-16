@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
-
+use Doctrine\ORM\Query\Expr;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 
 class MailboxEntityNameProvider implements EntityNameProviderInterface
 {
@@ -60,10 +60,14 @@ class MailboxEntityNameProvider implements EntityNameProviderInterface
             if ($format === self::SHORT) {
                 return $alias . 'label';
             } else {
+                $expr = new Expr();
+
                 return sprintf(
-                    'CONCAT(%s.label, \' %s\')',
+                    'CONCAT(%s.label, \' \', %s)',
                     $alias,
-                    $this->translator->trans('oro.email.mailbox.entity_label', [], null, $locale)
+                    (string)$expr->literal(
+                        $this->translator->trans('oro.email.mailbox.entity_label', [], null, $locale)
+                    )
                 );
             }
         }

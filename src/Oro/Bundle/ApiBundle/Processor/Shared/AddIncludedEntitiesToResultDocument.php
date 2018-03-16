@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\FormContext;
 
 /**
  * Adds the included entities to the response using the response document builder.
@@ -41,10 +41,12 @@ class AddIncludedEntitiesToResultDocument implements ProcessorInterface
             return;
         }
 
+        $requestType = $context->getRequestType();
         foreach ($includedEntities as $entity) {
             $entityData = $includedEntities->getData($entity);
             $documentBuilder->addIncludedObject(
                 $entityData->getNormalizedData(),
+                $requestType,
                 $entityData->getMetadata()
             );
         }

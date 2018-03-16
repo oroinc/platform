@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;

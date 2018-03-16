@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Symfony\Component\Validator\Constraints;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors;
 use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\NameValuePairType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class CollectFormErrorsTest extends FormProcessorTestCase
 {
@@ -257,8 +256,8 @@ class CollectFormErrorsTest extends FormProcessorTestCase
                 'field1',
                 'collection',
                 [
-                    'type'      => 'text',
-                    'options'   => ['constraints' => [new Constraints\NotBlank()]],
+                    'entry_type'      => 'text',
+                    'entry_options'   => ['constraints' => [new Constraints\NotBlank()]],
                     'allow_add' => true
                 ]
             )
@@ -290,8 +289,8 @@ class CollectFormErrorsTest extends FormProcessorTestCase
                 'collection',
                 [
                     'property_path' => '[field1]',
-                    'type'          => 'text',
-                    'options'       => ['constraints' => [new Constraints\NotBlank()]],
+                    'entry_type'          => 'text',
+                    'entry_options'       => ['constraints' => [new Constraints\NotBlank()]],
                     'allow_add'     => true
                 ]
             )
@@ -322,8 +321,8 @@ class CollectFormErrorsTest extends FormProcessorTestCase
                 'field1',
                 'collection',
                 [
-                    'type'      => new NameValuePairType(),
-                    'options'   => [
+                    'entry_type'      => new NameValuePairType(),
+                    'entry_options'   => [
                         'name_options' => ['constraints' => [new Constraints\NotBlank()]]
                     ],
                     'allow_add' => true
@@ -360,8 +359,8 @@ class CollectFormErrorsTest extends FormProcessorTestCase
                 'field1',
                 'collection',
                 [
-                    'type'      => new NameValuePairType(),
-                    'options'   => [
+                    'entry_type'      => new NameValuePairType(),
+                    'entry_options'   => [
                         'name_options' => [
                             'constraints'    => [new Constraints\NotBlank()],
                             'error_bubbling' => true

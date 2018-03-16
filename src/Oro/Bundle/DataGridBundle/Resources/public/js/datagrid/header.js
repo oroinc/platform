@@ -34,6 +34,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function Header() {
+            Header.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['themeOptions']));
             if (!options.collection) {

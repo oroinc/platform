@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\InstallerBundle\Form\Type\Configuration;
 
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
+use Oro\Bundle\InstallerBundle\Validator\Constraints\ExtensionLoaded;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
-use Oro\Bundle\InstallerBundle\Validator\Constraints\ExtensionLoaded;
 
 class DatabaseType extends AbstractType
 {

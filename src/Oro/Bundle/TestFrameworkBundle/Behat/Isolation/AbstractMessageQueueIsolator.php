@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Process\Process;
-
 use Oro\Bundle\MessageQueueBundle\Consumption\CacheState;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Process\Process;
 
 abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator implements
     IsolatorInterface,

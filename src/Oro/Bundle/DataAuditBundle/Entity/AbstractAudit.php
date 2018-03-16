@@ -49,6 +49,8 @@ abstract class AbstractAudit
     const ACTION_UPDATE = 'update';
     const ACTION_REMOVE = 'remove';
 
+    const OBJECT_NAME_MAX_LENGTH = 255;
+
     /**
      * @var integer $id
      *

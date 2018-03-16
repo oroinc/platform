@@ -1,0 +1,18 @@
+api:
+    entity_aliases:
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
+            alias: custom_alias_testdepartment
+            plural_alias: custom_alias_testdepartments
+
+    entities:
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
+            fields:
+                # for test purposes try to restore original name for field "name",
+                # that was renamed to "title" in app.yml
+                title:
+                    exclude: true
+                name:
+                    exclude: false
+
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee:
+            exclude: true

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class WorkflowEntityAclTest extends \PHPUnit_Framework_TestCase
 {

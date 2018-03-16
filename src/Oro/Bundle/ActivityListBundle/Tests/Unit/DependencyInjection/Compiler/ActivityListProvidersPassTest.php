@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Reference;
-
 use Oro\Bundle\ActivityListBundle\DependencyInjection\Compiler\ActivityListProvidersPass;
+use Symfony\Component\DependencyInjection\Reference;
 
 class ActivityListProvidersPassTest extends \PHPUnit_Framework_TestCase
 {

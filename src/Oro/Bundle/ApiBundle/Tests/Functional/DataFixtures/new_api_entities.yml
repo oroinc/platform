@@ -1,0 +1,11 @@
+Extend\Entity\TestApiE1:
+    custom_entity1:
+        name: 'Custom Entity 1'
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
+    entity1:
+        name: 'Entity 1'
+        organization: '@organization'
+        owner: '@business_unit'
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
+    entity2:
+        fieldString: 'Entity 2'

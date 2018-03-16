@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailTemplateTranslationType extends AbstractType
 {
@@ -38,15 +37,14 @@ class EmailTemplateTranslationType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $isWysiwygEnabled = $this->configManager->get('oro_form.wysiwyg_enabled');
 
         $resolver->setDefaults(
             [
                 'translatable_class'   => 'Oro\\Bundle\\EmailBundle\\Entity\\EmailTemplate',
-                'intention'            => 'emailtemplate_translation',
-                'cascade_validation'   => true,
+                'csrf_token_id'        => 'emailtemplate_translation',
                 'labels'               => [],
                 'content_options'      => [],
                 'subject_options'      => [],
@@ -77,6 +75,9 @@ class EmailTemplateTranslationType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
         return 'a2lix_translations_gedmo';

@@ -2,16 +2,18 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
+use Nelmio\ApiDocBundle\Formatter\AbstractFormatter;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Templating\EngineInterface;
-
-use Nelmio\ApiDocBundle\Formatter\AbstractFormatter;
 
 /**
  * Base HTML formatter that can be used for all types of REST API views.
  */
 class HtmlFormatter extends AbstractFormatter
 {
+    /** @var SecurityContextInterface */
+    protected $securityContext;
+
     /** @var FileLocatorInterface */
     protected $fileLocator;
 
@@ -24,7 +26,7 @@ class HtmlFormatter extends AbstractFormatter
     /** @var string */
     protected $endpoint;
 
-    /** @var boolean */
+    /** @var bool */
     protected $enableSandbox;
 
     /** @var array */
@@ -51,18 +53,24 @@ class HtmlFormatter extends AbstractFormatter
     /** @var string */
     protected $motdTemplate;
 
-    /** @var boolean */
+    /** @var bool */
     protected $defaultSectionsOpened;
 
+    /** @var bool */
+    protected $enableFormatParameter = true;
+
     /** @var string */
-    protected $documentationPath;
+    protected $rootRoute;
+
+    /** @var array */
+    protected $views;
 
     /**
-     * @param string $documentationPath
+     * @param SecurityContextInterface $securityContext
      */
-    public function setDocumentationPath($documentationPath)
+    public function setSecurityContext(SecurityContextInterface $securityContext)
     {
-        $this->documentationPath = $documentationPath;
+        $this->securityContext = $securityContext;
     }
 
     /**
@@ -98,7 +106,7 @@ class HtmlFormatter extends AbstractFormatter
     }
 
     /**
-     * @param boolean $enableSandbox
+     * @param bool $enableSandbox
      */
     public function setEnableSandbox($enableSandbox)
     {
@@ -170,11 +178,35 @@ class HtmlFormatter extends AbstractFormatter
     }
 
     /**
-     * @param boolean $defaultSectionsOpened
+     * @param bool $defaultSectionsOpened
      */
     public function setDefaultSectionsOpened($defaultSectionsOpened)
     {
         $this->defaultSectionsOpened = $defaultSectionsOpened;
+    }
+
+    /**
+     * @param bool $enableFormatParameter
+     */
+    public function setEnableFormatParameter($enableFormatParameter)
+    {
+        $this->enableFormatParameter = $enableFormatParameter;
+    }
+
+    /**
+     * @param string $rootRoute
+     */
+    public function setRootRoute($rootRoute)
+    {
+        $this->rootRoute = $rootRoute;
+    }
+
+    /**
+     * @param array $views
+     */
+    public function setViews(array $views)
+    {
+        $this->views = $views;
     }
 
     /**
@@ -225,7 +257,15 @@ class HtmlFormatter extends AbstractFormatter
             'js'                    => $this->getJs(),
             'motdTemplate'          => $this->motdTemplate,
             'defaultSectionsOpened' => $this->defaultSectionsOpened,
-            'documentationPath'     => $this->documentationPath
+            'enableFormatParameter' => $this->enableFormatParameter,
+            'rootRoute'             => $this->rootRoute ?? RestDocUrlGenerator::ROUTE,
+            'views'                 => $this->views,
+            'defaultView'           => $this->getDefaultView(),
+            'hasSecurityToken'      => $this->securityContext->hasSecurityToken(),
+            'userName'              => $this->securityContext->getUserName(),
+            'apiKey'                => $this->securityContext->getApiKey(),
+            'loginRoute'            => $this->securityContext->getLoginRoute(),
+            'logoutRoute'           => $this->securityContext->getLogoutRoute()
         ];
     }
 
@@ -259,5 +299,21 @@ class HtmlFormatter extends AbstractFormatter
     protected function getFileContent($path)
     {
         return file_get_contents($this->fileLocator->locate($path));
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDefaultView()
+    {
+        $result = '';
+        foreach ($this->views as $name => $view) {
+            if (isset($view['default']) && $view['default']) {
+                $result = $name;
+                break;
+            }
+        }
+
+        return $result;
     }
 }

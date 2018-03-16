@@ -4,15 +4,14 @@ namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Oro\Bundle\EmailBundle\Form\Model\EmailApi;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
-
-use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class EmailApiType extends AbstractType
 {
@@ -30,7 +29,7 @@ class EmailApiType extends AbstractType
                 [
                     'required'       => false,
                     'allow_add'      => true,
-                    'type'           => 'oro_email_email_folder_api',
+                    'entry_type'     => 'oro_email_email_folder_api',
                     'error_bubbling' => false
                 ]
             )
@@ -135,12 +134,12 @@ class EmailApiType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
                 'data_class'           => 'Oro\Bundle\EmailBundle\Form\Model\EmailApi',
-                'intention'            => 'email',
+                'csrf_token_id'        => 'email',
                 'csrf_protection'      => false
             ]
         );

@@ -4,13 +4,10 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Bundle\MessageQueueBundle\Entity\Job;
-
-use Oro\Component\Testing\Unit\EntityTrait;
 
 class LoadJobData extends AbstractFixture implements ContainerAwareInterface
 {

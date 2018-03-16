@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\Intl\Util\IntlTestHelper;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Form\Type\AddLanguageType;
 use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Intl\Util\IntlTestHelper;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class AddLanguageTypeTest extends FormIntegrationTestCase
 {

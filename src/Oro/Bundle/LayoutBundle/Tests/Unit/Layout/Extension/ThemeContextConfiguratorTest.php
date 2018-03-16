@@ -2,20 +2,23 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
-use Symfony\Component\HttpFoundation\Request;
-
-use Oro\Component\Layout\LayoutContext;
-
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeContextConfigurator;
+use Oro\Component\Layout\LayoutContext;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class ThemeContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ThemeContextConfigurator */
     protected $contextConfigurator;
 
+    /** @var RequestStack */
+    protected $requestStack;
+
     protected function setUp()
     {
-        $this->contextConfigurator = new ThemeContextConfigurator();
+        $this->requestStack = new RequestStack();
+        $this->contextConfigurator = new ThemeContextConfigurator($this->requestStack);
     }
 
     public function testConfigureContextWithOutRequest()
@@ -35,7 +38,7 @@ class ThemeContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('');
         $request->attributes->set('_theme', 'testTheme');
 
-        $this->contextConfigurator->setRequest($request);
+        $this->requestStack->push($request);
         $this->contextConfigurator->configureContext($context);
 
         $context->resolve();
@@ -50,17 +53,11 @@ class ThemeContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('');
         $request->attributes->set('_theme', 'testTheme');
 
-        $this->contextConfigurator->setRequest($request);
+        $this->requestStack->push($request);
         $this->contextConfigurator->configureContext($context);
 
         $context->resolve();
         $this->assertSame('themeShouldNotBeOverridden', $context->get('theme'));
-    }
-
-    public function testRequestSetterSynchronized()
-    {
-        $this->contextConfigurator->setRequest(new Request());
-        $this->contextConfigurator->setRequest(null);
     }
 
     public function testConfigureContextWithRequestDefaultTheme()
@@ -69,7 +66,7 @@ class ThemeContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $request = Request::create('');
 
-        $this->contextConfigurator->setRequest($request);
+        $this->requestStack->push($request);
         $this->contextConfigurator->configureContext($context);
 
         $context->resolve();

@@ -5,9 +5,9 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
 use Oro\Bundle\ImapBundle\Mail\Storage\Body;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\InvalidBodyFormatException;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
-use Oro\Bundle\ImapBundle\Manager\DTO\ItemId;
-use Oro\Bundle\ImapBundle\Manager\DTO\EmailBody;
 use Oro\Bundle\ImapBundle\Manager\DTO\EmailAttachment;
+use Oro\Bundle\ImapBundle\Manager\DTO\EmailBody;
+use Oro\Bundle\ImapBundle\Manager\DTO\ItemId;
 use Zend\Mail\Header\ContentType;
 
 class EmailTest extends \PHPUnit_Framework_TestCase

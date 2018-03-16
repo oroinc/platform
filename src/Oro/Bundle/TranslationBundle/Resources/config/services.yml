@@ -24,7 +24,7 @@ parameters:
 
 services:
     oro_translation.controller:
-        class: %oro_translation.controller.class%
+        class: '%oro_translation.controller.class%'
         arguments:
             - '@translator.default'
             - '@templating'
@@ -33,14 +33,14 @@ services:
         lazy: true
 
     oro_translation.extractor.php_code_extractor:
-        class: %oro_translation.extractor.php_code_extractor.class%
+        class: '%oro_translation.extractor.php_code_extractor.class%'
         arguments:
             - '@service_container'
         tags:
             - { name: translation.extractor, alias: oro_translation_php_extractor }
 
     oro_translation.service_provider:
-        class: %oro_translation.service_provider.class%
+        class: '%oro_translation.service_provider.class%'
         arguments:
             - '@oro_translation.uploader.default_adapter'
             - '@oro_translation.js_dumper'
@@ -50,7 +50,7 @@ services:
         lazy: true
 
     oro_translation.statistic_provider:
-        class: %oro_translation.statistic_provider.class%
+        class: '%oro_translation.statistic_provider.class%'
         arguments:
             - '@oro_translation.cache'
             - '@oro_translation.oro_translation_adapter'
@@ -61,35 +61,35 @@ services:
 
     # guzzle http client for crowdin
     oro_translation.guzzle_crowdin_client:
-        class: %oro_translation.guzzle_client.class%
+        class: '%oro_translation.guzzle_client.class%'
         arguments:
-            - %oro_translation.api.crowdin.endpoint%
+            - '%oro_translation.api.crowdin.endpoint%'
         lazy: true
 
     # guzzle http client for oro proxy
     oro_translation.guzzle_oro_client:
-        class: %oro_translation.guzzle_client.class%
+        class: '%oro_translation.guzzle_client.class%'
         arguments:
-            - %oro_translation.api.oro_service.endpoint%
+            - '%oro_translation.api.oro_service.endpoint%'
         lazy: true
 
     oro_translation.uploader.crowdin_adapter:
-        class: %oro_translation.crowdin.adapter.class%
+        class: '%oro_translation.crowdin.adapter.class%'
         arguments:
             - '@oro_translation.guzzle_crowdin_client'
 
     oro_translation.oro_translation_adapter:
-        class: %oro_translation.oro_translation.adapter.class%
+        class: '%oro_translation.oro_translation.adapter.class%'
         arguments:
             - '@oro_translation.guzzle_oro_client'
         calls:
-            - [ setApiKey, [ %oro_translation.api.oro_service.key% ] ]
+            - [ setApiKey, [ '%oro_translation.api.oro_service.key%' ] ]
             - [ setLogger, [ '@logger' ] ]
         tags:
             - { name: monolog.logger, channel: oro_translation }
 
     oro_translation.database_translation.metadata.cache:
-        class: %oro_translation.dynamic_translation.metadata.cache.class%
+        class: '%oro_translation.dynamic_translation.metadata.cache.class%'
         arguments:
             - '@oro_translation.database_translation.metadata.cache_impl'
 
@@ -124,7 +124,7 @@ services:
             - { name: oro_entity.database_checker }
 
     oro_translation.empty_array.loader:
-        class: %oro_translation.empty_array.loader.class%
+        class: '%oro_translation.empty_array.loader.class%'
 
     oro_translation.cache:
         parent: oro.cache.abstract
@@ -149,8 +149,8 @@ services:
         arguments:
             - '@oro_translation.controller'
             - '@router'
-            - %oro_translation.js_translation.domains%
-            - %kernel.root_dir%
+            - '%oro_translation.js_translation.domains%'
+            - '%kernel.root_dir%'
             - '@oro_translation.provider.language'
         lazy: true
 
@@ -199,7 +199,7 @@ services:
                 name: oro_entity.query_hint
                 hint: oro_translation.translatable
                 alias: HINT_TRANSLATABLE
-                output_walker: %oro_translation.translation_walker.class%
+                output_walker: '%oro_translation.translation_walker.class%'
 
     oro_translation.event_listener.translation:
         class: 'Oro\Bundle\TranslationBundle\EventListener\TranslationListener'
@@ -322,7 +322,7 @@ services:
 
     oro_translation.mass_action.reset_translation:
         class: 'Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassAction'
-        scope: prototype
+        shared: false
         tags:
             - { name: oro_datagrid.extension.mass_action.type, type: reset_translations }
 

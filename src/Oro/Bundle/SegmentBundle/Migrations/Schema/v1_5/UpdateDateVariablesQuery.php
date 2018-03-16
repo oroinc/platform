@@ -5,11 +5,9 @@ namespace Oro\Bundle\SegmentBundle\Migrations\Schema\v1_5;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class UpdateDateVariablesQuery implements MigrationQuery, ConnectionAwareInterface
 {

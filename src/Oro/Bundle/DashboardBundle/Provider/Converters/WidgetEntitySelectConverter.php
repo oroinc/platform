@@ -3,12 +3,9 @@
 namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
-
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class WidgetEntitySelectConverter extends ConfigValueConverterAbstract

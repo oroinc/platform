@@ -17,6 +17,13 @@ define([
         collection: undefined,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function ResetCollectionAction() {
+            ResetCollectionAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize action
          *
          * @param {Object} options

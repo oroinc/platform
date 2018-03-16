@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SoapBundle\Routing;
 
 use Doctrine\Common\Annotations\Reader;
-
 use FOS\RestBundle\Controller\Annotations as Rest;
 
 /**

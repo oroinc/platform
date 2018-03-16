@@ -3,14 +3,17 @@
 namespace Oro\Bundle\SecurityBundle\Search;
 
 use Doctrine\Common\Collections\Expr\CompositeExpression;
-
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
+use Oro\Bundle\SearchBundle\Query\Criteria\ExpressionBuilder;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\EventListener\SearchListener;
-use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionDataBuilderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
+/**
+ * Applies ACL check to search index queries
+ */
 class AclHelper
 {
     /** @var SearchMappingProvider */
@@ -19,7 +22,7 @@ class AclHelper
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /** @var OwnershipConditionDataBuilder */
+    /** @var AclConditionDataBuilderInterface */
     protected $ownershipDataBuilder;
 
     /** @var OwnershipMetadataProviderInterface */
@@ -28,13 +31,13 @@ class AclHelper
     /**
      * @param SearchMappingProvider         $mappingProvider
      * @param TokenAccessorInterface        $tokenAccessor
-     * @param OwnershipConditionDataBuilder $ownershipDataBuilder
+     * @param AclConditionDataBuilderInterface $ownershipDataBuilder
      * @param OwnershipMetadataProviderInterface $metadataProvider
      */
     public function __construct(
         SearchMappingProvider $mappingProvider,
         TokenAccessorInterface $tokenAccessor,
-        OwnershipConditionDataBuilder $ownershipDataBuilder,
+        AclConditionDataBuilderInterface $ownershipDataBuilder,
         OwnershipMetadataProviderInterface $metadataProvider
     ) {
         $this->tokenAccessor = $tokenAccessor;
@@ -93,7 +96,8 @@ class AclHelper
         }
 
         if (count($ownerExpressions) !== 0) {
-            $query->getCriteria()->andWhere(new CompositeExpression(CompositeExpression::TYPE_OR, $ownerExpressions));
+            $orExpression = new CompositeExpression(CompositeExpression::TYPE_OR, $ownerExpressions);
+            $query->getCriteria()->andWhere($orExpression);
         }
         $query->from($allowedAliases);
 
@@ -112,7 +116,7 @@ class AclHelper
 
     /**
      * @param Query $query
-     * @param $expr
+     * @param ExpressionBuilder $expr
      */
     protected function addOrganizationLimits(Query $query, $expr)
     {

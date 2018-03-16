@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Accessor;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\DefaultAccessor;
-
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
 class DefaultAccessorTest extends \PHPUnit_Framework_TestCase

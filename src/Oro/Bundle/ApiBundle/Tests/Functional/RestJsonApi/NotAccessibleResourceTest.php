@@ -76,15 +76,10 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             $method,
             $this->getUrl($route, array_merge($routeParameters, ['entity' => $entityType]))
         );
+        self::assertResponseStatusCodeEquals($response, 404);
         if ('HEAD' === $method) {
             // the HEAD response should not have the content
-            self::assertResponseStatusCodeEquals($response, 400);
             self::assertEmpty($response->getContent());
-        } else {
-            $this->assertResponseValidationError(
-                ['status' => '400', 'title' => 'entity type constraint'],
-                $response
-            );
         }
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }

@@ -6,17 +6,17 @@ parameters:
 
 services:
     oro_importexport.template_fixture.entity_registry:
-        class: %oro_importexport.template_fixture.entity_registry.class%
+        class: '%oro_importexport.template_fixture.entity_registry.class%'
         calls:
             - [setDispatcher, ['@event_dispatcher']]
 
     oro_importexport.template_fixture.manager:
-        class: %oro_importexport.template_fixture.manager.class%
+        class: '%oro_importexport.template_fixture.manager.class%'
         arguments:
             - '@oro_importexport.template_fixture.entity_registry'
 
     oro_importexport.action.execute_job:
-        class: %oro_importexport.action.execute_job.class%
+        class: '%oro_importexport.action.execute_job.class%'
         arguments:
             - '@oro_action.expression.context_accessor'
             - '@oro_importexport.job_executor'
@@ -95,13 +95,6 @@ services:
             - '@oro_importexport.context_registry'
         tags:
             - { name: 'oro_importexport.job.context.aggregator' }
-
-    oro_importexport.event_listener.export_join_listener:
-        class: Oro\Bundle\ImportExportBundle\EventListener\ExportJoinListener
-        arguments:
-            - '@doctrine'
-        tags:
-            - { name: kernel.event_listener, event: oro.import_export.after_entity_page_loaded, method: onAfterEntityPageLoaded }
 
     oro_importexport.configuration.registry:
         class: 'Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistry'

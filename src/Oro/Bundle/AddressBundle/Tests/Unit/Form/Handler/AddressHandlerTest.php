@@ -2,7 +2,12 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Handler;
 
+use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Form\Handler\AddressHandler;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class AddressHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -33,14 +38,14 @@ class AddressHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $this->request = $request = $this->createMock('Symfony\Component\HttpFoundation\Request');
-        $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->address = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Address')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->form = $this->createMock(FormInterface::class);
+        $this->request = $this->createMock(Request::class);
+        $requestStack = new RequestStack();
+        $requestStack->push($this->request);
+        $this->om = $this->createMock(ObjectManager::class);
+        $this->address = $this->createMock(Address::class);
 
-        $this->handler = new AddressHandler($this->form, $this->request, $this->om);
+        $this->handler = new AddressHandler($this->form, $requestStack, $this->om);
     }
 
     public function testGoodRequest()

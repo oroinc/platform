@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenKeyType;
 use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenType;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class UserApiKeyGenTypeTest extends FormIntegrationTestCase
 {
@@ -63,7 +62,7 @@ class UserApiKeyGenTypeTest extends FormIntegrationTestCase
         $expected   = [
             'data_class' => UserApi::class,
             'csrf_protection' => ['enabled' => true, 'fieild_name' => 'apikey_token'],
-            'intention'   => UserApiKeyGenType::NAME,
+            'csrf_token_id' => UserApiKeyGenType::NAME,
             'apiKeyElementId' => 'user-apikey-gen-elem'
         ];
         $form       = $this->factory->create($this->type, null, []);

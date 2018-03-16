@@ -4,22 +4,22 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\NormalizeValue;
 
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityClass;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
+use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
 class NormalizeEntityClassTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityAliasResolver;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityAliasResolverRegistry */
+    private $entityAliasResolverRegistry;
 
     /** @var NormalizeEntityClass */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
-        $this->entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityAliasResolverRegistry = $this->createMock(EntityAliasResolverRegistry::class);
 
-        $this->processor = new NormalizeEntityClass($this->entityAliasResolver);
+        $this->processor = new NormalizeEntityClass($this->entityAliasResolverRegistry);
     }
 
     public function testProcess()
@@ -27,15 +27,20 @@ class NormalizeEntityClassTest extends \PHPUnit_Framework_TestCase
         $context = new NormalizeValueContext();
         $context->setResult('alias');
 
-        $this->entityAliasResolver->expects($this->once())
+        $entityAliasResolver = $this->createMock(EntityAliasResolver::class);
+        $this->entityAliasResolverRegistry->expects(self::once())
+            ->method('getEntityAliasResolver')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($entityAliasResolver);
+        $entityAliasResolver->expects(self::once())
             ->method('getClassByPluralAlias')
             ->with('alias')
             ->willReturn('Test\Class');
 
         $this->processor->process($context);
 
-        $this->assertEquals(NormalizeEntityClass::REQUIREMENT, $context->getRequirement());
-        $this->assertEquals('Test\Class', $context->getResult());
+        self::assertEquals(NormalizeEntityClass::REQUIREMENT, $context->getRequirement());
+        self::assertEquals('Test\Class', $context->getResult());
     }
 
     public function testProcessForArray()
@@ -45,7 +50,12 @@ class NormalizeEntityClassTest extends \PHPUnit_Framework_TestCase
         $context->setArrayDelimiter(',');
         $context->setResult('alias1,alias2');
 
-        $this->entityAliasResolver->expects($this->exactly(2))
+        $entityAliasResolver = $this->createMock(EntityAliasResolver::class);
+        $this->entityAliasResolverRegistry->expects(self::once())
+            ->method('getEntityAliasResolver')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($entityAliasResolver);
+        $entityAliasResolver->expects(self::exactly(2))
             ->method('getClassByPluralAlias')
             ->willReturnMap(
                 [
@@ -56,11 +66,11 @@ class NormalizeEntityClassTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(
+        self::assertEquals(
             $this->getArrayRequirement(NormalizeEntityClass::REQUIREMENT),
             $context->getRequirement()
         );
-        $this->assertEquals(['Test\Class1', 'Test\Class2'], $context->getResult());
+        self::assertEquals(['Test\Class1', 'Test\Class2'], $context->getResult());
     }
 
     public function testProcessForAlreadyNormalizedAlias()
@@ -68,12 +78,17 @@ class NormalizeEntityClassTest extends \PHPUnit_Framework_TestCase
         $context = new NormalizeValueContext();
         $context->setResult('Test\Class');
 
-        $this->entityAliasResolver->expects($this->never())
+        $entityAliasResolver = $this->createMock(EntityAliasResolver::class);
+        $this->entityAliasResolverRegistry->expects(self::once())
+            ->method('getEntityAliasResolver')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($entityAliasResolver);
+        $entityAliasResolver->expects(self::never())
             ->method('getClassByPluralAlias');
 
         $this->processor->process($context);
 
-        $this->assertEquals('Test\Class', $context->getResult());
+        self::assertEquals('Test\Class', $context->getResult());
     }
 
     public function testProcessWhenNoValueToNormalize()
@@ -82,7 +97,7 @@ class NormalizeEntityClassTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->process($context);
 
-        $this->assertFalse($context->hasResult());
+        self::assertFalse($context->hasResult());
     }
 
     public function testProcessForAlreadyResolvedRequirement()
@@ -92,7 +107,7 @@ class NormalizeEntityClassTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals('test', $context->getRequirement());
+        self::assertEquals('test', $context->getRequirement());
     }
 
     protected function getArrayRequirement($requirement)

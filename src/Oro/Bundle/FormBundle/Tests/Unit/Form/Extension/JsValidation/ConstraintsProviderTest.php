@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension\JsValidation;
 
-use Symfony\Component\Validator\Constraints;
-use Symfony\Component\Validator\Constraint;
-
+use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProvider;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Form;
-
-use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProvider;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 
 class ConstraintsProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,7 +24,7 @@ class ConstraintsProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->metadataFactory = $this->createMock('Symfony\Component\Validator\MetadataFactoryInterface');
+        $this->metadataFactory = $this->createMock(MetadataFactoryInterface::class);
         $this->constraintsProvider = new ConstraintsProvider($this->metadataFactory);
     }
 

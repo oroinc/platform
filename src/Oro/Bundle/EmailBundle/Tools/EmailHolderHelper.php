@@ -3,12 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Tools;
 
 use Doctrine\Common\Util\ClassUtils;
-
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * The aim of this class is to help getting an email address from an object.

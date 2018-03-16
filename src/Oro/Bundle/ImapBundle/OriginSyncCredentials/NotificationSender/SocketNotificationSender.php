@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender;
 
-use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSenderInterface;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSenderInterface;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 
 /**

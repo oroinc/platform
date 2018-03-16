@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Contains methods to get the text representation of a mailbox.

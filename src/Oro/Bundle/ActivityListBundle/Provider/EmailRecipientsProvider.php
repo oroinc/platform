@@ -6,9 +6,6 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper;
@@ -17,6 +14,7 @@ use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EmailRecipientsProvider implements EmailRecipientsProviderInterface
 {

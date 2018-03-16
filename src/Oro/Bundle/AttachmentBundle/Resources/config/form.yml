@@ -9,40 +9,39 @@ parameters:
 
 services:
     oro_attachment.form.type:
-        class: %oro_attachment.form.type.class%
+        class: '%oro_attachment.form.type.class%'
         tags:
             - { name: form.type, alias: oro_attachment }
 
     oro_attachment.form.type.file_config:
-        class: %oro_attachment.form.type.file_config.class%
+        class: '%oro_attachment.form.type.file_config.class%'
         arguments:
             - '@oro_entity_config.config_manager'
         tags:
             - { name: form.type, alias: oro_attachment_file_config }
 
     oro_attachment.form.type.file:
-        class: %oro_attachment.form.type.file.class%
+        class: '%oro_attachment.form.type.file.class%'
         calls:
             - [setEventSubscriber,  ['@oro_attachment.form.file_subscriber']]
         tags:
             - { name: form.type, alias: oro_file }
 
     oro_attachment.form.type.image:
-        class: %oro_attachment.form.type.image.class%
+        class: '%oro_attachment.form.type.image.class%'
         tags:
             - { name: form.type, alias: oro_image }
 
     oro_attachment.form.file_subscriber:
-        class: %oro_attachment.form.file_subscriber.class%
+        class: '%oro_attachment.form.file_subscriber.class%'
         arguments: ['@oro_attachment.validator.file_config_validator']
 
     oro_attachment.validator.file_config_validator:
-        class: %oro_attachment.validator.file_config_validator.class%
+        class: '%oro_attachment.validator.file_config_validator.class%'
         arguments: ['@validator', '@oro_entity_config.config_manager', '@oro_config.global']
 
     oro_attachment.form.handler.attachment:
-        class: %oro_attachment.form.handler.attachment.class%
-        scope: request
+        class: '%oro_attachment.form.handler.attachment.class%'
         arguments:
-            - '@request'
+            - '@request_stack'
             - '@doctrine.orm.entity_manager'

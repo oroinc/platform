@@ -4,12 +4,14 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CollectResources;
 
 use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
 use Oro\Bundle\ApiBundle\Processor\CollectResources\LoadFromConfigBag;
+use Oro\Bundle\ApiBundle\Provider\ConfigBagInterface;
+use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\Version;
 
 class LoadFromConfigBagTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigBagInterface */
     protected $configBag;
 
     /** @var LoadFromConfigBag */
@@ -17,11 +19,14 @@ class LoadFromConfigBagTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configBag = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigBag')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configBag = $this->createMock(ConfigBagInterface::class);
 
-        $this->processor = new LoadFromConfigBag($this->configBag);
+        $configBagRegistry = $this->createMock(ConfigBagRegistry::class);
+        $configBagRegistry->expects(self::any())
+            ->method('getConfigBag')
+            ->willReturn($this->configBag);
+
+        $this->processor = new LoadFromConfigBag($configBagRegistry);
     }
 
     public function testProcess()
@@ -29,22 +34,17 @@ class LoadFromConfigBagTest extends \PHPUnit_Framework_TestCase
         $context = new CollectResourcesContext();
         $context->setVersion(Version::LATEST);
 
-        $this->configBag->expects($this->once())
-            ->method('getConfigs')
+        $this->configBag->expects(self::once())
+            ->method('getClassNames')
             ->with(Version::LATEST)
-            ->willReturn(
-                [
-                    'Test\Entity1' => null,
-                    'Test\Entity2' => null,
-                ]
-            );
+            ->willReturn(['Test\Entity1', 'Test\Entity2']);
 
         $this->processor->process($context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'Test\Entity1' => new ApiResource('Test\Entity1'),
-                'Test\Entity2' => new ApiResource('Test\Entity2'),
+                'Test\Entity2' => new ApiResource('Test\Entity2')
             ],
             $context->getResult()->toArray()
         );

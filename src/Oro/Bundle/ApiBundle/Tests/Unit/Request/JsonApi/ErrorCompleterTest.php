@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\JsonApi\JsonApiDocument;
 
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
@@ -17,6 +15,7 @@ use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\ErrorCompleter;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Symfony\Component\HttpFoundation\Response;
 
 class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,6 +25,9 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
     protected $valueNormalizer;
 
+    /** @var RequestType */
+    protected $requestType;
+
     /** @var ErrorCompleter */
     protected $errorCompleter;
 
@@ -33,6 +35,7 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
     {
         $this->exceptionTextExtractor = $this->createMock(ExceptionTextExtractorInterface::class);
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
+        $this->requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
         $this->errorCompleter = new ErrorCompleter($this->exceptionTextExtractor, $this->valueNormalizer);
     }
@@ -42,8 +45,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $error = new Error();
         $expectedError = new Error();
 
-        $this->errorCompleter->complete($error);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorWithInnerExceptionAndAlreadyCompletedProperties()
@@ -64,8 +67,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setDetail('test detail');
         $expectedError->setInnerException($exception);
 
-        $this->errorCompleter->complete($error);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorWithInnerExceptionAndExceptionTextExtractorReturnsNothing()
@@ -78,8 +81,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError = new Error();
         $expectedError->setInnerException($exception);
 
-        $this->errorCompleter->complete($error);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorWithInnerException()
@@ -113,8 +116,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($exception))
             ->willReturn($expectedError->getDetail());
 
-        $this->errorCompleter->complete($error);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorTitleByStatusCode()
@@ -126,8 +129,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setStatusCode(400);
         $expectedError->setTitle(Response::$statusTexts[400]);
 
-        $this->errorCompleter->complete($error);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorTitleByUnknownStatusCode()
@@ -138,8 +141,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError = new Error();
         $expectedError->setStatusCode(1000);
 
-        $this->errorCompleter->complete($error);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorWithPropertyPathAndPointer()
@@ -158,8 +161,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setDetail('test detail');
         $expectedError->setSource($expectedErrorSource);
 
-        $this->errorCompleter->complete($error);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorWithPropertyPathAndDetailEndsWithPoint()
@@ -171,8 +174,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError = new Error();
         $expectedError->setDetail('test detail. Source: property.');
 
-        $this->errorCompleter->complete($error);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 
     /**
@@ -187,8 +190,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError = new Error();
         $expectedError->setDetail($expectedResult['detail']);
 
-        $this->errorCompleter->complete($error);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 
     public function completeErrorWithPropertyPathButWithoutMetadataDataProvider()
@@ -237,8 +240,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setDetail('test detail');
         $expectedError->setSource(ErrorSource::createByPointer('/data/id'));
 
-        $this->errorCompleter->complete($error, $metadata);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorForField()
@@ -256,8 +259,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setDetail('test detail');
         $expectedError->setSource(ErrorSource::createByPointer('/data/attributes/firstName'));
 
-        $this->errorCompleter->complete($error, $metadata);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorForToOneAssociation()
@@ -275,8 +278,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setDetail('test detail');
         $expectedError->setSource(ErrorSource::createByPointer('/data/relationships/user/data'));
 
-        $this->errorCompleter->complete($error, $metadata);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorForToManyAssociation()
@@ -295,8 +298,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setDetail('test detail');
         $expectedError->setSource(ErrorSource::createByPointer('/data/relationships/groups/data'));
 
-        $this->errorCompleter->complete($error, $metadata);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorForChildOfToManyAssociation()
@@ -315,8 +318,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setDetail('test detail');
         $expectedError->setSource(ErrorSource::createByPointer('/data/relationships/groups/data/2'));
 
-        $this->errorCompleter->complete($error, $metadata);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorForNotMappedPointer()
@@ -328,8 +331,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError = new Error();
         $expectedError->setDetail('test detail. Source: notMappedPointer.');
 
-        $this->errorCompleter->complete($error, new EntityMetadata());
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType, new EntityMetadata());
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorForCollapsedArrayAssociation()
@@ -350,8 +353,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setDetail('test detail');
         $expectedError->setSource(ErrorSource::createByPointer('/data/attributes/groups'));
 
-        $this->errorCompleter->complete($error, $metadata);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorForChildOfCollapsedArrayAssociation()
@@ -372,8 +375,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setDetail('test detail');
         $expectedError->setSource(ErrorSource::createByPointer('/data/attributes/groups/1'));
 
-        $this->errorCompleter->complete($error, $metadata);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorForChildFieldOfCollapsedArrayAssociation()
@@ -394,8 +397,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setDetail('test detail');
         $expectedError->setSource(ErrorSource::createByPointer('/data/attributes/groups/1'));
 
-        $this->errorCompleter->complete($error, $metadata);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorForNotCollapsedArrayAssociation()
@@ -415,8 +418,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setDetail('test detail');
         $expectedError->setSource(ErrorSource::createByPointer('/data/attributes/groups'));
 
-        $this->errorCompleter->complete($error, $metadata);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorForChildOfNotCollapsedArrayAssociation()
@@ -436,8 +439,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setDetail('test detail');
         $expectedError->setSource(ErrorSource::createByPointer('/data/attributes/groups/1'));
 
-        $this->errorCompleter->complete($error, $metadata);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorForChildFieldOfNotCollapsedArrayAssociation()
@@ -457,8 +460,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setDetail('test detail');
         $expectedError->setSource(ErrorSource::createByPointer('/data/attributes/groups/1/name'));
 
-        $this->errorCompleter->complete($error, $metadata);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorForExpandRelatedEntitiesConfigFilterConstraint()
@@ -492,8 +495,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $this->exceptionTextExtractor->expects($this->never())
             ->method('getExceptionText');
 
-        $this->errorCompleter->complete($error);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorForFilterFieldsConfigFilterConstraint()
@@ -532,11 +535,11 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
             ->with(
                 'Test\Class',
                 DataType::ENTITY_TYPE,
-                new RequestType([RequestType::JSON_API])
+                self::identicalTo($this->requestType)
             )
             ->willReturn('test_entity');
 
-        $this->errorCompleter->complete($error);
-        $this->assertEquals($expectedError, $error);
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 }

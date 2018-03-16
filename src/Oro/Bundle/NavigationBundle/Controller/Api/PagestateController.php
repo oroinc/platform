@@ -2,19 +2,15 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
-use Symfony\Component\HttpFoundation\Response;
-
 use Doctrine\Common\Persistence\ObjectRepository;
-
-use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Util\Codes;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
 use Oro\Bundle\NavigationBundle\Entity\AbstractPageState;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @NamePrefix("oro_api_")

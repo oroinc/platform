@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
@@ -14,6 +11,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Event\EmailUserAdded;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EmailEntityBatchProcessor implements EmailEntityBatchInterface
 {

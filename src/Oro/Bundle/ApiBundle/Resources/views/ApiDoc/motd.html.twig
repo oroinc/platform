@@ -1,3 +1,4 @@
+{% set rootPath = path(rootRoute) %}
 <style type="text/css">
     #summary { display: none; }
     #api_type { float: left; font-size: 1.2em; padding: 12px 24px; }
@@ -7,6 +8,10 @@
     div.motd { padding-top: 10px; }
     div.motd div.documentation { padding: 3px 0; overflow: hidden; }
     div.motd div.documentation a { font-size: 1.2em; text-decoration: none; }
+    #sandbox_configuration { padding-top: 16px; padding-bottom: 5px; }
+    #sandbox_configuration .account-info { position: absolute; top: 7px; right: 16px; }
+    #sandbox_configuration .account-info em { padding-left: 1em; color: #2c4300; }
+    #sandbox_configuration .account-info a { padding-left: 2em; color: #2c4300; text-decoration: underline; }
 </style>
 <script type="text/javascript">
     handleResourceLinks = function ($el, apiPrefix) {
@@ -53,16 +58,18 @@
         return false;
     };
     $(function() {
-        {% set user = get_current_user() %}
-        var userName = {{ user ? user.username|json_encode|raw : 'null' }},
-            apiKey = {{ user and user.apiKeys|first ? (user.apiKeys|first).apiKey|json_encode|raw : 'null' }},
+        var userName = {{ userName|json_encode|raw }},
+            apiKey = {{ apiKey|json_encode|raw }},
+            loginUrl = {{ loginRoute ? path(loginRoute)|json_encode|raw : 'null' }},
+            logoutUrl = {{ logoutRoute ? path(logoutRoute)|json_encode|raw : 'null' }},
+            sessionAllowed = {{ hasSecurityToken|json_encode|raw }},
             wsseAllowed = userName && apiKey,
             serverTime = {{ 'now'|date('c', 'UTC')|json_encode|raw }},
             clientTime = new Date(),
             serverTimeOffset = Date.parse(serverTime) - clientTime,
+            $motd = $('.motd').first(),
             $apiDocLink = $('#header a').first(),
-            apiDocHref = $apiDocLink.attr('href'),
-            apiType = window.location.pathname.substr(apiDocHref.length + 1),
+            apiType = window.location.pathname.substr('{{ rootPath }}'.length + 1) || '{{ defaultView }}',
             apiPrefix = '',
             escapeSelector = function (val) {
                 return val.replace(/(:|\.|\[|\]|\{|\}|,)/g, "\\$1");
@@ -108,12 +115,44 @@
             apiPrefix = '-' + apiPrefixMatch[1];
         }
 
-        $apiDocLink.after('<div id="api_type">type:&nbsp;&nbsp;' +
-            '<a href="' + apiDocHref + '"' + (apiType === '' ? ' class="active"' : '') + '>plain</a>' +
-            '&nbsp;|&nbsp;' +
-            '<a href="' + apiDocHref + '/rest_json_api"' + (apiType === 'rest_json_api' ? ' class="active"' : '') + '>JSON.API</a>' +
-            '</div>'
-        );
+        /**
+         * Set "home" URI
+         */
+        $apiDocLink.attr('href', '{{ rootPath }}');
+
+        /**
+         * Add the API view selector
+         */
+        {% if views is defined and views and views|length > 1 -%}
+        $apiDocLink.after('<div id="api_type">type:' +
+            {%- for name, view in views %}
+            {%- if view.sandbox %}
+                {%- set viewLink = view.default ? '' : '/' ~ name %}
+                {%- set viewType = view.default ? '' : name %}
+                {%- if loop.first %}'&nbsp;' + {% else %}'&nbsp;|&nbsp;' + {% endif -%}
+                '<a href="' + '{{ rootPath ~ viewLink }}"' +
+                (apiType === '{{ viewType }}' ? ' class="active"' : '') + '>{{ view.label }}</a>' +
+            {%- endif %}
+            {%- endfor -%}
+            '</div>');
+        {% endif %}
+
+        /**
+         * Add the documentation link
+         */
+        {% if views is defined and views -%}
+        var documentationUrl = null;
+        {% for name, view in views -%}
+        {% if view.sandbox and view.documentation_path -%}
+            if (apiType === '{{ name }}') { documentationUrl = '{{ asset(view.documentation_path) }}'; }
+        {% endif -%}
+        {%- endfor -%}
+        if (documentationUrl) {
+            $motd.append('<div class="documentation">' +
+                '<a href="' + documentationUrl + '" target="_blank">The documentation</a>' +
+                '</div>');
+        }
+        {% endif %}
 
         /**
          * Add the authentication type selector
@@ -126,26 +165,29 @@
             '>{{ include('@OroApi/ApiDoc/warning.svg') }}</span>') +
             'authentication: ' +
             '<select id="authentication_type">' +
-                '<option value=""' + (!wsseAllowed ? ' selected=""' : '') + '>None</option>' +
+                '<option value=""' + (!wsseAllowed && !sessionAllowed ? ' selected=""' : '') + '>None</option>' +
                 '<option value="wsse"' + (wsseAllowed ? ' selected=""' : ' disabled=""') + '>WSSE</option>' +
+                '<option value="session"' + (!sessionAllowed ? ' disabled=""' : (!wsseAllowed ? ' selected=""' : '')) + '>Session</option>' +
             '</select>'
         );
-        if (!wsseAllowed) {
-            $('#header').css('background-color', '#F7FE2E');
+        if (!wsseAllowed && !sessionAllowed) {
+            $('#header').css('background-color', '#f7fe2e');
         }
 
         /**
-         * Make JSON as default body format for JSON.API sandbox
+         * Add loggin and logout links
          */
-        if (apiType === 'rest_json_api') {
-            $('#body_format').val('json');
+        var accountInfo = '';
+        if (userName) {
+            accountInfo = '<em>signed in as: ' + userName + '</em>';
+            if (logoutUrl) {
+                accountInfo += '<a href="' + logoutUrl + '?_api_view=' + apiType + '">sign out</a>'
+            }
+        } else if (loginUrl) {
+            accountInfo = '<a href="' + loginUrl + '?_api_view=' + apiType + '">sign in</a>'
         }
-
-        /**
-         * Disable the request format selector for JSON.API and new implementation of REST
-         */
-        if (apiType === 'rest_json_api' || apiType === 'rest_plain') {
-            $('#request_format').attr('disabled', 'disabled');
+        if (accountInfo) {
+            $('#sandbox_configuration').append('<span class="account-info">' + accountInfo + '</span>');
         }
 
         /**
@@ -179,6 +221,18 @@
             }
 
             /**
+             * Add Session authentication related headers
+             */
+            if (authType === 'session') {
+                $headers.append(
+                    '<div class="tuple autogenerated-header">' +
+                    '<input type="hidden" class="key" placeholder="Key" value="X-CSRF-Header">' +
+                    '<input type="hidden" class="value authorization-header" placeholder="Value" value="1">' +
+                    '</div>'
+                );
+            }
+
+            /**
              * Add a header contains the id of current operation
              * It will be used in ajaxPrefilter and ajaxComplete global handlers
              */
@@ -209,14 +263,21 @@
             }
 
             /**
-             * Add Header "Content-Type: application/vnd.api+json" for JSON.API resources
+             * Add view headers
              */
-            var $headers = $(this).closest('.content').find('fieldset.headers'),
-                routePath = $(this).parents('li.operation').find('div.heading span.path').text(),
-                isAllowedRoute = apiType === 'rest_json_api' && routePath.indexOf('/api/rest/') === -1;
-            if (isAllowedRoute) {
-                addHeader($headers, 'Content-Type', 'application/vnd.api+json');
-            }
+            {% if views is defined and views -%}
+                var $headers = $(this).closest('.content').find('fieldset.headers'),
+                    routePath = $(this).parents('li.operation').find('div.heading span.path').text();
+                {% for name, view in views -%}
+                {% if view.headers is defined and view.headers -%}
+                if (apiType === '{{ name }}' && routePath.indexOf('/api/rest/') === -1) {
+                    {%- for headerName, headerValue in view.headers -%}
+                    addHeader($headers, '{{ headerName }}', '{{ headerValue }}');
+                    {%- endfor -%}
+                }
+                {% endif %}
+                {%- endfor %}
+            {%- endif -%}
         });
 
         /**
@@ -308,27 +369,27 @@
                 }
             });
 
+            {% if not enableFormatParameter -%}
             /**
-             * Remove "_format" parameter for JSON.API and new implementation of REST sandboxes
+             * Remove "_format" parameter
              */
-            if (apiType === 'rest_json_api' || apiType === 'rest_plain') {
-                options.url = options.url.replace(
-                    new RegExp("([\?&])(_format=json&?)"), "$1"
-                );
-                if (options.data.lastIndexOf('{"', 0) === 0) {
-                    // json
-                    var data = JSON.parse(options.data);
-                    if (data.hasOwnProperty('_format')) {
-                        delete data['_format'];
-                        options.data = JSON.stringify(data);
-                    }
-                } else {
-                    // uri string
-                    options.data = options.data.replace(
-                        new RegExp("([&]?)(_format=json&?)"), "$1"
-                    );
+            options.url = options.url.replace(
+                new RegExp("([\?&])(_format=&?)"), "$1"
+            );
+            if (options.data.lastIndexOf('{"', 0) === 0) {
+                // json
+                var data = JSON.parse(options.data);
+                if (data.hasOwnProperty('_format')) {
+                    delete data['_format'];
+                    options.data = JSON.stringify(data);
                 }
+            } else {
+                // uri string
+                options.data = options.data.replace(
+                    new RegExp("([&]?)(_format=&?)"), "$1"
+                );
             }
+            {% endif %}
 
             /**
              * Remove "Content-type" header if both "Content-type" and "Content-Type" headers exist
@@ -397,10 +458,4 @@
     });
 </script>
 
-{% if documentationPath is defined and documentationPath %}
-    <div class="motd">
-        <div class="documentation">
-            <a href="{{ asset(documentationPath) }}" target="_blank">The documentation</a>
-        </div>
-    </div>
-{% endif %}
+<div class="motd"></div>

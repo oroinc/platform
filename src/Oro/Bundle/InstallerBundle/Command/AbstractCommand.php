@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
+use Oro\Bundle\InstallerBundle\CommandExecutor;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
-use Oro\Bundle\InstallerBundle\CommandExecutor;
 
 abstract class AbstractCommand extends ContainerAwareCommand
 {

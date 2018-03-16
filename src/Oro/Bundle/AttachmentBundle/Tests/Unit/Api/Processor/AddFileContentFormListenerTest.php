@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Api\Processor;
 
-use Symfony\Component\HttpFoundation\File\File as ComponentFile;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\AttachmentBundle\Api\Processor\AddFileContentFormListener;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Symfony\Component\HttpFoundation\File\File as ComponentFile;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class AddFileContentFormListenerTest extends FormProcessorTestCase
 {

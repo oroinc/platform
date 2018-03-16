@@ -3,10 +3,9 @@
 namespace Oro\Bundle\FilterBundle\Datasource\Orm;
 
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query\Expr;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 
 /**
  * Represents an adapter to ORM data source

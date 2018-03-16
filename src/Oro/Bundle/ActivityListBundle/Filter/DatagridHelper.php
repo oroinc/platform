@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\ActivityListBundle\Filter;
 
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\ActivityListBundle\Model\ActivityListQueryDesigner;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DatagridHelper
 {
@@ -39,8 +38,7 @@ class DatagridHelper
     }
 
     /**
-     * @ActivityListQueryDesigner $queryDesigner
-     *
+     * @param ActivityListQueryDesigner $source
      * @return DatagridInterface
      */
     public function createGrid(ActivityListQueryDesigner $source)

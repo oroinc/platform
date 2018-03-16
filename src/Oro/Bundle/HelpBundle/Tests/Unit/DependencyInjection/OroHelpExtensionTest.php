@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\HelpBundle\DependencyInjection\OroHelpExtension;
 use Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection\Fixtures\BarBundle\BarBundle;
 use Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooBundle;
-
 use Oro\Component\Config\CumulativeResourceManager;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
 {

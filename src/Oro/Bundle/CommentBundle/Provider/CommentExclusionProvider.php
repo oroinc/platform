@@ -3,7 +3,6 @@
 namespace Oro\Bundle\CommentBundle\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\EntityBundle\Provider\AbstractExclusionProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 

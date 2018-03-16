@@ -3,10 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
-use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclRepository;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclIdentityRepository;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclRepository;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 
 class WorkflowPermissionRegistry
 {

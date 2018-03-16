@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Form\Type;
 
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
+use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 
@@ -50,12 +51,18 @@ class ContextsSelectTypeTest extends TypeTestCase
             ->getMock();
     }
 
+    /**
+     * @return array
+     */
     protected function getExtensions()
     {
         return [
             new PreloadedExtension(
                 [
-                    'genemu_jqueryselect2_hidden' => new Select2Type('hidden')
+                    'oro_select2_hidden' => new Select2Type(
+                        'Symfony\Component\Form\Extension\Core\Type\HiddenType',
+                        'oro_select2_hidden'
+                    )
                 ],
                 []
             )
@@ -75,10 +82,16 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->entityTitleResolver,
             $this->createMock(FeatureChecker::class)
         );
-        $type->buildForm($builder, ['collectionModel' => false]);
+        $type->buildForm(
+            $builder,
+            [
+                'collectionModel' => false,
+                'configs' => ['separator' => ContextsToViewTransformer::SEPARATOR]
+            ]
+        );
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
@@ -91,7 +104,7 @@ class ContextsSelectTypeTest extends TypeTestCase
                         'placeholder'        => 'oro.activity.contexts.placeholder',
                         'allowClear'         => true,
                         'multiple'           => true,
-                        'separator'          => ';',
+                        'separator'          => ContextsToViewTransformer::SEPARATOR,
                         'forceSelectedData'  => true,
                         'minimumInputLength' => 0,
                     ]
@@ -106,7 +119,7 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->entityTitleResolver,
             $this->createMock(FeatureChecker::class)
         );
-        $type->setDefaultOptions($resolver);
+        $type->configureOptions($resolver);
     }
 
     public function testGetParent()
@@ -119,7 +132,7 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->entityTitleResolver,
             $this->createMock(FeatureChecker::class)
         );
-        $this->assertEquals('genemu_jqueryselect2_hidden', $type->getParent());
+        $this->assertEquals('oro_select2_hidden', $type->getParent());
     }
 
     public function testGetName()

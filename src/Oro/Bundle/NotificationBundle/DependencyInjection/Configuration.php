@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\NotificationBundle\DependencyInjection;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-
-use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 
 /**
  * This is the class that validates and merges configuration from your app/config files

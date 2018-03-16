@@ -5,14 +5,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-
 use Oro\Component\Testing\Unit\EntityTrait;
+use Psr\Log\LoggerInterface;
 
 class ProcessDefinitionsConfiguratorTest extends \PHPUnit_Framework_TestCase
 {

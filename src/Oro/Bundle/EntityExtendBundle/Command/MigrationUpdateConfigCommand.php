@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigLogger;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
+use Oro\Component\Log\OutputLogger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Component\Log\OutputLogger;
-
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigLogger;
-use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
-use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
 
 class MigrationUpdateConfigCommand extends ContainerAwareCommand
 {

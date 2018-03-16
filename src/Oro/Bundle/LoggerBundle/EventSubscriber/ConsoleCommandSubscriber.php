@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LoggerBundle\EventSubscriber;
 
 use Monolog\Logger;
-
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;

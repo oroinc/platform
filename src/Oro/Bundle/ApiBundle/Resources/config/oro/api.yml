@@ -3,10 +3,6 @@ api:
         Oro\Bundle\ApiBundle\Model\EntityIdentifier:
             alias:        entityidentifier
             plural_alias: entityidentifiers
-        # @deprecated since 2.0. Use Oro\Bundle\ApiBundle\Model\EntityIdentifier instead
-        Oro\Bundle\ApiBundle\Model\EntityDescriptor:
-            alias:        entitydescriptor
-            plural_alias: entitydescriptors
 
     entities:
         Oro\Bundle\ApiBundle\Model\EntityIdentifier:
@@ -15,8 +11,8 @@ api:
             fields:
                 # this is a predefined field name that is used to provide
                 # the class name of the target entity
-                # @see Oro\Component\EntitySerializer\ConfigUtil::CLASS_NAME
-                # @see Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessorInterface::getClassName
+                # @see \Oro\Component\EntitySerializer\ConfigUtil::CLASS_NAME
+                # @see \Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessorInterface::getClassName
                 __class__:
                     meta_property: true
                     data_type: string
@@ -24,28 +20,4 @@ api:
                 id:
                     data_type: string
             # this entity does not have own Data API resource
-            actions: false
-
-        # @deprecated since 2.0. Use Oro\Bundle\ApiBundle\Model\EntityIdentifier instead
-        Oro\Bundle\ApiBundle\Model\EntityDescriptor:
-            identifier_field_names: [id]
-            disable_fieldset: true
-            fields:
-                # this is a predefined field name that is used to provide
-                # the class name of the target entity
-                # @see Oro\Component\EntitySerializer\ConfigUtil::CLASS_NAME
-                # @see Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessorInterface::getClassName
-                __class__:
-                    meta_property: true
-                    data_type: string
-                    property_path: class
-                # the identifier of the target entity
-                id:
-                    data_type: string
-                # a human-readable representation of the target entity
-                title:
-                    data_type: string
-                    meta_property: true
-            # this entity does not have own Data API resource
-            # and should be used only as a sub-resource of other entities
             actions: false

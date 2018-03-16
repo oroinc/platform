@@ -3,10 +3,9 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-
+use Oro\Bundle\EmbeddedFormBundle\Migrations\Schema\v1_3\OroEmbeddedFormBundle;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\EmbeddedFormBundle\Migrations\Schema\v1_3\OroEmbeddedFormBundle;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)

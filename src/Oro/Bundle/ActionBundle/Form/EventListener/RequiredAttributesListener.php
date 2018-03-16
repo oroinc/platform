@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ActionBundle\Form\EventListener;
 
+use Oro\Bundle\ActionBundle\Model\ActionData;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-
-use Oro\Bundle\ActionBundle\Model\ActionData;
 
 /**
  * This listener removes attributes from context if they are not present in form in PRE_SET_DATA event

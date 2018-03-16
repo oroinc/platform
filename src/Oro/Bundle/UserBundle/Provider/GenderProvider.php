@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Provider;
 
-use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\UserBundle\Model\Gender;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class GenderProvider
 {

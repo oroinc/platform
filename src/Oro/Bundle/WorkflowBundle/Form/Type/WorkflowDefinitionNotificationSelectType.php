@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
-use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 
 class WorkflowDefinitionNotificationSelectType extends AbstractType
 {
@@ -78,6 +77,6 @@ class WorkflowDefinitionNotificationSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'genemu_jqueryselect2_entity';
+        return 'oro_select2_entity';
     }
 }

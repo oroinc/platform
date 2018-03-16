@@ -9,7 +9,6 @@ use Oro\Bundle\ActionBundle\Tests\Functional\Stub\ButtonStub;
 use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
-
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class WidgetControllerTest extends WebTestCase

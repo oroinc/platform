@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\SearchBundle\DependencyInjection;
 
+use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Query\Mode;
+use Oro\Bundle\SearchBundle\Query\Query;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-
-use Oro\Bundle\SearchBundle\Query\Mode;
-use Oro\Bundle\SearchBundle\Query\Query;
-use Oro\Bundle\SearchBundle\Engine\Indexer;
 
 class EntitiesConfigConfiguration implements ConfigurationInterface
 {

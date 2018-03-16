@@ -2,9 +2,8 @@
 
 namespace Oro\Component\Action\Action;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Component\ConfigExpression\ExpressionInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ActionFactory implements ActionFactoryInterface
 {

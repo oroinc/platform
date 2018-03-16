@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineEventHandlersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-
-use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineEventHandlersPass;
 
 class UpdateDoctrineEventHandlersPassTest extends \PHPUnit_Framework_TestCase
 {

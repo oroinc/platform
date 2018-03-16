@@ -3,7 +3,6 @@
 namespace Oro\Component\Layout;
 
 use Doctrine\Common\Cache\CacheProvider;
-
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
 

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Form\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FilterType extends AbstractType
 {
@@ -50,13 +50,13 @@ class FilterType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(
                 'entity'             => null,
                 'data_class'         => 'Oro\Bundle\QueryDesignerBundle\Model\Filter',
-                'intention'          => 'query_designer_filter',
+                'csrf_token_id'      => 'query_designer_filter',
                 'column_choice_type' => 'oro_entity_field_select',
             )
         );

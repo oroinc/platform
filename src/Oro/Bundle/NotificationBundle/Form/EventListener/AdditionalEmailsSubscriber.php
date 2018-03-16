@@ -5,18 +5,16 @@ namespace Oro\Bundle\NotificationBundle\Form\EventListener;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 
 class AdditionalEmailsSubscriber implements EventSubscriberInterface
 {

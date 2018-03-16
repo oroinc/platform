@@ -11,32 +11,32 @@ parameters:
 
 services:
     oro_chart.config_provider:
-        class: %oro_chart.config_provider.class%
+        class: '%oro_chart.config_provider.class%'
         arguments:
             - []
 
     oro_chart.view_builder:
-        class: %oro_chart.view_builder.class%
-        scope: prototype
+        class: '%oro_chart.view_builder.class%'
+        shared: false
         arguments:
             - '@oro_chart.config_provider'
             - '@oro_chart.data_transformer.factory'
             - '@twig'
 
     oro_chart.form.type.settings:
-        class: %oro_chart.form.type.settings.class%
+        class: '%oro_chart.form.type.settings.class%'
         arguments:
             - '@oro_chart.config_provider'
         tags:
             - { name: form.type, alias: oro_chart_setting }
 
     oro_chart.form.type.settings.collection:
-        class: %oro_chart.form.type.settings.collection.class%
+        class: '%oro_chart.form.type.settings.collection.class%'
         tags:
             - { name: form.type, alias: oro_chart_settings_collection }
 
     oro_chart.form.type:
-        class: %oro_chart.form.type.class%
+        class: '%oro_chart.form.type.class%'
         arguments:
             - '@oro_chart.config_provider'
         tags:
@@ -45,15 +45,15 @@ services:
              - [setEventListener,  ['@oro_chart.form.event_listener.chart']]
 
     oro_chart.form.event_listener.chart:
-        class: %oro_chart.form.event_listener.chart.class%
+        class: '%oro_chart.form.event_listener.chart.class%'
 
     oro_chart.data_transformer.factory:
-        class: %oro_chart.data_transformer.factory.class%
+        class: '%oro_chart.data_transformer.factory.class%'
         arguments:
             - '@service_container'
 
     oro_chart.data_transformer.pie_chart:
-        class: %oro_chart.data_transformer.pie_chart.class%
+        class: '%oro_chart.data_transformer.pie_chart.class%'
 
     oro_chart.options_builder:
-        class: %oro_chart.options_builder.class%
+        class: '%oro_chart.options_builder.class%'

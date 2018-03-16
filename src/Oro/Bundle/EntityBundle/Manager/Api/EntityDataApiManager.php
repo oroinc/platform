@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityBundle\Manager\Api;
 
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldManager;
 use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class EntityDataApiManager
 {

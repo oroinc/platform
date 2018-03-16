@@ -3,14 +3,11 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Configuration;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouterInterface;
 
 class OperationConfigurationValidatorTest extends \PHPUnit_Framework_TestCase
 {

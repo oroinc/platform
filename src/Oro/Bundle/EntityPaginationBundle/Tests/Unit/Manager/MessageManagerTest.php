@@ -3,10 +3,9 @@
 namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
+use Oro\Bundle\EntityPaginationBundle\Manager\MessageManager;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-
-use Oro\Bundle\EntityPaginationBundle\Manager\MessageManager;
 
 class MessageManagerTest extends \PHPUnit_Framework_TestCase
 {

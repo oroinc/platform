@@ -89,7 +89,7 @@ class EntityTest extends Selenium2TestCase
             ->tab('System')
             ->menu('Entities')
             ->menu($entityName);
-            /** @var ConfigEntity $login */
+        /** @var ConfigEntity $login */
         $login->openConfigEntity('Oro\Bundle\EntityConfigBundle')
             ->newCustomEntityAdd()
             ->checkEntityField('test_field')

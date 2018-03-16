@@ -3,19 +3,16 @@
 namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
-
 use Knp\Menu\ItemInterface;
-
+use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
+use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
+use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
-use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
-use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
-use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
-use Oro\Bundle\ScopeBundle\Entity\Scope;
 
 abstract class AbstractAjaxMenuController extends Controller
 {

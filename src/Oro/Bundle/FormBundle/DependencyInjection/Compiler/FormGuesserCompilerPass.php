@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\FormBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class FormGuesserCompilerPass implements CompilerPassInterface
 {

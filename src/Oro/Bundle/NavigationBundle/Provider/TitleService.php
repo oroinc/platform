@@ -6,7 +6,6 @@ use Knp\Menu\ItemInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
-
 use Oro\Component\DependencyInjection\ServiceLink;
 
 /**

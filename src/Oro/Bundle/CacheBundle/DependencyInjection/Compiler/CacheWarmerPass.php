@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\CacheBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface;
+use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface;
-use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 
 class CacheWarmerPass implements CompilerPassInterface
 {

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MessageQueueBundle\Consumption\CacheState;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\InterruptConsumptionExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
+use Psr\Log\LoggerInterface;
 
 class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
 {

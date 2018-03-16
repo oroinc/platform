@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Event;
 
+use Oro\Bundle\FormBundle\Event\FormHandler\FormAwareInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
-
-use Oro\Bundle\FormBundle\Event\FormHandler\FormAwareInterface;
 
 class EventDispatcher extends ImmutableEventDispatcher
 {

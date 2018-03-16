@@ -4,11 +4,9 @@ namespace Oro\Bundle\AddressBundle\Provider;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
-
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * The aim of this class is to help getting a phone number from an object.

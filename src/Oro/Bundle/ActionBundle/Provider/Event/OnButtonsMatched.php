@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Provider\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
+use Symfony\Component\EventDispatcher\Event;
 
 class OnButtonsMatched extends Event
 {

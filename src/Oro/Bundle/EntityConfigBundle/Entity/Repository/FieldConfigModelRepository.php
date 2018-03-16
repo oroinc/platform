@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Entity\Repository;
 
-use Doctrine\ORM\EntityRepository;
 use Doctrine\Common\Collections\Criteria;
-
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 

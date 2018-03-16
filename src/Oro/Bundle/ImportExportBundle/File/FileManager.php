@@ -6,9 +6,7 @@ use Gaufrette\Adapter;
 use Gaufrette\File;
 use Gaufrette\Filesystem;
 use Gaufrette\Stream;
-
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
-
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileManager

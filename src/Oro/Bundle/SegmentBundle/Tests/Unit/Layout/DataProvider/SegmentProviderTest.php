@@ -4,7 +4,6 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Layout\DataProvider;
 
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Layout\DataProvider\SegmentProvider;

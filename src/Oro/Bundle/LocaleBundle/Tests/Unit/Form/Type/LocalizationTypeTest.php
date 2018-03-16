@@ -2,23 +2,21 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\PreloadedExtension;
-
 use Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension;
 use Oro\Bundle\LocaleBundle\Form\Type\FormattingSelectType;
 use Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType;
-use Oro\Bundle\LocaleBundle\Form\Type\LocalizationType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationParentSelectType;
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizationType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub\Localization;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\FormattingSelectTypeStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizedFallbackValueCollectionTypeStub;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-
 use Oro\Component\Testing\Unit\EntityTrait;
-use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
+use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Symfony\Component\Form\PreloadedExtension;
 
 class LocalizationTypeTest extends FormIntegrationTestCase
 {

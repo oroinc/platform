@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension\Generator;
 
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\ParsedExpression;
-
+use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ExpressionGeneratorExtension;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
-use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ExpressionGeneratorExtension;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 class ExpressionGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\FirstEngineBundle\FirstEngineBundle;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondEngineBundle\SecondEngineBundle;
 use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
-use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroSearchExtensionTest extends ExtensionTestCase
 {

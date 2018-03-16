@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Form\EventListener;
 
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormInterface;
-
+use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
+use Oro\Bundle\QueryDesignerBundle\Model\DateGrouping;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Form\EventListener\DateGroupingFormSubscriber;
 use Oro\Bundle\ReportBundle\Form\Type\ReportType;
-use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
-use Oro\Bundle\QueryDesignerBundle\Model\DateGrouping;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormInterface;
 
 class DateGroupingFormSubscriberTest extends \PHPUnit_Framework_TestCase
 {

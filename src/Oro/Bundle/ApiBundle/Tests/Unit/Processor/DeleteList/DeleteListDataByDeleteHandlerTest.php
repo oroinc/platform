@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\DeleteList;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListDataByDeleteHandler;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
 {

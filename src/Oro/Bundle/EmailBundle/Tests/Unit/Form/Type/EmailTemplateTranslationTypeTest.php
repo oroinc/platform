@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType;
+use Symfony\Component\Form\FormView;
 
 class EmailTemplateTranslationTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,14 +27,14 @@ class EmailTemplateTranslationTypeTest extends \PHPUnit_Framework_TestCase
         unset($this->configManager);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));
 
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
     }
 
     public function testBuildView()

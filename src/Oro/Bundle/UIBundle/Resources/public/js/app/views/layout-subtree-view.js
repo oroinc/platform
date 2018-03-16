@@ -18,6 +18,13 @@ define(function(require) {
 
         formState: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function LayoutSubtreeView() {
+            LayoutSubtreeView.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             this.options = $.extend(true, {}, this.options, options);
             LayoutSubtreeView.__super__.initialize.apply(this, arguments);

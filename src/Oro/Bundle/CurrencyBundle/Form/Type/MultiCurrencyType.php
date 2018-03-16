@@ -2,17 +2,20 @@
 
 namespace Oro\Bundle\CurrencyBundle\Form\Type;
 
-use Symfony\Component\Form\FormInterface;
+use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
+use Oro\Bundle\CurrencyBundle\Entity\Price;
+use Oro\Bundle\CurrencyBundle\Form\DataTransformer\MoneyValueTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-use Oro\Bundle\CurrencyBundle\Form\DataTransformer\MoneyValueTransformer;
-use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
-
+/**
+ * Builds multi currency select with value and currency inputs, handles constraints assigning depending on default value
+ */
 class MultiCurrencyType extends PriceType
 {
     const NAME = 'oro_multicurrency';
@@ -47,9 +50,7 @@ class MultiCurrencyType extends PriceType
                 'number',
                 [
                     'required' => $isRequired,
-                    'scale' => $this->roundingService->getPrecision(),
-                    'rounding_mode' => $this->roundingService->getRoundType(),
-                    'attr' => ['data-scale' => $this->roundingService->getPrecision()],
+                    'scale' => Price::MAX_VALUE_SCALE,
                     'constraints' => $options['value_constraints']
                 ]
             )

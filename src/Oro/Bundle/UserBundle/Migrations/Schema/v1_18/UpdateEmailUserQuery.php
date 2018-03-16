@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_18;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 /**
  * Depends to the UserBundle

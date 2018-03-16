@@ -4,7 +4,6 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Entity\Repository;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 
 class ChannelRepositoryTest extends \PHPUnit_Framework_TestCase

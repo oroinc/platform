@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-
 use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class GetAvailableWorkflowByRecordGroup extends AbstractAction
 {

@@ -3,9 +3,6 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
@@ -13,6 +10,7 @@ use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Oro\Bundle\FormBundle\Tests\Unit\MockHelper;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
 {
@@ -71,6 +69,9 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
             ->getMock();
     }
 
+    /**
+     * @return array
+     */
     protected function getExtensions()
     {
         return array_merge(parent::getExtensions(), [new TestFormExtension()]);

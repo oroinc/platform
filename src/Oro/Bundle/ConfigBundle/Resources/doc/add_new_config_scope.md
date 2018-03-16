@@ -134,7 +134,7 @@ add new action to manipulate data:
      * )
      * @Template()
      */
-    public function testConfigAction($activeGroup = null, $activeSubGroup = null)
+    public function testConfigAction(Request $request, $activeGroup = null, $activeSubGroup = null)
     {
         $provider = $this->get('acme_test.provider.form_provider.test');
 
@@ -150,7 +150,7 @@ add new action to manipulate data:
 
             if ($this->get('oro_config.form.handler.config')
                 ->setConfigManager($manager)
-                ->process($form, $this->getRequest())
+                ->process($form, $request)
             ) {
                 $this->get('session')->getFlashBag()->add(
                     'success',

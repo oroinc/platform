@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
-use PHPUnit\Framework\TestCase;
-
-use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use NumberFormatter as IntlNumberFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 /**

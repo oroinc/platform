@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Utils;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\SearchBundle\Utils\SearchAllText;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class SearchAllTextTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Form\Type;
 
-use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormFactoryInterface;
 
 /**
  * @dbIsolationPerTest

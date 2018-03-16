@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\TypeTestCase;
-
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetSortByType;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class WidgetSortByTypeTest extends TypeTestCase
 {

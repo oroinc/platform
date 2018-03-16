@@ -2,19 +2,18 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Board;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
 use Oro\Bundle\DataGridBundle\Extension\Board\BoardExtension;
 use Oro\Bundle\DataGridBundle\Extension\Board\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager;
+use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class BoardExtensionTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,11 +3,10 @@ namespace Oro\Bundle\AddressBundle\Form\EventListener;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
 use Oro\Bundle\FormBundle\Entity\PrimaryItem;
-
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * When address is created/updated from single form, it will ensure the rules of one primary address uniqueness

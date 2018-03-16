@@ -2,19 +2,16 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment;
 
-use Symfony\Component\Config\Definition\Processor;
+use Oro\Bundle\ApiBundle\Config\EntityConfigMerger;
+use Oro\Bundle\ApiBundle\Provider\ConfigBagInterface;
 
-use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
-use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
-use Oro\Bundle\ApiBundle\Provider\ConfigBag;
-
-class TestConfigBag extends ConfigBag
+class TestConfigBag implements ConfigBagInterface
 {
-    /** @var ConfigExtensionRegistry */
-    private $extensionRegistry;
+    /** @var ConfigBagInterface */
+    private $configBag;
 
-    /** @var array */
-    private $originalConfig;
+    /** @var EntityConfigMerger */
+    private $entityConfigMerger;
 
     /** @var array */
     private $appendedConfig = [];
@@ -23,14 +20,49 @@ class TestConfigBag extends ConfigBag
     private $hasChanges = false;
 
     /**
-     * @param ConfigExtensionRegistry $extensionRegistry
+     * @param ConfigBagInterface $configBag
+     * @param EntityConfigMerger $entityConfigMerger
      */
-    public function setExtensionRegistry(ConfigExtensionRegistry $extensionRegistry)
+    public function __construct(
+        ConfigBagInterface $configBag,
+        EntityConfigMerger $entityConfigMerger
+    ) {
+        $this->configBag = $configBag;
+        $this->entityConfigMerger = $entityConfigMerger;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getClassNames(string $version): array
     {
-        $this->extensionRegistry = $extensionRegistry;
-        if (null === $this->originalConfig) {
-            $this->originalConfig = $this->config;
+        $result = $this->configBag->getClassNames($version);
+        if (!empty($this->appendedConfig['entities'])) {
+            $result = array_unique(array_merge($result, array_keys($this->appendedConfig['entities'])));
         }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfig(string $className, string $version): ?array
+    {
+        $result = $this->configBag->getConfig($className, $version);
+        if (!empty($this->appendedConfig['entities'][$className])) {
+            $result = $this->entityConfigMerger->merge($this->appendedConfig['entities'][$className], $result);
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRelationConfig(string $className, string $version): ?array
+    {
+        return $this->configBag->getRelationConfig($className, $version);
     }
 
     /**
@@ -40,11 +72,6 @@ class TestConfigBag extends ConfigBag
     public function appendEntityConfig($entityClass, array $config)
     {
         $this->appendedConfig['entities'][$entityClass] = $config;
-        $processor = new Processor();
-        $this->config = $processor->processConfiguration(
-            new ApiConfiguration($this->extensionRegistry),
-            [$this->originalConfig, $this->appendedConfig]
-        );
         $this->hasChanges = true;
     }
 
@@ -57,7 +84,6 @@ class TestConfigBag extends ConfigBag
             return false;
         }
 
-        $this->config = $this->originalConfig;
         $this->appendedConfig = [];
         $this->hasChanges = false;
 

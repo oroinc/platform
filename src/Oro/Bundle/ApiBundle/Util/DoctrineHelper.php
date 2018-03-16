@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper as BaseHelper;

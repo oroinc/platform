@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
-use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
-use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
+use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
+use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 
 class ValidationHelper
 {

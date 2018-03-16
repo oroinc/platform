@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit;
 
-use Oro\Component\Layout\LayoutFactoryBuilderInterface;
-use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
-
 use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\GroupingFormLayoutBuilder;
+use Oro\Component\Layout\LayoutFactoryBuilderInterface;
+use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
 
 /**
  * The base test case that helps testing block types

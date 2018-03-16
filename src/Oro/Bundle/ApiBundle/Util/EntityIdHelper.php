@@ -3,12 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Oro\Component\PhpUtils\ReflectionUtil;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
  * Provides a set of methods to simplify working with entity identifier.

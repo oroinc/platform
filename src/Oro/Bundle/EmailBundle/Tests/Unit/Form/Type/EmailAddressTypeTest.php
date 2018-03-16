@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
 
 class EmailAddressTypeTest extends TypeTestCase
 {
@@ -48,7 +47,7 @@ class EmailAddressTypeTest extends TypeTestCase
         $this->assertEquals(trim($formData), $view->vars['value']);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver */
         $resolver = $this->createMock(OptionsResolver::class);

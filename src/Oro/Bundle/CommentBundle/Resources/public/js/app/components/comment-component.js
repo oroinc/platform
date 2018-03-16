@@ -14,7 +14,16 @@ define(function(require) {
     var DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     CommentComponent = BaseComponent.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function CommentComponent() {
+            CommentComponent.__super__.constructor.apply(this, arguments);
+        },
 
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = options || {};
 

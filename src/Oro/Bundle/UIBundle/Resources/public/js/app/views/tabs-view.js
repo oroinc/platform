@@ -15,6 +15,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function DatePickerTabsView() {
+            DatePickerTabsView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['data', 'template']));
             DatePickerTabsView.__super__.initialize.apply(this, arguments);

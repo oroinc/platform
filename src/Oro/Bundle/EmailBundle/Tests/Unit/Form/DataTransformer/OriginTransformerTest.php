@@ -3,13 +3,11 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\DataTransformer\OriginTransformer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class OriginTransformerTest extends \PHPUnit_Framework_TestCase
 {

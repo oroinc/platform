@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-
 use Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 class ActionsPass implements CompilerPassInterface
 {

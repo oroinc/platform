@@ -48,7 +48,7 @@ services:
             - { name: twig.extension }
 
     kernel.listener.maintenance.event:
-        class: %oro_wamp.listener.maintenance.class%
+        class: '%oro_wamp.listener.maintenance.class%'
         arguments:
             - "@oro_wamp.publisher"
             - "@oro_security.token_accessor"
@@ -68,7 +68,7 @@ services:
         class: Oro\Bundle\SyncBundle\EventListener\DoctrineTagEventListener
         arguments:
             - '@oro_sync.content.topic_sender'
-            - %installed%
+            - '%installed%'
         tags:
             - { name: doctrine.event_listener, event: onFlush, connection: default }
             - { name: doctrine.event_listener, event: postFlush, connection: default }
@@ -89,11 +89,6 @@ services:
         class: Oro\Bundle\SyncBundle\Content\SimpleTagGenerator
         tags:
             - { name: oro_sync.tag_generator }
-
-    oro_sync.content.security.context.link:
-        deprecated: The "%service_id%" service is deprecated since 2.3.
-        tags:
-            - { name: oro_service_link, service: security.context }
 
     oro_sync.content.tag_generator_chain.link:
         tags:

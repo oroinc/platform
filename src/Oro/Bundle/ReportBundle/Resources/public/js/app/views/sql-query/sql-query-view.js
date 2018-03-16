@@ -13,13 +13,27 @@ define(function(require) {
             show_sql: 'oro.report.view_sql.show_sql_query',
             hide_sql: 'oro.report.view_sql.hide_sql_query'
         },
+
         messages: {
             copy_not_supported: 'oro.report.view_sql.messages.copy_not_supported',
             copied: 'oro.report.view_sql.messages.copied',
             copy_not_successful: 'oro.datagrid.view_sql.messages.copy_not_successful'
         },
+
         linkLabel: __('oro.report.view_sql.show_sql_query'),
+
         template: require('tpl!../../../../templates/sql-query-view.html'),
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function SqlQueryView() {
+            SqlQueryView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.grid = options.grid;
             this.metadata = options.metadata;
@@ -31,6 +45,7 @@ define(function(require) {
             }, this));
             SqlQueryView.__super__.initialize.call(this, options);
         },
+
         getTemplateData: function() {
             return {
                 sql: this.metadata.stored_sql.sql,
@@ -38,10 +53,12 @@ define(function(require) {
                 gridName: this.grid.name
             };
         },
+
         onUpdate: function() {
             this.metadata = this.grid.metadata;
             this.render();
         },
+
         toggleSqlCode: function() {
             var $box = this.$el.find('#sql-query-box-' + this.grid.name);
             var $link = this.$el.find('#show-sql-query-link');
@@ -56,6 +73,7 @@ define(function(require) {
                 $box.hide();
             }
         },
+
         copySql: function() {
             var sql = document.querySelector('#sql-query-box-' + this.grid.name + ' .sql-query-code');
             var range = document.createRange();

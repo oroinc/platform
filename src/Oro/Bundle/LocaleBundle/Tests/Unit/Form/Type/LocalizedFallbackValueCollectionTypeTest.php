@@ -34,16 +34,16 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit_Framework_TestCa
     {
         $expectedOptions = [
             'field' => 'string',
-            'type' => 'text',
-            'options' => [],
+            'entry_type' => 'text',
+            'entry_options' => [],
         ];
 
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($expectedOptions);
 
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
     }
 
     public function testBuildForm()
@@ -58,14 +58,14 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit_Framework_TestCa
             ->with(
                 LocalizedFallbackValueCollectionType::FIELD_VALUES,
                 LocalizedPropertyType::NAME,
-                ['type' => $type, 'options' => $options]
+                ['entry_type' => $type, 'entry_options' => $options]
             )->willReturnSelf();
         $builder->expects($this->at(1))
             ->method('add')
             ->with(
                 LocalizedFallbackValueCollectionType::FIELD_IDS,
                 'collection',
-                ['type' => 'hidden']
+                ['entry_type' => 'hidden']
             )->willReturnSelf();
         $builder->expects($this->once())
             ->method('addViewTransformer')
@@ -74,7 +74,7 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit_Framework_TestCa
 
         $this->type->buildForm(
             $builder,
-            ['type' => $type, 'options' => $options, 'field' => $field]
+            ['entry_type' => $type, 'entry_options' => $options, 'field' => $field]
         );
     }
 }

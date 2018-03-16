@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-use Oro\Component\Config\CumulativeResourceManager;
-
 use Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionListConfiguration;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Configuration\Stub\TestBundle1\TestBundle1;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Configuration\Stub\TestBundle2\TestBundle2;
+use Oro\Component\Config\CumulativeResourceManager;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class ConfigurablePermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 {

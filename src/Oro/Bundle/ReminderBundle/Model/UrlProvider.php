@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ReminderBundle\Model;
 
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Symfony\Component\Routing\RouterInterface;
 
 class UrlProvider
 {

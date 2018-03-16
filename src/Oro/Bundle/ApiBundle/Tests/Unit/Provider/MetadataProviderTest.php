@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
-use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
@@ -10,6 +9,7 @@ use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 class MetadataProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,9 +30,9 @@ class MetadataProviderTest extends \PHPUnit_Framework_TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage $className must not be empty.
      */
-    public function testShouldThrowExceptionIfNoClassName()
+    public function testShouldThrowExceptionIfClassNameIsEmpty()
     {
-        $this->metadataProvider->getMetadata(null, '1.2', new RequestType([]), new EntityDefinitionConfig());
+        $this->metadataProvider->getMetadata('', '1.2', new RequestType([]), new EntityDefinitionConfig());
     }
 
     public function testShouldBuildMetadata()

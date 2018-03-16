@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
+use Oro\Bundle\WorkflowBundle\Model\Action\TransitWorkflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
-
-use Oro\Bundle\WorkflowBundle\Model\Action\TransitWorkflow;
-use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-
-use Oro\Component\ConfigExpression\ContextAccessor;
 
 class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
 {

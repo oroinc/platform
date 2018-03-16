@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\LayoutBundle\EventListener;
 
+use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
+use Oro\Component\Layout\Extension\Theme\ResourceProvider\ResourceProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-
-use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
-use Oro\Component\Layout\Extension\Theme\ResourceProvider\ResourceProviderInterface;
 
 class ContainerListener
 {

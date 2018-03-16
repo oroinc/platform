@@ -3,15 +3,16 @@
 namespace Oro\Bundle\DataGridBundle\Datagrid\Common;
 
 use Doctrine\ORM\EntityRepository;
-
-use Oro\Component\Config\Common\ConfigObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
+use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Component\Config\Common\ConfigObject;
 
 /**
+ * This class represents read & parsed datagrid configuration.
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class DatagridConfiguration extends ConfigObject
@@ -436,5 +437,20 @@ class DatagridConfiguration extends ConfigObject
         );
 
         return $this;
+    }
+
+    /**
+     * @param string $datagridName
+     * @return bool
+     */
+    public function isDatagridExtendedFrom($datagridName)
+    {
+        $parentGrids = $this->offsetGetOr(SystemAwareResolver::KEY_EXTENDED_FROM, []);
+        foreach ($parentGrids as $parentGridName) {
+            if ($parentGridName === $datagridName) {
+                return true;
+            }
+        }
+        return false;
     }
 }

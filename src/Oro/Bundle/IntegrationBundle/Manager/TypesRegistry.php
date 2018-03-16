@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\IntegrationBundle\Manager;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Oro\Bundle\IntegrationBundle\Exception\LogicException;
+use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
+use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface as IntegrationInterface;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\DefaultOwnerTypeAwareInterface;

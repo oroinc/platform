@@ -4,13 +4,13 @@ parameters:
 
 services:
     oro_search.search.engine:
-        class: %oro_search.engine.class%
+        class: '%oro_search.engine.class%'
         arguments:
             - '@doctrine'
             - '@oro_search.mapper'
             - '@event_dispatcher'
         calls:
-            - [setLogQueries, [%oro_search.log_queries%]]
+            - [setLogQueries, ['%oro_search.log_queries%']]
 
     oro_search.search.engine.indexer:
         class: '%oro_search.engine.indexer.class%'

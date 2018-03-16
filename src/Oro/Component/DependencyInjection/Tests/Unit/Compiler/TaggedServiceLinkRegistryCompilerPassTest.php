@@ -2,13 +2,12 @@
 
 namespace Oro\Component\DependencyInjection\Tests\Unit\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-
 use Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass;
 use Oro\Component\DependencyInjection\ServiceLinkRegistry;
 use Oro\Component\DependencyInjection\Tests\Unit\Stub\ServiceLinkRegistryAwareStub;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class TaggedServiceLinkRegistryCompilerPassTest extends \PHPUnit_Framework_TestCase
 {

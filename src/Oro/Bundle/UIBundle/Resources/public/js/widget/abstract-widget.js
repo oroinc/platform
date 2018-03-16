@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var AbstractWidget;
+    var AbstractWidgetView;
     var document = window.document;
     var $ = require('jquery');
     var _ = require('underscore');
@@ -16,10 +16,10 @@ define(function(require) {
 
     /**
      * @export  oroui/js/widget/abstract-widget
-     * @class   oroui.widget.AbstractWidget
+     * @class   oroui.widget.AbstractWidgetView
      * @extends oroui.app.views.BaseView
      */
-    AbstractWidget = BaseView.extend({
+    AbstractWidgetView = BaseView.extend({
         options: {
             type: 'widget',
             actionsEl: '.widget-actions',
@@ -55,6 +55,13 @@ define(function(require) {
             renderComplete: '_initSectionActions'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function AbstractWidgetView() {
+            AbstractWidgetView.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             options = options || {};
             this.options = _.defaults(options, this.options);
@@ -85,7 +92,7 @@ define(function(require) {
                 // If remove method was called directly -- execute dispose first
                 this.dispose();
             } else {
-                AbstractWidget.__super__.remove.call(this);
+                AbstractWidgetView.__super__.remove.call(this);
             }
         },
 
@@ -117,7 +124,7 @@ define(function(require) {
             }
             this.trigger('widgetRemoved');
 
-            AbstractWidget.__super__.dispose.call(this);
+            AbstractWidgetView.__super__.dispose.call(this);
         },
 
         /**
@@ -913,5 +920,5 @@ define(function(require) {
         }
     });
 
-    return AbstractWidget;
+    return AbstractWidgetView;
 });

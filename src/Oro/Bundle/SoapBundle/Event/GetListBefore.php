@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SoapBundle\Event;
 
 use Doctrine\Common\Collections\Criteria;
-
 use Symfony\Component\EventDispatcher\Event;
 
 class GetListBefore extends Event

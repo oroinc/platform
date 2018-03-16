@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\CurrencyBundle\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Validator\Constraints;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
 
 class OptionalPriceValidator extends ConstraintValidator
 {
@@ -20,7 +19,9 @@ class OptionalPriceValidator extends ConstraintValidator
     {
         if ($price->getValue() && !$price->getCurrency()) {
             /* @var $constraint Constraints\OptionalPrice */
-            $this->context->addViolationAt('currency', $constraint->message);
+            $this->context->buildViolation($constraint->message)
+                ->atPath('currency')
+                ->addViolation();
         }
     }
 }

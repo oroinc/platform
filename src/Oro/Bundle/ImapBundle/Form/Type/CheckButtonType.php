@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CheckButtonType extends ButtonType
 {
@@ -34,9 +34,9 @@ class CheckButtonType extends ButtonType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::setDefaultOptions($resolver);
+        parent::configureOptions($resolver);
 
         $resolver->setDefaults(['attr' => ['class' => 'btn btn-primary']]);
     }

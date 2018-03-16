@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearerInterface;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension;
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\Mocks\ChainExtensionAwareClearer;
@@ -12,6 +10,7 @@ use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
 
 class ContainerResetExtensionTest extends \PHPUnit_Framework_TestCase
 {

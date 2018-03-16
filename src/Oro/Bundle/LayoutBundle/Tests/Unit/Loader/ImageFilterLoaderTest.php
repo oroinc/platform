@@ -3,16 +3,14 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Loader;
 
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
-
-use Prophecy\Argument;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
+use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageType;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
-use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
 use Oro\Bundle\LayoutBundle\Provider\CustomImageFilterProviderInterface;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
+use Prophecy\Argument;
 
 class ImageFilterLoaderTest extends \PHPUnit_Framework_TestCase
 {

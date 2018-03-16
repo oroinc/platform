@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Utils;
 
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 class FormUtils
 {
@@ -29,9 +29,19 @@ class FormUtils
         $config  = $form->get($fieldName)->getConfig();
         $options = $config->getOptions();
 
+        //@TODO replace in scope BAP-15236
+        unset($options['options']);
+
+        //@TODO Remove in scope BAP-15236
+        unset($options['csrf_provider']);
+
         if (array_key_exists('auto_initialize', $options)) {
             $options['auto_initialize'] = false;
         }
+
+        //@TODO Remove in scope BAP-15236
+        unset($options['cascade_validation']);
+
         $options = array_merge($options, $modifyOptions);
         $options = array_diff_key($options, array_flip($unsetOptions));
         $form->add($fieldName, $config->getType()->getName(), $options);

@@ -8,6 +8,13 @@ define(function(require) {
     var AuditFilter = require('orodataaudit/js/audit-filter');
 
     DataAuditConditionView = FieldConditionView.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function DataAuditConditionView() {
+            DataAuditConditionView.__super__.constructor.apply(this, arguments);
+        },
+
         getDefaultOptions: function() {
             var defaultOptions = DataAuditConditionView.__super__.getDefaultOptions.call(this);
             return _.extend({}, defaultOptions, {

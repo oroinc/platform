@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormView;
 
 class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
 {

@@ -5,7 +5,7 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @deprecated since 1.10. Use {@see Oro\Bundle\FormBundle\Form\Type\OroDurationType} instead
@@ -41,7 +41,7 @@ class OroTimeIntervalType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'widget'         => 'single_text',

@@ -4,7 +4,6 @@ namespace Oro\Bundle\TranslationBundle\Entity\Repository;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 

@@ -4,7 +4,7 @@ parameters:
 
 services:
     oro_datagrid.datasource.orm:
-        class: %oro_datagrid.datasource.orm.class%
+        class: '%oro_datagrid.datasource.orm.class%'
         arguments:
             - '@oro_datagrid.datasource.orm.configs.yaml_processor'
             - '@oro_datagrid.event.dispatcher'
@@ -19,7 +19,7 @@ services:
             - { name: oro_datagrid.datasource, type: array }
 
     oro_datagrid.datasource.orm.parameter_binder:
-        class: %oro_datagrid.datasource.orm.parameter_binder.class%
+        class: '%oro_datagrid.datasource.orm.parameter_binder.class%'
 
     oro_datagrid.datasource.orm.configs.yaml_processor:
         class: Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor

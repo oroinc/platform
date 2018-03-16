@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EmbeddedFormBundle\Validator\Constraints\NoTagsValidator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class NoTagsValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,7 +25,7 @@ class NoTagsValidatorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->constraint = $this->createMock('Oro\\Bundle\\EmbeddedFormBundle\\Validator\\Constraints\\NoTags');
-        $this->context = $this->createMock('Symfony\\Component\\Validator\\ExecutionContextInterface');
+        $this->context = $this->createMock(ExecutionContextInterface::class);
         $this->validator = new NoTagsValidator();
         $this->validator->initialize($this->context);
     }

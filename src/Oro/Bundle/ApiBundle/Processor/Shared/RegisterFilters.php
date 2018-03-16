@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
@@ -10,6 +9,7 @@ use Oro\Bundle\ApiBundle\Filter\MetadataAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\RequestAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 abstract class RegisterFilters implements ProcessorInterface
 {

@@ -18,6 +18,13 @@ define(function(require) {
             'click .schedule-button': 'onSync'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function IntegrationSyncView() {
+            IntegrationSyncView.__super__.constructor.apply(this, arguments);
+        },
+
         onSync: function(e) {
             e.preventDefault();
 

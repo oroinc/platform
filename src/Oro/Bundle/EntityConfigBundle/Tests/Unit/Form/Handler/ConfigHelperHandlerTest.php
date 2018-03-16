@@ -9,7 +9,6 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler;
 use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Component\Testing\Unit\EntityTrait;
-
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormInterface;

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
+use Oro\Bundle\FormBundle\Form\Extension\HintFormExtension;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
-
-use Oro\Bundle\FormBundle\Form\Extension\HintFormExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class HintFormExtensionTest extends \PHPUnit_Framework_TestCase

@@ -3,9 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Helper;
 
 use DateTime;
-
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\DashboardBundle\Helper\DateHelper;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 

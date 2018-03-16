@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Client;
 
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-
 use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class BufferedMessageProducerTest extends \PHPUnit_Framework_TestCase
 {

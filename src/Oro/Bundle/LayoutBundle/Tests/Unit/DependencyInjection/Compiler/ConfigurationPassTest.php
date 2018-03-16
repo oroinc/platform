@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Reference;
-
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigurationPass;
+use Symfony\Component\DependencyInjection\Reference;
 
 class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
 {

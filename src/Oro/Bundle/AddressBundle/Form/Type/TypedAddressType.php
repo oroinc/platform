@@ -4,10 +4,9 @@ namespace Oro\Bundle\AddressBundle\Form\Type;
 
 use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimarySubscriber;
 use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesTypesSubscriber;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TypedAddressType extends AbstractType
 {
@@ -49,7 +48,7 @@ class TypedAddressType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(

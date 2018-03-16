@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
 class EntityConfigGridListener extends AbstractConfigGridListener

@@ -2,19 +2,20 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 
+use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Persistence\Proxy;
 use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\DBAL\Logging\EchoSQLLogger;
-use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ScopeBundle\Manager\ScopeCriteriaProviderInterface;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item2;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\TestActivityScopeProvider;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Scope\WorkflowScopeManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadTestActivitiesForScopes;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
@@ -149,7 +150,8 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
         $this->assertInternalType('array', $result);
         $this->assertGreaterThanOrEqual(1, count($result));
         $this->assertContains(WorkflowAwareEntity::class, $result);
-        $this->assertNotContains(Item::class, $result);
+        $this->assertContains(Item::class, $result);
+        $this->assertNotContains(Item2::class, $result);
     }
 
     public function testInvalidateCache()

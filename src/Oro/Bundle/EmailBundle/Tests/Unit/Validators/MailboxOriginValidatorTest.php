@@ -6,6 +6,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Validator\Constraints\MailboxOrigin;
 use Oro\Bundle\EmailBundle\Validator\MailboxOriginValidator;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class MailboxOriginValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,8 +26,7 @@ class MailboxOriginValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->constraint = new MailboxOrigin();
 
-        $this->context = $this
-            ->createMock('Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context = $this->createMock(ExecutionContextInterface::class);
 
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
             ->disableOriginalConstructor()

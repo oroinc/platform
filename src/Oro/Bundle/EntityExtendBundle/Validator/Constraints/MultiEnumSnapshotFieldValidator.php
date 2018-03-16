@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\Validator\Constraint;
 
 class MultiEnumSnapshotFieldValidator extends AbstractFieldValidator
 {

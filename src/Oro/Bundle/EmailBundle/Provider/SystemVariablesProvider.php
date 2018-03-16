@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class SystemVariablesProvider implements SystemVariablesProviderInterface
 {

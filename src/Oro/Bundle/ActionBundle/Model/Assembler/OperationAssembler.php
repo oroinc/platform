@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActionBundle\Model\Assembler;
 use Oro\Bundle\ActionBundle\Form\Type\OperationType;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
-
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 

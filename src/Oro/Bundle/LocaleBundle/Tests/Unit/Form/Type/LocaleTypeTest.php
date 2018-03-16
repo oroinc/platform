@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\LocaleBundle\Form\Type\LocaleType;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\LocaleBundle\Form\Type\LocaleType;
 
 class LocaleTypeTest extends \PHPUnit_Framework_TestCase
 {

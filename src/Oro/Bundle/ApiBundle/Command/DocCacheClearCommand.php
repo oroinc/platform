@@ -2,23 +2,25 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor;
-
+/**
+ * The CLI command to clear Data API documentation cache (ApiDoc cache).
+ */
 class DocCacheClearCommand extends ContainerAwareCommand
 {
-    const COMMAND_NAME = 'oro:api:doc:cache:clear';
+    public const COMMAND_NAME = 'oro:api:doc:cache:clear';
 
-    const ALL_VIEWS                    = 'all';
-    const API_DOC_VIEWS_PARAMETER_NAME = 'oro_api.api_doc.views';
-    const API_DOC_EXTRACTOR_SERVICE    = 'nelmio_api_doc.extractor.api_doc_extractor';
+    private const ALL_VIEWS                    = 'all';
+    private const API_DOC_VIEWS_PARAMETER_NAME = 'oro_api.api_doc.views';
+    private const API_DOC_EXTRACTOR_SERVICE    = 'nelmio_api_doc.extractor.api_doc_extractor';
 
     /**
      * {@inheritdoc}
@@ -43,7 +45,7 @@ class DocCacheClearCommand extends ContainerAwareCommand
     {
         $this
             ->setName(self::COMMAND_NAME)
-            ->setDescription('Clears API documentation cache')
+            ->setDescription('Clears API documentation cache.')
             ->addOption(
                 'view',
                 null,
@@ -52,7 +54,8 @@ class DocCacheClearCommand extends ContainerAwareCommand
                 [self::ALL_VIEWS]
             )
             ->addOption('no-warmup', null, InputOption::VALUE_NONE, 'Do not warm up the cache.')
-            ->setHelp(<<<EOF
+            ->setHelp(
+                <<<EOF
 The <info>%command.name%</info> command clears API documentation cache for a given view:
 
   <info>php %command.full_name%</info>

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 class IntegrationConfiguration implements ConfigurationInterface
 {

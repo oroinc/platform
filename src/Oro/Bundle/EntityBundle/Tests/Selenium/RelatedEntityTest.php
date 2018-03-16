@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Selenium;
 
+use Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntities;
 use Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntity;
 use Oro\Bundle\NavigationBundle\Tests\Selenium\Pages\Navigation;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
-use Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntities;
 
 class RelatedEntityTest extends Selenium2TestCase
 {

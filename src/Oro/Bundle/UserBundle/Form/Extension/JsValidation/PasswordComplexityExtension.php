@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Form\Extension\JsValidation;
 
-use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormInterface;
-
 use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProvider;
 use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
 use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
+use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 /**
  * Extension of 'repeated' type to configure PasswordComplexity constraint

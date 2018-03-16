@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Security;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
-use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareJobExtension;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
+use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Job\JobStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class SecurityAwareJobExtensionTest extends \PHPUnit_Framework_TestCase
 {

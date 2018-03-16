@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Oro\Bundle\UserBundle\Form\Type\SetPasswordType;
 use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -68,7 +67,7 @@ class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('text', $this->formType->getParent());
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->disableOriginalConstructor()

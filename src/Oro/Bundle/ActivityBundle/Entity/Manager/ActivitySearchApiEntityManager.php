@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;

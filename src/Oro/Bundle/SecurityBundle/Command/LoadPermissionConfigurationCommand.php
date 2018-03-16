@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\SecurityBundle\Command;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Entity\Permission;
+use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\SecurityBundle\Entity\Permission;
-use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 
 class LoadPermissionConfigurationCommand extends ContainerAwareCommand
 {

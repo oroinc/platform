@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Config\Definition\Processor;
-
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Configuration;
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\Mocks\FooTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\DbalTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
 use Oro\Component\Testing\ClassExtensionTrait;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Processor;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)

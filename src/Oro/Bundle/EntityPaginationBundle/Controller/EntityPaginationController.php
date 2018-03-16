@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Navigation\NavigationResult;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class EntityPaginationController extends Controller
 {
@@ -76,7 +74,7 @@ class EntityPaginationController extends Controller
         $doctrineHelper = $this->get('oro_entity.doctrine_helper');
         $navigationService = $this->get('oro_entity_pagination.navigation');
 
-        $params = $this->getRequest()->query->all();
+        $params = $this->get('request_stack')->getCurrentRequest()->query->all();
 
         $entityName = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
         $identifier = $doctrineHelper->getSingleEntityIdentifierFieldName($entityName);

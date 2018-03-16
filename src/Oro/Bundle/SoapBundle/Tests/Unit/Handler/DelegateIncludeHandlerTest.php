@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SoapBundle\Tests\Unit\Handler;
 
-use Symfony\Component\DependencyInjection\Container;
-
 use Oro\Bundle\SoapBundle\Handler\DelegateIncludeHandler;
 use Oro\Bundle\SoapBundle\Handler\IncludeHandlerInterface;
+use Symfony\Component\DependencyInjection\Container;
 
 class DelegateIncludeHandlerTest extends \PHPUnit_Framework_TestCase
 {

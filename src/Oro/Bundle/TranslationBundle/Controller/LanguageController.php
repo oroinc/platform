@@ -3,10 +3,8 @@
 namespace Oro\Bundle\TranslationBundle\Controller;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller as BaseController;
 
 class LanguageController extends BaseController

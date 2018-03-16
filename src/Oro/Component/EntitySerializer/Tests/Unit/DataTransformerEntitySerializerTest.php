@@ -2,11 +2,10 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\DataTransformerInterface as FormDataTransformerInterface;
-
 use Oro\Component\EntitySerializer\DataTransformerInterface;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\DataTransformerInterface as FormDataTransformerInterface;
 
 class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
 {

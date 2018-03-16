@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Twig;
 
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -11,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Symfony\Component\Routing\RouterInterface;
 
 class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
 {

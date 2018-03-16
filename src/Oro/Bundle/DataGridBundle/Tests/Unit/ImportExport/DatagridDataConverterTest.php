@@ -7,6 +7,7 @@ use Oro\Bundle\DataGridBundle\ImportExport\DatagridDataConverter;
 use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class DatagridDataConverterTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,9 +28,7 @@ class DatagridDataConverterTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $serviceLink = $this->createMock(ServiceLink::class);
 
         $this->datagridManager = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Manager')
             ->disableOriginalConstructor()

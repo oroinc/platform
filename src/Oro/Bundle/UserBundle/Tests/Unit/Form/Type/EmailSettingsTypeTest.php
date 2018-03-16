@@ -43,7 +43,7 @@ class EmailSettingsTypeTest extends \PHPUnit_Framework_TestCase
                 
                 return true;
             }));
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
     }
 
     public function testBuildFormImapAccount()

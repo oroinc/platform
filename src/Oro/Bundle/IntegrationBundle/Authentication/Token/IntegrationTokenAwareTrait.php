@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Authentication\Token;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 trait IntegrationTokenAwareTrait
 {

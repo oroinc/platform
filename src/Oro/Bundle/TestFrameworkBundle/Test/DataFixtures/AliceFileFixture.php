@@ -31,7 +31,7 @@ class AliceFileFixture extends AliceFixture implements DependentFixtureInterface
      */
     public function getDependencies()
     {
-        $data = Yaml::parse($this->loader->locateFile($this->fileName));
+        $data = Yaml::parse(file_get_contents($this->loader->locateFile($this->fileName)));
 
         if (isset($data['dependencies'])) {
             return $data['dependencies'];

@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType;
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
 use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
-
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\TestUtils\Mocks\ServiceLink;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouterInterface;
 
 class RouteChoiceTypeTest extends FormIntegrationTestCase
 {
@@ -70,7 +68,7 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('genemu_jqueryselect2_choice', $this->formType->getParent());
+        $this->assertEquals('oro_select2_choice', $this->formType->getParent());
     }
 
     /**

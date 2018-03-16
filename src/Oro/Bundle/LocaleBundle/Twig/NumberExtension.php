@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class NumberExtension extends \Twig_Extension
 {

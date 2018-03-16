@@ -4,15 +4,14 @@ namespace Oro\Bundle\ActivityBundle\Form\Handler;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectManager;
-
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
+use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
-use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
-use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
-use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 
 class ActivityEntityApiHandler extends ApiFormHandler
 {
@@ -24,19 +23,19 @@ class ActivityEntityApiHandler extends ApiFormHandler
 
     /**
      * @param FormInterface                 $form
-     * @param Request                       $request
+     * @param RequestStack                  $requestStack
      * @param ObjectManager                 $entityManager
      * @param ActivityManager               $activityManager
      * @param AuthorizationCheckerInterface $authorizationChecker
      */
     public function __construct(
         FormInterface $form,
-        Request $request,
+        RequestStack $requestStack,
         ObjectManager $entityManager,
         ActivityManager $activityManager,
         AuthorizationCheckerInterface $authorizationChecker
     ) {
-        parent::__construct($form, $request, $entityManager);
+        parent::__construct($form, $requestStack, $entityManager);
         $this->activityManager = $activityManager;
         $this->authorizationChecker = $authorizationChecker;
     }

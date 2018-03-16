@@ -278,7 +278,7 @@ class ScopeManager
             ->toArray();
 
         foreach ($scopeCriteriaContext as $field => $value) {
-            if (null !== $value && $criteriaContext[$field] != $value) {
+            if (null !== $value && $criteriaContext[$field] !== $value) {
                 return false;
             }
         }

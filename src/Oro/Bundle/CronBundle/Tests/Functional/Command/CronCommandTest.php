@@ -5,9 +5,9 @@ namespace Oro\Bundle\CronBundle\Tests\Functional\Command;
 use Cron\CronExpression;
 use Oro\Bundle\CronBundle\Async\Topics;
 use Oro\Bundle\CronBundle\Helper\CronHelper;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class CronCommandTest extends WebTestCase
 {

@@ -11,6 +11,13 @@ define(function(require) {
             'click [data-role="remove"]': 'onRemoveAttachment'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function AttachmentView() {
+            AttachmentView.__super__.constructor.apply(this, arguments);
+        },
+
         onRemoveAttachment: function(e) {
             e.preventDefault();
             this.$el.hide();

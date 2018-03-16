@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ChartBundle\Model\Data\Transformer;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class TransformerFactory
 {

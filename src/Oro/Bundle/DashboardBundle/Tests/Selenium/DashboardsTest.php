@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Selenium;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 use Oro\Bundle\DashboardBundle\Tests\Selenium\Pages\Dashboards;
+use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
 /**
  * Class DashboardsTest

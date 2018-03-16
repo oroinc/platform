@@ -3,12 +3,10 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Cache\Cache;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter;
 use Oro\Bundle\TranslationBundle\Provider\PackagesProvider;
 use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
+use Psr\Log\LoggerInterface;
 
 class TranslationStatisticProviderTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,9 +2,9 @@
 
 namespace Oro\Component\Math;
 
-use Brick\Math\BigNumber as BrickBigNumber;
-use Brick\Math\BigInteger as BrickBigInteger;
 use Brick\Math\BigDecimal as BrickBigDecimal;
+use Brick\Math\BigInteger as BrickBigInteger;
+use Brick\Math\BigNumber as BrickBigNumber;
 use Brick\Math\BigRational as BrickBigRational;
 
 /**

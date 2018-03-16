@@ -18,6 +18,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function TriggerEventAction() {
+            TriggerEventAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             TriggerEventAction.__super__.initialize.apply(this, arguments);
         },

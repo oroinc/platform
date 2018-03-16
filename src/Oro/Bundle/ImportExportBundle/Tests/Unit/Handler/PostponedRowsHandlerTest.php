@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Handler;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Component\MessageQueue\Client\Message;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Oro\Component\MessageQueue\Job\ExtensionInterface;
-use Oro\Component\MessageQueue\Job\JobProcessor;
-use Oro\Component\MessageQueue\Job\JobRunner;
-
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Job\ExtensionInterface;
+use Oro\Component\MessageQueue\Job\JobProcessor;
+use Oro\Component\MessageQueue\Job\JobRunner;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class PostponedRowsHandlerTest extends \PHPUnit_Framework_TestCase
 {

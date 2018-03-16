@@ -5,9 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
@@ -20,6 +17,7 @@ use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Symfony\Component\HttpFoundation\Request;
 
 class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 {

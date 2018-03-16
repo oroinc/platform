@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Provider;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Oro\Bundle\ScopeBundle\Manager\AbstractScopeCriteriaProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ScopeUserCriteriaProvider extends AbstractScopeCriteriaProvider
 {

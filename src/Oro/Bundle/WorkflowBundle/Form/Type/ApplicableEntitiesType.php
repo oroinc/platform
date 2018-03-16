@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
+use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 
 class ApplicableEntitiesType extends AbstractType
 {

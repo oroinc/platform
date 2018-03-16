@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
+use Oro\Bundle\LocaleBundle\Form\DataTransformer\FallbackValueTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -10,10 +12,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
-
-use Oro\Bundle\LocaleBundle\Form\DataTransformer\FallbackValueTransformer;
 
 class FallbackValueType extends AbstractType
 {
@@ -41,12 +39,12 @@ class FallbackValueType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired([
-            'type',
+            'entry_type',
         ]);
 
         $resolver->setDefaults([
             'data_class' => null,
-            'options' => [],
+            'entry_options' => [],
             'fallback_type' => FallbackPropertyType::NAME,
             'fallback_type_localization' => null,
             'fallback_type_parent_localization' => null,
@@ -59,7 +57,7 @@ class FallbackValueType extends AbstractType
                 return $value;
             }
 
-            return in_array($options['type'], ['textarea', OroRichTextType::NAME], true);
+            return in_array($options['entry_type'], ['textarea', OroRichTextType::NAME], true);
         });
     }
 
@@ -68,10 +66,10 @@ class FallbackValueType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $valueOptions = array_merge($options['options'], ['required' => false]);
+        $valueOptions = array_merge($options['entry_options'], ['required' => false]);
 
         $builder
-            ->add('value', $options['type'], $valueOptions)
+            ->add('value', $options['entry_type'], $valueOptions)
             ->add(
                 'use_fallback',
                 'checkbox',
@@ -96,7 +94,7 @@ class FallbackValueType extends AbstractType
             if (is_array($data) && !empty($data['fallback'])) {
                 $event->getForm()
                     ->remove('value')
-                    ->add('value', $options['type'], array_merge($valueOptions, ['validation_groups' => false]));
+                    ->add('value', $options['entry_type'], array_merge($valueOptions, ['validation_groups' => false]));
             }
         });
     }

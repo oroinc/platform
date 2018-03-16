@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TagBundle\Tests\Unit\Fixtures;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\TagBundle\Entity\Taggable as OROTag;
 
 class Taggable implements OROTag

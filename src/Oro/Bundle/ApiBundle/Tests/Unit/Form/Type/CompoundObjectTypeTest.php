@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\TypeTestCase;
-
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Form\Type\CompoundObjectType;
@@ -15,6 +11,9 @@ use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\NameContainerType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class CompoundObjectTypeTest extends TypeTestCase
 {

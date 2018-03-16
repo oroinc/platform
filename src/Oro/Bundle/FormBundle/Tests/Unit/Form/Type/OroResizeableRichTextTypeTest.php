@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\TypeTestCase;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class OroResizeableRichTextTypeTest extends TypeTestCase
 {

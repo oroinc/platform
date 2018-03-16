@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionNotificationSelectType;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionNotificationSelectType;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCase
 {
@@ -74,7 +73,7 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
 
     public function testGetParent()
     {
-        $this->assertEquals('genemu_jqueryselect2_entity', $this->type->getParent());
+        $this->assertEquals('oro_select2_entity', $this->type->getParent());
     }
 
     /**
@@ -115,7 +114,7 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
      */
     protected function getExtensions()
     {
-        $entityType = new EntityType($this->getDefinitions(), 'genemu_jqueryselect2_entity');
+        $entityType = new EntityType($this->getDefinitions(), 'oro_select2_entity');
 
         return [
             new PreloadedExtension([$entityType->getName() => $entityType], [])

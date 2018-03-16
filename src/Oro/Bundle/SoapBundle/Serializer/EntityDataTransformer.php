@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SoapBundle\Serializer;
 
+use Oro\Component\EntitySerializer\EntityDataTransformer as BaseEntityDataTransformer;
 use Oro\Component\EntitySerializer\ValueTransformer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Component\EntitySerializer\EntityDataTransformer as BaseEntityDataTransformer;
 
 /**
  * @deprecated since 1.9. use {@see Oro\Component\EntitySerializer\EntityDataTransformer}

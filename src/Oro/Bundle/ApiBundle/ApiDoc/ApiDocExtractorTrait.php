@@ -3,13 +3,15 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Symfony\Component\Routing\Route;
-
 use Oro\Component\Routing\Resolver\EnhancedRouteCollection;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Oro\Component\Routing\RouteCollectionUtil;
+use Symfony\Component\Routing\Route;
 
+/**
+ * Common functionality for ApiDocExtractor and CachingApiDocExtractor.
+ */
 trait ApiDocExtractorTrait
 {
     /** @var RouteOptionsResolverInterface */
@@ -17,6 +19,9 @@ trait ApiDocExtractorTrait
 
     /** @var RestDocViewDetector */
     protected $docViewDetector;
+
+    /** @var ApiDocAnnotationHandlerInterface */
+    protected $apiDocAnnotationHandler;
 
     /**
      * Sets the RouteOptionsResolver.
@@ -36,6 +41,16 @@ trait ApiDocExtractorTrait
     public function setRestDocViewDetector(RestDocViewDetector $docViewDetector)
     {
         $this->docViewDetector = $docViewDetector;
+    }
+
+    /**
+     * Sets the ApiDocAnnotationHandler.
+     *
+     * @param ApiDocAnnotationHandlerInterface $apiDocAnnotationHandler
+     */
+    public function setApiDocAnnotationHandler(ApiDocAnnotationHandlerInterface $apiDocAnnotationHandler)
+    {
+        $this->apiDocAnnotationHandler = $apiDocAnnotationHandler;
     }
 
     /**
@@ -73,7 +88,7 @@ trait ApiDocExtractorTrait
 
     /**
      * This is optimized by performance and customized version of Nelmio's "extractAnnotations" method v2.13.0
-     * @see Nelmio\ApiDocBundle\Extractor\ApiDocExtractor::extractAnnotations
+     * @see \Nelmio\ApiDocBundle\Extractor\ApiDocExtractor::extractAnnotations
      *
      * @param Route[]  $routes
      * @param string   $view
@@ -97,20 +112,20 @@ trait ApiDocExtractorTrait
             if ($method) {
                 /** @var ApiDoc $annotation */
                 $annotation = $this->reader->getMethodAnnotation($method, static::ANNOTATION_CLASS);
-                if ($annotation
-                    && (
-                        in_array($view, $annotation->getViews(), true)
-                        || (0 === count($annotation->getViews()) && $view === ApiDoc::DEFAULT_VIEW)
-                    )
-                    && !in_array($annotation->getSection(), $excludeSections, true)
-                ) {
-                    $element = ['annotation' => $this->extractData($annotation, $route, $method)];
-                    $resource = $this->getRouteResource($annotation, $route);
-                    if ($resource) {
-                        $element['resource'] = $resource;
-                        $resources[] = $resource;
+                if (null !== $annotation) {
+                    $this->apiDocAnnotationHandler->handle($annotation, $route);
+                    $views = $annotation->getViews();
+                    if ((in_array($view, $views, true) || (empty($views) && ApiDoc::DEFAULT_VIEW === $view))
+                        && !in_array($annotation->getSection(), $excludeSections, true)
+                    ) {
+                        $element = ['annotation' => $this->extractData($annotation, $route, $method)];
+                        $resource = $this->getRouteResource($annotation, $route);
+                        if ($resource) {
+                            $element['resource'] = $resource;
+                            $resources[] = $resource;
+                        }
+                        $array[] = $element;
                     }
-                    $array[] = $element;
                 }
             }
         }

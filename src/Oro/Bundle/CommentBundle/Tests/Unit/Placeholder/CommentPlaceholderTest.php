@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Unit\Placeholder;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\CommentBundle\Placeholder\CommentPlaceholderFilter;
 use Oro\Bundle\CommentBundle\Tests\Unit\Fixtures\TestEntity;
 use Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
 {

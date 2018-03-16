@@ -3,22 +3,20 @@
 namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\UserBundle\Provider\RolePrivilegeAbstractProvider;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\SecurityBundle\Form\Type\AclAccessLevelSelectorType;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
+use Oro\Bundle\SecurityBundle\Form\Type\AclAccessLevelSelectorType;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
-use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
-use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
+use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
+use Oro\Bundle\UserBundle\Provider\RolePrivilegeAbstractProvider;
+use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider implements DatasourceInterface
 {

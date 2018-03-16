@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ReportBundle\Form\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
 use Oro\Bundle\ReportBundle\Form\EventListener\DateGroupingFormSubscriber;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ReportType extends AbstractQueryDesignerType
 {
@@ -58,7 +57,7 @@ class ReportType extends AbstractQueryDesignerType
             $this->getDefaultOptions(),
             array(
                 'data_class'         => 'Oro\Bundle\ReportBundle\Entity\Report',
-                'intention'          => 'report',
+                'csrf_token_id'      => 'report',
                 'query_type'         => 'report',
             )
         );

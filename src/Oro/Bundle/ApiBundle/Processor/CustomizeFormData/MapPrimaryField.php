@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeFormData;
 
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Form\ReflectionUtil;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Sets a "primary" flag in a collection based on a value of "primary" field.

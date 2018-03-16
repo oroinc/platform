@@ -2,11 +2,10 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit;
 
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class ContextAccessorTest extends \PHPUnit_Framework_TestCase
 {

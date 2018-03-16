@@ -2,13 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Totals;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Component\PhpUtils\ArrayUtil;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
@@ -16,13 +13,15 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
-
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
+ * Provides totals aggregation, which will be shown in grid's footer.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class OrmTotalsExtension extends AbstractExtension
@@ -300,9 +299,9 @@ class OrmTotalsExtension extends AbstractExtension
         };
 
         $queryBuilder = clone $this->masterQB;
-        $queryBuilder
-            ->select($totalQueries)
-            ->resetDQLPart('groupBy');
+        $queryBuilder->select($totalQueries);
+
+        $this->clearQueryBuilder($queryBuilder);
 
         $this->addPageLimits($queryBuilder, $pageData, $perPage);
 
@@ -318,6 +317,26 @@ class OrmTotalsExtension extends AbstractExtension
             ->getScalarResult();
 
         return array_shift($resultData);
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     */
+    private function clearQueryBuilder(QueryBuilder $queryBuilder)
+    {
+        $queryBuilder->resetDQLParts(['groupBy', 'having']);
+
+        $where = (string)$queryBuilder->getDQLPart('where');
+        $parameters = new ArrayCollection();
+
+        /** @var Parameter $parameter */
+        foreach ($queryBuilder->getParameters() as $parameter) {
+            if (strpos($where, $parameter->getName()) !== false) {
+                $parameters->add($parameter);
+            }
+        }
+
+        $queryBuilder->setParameters($parameters);
     }
 
     /**

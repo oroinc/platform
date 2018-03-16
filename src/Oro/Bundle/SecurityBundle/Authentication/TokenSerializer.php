@@ -3,15 +3,13 @@
 namespace Oro\Bundle\SecurityBundle\Authentication;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\Token\ImpersonationToken;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Role\RoleInterface;
-
-use Oro\Bundle\SecurityBundle\Authentication\Token\ImpersonationToken;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 class TokenSerializer implements TokenSerializerInterface
 {

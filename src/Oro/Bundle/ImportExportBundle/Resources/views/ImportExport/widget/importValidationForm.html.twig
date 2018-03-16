@@ -4,13 +4,14 @@
         {{ 'oro.importexport.import.columns_notice'|trans }}
     </div>
     <div class="form-container">
-        <form method="post"
-              data-nohash="true"
-              id="{{ form.vars.id }}"
-              name="{{ form.vars.name }}"
-              action="{{ path('oro_importexport_import_validation_form', {entity: entityName, importJob: importJob, importValidateJob: importValidateJob, options: options}) }}"
-              class="form-horizontal"
-              {{ form_enctype(form) }}>
+        {{ form_start(form, {
+            'action': path('oro_importexport_import_validation_form', {entity: entityName, importJob: importJob, importValidateJob: importValidateJob, options: options}),
+            'attr': {
+                'id': form.vars.id,
+                'data-nohash': 'true',
+                'class': 'form-horizontal'
+            }
+        }) }}
 
             <fieldset class="form">
                 <div class="import-file">
@@ -26,7 +27,7 @@
                 <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
                 <button class="btn btn-primary" type="submit">{{ 'Submit'|trans }}</button>
             </div>
-        </form>
+        {{ form_end(form) }}
         {{ oro_form_js_validation(form) }}
     </div>
 </div>

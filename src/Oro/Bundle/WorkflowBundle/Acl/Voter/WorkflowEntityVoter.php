@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Acl\Voter;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-
 use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
 
@@ -30,6 +29,7 @@ class WorkflowEntityVoter extends AbstractEntityVoter
 
     /**
      * {@inheritdoc}
+     * TODO: change public to protected in scope of BAP-15236
      */
     public function supportsClass($class)
     {

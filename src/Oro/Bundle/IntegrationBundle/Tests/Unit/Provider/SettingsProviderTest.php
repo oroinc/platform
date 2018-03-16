@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
-use Oro\Component\Config\Resolver\SystemAwareResolver;
 use Oro\Bundle\IntegrationBundle\Provider\SettingsProvider;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestService;
-
+use Oro\Component\Config\Resolver\SystemAwareResolver;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SettingsProviderTest extends \PHPUnit_Framework_TestCase

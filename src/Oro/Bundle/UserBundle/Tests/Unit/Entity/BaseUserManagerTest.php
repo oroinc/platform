@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 
-use Doctrine\ORM\ORMInvalidArgumentException;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
-
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-
+use Doctrine\ORM\ORMInvalidArgumentException;
 use Oro\Bundle\UserBundle\Entity\BaseUserManager;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
 class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
 {

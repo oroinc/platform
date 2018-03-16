@@ -29,6 +29,16 @@ define([
             'reset collection': 'updateState'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function BookmarkButtonView() {
+            BookmarkButtonView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             if (!options.navigationElementType) {
                 throw new Error('"navigationItemElementType" is required option for bookmark button');

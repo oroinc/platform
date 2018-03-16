@@ -78,9 +78,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
             ->with('sort')
             ->willReturn($sortFilterValue);
 
-        if ($config) {
-            $this->context->setConfig($this->createConfigObject($config));
-        }
+        $this->context->setConfig($this->createConfigObject($config ?? []));
         $this->context->setFilterValues($filterValueAccessor);
         $this->context->setClassName($className);
         $this->processor->process($this->context);
@@ -241,9 +239,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
                 }
             );
 
-        if ($config) {
-            $this->context->setConfig($this->createConfigObject($config));
-        }
+        $this->context->setConfig($this->createConfigObject($config ?? []));
         $this->context->setFilterValues($filterValueAccessor);
         $this->context->setClassName($className);
         $this->processor->process($this->context);

@@ -6,13 +6,13 @@ parameters:
 
 services:
     oro_batch.orm.query_builder.count_query_optimizer:
-        class: %oro_batch.orm.query_builder.count_query_optimizer.class%
+        class: '%oro_batch.orm.query_builder.count_query_optimizer.class%'
         calls:
             - [setEventDispatcher, ['@event_dispatcher']]
             - [setRelationHelper, ['@oro_entity.helper.relation_helper']]
 
     oro_batch.job.repository:
-        class: %oro_batch.job.repository.class%
+        class: '%oro_batch.job.repository.class%'
         arguments:
             - '@doctrine'
             - '%akeneo_batch.entity.job_execution.class%'

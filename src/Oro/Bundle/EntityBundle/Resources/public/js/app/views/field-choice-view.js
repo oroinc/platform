@@ -46,6 +46,16 @@ define(function(require) {
          */
         include: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function FieldChoiceView() {
+            FieldChoiceView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             options = $.extend(true, {}, this.defaultOptions, options);
             var optionNames = _.without(_.keys(this.defaultOptions), 'select2');

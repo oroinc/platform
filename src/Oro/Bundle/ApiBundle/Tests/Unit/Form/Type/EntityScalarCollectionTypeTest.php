@@ -3,17 +3,15 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
+use Oro\Bundle\ApiBundle\Form\Type\EntityScalarCollectionType;
+use Oro\Bundle\ApiBundle\Form\Type\ScalarCollectionType;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
-
-use Oro\Bundle\ApiBundle\Form\Type\EntityScalarCollectionType;
-use Oro\Bundle\ApiBundle\Form\Type\ScalarCollectionType;
-use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
-use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 
 class EntityScalarCollectionTypeTest extends TypeTestCase
 {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Twig;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Twig\EnumExtension;

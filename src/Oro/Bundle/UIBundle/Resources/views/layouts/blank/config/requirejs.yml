@@ -9,6 +9,7 @@ config:
             exports: 'Select2'
         'bootstrap-popover':
             deps:
+                - 'jquery'
                 - 'bootstrap-tooltip'
         'jquery.datepair':
             deps:
@@ -44,9 +45,6 @@ config:
             deps:
                 - 'jquery'
         'bootstrap-modal':
-            deps:
-                - 'jquery'
-        'bootstrap-popover':
             deps:
                 - 'jquery'
         'bootstrap-scrollspy':
@@ -171,6 +169,7 @@ config:
         'oroui/js/app/views/datepicker/datetimepicker-view': 'bundles/oroui/js/app/views/datepicker/datetimepicker-view.js'
         'oroui/js/app/views/datepicker/datepicker-view': 'bundles/oroui/js/app/views/datepicker/datepicker-view.js'
         'oroui/js/app/views/tab-collection-view': 'bundles/oroui/js/app/views/tab-collection-view.js'
+        'oroui/js/app/views/flash-message-view': 'bundles/oroui/js/app/views/flash-message-view.js'
 
         'oroui/js/viewport-manager': 'bundles/oroui/js/viewport-manager.js'
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
@@ -179,8 +178,12 @@ config:
         'oroui/js/layout': 'bundles/oroui/js/layout.js'
         'oroui/js/loading-mask': 'bundles/oroui/js/loading-mask.js'
         'oroui/js/mediator': 'bundles/oroui/js/mediator.js'
+        'oroui/js/tools': 'bundles/oroui/js/tools.js'
         'oroui/js/messenger': 'bundles/oroui/js/messenger.js'
         'oroui/js/modal': 'bundles/oroui/js/modal.js'
+
+        'oroui/js/extend/jquery': 'bundles/oroui/js/extend/jquery.js'
+        'oroui/js/extend/underscore': 'bundles/oroui/js/extend/underscore.js'
 
         'oroui/js/app/components/ajax-button': 'bundles/oroui/js/app/components/ajax-button.js'
         'oroui/js/app/components/jquery-widget-component': 'bundles/oroui/js/app/components/jquery-widget-component.js'

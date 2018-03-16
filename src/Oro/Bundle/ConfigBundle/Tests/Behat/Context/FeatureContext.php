@@ -4,12 +4,12 @@ namespace Oro\Bundle\ConfigBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Element\NodeElement;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\ActivityListBundle\Tests\Behat\Element\ActivityList;
-use Oro\Bundle\FormBundle\Tests\Behat\Element\AllowedColorsMapping;
-use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SidebarConfigMenu;
+use Oro\Bundle\FormBundle\Tests\Behat\Element\AllowedColorsMapping;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroSimpleColorPickerField;
 use Oro\Bundle\SalesBundle\Tests\Behat\Element\QuotesGrid;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;

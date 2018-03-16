@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Extension;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\TranslationBundle\Extension\TranslationContextResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class TranslationContextResolverTest extends \PHPUnit_Framework_TestCase
 {

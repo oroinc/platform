@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
-
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\SecurityFirewallCompilerPass;
 use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
 use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
 use Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener;
+use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class SecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Provider;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class RolePrivilegeCategoryProvider
 {

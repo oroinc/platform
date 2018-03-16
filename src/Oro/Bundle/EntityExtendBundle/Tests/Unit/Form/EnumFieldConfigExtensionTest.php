@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Extension;
 
-use Oro\Bundle\EntityExtendBundle\Form\Extension\EnumFieldConfigExtension;
 use Oro\Bundle\EntityExtendBundle\Form\EventListener\EnumFieldConfigSubscriber;
+use Oro\Bundle\EntityExtendBundle\Form\Extension\EnumFieldConfigExtension;
 
 class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Stub;
 
-use Symfony\Component\Console\Command\Command;
-
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerAwareInterface;
+use Symfony\Component\Console\Command\Command;
 
 /**
  * Class CommandStub is created to easily test concept of FeatureChecker injection

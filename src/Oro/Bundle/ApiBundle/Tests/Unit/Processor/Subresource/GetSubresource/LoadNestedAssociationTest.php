@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresource;
 
-use Oro\Component\EntitySerializer\EntitySerializer;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaProperty;
 use Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\LoadNestedAssociation;
 use Oro\Bundle\ApiBundle\Provider\EntityTitleProvider;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
+use Oro\Component\EntitySerializer\EntitySerializer;
 
 class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCase
 {

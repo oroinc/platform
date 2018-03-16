@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Form\Type;
 
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\AbstractType;
 
 class ColumnType extends AbstractType
 {
@@ -48,7 +48,7 @@ class ColumnType extends AbstractType
             array(
                 'entity'               => null,
                 'data_class'           => 'Oro\Bundle\QueryDesignerBundle\Model\Column',
-                'intention'            => 'query_designer_column',
+                'csrf_token_id'        => 'query_designer_column',
                 'column_choice_type'   => 'oro_entity_field_select',
                 'field_choice_options' => [],
             )

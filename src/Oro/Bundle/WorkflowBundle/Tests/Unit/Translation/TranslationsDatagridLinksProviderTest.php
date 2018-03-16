@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation;
 use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
-
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;

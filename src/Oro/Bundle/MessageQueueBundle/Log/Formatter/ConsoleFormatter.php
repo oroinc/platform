@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Log\Formatter;
 
-use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter as BaseConsoleFormatter;
-
 use Oro\Component\MessageQueue\Client\Config;
+use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter as BaseConsoleFormatter;
 
 /**
  * Formats message queue consumer related log records for the console output

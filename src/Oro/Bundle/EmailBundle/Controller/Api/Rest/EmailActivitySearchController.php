@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-
+use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ChainParameterFilter;
-use Oro\Bundle\SoapBundle\Request\Parameters\Filter\EntityClassParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\EmailAddressParameterFilter;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\EntityClassParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("email_search_relation")
@@ -63,19 +61,19 @@ class EmailActivitySearchController extends RestGetController
      *      description="Searches entities associated with the email activity.",
      *      resource=true
      * )
-     *
+     * @param Request $request
      * @return Response
      */
-    public function cgetAction()
+    public function cgetAction(Request $request)
     {
-        $page  = (int)$this->getRequest()->get('page', 1);
-        $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $page  = (int)$request->get('page', 1);
+        $limit = (int)$request->get('limit', self::ITEMS_PER_PAGE);
 
         $filters = [
-            'search' => $this->getRequest()->get('search')
+            'search' => $request->get('search')
         ];
 
-        $from = $this->getRequest()->get('from', null);
+        $from = $request->get('from', null);
         if ($from) {
             $filter          = new ChainParameterFilter(
                 [
@@ -86,7 +84,7 @@ class EmailActivitySearchController extends RestGetController
             $filters['from'] = $filter->filter($from, null);
         }
 
-        $email = $this->getRequest()->get('email', null);
+        $email = $request->get('email', null);
         if ($email) {
             $filter            = new ChainParameterFilter(
                 [

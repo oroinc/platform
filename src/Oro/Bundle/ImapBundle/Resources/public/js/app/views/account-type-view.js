@@ -1,17 +1,23 @@
 define(function(require) {
     'use strict';
 
-    var accountTypeView;
+    var AccountTypeView;
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
     var $ = require('jquery');
 
-    accountTypeView = BaseView.extend({
-
+    AccountTypeView = BaseView.extend({
         html: '',
 
         events: {
             'change select[name$="[accountType]"]': 'onChangeAccountType'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function AccountTypeView() {
+            AccountTypeView.__super__.constructor.apply(this, arguments);
         },
 
         /**
@@ -22,7 +28,11 @@ define(function(require) {
         initialize: function(options) {},
 
         render: function() {
-            this.$el.html(this.html).find('.control-group.switchable-field').hide();
+            if (this.html.length) {
+                this.$el.html(this.html).find('.control-group.switchable-field').hide();
+                this.html = '';
+            }
+
             this._deferredRender();
             this.initLayout().done(_.bind(this._resolveDeferredRender, this));
         },
@@ -40,7 +50,7 @@ define(function(require) {
          *
          * @param html
          *
-         * @returns {accountTypeView}
+         * @returns {AccountTypeView}
          */
         setHtml: function(html) {
             this.html = html;
@@ -49,5 +59,5 @@ define(function(require) {
         }
     });
 
-    return accountTypeView;
+    return AccountTypeView;
 });

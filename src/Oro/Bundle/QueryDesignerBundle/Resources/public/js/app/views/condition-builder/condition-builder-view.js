@@ -75,7 +75,7 @@ define(function(require) {
             return events;
         },
 
-        constructor: function(options) {
+        constructor: function ConditionBuilderView(options) {
             this.options = this._prepareOptions(options);
             ConditionBuilderView.__super__.constructor.call(this, options);
         },

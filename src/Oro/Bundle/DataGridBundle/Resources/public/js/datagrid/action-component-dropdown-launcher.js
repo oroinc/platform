@@ -34,6 +34,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function ActionComponentDropdownLauncher() {
+            ActionComponentDropdownLauncher.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.componentOptions = _.omit(options, ['action', 'componentConstructor']);
             this.componentConstructor = options.componentConstructor;

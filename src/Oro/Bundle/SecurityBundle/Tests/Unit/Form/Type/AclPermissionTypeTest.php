@@ -34,9 +34,9 @@ class AclPermissionTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_acl_permission', $this->formType->getName());
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolverInterface')
+        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -47,6 +47,6 @@ class AclPermissionTypeTest extends \PHPUnit_Framework_TestCase
                     'privileges_config' => array()
                 )
             );
-        $this->formType->setDefaultOptions($resolver);
+        $this->formType->configureOptions($resolver);
     }
 }

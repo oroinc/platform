@@ -3,11 +3,10 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Filter;
 
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 use Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilterManager;
+use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Entity\TestFilter;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class WidgetProviderFilterTest extends \PHPUnit_Framework_TestCase
 {

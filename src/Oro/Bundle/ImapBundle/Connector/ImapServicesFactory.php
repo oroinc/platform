@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImapBundle\Connector;
 
-use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Connector\Exception\InvalidConfigurationException;
+use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 
 /**
  * Provides a factory class that creates ImapServices objects.

@@ -7,7 +7,7 @@
     "license": "MIT",
     "require": {
         "php": "7.1.*",
-        "symfony/symfony": "2.8.*, !=2.8.10",
+        "symfony/symfony": "3.3.*",
         "mtdowling/cron-expression": "1.0.*",
         "oro/log": "dev-master",
         "oro/ui-bundle": "dev-master",

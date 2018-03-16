@@ -14,6 +14,7 @@ class ExtendedContainerBuilder extends ContainerBuilder
      * Usable for extensions which requires to have just one config.
      * http://api.symfony.com/2.3/Symfony/Component/Config/Definition/Builder/ArrayNodeDefinition.html
      * #method_disallowNewKeysInSubsequentConfigs
+     * @throws \ReflectionException
      */
     public function setExtensionConfig($name, array $config = [])
     {
@@ -51,33 +52,40 @@ class ExtendedContainerBuilder extends ContainerBuilder
         $prop->setAccessible(true);
         $passes = $prop->getValue($passConfig);
 
-        $resultPasses    = [];
-        $srcPass         = null;
+        $resultPasses = [];
+        $srcPass = null;
         $targetPassIndex = -1;
-        foreach ($passes as $i => $pass) {
-            switch (get_class($pass)) {
-                case $passClassName:
-                    $srcPass = $pass;
-                    break;
-                case $targetPassClassName:
-                    if (null !== $srcPass) {
-                        // the source pass is already located before the target pass
-                        $resultPasses = null;
-                        break 2;
-                    }
-                    // in case if several instances of the target pass exist
-                    // the source pass should be located before the first instance of the target pass
-                    if (-1 === $targetPassIndex) {
-                        $targetPassIndex = count($resultPasses);
-                        $resultPasses[]  = null;
-                    }
-                    $resultPasses[] = $pass;
-                    break;
-                default:
-                    $resultPasses[] = $pass;
-                    break;
+        $targetPassPriority = -1;
+        // We need to traverse array in order defined by priorities
+        krsort($passes);
+        foreach ($passes as $priority => $passesGroup) {
+            foreach ($passesGroup as $i => $pass) {
+                switch (\get_class($pass)) {
+                    case $passClassName:
+                        $srcPass = $pass;
+                        break;
+                    case $targetPassClassName:
+                        if (null !== $srcPass) {
+                            // the source pass is already located before the target pass
+                            $resultPasses = null;
+                            break 3;
+                        }
+                        // in case if several instances of the target pass exist
+                        // the source pass should be located before the first instance of the target pass
+                        if (-1 === $targetPassIndex) {
+                            $resultPasses[$priority][] = null;
+                            $targetPassIndex = \count($resultPasses[$priority]) - 1;
+                            $targetPassPriority = $priority;
+                        }
+                        $resultPasses[$priority][] = $pass;
+                        break;
+                    default:
+                        $resultPasses[$priority][] = $pass;
+                        break;
+                }
             }
         }
+
         if (null !== $resultPasses) {
             if (null === $srcPass) {
                 throw new InvalidArgumentException(sprintf('Unknown compiler pass "%s".', $passClassName));
@@ -85,7 +93,7 @@ class ExtendedContainerBuilder extends ContainerBuilder
             if (-1 === $targetPassIndex) {
                 throw new InvalidArgumentException(sprintf('Unknown compiler pass "%s".', $targetPassClassName));
             }
-            $resultPasses[$targetPassIndex] = $srcPass;
+            $resultPasses[$targetPassPriority][$targetPassIndex] = $srcPass;
             $prop->setValue($passConfig, $resultPasses);
         }
     }

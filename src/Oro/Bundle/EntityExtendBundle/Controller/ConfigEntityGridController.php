@@ -3,19 +3,20 @@
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
 use FOS\RestBundle\Util\Codes;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Class ConfigEntityGridController
@@ -27,6 +28,7 @@ use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 class ConfigEntityGridController extends Controller
 {
     /**
+     * @param Request $request
      * @param EntityConfigModel $entity
      * @return array
      *
@@ -44,7 +46,7 @@ class ConfigEntityGridController extends Controller
      * )
      * @Template
      */
-    public function uniqueAction(EntityConfigModel $entity)
+    public function uniqueAction(Request $request, EntityConfigModel $entity)
     {
         $className      = $entity->getClassName();
         $entityProvider = $this->get('oro_entity_config.provider.entity');
@@ -58,7 +60,6 @@ class ConfigEntityGridController extends Controller
             ]
         );
 
-        $request = $this->getRequest();
         if ($request->getMethod() == 'POST') {
             $form->submit($request);
 
@@ -88,20 +89,22 @@ class ConfigEntityGridController extends Controller
      *      group_name=""
      * )
      * @Template
+     * @param Request $request
+     * @return array|RedirectResponse
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        $request = $this->getRequest();
-
         /** @var ConfigManager $configManager */
         $configManager = $this->get('oro_entity_config.config_manager');
 
         if ($request->getMethod() == 'POST') {
-            $className = ExtendHelper::ENTITY_NAMESPACE . $request->request->get(
-                'oro_entity_config_type[model][className]',
-                null,
-                true
-            );
+            $formData = $request->request->get('oro_entity_config_type');
+            if (!$formData || !isset($formData['model']['className'])) {
+                throw new BadRequestHttpException(
+                    'Request should contains "oro_entity_config_type[model][className]" parameter'
+                );
+            }
+            $className = ExtendHelper::ENTITY_NAMESPACE . $formData['model']['className'];
 
             $entityModel  = $configManager->createConfigEntityModel($className);
             $extendConfig = $configManager->getProvider('extend')->getConfig($className);

@@ -4,10 +4,9 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\Loader\ArrayLoader;
 use Knp\Menu\Util\MenuManipulator;
-
-use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuItemStub;
-use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
+use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
+use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuItemStub;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)

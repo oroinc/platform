@@ -7,7 +7,7 @@ define([
 ], function(_, $, BaseComponent, routing, mediator) {
     'use strict';
 
-    return BaseComponent.extend({
+    var CreateOrSelectChoiceComponent = BaseComponent.extend({
 
         MODE_CREATE: 'create',
         MODE_VIEW: 'view',
@@ -28,6 +28,13 @@ define([
         $existingEntityInput: null,
         $dialog: null,
         editable: false,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function CreateOrSelectChoiceComponent() {
+            CreateOrSelectChoiceComponent.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * @param options
@@ -229,4 +236,6 @@ define([
             }
         }
     });
+
+    return CreateOrSelectChoiceComponent;
 });

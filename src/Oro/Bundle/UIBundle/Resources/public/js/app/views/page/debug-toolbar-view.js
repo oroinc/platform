@@ -36,6 +36,13 @@ define([
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function DebugToolbarView() {
+            DebugToolbarView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Handles page load event
          *  - loads debug data
          *  - updates a debugger bar

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
-use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\EntitySerializer\EntityConfig;
 
 /**
  * Represents a configuration of all filters for an entity.

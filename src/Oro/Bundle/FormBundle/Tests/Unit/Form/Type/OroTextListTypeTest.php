@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\FormBundle\Form\Type\OroTextListType;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroTextListTypeTest extends FormIntegrationTestCase
 {

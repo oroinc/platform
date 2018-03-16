@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\EventListener\CollectionTypeSubscriber;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Form\EventListener\CollectionTypeSubscriber;
 
 class CollectionType extends AbstractType
 {
@@ -64,7 +63,7 @@ class CollectionType extends AbstractType
                 'row_count_initial'    => 1,
             ]
         );
-        $resolver->setRequired(['type']);
+        $resolver->setRequired(['entry_type']);
         $resolver->setNormalizer('show_form_when_empty', function (Options $options, $value) {
             return !$options['allow_add'] ? false : $value;
         });

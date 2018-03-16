@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
@@ -13,6 +12,7 @@ use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityFieldV
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodName;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
+use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class UniqueExtendEntityMethodNameValidatorTest extends AbstractConstraintValidatorTest

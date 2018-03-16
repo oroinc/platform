@@ -4,9 +4,9 @@ namespace Oro\Bundle\SecurityBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AclPrivilegeType extends AbstractType
 {
@@ -29,11 +29,11 @@ class AclPrivilegeType extends AbstractType
             'permissions',
             PermissionCollectionType::NAME,
             array(
-                'type' => new AclPermissionType(),
+                'entry_type' => new AclPermissionType(),
                 'allow_add' => true,
                 'prototype' => false,
                 'allow_delete' => false,
-                'options' => array(
+                'entry_options' => array(
                     'privileges_config' => $options['privileges_config']
                 ),
             )
@@ -51,7 +51,7 @@ class AclPrivilegeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(

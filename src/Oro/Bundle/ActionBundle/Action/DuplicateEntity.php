@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ActionBundle\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
-
-use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\AbstractAction;
+use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Exception\InvalidParameterException;
-use Oro\Component\Duplicator\DuplicatorFactory;
 use Oro\Component\Duplicator\Duplicator;
+use Oro\Component\Duplicator\DuplicatorFactory;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class DuplicateEntity extends AbstractAction
 {

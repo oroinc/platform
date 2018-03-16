@@ -4,6 +4,7 @@ namespace Oro\Bundle\CommentBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class CommentRepository extends EntityRepository
 {
@@ -16,7 +17,7 @@ class CommentRepository extends EntityRepository
     public function getBaseQueryBuilder($fieldName, $entityIds)
     {
         $qb = $this->createQueryBuilder('c');
-        $qb->andWhere('c.' . $fieldName . ' in (:param1)');
+        $qb->andWhere($qb->expr()->in(QueryBuilderUtil::getField('c', $fieldName), ':param1'));
         $qb->setParameter('param1', $entityIds);
 
         return $qb;

@@ -7,14 +7,12 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\EventDispatcher\EventDispatcher;
-
 use Oro\Bundle\BatchBundle\Event\CountQueryOptimizationEvent;
+use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 use Oro\Bundle\FormBundle\EventListener\CountQueryOptimizationListener;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
-use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CountQueryOptimizationListenerTest extends OrmTestCase
 {

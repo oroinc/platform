@@ -27,11 +27,6 @@ class PrepareResultItemEventTest extends \PHPUnit_Framework_TestCase
         $this->event = new PrepareResultItemEvent($this->resultItem);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_search.prepare_result_item', $this->event->getName());
-    }
-
     public function testGetResultItem()
     {
         $this->assertEquals($this->resultItem, $this->event->getResultItem());

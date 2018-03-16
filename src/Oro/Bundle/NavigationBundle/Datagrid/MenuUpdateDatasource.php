@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Datagrid;
 
 use Knp\Menu\Util\MenuManipulator;
-
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;

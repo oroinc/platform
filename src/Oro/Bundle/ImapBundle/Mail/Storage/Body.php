@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
-use Zend\Mail\Headers;
-use Zend\Mail\Storage\Part;
-
 use Oro\Bundle\ImapBundle\Mail\Processor\ContentProcessor;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\InvalidBodyFormatException;
+use Zend\Mail\Headers;
+use Zend\Mail\Storage\Part;
 
 class Body
 {

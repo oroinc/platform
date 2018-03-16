@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 
 use Doctrine\ORM\Query\Expr\Comparison;
-
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AndCompositeExpression;
 
 class AndCompositeExpressionTest extends \PHPUnit_Framework_TestCase

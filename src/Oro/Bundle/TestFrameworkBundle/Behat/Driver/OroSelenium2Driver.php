@@ -10,6 +10,9 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\ElementValueInterface;
 use WebDriver\Element;
 use WebDriver\Key;
 
+/**
+ * Contains overrides of some Selenium2Driver methods as well as new methods related to selenium driver functionality
+ */
 class OroSelenium2Driver extends Selenium2Driver
 {
     use AssertTrait;
@@ -69,12 +72,14 @@ class OroSelenium2Driver extends Selenium2Driver
             if ('text' === $element->attribute('type')) {
                 $this->setTextInputElement($element, $value);
                 $this->triggerEvent($xpath, 'keyup');
+                $this->triggerEvent($xpath, 'change');
 
                 return;
             }
         } elseif ('textarea' === $elementName && 'true' === $element->attribute('aria-hidden')) {
             $this->fillTinyMce($element, $value);
             $this->triggerEvent($xpath, 'keyup');
+            $this->triggerEvent($xpath, 'change');
 
             return;
         }
@@ -130,9 +135,10 @@ class OroSelenium2Driver extends Selenium2Driver
      */
     protected function setTextInputElement(Element $element, $value)
     {
+        $value = json_encode($value);
         $script = <<<JS
 var node = {{ELEMENT}};
-node.value = '$value';
+node.value = $value;
 JS;
         $this->executeJsOnElement($element, $script);
     }

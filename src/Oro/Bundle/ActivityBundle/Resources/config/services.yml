@@ -16,7 +16,7 @@ parameters:
 
 services:
     oro_activity.manager:
-        class: %oro_activity.manager.class%
+        class: '%oro_activity.manager.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity.orm.entity_class_resolver'
@@ -36,28 +36,28 @@ services:
             - '@oro_entity_config.config_manager'
 
     oro_activity.entity_config_dumper.extension:
-        class: %oro_activity.entity_config_dumper.extension.class%
+        class: '%oro_activity.entity_config_dumper.extension.class%'
         parent: oro_entity_extend.entity_config_dumper.extension.association
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
     oro_activity.entity_generator.extension:
-        class: %oro_activity.entity_generator.extension.class%
+        class: '%oro_activity.entity_generator.extension.class%'
         arguments:
             - '@oro_entity_config.provider.grouping'
         tags:
             - { name: oro_entity_extend.entity_generator_extension }
 
     oro_activity.migration.extension.activity:
-        class: %oro_activity.migration.extension.activity.class%
+        class: '%oro_activity.migration.extension.activity.class%'
         tags:
             - { name: oro_migration.extension, extension_name: activity }
 
     oro_activity.widget_provider.activities:
-        class: %oro_activity.widget_provider.activities.class%
+        class: '%oro_activity.widget_provider.activities.class%'
 
     oro_activity.widget_provider.activities.main:
-        class: %oro_activity.widget_provider.activities.main.class%
+        class: '%oro_activity.widget_provider.activities.main.class%'
         arguments:
             - '@oro_activity.manager'
             - '@security.authorization_checker'
@@ -76,7 +76,7 @@ services:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter }
 
     oro_activity.widget_provider.actions:
-        class: %oro_activity.widget_provider.actions.class%
+        class: '%oro_activity.widget_provider.actions.class%'
         arguments:
             - '@oro_activity.manager'
             - '@oro_ui.placeholder.provider'
@@ -102,21 +102,21 @@ services:
             - { name: oro_entity.exclusion_provider.api }
 
     oro_activity.manager.activity.api:
-        class: %oro_activity.manager.activity.api.class%
+        class: '%oro_activity.manager.activity.api.class%'
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_activity.manager'
 
     oro_activity.manager.activity_entity.api:
-        class: %oro_activity.manager.activity_entity.api.class%
+        class: '%oro_activity.manager.activity_entity.api.class%'
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_activity.manager'
 
     oro_activity.manager.activity_search.api:
-        class: %oro_activity.manager.activity_search.api.class%
+        class: '%oro_activity.manager.activity_search.api.class%'
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '@doctrine.orm.entity_manager'
@@ -153,19 +153,17 @@ services:
             - '@event_dispatcher'
 
     oro_activity.form.handler.activity_entity.api:
-        class: %oro_activity.form.handler.activity_entity.api.class%
-        scope: request
+        class: '%oro_activity.form.handler.activity_entity.api.class%'
         arguments:
             - '@oro_activity.form.activity_entity.api'
-            - '@request'
+            - '@request_stack'
             - '@doctrine.orm.entity_manager'
             - '@oro_activity.manager'
             - '@security.authorization_checker'
 
     oro_activity.form.activity_entity.api:
         class: Symfony\Component\Form\Form
-        factory_method: createNamed
-        factory_service: form.factory
+        factory: ['@form.factory', createNamed]
         arguments:
             - targets
             - 'oro_related_entity_standalone_collection_api'
@@ -176,7 +174,7 @@ services:
                     minMessage: "The 'targets' collection should contain at least one element"
 
     oro_activity.manager.activity_target.api:
-        class: %oro_activity.manager.activity_target.api.class%
+        class: '%oro_activity.manager.activity_target.api.class%'
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - '@doctrine.orm.entity_manager'

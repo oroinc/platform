@@ -13,6 +13,16 @@ define(function(require) {
             actions: null
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function TransitionDefinitionModel() {
+            TransitionDefinitionModel.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             if (this.get('preactions') === null) {
                 this.set('preactions', {});

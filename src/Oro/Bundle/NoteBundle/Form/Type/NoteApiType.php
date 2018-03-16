@@ -2,19 +2,21 @@
 
 namespace Oro\Bundle\NoteBundle\Form\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Form\EventListener\NoteSubscriber;
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NoteApiType extends NoteType
 {
     /** @var  ConfigManager $configManager */
     protected $configManager;
 
+    /**
+     * @param ConfigManager $configManager
+     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -42,12 +44,12 @@ class NoteApiType extends NoteType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
                 'data_class'         => Note::ENTITY_NAME,
-                'intention'          => 'note',
+                'csrf_token_id'      => 'note',
                 'csrf_protection'    => false
             ]
         );

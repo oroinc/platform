@@ -7,18 +7,44 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var BaseView = require('oroui/js/app/views/base/view');
     var FuzzySearch = require('oroui/js/fuzzy-search');
+    var persistentStorage = require('oroui/js/persistent-storage');
+    var highlightSwitcherTemplate = require('tpl!oroui/templates/highlight-switcher.html');
 
     HighlightTextView = BaseView.extend({
         /**
          * @inheritDoc
          */
         optionNames: BaseView.prototype.optionNames.concat([
-            'text',
-            'fuzzySearch',
-            'viewGroup',
-            'highlightClass', 'elementHighlightClass', 'notFoundClass', 'foundClass',
-            'highlightSelectors', 'toggleSelectors'
+            'text', 'toggleSelectors', 'viewGroup', 'notFoundClass',
+            'elementHighlightClass', 'foundClass', 'fuzzySearch',
+            'highlightClass', 'highlightSelectors', 'highlightStateStorageKey',
+            'highlightSwitcherContainer', 'highlightSwitcherElement',
+            'highlightSwitcherTemplate', 'showNotFoundItems'
         ]),
+
+        events: {
+            'click [data-role="highlight-switcher"]': 'changeHighlightSwitcherState'
+        },
+
+        /**
+         * @property {Function}
+         */
+        highlightSwitcherTemplate: highlightSwitcherTemplate,
+
+        /**
+         * @property {String}
+         */
+        highlightSwitcherElement: '[data-role="highlight-switcher"]',
+
+        /**
+         * @property {String}
+         */
+        highlightSwitcherContainer: null,
+
+        /**
+         * @property {String}
+         */
+        highlightStateStorageKey: null,
 
         /**
          * @property {String}
@@ -31,9 +57,14 @@ define(function(require) {
         findText: null,
 
         /**
-         * @property {String}
+         * @property {Boolean}
          */
         fuzzySearch: false,
+
+        /**
+         * @property {Boolean}
+         */
+        showNotFoundItems: false,
 
         /**
          * @property {String}
@@ -78,6 +109,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function HighlightTextView() {
+            HighlightTextView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.findHighlightClass = '.' + this.highlightClass;
             this.findElementHighlightClass = '.' + this.elementHighlightClass;
@@ -87,6 +125,7 @@ define(function(require) {
 
             HighlightTextView.__super__.initialize.apply(this, arguments);
 
+            this.renderHighlightSwitcher();
             this.update(this.text);
 
             mediator.on(this.viewGroup + ':highlight-text:update', this.update, this);
@@ -113,13 +152,17 @@ define(function(require) {
             }
             this.text = text;
             var regexp = this.text;
+
             if (this.fuzzySearch) {
                 regexp = this.text.toLowerCase().replace(/\s/g, '').split('');
-                regexp = '[' + _.uniq(regexp).join('') + ']';
+                regexp = '[' + this._escape(_.uniq(regexp).join('')) + ']';
+            } else {
+                regexp = this._escape(regexp);
             }
             this.findText = this.text.length ? new RegExp(regexp, 'gi') : null;
 
             this.render();
+            this.toggleHighlightSwitcher();
         },
 
         /**
@@ -176,7 +219,7 @@ define(function(require) {
             }
 
             var $parent = $el.closest(this.toggleSelectors[element.selector]);
-            if (this.isElementHighlighted($parent)) {
+            if (this.isElementHighlighted($parent) && !this.showNotFoundItems) {
                 $el.addClass(this.notFoundClass);
             }
         },
@@ -223,6 +266,17 @@ define(function(require) {
                 $highlighted = $highlighted.filter(':visible');
             }
             return $highlighted.length > 0;
+        },
+
+        /**
+         * Check is applicable switcher state
+         *
+         * @return {boolean}
+         */
+        isApplicableSwitcher: function() {
+            var foundHighlight = this.$el.find(this.findHighlightClass);
+            var foundSiblings = this.$el.find(this.findFoundClass).siblings().not(this.findHighlightClass);
+            return foundHighlight.length && foundSiblings.length;
         },
 
         /**
@@ -311,6 +365,70 @@ define(function(require) {
         },
 
         /**
+         * Render highlight switcher interface for changing visibility of notFoundItems
+         */
+        renderHighlightSwitcher: function() {
+            if (this.highlightSwitcherContainer) {
+                this.$el.find(this.highlightSwitcherContainer).append(this.highlightSwitcherTemplate());
+                this.checkHighlightSwitcherState();
+            }
+        },
+
+        /**
+         * Toggle visibility of highlight switcher view
+         *
+         * @param {boolean} state
+         */
+        toggleHighlightSwitcher: function(state) {
+            state = state ? state : this.isApplicableSwitcher();
+            this.$el.find(this.highlightSwitcherElement).toggleClass('hide', !state);
+        },
+
+        /**
+         * Check highlight switcher state and get value from localStorage
+         */
+        checkHighlightSwitcherState: function() {
+            var switcherState = persistentStorage.getItem(this.highlightStateStorageKey);
+            if (this.highlightStateStorageKey && switcherState) {
+                this.showNotFoundItems = switcherState === 'true';
+            }
+            this.toggleHighlightSwitcherItems(!this.showNotFoundItems);
+        },
+
+        /**
+         * Set highlight switcher state to localStorage
+         *
+         * @param {boolean} state
+         */
+        setHighlightSwitcherState: function(state) {
+            if (this.highlightStateStorageKey) {
+                persistentStorage.setItem(this.highlightStateStorageKey, state || !this.showNotFoundItems);
+            }
+        },
+
+        /**
+         * Change highlight switcher state
+         *
+         * @param {boolean} state
+         */
+        changeHighlightSwitcherState: function(state) {
+            state = _.isBoolean(state) ? state : this.showNotFoundItems;
+            this.setHighlightSwitcherState();
+            this.toggleHighlightSwitcherItems(state);
+            this.showNotFoundItems = !state;
+            this.update(this.text);
+        },
+
+        /**
+         * Toggle visibility of highlight switcher items
+         *
+         * @param {boolean} state
+         */
+        toggleHighlightSwitcherItems: function(state) {
+            this.$el.find(this.highlightSwitcherElement).toggleClass('highlighted-only', !state);
+        },
+
+        /**
          * Check if given element is field
          *
          * @param {jQuery} $element
@@ -338,6 +456,16 @@ define(function(require) {
             var fieldName = 'field__value';
 
             return elementName === fieldName;
+        },
+
+        /**
+         * Escaping special characters for regexp expression
+         *
+         * @param str
+         * @private
+         */
+        _escape: function(str) {
+            return str.replace(/[-[\]{}()*+?.,\\^$|#]/g, '\\$&');
         }
     });
 

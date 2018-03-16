@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumFilterTypeTest extends TypeTestCase
 {
@@ -33,9 +32,15 @@ class EnumFilterTypeTest extends TypeTestCase
     }
 
     /**
-     * @dataProvider setDefaultOptionsProvider
+     * @dataProvider configureOptionsProvider
+     * @param string $enumCode
+     * @param string $class
+     * @param string $nullValue
+     * @param array $values
+     * @param array|null $fieldOptions
+     * @param array|null $expectedOptions
      */
-    public function testSetDefaultOptions(
+    public function testConfigureOptions(
         $enumCode,
         $class,
         $nullValue,
@@ -91,7 +96,7 @@ class EnumFilterTypeTest extends TypeTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function setDefaultOptionsProvider()
+    public function configureOptionsProvider()
     {
         return [
             [
@@ -243,7 +248,7 @@ class EnumFilterTypeTest extends TypeTestCase
     public function testClassNormalizerOptionsException()
     {
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
         $resolver->resolve([
             'enum_code'     => null,
             'class'         => null,
@@ -258,7 +263,7 @@ class EnumFilterTypeTest extends TypeTestCase
     public function testClassNormalizerUnexpectedEnumException()
     {
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
         $resolver->resolve([
             'enum_code'     => 'unknown',
             'null_value'    => ':empty:'

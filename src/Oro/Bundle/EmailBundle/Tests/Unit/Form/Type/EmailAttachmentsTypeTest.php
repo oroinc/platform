@@ -3,12 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormInterface;
-
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormInterface;
 
 class EmailAttachmentsTypeTest extends \PHPUnit_Framework_TestCase
 {

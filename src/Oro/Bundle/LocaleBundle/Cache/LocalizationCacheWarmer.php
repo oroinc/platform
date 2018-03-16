@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Cache;
 
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 class LocalizationCacheWarmer implements CacheWarmerInterface
 {

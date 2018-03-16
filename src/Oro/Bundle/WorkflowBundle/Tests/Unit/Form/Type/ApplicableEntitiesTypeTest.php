@@ -3,12 +3,10 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Inflector\Inflector;
-
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\StubEntity;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ApplicableEntitiesTypeTest extends \PHPUnit_Framework_TestCase
 {

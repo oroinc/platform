@@ -2,24 +2,24 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CollectResources;
 
+use Oro\Bundle\ApiBundle\Provider\ExclusionProviderRegistry;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 /**
  * Removes resources for excluded entities.
  */
 class RemoveExcludedEntities implements ProcessorInterface
 {
-    /** @var ExclusionProviderInterface */
-    protected $entityExclusionProvider;
+    /** @var ExclusionProviderRegistry */
+    private $exclusionProviderRegistry;
 
     /**
-     * @param ExclusionProviderInterface $entityExclusionProvider
+     * @param ExclusionProviderRegistry $exclusionProviderRegistry
      */
-    public function __construct(ExclusionProviderInterface $entityExclusionProvider)
+    public function __construct(ExclusionProviderRegistry $exclusionProviderRegistry)
     {
-        $this->entityExclusionProvider = $entityExclusionProvider;
+        $this->exclusionProviderRegistry = $exclusionProviderRegistry;
     }
 
     /**
@@ -31,8 +31,9 @@ class RemoveExcludedEntities implements ProcessorInterface
 
         $resources = $context->getResult();
         $entityClasses = array_keys($resources->toArray());
+        $exclusionProvider = $this->exclusionProviderRegistry->getExclusionProvider($context->getRequestType());
         foreach ($entityClasses as $entityClass) {
-            if ($this->entityExclusionProvider->isIgnoredEntity($entityClass)) {
+            if ($exclusionProvider->isIgnoredEntity($entityClass)) {
                 $resources->remove($entityClass);
             }
         }

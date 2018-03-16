@@ -29,6 +29,13 @@ define(function(require) {
             'addedToParent': 'delegateEvents'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailNotificationView() {
+            EmailNotificationView.__super__.constructor.apply(this, arguments);
+        },
+
         render: function() {
             EmailNotificationView.__super__.render.apply(this, arguments);
             this.$el.toggleClass('highlight', !this.model.get('seen'));

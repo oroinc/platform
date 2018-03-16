@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
-use Oro\Bundle\FilterBundle\Form\Type\Filter\SelectRowFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\SelectRowFilterType;
 
 class SelectRowFilter extends ChoiceFilter
 {
@@ -30,7 +30,7 @@ class SelectRowFilter extends ChoiceFilter
                 $parameterName = $ds->generateParameterName($this->getName());
                 $this->applyFilterToClause(
                     $ds,
-                    $ds->expr()->in($this->get(FilterUtility::DATA_NAME_KEY), $parameterName, true)
+                    $ds->expr()->in($this->getDataFieldName(), $parameterName, true)
                 );
                 $ds->setParameter($parameterName, $data['in']);
             } else {
@@ -41,7 +41,7 @@ class SelectRowFilter extends ChoiceFilter
             $parameterName = $ds->generateParameterName($this->getName());
             $this->applyFilterToClause(
                 $ds,
-                $ds->expr()->notIn($this->get(FilterUtility::DATA_NAME_KEY), $parameterName, true)
+                $ds->expr()->notIn($this->getDataFieldName(), $parameterName, true)
             );
             $ds->setParameter($parameterName, $data['out']);
         }

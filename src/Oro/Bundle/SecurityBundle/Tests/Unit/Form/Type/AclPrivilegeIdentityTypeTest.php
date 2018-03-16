@@ -29,9 +29,9 @@ class AclPrivilegeIdentityTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_acl_privilege_identity', $this->formType->getName());
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolverInterface')
+        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -41,6 +41,6 @@ class AclPrivilegeIdentityTypeTest extends \PHPUnit_Framework_TestCase
                     'data_class' => 'Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity'
                 )
             );
-        $this->formType->setDefaultOptions($resolver);
+        $this->formType->configureOptions($resolver);
     }
 }

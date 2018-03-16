@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormConfigInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -14,6 +11,8 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NonExtendedEntityBidirectional;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NonExtendedEntityBidirectionalValidator;
 use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormConfigInterface;
 
 class NonExtendedEntityBidirectionalValidatorTest extends AbstractConstraintValidatorTest
 {

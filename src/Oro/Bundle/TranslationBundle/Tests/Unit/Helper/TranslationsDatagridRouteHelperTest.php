@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Helper;
 
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
-
 use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
+use Symfony\Component\Routing\RouterInterface;
 
 class TranslationsDatagridRouteHelperTest extends \PHPUnit_Framework_TestCase
 {

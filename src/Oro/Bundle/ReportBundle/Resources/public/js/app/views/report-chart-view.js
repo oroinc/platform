@@ -24,6 +24,16 @@ define(function(request) {
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function ReportChartView(options) {
+            var $el = $(options.el);
+
+            this.$choiceElement = $el.find(this.defaults.templates.name({baseName: $el.data('ftid')}));
+            ReportChartView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @param {Array} options
          */
         initialize: function(options) {
@@ -85,13 +95,6 @@ define(function(request) {
                 this.getParentElement(block).hide();
                 this.getTargetElement(block, name).show();
             }, this);
-        },
-
-        constructor: function(options) {
-            var $el = $(options.el);
-
-            this.$choiceElement = $el.find(this.defaults.templates.name({baseName: $el.data('ftid')}));
-            ReportChartView.__super__.constructor.apply(this, arguments);
         },
 
         dispose: function() {

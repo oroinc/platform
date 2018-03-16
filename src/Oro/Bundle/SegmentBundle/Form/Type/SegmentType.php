@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SegmentBundle\Form\Type;
 
+use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
 
 class SegmentType extends AbstractQueryDesignerType
 {
@@ -61,7 +60,7 @@ class SegmentType extends AbstractQueryDesignerType
             $this->getDefaultOptions(),
             [
                 'data_class'         => 'Oro\Bundle\SegmentBundle\Entity\Segment',
-                'intention'          => 'segment',
+                'csrf_token_id'      => 'segment',
                 'query_type'         => 'segment',
             ]
         );

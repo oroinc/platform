@@ -3,18 +3,16 @@
 namespace Oro\Bundle\EntityConfigBundle\Twig;
 
 use Doctrine\Common\Util\ClassUtils;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\ConfigBundle\Exception\UnexpectedTypeException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\RouterInterface;
 
 class ConfigExtension extends \Twig_Extension
 {

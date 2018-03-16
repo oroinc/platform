@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumNameType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EnumNameTypeTest extends TypeTestCase
 {
@@ -36,14 +35,19 @@ class EnumNameTypeTest extends TypeTestCase
     }
 
     /**
-     * @dataProvider setDefaultOptionsProvider
+     * @dataProvider configureOptionsProvider
+     * @param ConfigIdInterface $configId
+     * @param boolean $isNewConfig
+     * @param boolean $hasEnumCode
+     * @param array $options
+     * @param array $expectedOptions
      */
-    public function testSetDefaultOptions(
+    public function testConfigureOptions(
         ConfigIdInterface $configId,
         $isNewConfig,
         $hasEnumCode,
-        $options,
-        $expectedOptions
+        array $options,
+        array $expectedOptions
     ) {
         $fieldName = $configId instanceof FieldConfigId ? $configId->getFieldName() : null;
 
@@ -53,7 +57,7 @@ class EnumNameTypeTest extends TypeTestCase
             ->will($this->returnValue($hasEnumCode));
 
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
 
         $options['config_id']     = $configId;
         $options['config_is_new'] = $isNewConfig;
@@ -92,7 +96,7 @@ class EnumNameTypeTest extends TypeTestCase
         return $resolver;
     }
 
-    public function setDefaultOptionsProvider()
+    public function configureOptionsProvider()
     {
         return [
             [
@@ -160,7 +164,7 @@ class EnumNameTypeTest extends TypeTestCase
             ->will($this->returnValue(true));
 
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
 
         $resolvedOptions = $resolver->resolve(['config_id' => $configId]);
 
@@ -186,7 +190,7 @@ class EnumNameTypeTest extends TypeTestCase
             ->will($this->returnValue(false));
 
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
 
         $resolvedOptions = $resolver->resolve(['config_id' => $configId]);
 

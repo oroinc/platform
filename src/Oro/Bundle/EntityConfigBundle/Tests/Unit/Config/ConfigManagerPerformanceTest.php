@@ -4,9 +4,6 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\ORM\UnitOfWork;
-
-use Symfony\Component\Stopwatch\Stopwatch;
-
 use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
@@ -15,10 +12,12 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\LockObject;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Config\LockObject;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * Contains tests for a performance crucial parts of entity configs
@@ -399,9 +398,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $emLink   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emLink   = $this->createMock(ServiceLink::class);
         $emLink->expects($this->any())
             ->method('getService')
             ->will($this->returnValue($this->em));

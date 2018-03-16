@@ -5,14 +5,11 @@ namespace Oro\Bundle\LocaleBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-
 use JMS\Serializer\Annotation as Serializer;
-
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-
 use Oro\Bundle\LocaleBundle\Model\ExtendLocalization;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 

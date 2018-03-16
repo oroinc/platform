@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
-use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Intl\Intl;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Intl\Intl;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LanguageType extends AbstractType
 {
@@ -42,6 +41,7 @@ class LanguageType extends AbstractType
         $resolver->setDefaults(
             [
                 'choices' => $this->getLanguageChoices(true),
+                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
                 'choices_as_values' => true,
                 'show_all' => false,
                 'empty_value' => '',

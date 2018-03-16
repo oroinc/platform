@@ -5,11 +5,9 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Form\Type;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
-
+use Oro\Bundle\SegmentBundle\Form\Type\SegmentChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\SegmentBundle\Form\Type\SegmentChoiceType;
 
 class SegmentChoiceTypeTest extends \PHPUnit_Framework_TestCase
 {

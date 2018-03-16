@@ -11,17 +11,32 @@ define(function(require) {
      */
     CapabilityGroupView = BaseCollectionView.extend({
         animationDuration: 0,
+
         className: 'role-capability',
+
         template: require('tpl!orouser/templates/role/capability-group.html'),
+
         listSelector: '[data-name="capability-items"]',
+
         fallbackSelector: '[data-name="capability-empty-items"]',
+
         itemView: CapabilityItemView,
+
         listen: {
             'change collection': 'onChange'
         },
+
         events: {
             'click [data-name="capabilities-select-all"]': 'onSelectAll'
         },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function CapabilityGroupView() {
+            CapabilityGroupView.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             this.model = options.model;
             this.collection = options.model.get('items');

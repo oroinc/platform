@@ -3,15 +3,13 @@
 namespace Oro\Bundle\CacheBundle\DependencyInjection\Compiler;
 
 use Doctrine\Common\Cache\CacheProvider;
-
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
+use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
-use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 
 class CacheConfigurationPass implements CompilerPassInterface
 {

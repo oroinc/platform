@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\EventListener;
 use Oro\Bundle\EntityConfigBundle\EventListener\AttributeFamilyFormViewListener;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;
-
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Translation\TranslatorInterface;
 

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
 use Oro\Bundle\UserBundle\Form\EventListener\ChangeRoleSubscriber;
+use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
 
 class AclRoleTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,9 +36,9 @@ class AclRoleTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_user_role_form', $this->formType->getName());
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolverInterface')
+        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -46,9 +46,9 @@ class AclRoleTypeTest extends \PHPUnit_Framework_TestCase
             ->with(
                 array(
                     'data_class' => 'Oro\Bundle\UserBundle\Entity\Role',
-                    'intention'  => 'role'
+                    'csrf_token_id' => 'role'
                 )
             );
-        $this->formType->setDefaultOptions($resolver);
+        $this->formType->configureOptions($resolver);
     }
 }

@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
-
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Validator\Constraints;
 use Oro\Bundle\LocaleBundle\Validator\Constraints\DefaultLocalizationValidator;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 class DefaultLocalizationValidatorTest extends \PHPUnit_Framework_TestCase
 {

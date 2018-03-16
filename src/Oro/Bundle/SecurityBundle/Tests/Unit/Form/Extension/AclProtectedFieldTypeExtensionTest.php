@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension;
 
+use Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension;
+use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
@@ -9,14 +12,11 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
-
-use Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension;
-use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 
 class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 {
@@ -61,8 +61,8 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $this->extension->buildForm($builder, $options);
         $listeners = $dispatcher->getListeners();
         $this->assertCount(2, $listeners);
-        $this->assertTrue(array_key_exists('form.pre_bind', $listeners));
-        $this->assertTrue(array_key_exists('form.post_bind', $listeners));
+        $this->assertTrue(array_key_exists(FormEvents::PRE_SUBMIT, $listeners));
+        $this->assertTrue(array_key_exists(FormEvents::POST_SUBMIT, $listeners));
     }
 
     public function testBuildFormWithoutDataClassInOptions()

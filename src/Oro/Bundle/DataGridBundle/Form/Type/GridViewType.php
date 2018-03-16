@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Form\Type;
 
+use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\DataGridBundle\Entity\GridView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class GridViewType extends AbstractType
 {
@@ -57,8 +56,8 @@ class GridViewType extends AbstractType
                 'error_bubbling' => false,
                 'allow_add'      => true,
                 'allow_delete'   => true,
-                'type'           => 'choice',
-                'options'        => [
+                'entry_type'           => 'choice',
+                'entry_options'        => [
                     'choices' => [
                         1  => 1,
                         -1 => -1
@@ -74,7 +73,7 @@ class GridViewType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class' => 'Oro\Bundle\DataGridBundle\Entity\AbstractGridView',

@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityBundle\Provider;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Util\Inflector;
-
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**

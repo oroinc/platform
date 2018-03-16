@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Form\Handler;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 

@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
-
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\Status;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class StatusHandler
 {
@@ -18,9 +17,9 @@ class StatusHandler
     protected $form;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Request
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * @var \Doctrine\Common\Persistence\ObjectManager
@@ -35,14 +34,14 @@ class StatusHandler
     /**
      *
      * @param FormInterface $form
-     * @param Request       $request
+     * @param RequestStack  $requestStack
      * @param ObjectManager $em
      * @param UserManager   $um
      */
-    public function __construct(FormInterface $form, Request $request, ObjectManager $em, UserManager $um)
+    public function __construct(FormInterface $form, RequestStack $requestStack, ObjectManager $em, UserManager $um)
     {
         $this->form = $form;
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->em = $em;
         $this->um = $um;
     }
@@ -59,8 +58,9 @@ class StatusHandler
     {
         $this->form->setData($status);
 
-        if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $this->form->submit($this->request);
+        $request = $this->requestStack->getCurrentRequest();
+        if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
+            $this->form->submit($request);
 
             if ($this->form->isValid()) {
                 $this->onSuccess($user, $status, $updateCurrentStatus);

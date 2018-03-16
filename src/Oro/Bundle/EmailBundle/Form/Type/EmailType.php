@@ -2,14 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Validator\Constraints\Valid;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
@@ -18,6 +10,13 @@ use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Validator\Constraints\Valid;
 
 class EmailType extends AbstractType
 {
@@ -136,14 +135,14 @@ class EmailType extends AbstractType
                 ]
             )
             ->add('attachments', 'oro_email_attachments', [
-                'type' => 'oro_email_attachment',
+                'entry_type' => 'oro_email_attachment',
                 'required' => false,
                 'allow_add' => true,
                 'prototype' => false,
                 'constraints' => [
                     new Valid()
                 ],
-                'options' => [
+                'entry_options' => [
                     'required' => false,
                 ],
             ])
@@ -253,12 +252,12 @@ class EmailType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
                 'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\Email',
-                'intention'          => 'email',
+                'csrf_token_id'      => 'email',
                 'csrf_protection'    => true,
             ]
         );

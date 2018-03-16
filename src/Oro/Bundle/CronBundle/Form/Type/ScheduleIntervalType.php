@@ -4,7 +4,6 @@ namespace Oro\Bundle\CronBundle\Form\Type;
 
 use Oro\Bundle\CronBundle\Entity\ScheduleIntervalInterface;
 use Oro\Bundle\FormBundle\Form\Type\OroDateTimeType;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;

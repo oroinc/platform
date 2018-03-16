@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_3;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
-use Oro\Component\Config\Common\ConfigObject;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
+use Oro\Component\Config\Common\ConfigObject;
+use Psr\Log\LoggerInterface;
 
 class MigrateValuesQuery extends ParametrizedMigrationQuery
 {

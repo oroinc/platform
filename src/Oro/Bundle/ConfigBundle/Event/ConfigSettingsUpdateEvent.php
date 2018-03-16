@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ConfigBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Symfony\Component\EventDispatcher\Event;
 
 class ConfigSettingsUpdateEvent extends Event
 {

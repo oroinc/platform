@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\Common\Persistence\Mapping\AbstractClassMetadataFactory;
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\ManagerBagInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;

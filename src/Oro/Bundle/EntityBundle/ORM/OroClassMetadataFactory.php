@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
-
 use Oro\Bundle\EntityBundle\DataCollector\OrmLogger;
 
 class OroClassMetadataFactory extends ClassMetadataFactory

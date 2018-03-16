@@ -3,12 +3,10 @@
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_1;
 
 use Doctrine\DBAL\Schema\Schema;
-
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class OroEntityExtendBundle implements Migration, ContainerAwareInterface
 {

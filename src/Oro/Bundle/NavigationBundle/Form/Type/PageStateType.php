@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PageStateType extends AbstractType
 {
@@ -33,12 +33,12 @@ class PageStateType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(
                 'data_class'      => 'Oro\Bundle\NavigationBundle\Entity\AbstractPageState',
-                'intention'       => 'pagestate',
+                'csrf_token_id'   => 'pagestate',
                 'csrf_protection' => false,
             )
         );

@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\SyncBundle\Content;
 
+use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
+use Oro\Component\DependencyInjection\ServiceLink;
 use Psr\Log\LoggerInterface;
-
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class TopicSender
 {

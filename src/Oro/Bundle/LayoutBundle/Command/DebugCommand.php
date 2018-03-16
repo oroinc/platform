@@ -2,19 +2,16 @@
 
 namespace Oro\Bundle\LayoutBundle\Command;
 
+use Oro\Bundle\LayoutBundle\Command\Util\DebugLayoutContext;
+use Oro\Bundle\LayoutBundle\Command\Util\DebugOptionsResolverDecorator;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\LayoutManager;
+use Oro\Component\Layout\LayoutRegistryInterface;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
-use Oro\Component\Layout\LayoutManager;
-use Oro\Component\Layout\LayoutRegistryInterface;
-use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\LayoutBundle\Command\Util\DebugLayoutContext;
-use Oro\Bundle\LayoutBundle\Command\Util\DebugOptionsResolverDecorator;
 
 class DebugCommand extends ContainerAwareCommand
 {

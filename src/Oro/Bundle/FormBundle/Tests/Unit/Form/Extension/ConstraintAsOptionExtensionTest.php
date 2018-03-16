@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Extension;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\NotBlank;
-
 use Oro\Bundle\FormBundle\Form\Extension\ConstraintAsOptionExtension;
 use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ConstraintAsOptionExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,7 +24,7 @@ class ConstraintAsOptionExtensionTest extends \PHPUnit_Framework_TestCase
         unset($this->extension);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $constraintOptions = array(
             new NotBlank(),
@@ -41,7 +40,7 @@ class ConstraintAsOptionExtensionTest extends \PHPUnit_Framework_TestCase
         $resolver = new OptionsResolver();
         $resolver->setDefaults(array('constraints' => array()));
 
-        $this->extension->setDefaultOptions($resolver);
+        $this->extension->configureOptions($resolver);
         $actualOptions = $resolver->resolve(array('constraints' => $constraintOptions));
 
         $this->assertArrayHasKey('constraints', $actualOptions);

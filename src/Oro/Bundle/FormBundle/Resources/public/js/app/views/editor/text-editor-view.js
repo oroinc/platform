@@ -111,7 +111,7 @@ define(function(require) {
          */
         _isFocused: false,
 
-        constructor: function(options) {
+        constructor: function TextEditorView(options) {
             var optionsClassName;
             var prototypeClassName;
             if (options.className) {
