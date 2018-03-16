@@ -33,9 +33,8 @@ define(function(require) {
                 // compose global instances
                 for (i = 0; i < reuses.length; i += 1) {
                     if (
-                        _.isObject(reuses[i][2])
-                        && reuses[i][2].el
-                        && !(($el = BaseView.resolveElOption(reuses[i][2].el)) && $el.length)
+                        _.isObject(reuses[i][2]) && reuses[i][2].el &&
+                        !(($el = BaseView.resolveElOption(reuses[i][2].el)) && $el.length)
                     ) {
                         // temporary fix for BAP-16640 issue
                         // solid fix will be applied in OPA-92
