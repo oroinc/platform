@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
+use Composer\Question\StrictConfirmationQuestion;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -89,7 +90,8 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->inputOptionProvider = new InputOptionProvider($output, $input, $this->getHelperSet()->get('dialog'));
+        $this->inputOptionProvider = new InputOptionProvider($output, $input, $this->getHelperSet()->get('question'));
+
         if (false === $input->isInteractive()) {
             $this->validate($input);
         }
@@ -276,32 +278,29 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $options = [
             'user-name'      => [
                 'label'                  => 'Username',
-                'askMethod'              => 'ask',
-                'additionalAskArguments' => [],
+                'options'                => [
+                    'args' => [LoadAdminUserData::DEFAULT_ADMIN_USERNAME]
+                ],
                 'defaultValue'           => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
             ],
             'user-email'     => [
                 'label'                  => 'Email',
-                'askMethod'              => 'askAndValidate',
-                'additionalAskArguments' => [$emailValidator],
+                'options'                => ['settings' => ['validator' => [$emailValidator]]],
                 'defaultValue'           => null,
             ],
             'user-firstname' => [
                 'label'                  => 'First name',
-                'askMethod'              => 'askAndValidate',
-                'additionalAskArguments' => [$firstNameValidator],
+                'options'                => ['settings' => ['validator' => [$firstNameValidator]]],
                 'defaultValue'           => null,
             ],
             'user-lastname'  => [
                 'label'                  => 'Last name',
-                'askMethod'              => 'askAndValidate',
-                'additionalAskArguments' => [$lastNameValidator],
+                'options'                => ['settings' => ['validator' => [$lastNameValidator]]],
                 'defaultValue'           => null,
             ],
             'user-password'  => [
                 'label'                  => 'Password',
-                'askMethod'              => 'askHiddenResponseAndValidate',
-                'additionalAskArguments' => [$passwordValidator],
+                'options'                => ['settings' => ['validator' => [$passwordValidator], 'hidden' => [true]]],
                 'defaultValue'           => null,
             ],
         ];
@@ -312,8 +311,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 $optionName,
                 $optionData['label'],
                 $optionData['defaultValue'],
-                $optionData['askMethod'],
-                $optionData['additionalAskArguments']
+                $optionData['options']
             );
         }
 
@@ -353,8 +351,10 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $options = [
             'organization-name' => [
                 'label'                  => 'Organization name',
-                'askMethod'              => 'askAndValidate',
-                'additionalAskArguments' => [$organizationNameValidator],
+                'options'                => [
+                    'constructorArgs' => [$defaultOrganizationName],
+                    'settings' => ['validator' => [$organizationNameValidator]]
+                ],
                 'defaultValue'           => $defaultOrganizationName,
             ]
         ];
@@ -365,8 +365,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 $optionName,
                 $optionData['label'],
                 $optionData['defaultValue'],
-                $optionData['askMethod'],
-                $optionData['additionalAskArguments']
+                $optionData['options']
             );
         }
 
@@ -393,8 +392,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             'application-url' => [
                 'label'                  => 'Application URL',
                 'config_key'             => 'oro_ui.application_url',
-                'askMethod'              => 'ask',
-                'additionalAskArguments' => [],
             ]
         ];
 
@@ -406,8 +403,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 $optionName,
                 $optionData['label'],
                 $defaultValue,
-                $optionData['askMethod'],
-                $optionData['additionalAskArguments']
+                ['constructorArgs' => [$defaultValue]]
             );
 
             // update setting if it's not empty and not equal to default value
@@ -487,8 +483,10 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             'sample-data',
             'Load sample data (y/n)',
             false,
-            'askConfirmation',
-            [false]
+            [
+                'class' => StrictConfirmationQuestion::class,
+                'constructorArgs' => [false]
+            ]
         );
         if ($isDemo) {
             // load demo fixtures
