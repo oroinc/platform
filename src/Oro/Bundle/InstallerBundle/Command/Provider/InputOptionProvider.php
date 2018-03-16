@@ -48,7 +48,7 @@ class InputOptionProvider
         $hasOptionValue = !empty($value);
 
         // special case for askConfirmation
-        if ($hasOptionValue && isset($options['class']) && $options['class'] === ConfirmationQuestion::class) {
+        if ($hasOptionValue && isset($options['class']) && is_a($options['class'], ConfirmationQuestion::class, true)) {
             if (in_array(strtolower($value[0]), ['y', 'n'])) {
                 $value = strtolower($value[0]) === 'y';
             } else {
