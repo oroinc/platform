@@ -33,6 +33,7 @@ rules:
   no-useless-concat: 'error'
   no-loop-func: 'error'
   no-eval: 'error'
+  operator-linebreak: 'error'
   new-cap:
     - 'error'
     - {

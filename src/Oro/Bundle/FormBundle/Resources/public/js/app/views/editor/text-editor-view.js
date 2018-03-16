@@ -153,8 +153,8 @@ define(function(require) {
             if (emptyValue === void 0) {
                 emptyValue = '';
             }
-            return this.placeholderRaw !== void 0 ? this.placeholderRaw :
-                (this.placeholder !== void 0 ? __(this.placeholder) : emptyValue);
+            return this.placeholderRaw !== void 0 ? this.placeholderRaw
+                : (this.placeholder !== void 0 ? __(this.placeholder) : emptyValue);
         },
 
         getTemplateData: function() {
