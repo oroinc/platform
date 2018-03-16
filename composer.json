@@ -53,7 +53,7 @@
         "lexik/maintenance-bundle": "2.1.1",
         "sylius/flow-bundle": "0.19.*",
         "composer/composer": "1.4.*",
-        "akeneo/batch-bundle": "0.4.2",
+        "akeneo/batch-bundle": "0.4.7",
         "nesbot/Carbon": "1.21.*",
         "monolog/monolog": "1.22.*",
         "ocramius/proxy-manager": "0.5.*",
@@ -141,6 +141,10 @@
         "asset-packagist": {
             "type": "composer",
             "url": "https://asset-packagist.orocrm.com"
+        },
+        "akeneo": {
+            "type": "vcs",
+            "url": "https://github.com/laboro/BatchBundle.git"
         }
     },
     "minimum-stability": "dev",
