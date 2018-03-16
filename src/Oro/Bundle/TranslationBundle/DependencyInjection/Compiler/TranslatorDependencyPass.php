@@ -14,6 +14,8 @@ class TranslatorDependencyPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $translatorDef = $container->getDefinition('translator.default');
+
+        $translatorDef->setClass('Oro\Bundle\TranslationBundle\Translation\Translator');
         $translatorDef->addMethodCall(
             'setDatabaseMetadataCache',
             [new Reference('oro_translation.database_translation.metadata.cache')]
@@ -22,5 +24,15 @@ class TranslatorDependencyPass implements CompilerPassInterface
             'setResourceCache',
             [new Reference('oro_translation.resource.cache')]
         );
+
+        $arguments = $translatorDef->getArguments();
+        array_unshift(
+            $arguments,
+            new Reference('oro_translation.provider.translation_domain'),
+            new Reference('oro_translation.strategy.provider_link'),
+            '%installed%'
+        );
+
+        $translatorDef->setArguments($arguments);
     }
 }
