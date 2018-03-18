@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle\Command\Provider;
 
+use Composer\Question\StrictConfirmationQuestion;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -48,7 +49,7 @@ class InputOptionProvider
         $hasOptionValue = !empty($value);
 
         // special case for askConfirmation
-        if ($hasOptionValue && isset($options['class']) && is_a($options['class'], ConfirmationQuestion::class, true)) {
+        if ($hasOptionValue && $this->isConfirmationQuestion($options)) {
             if (in_array(strtolower($value[0]), ['y', 'n'])) {
                 $value = strtolower($value[0]) === 'y';
             } else {
@@ -73,6 +74,20 @@ class InputOptionProvider
         }
 
         return $value;
+    }
+
+    /**
+     * @param array $options
+     * @return bool
+     */
+    private function isConfirmationQuestion(array $options)
+    {
+        if (!isset($options['class'])) {
+            return false;
+        }
+
+        return is_a($options['class'], ConfirmationQuestion::class, true)
+            || is_a($options['class'], StrictConfirmationQuestion::class, true);
     }
 
     /**
