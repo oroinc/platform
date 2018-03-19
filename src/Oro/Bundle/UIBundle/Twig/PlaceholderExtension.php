@@ -111,11 +111,8 @@ class PlaceholderExtension extends \Twig_Extension
                 $query = $request->query->all();
             }
 
-            /** @var HttpKernelExtension $kernelExtension */
-            $kernelExtension = $environment->getExtension(HttpKernelExtension::class);
-
-            return $kernelExtension->renderFragment(
-                $kernelExtension->controller($item['action'], $variables, $query)
+            return $this->container->get('fragment.handler')->render(
+                HttpKernelExtension::controller($item['action'], $variables, $query)
             );
         }
 
