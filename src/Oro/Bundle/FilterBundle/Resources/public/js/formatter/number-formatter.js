@@ -3,7 +3,7 @@ define(function(require) {
 
     var _ = require('underscore');
     var AbstractFormatter = require('./abstract-formatter');
-    var localeSettings = require('orolocale/js/locale-settings');
+    var formatter = require('orolocale/js/formatter/number');
 
     /**
      * A floating point number formatter. Doesn't understand notation at the moment.
@@ -24,9 +24,6 @@ define(function(require) {
         if (this.decimals < 0 || this.decimals > 20) {
             throw new RangeError('decimals must be between 0 and 20');
         }
-
-        var numberFormats = localeSettings.getNumberFormats('decimal');
-        this.decimalSeparator = numberFormats.decimal_separator_symbol;
     };
 
     NumberFormatter.prototype = new AbstractFormatter();
@@ -62,58 +59,51 @@ define(function(require) {
          *
          * @memberOf orofilter.formatter.NumberFormatter
          * @param {number} number
-         * @return {string}
+         * @return {string|number}
          */
         fromRaw: function(number) {
             if (isNaN(number) || number === null) {
                 return '';
             }
 
-            number = number.toFixed(this.decimals);
+            if (this.percent) {
+                return formatter.formatPercent(number / 100);
+            } else {
+                number = number.toFixed(this.decimals);
 
-            var parts = number.split('.');
-            var integerPart = parts[0];
-            var isPercentValueTrim = parts[1] && parts[1] === this.EMPTY_DECIMAL && this.percent;
-            var decimalPart = parts[1] && !isPercentValueTrim ? (this.decimalSeparator || '.') + parts[1] : '';
+                var parts = number.split('.');
+                var integerPart = parts[0];
+                var isPercentValueTrim = parts[1] && parts[1] === this.EMPTY_DECIMAL && this.percent;
+                var decimalPart = parts[1] && !isPercentValueTrim ? (this.decimalSeparator || '.') + parts[1] : '';
 
-            return integerPart.replace(this.HUMANIZED_NUM_RE, '$1' + this.orderSeparator) + decimalPart;
+                return integerPart.replace(this.HUMANIZED_NUM_RE, '$1' + this.orderSeparator) + decimalPart;
+            }
         },
 
         /**
-         * Takes a string, possibly formatted with `orderSeparator` and/or
-         * `decimalSeparator`, and convert it back to a number.
+         * Takes a floating point number and convert it to a formatted string where
+         * every thousand is separated by `orderSeparator`, with a `decimal` number of
          *
          * @memberOf orofilter.formatter.NumberFormatter
          * @param {string} formattedData
-         * @return {number|undefined} Undefined if the string cannot be converted to
+         * @return {number|NaN} NaN if the string cannot be converted to
          * a number.
          */
         toRaw: function(formattedData) {
-            if (/^\s+$/.test(formattedData) || formattedData === '') {
+            if (formattedData === null || /^\s+$/.test(formattedData) || formattedData === '') {
                 return void 0;
             }
-            var rawData = '';
-            var i;
 
-            var thousands = formattedData.trim().split(this.orderSeparator);
-            for (i = 0; i < thousands.length; i++) {
-                rawData += thousands[i];
+            if (this.percent && formattedData.indexOf('%') > -1) {
+                formattedData = formattedData.replace(/%/g, '');
             }
 
-            var decimalParts = rawData.split(this.decimalSeparator);
-            rawData = '';
-            for (i = 0; i < decimalParts.length; i++) {
-                rawData = rawData + decimalParts[i] + '.';
-            }
+            formattedData = formatter.unformat(formattedData);
 
-            if (rawData[rawData.length - 1] === '.') {
-                rawData = rawData.slice(0, rawData.length - 1);
+            if (!this.percent) {
+                formattedData = String(formattedData.toFixed(this.decimals)) * 1;
             }
-
-            var result = (rawData * 1).toFixed(this.decimals) * 1;
-            if (_.isNumber(result) && !_.isNaN(result)) {
-                return result;
-            }
+            return formattedData;
         }
     });
 
