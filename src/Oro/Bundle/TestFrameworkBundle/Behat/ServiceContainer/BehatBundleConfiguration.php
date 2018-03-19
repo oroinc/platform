@@ -8,6 +8,9 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * Configuration defenition of `/Tests/Behat/behat.yml` for bundles.
+ */
 class BehatBundleConfiguration implements ConfigurationInterface
 {
     /**
@@ -130,6 +133,13 @@ class BehatBundleConfiguration implements ConfigurationInterface
                         ->children()
                             ->scalarNode('class')->isRequired()->end()
                             ->scalarNode('route')->isRequired()->end()
+                        ->end()
+                    ->end()
+                ->end()
+                ->arrayNode('optional_listeners')
+                    ->children()
+                        ->arrayNode('required_for_fixtures')
+                            ->prototype('scalar')->end()
                         ->end()
                     ->end()
                 ->end()
