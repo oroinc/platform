@@ -69,7 +69,7 @@ entity_config:
                         type: choice
                         options:
                             choices: ['No', 'Yes']
-                            empty_value: false
+                            placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.searchable
                 filterable:
@@ -80,7 +80,7 @@ entity_config:
                         type: choice
                         options:
                             choices: ['No', 'Yes']
-                            empty_value: false
+                            placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.filterable
                 filter_by:
@@ -93,7 +93,7 @@ entity_config:
                             choices:
                                 exact_value: 'oro.entity_config.field_config.filter_by.exact_value.label'
                                 fuzzy_search: 'oro.entity_config.field_config.filter_by.fuzzy_search.label'
-                            empty_value: false
+                            placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.filter_by.label
                             tooltip: oro.entity_config.entity_config.attribute.field.items.filter_by.tooltip
@@ -105,7 +105,7 @@ entity_config:
                         type: choice
                         options:
                             choices: ['No', 'Yes']
-                            empty_value: false
+                            placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.sortable
                 enabled:
@@ -116,7 +116,7 @@ entity_config:
                         type: choice
                         options:
                             choices: ['No', 'Yes']
-                            empty_value: false
+                            placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.enabled
                 visible:
@@ -132,6 +132,6 @@ entity_config:
                         type: choice
                         options:
                             choices: ['No', 'Yes']
-                            empty_value: false
+                            placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.visible
