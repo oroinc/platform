@@ -327,7 +327,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
                 function (ContextInterface $context, $blockId) use ($assertContextCallback, $renderBlocks) {
                     if (!$context->isResolved()) {
                         $context->getResolver()
-                            ->setOptional(['theme'])
+                            ->setDefined(['theme'])
                             ->setDefaults(['action' => '']);
                         $context->resolve();
                     }

@@ -46,16 +46,15 @@ class EntityFilterType extends AbstractChoiceType
             )
         );
 
-        $resolver->setNormalizers(
-            array(
-                'field_type' => function (Options $options, $value) {
-                    if (!empty($options['translatable'])) {
-                        $value = 'translatable_entity';
-                    }
-
-                    return $value;
+        $resolver->setNormalizer(
+            'field_type',
+            function (Options $options, $value) {
+                if (!empty($options['translatable'])) {
+                    $value = 'translatable_entity';
                 }
-            )
+
+                return $value;
+            }
         );
     }
 }

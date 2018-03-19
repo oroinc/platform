@@ -48,6 +48,23 @@ class FormUtils
     }
 
     /**
+     * @param FormInterface $form
+     * @param string $fieldName
+     * @param array $mergeOptions
+     */
+    public static function replaceFieldOptionsRecursive(
+        FormInterface $form,
+        string $fieldName,
+        array $mergeOptions = []
+    ) {
+        $config  = $form->get($fieldName)->getConfig();
+        $options = $config->getOptions();
+
+        $options = array_replace_recursive($options, $mergeOptions);
+        $form->add($fieldName, $config->getType()->getName(), $options);
+    }
+
+    /**
      * Appends CSS class(es) to given form view
      *
      * @param FormView $view

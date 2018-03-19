@@ -40,7 +40,7 @@ class TooltipFormExtensionTest extends \PHPUnit_Framework_TestCase
         $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->getMock();
         $resolver->expects($this->once())
-            ->method('setOptional')
+            ->method('setDefined')
             ->with(
                 array(
                     'tooltip',

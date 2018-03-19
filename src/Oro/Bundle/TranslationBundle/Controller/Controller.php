@@ -8,6 +8,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
+/**
+ * Used when JSON file with js translations not generated and application make direct request to get this file.
+ */
 class Controller
 {
     /**
@@ -57,12 +60,12 @@ class Controller
      */
     public function indexAction(Request $request, $_locale)
     {
-        $domains = isset($this->options['domains']) ? $this->options['domains'] : array();
+        $domains = isset($this->options['domains']) ? $this->options['domains'] : [];
         $debug = isset($this->options['debug']) ? (bool)$this->options['debug'] : false;
 
         $content = $this->renderJsTranslationContent($domains, $_locale, $debug);
 
-        return new Response($content, 200, array('Content-Type' => $request->getMimeType('js')));
+        return new Response($content, 200, ['Content-Type' => $request->getMimeType('json')]);
     }
 
     /**
@@ -90,6 +93,6 @@ class Controller
             $result['translations'][$locale][$domain] = $translations;
         }
 
-        return $this->templating->render($this->template, array('json' => $result));
+        return $this->templating->render($this->template, ['json' => $result]);
     }
 }

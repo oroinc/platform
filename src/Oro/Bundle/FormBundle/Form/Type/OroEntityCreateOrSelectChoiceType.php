@@ -99,16 +99,15 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
             'editable' => false,
         ]);
 
-        $resolver->setNormalizers(
-            [
-                'editable' => function (Options $options, $value) {
-                    if (!$options['edit_route']) {
-                        return false;
-                    }
+        $resolver->setNormalizer(
+            'editable',
+            function (Options $options, $value) {
+                if (!$options['edit_route']) {
+                    return false;
+                }
 
-                    return $value;
-                },
-            ]
+                return $value;
+            }
         );
     }
 

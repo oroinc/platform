@@ -79,11 +79,7 @@ class EntityIdentifierType extends AbstractType
                 'values_delimiter' => ','
             )
         )
-        ->setAllowedValues(
-            array(
-                'multiple' => array(true, false),
-            )
-        );
+        ->setAllowedValues('multiple', [true, false]);
         $resolver->setRequired(array('class'));
 
         $registry = $this->registry;
@@ -130,12 +126,8 @@ class EntityIdentifierType extends AbstractType
             return $queryBuilder;
         };
 
-        $resolver->setNormalizers(
-            array(
-                'em' => $emNormalizer,
-                'queryBuilder' => $queryBuilderNormalizer,
-            )
-        );
+        $resolver->setNormalizer('em', $emNormalizer)
+            ->setNormalizer('queryBuilder', $queryBuilderNormalizer);
     }
 
     /**

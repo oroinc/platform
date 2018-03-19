@@ -92,7 +92,7 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreEnd
     public function testResolveShouldThrowExceptionIfInvalidObjectTypeAdded()
     {
-        $this->context->getResolver()->setOptional(['test']);
+        $this->context->getResolver()->setDefined(['test']);
         $this->context->set('test', new \stdClass());
         $this->context->resolve();
     }
@@ -124,14 +124,14 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
         $this->context->set('test', 'val');
 
         $this->context->getResolver()
-            ->setOptional(['test'])
-            ->setNormalizers(
-                [
-                    'test' => function ($options, $val) {
-                        return $val . '_normalized';
-                    }
-                ]
+            ->setDefined(['test'])
+            ->setNormalizer(
+                'test',
+                function ($options, $val) {
+                    return $val . '_normalized';
+                }
             );
+
         $this->context->resolve();
 
         $this->assertEquals('val_normalized', $this->context['test']);
@@ -198,7 +198,7 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemoveExistingValueThrowsExceptionWhenDataAlreadyResolved()
     {
-        $this->context->getResolver()->setOptional(['test']);
+        $this->context->getResolver()->setDefined(['test']);
         $this->context->set('test', 'val');
         $this->context->resolve();
 
@@ -226,7 +226,7 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
         $item = $this->createMock(ContextItemInterface::class);
         $item->expects($this->once())->method('getHash')->willReturn('value');
 
-        $this->context->getResolver()->setOptional(['item']);
+        $this->context->getResolver()->setDefined(['item']);
         $this->context->set('item', $item);
         $this->context->resolve();
 

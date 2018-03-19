@@ -18,3 +18,7 @@ oro_behat_extension:
         locator: '//a[contains(@class,"dropdown-toggle") and contains(@class,"mode-text-only") and @data-drop-secondary-location="left"]'
         type: xpath
 
+    First Activity Item:
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+      selector: '.activity-list-widget .list-item:nth-child(1)'
+

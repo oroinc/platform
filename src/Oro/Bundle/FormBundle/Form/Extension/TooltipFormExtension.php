@@ -52,7 +52,7 @@ class TooltipFormExtension extends AbstractTypeExtension
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional($this->optionalParameters);
+        $resolver->setDefined($this->optionalParameters);
     }
 
     /**

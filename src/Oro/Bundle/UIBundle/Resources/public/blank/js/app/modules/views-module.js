@@ -18,7 +18,8 @@ define(function(require) {
         el: 'body',
         keepElement: true,
         regions: {
-            mainContainer: '#container'
+            mainContainer: '#container',
+            messages: '#flash-messages'
         }
     });
 

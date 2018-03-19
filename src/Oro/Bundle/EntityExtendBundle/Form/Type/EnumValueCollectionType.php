@@ -38,27 +38,38 @@ class EnumValueCollectionType extends AbstractType
             ]
         );
 
-        $resolver->setNormalizers(
-            [
-                'disabled'          => function (Options $options, $value) {
-                    return $this->isDisabled($options) ? true : $value;
-                },
-                'options'           => function (Options $options, $value) {
-                    return array_replace(
-                        ['allow_multiple_selection' => ($this->isMultipleSelectEnable($options['config_id']))],
-                        (array) $value
-                    );
-                },
-                'allow_add'         => function (Options $options, $value) {
-                    return $options['disabled'] || $this->isDisabled($options, 'add') ? false : $value;
-                },
-                'allow_delete'      => function (Options $options, $value) {
-                    return $options['disabled'] || $this->isDisabled($options, 'delete') ? false : $value;
-                },
-                'validation_groups' => function (Options $options, $value) {
-                    return $options['disabled'] ? false : $value;
-                },
-            ]
+        $resolver->setNormalizer(
+            'disabled',
+            function (Options $options, $value) {
+                return $this->isDisabled($options) ? true : $value;
+            }
+        )
+        ->setNormalizer(
+            'options',
+            function (Options $options, $value) {
+                return array_replace(
+                    ['allow_multiple_selection' => ($this->isMultipleSelectEnable($options['config_id']))],
+                    (array) $value
+                );
+            }
+        )
+        ->setNormalizer(
+            'allow_add',
+            function (Options $options, $value) {
+                return $options['disabled'] || $this->isDisabled($options, 'add') ? false : $value;
+            }
+        )
+        ->setNormalizer(
+            'allow_delete',
+            function (Options $options, $value) {
+                return $options['disabled'] || $this->isDisabled($options, 'delete') ? false : $value;
+            }
+        )
+        ->setNormalizer(
+            'validation_groups',
+            function (Options $options, $value) {
+                return $options['disabled'] ? false : $value;
+            }
         );
     }
 

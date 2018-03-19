@@ -74,7 +74,7 @@ class ConfigType extends AbstractType
                     'choices'     => [],
                     'block'       => 'general',
                     'disabled'    => true,
-                    'empty_value' => 'oro.entity_extend.form.data_type.' . $fieldType
+                    'placeholder' => 'oro.entity_extend.form.data_type.' . $fieldType
                 )
             );
         } else {
@@ -122,11 +122,7 @@ class ConfigType extends AbstractType
     {
         $resolver->setRequired(array('config_model'));
 
-        $resolver->setAllowedTypes(
-            array(
-                'config_model' => 'Oro\Bundle\EntityConfigBundle\Entity\ConfigModel'
-            )
-        );
+        $resolver->setAllowedTypes('config_model', 'Oro\Bundle\EntityConfigBundle\Entity\ConfigModel');
     }
 
     /**

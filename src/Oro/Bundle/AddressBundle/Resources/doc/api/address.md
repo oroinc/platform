@@ -17,7 +17,7 @@ Retrieve a collection of address records.
 ### create
 
 Create a new address record.
-The created record is returned in the response.
+The created record is returned in the response body.
 
 {@inheritdoc}
 
@@ -118,7 +118,7 @@ Delete a specific address record.
 ### delete_list
 
 Delete a collection of address records.
-The list of records that will be deleted, could be limited by filters.
+The list of records to be deleted can be limited by filters.
 
 {@inheritdoc}
 

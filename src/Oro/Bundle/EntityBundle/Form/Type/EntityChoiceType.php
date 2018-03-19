@@ -44,7 +44,7 @@ class EntityChoiceType extends AbstractType
                 'choice_attr'          => function ($choice) {
                     return $this->getChoiceAttributes($choice);
                 },
-                'empty_value'          => '',
+                'placeholder'          => '',
                 'show_plural'          => false,
                 'configs'              => $defaultConfigs,
                 'translatable_options' => false,
@@ -66,13 +66,13 @@ class EntityChoiceType extends AbstractType
                 }
             ]
         );
-        $resolver->setNormalizers(
-            [
-                // this normalizer allows to add/override config options outside
-                'configs' => function (Options $options, $configs) use ($defaultConfigs) {
-                    return array_merge($defaultConfigs, $configs);
-                }
-            ]
+
+        // this normalizer allows to add/override config options outside
+        $resolver->setNormalizer(
+            'configs',
+            function (Options $options, $configs) use ($defaultConfigs) {
+                return array_merge($defaultConfigs, $configs);
+            }
         );
     }
 

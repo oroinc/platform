@@ -34,7 +34,7 @@ class RecipientListType extends AbstractType
                 'property'      => 'name',
                 'multiple'      => true,
                 'expanded'      => true,
-                'empty_value'   => '',
+                'placeholder'   => '',
                 'empty_data'    => null,
                 'required'      => false,
             ]

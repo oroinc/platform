@@ -83,9 +83,11 @@ class UserType extends AbstractType
                     'multiple'      => true,
                     'expanded'      => true,
                     'required'      => !$this->isMyProfilePage,
-                    'read_only'     => $this->isMyProfilePage,
                     'disabled'      => $this->isMyProfilePage,
-                    'translatable_options' => false
+                    'translatable_options' => false,
+                    'attr' => [
+                        'readonly' => $this->isMyProfilePage
+                    ]
                 ]
             );
         }
@@ -100,9 +102,11 @@ class UserType extends AbstractType
                     'multiple'  => true,
                     'expanded'  => true,
                     'required'  => false,
-                    'read_only' => $this->isMyProfilePage,
                     'disabled'  => $this->isMyProfilePage,
-                    'translatable_options' => false
+                    'translatable_options' => false,
+                    'attr' => [
+                        'readonly' => $this->isMyProfilePage
+                    ]
                 ]
             );
         }

@@ -131,43 +131,46 @@ class OroRichTextType extends AbstractType
         ];
 
         $resolver->setDefaults($defaults);
-        $resolver->setNormalizers(
-            [
-                'wysiwyg_options' => function (Options $options, $wysiwygOptions) use ($defaultWysiwygOptions) {
-                    if (!empty($wysiwygOptions['toolbar'])) {
-                        $wysiwygOptions = array_merge($defaultWysiwygOptions, $wysiwygOptions);
-                        unset($wysiwygOptions['toolbar_type']);
 
-                        return $wysiwygOptions;
-                    }
-
-                    if (empty($wysiwygOptions['toolbar_type'])
-                        || !array_key_exists($wysiwygOptions['toolbar_type'], self::$toolbars)
-                    ) {
-                        $toolbarType = self::TOOLBAR_DEFAULT;
-                    } else {
-                        $toolbarType = $wysiwygOptions['toolbar_type'];
-                    }
-                    $wysiwygOptions['toolbar'] = self::$toolbars[$toolbarType];
-
+        $resolver->setNormalizer(
+            'wysiwyg_options',
+            function (Options $options, $wysiwygOptions) use ($defaultWysiwygOptions) {
+                if (!empty($wysiwygOptions['toolbar'])) {
                     $wysiwygOptions = array_merge($defaultWysiwygOptions, $wysiwygOptions);
                     unset($wysiwygOptions['toolbar_type']);
 
                     return $wysiwygOptions;
-                },
-                'attr'            => function (Options $options, $attr) {
-                    $pageComponent  = $options->get('page-component');
-                    $wysiwygOptions = (array) $options->get('wysiwyg_options');
-
-                    $pageComponent['options']            = array_merge($pageComponent['options'], $wysiwygOptions);
-                    $pageComponent['options']['enabled'] = (bool) $options->get('wysiwyg_enabled');
-
-                    $attr['data-page-component-module']  = $pageComponent['module'];
-                    $attr['data-page-component-options'] = json_encode($pageComponent['options']);
-
-                    return $attr;
                 }
-            ]
+
+                if (empty($wysiwygOptions['toolbar_type'])
+                    || !array_key_exists($wysiwygOptions['toolbar_type'], self::$toolbars)
+                ) {
+                    $toolbarType = self::TOOLBAR_DEFAULT;
+                } else {
+                    $toolbarType = $wysiwygOptions['toolbar_type'];
+                }
+                $wysiwygOptions['toolbar'] = self::$toolbars[$toolbarType];
+
+                $wysiwygOptions = array_merge($defaultWysiwygOptions, $wysiwygOptions);
+                unset($wysiwygOptions['toolbar_type']);
+
+                return $wysiwygOptions;
+            }
+        )
+        ->setNormalizer(
+            'attr',
+            function (Options $options, $attr) {
+                $pageComponent  = $options['page-component'];
+                $wysiwygOptions = (array) $options['wysiwyg_options'];
+
+                $pageComponent['options']            = array_merge($pageComponent['options'], $wysiwygOptions);
+                $pageComponent['options']['enabled'] = (bool) $options['wysiwyg_enabled'];
+
+                $attr['data-page-component-module']  = $pageComponent['module'];
+                $attr['data-page-component-options'] = json_encode($pageComponent['options']);
+
+                return $attr;
+            }
         );
     }
 

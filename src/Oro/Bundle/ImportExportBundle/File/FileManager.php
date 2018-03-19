@@ -9,6 +9,10 @@ use Gaufrette\Stream;
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * Handles file manipulation logic and all related stuff such as creating path, etc.
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class FileManager
 {
     /** @var Filesystem */
@@ -131,6 +135,21 @@ class FileManager
         @file_put_contents($pathFile, $content);
 
         return $pathFile;
+    }
+
+    /** As ini_set('auto_detect_line_endings', true); does not fix problem of line endings in the file we forced to
+     * explicitly replace all possible `new lines` to one common
+     * It is possible to replace it on field level (CsvFileStreamWriter::writeLine()) but it will be overhead because
+     * it is called several times for each row in file
+     * @param string $file
+     * @return string
+     */
+    public function fixNewLines($file)
+    {
+        $allContent = file_get_contents($file);
+        file_put_contents($file, preg_replace('~\R~u', PHP_EOL, $allContent));
+
+        return $file;
     }
 
     /**

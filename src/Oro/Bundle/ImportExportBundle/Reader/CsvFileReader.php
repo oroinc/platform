@@ -9,6 +9,9 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 
+/**
+ * Corresponds for reading csv file line by line using context passed
+ */
 class CsvFileReader extends AbstractFileReader
 {
     /**
@@ -65,9 +68,13 @@ class CsvFileReader extends AbstractFileReader
                 if (count($this->header) !== count($data)) {
                     throw new InvalidItemException(
                         sprintf(
-                            'Expecting to get %d columns, actually got %d',
+                            'Expecting to get %d columns, actually got %d.
+                            Header contains: %s 
+                            Row contains: %s',
                             count($this->header),
-                            count($data)
+                            count($data),
+                            print_r($this->header, true),
+                            print_r($data, true)
                         ),
                         $data
                     );

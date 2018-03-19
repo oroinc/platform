@@ -52,9 +52,9 @@ define(['underscore'], function(_) {
          * @returns {Object}
          */
         generateEvents: function(view) {
-            var oldEvents = this.canGenerateEventsAsObject ?
-                this.View.prototype.events :
-                this.View.prototype.events.call(view);
+            var oldEvents = this.canGenerateEventsAsObject
+                ? this.View.prototype.events
+                : this.View.prototype.events.call(view);
             var events = Object.create(oldEvents);
             for (var key in this.extendedEvents) {
                 if (this.extendedEvents.hasOwnProperty(key)) {
@@ -71,9 +71,9 @@ define(['underscore'], function(_) {
 
         generateDeclaration: function() {
             var _this = this;
-            return this.canGenerateEventsAsObject ?
-                this.generateEvents() :
-                function() {
+            return this.canGenerateEventsAsObject
+                ? this.generateEvents()
+                : function() {
                     _this.generateEvents(this);
                 };
         }

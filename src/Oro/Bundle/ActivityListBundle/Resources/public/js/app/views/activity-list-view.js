@@ -490,9 +490,9 @@ define(function(require) {
          * @protected
          */
         _getUrl: function(actionKey, model) {
-            var className = model.getRelatedActivityClass();
-            var route = this.options.configuration[className].routes[actionKey];
-            return routing.generate(route, {id: model.get('relatedActivityId')});
+            var routes = model.get('routes');
+
+            return routing.generate(routes[actionKey], {id: model.get('relatedActivityId')});
         },
 
         _getMessage: function(labelKey) {

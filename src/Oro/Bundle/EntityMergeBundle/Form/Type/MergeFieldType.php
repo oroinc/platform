@@ -135,22 +135,17 @@ class MergeFieldType extends AbstractType
             )
         );
 
-        $resolver->setAllowedTypes(
-            array(
-                'metadata' => 'Oro\\Bundle\\EntityMergeBundle\\Metadata\\FieldMetadata',
-                'entities' => 'array',
-            )
-        );
+        $resolver->setAllowedTypes('metadata', 'Oro\\Bundle\\EntityMergeBundle\\Metadata\\FieldMetadata');
+        $resolver->setAllowedTypes('entities', 'array');
 
-        $resolver->setNormalizers(
-            array(
-                'label' => function (Options $options, $value) {
-                    if (!$value) {
-                        $value = $options['metadata']->get('label');
-                    }
-                    return $value;
+        $resolver->setNormalizer(
+            'label',
+            function (Options $options, $value) {
+                if (!$value) {
+                    $value = $options['metadata']->get('label');
                 }
-            )
+                return $value;
+            }
         );
     }
 

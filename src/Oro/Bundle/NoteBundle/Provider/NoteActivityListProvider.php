@@ -68,7 +68,7 @@ class NoteActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getRoutes()
+    public function getRoutes($activityEntity)
     {
         return [
             'itemView'   => 'oro_note_widget_info',

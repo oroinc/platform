@@ -3,10 +3,11 @@
 namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\DBAL\Driver\DriverException;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\DBAL;
 
+/**
+ * Helper class to get information about database exceptions
+ */
 class DatabaseExceptionHelper
 {
     /**
@@ -21,22 +22,40 @@ class DatabaseExceptionHelper
     {
         $this->registry = $registry;
     }
-    
+
     /**
-     * @param DriverException $exception
+     * @param \Exception $e
+     * @return DBAL\Driver\DriverException|\Exception|null
+     */
+    public function getDriverException(\Exception $e)
+    {
+        $driverException = null;
+        if ($e instanceof DBAL\Driver\DriverException) {
+            $driverException = $e;
+        } elseif ($e instanceof DBAL\Exception\DriverException) {
+            $driverException = $e->getPrevious();
+        }
+
+        return $driverException;
+    }
+
+    /**
+     * @param DBAL\Driver\DriverException $exception
      * @return bool
      */
-    public function isDeadlock(DriverException $exception)
+    public function isDeadlock(DBAL\Driver\DriverException $exception)
     {
-        $code = (string)$exception->getErrorCode();
+        $sqlState = (string)$exception->getSQLState();
         $platform = $this->registry->getConnection()->getDatabasePlatform();
 
-        if ($platform instanceof MySqlPlatform) {
-            //Error: 1213 SQLSTATE: 40001 (ER_LOCK_DEADLOCK)
-            return $code === '1213';
-        } elseif ($platform instanceof PostgreSqlPlatform) {
+        if ($platform instanceof DBAL\Platforms\MySqlPlatform) {
+            $code = (string)$exception->getErrorCode();
+            //SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock;
+            //SQLSTATE[HY000]: General error: 1205 Lock wait timeout exceeded
+            return $sqlState === '40001' || $code === '1205' || $code === '1213';
+        } elseif ($platform instanceof DBAL\Platforms\PostgreSqlPlatform) {
             //40P01 DEADLOCK DETECTED deadlock_detected
-            return $code === '40P01';
+            return $sqlState === '40P01';
         }
 
         return false;

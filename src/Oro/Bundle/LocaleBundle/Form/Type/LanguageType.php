@@ -44,7 +44,7 @@ class LanguageType extends AbstractType
                 // TODO: Remove 'choices_as_values' option in scope of BAP-15236
                 'choices_as_values' => true,
                 'show_all' => false,
-                'empty_value' => '',
+                'placeholder' => '',
                 'translatable_options' => false,
                 'configs' => [
                     'placeholder' => 'oro.locale.localization.form.placeholder.select_language',

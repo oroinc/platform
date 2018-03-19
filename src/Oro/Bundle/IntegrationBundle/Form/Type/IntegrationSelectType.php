@@ -60,7 +60,7 @@ class IntegrationSelectType extends AbstractType
             return array_merge($defaultConfigs, $configs);
         };
         $choiceList        = function (Options $options) use ($em) {
-            $types = $options->has('allowed_types') ? $options->get('allowed_types') : null;
+            $types = $options['allowed_types'] ?? null;
 
             return new EntityChoiceList(
                 $em,
@@ -72,13 +72,13 @@ class IntegrationSelectType extends AbstractType
 
         $resolver->setDefaults(
             [
-                'empty_value' => '',
+                'placeholder' => '',
                 'configs'     => $defaultConfigs,
                 'choice_list' => $choiceList
             ]
         );
-        $resolver->setOptional(['allowed_types']);
-        $resolver->setNormalizers(['configs' => $configsNormalizer]);
+        $resolver->setDefined(['allowed_types']);
+        $resolver->setNormalizer('configs', $configsNormalizer);
     }
 
     /**

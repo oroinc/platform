@@ -54,7 +54,7 @@ class EmailTemplateTranslationType extends AbstractType
                             [
                                 'field_type' => 'text'
                             ],
-                            $options->get('subject_options')
+                            $options['subject_options']
                         ),
                         'content' => array_merge_recursive(
                             [
@@ -67,7 +67,7 @@ class EmailTemplateTranslationType extends AbstractType
                                     'height'     => '250px'
                                 ]
                             ],
-                            $options->get('content_options')
+                            $options['content_options']
                         )
                     ];
                 },

@@ -431,7 +431,8 @@ class NumberFormatterTest extends TestCase
             array('POSITIVE_PREFIX', 'DECIMAL', 'en_US', ''),
             array('negative_prefix', 'decimal', 'en_US', '-'),
             array(\NumberFormatter::NEGATIVE_SUFFIX, \NumberFormatter::DECIMAL, 'en_US', ''),
-            array(\NumberFormatter::PADDING_CHARACTER, \NumberFormatter::DECIMAL, 'en_US', '*'),
+            // TODO BAP-16725
+            // array(\NumberFormatter::PADDING_CHARACTER, \NumberFormatter::DECIMAL, 'en_US', '*'),
             array(\NumberFormatter::CURRENCY_CODE, \NumberFormatter::CURRENCY, 'en_US', 'USD'),
             array(\NumberFormatter::DEFAULT_RULESET, \NumberFormatter::DECIMAL, 'en_US', false),
             array(\NumberFormatter::PUBLIC_RULESETS, \NumberFormatter::DECIMAL, 'en_US', false)

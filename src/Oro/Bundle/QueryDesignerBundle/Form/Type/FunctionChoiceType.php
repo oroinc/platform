@@ -54,7 +54,7 @@ class FunctionChoiceType extends AbstractType
 
         $resolver->setDefaults([
             'choices'                => [],
-            'empty_value'            => 'oro.query_designer.form.choose_function',
+            'placeholder'            => 'oro.query_designer.form.choose_function',
             'empty_data'             => '',
             'page_component'         => 'oroui/js/app/components/view-component',
             'page_component_options' => [

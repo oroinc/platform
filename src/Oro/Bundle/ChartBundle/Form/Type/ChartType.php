@@ -47,7 +47,7 @@ class ChartType extends ConfigProviderAwareType
                         },
                         $chartConfigs
                     ),
-                    'empty_value' => 'oro.chart.form.chart_empty_value'
+                    'placeholder' => 'oro.chart.form.chart_empty_value'
                 ]
             )
             ->add(
@@ -79,8 +79,8 @@ class ChartType extends ConfigProviderAwareType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(['chart_filter']);
-        $resolver->setAllowedTypes(['chart_filter' => 'callable']);
+        $resolver->setDefined(['chart_filter']);
+        $resolver->setAllowedTypes('chart_filter', 'callable');
     }
 
     /**

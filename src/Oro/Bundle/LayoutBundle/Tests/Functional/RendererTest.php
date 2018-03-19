@@ -24,7 +24,7 @@ class RendererTest extends LayoutTestCase
         }
 
         $context = new LayoutContext();
-        $context->getResolver()->setOptional(['form', 'body_class']);
+        $context->getResolver()->setDefined(['form', 'body_class']);
         $form = $this->getTestForm();
         $context->data()->set('form', $form->createView());
         $context->set('body_class', 'test-body');
@@ -50,7 +50,7 @@ class RendererTest extends LayoutTestCase
         }
 
         $context = new LayoutContext();
-        $context->getResolver()->setOptional(['form', 'body_class']);
+        $context->getResolver()->setDefined(['form', 'body_class']);
         $form = $this->getTestForm();
         $context->data()->set('form', $form->createView());
         $context->set('body_class', 'test-body');
@@ -70,7 +70,7 @@ class RendererTest extends LayoutTestCase
         }
 
         $context = new LayoutContext();
-        $context->getResolver()->setOptional(['form']);
+        $context->getResolver()->setDefined(['form']);
         $form = $this->getTestForm('test.php', 'patch');
         $context->data()->set('form', $form->createView());
 
@@ -99,7 +99,7 @@ class RendererTest extends LayoutTestCase
         }
 
         $context = new LayoutContext();
-        $context->getResolver()->setOptional(['form']);
+        $context->getResolver()->setDefined(['form']);
         $form = $this->getTestForm('test.php', 'patch');
         $context->data()->set('form', $form->createView());
 

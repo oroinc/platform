@@ -72,19 +72,16 @@ class EntityFieldSelectType extends AbstractType
                 'with_relations'            => false,
                 'with_unidirectional'       => false,
                 'with_virtual_fields'       => false,
-                'empty_value'               => '',
+                'placeholder'               => '',
                 'skip_load_entities'        => false,
                 'skip_load_data'            => false,
                 'multiple'                  => false,
                 'configs'                   => $defaultConfigs,
             ]
         );
-        $resolver->setNormalizers(
-            [
-                'configs' => $configsNormalizer,
-                'attr'    => $attrNormalizer,
-            ]
-        );
+
+        $resolver->setNormalizer('configs', $configsNormalizer)
+            ->setNormalizer('attr', $attrNormalizer);
     }
 
     /**

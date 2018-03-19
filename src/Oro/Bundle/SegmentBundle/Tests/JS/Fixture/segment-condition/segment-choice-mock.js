@@ -11,7 +11,7 @@ define(function(require) {
 
         entity: null,
 
-        constructor: function() {
+        constructor: function SegmentChoiceMock() {
             SegmentChoiceMock.lastCreatedInstance = this;
             spyOn(this, 'setValue').and.callThrough();
             spyOn(this, 'setData').and.callThrough();

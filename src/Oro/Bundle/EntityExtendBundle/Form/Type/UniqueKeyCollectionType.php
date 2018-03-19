@@ -71,7 +71,7 @@ class UniqueKeyCollectionType extends AbstractType
     {
         $resolver
             ->setRequired(['className'])
-            ->setAllowedTypes(['className' => 'string']);
+            ->setAllowedTypes('className', 'string');
     }
 
     /**

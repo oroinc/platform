@@ -51,7 +51,7 @@
         "guzzle/guzzle": "3.7.*",
         "lexik/maintenance-bundle": "2.1.1",
         "composer/composer": "1.4.*",
-        "akeneo/batch-bundle": "0.4.2",
+        "akeneo/batch-bundle": "0.4.7",
         "nesbot/Carbon": "1.21.*",
         "monolog/monolog": "1.22.*",
         "ocramius/proxy-manager": "0.5.*",
@@ -109,7 +109,7 @@
         "doctrine/annotations": "1.3.*",
         "robloach/component-installer": "0.2.*",
         "jms/cg": "1.2.*",
-        "oro/redis-config": "~2.0",
+        "oro/redis-config": "2.x-dev",
         "brick/math": "0.5.*",
         "bower-asset/fuse": "3.2.*"
     },
@@ -133,6 +133,10 @@
         "asset-packagist": {
             "type": "composer",
             "url": "https://asset-packagist.orocrm.com"
+        },
+        "akeneo": {
+            "type": "vcs",
+            "url": "https://github.com/laboro/BatchBundle.git"
         }
     },
     "minimum-stability": "dev",

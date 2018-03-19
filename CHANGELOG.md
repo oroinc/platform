@@ -9,8 +9,15 @@
 * Removed deprecated class `Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataContext`
 * Removed deprecated class `Oro\Bundle\ApiBundle\Model\EntityDescriptor`
 
+#### EntityConfigBundle
+* Removed deprecated methods `getDefaultTimeout` and `setDefaultTimeout` from class `Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor`
+
 #### ImportExportBundle
 * Removed class `Oro\Bundle\ImportExportBundle\EventListener\ExportJoinListener` and corresponding service `oro_importexport.event_listener.export_join_listener`
+* Parameter `%oro_importexport.file.split_csv_file.size_of_batch%` was removed use `%oro_importexport.import.size_of_batch%` instead.
+
+#### InstallerBundle
+* Removed deprecated methods `getDefaultTimeout` and `setDefaultTimeout` from class `Oro\Bundle\InstallerBundle\CommandExecutor`
 
 #### UIBundle
 * Removed twig filter `oro_html_tag_trim` use `oro_html_escape` instead. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_escape).

@@ -73,7 +73,7 @@ class ReportChartSchemaType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['data_schema']);
-        $resolver->setAllowedTypes(['data_schema' => 'array']);
+        $resolver->setAllowedTypes('data_schema', 'array');
     }
 
     /**

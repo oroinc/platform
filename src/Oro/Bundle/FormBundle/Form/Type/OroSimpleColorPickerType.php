@@ -40,14 +40,13 @@ class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
                     'custom_color_control' => null // hue, brightness, saturation, or wheel. defaults wheel
                 ]
             )
-            ->setNormalizers(
-                [
-                    'colors' => function (Options $options, $colors) {
-                        return $options['color_schema'] === 'custom'
-                            ? $colors
-                            : $this->getColors($options['color_schema']);
-                    }
-                ]
+            ->setNormalizer(
+                'colors',
+                function (Options $options, $colors) {
+                    return $options['color_schema'] === 'custom'
+                        ? $colors
+                        : $this->getColors($options['color_schema']);
+                }
             );
     }
 

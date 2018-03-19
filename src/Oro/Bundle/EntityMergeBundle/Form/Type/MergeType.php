@@ -82,12 +82,8 @@ class MergeType extends AbstractType
             )
         );
 
-        $resolver->setAllowedTypes(
-            array(
-                'metadata' => 'Oro\\Bundle\\EntityMergeBundle\\Metadata\\EntityMetadata',
-                'entities' => 'array',
-            )
-        );
+        $resolver->setAllowedTypes('metadata', 'Oro\\Bundle\\EntityMergeBundle\\Metadata\\EntityMetadata');
+        $resolver->setAllowedTypes('entities', 'array');
     }
 
     /**

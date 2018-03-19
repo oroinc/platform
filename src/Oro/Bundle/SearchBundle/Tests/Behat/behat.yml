@@ -43,3 +43,7 @@ oro_behat_extension:
         - OroSearchBundle::SearchContext
       paths:
         - '@OroSearchBundle/Tests/Behat/Features'
+
+  optional_listeners:
+    required_for_fixtures:
+      - 'oro_search.index_listener'

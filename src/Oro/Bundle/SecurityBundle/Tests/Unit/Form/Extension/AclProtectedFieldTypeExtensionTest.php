@@ -153,9 +153,9 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         );
         $this->assertTrue($view->children['city']->isRendered());
         $this->assertFalse($view->children['street']->isRendered());
-        $this->assertTrue($view->children['street']->vars['read_only']);
+        $this->assertTrue($view->children['street']->vars['attr']['readonly']);
         $this->assertFalse($view->children['country']->isRendered());
-        $this->assertTrue($view->children['country']->vars['read_only']);
+        $this->assertTrue($view->children['country']->vars['attr']['readonly']);
     }
 
     public function testPreSubmitOnEmptyData()

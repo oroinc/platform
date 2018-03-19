@@ -27,15 +27,16 @@ class EnumPublicType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setNormalizers(
-            [
-                'disabled'          => function (Options $options, $value) {
-                    return $this->isReadOnly($options) ? true : $value;
-                },
-                'validation_groups' => function (Options $options, $value) {
-                    return $options['disabled'] ? false : $value;
-                }
-            ]
+        $resolver->setNormalizer(
+            'disabled',
+            function (Options $options, $value) {
+                return $this->isReadOnly($options) ? true : $value;
+            }
+        )->setNormalizer(
+            'validation_groups',
+            function (Options $options, $value) {
+                return $options['disabled'] ? false : $value;
+            }
         );
     }
 
