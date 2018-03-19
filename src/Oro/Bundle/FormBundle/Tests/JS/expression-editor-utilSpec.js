@@ -13,7 +13,7 @@ define(function(require) {
         return _.defaults(customOptions, {
             entityDataProvider: new DataProviderMock(entitiesData),
             dataSourceNames: ['pricelist'],
-            rootEntities: ['pricelist', 'product']
+            supportedNames: ['pricelist', 'product']
         });
     }
 

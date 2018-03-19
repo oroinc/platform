@@ -36,10 +36,9 @@ if you set it to 2, you can choose `product.id` but `product.category.id` would 
         ...
    }
    ````
-- `rootEntities` - array containing entity aliases (or class names if entity has no alias), that can be used 
-in the expression e.g.
+- `supportedNames` - array containing entity aliases that can be used in the expression e.g.
 
-        ["product", "pricelist", "Oro\\Bundle\\SomeBundle\\Entity\\SomeEntity"]
+        ["product", "pricelist"]
 
 In case `entityDataProvider` is absent in options the ExpressionEditorUtil throws an exeptions.
 The same in case `itemLevelLimit` less then 2.
@@ -105,7 +104,7 @@ Create `ExpressionEditorView` and use its util instance for validation (assuming
             math: ['+', '-'],
             equality: ['==']
         },
-        rootEntities: ['email']
+        supportedNames: ['email']
     });
     console.log(editorView.util.validate('email.id == 1'))
 

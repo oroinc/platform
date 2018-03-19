@@ -162,7 +162,9 @@
                         'id': type ~ '-condition-builder',
                         'page_limit': constant('\\Oro\\Bundle\\SegmentBundle\\Entity\\Manager\\SegmentManager::PER_PAGE'),
                         'metadata': metadata,
-                    })
+                    }),
+                    segmentQD.expressionEditor(),
+                    QD.query_type_converter()
                 ]
             },
         ]

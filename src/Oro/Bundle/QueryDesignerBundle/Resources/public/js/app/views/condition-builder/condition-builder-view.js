@@ -169,6 +169,7 @@ define(function(require) {
             if (!tools.isEqualsLoosely(value, this.value)) {
                 this.value = value;
                 this.render();
+                this.trigger('change', value);
             }
         },
 

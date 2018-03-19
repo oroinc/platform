@@ -309,4 +309,24 @@
     }
   }
 }
+button.btn.btn-link {
+  height: auto;
+  font-size: inherit;
+  line-height: inherit;
+  vertical-align: baseline;
+  text-decoration: none;
+  color: @linkColor;
+  &:hover {
+    color: @linkColorHover;
+  }
+  &:active {
+    box-shadow: none;
+  }
+  &.disabled {
+    color: #bfbfbf;
+    pointer-events: none;
+    opacity: 1;
+  }
+}
+
 /* disabled button group with dropdown-menu:end */

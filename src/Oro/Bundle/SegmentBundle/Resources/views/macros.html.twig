@@ -140,3 +140,26 @@
     <div data-page-component-module="orosegment/js/app/components/segment-component"
          data-page-component-options="{{ widgetOptions|json_encode }}"></div>
 {% endmacro %}
+
+{#
+    Renders textarea with attributes for initialization of an editor component
+
+    @param array    params
+
+    @param string   param.name - name of instance of page component
+    @param array    params.options - options for js-component
+#}
+{% macro expressionEditor(params) %}
+    {% set params = {
+        options: {
+            dataProviderConfig: {
+                filterPreset: 'querydesigner'
+            }
+        }
+    }|merge_recursive(params|default({})) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    <textarea {{ UI.renderPageComponentAttributes({
+        module: 'oroform/js/app/components/expression-editor-component',
+        name: 'expression-editor'
+    }|merge(params)) }}></textarea>
+{% endmacro %}

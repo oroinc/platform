@@ -55,7 +55,7 @@ define(function(require) {
                 inclusion: ['in', 'not in'],
                 like: ['matches']
             },
-            rootEntities: []
+            supportedNames: []
         },
 
         /**
@@ -104,7 +104,33 @@ define(function(require) {
             this.options = _.defaults(_.pick(options, _.keys(this.defaultOptions)), this.defaultOptions);
             this.expressionLanguage = new ExpressionLanguage();
             this._prepareOperationsItems();
-            var entities = this.options.rootEntities.map(function(entityName) {
+            this._createValidator();
+            this.listenTo(this.entityDataProvider, 'root-entity-change', this.onRootEntityChanged);
+            ExpressionEditorUtil.__super__.initialize.call(this, options);
+        },
+
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
+            [
+                'entityDataProvider', 'expressionOperandTypeValidator', 'dataSourceNames', 'options',
+                'expressionLanguage', 'operationsItems'
+            ].forEach(function(key) {
+                delete this[key];
+            }.bind(this));
+
+            ExpressionEditorUtil.__super__.dispose.call(this);
+        },
+
+        /**
+         * Prepares options and creates instance of ExpressionOperandTypeValidator
+         *
+         * @protected
+         */
+        _createValidator: function() {
+            var entities = this._getSupportedNames().map(function(entityName) {
                 return {
                     isCollection: this.dataSourceNames.indexOf(entityName) !== -1,
                     name: entityName,
@@ -118,7 +144,13 @@ define(function(require) {
                 isConditionalNodeAllowed: false
             };
             this.expressionOperandTypeValidator = new ExpressionOperandTypeValidator(validatorOptions);
-            ExpressionEditorUtil.__super__.initialize.call(this, options);
+        },
+
+        /**
+         * Rebuild validator instance when supported names are changed
+         */
+        onRootEntityChanged: function() {
+            this._createValidator();
         },
 
         /**
@@ -130,7 +162,7 @@ define(function(require) {
         validate: function(expression) {
             var isValid = true;
             try {
-                var parsedExpression = this.expressionLanguage.parse(expression, this.options.rootEntities);
+                var parsedExpression = this.expressionLanguage.parse(expression, this._getSupportedNames());
                 this.expressionOperandTypeValidator.expectValid(parsedExpression);
             } catch (ex) {
                 isValid = false;
@@ -162,10 +194,10 @@ define(function(require) {
             var tokens = this.expressionLanguage.getLexer().tokenizeForce(expression).tokens;
             var currentTokenIndex = this._findCurrentTokenIndex(tokens, position);
             if (currentTokenIndex === -1) {
-                this._fillRootEntitiesOptions(autocompleteData);
+                this._fillEntityNamesOptions(autocompleteData);
                 return autocompleteData;
             }
-            var fieldChain = this.findFieldChain(tokens, currentTokenIndex, this.options.rootEntities);
+            var fieldChain = this.findFieldChain(tokens, currentTokenIndex, this._getSupportedNames());
             var currentToken = tokens[currentTokenIndex];
             if (fieldChain) {
                 if (this.dataSourceNames.indexOf(fieldChain.entity.value) !== -1) {
@@ -180,11 +212,11 @@ define(function(require) {
             } else if (currentToken.test(Token.OPERATOR_TYPE)) {
                 this._fillOperatorsOptions(autocompleteData, currentToken);
             } else if (currentToken.test(Token.NAME_TYPE)) {
-                this._fillRootEntitiesOptions(autocompleteData, currentToken);
+                this._fillEntityNamesOptions(autocompleteData, currentToken);
             } else if (currentToken.test(Token.EOF_TYPE)) {
                 var prevToken = currentTokenIndex === 0 ? null : tokens[currentTokenIndex - 1];
                 if (!prevToken || prevToken.test(Token.OPERATOR_TYPE) || prevToken.test(Token.PUNCTUATION_TYPE, '(')) {
-                    this._fillRootEntitiesOptions(autocompleteData, currentToken);
+                    this._fillEntityNamesOptions(autocompleteData, currentToken);
                 } else {
                     this._fillOperatorsOptions(autocompleteData);
                 }
@@ -194,16 +226,31 @@ define(function(require) {
         },
 
         /**
-         * Fill autocomplete data with root entities items
+         * Returns array of supported entity names including provider root entity name
+         *
+         * @return {Array.<string>}
+         * @private
+         */
+        _getSupportedNames: function() {
+            var names = _.clone(this.options.supportedNames);
+            var rootEntityName = this.entityDataProvider.rootEntity && this.entityDataProvider.rootEntity.get('alias');
+            if (rootEntityName && names.indexOf(rootEntityName) === -1) {
+                names.push(rootEntityName);
+            }
+            return names;
+        },
+
+        /**
+         * Fill autocomplete data with supported entity names items
          *
          * @param {AutocompleteData} autocompleteData
          * @param {Token} [currentToken]
          * @private
          */
-        _fillRootEntitiesOptions: function(autocompleteData, currentToken) {
+        _fillEntityNamesOptions: function(autocompleteData, currentToken) {
             autocompleteData.itemsType = 'entities';
             autocompleteData.items = {};
-            _.each(this.options.rootEntities, function(alias) {
+            _.each(this._getSupportedNames(), function(alias) {
                 autocompleteData.items[alias] = {
                     item: alias,
                     hasChildren: true

@@ -5,7 +5,13 @@ oro_behat_extension:
     FilterConditionDropdown:
       selector:
         type: xpath
-        locator: "(//a[contains(@class, 'dropdown-toggle')] | //div/div/button)[last()]"
+        locator: >
+          (
+            //div[contains(@class, 'condition-item')]//span[contains(@class, 'active-filter')]
+              //a[contains(@class, 'dropdown-toggle')] |
+            //div[contains(@class, 'condition-item')]//span[contains(@class, 'active-filter')]
+              //button[contains(@class, 'select-filter-widget')]
+          )[last()]
     RemoveCondition:
         selector: ".condition .close"
     LastConditionItem:

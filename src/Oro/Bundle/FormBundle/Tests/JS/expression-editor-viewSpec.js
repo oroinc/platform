@@ -25,7 +25,7 @@ define(function(require) {
             dataSource: {
                 pricelist: dataSource
             },
-            rootEntities: ['pricelist', 'product']
+            supportedNames: ['pricelist', 'product']
         });
     }
 

@@ -17,10 +17,11 @@ define(function(require) {
             EntityStructureDataProvider
                 .createDataProvider(options.dataProviderConfig, this)
                 .then(function(provider) {
-                    this._resolveDeferredInit();
                     if (!this.disposed) {
+                        this.provider = provider;
                         this.initExpressionEditorView(options, provider);
                     }
+                    this._resolveDeferredInit();
                 }.bind(this));
             ExpressionEditorComponent.__super__.initialize.call(this, options);
         },
@@ -39,6 +40,15 @@ define(function(require) {
             }, _.omit(options, '_sourceElement', '_subPromises', 'dataProviderConfig'));
 
             this.view = new ExpressionEditorView(viewOptions);
+        },
+
+        /**
+         * Sets root entity in instance EntityStructureDataProvider
+         *
+         * @param {string} entityClassName
+         */
+        setEntity: function(entityClassName) {
+            this.provider.setRootEntityClassName(entityClassName);
         }
     });
 

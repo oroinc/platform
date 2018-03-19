@@ -8,3 +8,7 @@ oro:
         field_condition:
             filter_not_supported: "This filter is not supported."
             lifetimevalue_filter_not_supported: "The filtering by the LifetimeValue is not supported yet."
+    query_type_switcher:
+        modes:
+            simple: "Simple"
+            advanced: "Advanced"

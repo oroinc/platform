@@ -48,10 +48,10 @@ define(function(require) {
             focus: 'debouncedAutocomplete',
             click: 'debouncedAutocomplete',
             input: 'debouncedAutocomplete',
-            keyup: 'debouncedValidate',
-            change: 'debouncedValidate',
-            blur: 'debouncedValidate',
-            paste: 'debouncedValidate'
+            blur: 'debouncedOnChange',
+            keyup: 'debouncedOnChange',
+            paste: 'debouncedOnChange',
+            change: 'debouncedOnChange'
         },
 
         /**
@@ -63,9 +63,9 @@ define(function(require) {
                     this.autocomplete(e);
                 }
             }.bind(this), this.delay);
-            this.debouncedValidate = _.debounce(function(e) {
+            this.debouncedOnChange = _.debounce(function(e) {
                 if (!this.disposed) {
-                    this.validate(e);
+                    this.onChange(e);
                 }
             }.bind(this), this.delay);
             ExpressionEditorView.__super__.constructor.call(this, options);
@@ -76,7 +76,7 @@ define(function(require) {
          */
         initialize: function(options) {
             var utilOptions = _.pick(options,
-                'itemLevelLimit', 'allowedOperations', 'operations', 'rootEntities', 'entityDataProvider');
+                'itemLevelLimit', 'allowedOperations', 'operations', 'supportedNames', 'entityDataProvider');
             utilOptions.dataSourceNames = _.keys(options.dataSource);
             this.util = new ExpressionEditorUtil(utilOptions);
 
@@ -88,6 +88,7 @@ define(function(require) {
         },
 
         render: function() {
+            this._toggleErrorState(this.isValid());
             this.$el.typeahead({
                 minLength: 0,
                 items: 20,
@@ -123,6 +124,22 @@ define(function(require) {
             return ExpressionEditorView.__super__.dispose.apply(this, arguments);
         },
 
+        onChange: function(e) {
+            var isValid = this.isValid();
+            this._toggleErrorState(isValid);
+            this.trigger('change', e.currentTarget.value, isValid);
+        },
+
+        isValid: function() {
+            var value = this.getValue();
+            return value === '' || this.util.validate(value);
+        },
+
+        _toggleErrorState: function(isValid) {
+            this.$el.toggleClass('error', !isValid);
+            this.$el.parent().toggleClass('validation-error', !isValid);
+        },
+
         /**
          * Show autocomplete list
          */
@@ -130,13 +147,27 @@ define(function(require) {
             this.typeahead.lookup();
         },
 
+
         /**
-         * Validate expression
+         * Sets value to view DOM element
+         *
+         * @param {string} value
          */
-        validate: function() {
-            var isValid = this.util.validate(this.$el.val());
-            this.$el.toggleClass('error', !isValid);
-            this.$el.parent().toggleClass('validation-error', !isValid);
+        setValue: function(value) {
+            this.$el.val(value);
+            var isValid = this.isValid();
+            this._toggleErrorState(isValid);
+            this.trigger('change', value, isValid);
+        },
+
+        /**
+         * Returns value of view DOM element
+         *
+         * @return {string}
+         */
+
+        getValue: function() {
+            return this.$el.val();
         },
 
         /**

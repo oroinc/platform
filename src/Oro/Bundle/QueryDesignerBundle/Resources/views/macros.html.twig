@@ -284,3 +284,11 @@
     </script>
     {% endspaceless %}
 {% endmacro %}
+
+{% macro query_type_converter(params) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    <div {{ UI.renderPageComponentAttributes({
+        module: 'oroquerydesigner/js/app/components/query-type-converter-component',
+        name: 'query-type-converter'
+    }|merge(params|default({}))) }}></div>
+{% endmacro %}

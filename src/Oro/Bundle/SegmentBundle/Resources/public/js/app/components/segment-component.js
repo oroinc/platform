@@ -19,6 +19,8 @@ define(function(require) {
     SegmentComponent = BaseComponent.extend({
         relatedSiblingComponents: {
             conditionBuilderComponent: 'condition-builder',
+            expressionEditorComponent: 'expression-editor',
+            queryTypeConverterComponent: 'query-type-converter',
             columnFieldChoiceComponent: 'column-field-choice',
             columnFunctionChoiceComponent: 'column-function-choice',
             groupingFieldChoiceComponent: 'grouping-field-choice',
@@ -99,7 +101,9 @@ define(function(require) {
             this.initGrouping();
             this.initDateGrouping();
             this.initColumn();
+            this.initExpressionEditor();
             var promise = this.configureFilters();
+            this.initQueryTypeConverter();
 
             this.form = this.$storage.parents('form');
             this.form.submit(_.bind(this.onBeforeSubmit, this));
@@ -109,7 +113,7 @@ define(function(require) {
 
         initStorage: function() {
             this.$storage = $(this.options.valueSource);
-            this.$storage.on('change.' + this.cid, function() {
+            this.$storage.on('change' + this.eventNamespace(), function() {
                 this.trigger('updateData', this.load());
             }.bind(this));
         },
@@ -158,9 +162,9 @@ define(function(require) {
                 }
             }.bind(this);
 
-            $entityChoice.on('change', onEntityChoiceChange);
+            $entityChoice.on('change' + this.eventNamespace(), onEntityChoiceChange);
             this.once('dispose:before', function() {
-                $entityChoice.off('change', onEntityChoiceChange);
+                $entityChoice.off('change' + this.eventNamespace(), onEntityChoiceChange);
             }, this);
         },
 
@@ -218,9 +222,13 @@ define(function(require) {
 
             this.trigger('dispose:before');
             delete this.options;
-            this.$storage.off('.' + this.cid);
+            this.$storage.off(this.eventNamespace());
             delete this.$storage;
             SegmentComponent.__super__.dispose.call(this);
+        },
+
+        eventNamespace: function() {
+            return '.delegateEvents' + this.cid;
         },
 
         /**
@@ -562,6 +570,31 @@ define(function(require) {
             }, this);
         },
 
+        initExpressionEditor: function() {
+            if (!this.expressionEditorComponent) {
+                // there's no expression editor
+                return;
+            }
+
+            this.expressionEditorComponent.setEntity(this.entityClassName);
+            this.on('entityChange', function(entityClassName) {
+                this.expressionEditorComponent.setEntity(entityClassName);
+            });
+
+            this.expressionEditorComponent.view.setValue(this.load('expression'));
+            this.listenTo(this.expressionEditorComponent.view, 'change', function(value) {
+                this.save(value, 'expression');
+            });
+
+            this.on('resetData', function(data) {
+                data.expression = '';
+                this.expressionEditorComponent.view.setValue(data.expression);
+            }, this);
+            this.on('updateData', function(data) {
+                this.expressionEditorComponent.view.setValue(data.expression);
+            }, this);
+        },
+
         configureFilters: function() {
             if (!this.conditionBuilderComponent) {
                 // there's no condition builder
@@ -587,6 +620,24 @@ define(function(require) {
             }, this);
 
             return $.when(this.conditionBuilderComponent.view.getDeferredRenderPromise());
+        },
+
+        initQueryTypeConverter: function() {
+            if (
+                !this.queryTypeConverterComponent || !this.conditionBuilderComponent || !this.expressionEditorComponent
+            ) {
+                // there're no all required components
+                return;
+            }
+
+            var expressionEditorValue = this.expressionEditorComponent.view.getValue();
+            var conditionBuilderValue = this.conditionBuilderComponent.view.getValue();
+
+            if (_.isEmpty(expressionEditorValue) && !_.isEmpty(conditionBuilderValue)) {
+                this.queryTypeConverterComponent.setMode('simple');
+            } else if (!_.isEmpty(expressionEditorValue) && _.isEmpty(conditionBuilderValue)) {
+                this.queryTypeConverterComponent.setMode('advanced');
+            }
         }
     }, {
         INVALID_DATA_ISSUE: 'INVALID_DATA',
