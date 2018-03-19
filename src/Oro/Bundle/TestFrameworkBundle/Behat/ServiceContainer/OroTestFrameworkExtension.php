@@ -154,6 +154,9 @@ class OroTestFrameworkExtension implements TestworkExtension
             ->clearTag(EventDispatcherExtension::SUBSCRIBER_TAG);
     }
 
+    /**
+     * @param ContainerBuilder $container
+     */
     private function transferApplicationParameters(ContainerBuilder $container)
     {
         /** @var KernelInterface $kernel */
@@ -176,8 +179,12 @@ class OroTestFrameworkExtension implements TestworkExtension
             $isolator = $container->get($id);
 
             if ($isolator->isApplicable($applicationContainer)) {
-                $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-                $isolators[$priority][] = new Reference($id);
+                $reference = new Reference($id);
+
+                foreach ($attributes as $attribute) {
+                    $priority = isset($attribute['priority']) ? $attribute['priority'] : 0;
+                    $isolators[$priority][] = $reference;
+                }
             }
         }
 
@@ -203,7 +210,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         foreach ($container->findTaggedServiceIds('artifacts_handler') as $id => $attributes) {
             $handlerClass = $container->getDefinition($id)->getClass();
 
-            if (!in_array(ArtifactsHandlerInterface::class, class_implements($handlerClass))) {
+            if (!in_array(ArtifactsHandlerInterface::class, class_implements($handlerClass), true)) {
                 throw new InvalidArgumentException(sprintf(
                     '"%s" should implement "%s"',
                     $handlerClass,
@@ -285,6 +292,9 @@ class OroTestFrameworkExtension implements TestworkExtension
         }
     }
 
+    /**
+     * @param ContainerBuilder $container
+     */
     private function processSuiteAwareSubscriber(ContainerBuilder $container)
     {
         $services = [];
@@ -326,6 +336,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $suites = $container->getParameter('suite.configurations');
         $pages = [];
         $elements = [];
+        $requiredOptionalListeners = [];
 
         /** @var BundleInterface $bundle */
         foreach ($kernel->getBundles() as $bundle) {
@@ -348,10 +359,16 @@ class OroTestFrameworkExtension implements TestworkExtension
             $this->appendConfiguration($pages, $processedConfiguration[self::PAGES_CONFIG_ROOT]);
             $this->appendConfiguration($elements, $processedConfiguration[self::ELEMENTS_CONFIG_ROOT]);
             $suites = array_merge($suites, $processedConfiguration[self::SUITES_CONFIG_ROOT]);
+            $requiredOptionalListeners = array_merge(
+                $requiredOptionalListeners,
+                $processedConfiguration['optional_listeners']['required_for_fixtures'] ?? []
+            );
         }
 
         $container->getDefinition('oro_element_factory')->replaceArgument(2, $elements);
         $container->getDefinition('oro_page_factory')->replaceArgument(1, $pages);
+        $container->getDefinition('oro_behat_extension.isolation.doctrine_isolator')
+            ->addMethodCall('setRequiredListeners', [array_unique($requiredOptionalListeners)]);
         $suites = array_merge($suites, $container->getParameter('suite.configurations'));
         $container->setParameter('suite.configurations', $suites);
     }

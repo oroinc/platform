@@ -133,6 +133,13 @@ class BehatBundleConfiguration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('optional_listeners')
+                    ->children()
+                        ->arrayNode('required_for_fixtures')
+                            ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 
