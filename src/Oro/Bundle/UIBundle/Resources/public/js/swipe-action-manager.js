@@ -57,7 +57,6 @@ define(function(require) {
          */
         _bindEvents: function() {
             this.$el.on('touchstart', _.bind(this._swipeStart, this));
-            this.$el.on('touchmove', _.bind(this._swipeMove, this));
             this.$el.on('touchend', _.bind(this._swipeEnd, this));
         },
 
@@ -76,16 +75,6 @@ define(function(require) {
             };
 
             this.startTime = new Date().getTime();
-        },
-
-        /**
-         * Handler for start move
-         *
-         * @param {jQuery.Event} event
-         * @private
-         */
-        _swipeMove: function(event) {
-            event.preventDefault();
         },
 
         /**
