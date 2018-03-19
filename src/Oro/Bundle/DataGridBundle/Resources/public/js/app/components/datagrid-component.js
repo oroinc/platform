@@ -430,8 +430,10 @@ define(function(require) {
             }
 
             if (!this.themeOptions.disableStickedScrollbar) {
-                if (tools.isMobile() || !this.metadata.enableFullScreenLayout) {
-                    plugins.push(StickedScrollbarPlugin);
+                if (!(this.metadata.enableResponsiveGrids && tools.isMobile())) {
+                    if (tools.isMobile() || !this.metadata.enableFullScreenLayout) {
+                        plugins.push(StickedScrollbarPlugin);
+                    }
                 }
             }
 

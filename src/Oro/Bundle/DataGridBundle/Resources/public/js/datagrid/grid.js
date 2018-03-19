@@ -222,6 +222,8 @@ define(function(require) {
             this._listenToCollectionEvents();
             this._listenToContentEvents();
             this._listenToCommands();
+
+            console.log(this.$el);
         },
 
         /**
