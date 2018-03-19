@@ -29,7 +29,15 @@ class AddIndexes implements Migration
     protected function addIndexes(Schema $schema, $tableName)
     {
         $table = $schema->getTable($tableName);
-        $table->addIndex(['field'], $tableName . '_field_idx');
-        $table->addIndex(['item_id', 'field'], $tableName . '_item_field_idx');
+
+        $fieldIndexName = $tableName . '_field_idx';
+        if (!$table->hasIndex($fieldIndexName)) {
+            $table->addIndex(['field'], $fieldIndexName);
+        }
+
+        $itemFieldIndexName = $tableName . '_item_field_idx';
+        if (!$table->hasIndex($itemFieldIndexName)) {
+            $table->addIndex(['item_id', 'field'], $itemFieldIndexName);
+        }
     }
 }
