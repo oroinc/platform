@@ -14,6 +14,7 @@
 
 #### ImportExportBundle
 * Removed class `Oro\Bundle\ImportExportBundle\EventListener\ExportJoinListener` and corresponding service `oro_importexport.event_listener.export_join_listener`
+* Parameter `%oro_importexport.file.split_csv_file.size_of_batch%` was removed use `%oro_importexport.import.size_of_batch%` instead.
 
 #### InstallerBundle
 * Removed deprecated methods `getDefaultTimeout` and `setDefaultTimeout` from class `Oro\Bundle\InstallerBundle\CommandExecutor`

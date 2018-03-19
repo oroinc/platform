@@ -297,10 +297,10 @@ define(function(require) {
             }
             var visibleRect = this.getVisibleRect(el, null, false, onAfterGetClientRect);
             var scrolls = {
-                vertical: rect.top !== visibleRect.top ? visibleRect.top - rect.top :
-                    (rect.bottom !== visibleRect.bottom ? visibleRect.bottom - rect.bottom : 0),
-                horizontal: rect.left !== visibleRect.left ? visibleRect.left - rect.left :
-                    (rect.right !== visibleRect.right ? visibleRect.right - rect.right : 0)
+                vertical: rect.top !== visibleRect.top ? visibleRect.top - rect.top
+                    : (rect.bottom !== visibleRect.bottom ? visibleRect.bottom - rect.bottom : 0),
+                horizontal: rect.left !== visibleRect.left ? visibleRect.left - rect.left
+                    : (rect.right !== visibleRect.right ? visibleRect.right - rect.right : 0)
             };
 
             if (verticalGap && scrolls.vertical) {

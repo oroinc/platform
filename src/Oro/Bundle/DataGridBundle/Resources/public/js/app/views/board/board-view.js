@@ -168,8 +168,8 @@ define(function(require) {
                 var placeholders = {
                     entityHint: (this.boardPlugin.main.grid.entityHint || __('oro.datagrid.entityHint')).toLowerCase()
                 };
-                var message = _.isEmpty(this.serverCollection.state.filters) ?
-                    'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
+                var message = _.isEmpty(this.serverCollection.state.filters)
+                    ? 'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
 
                 this.$('.no-data').html(this.boardPlugin.main.grid.noDataTemplate({
                     hint: __(message, placeholders).replace('\n', '<br />')
