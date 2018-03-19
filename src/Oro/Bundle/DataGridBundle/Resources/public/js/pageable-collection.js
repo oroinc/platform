@@ -158,6 +158,13 @@ define([
         onePagePagination: false,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function PageableCollection() {
+            PageableCollection.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize basic parameters from source options
          *
          * @param models

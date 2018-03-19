@@ -7,6 +7,13 @@ define(function(require) {
     var ComponentNeedsB = BaseComponent.extend({
         relatedSiblingComponents: {
             componentB: 'component-b'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ComponentNeedsB() {
+            ComponentNeedsB.__super__.constructor.apply(this, arguments);
         }
     });
 
@@ -14,22 +21,50 @@ define(function(require) {
         relatedSiblingComponents: {
             componentC: 'component-c',
             componentE: 'component-e'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ComponentNeedsCE() {
+            ComponentNeedsCE.__super__.constructor.apply(this, arguments);
         }
     });
 
     var ComponentNeedsA = BaseComponent.extend({
         relatedSiblingComponents: {
             componentA: 'component-a'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ComponentNeedsA() {
+            ComponentNeedsA.__super__.constructor.apply(this, arguments);
         }
     });
 
     var ComponentExtendNoNeedA = ComponentNeedsA.extend({
         relatedSiblingComponents: {
             componentA: false
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ComponentExtendNoNeedA() {
+            ComponentExtendNoNeedA.__super__.constructor.apply(this, arguments);
         }
     });
 
-    var ComponentNoNeeds = BaseComponent.extend({});
+    var ComponentNoNeeds = BaseComponent.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function ComponentNoNeeds() {
+            ComponentNoNeeds.__super__.constructor.apply(this, arguments);
+        }
+    });
 
     var components = {
         'js/needs-b-component': ComponentNeedsB,

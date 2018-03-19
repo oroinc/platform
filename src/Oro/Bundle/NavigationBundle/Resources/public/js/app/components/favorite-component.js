@@ -52,7 +52,7 @@ define([
         _createTabView: function() {
             var options = this._options.tabOptions || {};
             var collection = this.collection;
-            var TabItemView = ItemView.extend({
+            var TabItemView = ItemView.extend({// eslint-disable-line oro/named-constructor
                 template: this._options.tabItemTemplate
             });
 
