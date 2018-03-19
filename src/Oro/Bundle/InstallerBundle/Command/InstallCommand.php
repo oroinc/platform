@@ -279,7 +279,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             'user-name'      => [
                 'label'                  => 'Username',
                 'options'                => [
-                    'args' => [LoadAdminUserData::DEFAULT_ADMIN_USERNAME]
+                    'constructorArgs' => [LoadAdminUserData::DEFAULT_ADMIN_USERNAME]
                 ],
                 'defaultValue'           => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
             ],
