@@ -8,6 +8,9 @@ use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * Consume messages from DBAL
+ */
 class DbalMessageConsumer implements MessageConsumerInterface
 {
     /**
@@ -138,10 +141,8 @@ class DbalMessageConsumer implements MessageConsumerInterface
     {
         InvalidMessageException::assertMessageInstanceOf($message, DbalMessage::class);
 
-        $this->dbal->beginTransaction();
-
         $sql = sprintf(
-            'SELECT id FROM %s WHERE id=:id FOR UPDATE',
+            'SELECT id FROM %s WHERE id=:id',
             $this->connection->getTableName()
         );
 
@@ -156,19 +157,13 @@ class DbalMessageConsumer implements MessageConsumerInterface
                 $affectedRows = $this->dbal->delete($this->connection->getTableName(), ['id' => $message->getId()], [
                     'id' => Type::INTEGER,
                 ]);
-                $this->dbal->commit();
             } catch (\Exception $e) {
                 sleep(1);
-                try {
-                    $affectedRows = $this->dbal->delete(
-                        $this->connection->getTableName(),
-                        ['id' => $message->getId()],
-                        ['id' => Type::INTEGER, ]
-                    );
-                    $this->dbal->commit();
-                } catch (\Exception $e) {
-                    $this->dbal->rollBack();
-                }
+                $affectedRows = $this->dbal->delete(
+                    $this->connection->getTableName(),
+                    ['id' => $message->getId()],
+                    ['id' => Type::INTEGER, ]
+                );
             }
         }
         if (1 !== $affectedRows) {
@@ -188,10 +183,8 @@ class DbalMessageConsumer implements MessageConsumerInterface
     {
         InvalidMessageException::assertMessageInstanceOf($message, DbalMessage::class);
 
-        $this->dbal->beginTransaction();
-
         $sql = sprintf(
-            'SELECT id FROM %s WHERE id=:id FOR UPDATE',
+            'SELECT id FROM %s WHERE id=:id',
             $this->connection->getTableName()
         );
 
@@ -210,19 +203,13 @@ class DbalMessageConsumer implements MessageConsumerInterface
                 $affectedRows = $this->dbal->delete($this->connection->getTableName(), ['id' => $message->getId()], [
                     'id' => Type::INTEGER,
                 ]);
-                $this->dbal->commit();
             } catch (\Exception $e) {
                 sleep(1);
-                try {
-                    $affectedRows = $this->dbal->delete(
-                        $this->connection->getTableName(),
-                        ['id' => $message->getId()],
-                        ['id' => Type::INTEGER, ]
-                    );
-                    $this->dbal->commit();
-                } catch (\Exception $e) {
-                    $this->dbal->rollBack();
-                }
+                $affectedRows = $this->dbal->delete(
+                    $this->connection->getTableName(),
+                    ['id' => $message->getId()],
+                    ['id' => Type::INTEGER, ]
+                );
             }
         }
         if (1 !== $affectedRows) {
@@ -272,85 +259,76 @@ class DbalMessageConsumer implements MessageConsumerInterface
          * same table as update query and the solution is to use one
          * more sub query.
          */
-        $this->dbal->beginTransaction();
         $row = null;
-        try {
-            $now = time();
+        $now = time();
+
+        $sql = sprintf(
+            'SELECT id FROM %s WHERE queue=:queue AND consumer_id IS NULL AND ' .
+            '(delayed_until IS NULL OR delayed_until<=:delayedUntil) ' .
+            'ORDER BY priority DESC, id ASC LIMIT 1',
+            $this->connection->getTableName()
+        );
+
+        $row = $this->dbal->executeQuery(
+            $sql,
+            [
+                'queue' => $this->queue->getQueueName(),
+                'delayedUntil' => $now,
+            ],
+            [
+                'queue' => Type::STRING,
+                'delayedUntil' => Type::INTEGER,
+            ]
+        )->fetch();
+
+        if ($row) {
+            $messageId = $row['id'];
 
             $sql = sprintf(
-                'SELECT id FROM %s WHERE queue=:queue AND consumer_id IS NULL AND ' .
-                '(delayed_until IS NULL OR delayed_until<=:delayedUntil) ' .
-                'ORDER BY priority DESC, id ASC LIMIT 1 FOR UPDATE',
+                'UPDATE %s SET consumer_id=:consumerId  WHERE id = :messageId',
                 $this->connection->getTableName()
             );
 
-            $row = $this->dbal->executeQuery(
+            $this->dbal->executeUpdate(
                 $sql,
                 [
-                    'queue' => $this->queue->getQueueName(),
-                    'delayedUntil' => $now,
+                    'messageId' => $messageId,
+                    'consumerId' => $this->consumerId
                 ],
                 [
+                    'messageId' => Type::STRING,
+                    'consumerId' => Type::STRING
+                ]
+            );
+
+            $sql = sprintf(
+                'SELECT * FROM %s WHERE consumer_id=:consumerId AND queue=:queue LIMIT 1',
+                $this->connection->getTableName()
+            );
+
+            $dbalMessage = $this->dbal->executeQuery(
+                $sql,
+                [
+                    'consumerId' => $this->consumerId,
+                    'queue' => $this->queue->getQueueName(),
+                ],
+                [
+                    'consumerId' => Type::STRING,
                     'queue' => Type::STRING,
-                    'delayedUntil' => Type::INTEGER,
                 ]
             )->fetch();
 
-            if ($row) {
-                $messageId = $row['id'];
-
-                $sql = sprintf(
-                    'UPDATE %s SET consumer_id=:consumerId  WHERE id = :messageId',
-                    $this->connection->getTableName()
-                );
-
-                $this->dbal->executeUpdate(
-                    $sql,
-                    [
-                        'messageId' => $messageId,
-                        'consumerId' => $this->consumerId
-                    ],
-                    [
-                        'messageId' => Type::STRING,
-                        'consumerId' => Type::STRING
-                    ]
-                );
-
-                $sql = sprintf(
-                    'SELECT * FROM %s WHERE consumer_id=:consumerId AND queue=:queue LIMIT 1',
-                    $this->connection->getTableName()
-                );
-
-                $dbalMessage = $this->dbal->executeQuery(
-                    $sql,
-                    [
-                        'consumerId' => $this->consumerId,
-                        'queue' => $this->queue->getQueueName(),
-                    ],
-                    [
-                        'consumerId' => Type::STRING,
-                        'queue' => Type::STRING,
-                    ]
-                )->fetch();
-
-                if (false == $dbalMessage) {
-                    throw new \LogicException(sprintf(
-                        'Expected one record but got nothing. consumer_id: "%s"',
-                        $this->consumerId
-                    ));
-                }
-                $this->dbal->commit();
-
-                return $this->convertMessage($dbalMessage);
+            if (false == $dbalMessage) {
+                throw new \LogicException(sprintf(
+                    'Expected one record but got nothing. consumer_id: "%s"',
+                    $this->consumerId
+                ));
             }
 
-            $this->dbal->commit();
-        } catch (\LogicException $e) {
-            $this->dbal->rollBack();
-            throw ($e);
-        } catch (\Exception $e) {
-            $this->dbal->rollBack();
+            return $this->convertMessage($dbalMessage);
         }
+
+        return null;
     }
 
     /**
