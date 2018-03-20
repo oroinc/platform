@@ -254,7 +254,15 @@ class Form extends Element
         $value = trim($value);
 
         if (0 === strpos($value, '[')) {
-            return array_map('trim', explode(',', trim($value, '[]')));
+            return self::normalizeValue(
+                array_map(
+                    'trim',
+                    explode(
+                        ',',
+                        trim($value, '[]')
+                    )
+                )
+            );
         }
 
         if (preg_match('/^\d{4}-\d{2}-\d{2}/', trim($value))) {
@@ -263,7 +271,7 @@ class Form extends Element
 
         $value = self::checkAdditionalFunctions($value);
 
-        if (in_array($value, ['true', 'false', 'yes', 'no', 'on', 'off'])) {
+        if (in_array($value, ['true', 'false'])) {
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         }
 
