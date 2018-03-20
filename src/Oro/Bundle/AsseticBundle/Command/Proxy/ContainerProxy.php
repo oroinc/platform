@@ -28,6 +28,14 @@ class ContainerProxy implements ContainerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function initialized($id)
+    {
+        return $this->container->initialized($id);
+    }
+
+    /**
      * Replaces existing service with new implementation.
      *
      * @param string $id      The service identifier

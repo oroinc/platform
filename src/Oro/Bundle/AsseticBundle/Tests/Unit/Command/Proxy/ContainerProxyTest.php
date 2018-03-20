@@ -89,4 +89,16 @@ class ContainerProxyTest extends \PHPUnit_Framework_TestCase
             ['setParameter', ['name', 'test'], null],
         ];
     }
+
+    public function testInitialized()
+    {
+        $id = 'acme.service_id';
+
+        $this->target->expects($this->once())
+            ->method('initialized')
+            ->with($id)
+            ->willReturn(true);
+
+        $this->assertTrue($this->proxy->initialized($id));
+    }
 }
