@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Dbal;
 
 use Doctrine\DBAL\Connection;
@@ -19,15 +20,13 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $connection
             ->expects($this->once())
             ->method('getDBALConnection')
-            ->will($this->returnValue($this->createDBALConnectionMock()))
-        ;
+            ->will($this->returnValue($this->createDBALConnectionMock()));
 
         $session = $this->createSessionMock();
         $session
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
         new DbalMessageConsumer($session, new DbalDestination('queue'));
     }
@@ -38,15 +37,13 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $connection
             ->expects($this->once())
             ->method('getDBALConnection')
-            ->will($this->returnValue($this->createDBALConnectionMock()))
-        ;
+            ->will($this->returnValue($this->createDBALConnectionMock()));
 
         $session = $this->createSessionMock();
         $session
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
         $destination = new DbalDestination('queue');
 
@@ -61,20 +58,18 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $connection
             ->expects($this->once())
             ->method('getDBALConnection')
-            ->will($this->returnValue($this->createDBALConnectionMock()))
-        ;
+            ->will($this->returnValue($this->createDBALConnectionMock()));
 
         $session = $this->createSessionMock();
         $session
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
         $this->expectException(InvalidMessageException::class);
         $this->expectExceptionMessage(
-            'The message must be an instance of '.
-            'Oro\Component\MessageQueue\Transport\Dbal\DbalMessage '.
+            'The message must be an instance of ' .
+            'Oro\Component\MessageQueue\Transport\Dbal\DbalMessage ' .
             'but it is Oro\Component\MessageQueue\Transport\Null\NullMessage.'
         );
 
@@ -90,8 +85,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $session
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
         $destination = new DbalDestination('queue');
 
@@ -113,7 +107,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $dbal
             ->expects($this->once())
             ->method('executeQuery')
-            ->with('SELECT id FROM tableName WHERE id=:id FOR UPDATE', ['id' => 123])
+            ->with('SELECT id FROM tableName WHERE id=:id', ['id' => 123])
             ->willReturn($statment);
         $dbal
             ->expects($this->once())
@@ -125,20 +119,17 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $connection
             ->expects($this->once())
             ->method('getDBALConnection')
-            ->will($this->returnValue($dbal))
-        ;
+            ->will($this->returnValue($dbal));
         $connection
             ->expects($this->exactly(2))
             ->method('getTableName')
-            ->will($this->returnValue('tableName'))
-        ;
+            ->will($this->returnValue('tableName'));
 
         $session = $this->createSessionMock();
         $session
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
         $message = new DbalMessage();
         $message->setId(123);
@@ -159,33 +150,29 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $dbal
             ->expects($this->once())
             ->method('executeQuery')
-            ->with('SELECT id FROM tableName WHERE id=:id FOR UPDATE', ['id' => 123])
+            ->with('SELECT id FROM tableName WHERE id=:id', ['id' => 123])
             ->willReturn($statment);
         $dbal
             ->expects($this->once())
             ->method('delete')
             ->with('tableName', ['id' => 123])
-            ->will($this->returnValue(0))
-        ;
+            ->will($this->returnValue(0));
 
         $connection = $this->createConnectionMock();
         $connection
             ->expects($this->once())
             ->method('getDBALConnection')
-            ->will($this->returnValue($dbal))
-        ;
+            ->will($this->returnValue($dbal));
         $connection
             ->expects($this->exactly(2))
             ->method('getTableName')
-            ->will($this->returnValue('tableName'))
-        ;
+            ->will($this->returnValue('tableName'));
 
         $session = $this->createSessionMock();
         $session
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
         $message = new DbalMessage();
         $message->setId(123);
@@ -202,20 +189,18 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $connection
             ->expects($this->once())
             ->method('getDBALConnection')
-            ->will($this->returnValue($this->createDBALConnectionMock()))
-        ;
+            ->will($this->returnValue($this->createDBALConnectionMock()));
 
         $session = $this->createSessionMock();
         $session
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
         $this->expectException(InvalidMessageException::class);
         $this->expectExceptionMessage(
-            'The message must be an instance of '.
-            'Oro\Component\MessageQueue\Transport\Dbal\DbalMessage '.
+            'The message must be an instance of ' .
+            'Oro\Component\MessageQueue\Transport\Dbal\DbalMessage ' .
             'but it is Oro\Component\MessageQueue\Transport\Null\NullMessage.'
         );
 
@@ -235,33 +220,29 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $dbal
             ->expects($this->once())
             ->method('executeQuery')
-            ->with('SELECT id FROM tableName WHERE id=:id FOR UPDATE', ['id' => 123])
+            ->with('SELECT id FROM tableName WHERE id=:id', ['id' => 123])
             ->willReturn($statment);
         $dbal
             ->expects($this->once())
             ->method('delete')
             ->with('tableName', ['id' => 123])
-            ->will($this->returnValue(1))
-        ;
+            ->will($this->returnValue(1));
 
         $connection = $this->createConnectionMock();
         $connection
             ->expects($this->once())
             ->method('getDBALConnection')
-            ->will($this->returnValue($dbal))
-        ;
+            ->will($this->returnValue($dbal));
         $connection
             ->expects($this->exactly(2))
             ->method('getTableName')
-            ->will($this->returnValue('tableName'))
-        ;
+            ->will($this->returnValue('tableName'));
 
         $session = $this->createSessionMock();
         $session
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
         $message = new DbalMessage();
         $message->setId(123);
@@ -282,33 +263,29 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $dbal
             ->expects($this->once())
             ->method('executeQuery')
-            ->with('SELECT id FROM tableName WHERE id=:id FOR UPDATE', ['id' => 123])
+            ->with('SELECT id FROM tableName WHERE id=:id', ['id' => 123])
             ->willReturn($statment);
         $dbal
             ->expects($this->once())
             ->method('delete')
             ->with('tableName', ['id' => 123])
-            ->will($this->returnValue(0))
-        ;
+            ->will($this->returnValue(0));
 
         $connection = $this->createConnectionMock();
         $connection
             ->expects($this->once())
             ->method('getDBALConnection')
-            ->will($this->returnValue($dbal))
-        ;
+            ->will($this->returnValue($dbal));
         $connection
             ->expects($this->exactly(2))
             ->method('getTableName')
-            ->will($this->returnValue('tableName'))
-        ;
+            ->will($this->returnValue('tableName'));
 
         $session = $this->createSessionMock();
         $session
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
         $message = new DbalMessage();
         $message->setId(123);
@@ -332,14 +309,13 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $dbal
             ->expects($this->once())
             ->method('executeQuery')
-            ->with('SELECT id FROM tableName WHERE id=:id FOR UPDATE', ['id' => 123])
+            ->with('SELECT id FROM tableName WHERE id=:id', ['id' => 123])
             ->willReturn($statment);
         $dbal
             ->expects($this->once())
             ->method('delete')
             ->with('tableName', ['id' => 123])
-            ->will($this->returnValue(1))
-        ;
+            ->will($this->returnValue(1));
 
         $expectedMessage = [
             'body' => 'body',
@@ -354,27 +330,23 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('insert')
             ->with('tableName', $expectedMessage)
-            ->will($this->returnValue(1))
-        ;
+            ->will($this->returnValue(1));
 
         $connection = $this->createConnectionMock();
         $connection
             ->expects($this->once())
             ->method('getDBALConnection')
-            ->will($this->returnValue($dbal))
-        ;
+            ->will($this->returnValue($dbal));
         $connection
             ->expects($this->exactly(3))
             ->method('getTableName')
-            ->will($this->returnValue('tableName'))
-        ;
+            ->will($this->returnValue('tableName'));
 
         $session = $this->createSessionMock();
         $session
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
         $message = new DbalMessage();
         $message->setId(123);
@@ -399,27 +371,24 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $dbal
             ->expects($this->once())
             ->method('executeQuery')
-            ->with('SELECT id FROM tableName WHERE id=:id FOR UPDATE', ['id' => 123])
+            ->with('SELECT id FROM tableName WHERE id=:id', ['id' => 123])
             ->willReturn($statment);
 
         $connection = $this->createConnectionMock();
         $connection
             ->expects($this->once())
             ->method('getDBALConnection')
-            ->will($this->returnValue($dbal))
-        ;
+            ->will($this->returnValue($dbal));
         $connection
             ->expects($this->once())
             ->method('getTableName')
-            ->will($this->returnValue('tableName'))
-        ;
+            ->will($this->returnValue('tableName'));
 
         $session = $this->createSessionMock();
         $session
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
         $message = new DbalMessage();
         $message->setId(123);
@@ -444,43 +413,38 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $dbal
             ->expects($this->once())
             ->method('executeQuery')
-            ->with('SELECT id FROM tableName WHERE id=:id FOR UPDATE', ['id' => null])
+            ->with('SELECT id FROM tableName WHERE id=:id', ['id' => null])
             ->willReturn($statment);
         $dbal
             ->expects($this->once())
             ->method('delete')
-            ->will($this->returnValue(1))
-        ;
+            ->will($this->returnValue(1));
         $dbal
             ->expects($this->once())
             ->method('insert')
-            ->will($this->returnValue(0))
-        ;
+            ->will($this->returnValue(0));
 
         $connection = $this->createConnectionMock();
         $connection
             ->expects($this->once())
             ->method('getDBALConnection')
-            ->will($this->returnValue($dbal))
-        ;
+            ->will($this->returnValue($dbal));
         $connection
             ->expects($this->exactly(3))
             ->method('getTableName')
-            ->will($this->returnValue('tableName'))
-        ;
+            ->will($this->returnValue('tableName'));
 
         $session = $this->createSessionMock();
         $session
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
         $message = new DbalMessage();
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
-            'Expected record was inserted but it is not. message: '.
+            'Expected record was inserted but it is not. message: ' .
             '"{"body":null,"headers":"[]","properties":"[]","priority":0,"queue":"queue","redelivered":true}"'
         );
         $consumer = new DbalMessageConsumer($session, new DbalDestination('queue'));
@@ -503,49 +467,37 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $statement
             ->expects($this->at(0))
             ->method('fetch')
-            ->will($this->returnValue(1))
-        ;
+            ->will($this->returnValue(1));
         $statement
             ->expects($this->at(1))
             ->method('fetch')
-            ->will($this->returnValue($dbalMessage))
-        ;
+            ->will($this->returnValue($dbalMessage));
 
         $dbal = $this->createDBALConnectionMock();
         $dbal
             ->expects($this->exactly(2))
             ->method('executeQuery')
-            ->will($this->returnValue($statement))
-        ;
-
-        $dbal
-            ->expects($this->once())
-            ->method('commit')
-        ;
+            ->will($this->returnValue($statement));
 
         $connection = $this->createConnectionMock();
         $connection
             ->expects($this->once())
             ->method('getDBALConnection')
-            ->will($this->returnValue($dbal))
-        ;
+            ->will($this->returnValue($dbal));
         $connection
             ->expects($this->exactly(3))
             ->method('getTableName')
-            ->will($this->returnValue('tableName'))
-        ;
+            ->will($this->returnValue('tableName'));
 
         $session = $this->createSessionMock();
         $session
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
         $session
             ->expects($this->once())
             ->method('createMessage')
-            ->will($this->returnValue($message = new DbalMessage()))
-        ;
+            ->will($this->returnValue($message = new DbalMessage()));
 
         $consumer = new DbalMessageConsumer($session, new DbalDestination('queue'));
         $result = $consumer->receiveNoWait();
@@ -565,35 +517,30 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $statement
             ->expects($this->once())
             ->method('fetch')
-            ->will($this->returnValue(0))
-        ;
+            ->will($this->returnValue(0));
         $dbal = $this->createDBALConnectionMock();
 
         $dbal
             ->expects($this->once())
             ->method('executeQuery')
-            ->will($this->returnValue($statement))
-        ;
+            ->will($this->returnValue($statement));
 
 
         $connection = $this->createConnectionMock();
         $connection
             ->expects($this->once())
             ->method('getDBALConnection')
-            ->will($this->returnValue($dbal))
-        ;
+            ->will($this->returnValue($dbal));
         $connection
             ->expects($this->once())
             ->method('getTableName')
-            ->will($this->returnValue('tableName'))
-        ;
+            ->will($this->returnValue('tableName'));
 
         $session = $this->createSessionMock();
         $session
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
         $consumer = new DbalMessageConsumer($session, new DbalDestination('queue'));
         $consumer->setPollingInterval(1000);
@@ -608,86 +555,37 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $statement
             ->expects($this->at(0))
             ->method('fetch')
-            ->will($this->returnValue(1))
-        ;
+            ->will($this->returnValue(1));
         $statement
             ->expects($this->at(1))
             ->method('fetch')
-            ->will($this->returnValue(0))
-        ;
+            ->will($this->returnValue(0));
         $dbal = $this->createDBALConnectionMock();
 
         $dbal
             ->expects($this->exactly(2))
             ->method('executeQuery')
-            ->will($this->returnValue($statement))
-        ;
+            ->will($this->returnValue($statement));
 
         $connection = $this->createConnectionMock();
         $connection
             ->expects($this->once())
             ->method('getDBALConnection')
-            ->will($this->returnValue($dbal))
-        ;
+            ->will($this->returnValue($dbal));
         $connection
             ->expects($this->exactly(3))
             ->method('getTableName')
-            ->will($this->returnValue('tableName'))
-        ;
+            ->will($this->returnValue('tableName'));
 
         $session = $this->createSessionMock();
         $session
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Expected one record but got nothing. consumer_id:');
         $consumer = new DbalMessageConsumer($session, new DbalDestination('queue'));
         $consumer->receive();
-    }
-
-    public function testShouldRollbackTransactionIfExceptionThrownOnFirstUpdate()
-    {
-        $statement = $this->createDBALStatementMock();
-        $statement
-            ->expects($this->once())
-            ->method('fetch')
-            ->willThrowException(new \Exception())
-        ;
-        $dbal = $this->createDBALConnectionMock();
-
-        $dbal
-            ->expects($this->once())
-            ->method('executeQuery')
-            ->will($this->returnValue($statement))
-        ;
-        $dbal
-            ->expects($this->once())
-            ->method('rollBack')
-        ;
-
-        $connection = $this->createConnectionMock();
-        $connection
-            ->expects($this->once())
-            ->method('getDBALConnection')
-            ->will($this->returnValue($dbal))
-        ;
-        $connection
-            ->expects($this->once())
-            ->method('getTableName')
-            ->will($this->returnValue('tableName'))
-        ;
-
-        $session = $this->createSessionMock();
-        $session
-            ->expects($this->once())
-            ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
-
-        $consumer = new DbalMessageConsumer($session, new DbalDestination('queue'));
-        $consumer->receiveNoWait();
     }
 
     /**
