@@ -1115,8 +1115,8 @@ define(function(require) {
             var placeholders = {
                 entityHint: (this.entityHint || __('oro.datagrid.entityHint')).toLowerCase()
             };
-            var message = _.isEmpty(this.collection.state.filters) ?
-                'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
+            var message = _.isEmpty(this.collection.state.filters)
+                ? 'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
             message = this.noColumnsFlag ? 'oro.datagrid.no.columns' : message;
 
             this.$(this.selectors.noDataBlock).html($(this.noDataTemplate({

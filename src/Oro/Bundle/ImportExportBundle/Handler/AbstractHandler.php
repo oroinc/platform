@@ -10,14 +10,16 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\File\BatchFileManager;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
-use Oro\Bundle\ImportExportBundle\File\FileSystemOperator;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\ReaderChain;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class AbstractHandler
+/**
+ * Abstract class for export/import handlers.
+ */
+abstract class AbstractHandler
 {
     /**
      * @var JobExecutor
@@ -28,11 +30,6 @@ class AbstractHandler
      * @var ProcessorRegistry
      */
     protected $processorRegistry;
-
-    /**
-     * @var FileSystemOperator
-     */
-    protected $fileSystemOperator;
 
     /**
      * @var ConfigProvider

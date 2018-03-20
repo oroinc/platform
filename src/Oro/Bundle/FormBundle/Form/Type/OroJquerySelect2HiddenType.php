@@ -65,7 +65,7 @@ class OroJquerySelect2HiddenType extends AbstractType
         $resolver
             ->setDefaults(
                 [
-                    'empty_value'        => '',
+                    'placeholder'        => '',
                     'empty_data'         => null,
                     'data_class'         => null,
                     'entity_class'       => null,

@@ -133,19 +133,19 @@ define(function(require) {
                     return _.escape(item.label);
                 },
                 formatResult: function(item) {
-                    return _.escape(item.label) + (item.isNew ?
-                        (' <span class="select2__result-entry-info">(' +
-                        __('oro.tag.inline_editing.new_tag') + ')</span>') :
-                        '');
+                    return _.escape(item.label) + (item.isNew
+                        ? (' <span class="select2__result-entry-info">(' +
+                        __('oro.tag.inline_editing.new_tag') + ')</span>')
+                        : '');
                 },
                 formatNoMatches: function() {
                     // no matches appears in following two cases only
                     // we use this message not for its original mission
-                    return _this.isLoading ?
-                        __('oro.tag.inline_editing.loading') :
-                        (_this.isCurrentTagSelected() ?
-                            __('oro.tag.inline_editing.existing_tag') :
-                            __('oro.tag.inline_editing.no_matches')
+                    return _this.isLoading
+                        ? __('oro.tag.inline_editing.loading')
+                        : (_this.isCurrentTagSelected()
+                            ? __('oro.tag.inline_editing.existing_tag')
+                            : __('oro.tag.inline_editing.no_matches')
                         );
                 },
                 initSelection: function(element, callback) {

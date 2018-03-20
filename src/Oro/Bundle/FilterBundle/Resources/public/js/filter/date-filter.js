@@ -256,8 +256,8 @@ define(function(require) {
         },
 
         _getPickerConstructor: function() {
-            return tools.isMobile() || !this.dateWidgetOptions.showDatevariables ? DatePickerView :
-                VariableDatePickerView;
+            return tools.isMobile() || !this.dateWidgetOptions.showDatevariables
+                ? DatePickerView : VariableDatePickerView;
         },
 
         onChangeFilterType: function(e) {

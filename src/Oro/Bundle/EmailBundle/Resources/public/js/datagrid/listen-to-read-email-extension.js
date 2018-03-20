@@ -14,8 +14,7 @@ define(function(require) {
         },
         _changeHandler: function(collection, model, ids) {
             collection.each(function(model) {
-                var rowClassName = ids.indexOf(Number(model.get('id'))) === -1 ?
-                    'email-row-is-readed' : '';
+                var rowClassName = ids.indexOf(Number(model.get('id'))) === -1 ? 'email-row-is-readed' : '';
                 model.set('row_class_name', rowClassName);
             });
         }

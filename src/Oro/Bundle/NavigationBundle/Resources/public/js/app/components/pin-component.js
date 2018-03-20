@@ -59,7 +59,7 @@ define([
         _createBarView: function() {
             var options = this._options.barOptions || {};
             var collection = this.collection;
-            var BarItemView = ItemView.extend({
+            var BarItemView = ItemView.extend({// eslint-disable-line oro/named-constructor
                 template: this._options.barItemTemplate
             });
 
@@ -81,7 +81,7 @@ define([
             var options = this._options.dropdownOptions || {};
             var collection = this.collection;
             var pinBar = this.pinBar;
-            var DropdownItemView = ItemView.extend({
+            var DropdownItemView = ItemView.extend({// eslint-disable-line oro/named-constructor
                 template: this._options.dropdownItemTemplate
             });
 

@@ -77,8 +77,8 @@ define(function(require) {
                 return formattedNumber.replace('%', '');
             },
             replaceCurrency: function(formattedNumber, options) {
-                var currencyLayout = configuration.get('currency-view-type') === 'symbol' ?
-                    localeSettings.getCurrencySymbol(options.currency_code) : options.currency_code;
+                var currencyLayout = configuration.get('currency-view-type') === 'symbol'
+                    ? localeSettings.getCurrencySymbol(options.currency_code) : options.currency_code;
 
                 var isPrepend = configuration.get('is-currency-symbol-prepend');
 

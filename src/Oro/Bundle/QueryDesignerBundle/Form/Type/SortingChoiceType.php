@@ -20,7 +20,7 @@ class SortingChoiceType extends AbstractType
                     'ASC'  => 'oro.query_designer.form.sorting_asc',
                     'DESC' => 'oro.query_designer.form.sorting_desc'
                 ),
-                'empty_value' => 'oro.query_designer.form.choose_sorting',
+                'placeholder' => 'oro.query_designer.form.choose_sorting',
                 'empty_data'  => ''
             )
         );

@@ -74,7 +74,7 @@ class ConfigType extends AbstractType
                     'choices'     => [],
                     'block'       => 'general',
                     'disabled'    => true,
-                    'empty_value' => 'oro.entity_extend.form.data_type.' . $fieldType
+                    'placeholder' => 'oro.entity_extend.form.data_type.' . $fieldType
                 )
             );
         } else {

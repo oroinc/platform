@@ -24,7 +24,7 @@ class ReportType extends AbstractQueryDesignerType
                     'class'       => 'OroReportBundle:ReportType',
                     'property'    => 'label',
                     'required'    => true,
-                    'empty_value' => 'oro.report.form.choose_report_type'
+                    'placeholder' => 'oro.report.form.choose_report_type'
                 )
             )
             ->add(

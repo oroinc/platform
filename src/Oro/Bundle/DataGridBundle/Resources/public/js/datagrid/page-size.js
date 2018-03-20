@@ -121,16 +121,16 @@ define([
                 this.items,
                 _.bind(
                     function(item) {
-                        return item.size === undefined ?
-                            this.collection.state.pageSize === item : this.collection.state.pageSize === item.size;
+                        return item.size === undefined
+                            ? this.collection.state.pageSize === item : this.collection.state.pageSize === item.size;
                     },
                     this
                 )
             );
 
             if (currentSizeLabel.length > 0) {
-                currentSizeLabel = _.isUndefined(currentSizeLabel[0].label) ?
-                    currentSizeLabel[0] : currentSizeLabel[0].label;
+                currentSizeLabel = _.isUndefined(currentSizeLabel[0].label)
+                    ? currentSizeLabel[0] : currentSizeLabel[0].label;
             } else {
                 currentSizeLabel = this.items[0];
             }
