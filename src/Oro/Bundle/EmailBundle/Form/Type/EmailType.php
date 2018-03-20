@@ -156,10 +156,6 @@ class EmailType extends AbstractType
                     'collectionModel' => true,
                     'error_bubbling'  => false,
                     'tooltip'   => 'oro.email.contexts.tooltip',
-                    'read_only' => !$this->authorizationChecker->isGranted(
-                        'EDIT',
-                        'entity:Oro\Bundle\EmailBundle\Entity\EmailUser'
-                    ),
                     'configs'   => [
                         'containerCssClass' => 'taggable-email',
                         'route_name'       => 'oro_activity_form_autocomplete_search',
@@ -167,6 +163,12 @@ class EmailType extends AbstractType
                             'activity' => 'emails',
                             'name'     => 'emails'
                         ],
+                    ],
+                    'attr' => [
+                        'readonly' => !$this->authorizationChecker->isGranted(
+                            'EDIT',
+                            'entity:Oro\Bundle\EmailBundle\Entity\EmailUser'
+                        )
                     ]
                 ]
             );

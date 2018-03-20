@@ -208,9 +208,9 @@ define(function(require) {
         },
 
         getEditorOptions: function() {
-            var viewConfiguration = this.inlineEditingOptions.editor ?
-                this.inlineEditingOptions.editor.view_options :
-                {};
+            var viewConfiguration = this.inlineEditingOptions.editor
+                ? this.inlineEditingOptions.editor.view_options
+                : {};
 
             if (!this.isInsertEditorModeOverlay()) {
                 viewConfiguration.container = this.view.$el;

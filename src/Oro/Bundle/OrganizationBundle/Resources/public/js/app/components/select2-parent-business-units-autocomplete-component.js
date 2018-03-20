@@ -6,6 +6,16 @@ define(function(require) {
     var _ = require('underscore');
 
     Select2ParentBusinessUnitsAutocompleteComponent = Select2TreeAutocompleteComponent.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function Select2ParentBusinessUnitsAutocompleteComponent() {
+            Select2ParentBusinessUnitsAutocompleteComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             var params = {
                 entity_id: options.configs.entity_id

@@ -53,7 +53,7 @@ class AddLanguageType extends AbstractType
         $resolver->setDefaults(
             [
                 'choices' => $this->getLanguageChoices(),
-                'empty_value' => 'oro.translation.language.form.select.empty_value',
+                'placeholder' => 'oro.translation.language.form.select.empty_value',
             ]
         );
     }

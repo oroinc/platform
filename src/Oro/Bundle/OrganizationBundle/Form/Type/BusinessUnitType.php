@@ -56,7 +56,7 @@ class BusinessUnitType extends AbstractType
                     'required' => false,
                     'label' => 'oro.organization.businessunit.parent.label',
                     'autocomplete_alias' => 'business_units_owner_search_handler',
-                    'empty_value' => 'oro.business_unit.form.none_business_user',
+                    'placeholder' => 'oro.business_unit.form.none_business_user',
                     'configs' => [
                         'multiple' => false,
                         'component'   => 'tree-autocomplete',
@@ -142,7 +142,7 @@ class BusinessUnitType extends AbstractType
                     'required' => false,
                     'label' => 'oro.organization.businessunit.parent.label',
                     'autocomplete_alias' => 'parent-business-units',
-                    'empty_value' => 'oro.business_unit.form.none_business_user',
+                    'placeholder' => 'oro.business_unit.form.none_business_user',
                     'configs' => [
                         'multiple' => false,
                         'component'   => 'parent-business-units-autocomplete',

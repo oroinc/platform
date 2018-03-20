@@ -3,12 +3,13 @@ define([
 ], function(require, _, $, Backbone, constants, mediator) {
     'use strict';
 
+    var WidgetContainerModel;
     /**
      * @export  orosidebar/js/widget-container/model
      * @class   orosidebar.widgetContainer.Model
      * @extends Backbone.Model
      */
-    return Backbone.Model.extend({
+    WidgetContainerModel = Backbone.Model.extend({
         defaults: {
             icon: '',
             iconClass: '',
@@ -21,6 +22,16 @@ define([
             highlighted: false
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function WidgetContainerModel() {
+            WidgetContainerModel.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             this.stateSnapshot = this.get('state');
             this.isDragged = false;
@@ -98,4 +109,6 @@ define([
             this.set(_.omit(widgetData, 'settings', 'placement'));
         }
     });
+
+    return WidgetContainerModel;
 });

@@ -40,7 +40,7 @@ class TargetFieldType extends AbstractType
             [
                 'attr'            => ['class' => 'extend-rel-target-field'],
                 'label'           => 'oro.entity_extend.form.target_field',
-                'empty_value'     => 'oro.entity.form.choose_entity_field',
+                'placeholder'     => 'oro.entity.form.choose_entity_field',
                 'choices'         => $this->getFieldChoiceList(),
                 'auto_initialize' => false
             ]

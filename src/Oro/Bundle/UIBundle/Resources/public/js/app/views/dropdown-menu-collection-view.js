@@ -40,6 +40,13 @@ define(function(require) {
      * @exports DropdownMenuView
      */
     DropdownMenuCollectionView = BaseCollectionView.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function DropdownMenuCollectionView() {
+            DropdownMenuCollectionView.__super__.constructor.apply(this, arguments);
+        },
+
         tagName: 'div',
         className: 'dropdown-menu dropdown-menu-collection',
         animationDuration: 0,
@@ -73,18 +80,11 @@ define(function(require) {
             '<ul class="dropdown-menu-collection__list" data-name="list"></ul>'
         ].join('')),
 
-        /**
-         * @inheritDoc
-         */
-        constructor: function DropdownMenuCollectionView() {
-            DropdownMenuCollectionView.__super__.constructor.apply(this, arguments);
-        },
-
         initialize: function(options) {
             _.extend(this, _.pick(options, ['loadingText', 'fallbackText', 'keysMap', 'dropdownMenuOptions']));
             if (options.keysMap) {
                 var keysMap = options.keysMap;
-                var ItemView = this.itemView = this.itemView.extend({
+                var ItemView = this.itemView = this.itemView.extend({// eslint-disable-line oro/named-constructor
                     getTemplateData: function() {
                         var data = ItemView.__super__.getTemplateData.call(this);
                         data.id = keysMap.id && data[keysMap.id];
@@ -110,7 +110,7 @@ define(function(require) {
             return data;
         },
 
-        itemView: BaseView.extend({
+        itemView: BaseView.extend({// eslint-disable-line oro/named-constructor
             tagName: 'li',
             template: _.template('<a href="#" data-value="<%= id %>"><%= text %></a>')
         }),

@@ -50,7 +50,7 @@ class LanguageSelectType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'empty_value' => '',
+            'placeholder' => '',
             'choices' => $this->provider->getLanguageChoices(true),
             'translatable_options' => false,
             'configs' => [

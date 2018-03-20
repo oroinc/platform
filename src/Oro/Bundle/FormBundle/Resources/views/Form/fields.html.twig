@@ -457,7 +457,7 @@
 
     <div class="create-select-entity-container clearfix">
         <div id="{{ btnGroupId }}" class="buttons-container">
-            <a href="javascript:void(0)" class="entity-select-btn" title="{{ 'Choose'|trans }}"{% if disabled or read_only %} disabled="disabled"{% endif %}>
+            <a href="javascript:void(0)" class="entity-select-btn" title="{{ 'Choose'|trans }}"{% if disabled or (attr.readonly is defined and attr.readonly) %} disabled="disabled"{% endif %}>
                 <span
                     data-label="{{ 'Choose Existing'|trans }}"
                     data-alt-label-view="{{ 'Choose Another'|trans }}"
@@ -470,11 +470,11 @@
                 </span>
             </a>
 
-            <a href="javascript:void(0)" class="entity-create-btn" title="{{ 'Create New'|trans }}"{% if disabled or read_only %} disabled="disabled"{% endif %}>
+            <a href="javascript:void(0)" class="entity-create-btn" title="{{ 'Create New'|trans }}"{% if disabled or (attr.readonly is defined and attr.readonly) %} disabled="disabled"{% endif %}>
                 <span>{{ 'Create New'|trans }}</span>
             </a>
 
-            <a href="javascript:void(0)" class="entity-cancel-btn" title="{{ 'Cancel'|trans }}"{% if disabled or read_only %} disabled="disabled"{% endif %}>
+            <a href="javascript:void(0)" class="entity-cancel-btn" title="{{ 'Cancel'|trans }}"{% if disabled or (attr.readonly is defined and attr.readonly) %} disabled="disabled"{% endif %}>
                 <span>{{ 'Cancel'|trans }}</span>
             </a>
         </div>
@@ -565,7 +565,7 @@
 {% endblock %}
 
 {% block oro_entity_create_or_select_inline_widget %}
-    {% set isButtonsEnabled = not disabled and not read_only %}
+    {% set isButtonsEnabled = not disabled and (attr.readonly is not defined or not attr.readonly) %}
     <div id="{{ id }}-el"
             {% if configs.extra_config is not defined or not configs.extra_config %}
                 {% if form.vars.configs.async_dialogs|default(false) is sameas(true) %}

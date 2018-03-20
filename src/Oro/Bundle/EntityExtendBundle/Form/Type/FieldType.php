@@ -89,7 +89,7 @@ class FieldType extends AbstractType
                         ? ['data-fieldname' => $parts[1]]
                         : [];
                 },
-                'empty_value' => '',
+                'placeholder' => '',
                 'block'       => 'general',
                 'configs'     => [
                     'placeholder'          => self::TYPE_LABEL_PREFIX . 'choose_value',

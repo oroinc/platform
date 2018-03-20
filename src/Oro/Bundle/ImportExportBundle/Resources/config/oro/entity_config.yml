@@ -44,7 +44,7 @@ entity_config:
                                 false:      'No'
                                 -1:         oro.importexport.entity_config.identity.only_when_not_empty
                                 true:       oro.importexport.entity_config.identity.always
-                            empty_value:    false
+                            placeholder:    false
                             required:       false
                             block:          import_export
                             tooltip:        oro.importexport.entity_config.identity.tooltip
@@ -59,7 +59,7 @@ entity_config:
                             choices:
                                 false:      'No'
                                 true:       'Yes'
-                            empty_value:    false
+                            placeholder:    false
                             required:       false
                             block:          import_export
                 # is relation must be represented by all it's fields
@@ -73,7 +73,7 @@ entity_config:
                             choices:
                                 false:      'Identity only'
                                 true:       'All'
-                            empty_value:    false
+                            placeholder:    false
                             required:       false
                             block:          import_export
                             tooltip:        'oro.importexport.entity_config.full.tooltip'
