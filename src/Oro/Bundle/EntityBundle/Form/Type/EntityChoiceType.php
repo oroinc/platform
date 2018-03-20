@@ -44,7 +44,7 @@ class EntityChoiceType extends AbstractType
                 'choice_attr'          => function ($choice) {
                     return $this->getChoiceAttributes($choice);
                 },
-                'empty_value'          => '',
+                'placeholder'          => '',
                 'show_plural'          => false,
                 'configs'              => $defaultConfigs,
                 'translatable_options' => false,

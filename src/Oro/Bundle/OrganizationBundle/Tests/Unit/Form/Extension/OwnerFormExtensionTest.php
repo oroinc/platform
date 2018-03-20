@@ -232,7 +232,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             $this->fieldName,
             'oro_type_business_unit_select_autocomplete',
             array(
-                'empty_value' => 'oro.business_unit.form.choose_business_user',
+                'placeholder' => 'oro.business_unit.form.choose_business_user',
                 'label' => 'oro.user.owner.label',
                 'configs' => [
                     'multiple' => false,

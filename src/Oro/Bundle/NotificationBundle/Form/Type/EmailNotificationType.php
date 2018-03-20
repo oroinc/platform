@@ -93,7 +93,7 @@ class EmailNotificationType extends AbstractType
                 'attr' => [
                     'autocomplete' => 'off'
                 ],
-                'empty_value'   => '',
+                'placeholder'   => '',
                 'required'      => true
             ]
         );
@@ -108,7 +108,7 @@ class EmailNotificationType extends AbstractType
                     'allowClear' => true,
                     'placeholder' => 'oro.email.form.choose_template',
                 ],
-                'empty_value' => '',
+                'placeholder' => '',
                 'required' => true
             ]
         );

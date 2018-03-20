@@ -30,7 +30,7 @@ class FormattingSelectType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'empty_value' => '',
+            'placeholder' => '',
             'choices' => $this->provider->getFormattingChoices(),
             'translatable_options' => false,
             'configs' => [

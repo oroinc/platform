@@ -72,7 +72,7 @@ class IntegrationSelectType extends AbstractType
 
         $resolver->setDefaults(
             [
-                'empty_value' => '',
+                'placeholder' => '',
                 'configs'     => $defaultConfigs,
                 'choice_list' => $choiceList
             ]

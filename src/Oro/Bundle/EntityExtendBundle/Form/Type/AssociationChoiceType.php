@@ -15,7 +15,7 @@ class AssociationChoiceType extends AbstractAssociationType
 
         $resolver->setDefaults(
             [
-                'empty_value' => false,
+                'placeholder' => false,
                 'choices'     => ['No', 'Yes'],
                 'schema_update_required' => function ($newVal, $oldVal) {
                     return true == $newVal && false == $oldVal;

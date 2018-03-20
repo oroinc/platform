@@ -41,7 +41,7 @@ class DashboardSelectType extends AbstractType
                 'class' => 'OroDashboardBundle:Dashboard',
                 'property' => 'label',
                 'choices' => $this->getChoices(),
-                'empty_value' => 'oro.dashboard.start_dashboard.empty_value',
+                'placeholder' => 'oro.dashboard.start_dashboard.empty_value',
             )
         );
     }

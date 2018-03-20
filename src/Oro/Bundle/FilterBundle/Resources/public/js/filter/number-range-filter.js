@@ -299,6 +299,22 @@ define(function(require) {
             formatted.value_end = this._toDisplayValue(data.value_end);
 
             return formatted;
+        },
+
+        /**
+         * @inheritDoc
+         * @returns {boolean}
+         * @private
+         */
+        _isValid: function() {
+            var rawValue = this.formatter.toRaw(this._readDOMValue().value_end);
+            var validValueEnd = rawValue === void 0 || this._checkNumberRules(rawValue);
+
+            if (!validValueEnd) {
+                return false;
+            } else {
+                return NumberRangeFilter.__super__._isValid.apply(this, arguments);
+            }
         }
     });
 

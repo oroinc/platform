@@ -89,7 +89,7 @@ define(function(require) {
             notesOptions.collection = collection;
 
             // bind template for item view
-            notesOptions.itemView = notesOptions.itemView.extend({
+            notesOptions.itemView = notesOptions.itemView.extend({// eslint-disable-line oro/named-constructor
                 template: _.template($(notesOptions.itemTemplate).html())
             });
 

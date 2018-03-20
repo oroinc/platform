@@ -72,7 +72,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
                 'inputOptions' => [],
                 'expectedOptions' => [
                     'required' => false,
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'choices' => [
                         FallbackType::SYSTEM => 'oro.locale.fallback.type.default',
                     ],
@@ -85,7 +85,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
                 ],
                 'expectedOptions' => [
                     'required' => false,
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'choices' => [
                         FallbackType::PARENT_LOCALIZATION => 'oro.locale.fallback.type.parent_localization',
                         FallbackType::SYSTEM => 'oro.locale.fallback.type.default',
@@ -101,7 +101,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
                 ],
                 'expectedOptions' => [
                     'required' => false,
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'choices' => [
                         FallbackType::PARENT_LOCALIZATION => 'en [Parent Localization]',
                         FallbackType::SYSTEM => 'oro.locale.fallback.type.default',

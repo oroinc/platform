@@ -102,7 +102,9 @@ class RestrictionsExtension extends AbstractTypeExtension
         $field = $restriction['field'];
         $mode  = $restriction['mode'];
         if ($mode === 'full') {
-            FormUtils::replaceField($form, $field, ['read_only' => true]);
+            FormUtils::replaceFieldOptionsRecursive($form, $field, [
+                'attr' => ['readonly' => true]
+            ]);
         } else {
             $values = $restriction['values'];
             if ($mode === 'disallow') {
@@ -127,7 +129,9 @@ class RestrictionsExtension extends AbstractTypeExtension
         if ($fieldForm->getConfig()->hasOption('excluded_values')) {
             FormUtils::replaceField($form, $field, ['excluded_values' => $disabledValues]);
         } else {
-            FormUtils::replaceField($form, $field, ['read_only' => true]);
+            FormUtils::replaceFieldOptionsRecursive($form, $field, [
+                'attr' => ['readonly' => true]
+            ]);
         }
     }
 }

@@ -91,7 +91,7 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
                 },
                 'compact' => false,
                 'full_localization_list' => null,
-                'empty_value' => '',
+                'placeholder' => '',
                 'translatable_options' => false,
                 'configs' => [
                     'placeholder' => 'oro.locale.localization.form.placeholder.select_localization',
