@@ -144,9 +144,9 @@ define(function(require) {
      */
     Interval2d.prototype.includesPoint = function(point) {
         var line = this.line;
-        return line.slope === Infinity ?
-            (point.x === this.a.x && util.between(point.y, this.a.y, this.b.y)) :
-            (util.between(point.x, this.a.x, this.b.x) && point.y === line.intercept + point.x * line.slope);
+        return line.slope === Infinity
+            ? (point.x === this.a.x && util.between(point.y, this.a.y, this.b.y))
+            : (util.between(point.x, this.a.x, this.b.x) && point.y === line.intercept + point.x * line.slope);
     };
 
     /**

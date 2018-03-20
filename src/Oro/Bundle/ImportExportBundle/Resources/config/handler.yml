@@ -17,13 +17,15 @@ services:
             - '@translator'
             - '@oro_importexport.writer.writer_chain'
             - '@oro_importexport.reader.reader_chain'
-            - '@oro_importexport.file.batch_file_manager'
+            - ~
             - '@oro_importexport.file.file_manager'
 
     oro_importexport.handler.import.abstract:
         class: '%oro_importexport.handler.import.abstract.class%'
         absract: true
         parent: oro_importexport.handler.abstract
+        arguments:
+            index_6: '@oro_importexport.file.batch_file_manager.import'
 
     oro_importexport.handler.import.http:
         class: '%oro_importexport.handler.import.http.class%'
@@ -33,11 +35,10 @@ services:
     oro_importexport.handler.export:
         class: '%oro_importexport.handler.export.class%'
         parent: oro_importexport.handler.abstract
+        arguments:
+            index_6: '@oro_importexport.file.batch_file_manager.export'
         calls:
             - [setMimeTypeGuesser, ['@oro_importexport.file.mime_type_guesser']]
-            - [setReaderChain, ['@oro_importexport.reader.reader_chain']]
-            - [setFileManager, ['@oro_importexport.file.file_manager']]
-            - [setWriterChain, ['@oro_importexport.writer.writer_chain']]
         lazy: true
 
     oro_importexport.handler.import.cli:

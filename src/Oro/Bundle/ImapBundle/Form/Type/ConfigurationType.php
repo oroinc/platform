@@ -90,7 +90,7 @@ class ConfigurationType extends AbstractType
                 'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
                 'attr'        => ['class' => 'imap-config check-connection switchable-field'],
                 'empty_data'  => null,
-                'empty_value' => '',
+                'placeholder' => '',
                 'required'    => false
             ])
             ->add('useSmtp', 'checkbox', [
@@ -116,7 +116,7 @@ class ConfigurationType extends AbstractType
                 'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
                 'attr'        => ['class' => 'smtp-config check-connection switchable-field'],
                 'empty_data'  => null,
-                'empty_value' => '',
+                'placeholder' => '',
                 'required'    => false
             ])
             ->add('user', 'text', [

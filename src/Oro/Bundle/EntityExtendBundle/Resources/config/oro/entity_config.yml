@@ -488,7 +488,7 @@ entity_config:
                     #        subblock:       properties
                     #        required:       false
                     #        choices:        ['No', 'Yes']
-                    #        empty_value:    false
+                    #        placeholder:    false
                     #        label:          oro.entity_extend.enum_public
                     #        tooltip:        oro.entity_extend.enum_public.tooltip
 
@@ -525,7 +525,7 @@ entity_config:
                         type:               choice
                         options:
                             choices:        ['No', 'Yes']
-                            empty_value:    false
+                            placeholder:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
                             tooltip:        oro.entity_extend.entity_config.search.entity.items.searchable.tooltip
@@ -545,7 +545,7 @@ entity_config:
                         type:               choice
                         options:
                             choices:        ['No', 'Yes']
-                            empty_value:    false
+                            placeholder:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
                             tooltip:        oro.entity_extend.entity_config.search.field.items.searchable.tooltip
@@ -563,7 +563,7 @@ entity_config:
                         type:               choice
                         options:
                             choices:        ['No', 'Yes']
-                            empty_value:    false
+                            placeholder:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.title_field
                             tooltip:        oro.entity_extend.entity_config.search.field.items.title_field.tooltip

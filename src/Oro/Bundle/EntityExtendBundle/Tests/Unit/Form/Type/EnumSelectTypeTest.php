@@ -89,7 +89,7 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
 
         $this->assertEquals(
             [
-                'empty_value' => $expectedEmptyValue,
+                'placeholder' => $expectedEmptyValue,
                 'empty_data'  => $expectedEmptyData,
                 'configs'     => [
                     'allowClear'  => true,
@@ -136,7 +136,7 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
 
         $this->assertEquals(
             [
-                'empty_value' => null,
+                'placeholder' => null,
                 'empty_data'  => '',
                 'configs'     => [
                     'allowClear'  => true,

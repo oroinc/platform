@@ -51,8 +51,8 @@ define(['jquery'], function($) {
 
         var contentWindow = frame.prop('contentWindow');
         var contentDocument = frame.prop('contentDocument');
-        var frameDoc = contentWindow ? contentWindow :
-            contentDocument.document ? contentDocument.document : contentDocument;
+        var frameDoc = contentWindow ? contentWindow
+            : contentDocument.document ? contentDocument.document : contentDocument;
         frameDoc.document.open();
         var title = $('.lg-sub-html').text();
         frameDoc.document.write('<html><head><title>' + title + '</title>');

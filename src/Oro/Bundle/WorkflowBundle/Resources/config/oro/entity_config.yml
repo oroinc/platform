@@ -14,5 +14,5 @@ entity_config:
                             choices:
                                 false:      oro.workflow.entity_config.show_step_in_grid.choice.hide
                                 true:       oro.workflow.entity_config.show_step_in_grid.choice.show
-                            empty_value:    false
+                            placeholder:    false
                             block:          other

@@ -173,10 +173,10 @@
     {% if oro_config_value('oro_form.wysiwyg_enabled') %}
         {% set data = data|oro_html_sanitize %}
     {%  else %}
-        {% set data = data|striptags %}
+        {% set data = data|striptags|nl2br %}
     {% endif %}
 
-    {{ _self.renderAttribute(title, '<div class="control-label html-property">' ~ data|nl2br|default('oro.ui.empty'|trans) ~ '</div>') }}
+    {{ _self.renderAttribute(title, '<div class="control-label html-property">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#

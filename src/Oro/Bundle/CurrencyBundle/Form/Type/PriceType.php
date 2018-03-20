@@ -47,7 +47,7 @@ class PriceType extends AbstractType
                 'full_currency_list' => $options['full_currency_list'],
                 'compact' => $options['compact'],
                 'required' => $isRequiredPrice,
-                'empty_value' => $options['currency_empty_value'],
+                'placeholder' => $options['currency_empty_value'],
             ];
         } else {
             $currencyType = 'hidden';

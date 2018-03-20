@@ -83,10 +83,10 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
             }
 
             if ($this->isViewGranted($entity, $childForm)) {
-                $view->children[$childName]->vars['read_only'] = true;
+                $view->children[$childName]->vars['attr']['readonly'] = true;
                 if (count($view->children[$childName]->children)) {
                     foreach ($view->children[$childName]->children as $child) {
-                        $child->vars['read_only'] = true;
+                        $child->vars['attr']['readonly'] = true;
                     }
                 }
             } else {

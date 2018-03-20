@@ -14,6 +14,7 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailOriginFromType extends AbstractType
@@ -84,8 +85,14 @@ class EmailOriginFromType extends AbstractType
         $choices = $this->createChoices();
         $resolver->setDefaults([
             'choices'   => $choices,
-            'read_only' => count($choices) === 1,
+            'attr' => [],
         ]);
+
+        $resolver->setNormalizer('attr', function (Options $options, $value) {
+            $value['readonly'] = (count($options['choices']) === 1);
+
+            return $value;
+        });
     }
 
     /**
