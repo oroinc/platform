@@ -1,8 +1,4 @@
 parameters:
-    # override TWIG services
-    twig.class: Oro\Bundle\UIBundle\Twig\Environment
-    twig.cache_warmer.class: Oro\Bundle\UIBundle\Cache\TemplateCacheCacheWarmer
-
     oro_ui.placeholder.provider.class:                     Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider
     oro_ui.placeholder.resolver.class:                     Oro\Component\Config\Resolver\SystemAwareResolver
     oro_ui.placeholder.filter.class:                       Oro\Bundle\UIBundle\Placeholder\PlaceholderFilter
