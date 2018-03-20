@@ -107,6 +107,8 @@ define(function(require) {
         defaults: {
             rowClickActionClass: 'row-click-action',
             rowClassName: '',
+            rowActionsClass: 'has-actions',
+            rowSelectClass: 'has-select-action',
             toolbarOptions: {
                 addResetAction: true,
                 addRefreshAction: true,
@@ -546,10 +548,22 @@ define(function(require) {
          */
         _initColumns: function(options) {
             if (Object.keys(this.rowActions).length > 0) {
+                if (options.rowClassName) {
+                    options.rowClassName = options.rowClassName + ' ' + this.rowActionsClass;
+                } else {
+                    options.rowClassName = this.rowClassName + ' ' + this.rowActionsClass;
+                }
+
                 options.columns.push(this._createActionsColumn());
             }
 
             if (options.multiSelectRowEnabled) {
+                if (options.rowClassName) {
+                    options.rowClassName = options.rowClassName + ' ' + this.rowSelectClass;
+                } else {
+                    options.rowClassName = this.rowClassName + ' ' + this.rowSelectClass;
+                }
+
                 options.columns.unshift(this._createSelectRowColumn());
             }
 

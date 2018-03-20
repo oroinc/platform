@@ -3,6 +3,7 @@ define(function(require) {
 
     var StickedScrollbarPlugin;
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    var viewportManager = require('oroui/js/viewport-manager');
     var mediator = require('oroui/js/mediator');
     var $ = require('jquery');
     var _ = require('underscore');
@@ -26,14 +27,21 @@ define(function(require) {
             }
         },
 
+        viewport: {
+            minScreenType: 'any'
+        },
+
         domCache: null,
 
         /**
          * @inheritDoc
          */
-        initialize: function(grid) {
+        initialize: function(grid, options) {
+            _.extend(this, _.pick(options || {}, ['viewport']));
             this.grid = grid;
             this.listenTo(this.grid, 'shown', this.enable);
+            mediator.on('viewport:change', this.onViewportChange, this);
+
             return StickedScrollbarPlugin.__super__.initialize.apply(this, arguments);
         },
 
@@ -48,7 +56,7 @@ define(function(require) {
          * @inheritDoc
          */
         enable: function() {
-            if (this.enabled || !this.grid.rendered) {
+            if (this.enabled || !this.grid.rendered || !this.isApplicable(viewportManager.getViewport())) {
                 return;
             }
 
@@ -57,7 +65,7 @@ define(function(require) {
             this.domCache.$scrollbar = this.domCache.$container.find('.mCSB_scrollTools');
             this.delegateEvents();
 
-            return StickedScrollbarPlugin.__super__.enable.apply(this, arguments);
+            StickedScrollbarPlugin.__super__.enable.apply(this, arguments);
         },
 
         /**
@@ -79,6 +87,7 @@ define(function(require) {
             }
 
             this.disable();
+            mediator.off('viewport:change', this.onViewportChange, this);
             delete this.domCache;
 
             return StickedScrollbarPlugin.__super__.dispose.apply(this, arguments);
@@ -126,6 +135,8 @@ define(function(require) {
             }, this);
 
             this.stopListening();
+            // Need reenable event for wake up plugin
+            mediator.on('viewport:change', this.onViewportChange, this);
         },
 
         manageScroll: function() {
@@ -174,6 +185,10 @@ define(function(require) {
             return viewportBottom > 0 || viewportLowLevel < containerOffsetTop;
         },
 
+        isApplicable: function(viewport) {
+            return viewport.isApplicable(this.viewport);
+        },
+
         attachScrollbar: function() {
             this.domCache.$scrollbar.removeAttr('style');
         },
@@ -202,6 +217,14 @@ define(function(require) {
 
         onGridHeaderCellWidthBeforeUpdate: function() {
             this.domCache.$grid.parents('.mCSB_container:first').css({width: ''});
+        },
+
+        onViewportChange: function(viewport) {
+            if (this.isApplicable(viewport)) {
+                this.enable();
+            } else {
+                this.disable();
+            }
         }
     });
 

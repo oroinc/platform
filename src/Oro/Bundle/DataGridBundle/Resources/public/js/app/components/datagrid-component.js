@@ -430,7 +430,14 @@ define(function(require) {
             }
 
             if (!this.themeOptions.disableStickedScrollbar) {
-                if (!(this.metadata.enableResponsiveGrids && tools.isMobile())) {
+                if (this.metadata.responsiveGrids && this.metadata.responsiveGrids.enable) {
+                    plugins.push({
+                        constructor: StickedScrollbarPlugin,
+                        options: {
+                            viewport: this.metadata.responsiveGrids.viewport || {}
+                        }
+                    });
+                } else {
                     if (tools.isMobile() || !this.metadata.enableFullScreenLayout) {
                         plugins.push(StickedScrollbarPlugin);
                     }
