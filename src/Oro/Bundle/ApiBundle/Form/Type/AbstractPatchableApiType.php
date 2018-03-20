@@ -28,8 +28,7 @@ abstract class AbstractPatchableApiType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'cascade_validation' => true,
-                'csrf_protection'    => false
+                'csrf_protection' => false
             ]
         );
     }
