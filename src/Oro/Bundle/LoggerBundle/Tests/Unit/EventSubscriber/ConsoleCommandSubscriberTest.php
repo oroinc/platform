@@ -7,7 +7,7 @@ use Oro\Bundle\LoggerBundle\EventSubscriber\ConsoleCommandSubscriber;
 use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleExceptionEvent;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
 
 class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -104,8 +104,8 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $input = new InputStub('test:command', $arguments, $options);
 
-        /** @var ConsoleExceptionEvent|\PHPUnit_Framework_MockObject_MockObject $event */
-        $event = $this->createMock(ConsoleExceptionEvent::class);
+        /** @var ConsoleErrorEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        $event = $this->createMock(ConsoleErrorEvent::class);
 
         $event->expects($this->once())
             ->method('getInput')
