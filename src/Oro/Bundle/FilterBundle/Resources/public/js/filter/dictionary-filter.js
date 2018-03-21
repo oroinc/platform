@@ -94,6 +94,7 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
+            this.selectedData = {};
             if (this.filterParams) {
                 this.dictionaryClass = this.filterParams.class.replace(/\\/g, '_');
             } else {

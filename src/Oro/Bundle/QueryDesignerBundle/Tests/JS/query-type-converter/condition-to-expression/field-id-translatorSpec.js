@@ -4,10 +4,10 @@ define(function(require) {
     var FieldIdTranslator =
         require('oroquerydesigner/js/query-type-converter/condition-to-expression/field-id-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
+    var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
+    var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
     var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
     var NameNode = ExpressionLanguageLibrary.NameNode;
-    var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
 
     describe('oroquerydesigner/js/query-type-converter/condition-to-expression/field-id-translator', function() {
         var providerMock;

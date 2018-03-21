@@ -7,6 +7,9 @@ use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Class DictionaryFilter implements enum filter
+ */
 class DictionaryFilter extends BaseMultiChoiceFilter
 {
     const FILTER_TYPE_NAME = 'dictionary';
@@ -87,7 +90,8 @@ class DictionaryFilter extends BaseMultiChoiceFilter
         try {
             $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
             list($joinAlias) = explode('.', $fieldName);
-            if ($join = QueryBuilderUtil::findJoinByAlias($ds->getQueryBuilder(), $joinAlias) && $this->isToOne($ds)) {
+            $join = QueryBuilderUtil::findJoinByAlias($ds->getQueryBuilder(), $joinAlias);
+            if ($join && $this->isToOne($ds)) {
                 return $join->getJoin();
             }
 

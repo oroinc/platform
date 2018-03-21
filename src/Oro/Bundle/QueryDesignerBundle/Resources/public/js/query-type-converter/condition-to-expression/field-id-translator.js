@@ -22,6 +22,8 @@ define(function(require) {
     }
 
     Object.assign(FieldIdTranslator.prototype, {
+        constructor: FieldIdTranslator,
+
         /**
          * Translates fieldId string (see definition in EntityStructureDataProvider) to AST of Expression Language
          *
