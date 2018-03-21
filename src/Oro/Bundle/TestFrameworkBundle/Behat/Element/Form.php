@@ -8,10 +8,10 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Doctrine\Common\Inflector\Inflector;
 
 /**
- * Class Form
+ * Form element implementation
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyMethods)
- * @package Oro\Bundle\TestFrameworkBundle\Behat\Element
  */
 class Form extends Element
 {
@@ -49,13 +49,16 @@ class Form extends Element
         }
     }
 
+    /**
+     * @param TableNode $table
+     */
     public function assertFields(TableNode $table)
     {
         foreach ($table->getRows() as $row) {
             list($label, $value) = $row;
             $locator = isset($this->options['mapping'][$label]) ? $this->options['mapping'][$label] : $label;
             $field = $this->findField($locator);
-            self::assertNotNull($field, sprintf("Field `%s` not found", $label));
+            self::assertNotNull($field, sprintf('Field `%s` not found', $label));
 
             $field = $this->wrapField($label, $field);
 
@@ -138,7 +141,6 @@ class Form extends Element
 
     /**
      * {@inheritdoc}
-     * @todo Move behat elements to Driver layer. BAP-11887.
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
@@ -248,7 +250,15 @@ class Form extends Element
         $value = trim($value);
 
         if (0 === strpos($value, '[')) {
-            return array_map('trim', explode(',', trim($value, '[]')));
+            return self::normalizeValue(
+                array_map(
+                    'trim',
+                    explode(
+                        ',',
+                        trim($value, '[]')
+                    )
+                )
+            );
         }
 
         if (preg_match('/^\d{4}-\d{2}-\d{2}/', trim($value))) {
@@ -257,7 +267,7 @@ class Form extends Element
 
         $value = self::checkAdditionalFunctions($value);
 
-        if (in_array($value, ['true', 'false', 'yes', 'no', 'on', 'off'])) {
+        if (in_array($value, ['true', 'false'])) {
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         }
 
@@ -290,6 +300,10 @@ class Form extends Element
         return $value;
     }
 
+    /**
+     * @param string $locator
+     * @return NodeElement|null
+     */
     protected function findFieldSetLabel($locator)
     {
         $labelSelector = sprintf("h5.user-fieldset:contains('%s')", $locator);
