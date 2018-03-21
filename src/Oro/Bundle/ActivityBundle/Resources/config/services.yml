@@ -166,7 +166,7 @@ services:
         factory: ['@form.factory', createNamed]
         arguments:
             - targets
-            - 'oro_related_entity_standalone_collection_api'
+            - Oro\Bundle\FormBundle\Form\Type\RelatedEntityStandaloneCollectionApiType
             - ~
             - constraints:
                 - Count:
