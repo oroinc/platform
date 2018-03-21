@@ -11,6 +11,7 @@ define(function(require) {
         FunctionNode: require('oroexpressionlanguage/js/library/node/function-node'),
         GetAttrNode: require('oroexpressionlanguage/js/library/node/get-attr-node'),
         NameNode: require('oroexpressionlanguage/js/library/node/name-node'),
+        Node: require('oroexpressionlanguage/js/library/node/node'),
         UnaryNode: require('oroexpressionlanguage/js/library/node/unary-node'),
 
         // parser-cache
