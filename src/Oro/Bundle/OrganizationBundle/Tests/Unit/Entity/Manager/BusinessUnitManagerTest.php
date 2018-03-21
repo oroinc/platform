@@ -588,6 +588,5 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
         $owner = $businessUnit->getOwner();
 
         $tree->addBusinessUnit($businessUnit->getId(), $owner ? $owner->getId() : null);
-//        $tree->addBusOrganization($businessUnit->getId(), $businessUnit->getOrganization()->getId());
     }
 }
