@@ -3,71 +3,57 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\User;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 
 class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|BusinessUnitRepository */
     protected $buRepo;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityRepository */
     protected $userRepo;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|AclHelper */
     protected $aclHelper;
-    /**
-     * @var BusinessUnitManager
-     */
+
+    /** @var BusinessUnitManager */
     protected $businessUnitManager;
 
     protected function setUp()
     {
-        $this->buRepo = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->userRepo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->buRepo = $this->createMock(BusinessUnitRepository::class);
+        $this->userRepo = $this->createMock(EntityRepository::class);
+
+        $this->em = $this->createMock(EntityManager::class);
         $this->em->expects($this->any())
             ->method('getRepository')
-            ->with(
-                $this->logicalOr(
-                    $this->equalTo('OroOrganizationBundle:BusinessUnit'),
-                    $this->equalTo('OroUserBundle:User')
-                )
-            )
-            ->will(
-                $this->returnCallback(
-                    function ($param) {
-                        if ($param == 'OroOrganizationBundle:BusinessUnit') {
-                            return $this->buRepo;
-                        } else {
-                            return $this->userRepo;
-                        }
-                    }
-                )
+            ->willReturnMap(
+                [
+                    ['OroOrganizationBundle:BusinessUnit', $this->buRepo],
+                    ['OroUserBundle:User', $this->userRepo],
+                ]
             );
 
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
-        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->aclHelper = $this->createMock(AclHelper::class);
 
         $this->businessUnitManager = new BusinessUnitManager($this->em, $this->tokenAccessor, $this->aclHelper);
     }
@@ -132,12 +118,18 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getTreeNodesProvider
+     *
+     * @param array $tree
+     * @param int $expectedCount
      */
     public function testGetTreeNodesCount(array $tree, $expectedCount)
     {
         $this->assertEquals($expectedCount, $this->businessUnitManager->getTreeNodesCount($tree));
     }
 
+    /**
+     * @return array
+     */
     public function getTreeNodesProvider()
     {
         return [
@@ -256,18 +248,27 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider dataProvider
+     * @dataProvider canUserBeSetAsOwnerDataProvider
+     *
+     * @param User $currentUser
+     * @param $newUser
+     * @param int $accessLevel
+     * @param Organization $organizationContext
+     * @param bool $isCanBeSet
      */
-    public function testCanUserBeSetAsOwner($currentUser, $newUser, $accessLevel, $organizationContext, $isCanBeSet)
-    {
+    public function testCanUserBeSetAsOwner(
+        User $currentUser,
+        User $newUser,
+        $accessLevel,
+        Organization $organizationContext,
+        $isCanBeSet
+    ) {
         $tree = new OwnerTree();
         $this->addUserInfoToTree($tree, $currentUser);
         $this->addUserInfoToTree($tree, $newUser);
 
-        $treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        /** @var OwnerTreeProvider|\PHPUnit_Framework_MockObject_MockObject $treeProvider */
+        $treeProvider = $this->createMock(OwnerTreeProvider::class);
         $treeProvider->expects($this->any())
             ->method('getTree')
             ->will($this->returnValue($tree));
@@ -286,7 +287,7 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
-    public function dataProvider()
+    public function canUserBeSetAsOwnerDataProvider()
     {
         $organization1 = new Organization();
         $organization1->setId(1);
@@ -403,6 +404,146 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider canBusinessUnitBeSetAsOwnerDataProvider
+     *
+     * @param User $currentUser
+     * @param BusinessUnit $newBusinessUnit
+     * @param int $accessLevel
+     * @param Organization $organizationContext
+     * @param bool $isCanBeSet
+     */
+    public function testCanBusinessUnitBeSetAsOwner(
+        User $currentUser,
+        BusinessUnit $newBusinessUnit,
+        $accessLevel,
+        Organization $organizationContext,
+        $isCanBeSet
+    ) {
+        $tree = new OwnerTree();
+        $this->addUserInfoToTree($tree, $currentUser);
+        $this->addBusinessUnitInfoToTree($tree, $newBusinessUnit);
+
+        /** @var OwnerTreeProvider|\PHPUnit_Framework_MockObject_MockObject $treeProvider */
+        $treeProvider = $this->createMock(OwnerTreeProvider::class);
+        $treeProvider->expects($this->any())
+            ->method('getTree')
+            ->willReturn($tree);
+
+        $this->buRepo->expects($this->any())
+            ->method('getBusinessUnitIds')
+            ->willReturn([1, 2]);
+
+        $this->assertEquals(
+            $isCanBeSet,
+            $this->businessUnitManager->canBusinessUnitBeSetAsOwner(
+                $currentUser,
+                $newBusinessUnit,
+                $accessLevel,
+                $treeProvider,
+                $organizationContext
+            )
+        );
+    }
+
+    /**
+     * @Suppress2Warnings(PHPMD.ExcessiveMethodLength)
+     * @return array
+     */
+    public function canBusinessUnitBeSetAsOwnerDataProvider()
+    {
+        $organization1 = new Organization();
+        $organization1->setId(1);
+
+        $organization2 = new Organization();
+        $organization2->setId(2);
+
+        $bu11 = new BusinessUnit();
+        $bu11->setId(1);
+        $bu11->setOrganization($organization1);
+
+        $bu22 = new BusinessUnit();
+        $bu22->setId(2);
+        $bu22->setOrganization($organization2);
+
+        $newBusinessUnit = new BusinessUnit();
+        $newBusinessUnit->setId(1);
+        $newBusinessUnit->setOrganization($organization1);
+
+        return [
+            'BASIC_LEVEL access level, current business unit' => [
+                $this->getCurrentUser(42, [$organization1], [$bu11]),
+                $newBusinessUnit,
+                AccessLevel::BASIC_LEVEL,
+                $organization1,
+                false
+            ],
+            'BASIC_LEVEL access level, another business unit' => [
+                $this->getCurrentUser(42, [$organization2], [$bu22]),
+                $newBusinessUnit,
+                AccessLevel::BASIC_LEVEL,
+                $organization2,
+                false
+            ],
+            'SYSTEM_LEVEL access level, current business unit' => [
+                $this->getCurrentUser(42, [$organization1], [$bu11]),
+                $newBusinessUnit,
+                AccessLevel::SYSTEM_LEVEL,
+                $organization1,
+                true
+            ],
+            'SYSTEM_LEVEL access level, another business unit' => [
+                $this->getCurrentUser(42, [$organization2], [$bu22]),
+                $newBusinessUnit,
+                AccessLevel::SYSTEM_LEVEL,
+                $organization2,
+                true
+            ],
+            'GLOBAL_LEVEL access level, current business unit' => [
+                $this->getCurrentUser(42, [$organization1], [$bu11]),
+                $newBusinessUnit,
+                AccessLevel::GLOBAL_LEVEL,
+                $organization1,
+                true
+            ],
+            'GLOBAL_LEVEL access level, another business unit' => [
+                $this->getCurrentUser(42, [$organization2], [$bu22]),
+                $newBusinessUnit,
+                AccessLevel::GLOBAL_LEVEL,
+                $organization2,
+                true
+            ],
+            'LOCAL_LEVEL access level, current business unit' => [
+                $this->getCurrentUser(42, [$organization1], [$bu11]),
+                $newBusinessUnit,
+                AccessLevel::LOCAL_LEVEL,
+                $organization1,
+                true
+            ],
+            'LOCAL_LEVEL access level, another business unit' => [
+                $this->getCurrentUser(42, [$organization2], [$bu22]),
+                $newBusinessUnit,
+                AccessLevel::LOCAL_LEVEL,
+                $organization2,
+                false
+            ],
+            'DEEP_LEVEL access level, current business unit' => [
+                $this->getCurrentUser(42, [$organization1], [$bu11]),
+                $newBusinessUnit,
+                AccessLevel::DEEP_LEVEL,
+                $organization1,
+                true
+            ],
+            'DEEP_LEVEL access level, another business unit' => [
+                $this->getCurrentUser(42, [$organization2], [$bu22]),
+                $newBusinessUnit,
+                AccessLevel::DEEP_LEVEL,
+                $organization2,
+                false
+            ]
+        ];
+    }
+
+    /**
      * @param int   $id
      * @param array $organizations
      * @param array $bUnits
@@ -418,6 +559,10 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
         return $user;
     }
 
+    /**
+     * @param OwnerTree $tree
+     * @param User $user
+     */
     protected function addUserInfoToTree(OwnerTree $tree, User $user)
     {
         $owner = $user->getOwner();
@@ -432,5 +577,17 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
                 }
             }
         }
+    }
+
+    /**
+     * @param OwnerTree $tree
+     * @param BusinessUnit $businessUnit
+     */
+    protected function addBusinessUnitInfoToTree(OwnerTree $tree, BusinessUnit $businessUnit)
+    {
+        $owner = $businessUnit->getOwner();
+
+        $tree->addBusinessUnit($businessUnit->getId(), $owner ? $owner->getId() : null);
+//        $tree->addBusOrganization($businessUnit->getId(), $businessUnit->getOrganization()->getId());
     }
 }
