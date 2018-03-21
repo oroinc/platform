@@ -59,7 +59,7 @@ class FallbackPropertyType extends AbstractType
         $resolver->setDefaults(
             [
                 'required'           => false,
-                'empty_value'        => false,
+                'placeholder'        => false,
                 'enabled_fallbacks'  => [],
                 'existing_fallbacks' => [
                     FallbackType::SYSTEM        => 'oro.locale.fallback.type.default',

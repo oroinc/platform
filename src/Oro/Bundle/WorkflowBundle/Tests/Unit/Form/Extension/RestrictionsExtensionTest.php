@@ -92,8 +92,8 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
 
         foreach ($fields as $field) {
             $this->assertEquals(
-                $field['read_only'],
-                $form->get($field['name'])->getConfig()->getOption('read_only')
+                $field['expectedAttr'],
+                $form->get($field['name'])->getConfig()->getOption('attr')
             );
         }
     }
@@ -114,8 +114,8 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
             'enabled extension'          => [
                 ['disable_workflow_restrictions' => false, 'data_class' => 'test'],
                 [
-                    ['name' => 'test_field_1', 'read_only' => true],
-                    ['name' => 'test_field_2', 'read_only' => false]
+                    ['name' => 'test_field_1', 'expectedAttr' => ['readonly' => true]],
+                    ['name' => 'test_field_2', 'expectedAttr' => []]
                 ],
                 [
                     ['field' => 'test_field_1', 'mode' => 'full'],
@@ -124,8 +124,8 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
             'no fields for restrictions' => [
                 ['disable_workflow_restrictions' => false, 'data_class' => 'test'],
                 [
-                    ['name' => 'test_field_1', 'read_only' => false],
-                    ['name' => 'test_field_2', 'read_only' => false]
+                    ['name' => 'test_field_1', 'expectedAttr' => []],
+                    ['name' => 'test_field_2', 'expectedAttr' => []]
                 ],
                 [
                     ['field' => 'test_field_3', 'mode' => 'full'],
@@ -134,15 +134,15 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
             'disabled extension'         => [
                 ['disable_workflow_restrictions' => false],
                 [
-                    ['name' => 'test_field_1', 'read_only' => false],
-                    ['name' => 'test_field_2', 'read_only' => false]
+                    ['name' => 'test_field_1', 'expectedAttr' => []],
+                    ['name' => 'test_field_2', 'expectedAttr' => []]
                 ],
             ],
             'no data_class option'       => [
                 ['disable_workflow_restrictions' => true],
                 [
-                    ['name' => 'test_field_1', 'read_only' => false],
-                    ['name' => 'test_field_2', 'read_only' => false]
+                    ['name' => 'test_field_1', 'expectedAttr' => []],
+                    ['name' => 'test_field_2', 'expectedAttr' => []]
                 ],
             ]
         ];

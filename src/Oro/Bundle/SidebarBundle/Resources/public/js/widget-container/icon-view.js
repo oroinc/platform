@@ -20,6 +20,13 @@ define(function(require) {
             'end-loading model': 'onLoadingEnd'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function WidgetContainerIconView() {
+            WidgetContainerIconView.__super__.constructor.apply(this, arguments);
+        },
+
         render: function() {
             WidgetContainerIconView.__super__.render.call(this);
 

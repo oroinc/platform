@@ -41,8 +41,8 @@ services:
         class: '%oro_imap.services.factory.class%'
         arguments:
             - # The configuration of IMAP services. The empty key is used to configure IMAP servers which have not any special preferences
-                "": ['%oro_imap.storage.other.class%, %oro_imap.search_string_manager.other.class%']
-                X-GM-EXT-1: ['%oro_imap.storage.gmail.class%, %oro_imap.search_string_manager.gmail.class%']
+                "": ['%oro_imap.storage.other.class%', '%oro_imap.search_string_manager.other.class%']
+                X-GM-EXT-1: ['%oro_imap.storage.gmail.class%', '%oro_imap.search_string_manager.gmail.class%']
 
     oro_imap.email_body_loader:
         public: false

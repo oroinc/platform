@@ -61,7 +61,7 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
 
         $resolver->setDefaults(
             [
-                'empty_value' => false,
+                'placeholder' => false,
                 'choices'     => function (Options $options) {
                     return $this->getChoices($options['association_class']);
                 },

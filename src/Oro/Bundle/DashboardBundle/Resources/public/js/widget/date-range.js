@@ -122,9 +122,9 @@ define(function(require) {
 
         getDefaultTypeValue: function() {
             var choiceData = _.pluck(this.choices, 'data');
-            return choiceData.indexOf(this.typeDefinedValues.all_time) === -1 ?
-                this.emptyValue.type :
-                this.typeDefinedValues.all_time;
+            return choiceData.indexOf(this.typeDefinedValues.all_time) === -1
+                ? this.emptyValue.type
+                : this.typeDefinedValues.all_time;
         },
 
         _getParts: function() {

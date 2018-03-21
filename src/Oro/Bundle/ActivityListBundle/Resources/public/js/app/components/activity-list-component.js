@@ -126,7 +126,7 @@ define(function(require) {
             }
 
             // bind template for item view
-            activityOptions.itemView = activityOptions.itemView.extend({
+            activityOptions.itemView = activityOptions.itemView.extend({// eslint-disable-line oro/named-constructor
                 template: _.template($(activityOptions.itemTemplate).html())
             });
 

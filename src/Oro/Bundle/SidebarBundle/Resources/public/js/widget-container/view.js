@@ -31,6 +31,13 @@ define(function(require) {
             'layout:reposition mediator': 'adjustMaxHeight'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function WidgetContainerView() {
+            WidgetContainerView.__super__.constructor.apply(this, arguments);
+        },
+
         render: function() {
             this.$el.attr('data-cid', this.model.cid);
 

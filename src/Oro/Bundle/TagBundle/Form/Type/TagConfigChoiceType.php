@@ -19,13 +19,13 @@ class TagConfigChoiceType extends AbstractConfigType
 
         $resolver->setDefaults(
             [
-                'empty_value' => false,
+                'placeholder' => false,
                 'choices'     => ['No', 'Yes']
             ]
         );
 
         $resolver->setNormalizer(
-            'empty_value',
+            'placeholder',
             function (Options $options, $value) {
                 return $this->isImplementsTaggable($options) ? 'Yes' : $value;
             }

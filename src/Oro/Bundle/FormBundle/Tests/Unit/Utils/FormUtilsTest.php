@@ -181,4 +181,71 @@ class FormUtilsTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider replaceOptionsDataProvider
+     *
+     * @param array $fieldOptions
+     * @param array $replaceOptions
+     * @param array $expectedOptions
+     */
+    public function testReplaceFieldOptionsRecursive($fieldOptions = [], $replaceOptions = [], $expectedOptions = [])
+    {
+        $testFieldName = 'testField';
+        $testTypeName  = 'testType';
+
+        $rootForm   = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $childForm  = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
+        $formType   = $this->createMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+
+        $rootForm->expects($this->once())->method('get')->with($testFieldName)
+            ->will($this->returnValue($childForm));
+
+        $childForm->expects($this->once())->method('getConfig')
+            ->will($this->returnValue($formConfig));
+
+        $formConfig->expects($this->once())->method('getType')
+            ->will($this->returnValue($formType));
+
+        $formConfig->expects($this->once())->method('getOptions')
+            ->will($this->returnValue($fieldOptions));
+
+        $formType->expects($this->once())->method('getName')
+            ->will($this->returnValue($testTypeName));
+
+        $rootForm->expects($this->once())->method('add')
+            ->with($testFieldName, $testTypeName, $expectedOptions);
+
+        FormUtils::replaceFieldOptionsRecursive($rootForm, $testFieldName, $replaceOptions);
+    }
+
+    /**
+     * @return array
+     */
+    public function replaceOptionsDataProvider()
+    {
+        return [
+            'no options modified' => [
+                ['required' => true, 'attr' => ['readonly' => true]],
+                [],
+                ['required' => true, 'attr' => ['readonly' => true]]
+            ],
+            'readonly option is merged and replaces existing option' => [
+                ['attr' => ['readonly' => true]],
+                ['attr' => ['readonly' => false]],
+                ['attr' => ['readonly' => false]]
+            ],
+            'string option is replaced' => [
+                ['required' => true],
+                ['required' => false],
+                ['required' => false]
+            ],
+            'readonly option is merged and added to attr array option' => [
+                ['attr' => []],
+                ['attr' => ['readonly' => true]],
+                ['attr' => ['readonly' => true]],
+            ]
+        ];
+    }
 }

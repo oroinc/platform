@@ -12,6 +12,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TargetType extends AbstractType
@@ -65,11 +66,10 @@ class TargetType extends AbstractType
         $resolver->setDefaults(
             array(
                 'attr'        => array(
-                    'class' => 'extend-rel-target-name'
+                    'class' => 'extend-rel-target-name',
                 ),
                 'label'       => 'oro.entity_extend.form.target_entity',
-                'empty_value' => $this->targetEntityClass ? null : '',
-                'read_only'   => (bool) $this->targetEntityClass,
+                'placeholder' => $this->targetEntityClass ? null : '',
                 'choices'     => $this->getEntityChoiceList(
                     $this->configId->getClassName(),
                     $this->configId->getFieldType()
@@ -85,6 +85,12 @@ class TargetType extends AbstractType
                 )
             )
         );
+
+        $resolver->setNormalizer('attr', function (Options $options, $value) {
+            $value['readonly'] = (bool) $this->targetEntityClass;
+
+            return $value;
+        });
     }
 
     /**

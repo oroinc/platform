@@ -227,7 +227,7 @@ class RelationType extends AbstractType
         /** @var FieldConfigId $fieldConfigId */
         $fieldConfigId = $this->config->getId();
 
-        // read_only when updating field (so bidirectional option already exists)
+        // readonly when updating field (so bidirectional option already exists)
         $readOnly = $this->config->get('bidirectional') !== null;
 
         // if reusing relation ("Reuse existing relation" option on UI) or for one2many relation
@@ -241,12 +241,14 @@ class RelationType extends AbstractType
         if (in_array($fieldConfigId->getFieldType(), static::ALLOWED_BIDIRECTIONAL_RELATIONS, true)) {
             $options = [
                 'choices' => ['No', 'Yes'],
-                'empty_value' => false,
+                'placeholder' => false,
                 'block' => 'general',
                 'subblock' => 'properties',
                 'label' => 'oro.entity_extend.entity_config.extend.field.items.bidirectional',
-                'read_only' => $readOnly,
-                'data' => $this->getArrayValue($data, 'bidirectional')
+                'data' => $this->getArrayValue($data, 'bidirectional'),
+                'attr' => [
+                    'readonly' => $readOnly
+                ]
             ];
 
             $form->add('bidirectional', 'oro_select2_choice', $options);

@@ -94,7 +94,9 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 'multiple'  => true,
                 'expanded'  => true,
                 'required'  => false,
-                'read_only' => $isMyProfile,
+                'attr'      => [
+                    'readonly' => $isMyProfile,
+                ],
                 'disabled'  => $isMyProfile,
                 'translatable_options' => false
             );

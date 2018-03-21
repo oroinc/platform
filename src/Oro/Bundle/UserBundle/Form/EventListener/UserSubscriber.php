@@ -96,7 +96,7 @@ class UserSubscriber implements EventSubscriberInterface
                     'required' => true,
                     'disabled' => false,
                     'choices' => $enabledChoices,
-                    'empty_value' => 'Please select',
+                    'placeholder' => 'Please select',
                     'empty_data' => '',
                     'auto_initialize' => false
                 ]

@@ -56,8 +56,7 @@ class FeatureCSChecker implements HealthCheckerInterface
         if ($expectedFileName != $featureFileName) {
             $this->rename($path, $expectedFileName);
             $this->errors[] = sprintf(
-                'Feature "%s" should be renamed to "%s"'.PHP_EOL.
-                    'Actually it is renamed, so please apply and commit changes',
+                'Feature "%s" should be renamed to "%s".',
                 $featureFileName,
                 $expectedFileName
             );

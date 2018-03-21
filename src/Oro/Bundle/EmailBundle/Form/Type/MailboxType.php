@@ -84,7 +84,7 @@ class MailboxType extends AbstractType
             'choices'     => $this->storage->getProcessTypeChoiceList(),
             'required'    => false,
             'mapped'      => false,
-            'empty_value' => 'oro.email.mailbox.process.default.label',
+            'placeholder' => 'oro.email.mailbox.process.default.label',
             'empty_data'  => null,
         ]);
         $builder->add(

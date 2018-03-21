@@ -149,7 +149,7 @@ entity_config:
                                 1: oro.entity.entity_config.datagrid.field.items.is_visible.shown
                                 3: oro.entity.entity_config.datagrid.field.items.is_visible.hidden
                                 2: oro.entity.entity_config.datagrid.field.items.is_visible.mandatory
-                            empty_value:    false
+                            placeholder:    false
                             block:          other
                             label:          oro.entity.entity_config.datagrid.field.items.is_visible
                             tooltip:        oro.entity.entity_config.datagrid.field.items.is_visible.tooltip
@@ -167,7 +167,7 @@ entity_config:
                         type:               choice
                         options:
                             choices:        ['No', 'Yes']
-                            empty_value:    false
+                            placeholder:    false
                             block:          other
                             label:          oro.entity.entity_config.datagrid.field.items.show_filter
                 order:
@@ -219,7 +219,7 @@ entity_config:
                         type:               choice
                         options:
                             choices:        ['No', 'Yes']
-                            empty_value:    false
+                            placeholder:    false
                             block:          other
                             label:          oro.entity.entity_config.form.field.items.is_enabled
 
@@ -240,7 +240,7 @@ entity_config:
                         type:               choice
                         options:
                             choices:        ['No', 'Yes']
-                            empty_value:    false
+                            placeholder:    false
                             block:          other
                             label:          oro.entity.entity_config.view.field.items.is_displayable
                 priority:

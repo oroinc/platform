@@ -63,7 +63,7 @@ class MultiCurrencyType extends PriceType
                     'full_currency_list' => $options['full_currency_list'],
                     'compact' => false,
                     'required' => $isRequired,
-                    'empty_value' => false
+                    'placeholder' => false
                 ]
             );
 
