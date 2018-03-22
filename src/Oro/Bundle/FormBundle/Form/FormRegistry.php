@@ -250,4 +250,3 @@ class FormRegistry implements FormRegistryInterface
         return $this->extensions;
     }
 }
-
