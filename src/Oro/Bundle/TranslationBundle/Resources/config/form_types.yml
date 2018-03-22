@@ -9,8 +9,8 @@ services:
         tags:
             - { name: form.type, alias: translatable_entity }
 
-    oro_translation.form.type.jqueryselect2_translatable_entity:
-        class: Oro\Bundle\FormBundle\Form\Type\Select2TranslatableEntityType
+    oro_translation.form.type.select2_translatable_entity:
+        class: Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType
         tags:
             - { name: form.type, alias: oro_select2_translatable_entity }
 
