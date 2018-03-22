@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class MailboxHandler implements FormAwareInterface
 {
-    const FORM = 'oro_email_mailbox';
+    const FORM = MailboxType::class;
 
     /** @var Registry */
     protected $doctrine;

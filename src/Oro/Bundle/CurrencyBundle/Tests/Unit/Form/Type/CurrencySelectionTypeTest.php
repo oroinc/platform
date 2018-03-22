@@ -5,7 +5,9 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\CurrencyBundle\Form\Type\CurrencySelectionType;
 use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Utils\CurrencyNameHelperStub;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Intl\Intl;
@@ -38,8 +40,6 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
      */
     protected function setUp()
     {
-        parent::setUp();
-
         $this->currencyProvider = $this->getMockBuilder(CurrencyProviderInterface::class)
             ->setMethods([
                 'getCurrencyList',
@@ -66,6 +66,24 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
             $this->localeSettings,
             $this->currencyNameHelper
         );
+
+        parent::setUp();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [
+                    $this->formType,
+                    CurrencySelectionType::class => $this->formType
+                ],
+                []
+            ),
+        ];
     }
 
     /**
@@ -223,7 +241,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
      */
     public function testInvalidTypeOfCurrenciesListOption()
     {
-        $this->factory->create($this->formType, null, ['currencies_list' => 'string']);
+        $this->factory->create(CurrencySelectionType::class, null, ['currencies_list' => 'string']);
     }
 
     /**
@@ -232,7 +250,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
      */
     public function testUnknownCurrency()
     {
-        $this->factory->create($this->formType, null, ['currencies_list' => ['CUR', 'TST']]);
+        $this->factory->create(CurrencySelectionType::class, null, ['currencies_list' => ['CUR', 'TST']]);
     }
 
     /**
@@ -241,17 +259,12 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
      */
     public function testInvalidTypeOfAdditionalCurrenciesOption()
     {
-        $this->factory->create($this->formType, null, ['additional_currencies' => 'string']);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(CurrencySelectionType::NAME, $this->formType->getName());
+        $this->factory->create(CurrencySelectionType::class, null, ['additional_currencies' => 'string']);
     }
 
     public function testGetParent()
     {
-        $this->assertEquals('choice', $this->formType->getParent());
+        $this->assertEquals(ChoiceType::class, $this->formType->getParent());
     }
 
     /**
@@ -262,7 +275,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
      */
     protected function doTestForm(array $inputOptions, array $expectedOptions, $submittedData)
     {
-        $form = $this->factory->create($this->formType, null, $inputOptions);
+        $form = $this->factory->create(CurrencySelectionType::class, null, $inputOptions);
         $formConfig = $form->getConfig();
 
         foreach ($expectedOptions as $key => $value) {

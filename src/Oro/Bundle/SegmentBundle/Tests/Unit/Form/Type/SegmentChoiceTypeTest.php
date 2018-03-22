@@ -32,6 +32,7 @@ class SegmentChoiceTypeTest extends \PHPUnit_Framework_TestCase
             'placeholder' => 'oro.segment.form.segment_choice.placeholder',
             'entityClass' => 'TestEntityClass',
             'choices' => [1 => 'First Segment', 5 => 'Second Segment'],
+            'choices_as_values' => true
         ];
 
         $repo = $this->getMockBuilder(ObjectRepository::class)

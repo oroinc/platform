@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type\Stub;
 
 use Oro\Bundle\FormBundle\Form\Type\OroIconType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroIconTypeStub extends AbstractType
@@ -41,6 +42,6 @@ class OroIconTypeStub extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

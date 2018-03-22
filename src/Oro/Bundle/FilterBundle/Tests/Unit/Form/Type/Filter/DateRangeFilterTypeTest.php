@@ -8,6 +8,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractDateTypeTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 
 class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
 {
@@ -36,10 +37,11 @@ class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
             new FilterType($translator)
         );
 
+        $this->type = new DateRangeFilterType($translator, new DateModifierProvider(), $subscriber);
         $this->formExtensions[] = new CustomFormExtension($types);
+        $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
         parent::setUp();
-        $this->type = new DateRangeFilterType($translator, new DateModifierProvider(), $subscriber);
     }
 
     /**
@@ -50,11 +52,6 @@ class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
         return $this->type;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(DateRangeFilterType::NAME, $this->type->getName());
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -63,7 +60,7 @@ class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
         return array(
             array(
                 'defaultOptions' => array(
-                    'field_type' => DateRangeType::NAME,
+                    'field_type' => DateRangeType::class,
                     'widget_options' => array(
                         'showDatevariables' => true,
                         'showTime'          => false,

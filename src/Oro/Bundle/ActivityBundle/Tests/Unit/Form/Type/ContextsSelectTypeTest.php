@@ -6,8 +6,7 @@ use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Bundle\FormBundle\Form\Type\Select2HiddenType;
 use Symfony\Component\Form\Test\TypeTestCase;
 
 class ContextsSelectTypeTest extends TypeTestCase
@@ -49,24 +48,6 @@ class ContextsSelectTypeTest extends TypeTestCase
         $this->entityTitleResolver = $this->getMockBuilder(EntityNameResolver::class)
             ->disableOriginalConstructor()
             ->getMock();
-    }
-
-    /**
-     * @return array
-     */
-    protected function getExtensions()
-    {
-        return [
-            new PreloadedExtension(
-                [
-                    'oro_select2_hidden' => new Select2Type(
-                        'Symfony\Component\Form\Extension\Core\Type\HiddenType',
-                        'oro_select2_hidden'
-                    )
-                ],
-                []
-            )
-        ];
     }
 
     public function testBuildForm()
@@ -132,19 +113,6 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->entityTitleResolver,
             $this->createMock(FeatureChecker::class)
         );
-        $this->assertEquals('oro_select2_hidden', $type->getParent());
-    }
-
-    public function testGetName()
-    {
-        $type = new ContextsSelectType(
-            $this->em,
-            $this->configManager,
-            $this->translator,
-            $this->dispatcher,
-            $this->entityTitleResolver,
-            $this->createMock(FeatureChecker::class)
-        );
-        $this->assertEquals('oro_activity_contexts_select', $type->getName());
+        $this->assertEquals(Select2HiddenType::class, $type->getParent());
     }
 }

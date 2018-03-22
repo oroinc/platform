@@ -6,17 +6,16 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType as SymfonyTextareaType;
 
 class TextareaTypeTest extends AbstractConfigTypeTestCase
 {
-    /** @var TextareaType */
-    protected $type;
-
-    protected function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFormType()
     {
-        parent::setUp();
-
-        $this->type = new TextareaType(
+        return new TextareaType(
             new ConfigTypeHelper($this->configManager),
             $this->configManager
         );
@@ -29,7 +28,7 @@ class TextareaTypeTest extends AbstractConfigTypeTestCase
     {
         $this->doTestSubmit(
             'testAttr',
-            $this->type,
+            TextareaType::class,
             [
                 'config_id' => new EntityConfigId('test', 'Test\Entity'),
             ],
@@ -53,19 +52,12 @@ class TextareaTypeTest extends AbstractConfigTypeTestCase
         ];
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'oro_entity_extend_textarea',
-            $this->type->getName()
-        );
-    }
-
     public function testGetParent()
     {
+        $type = $this->getFormType();
         $this->assertEquals(
-            'textarea',
-            $this->type->getParent()
+            SymfonyTextareaType::class,
+            $type->getParent()
         );
     }
 }

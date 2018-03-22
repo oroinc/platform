@@ -5,6 +5,8 @@ namespace Oro\Bundle\EntityConfigBundle\Form\Handler;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
+use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\UIBundle\Route\Router;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -69,7 +71,7 @@ class ConfigHelperHandler
         $entityConfigModel = $fieldConfigModel->getEntity();
 
         return $this->formFactory->create(
-            'oro_entity_extend_field_type',
+            FieldType::class,
             $fieldConfigModel,
             ['class_name' => $entityConfigModel->getClassName()]
         );
@@ -82,7 +84,7 @@ class ConfigHelperHandler
     public function createSecondStepFieldForm(FieldConfigModel $fieldConfigModel)
     {
         return $this->formFactory->create(
-            'oro_entity_config_type',
+            ConfigType::class,
             null,
             ['config_model' => $fieldConfigModel]
         );

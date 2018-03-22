@@ -38,7 +38,7 @@ class MultipleEntityType extends AbstractType
     {
         $builder->add(
             'added',
-            'oro_entity_identifier',
+            EntityIdentifierType::class,
             [
                 'class'    => $options['class'],
                 'multiple' => true,
@@ -47,7 +47,7 @@ class MultipleEntityType extends AbstractType
         );
         $builder->add(
             'removed',
-            'oro_entity_identifier',
+            EntityIdentifierType::class,
             [
                 'class'    => $options['class'],
                 'multiple' => true,

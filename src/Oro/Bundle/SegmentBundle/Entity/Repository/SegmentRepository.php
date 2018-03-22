@@ -21,7 +21,7 @@ class SegmentRepository extends EntityRepository
 
         $result = [];
         foreach ($segments as $segment) {
-            $result[$segment['id']] = $segment['name'];
+            $result[$segment['name']] = $segment['id'];
         }
 
         return $result;

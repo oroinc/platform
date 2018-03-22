@@ -7,13 +7,11 @@ use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
 
 class IntegerAssociationPropertyTypeTest extends AssociationTypeTestCase
 {
-    /** @var IntegerAssociationPropertyType */
-    protected $type;
-
-    protected function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFormType()
     {
-        parent::setUp();
-
         $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
@@ -21,25 +19,18 @@ class IntegerAssociationPropertyTypeTest extends AssociationTypeTestCase
             ->method('getEntityClass')
             ->will($this->returnArgument(0));
 
-        $this->type = new IntegerAssociationPropertyType(
+        return new IntegerAssociationPropertyType(
             new AssociationTypeHelper($this->configManager, $entityClassResolver),
             $this->configManager
         );
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'oro_entity_extend_association_property_integer',
-            $this->type->getName()
-        );
-    }
-
     public function testGetParent()
     {
+        $type = $this->getFormType();
         $this->assertEquals(
             'integer',
-            $this->type->getParent()
+            $type->getParent()
         );
     }
 

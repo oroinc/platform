@@ -5,8 +5,10 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueCollectionType;
+use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -85,7 +87,7 @@ class EnumValueCollectionTypeTest extends TypeTestCase
         unset($resolvedOptions['config_is_new']);
         $this->assertFalse($resolvedOptions['handle_primary']);
         unset($resolvedOptions['handle_primary']);
-        $this->assertEquals('oro_entity_extend_enum_value', $resolvedOptions['type']);
+        $this->assertEquals(EnumValueType::class, $resolvedOptions['type']);
         unset($resolvedOptions['type']);
 
         $this->assertEquals($expectedOptions, $resolvedOptions);
@@ -294,19 +296,8 @@ class EnumValueCollectionTypeTest extends TypeTestCase
         $this->assertFalse($view->vars['show_form_when_empty']);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'oro_entity_extend_enum_value_collection',
-            $this->type->getName()
-        );
-    }
-
     public function testGetParent()
     {
-        $this->assertEquals(
-            'oro_collection',
-            $this->type->getParent()
-        );
+        $this->assertEquals(CollectionType::class, $this->type->getParent());
     }
 }

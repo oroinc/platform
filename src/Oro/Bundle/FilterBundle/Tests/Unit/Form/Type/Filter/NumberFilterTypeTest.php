@@ -7,6 +7,10 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 class NumberFilterTypeTest extends AbstractTypeTestCase
 {
@@ -23,10 +27,11 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
     protected function setUp()
     {
         $translator             = $this->createMockTranslator();
+        $this->type = new NumberFilterType($translator);
         $this->formExtensions[] = new CustomFormExtension(array(new FilterType($translator)));
+        $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
         parent::setUp();
-        $this->type = new NumberFilterType($translator);
     }
 
     /**
@@ -37,11 +42,6 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(NumberFilterType::NAME, $this->type->getName());
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -50,7 +50,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         return array(
             array(
                 'defaultOptions' => array(
-                    'field_type'        => 'number',
+                    'field_type'        => NumberType::class,
                     'operator_choices'  => array(
                         NumberFilterType::TYPE_EQUAL         => 'oro.filter.form.label_type_equal',
                         NumberFilterType::TYPE_NOT_EQUAL     => 'oro.filter.form.label_type_not_equal',
@@ -119,7 +119,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                     'data_type' => NumberFilterType::DATA_INTEGER
                 ),
                 'customOptions' => array(
-                    'field_type' => 'integer',
+                    'field_type' => IntegerType::class,
                     'data_type'  => NumberFilterType::DATA_INTEGER
                 ),
             ),
@@ -139,7 +139,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                     'data_type' => NumberFilterType::DATA_INTEGER
                 ),
                 'customOptions' => array(
-                    'field_type' => 'integer',
+                    'field_type' => IntegerType::class,
                     'data_type'  => NumberFilterType::DATA_INTEGER
                 ),
             ),
@@ -159,7 +159,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                     'data_type' => NumberFilterType::DATA_INTEGER
                 ),
                 'customOptions' => array(
-                    'field_type' => 'integer',
+                    'field_type' => IntegerType::class,
                     'data_type'  => NumberFilterType::DATA_INTEGER
                 ),
             ),
@@ -222,7 +222,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                     'data_type' => NumberFilterType::DATA_DECIMAL
                 ),
                 'customOptions' => array(
-                    'field_type'        => 'money',
+                    'field_type'        => MoneyType::class,
                     'data_type'         => NumberFilterType::DATA_DECIMAL,
                     'formatter_options' => array(
                         'decimals'       => 4,
@@ -240,7 +240,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                     'data_type' => NumberFilterType::DATA_INTEGER
                 ),
                 'customOptions' => array(
-                    'field_type' => 'money'
+                    'field_type' => MoneyType::class
                 ),
             ),
         );

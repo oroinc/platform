@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -35,7 +36,7 @@ class WidgetDateRangeValueType extends AbstractType
     {
         $builder->add(
             'start',
-            'text',
+            TextType::class,
             array_merge(
                 ['required' => false],
                 $options['field_options'],
@@ -45,7 +46,7 @@ class WidgetDateRangeValueType extends AbstractType
 
         $builder->add(
             'end',
-            'text',
+            TextType::class,
             array_merge(
                 ['required' => false],
                 $options['field_options'],

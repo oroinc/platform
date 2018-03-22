@@ -12,7 +12,7 @@ class BooleanTypeTest extends TypeTestCase
      */
     public function testWithValidValue($value, $expected)
     {
-        $form = $this->factory->create(new BooleanType());
+        $form = $this->factory->create(BooleanType::class);
         $form->submit($value);
         $this->assertTrue($form->isSynchronized());
         $this->assertSame($expected, $form->getData());
@@ -41,7 +41,7 @@ class BooleanTypeTest extends TypeTestCase
      */
     public function testWithInvalidValue($value)
     {
-        $form = $this->factory->create(new BooleanType());
+        $form = $this->factory->create(BooleanType::class);
         $form->submit($value);
         $this->assertFalse($form->isSynchronized());
     }
@@ -51,11 +51,5 @@ class BooleanTypeTest extends TypeTestCase
         return [
             ['test'],
         ];
-    }
-
-    public function testGetName()
-    {
-        $type = new BooleanType();
-        $this->assertEquals('oro_api_boolean', $type->getName());
     }
 }

@@ -3,6 +3,8 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroMoneyType;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroMoneyTypeTest extends FormIntegrationTestCase
@@ -24,8 +26,6 @@ class OroMoneyTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->setMethods(array('getLocale', 'getCurrency', 'getCurrencySymbolByCurrency'))
@@ -37,6 +37,7 @@ class OroMoneyTypeTest extends FormIntegrationTestCase
             ->getMock();
 
         $this->formType = new OroMoneyType($this->localeSettings, $this->numberFormatter);
+        parent::setUp();
     }
 
     protected function tearDown()
@@ -47,14 +48,24 @@ class OroMoneyTypeTest extends FormIntegrationTestCase
         unset($this->localeSettings);
     }
 
-    public function testGetName()
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
     {
-        $this->assertEquals(OroMoneyType::NAME, $this->formType->getName());
+        return [
+            new PreloadedExtension(
+                [
+                    OroMoneyType::class => $this->formType
+                ],
+                []
+            ),
+        ];
     }
 
     public function testGetParent()
     {
-        $this->assertEquals('money', $this->formType->getParent());
+        $this->assertEquals(MoneyType::class, $this->formType->getParent());
     }
 
     /**
@@ -142,7 +153,7 @@ class OroMoneyTypeTest extends FormIntegrationTestCase
             ->with(\NumberFormatter::GROUPING_USED)
             ->will($this->returnValue(1));
 
-        $form = $this->factory->create($this->formType, null, $options);
+        $form = $this->factory->create(OroMoneyType::class, null, $options);
 
         $form->submit($data);
 

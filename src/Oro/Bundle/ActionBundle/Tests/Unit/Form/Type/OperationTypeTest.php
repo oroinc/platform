@@ -11,6 +11,8 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class OperationTypeTest extends FormIntegrationTestCase
@@ -23,19 +25,33 @@ class OperationTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->requiredAttributesListener = new RequiredAttributesListener();
 
         $this->formType = new OperationType(
             $this->requiredAttributesListener,
             new ContextAccessor()
         );
+        parent::setUp();
     }
 
     protected function tearDown()
     {
         unset($this->formType, $this->operationManager, $this->requiredAttributesListener);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [
+                    OperationType::class => $this->formType
+                ],
+                []
+            ),
+        ];
     }
 
     /**
@@ -56,7 +72,7 @@ class OperationTypeTest extends FormIntegrationTestCase
         array $expectedChildrenOptions = [],
         ActionData $expectedDefaultData = null
     ) {
-        $form = $this->factory->create($this->formType, $defaultData, $inputOptions);
+        $form = $this->factory->create(OperationType::class, $defaultData, $inputOptions);
 
         foreach ($expectedChildrenOptions as $name => $options) {
             $this->assertTrue($form->has($name));
@@ -98,16 +114,16 @@ class OperationTypeTest extends FormIntegrationTestCase
                     ]),
                     'attribute_fields' => [
                         'field1'  => [
-                            'form_type' => 'text',
+                            'form_type' => TextType::class,
                             'label' => 'Field1 Label',
                             'options' => ['required' => true]
                         ],
                         'field2' => [
-                            'form_type' => 'text',
+                            'form_type' => TextType::class,
                             'label' => 'Field2 Label Orig'
                         ],
                         'field3' => [
-                            'form_type' => 'text',
+                            'form_type' => TextType::class,
                         ],
                     ],
                 ],
@@ -138,13 +154,13 @@ class OperationTypeTest extends FormIntegrationTestCase
                     ]),
                     'attribute_fields' => [
                         'field1'  => [
-                            'form_type' => 'text'
+                            'form_type' => TextType::class,
                         ],
                         'field2' => [
-                            'form_type' => 'text'
+                            'form_type' => TextType::class,
                         ],
                         'field3' => [
-                            'form_type' => 'text',
+                            'form_type' => TextType::class,
                         ],
                     ],
                 ],
@@ -182,10 +198,10 @@ class OperationTypeTest extends FormIntegrationTestCase
                     ]),
                     'attribute_fields' => [
                         'field1'  => [
-                            'form_type' => 'text'
+                            'form_type' => TextType::class,
                         ],
                         'field2' => [
-                            'form_type' => 'text'
+                            'form_type' => TextType::class,
                         ],
                     ],
                     'attribute_default_values' => [
@@ -239,7 +255,7 @@ class OperationTypeTest extends FormIntegrationTestCase
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
 
-        $this->factory->create($this->formType, $data, $options);
+        $this->factory->create(OperationType::class, $data, $options);
     }
 
     /**
@@ -253,7 +269,7 @@ class OperationTypeTest extends FormIntegrationTestCase
                     'operation' => $this->createOperation(['field' => []]),
                     'attribute_fields' => [
                         'field'  => [
-                            'form_type' => 'text'
+                            'form_type' => TextType::class,
                         ]
                     ],
                 ],
@@ -266,7 +282,7 @@ class OperationTypeTest extends FormIntegrationTestCase
                     'operation' => $this->createOperation([]),
                     'attribute_fields' => [
                         'field'  => [
-                            'form_type' => 'text'
+                            'form_type' => TextType::class,
                         ]
                     ],
                 ],
@@ -329,7 +345,7 @@ class OperationTypeTest extends FormIntegrationTestCase
                     $attribute
                         ->setName($attributeName)
                         ->setLabel(ucfirst($attributeName) . ' Label')
-                        ->setType(isset($attributeDefinition['type']) ? $attributeDefinition['type'] : 'text')
+                        ->setType(isset($attributeDefinition['type']) ? $attributeDefinition['type'] : TextType::class)
                         ->setPropertyPath(
                             isset($attributeDefinition['property_path']) ? $attributeDefinition['property_path'] : null
                         );

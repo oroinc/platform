@@ -8,23 +8,17 @@ use Oro\Bundle\LocaleBundle\Form\Type\LocalizationCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\PercentTypeStub;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class LocalizedPropertyTypeTest extends AbstractLocalizedType
 {
-    /**
-     * @var LocalizedPropertyType
-     */
-    protected $formType;
-
     protected function setUp()
     {
         $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
 
         parent::setUp();
-
-        $this->formType = new LocalizedPropertyType();
     }
 
     /**
@@ -41,10 +35,10 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
         return [
             new PreloadedExtension(
                 [
-                    FallbackPropertyType::NAME => new FallbackPropertyType($translator),
-                    FallbackValueType::NAME => new FallbackValueType(),
-                    LocalizationCollectionType::NAME => $localizationCollection,
-                    PercentTypeStub::NAME => new PercentTypeStub(),
+                    FallbackPropertyType::class => new FallbackPropertyType($translator),
+                    FallbackValueType::class => new FallbackValueType(),
+                    LocalizationCollectionType::class => $localizationCollection,
+                    PercentTypeStub::class => new PercentTypeStub(),
                 ],
                 []
             )
@@ -63,7 +57,7 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
     {
         $this->setRegistryExpectations();
 
-        $form = $this->factory->create($this->formType, $defaultData, $options);
+        $form = $this->factory->create(LocalizedPropertyType::class, $defaultData, $options);
 
         $this->assertEquals($defaultData, $form->getData());
         foreach ($viewData as $field => $data) {
@@ -82,7 +76,7 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
     {
         return [
             'text with null data' => [
-                'options' => ['entry_type' => 'text'],
+                'options' => ['entry_type' => TextType::class],
                 'defaultData' => null,
                 'viewData' => [
                     LocalizedPropertyType::FIELD_DEFAULT => null,
@@ -101,7 +95,7 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
                 ],
             ],
             'percent with full data' => [
-                'options' => ['entry_type' => PercentTypeStub::NAME, 'entry_options' => ['type' => 'integer']],
+                'options' => ['entry_type' => PercentTypeStub::class, 'entry_options' => ['type' => 'integer']],
                 'defaultData' => [
                     null => 5,
                     1    => 10,
@@ -132,10 +126,5 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
                 ],
             ],
         ];
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(LocalizedPropertyType::NAME, $this->formType->getName());
     }
 }

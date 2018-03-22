@@ -4,6 +4,9 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class FilterTypeTest extends AbstractTypeTestCase
 {
@@ -14,9 +17,10 @@ class FilterTypeTest extends AbstractTypeTestCase
 
     protected function setUp()
     {
-        parent::setUp();
         $translator = $this->createMockTranslator();
         $this->type = new FilterType($translator);
+        $this->formExtensions[] = new PreloadedExtension([$this->type], []);
+        parent::setUp();
     }
 
     /**
@@ -27,11 +31,6 @@ class FilterTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(FilterType::NAME, $this->type->getName());
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -40,10 +39,10 @@ class FilterTypeTest extends AbstractTypeTestCase
         return array(
             array(
                 'defaultOptions' => array(
-                    'field_type' => 'text',
+                    'field_type' => TextType::class,
                     'field_options' => array(),
                     'operator_choices' => array(),
-                    'operator_type' => 'choice',
+                    'operator_type' => ChoiceType::class,
                     'operator_options' => array(),
                     'show_filter' => false,
                     'lazy' => false

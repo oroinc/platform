@@ -9,7 +9,6 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
@@ -22,10 +21,6 @@ class EntityScalarCollectionTypeTest extends TypeTestCase
     {
         return [
             new ValidatorExtension(Validation::createValidator()),
-            new PreloadedExtension(
-                ['oro_api_scalar_collection' => new ScalarCollectionType()],
-                []
-            )
         ];
     }
 
@@ -55,7 +50,7 @@ class EntityScalarCollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new EntityScalarCollectionType(),
+            EntityScalarCollectionType::class,
             [
                 'entry_data_class'    => Group::class,
                 'entry_data_property' => 'name'
@@ -67,15 +62,9 @@ class EntityScalarCollectionTypeTest extends TypeTestCase
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testGetName()
-    {
-        $type = new EntityScalarCollectionType();
-        $this->assertEquals('oro_api_entity_scalar_collection', $type->getName());
-    }
-
     public function testGetParent()
     {
         $type = new EntityScalarCollectionType();
-        $this->assertEquals('oro_api_scalar_collection', $type->getParent());
+        $this->assertEquals(ScalarCollectionType::class, $type->getParent());
     }
 }

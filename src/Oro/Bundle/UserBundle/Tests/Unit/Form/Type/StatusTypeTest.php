@@ -13,8 +13,7 @@ class StatusTypeTest extends FormIntegrationTestCase
             'status' => 'test status',
         );
 
-        $type = new StatusType();
-        $form = $this->factory->create($type);
+        $form = $this->factory->create(StatusType::class);
 
         $status = new Status();
         $status->setStatus($formData['status']);

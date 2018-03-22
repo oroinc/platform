@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationTypeSelectType;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -94,11 +95,6 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('oro_select2_choice', $this->type->getParent());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_integration_type_select', $this->type->getName());
+        $this->assertEquals(Select2ChoiceType::class, $this->type->getParent());
     }
 }

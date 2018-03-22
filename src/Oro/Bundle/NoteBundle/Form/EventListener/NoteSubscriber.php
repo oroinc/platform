@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -59,7 +60,7 @@ class NoteSubscriber implements EventSubscriberInterface
 
                 $form->add(
                     $fieldConfigId->getFieldName(),
-                    'entity',
+                    EntityType::class,
                     [
                         'required' => false,
                         'class'    => $fieldExtendConfig->get('target_entity'),

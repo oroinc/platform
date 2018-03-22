@@ -41,7 +41,7 @@ class OroIconTypeStub extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'oro_icon_select';
     }

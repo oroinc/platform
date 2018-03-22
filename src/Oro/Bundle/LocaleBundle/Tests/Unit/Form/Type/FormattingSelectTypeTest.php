@@ -6,9 +6,10 @@ use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\LocaleBundle\Form\Type\FormattingSelectType;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class FormattingSelectTypeTest extends FormIntegrationTestCase
 {
@@ -24,20 +25,14 @@ class FormattingSelectTypeTest extends FormIntegrationTestCase
 
     public function setUp()
     {
-        parent::setUp();
-
         $this->provider = $this->createMock(LocalizationChoicesProvider::class);
         $this->formType = new FormattingSelectType($this->provider);
+        parent::setUp();
     }
 
     public function testGetParent()
     {
-        $this->assertEquals(OroChoiceType::NAME, $this->formType->getParent());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(FormattingSelectType::NAME, $this->formType->getName());
+        $this->assertEquals(OroChoiceType::class, $this->formType->getParent());
     }
 
     public function testBuildForm()
@@ -49,7 +44,7 @@ class FormattingSelectTypeTest extends FormIntegrationTestCase
 
         $this->provider->expects($this->once())->method('getFormattingChoices')->willReturn($data);
 
-        $form = $this->factory->create($this->formType);
+        $form = $this->factory->create(FormattingSelectType::class);
 
         $choices = $form->createView()->vars['choices'];
 
@@ -71,10 +66,16 @@ class FormattingSelectTypeTest extends FormIntegrationTestCase
             ->setMethods(['configureOptions', 'getParent'])
             ->disableOriginalConstructor()
             ->getMock();
-        $choiceType->expects($this->any())->method('getParent')->willReturn('choice');
+        $choiceType->expects($this->any())->method('getParent')->willReturn(ChoiceType::class);
 
         return [
-            new PreloadedExtension(['oro_choice' => $choiceType], [])
+            new PreloadedExtension(
+                [
+                    FormattingSelectType::class => $this->formType,
+                    OroChoiceType::class => $choiceType
+                ],
+                []
+            )
         ];
     }
 }

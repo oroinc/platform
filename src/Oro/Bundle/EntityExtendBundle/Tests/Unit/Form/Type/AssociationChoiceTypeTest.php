@@ -6,16 +6,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class AssociationChoiceTypeTest extends AssociationTypeTestCase
 {
-    /** @var AssociationChoiceType */
-    protected $type;
-
-    protected function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFormType()
     {
-        parent::setUp();
-
         $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
@@ -23,7 +22,7 @@ class AssociationChoiceTypeTest extends AssociationTypeTestCase
             ->method('getEntityClass')
             ->will($this->returnArgument(0));
 
-        $this->type = new AssociationChoiceType(
+        return new AssociationChoiceType(
             new AssociationTypeHelper($this->configManager, $entityClassResolver),
             $this->configManager
         );
@@ -36,7 +35,7 @@ class AssociationChoiceTypeTest extends AssociationTypeTestCase
     {
         $this->doTestSubmit(
             'enabled',
-            $this->type,
+            AssociationChoiceType::class,
             [
                 'config_id'         => new EntityConfigId('test', 'Test\Entity'),
                 'association_class' => 'Test\AssocEntity'
@@ -60,14 +59,10 @@ class AssociationChoiceTypeTest extends AssociationTypeTestCase
         ];
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_entity_extend_association_choice', $this->type->getName());
-    }
-
     public function testGetParent()
     {
-        $this->assertEquals('choice', $this->type->getParent());
+        $type = $this->getFormType();
+        $this->assertEquals(ChoiceType::class, $type->getParent());
     }
 
     /**

@@ -26,6 +26,6 @@ class EntityFilter extends ChoiceFilter
      */
     protected function getFormType()
     {
-        return EntityFilterType::NAME;
+        return EntityFilterType::class;
     }
 }

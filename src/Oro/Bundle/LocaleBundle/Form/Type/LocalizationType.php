@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -21,14 +22,14 @@ class LocalizationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name', 'text', [
+            ->add('name', TextType::class, [
                 'required' => true,
                 'label' => 'oro.locale.localization.name.label',
                 StripTagsExtension::OPTION_NAME => true,
             ])
             ->add(
                 'titles',
-                LocalizedFallbackValueCollectionType::NAME,
+                LocalizedFallbackValueCollectionType::class,
                 [
                     'required' => true,
                     'label' => 'oro.locale.localization.title.label',
@@ -40,7 +41,7 @@ class LocalizationType extends AbstractType
             )
             ->add(
                 'language',
-                LanguageSelectType::NAME,
+                LanguageSelectType::class,
                 [
                     'required' => true,
                     'label' => 'oro.locale.localization.language.label'
@@ -48,7 +49,7 @@ class LocalizationType extends AbstractType
             )
             ->add(
                 'formattingCode',
-                FormattingSelectType::NAME,
+                FormattingSelectType::class,
                 [
                     'required' => true,
                     'label' => 'oro.locale.localization.formatting_code.label'
@@ -56,7 +57,7 @@ class LocalizationType extends AbstractType
             )
             ->add(
                 'parentLocalization',
-                LocalizationParentSelectType::NAME,
+                LocalizationParentSelectType::class,
                 ['required' => false, 'label' => 'oro.locale.localization.parent_localization.label']
             );
     }

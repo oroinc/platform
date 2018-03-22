@@ -13,6 +13,7 @@ use Doctrine\ORM\QueryBuilder;
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\TranslationBundle\Tests\Unit\Form\Type\Stub\TestEntity;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
@@ -127,14 +128,9 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
         unset($this->type);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(TranslatableEntityType::NAME, $this->type->getName());
-    }
-
     public function testGetParent()
     {
-        $this->assertEquals('choice', $this->type->getParent());
+        $this->assertEquals(ChoiceType::class, $this->type->getParent());
     }
 
     /**

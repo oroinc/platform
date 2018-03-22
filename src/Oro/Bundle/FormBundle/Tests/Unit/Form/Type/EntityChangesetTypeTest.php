@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\Type\DataChangesetType;
 use Oro\Bundle\FormBundle\Form\Type\EntityChangesetType;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -32,24 +32,23 @@ class EntityChangesetTypeTest extends FormIntegrationTestCase
 
         parent::setUp();
     }
+
     /**
      * @return array
      */
     protected function getExtensions()
     {
         return [
-            new PreloadedExtension([DataChangesetType::NAME => new DataChangesetType()], [])
+            new PreloadedExtension([
+                EntityChangesetType::class => $this->type,
+                DataChangesetType::class => new DataChangesetType()
+            ], [])
         ];
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(EntityChangesetType::NAME, $this->type->getName());
     }
 
     public function testGetParent()
     {
-        $this->assertEquals(DataChangesetType::NAME, $this->type->getParent());
+        $this->assertEquals(DataChangesetType::class, $this->type->getParent());
     }
 
     public function testConfigureOptions()
@@ -82,7 +81,7 @@ class EntityChangesetTypeTest extends FormIntegrationTestCase
                 )
             );
 
-        $form = $this->factory->create($this->type, $defaultData, ['class' => '\stdClass']);
+        $form = $this->factory->create(EntityChangesetType::class, $defaultData, ['class' => '\stdClass']);
 
         $this->assertEquals($viewData, $form->getViewData());
 

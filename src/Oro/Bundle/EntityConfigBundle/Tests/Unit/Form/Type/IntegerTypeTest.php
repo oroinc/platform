@@ -29,14 +29,6 @@ class IntegerTypeTest extends AbstractConfigTypeTestCase
         $this->doTestConfigureOptions($this->type, $configId, $immutable, $options, $expectedOptions);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'oro_entity_config_integer',
-            $this->type->getName()
-        );
-    }
-
     public function testGetParent()
     {
         $this->assertEquals(

@@ -11,7 +11,8 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LocalizationSelectionTypeTest extends FormIntegrationTestCase
@@ -38,8 +39,6 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
      */
     protected function setUp()
     {
-        parent::setUp();
-
         $this->configManager = $this->getMockBuilder(ConfigManager::class)
             ->setMethods(['get'])
             ->disableOriginalConstructor()
@@ -68,16 +67,12 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
             $this->localizationManager,
             $this->localizationChoicesProvider
         );
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(LocalizationSelectionType::NAME, $this->formType->getName());
+        parent::setUp();
     }
 
     public function testGetParent()
     {
-        $this->assertEquals(OroChoiceType::NAME, $this->formType->getParent());
+        $this->assertEquals(OroChoiceType::class, $this->formType->getParent());
     }
 
     public function testConfigureOptions()
@@ -128,7 +123,7 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
             3 => 'Localization 3',
         ]);
 
-        $form = $this->factory->create($this->formType);
+        $form = $this->factory->create(LocalizationSelectionType::class);
 
         $form->submit($submittedValue);
 
@@ -161,10 +156,16 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
             ->setMethods(['configureOptions', 'getParent'])
             ->disableOriginalConstructor()
             ->getMock();
-        $choiceType->expects($this->any())->method('getParent')->willReturn('choice');
+        $choiceType->expects($this->any())->method('getParent')->willReturn(ChoiceType::class);
 
         return [
-            new PreloadedExtension([OroChoiceType::NAME => $choiceType], []),
+            new PreloadedExtension(
+                [
+                    LocalizationSelectionType::class => $this->formType,
+                    OroChoiceType::class => $choiceType
+                ],
+                []
+            ),
             $this->getValidatorExtension(true)
         ];
     }

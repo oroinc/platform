@@ -72,7 +72,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_jqueryselect2_hidden';
+        return OroJquerySelect2HiddenType::class;
     }
 
     /**

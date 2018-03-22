@@ -32,7 +32,7 @@ class ChoiceTreeFilterType extends AbstractType
      */
     public function getParent()
     {
-        return TextFilterType::NAME;
+        return TextFilterType::class;
     }
 
     /**

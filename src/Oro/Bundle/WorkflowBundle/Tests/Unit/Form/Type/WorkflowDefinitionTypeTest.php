@@ -14,7 +14,8 @@ use Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionChoicesGroupProvider;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type\Stub\ApplicableEntitiesTypeStub;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type\Stub\OroIconTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
@@ -24,10 +25,9 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $choicesProvider = $this->createMock(WorkflowDefinitionChoicesGroupProvider::class);
         $this->formType = new WorkflowDefinitionType($choicesProvider);
+        parent::setUp();
     }
 
     protected function tearDown()
@@ -46,7 +46,7 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
      */
     public function testSubmit(array $fields, array $submittedData, array $expectedData)
     {
-        $form = $this->factory->create($this->formType);
+        $form = $this->factory->create(WorkflowDefinitionType::class);
 
         foreach ($fields as $field => $options) {
             $this->assertTrue($form->has($field));
@@ -110,11 +110,6 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
         $this->formType->configureOptions($resolver);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(WorkflowDefinitionType::NAME, $this->formType->getName());
-    }
-
     public function testGetBlockPrefix()
     {
         $this->assertEquals(WorkflowDefinitionType::NAME, $this->formType->getBlockPrefix());
@@ -142,12 +137,13 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
             [
                 new PreloadedExtension(
                     [
-                        OroIconType::NAME => new OroIconTypeStub(),
-                        OroChoiceType::NAME => $choiceType,
-                        ApplicableEntitiesType::NAME => new ApplicableEntitiesTypeStub()
+                        $this->formType,
+                        OroIconType::class => new OroIconTypeStub(),
+                        OroChoiceType::class => $choiceType,
+                        ApplicableEntitiesType::class => new ApplicableEntitiesTypeStub()
                     ],
                     [
-                        'form' => [new TooltipFormExtension($configProvider, $translator)],
+                        FormType::class => [new TooltipFormExtension($configProvider, $translator)],
                     ]
                 ),
                 $this->getValidatorExtension(false)

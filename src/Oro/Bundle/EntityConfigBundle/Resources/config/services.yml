@@ -226,7 +226,7 @@ services:
         arguments:
             - '@oro_entity_config.provider.attribute'
         tags:
-            - { name: form.type_extension, alias: oro_entity_extend_field_type }
+            - { name: form.type_extension, alias: oro_entity_extend_field_type, extended_type: Oro\Bundle\EntityExtendBundle\Form\Type\FieldType }
 
     oro_entity_config.form.handler.create_update_config_field_handler:
         class: Oro\Bundle\EntityConfigBundle\Form\Handler\CreateUpdateConfigFieldHandler

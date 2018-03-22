@@ -9,26 +9,10 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class OroDateTimeTypeTest extends TypeTestCase
 {
-    /**
-     * @var OroDateTimeType
-     */
-    private $type;
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->type = new OroDateTimeType();
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_datetime', $this->type->getName());
-    }
-
     public function testGetParent()
     {
-        $this->assertEquals('datetime', $this->type->getParent());
+        $type = new OroDateTimeType();
+        $this->assertEquals(DateTimeType::class, $type->getParent());
     }
 
     public function testConfigureOptions()
@@ -42,7 +26,7 @@ class OroDateTimeTypeTest extends TypeTestCase
             'years'            => [],
         );
 
-        $form = $this->factory->create($this->type);
+        $form = $this->factory->create(OroDateTimeType::class);
         $form->submit((new \DateTime()));
 
         $options = $form->getConfig()->getOptions();
@@ -64,7 +48,8 @@ class OroDateTimeTypeTest extends TypeTestCase
             ->disableOriginalConstructor()->getMock();
 
         $view = new FormView();
-        $this->type->finishView($view, $form, $options);
+        $type = new OroDateTimeType();
+        $type->finishView($view, $form, $options);
         foreach ($expectedKeys as $key => $expectedKey) {
             $this->assertArrayHasKey($expectedKey, $view->vars);
             $this->assertEquals($expectedValues[$key], $view->vars[$expectedKey]);
@@ -98,7 +83,7 @@ class OroDateTimeTypeTest extends TypeTestCase
      */
     public function testSubmitValidData($value, $expectedValue)
     {
-        $form = $this->factory->create($this->type);
+        $form = $this->factory->create(OroDateTimeType::class);
         $form->submit($value);
         $this->assertDateTimeEquals($expectedValue, $form->getData());
     }

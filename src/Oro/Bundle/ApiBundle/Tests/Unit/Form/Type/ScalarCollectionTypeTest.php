@@ -43,7 +43,7 @@ class ScalarCollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new ScalarCollectionType(),
+            ScalarCollectionType::class,
             [
                 'entry_data_class'    => Group::class,
                 'entry_data_property' => 'name'
@@ -85,7 +85,7 @@ class ScalarCollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new ScalarCollectionType(),
+            ScalarCollectionType::class,
             [
                 'entry_data_class'    => Group::class,
                 'entry_data_property' => 'name'
@@ -123,7 +123,7 @@ class ScalarCollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new ScalarCollectionType(),
+            ScalarCollectionType::class,
             [
                 'entry_data_class'    => Group::class,
                 'entry_data_property' => 'name'
@@ -162,7 +162,7 @@ class ScalarCollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new ScalarCollectionType(),
+            ScalarCollectionType::class,
             [
                 'entry_data_class'    => Group::class,
                 'entry_data_property' => 'name'
@@ -200,7 +200,7 @@ class ScalarCollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new ScalarCollectionType(),
+            ScalarCollectionType::class,
             [
                 'entry_data_class'    => Group::class,
                 'entry_data_property' => 'name',
@@ -227,7 +227,7 @@ class ScalarCollectionTypeTest extends TypeTestCase
     public function testWithInvalidValue()
     {
         $form = $this->factory->create(
-            new ScalarCollectionType(),
+            ScalarCollectionType::class,
             null,
             [
                 'entry_data_class'    => Group::class,
@@ -236,11 +236,5 @@ class ScalarCollectionTypeTest extends TypeTestCase
         );
         $form->submit('test');
         $this->assertFalse($form->isSynchronized());
-    }
-
-    public function testGetName()
-    {
-        $type = new ScalarCollectionType();
-        $this->assertEquals('oro_api_scalar_collection', $type->getName());
     }
 }

@@ -105,7 +105,7 @@ services:
             - '%oro_locale.entity.localization.class%'
             - ["name"]
         tags:
-            - { name: oro_form.autocomplete.search_handler, alias: oro_localization, acl_resource: oro_locale_localization_view }
+            - { name: oro_form.autocomplete.search_handler, alias: Oro\Bundle\LocaleBundle\Form\Type\LocalizationType, acl_resource: oro_locale_localization_view }
 
     oro_locale.form.type.language_select:
         class: Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType

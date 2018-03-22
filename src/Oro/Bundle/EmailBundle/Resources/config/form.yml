@@ -71,12 +71,12 @@ services:
         arguments:
             - '@doctrine'
         tags:
-            - { name: form.type_extension, alias: oro_email_mailbox }
+            - { name: form.type_extension, alias: oro_email_mailbox, extended_type: Oro\Bundle\EmailBundle\Form\Type\MailboxType }
 
     oro_email.form.emailtemplate:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
-        arguments: ["oro_email_emailtemplate", "oro_email_emailtemplate", null]
+        arguments: ["oro_email_emailtemplate", Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType, null]
 
     oro_email.form.type.emailtemplate:
         class: '%oro_email.form.type.emailtemplate.class%'
@@ -131,7 +131,7 @@ services:
     oro_email.form.email:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
-        arguments: ["oro_email_email", "oro_email_email", null]
+        arguments: ["oro_email_email", Oro\Bundle\EmailBundle\Form\Type\EmailType, null]
 
     oro_email.form.type.email:
         class: '%oro_email.form.type.email.class%'
@@ -161,7 +161,7 @@ services:
         factory: ['@form.factory', createNamed]
         arguments:
             - ~
-            - 'oro_email_email_api'
+            - Oro\Bundle\EmailBundle\Form\Type\EmailApiType
 
     oro_email.form.type.email.api:
         class: '%oro_email.form.type.email.api.class%'

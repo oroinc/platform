@@ -7,6 +7,8 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler;
+use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
+use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Form\FormFactory;
@@ -98,7 +100,7 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('create')
             ->with(
-                'oro_entity_extend_field_type',
+                FieldType::class,
                 $fieldConfigModel,
                 ['class_name' => $entityClassName]
             )
@@ -117,7 +119,7 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('create')
             ->with(
-                'oro_entity_config_type',
+                ConfigType::class,
                 null,
                 ['config_model' => $fieldConfigModel]
             )

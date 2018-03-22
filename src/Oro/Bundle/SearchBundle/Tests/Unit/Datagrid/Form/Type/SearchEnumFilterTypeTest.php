@@ -52,11 +52,6 @@ class SearchEnumFilterTypeTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(SearchEnumFilterType::NAME, $this->type->getName());
-    }
-
     public function testGetBlockPrefix()
     {
         $this->assertEquals(SearchEnumFilterType::NAME, $this->type->getBlockPrefix());
@@ -64,6 +59,6 @@ class SearchEnumFilterTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals(EnumFilterType::NAME, $this->type->getParent());
+        $this->assertEquals(EnumFilterType::class, $this->type->getParent());
     }
 }

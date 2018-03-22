@@ -3,7 +3,7 @@
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\CurrencyBundle\Form\Type\CurrencyType;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Form\Extension\Core\Type\CurrencyType as BaseCurrencyType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CurrencyTypeTest extends \PHPUnit_Framework_TestCase
@@ -36,11 +36,6 @@ class CurrencyTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('currency', $this->formType->getParent());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_currency', $this->formType->getName());
+        $this->assertEquals(BaseCurrencyType::class, $this->formType->getParent());
     }
 }

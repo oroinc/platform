@@ -35,11 +35,6 @@ class CryptedStringTypeTest extends \PHPUnit_Framework_TestCase
         $this->fieldType = CryptedStringType::getType('crypted_string');
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('crypted_string', $this->fieldType->getName());
-    }
-
     public function testConvertToDatabaseValue()
     {
         $testString = 'test';

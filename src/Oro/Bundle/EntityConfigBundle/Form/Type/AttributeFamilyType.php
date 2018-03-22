@@ -47,7 +47,7 @@ class AttributeFamilyType extends AbstractType
 
         $builder->add(
             'labels',
-            LocalizedFallbackValueCollectionType::NAME,
+            LocalizedFallbackValueCollectionType::class,
             [
                 'label' => 'oro.entity_config.attribute_family.labels.label',
                 'block' => 'settings',
@@ -71,7 +71,7 @@ class AttributeFamilyType extends AbstractType
 
         $builder->add(
             'image',
-            ImageType::NAME,
+            ImageType::class,
             [
                 'label' => 'oro.entity_config.attribute_family.image.label',
                 'block' => 'settings',
@@ -81,7 +81,7 @@ class AttributeFamilyType extends AbstractType
 
         $builder->add(
             'attributeGroups',
-            AttributeGroupCollectionType::NAME,
+            AttributeGroupCollectionType::class,
             [
                 'label' => 'oro.entity_config.attribute_family.attribute_groups.label',
                 'block' => 'attributes',

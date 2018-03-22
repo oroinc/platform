@@ -3,28 +3,15 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroDurationType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroDurationTypeTest extends FormIntegrationTestCase
 {
-    /** @var OroDurationType */
-    protected $type;
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->type = new OroDurationType();
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(OroDurationType::NAME, $this->type->getName());
-    }
-
     public function testGetParent()
     {
-        $this->assertEquals('text', $this->type->getParent());
+        $type = new OroDurationType();
+        $this->assertEquals(TextType::class, $type->getParent());
     }
 
     public function testConfigureOptions()
@@ -34,7 +21,7 @@ class OroDurationTypeTest extends FormIntegrationTestCase
             'type' => 'text',
         ];
 
-        $form = $this->factory->create($this->type);
+        $form = $this->factory->create(OroDurationType::class);
 
         $options = $form->getConfig()->getOptions();
         foreach ($expectedOptions as $name => $expectedValue) {
@@ -51,7 +38,7 @@ class OroDurationTypeTest extends FormIntegrationTestCase
      */
     public function testSubmit($value, $expected)
     {
-        $form = $this->factory->create($this->type);
+        $form = $this->factory->create(OroDurationType::class);
         $form->submit($value);
         $data = $form->getData();
 
@@ -81,7 +68,7 @@ class OroDurationTypeTest extends FormIntegrationTestCase
 
     public function testSubmitInvalidDataThrowsError()
     {
-        $form = $this->factory->create($this->type);
+        $form = $this->factory->create(OroDurationType::class);
         $form->submit('invalid');
         $errors = $form->getErrors();
 

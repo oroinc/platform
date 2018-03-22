@@ -6,17 +6,16 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextType as SymfonyTextType;
 
 class TextTypeTest extends AbstractConfigTypeTestCase
 {
-    /** @var TextType */
-    protected $type;
-
-    protected function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFormType()
     {
-        parent::setUp();
-
-        $this->type = new TextType(
+        return new TextType(
             new ConfigTypeHelper($this->configManager),
             $this->configManager
         );
@@ -29,7 +28,7 @@ class TextTypeTest extends AbstractConfigTypeTestCase
     {
         $this->doTestSubmit(
             'testAttr',
-            $this->type,
+            TextType::class,
             [
                 'config_id' => new EntityConfigId('test', 'Test\Entity'),
             ],
@@ -53,19 +52,12 @@ class TextTypeTest extends AbstractConfigTypeTestCase
         ];
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'oro_entity_extend_text',
-            $this->type->getName()
-        );
-    }
-
     public function testGetParent()
     {
+        $type = $this->getFormType();
         $this->assertEquals(
-            'text',
-            $this->type->getParent()
+            SymfonyTextType::class,
+            $type->getParent()
         );
     }
 }

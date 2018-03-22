@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\UserBundle\Form\EventListener\ChangeRoleSubscriber;
 use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class AclRoleTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,7 +22,7 @@ class AclRoleTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $builder->expects($this->at(0))->method('add')
-            ->with('label', 'text', array('required' => true, 'label' => 'oro.user.role.role.label'));
+            ->with('label', TextType::class, array('required' => true, 'label' => 'oro.user.role.role.label'));
         $builder->expects($this->at(1))->method('add')
             ->with('appendUsers');
         $builder->expects($this->once())
@@ -29,11 +30,6 @@ class AclRoleTypeTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf(ChangeRoleSubscriber::class));
 
         $this->formType->buildForm($builder, array());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_user_role_form', $this->formType->getName());
     }
 
     public function testConfigureOptions()

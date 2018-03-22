@@ -5,7 +5,7 @@ namespace Oro\Bundle\InstallerBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Oro\Bundle\InstallerBundle\Form\Type\Configuration\DatabaseType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class DatabaseTypeTest extends FormIntegrationTestCase
@@ -33,7 +33,7 @@ class DatabaseTypeTest extends FormIntegrationTestCase
 
     public function testBuildForm()
     {
-        $form = $this->factory->create($this->type, [], []);
+        $form = $this->factory->create(DatabaseType::class, [], []);
 
         $this->assertTrue($form->has('oro_installer_database_driver'));
         $this->assertTrue($form->has('oro_installer_database_host'));
@@ -47,7 +47,7 @@ class DatabaseTypeTest extends FormIntegrationTestCase
 
     public function testFormViewDriverOptions()
     {
-        $form = $this->factory->create($this->type, [
+        $form = $this->factory->create(DatabaseType::class, [
             'oro_installer_database_driver_options' => [
                 'firstOption' => 'firstValue',
                 'secondOption' => 'secondValue'
@@ -69,7 +69,7 @@ class DatabaseTypeTest extends FormIntegrationTestCase
 
     public function testFormSubmit()
     {
-        $form = $this->factory->create($this->type, []);
+        $form = $this->factory->create(DatabaseType::class, []);
 
         $form->submit([
             'oro_installer_database_driver' => 'pdo_mysql',
@@ -102,18 +102,19 @@ class DatabaseTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_installer_configuration_database', $this->type->getName());
-    }
-
     /**
      * {@inheritdoc}
      */
     protected function getExtensions()
     {
         return [
-            new PreloadedExtension(['oro_collection' => new CollectionType()], []),
+            new PreloadedExtension(
+                [
+                    DatabaseType::class => $this->type,
+                    CollectionType::class => new CollectionType()
+                ],
+                []
+            ),
             $this->getValidatorExtension(true),
         ];
     }

@@ -285,18 +285,10 @@ class EnumFilterTypeTest extends TypeTestCase
         return $resolver;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(
-            EnumFilterType::NAME,
-            $this->type->getName()
-        );
-    }
-
     public function testGetParent()
     {
         $this->assertEquals(
-            ChoiceFilterType::NAME,
+            ChoiceFilterType::class,
             $this->type->getParent()
         );
     }

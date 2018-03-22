@@ -3,31 +3,17 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\FormBundle\Form\Type\Select2Type;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroChoiceTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var OroChoiceType
-     */
-    protected $formType;
-
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->formType = new OroChoiceType();
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_choice', $this->formType->getName());
-    }
-
     public function testGetParent()
     {
-        $this->assertEquals('oro_select2_choice', $this->formType->getParent());
+        $formType = new OroChoiceType();
+        $this->assertEquals(Select2ChoiceType::class, $formType->getParent());
     }
 
     /**
@@ -41,7 +27,7 @@ class OroChoiceTypeTest extends FormIntegrationTestCase
         array $viewData,
         array $options = []
     ) {
-        $form = $this->factory->create($this->formType, $data, $options);
+        $form = $this->factory->create(OroChoiceType::class, $data, $options);
         $view = $form->createView();
 
         foreach ($viewData as $key => $value) {

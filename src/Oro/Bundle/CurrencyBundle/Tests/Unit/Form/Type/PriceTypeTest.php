@@ -8,25 +8,10 @@ use Oro\Bundle\CurrencyBundle\Form\Type\PriceType;
 use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 
 class PriceTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var PriceType
-     */
-    protected $formType;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        $this->formType = PriceTypeGenerator::createPriceType($this);
-
-        parent::setUp();
-    }
-
     /**
      * @return array
      */
@@ -55,11 +40,14 @@ class PriceTypeTest extends FormIntegrationTestCase
 
         return [
             new PreloadedExtension(
-                [CurrencySelectionType::NAME => new CurrencySelectionType(
-                    $currencyProvider,
-                    $localeSettings,
-                    $currencyNameHelper
-                )],
+                [
+                    PriceType::class => PriceTypeGenerator::createPriceType($this),
+                    CurrencySelectionType::class => new CurrencySelectionType(
+                        $currencyProvider,
+                        $localeSettings,
+                        $currencyNameHelper
+                    )
+                ],
                 []
             ),
             $this->getValidatorExtension(true),
@@ -76,7 +64,7 @@ class PriceTypeTest extends FormIntegrationTestCase
      */
     public function testSubmit($isValid, $defaultData, $submittedData, $expectedData, array $options = [])
     {
-        $form = $this->factory->create($this->formType, $defaultData, $options);
+        $form = $this->factory->create(PriceType::class, $defaultData, $options);
 
         $this->assertEquals($defaultData, $form->getData());
         $form->submit($submittedData);
@@ -163,13 +151,5 @@ class PriceTypeTest extends FormIntegrationTestCase
                 ]
             ]
         ];
-    }
-
-    /**
-     * Test getName
-     */
-    public function testGetName()
-    {
-        $this->assertEquals(PriceType::NAME, $this->formType->getName());
     }
 }

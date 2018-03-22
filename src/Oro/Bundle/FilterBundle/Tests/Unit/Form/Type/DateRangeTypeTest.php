@@ -3,6 +3,8 @@
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 class DateRangeTypeTest extends AbstractTypeTestCase
 {
@@ -19,8 +21,6 @@ class DateRangeTypeTest extends AbstractTypeTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->setMethods(array('getTimezone'))
@@ -31,6 +31,8 @@ class DateRangeTypeTest extends AbstractTypeTestCase
             ->will($this->returnValue($this->defaultTimezone));
 
         $this->type = new DateRangeType($localeSettings);
+        $this->formExtensions[] = new PreloadedExtension([$this->type], []);
+        parent::setUp();
     }
 
     /**
@@ -41,11 +43,6 @@ class DateRangeTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(DateRangeType::NAME, $this->type->getName());
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -54,7 +51,7 @@ class DateRangeTypeTest extends AbstractTypeTestCase
         return array(
             array(
                 'defaultOptions' => array(
-                    'field_type' => 'date',
+                    'field_type' => DateType::class,
                     'field_options' => array(),
                     'start_field_options' => array(),
                     'end_field_options' => array(),

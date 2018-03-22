@@ -21,10 +21,10 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Stubs\OrmDatasourceExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
-use Symfony\Component\Form\PreloadedExtension;
 
 class OrmDatasourceExtensionTest extends OrmTestCase
 {
