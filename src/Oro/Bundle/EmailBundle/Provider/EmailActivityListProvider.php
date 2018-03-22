@@ -483,7 +483,7 @@ class EmailActivityListProvider implements
         $route = null;
         $entityMetadata = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner));
         
-        if(null !== $entityMetadata) {
+        if (null !== $entityMetadata) {
             $route = $entityMetadata->getRoute('view');
         }
         
