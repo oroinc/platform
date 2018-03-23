@@ -3,7 +3,7 @@ define(function(require) {
 
     var jsonSchemaValidator = require('oroui/js/tools/json-schema-validator');
     var AbstractFilterTranslator =
-        require('oroquerydesigner/js/query-type-converter/condition-to-expression/abstract-filter-translator');
+        require('oroquerydesigner/js/query-type-converter/to-expression/abstract-filter-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
     var ArrayNode = ExpressionLanguageLibrary.ArrayNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
@@ -12,9 +12,9 @@ define(function(require) {
     /**
      * @inheritDoc
      */
-    function DictionaryFilterTranslator() {
+    var DictionaryFilterTranslator = function DictionaryFilterTranslatorToExpression() {
         DictionaryFilterTranslator.__super__.constructor.apply(this, arguments);
-    }
+    };
 
     DictionaryFilterTranslator.prototype = Object.create(AbstractFilterTranslator.prototype);
     DictionaryFilterTranslator.__super__ = AbstractFilterTranslator.prototype;
@@ -33,8 +33,8 @@ define(function(require) {
          * @inheritDoc
          */
         test: function(condition) {
-            var filterConfig;
             var result = false;
+            var filterConfigs = this.filterConfigProvider.getFilterConfigsByType('dictionary');
             var schema = {
                 type: 'object',
                 required: ['columnName', 'criterion'],
@@ -46,7 +46,7 @@ define(function(require) {
                         properties: {
                             filter: {
                                 'type': 'string',
-                                'enum': _.pluck(this.filterConfigs, 'name')
+                                'enum': _.pluck(filterConfigs, 'name')
                             },
                             data: {
                                 type: 'object',
@@ -66,8 +66,8 @@ define(function(require) {
             };
 
             if (jsonSchemaValidator.validate(schema, condition)) {
-                filterConfig = _.findWhere(this.filterConfigs, {name: condition.criterion.filter});
-                result = _.pluck(filterConfig.choices, 'value').indexOf(condition.criterion.data.type) !== -1;
+                var config = _.findWhere(filterConfigs, {name: condition.criterion.filter});
+                result = _.pluck(config.choices, 'value').indexOf(condition.criterion.data.type) !== -1;
             }
 
             return result;
@@ -76,7 +76,7 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        _translate: function(condition) {
+        translate: function(condition) {
             var values = new ArrayNode();
             condition.criterion.data.value.forEach(function(val) {
                 values.addElement(new ConstantNode(val));

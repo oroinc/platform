@@ -21,7 +21,12 @@ config:
         'oroquerydesigner/js/app/modules/entity-filter-preset-module': 'bundles/oroquerydesigner/js/app/modules/entity-filter-preset-module.js'
         'oroquerydesigner/js/validator/not-blank-filters': 'bundles/oroquerydesigner/js/validator/not-blank-filters.js'
 
-        'oroquerydesigner/js/query-type-converter/condition-to-expression/field-id-translator': 'bundles/oroquerydesigner/js/query-type-converter/condition-to-expression/field-id-translator.js'
+        'oroquerydesigner/js/query-type-converter/from-expression/abstract-filter-translator': 'bundles/oroquerydesigner/js/query-type-converter/from-expression/abstract-filter-translator.js'
+        'oroquerydesigner/js/query-type-converter/from-expression/dictionary-filter-translator': 'bundles/oroquerydesigner/js/query-type-converter/from-expression/dictionary-filter-translator.js'
+        'oroquerydesigner/js/query-type-converter/from-expression/field-id-translator': 'bundles/oroquerydesigner/js/query-type-converter/from-expression/field-id-translator.js'
+        'oroquerydesigner/js/query-type-converter/to-expression/abstract-filter-translator': 'bundles/oroquerydesigner/js/query-type-converter/to-expression/abstract-filter-translator.js'
+        'oroquerydesigner/js/query-type-converter/to-expression/dictionary-filter-translator': 'bundles/oroquerydesigner/js/query-type-converter/to-expression/dictionary-filter-translator.js'
+        'oroquerydesigner/js/query-type-converter/to-expression/field-id-translator': 'bundles/oroquerydesigner/js/query-type-converter/to-expression/field-id-translator.js'
         'oroquerydesigner/js/query-type-converter/expression-functions-provider': 'bundles/oroquerydesigner/js/query-type-converter/expression-functions-provider.js'
 
     appmodules:

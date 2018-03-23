@@ -1,8 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var FieldIdTranslator =
-        require('oroquerydesigner/js/query-type-converter/expression-to-condition/field-id-translator');
+    var FieldIdTranslator = require('oroquerydesigner/js/query-type-converter/from-expression/field-id-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
     var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
@@ -11,14 +10,14 @@ define(function(require) {
     var NameNode = ExpressionLanguageLibrary.NameNode;
     var Node = ExpressionLanguageLibrary.Node;
 
-    describe('oroquerydesigner/js/query-type-converter/expression-to-condition/field-id-translator', function() {
-        var providerMock;
+    describe('oroquerydesigner/js/query-type-converter/from-expression/field-id-translator', function() {
+        var entityStructureDataProviderMock;
         var translator;
         var fooGetBarAST;
 
         beforeEach(function() {
-            providerMock = {
-                getPathByRelativePropertyPath: jasmine.createSpy('getPathByRelativePropertyPath').and
+            entityStructureDataProviderMock = jasmine.combineSpyObj('entityStructureDataProvider', [
+                jasmine.createSpy('getPathByRelativePropertyPath').and
                     .callFake(function(relativePropertyPath) {
                         return {
                             'bar': 'bar',
@@ -26,17 +25,17 @@ define(function(require) {
                             'bar.qux.baz': 'bar+Oro\\QuxClassName::qux+Oro\\BazClassName::baz'
                         }[relativePropertyPath];
                     }),
-                rootEntity: {
-                    get: jasmine.createSpy('get').and
+                jasmine.combineSpyObj('rootEntity', [
+                    jasmine.createSpy('get').and
                         .callFake(function(attr) {
                             return {
                                 alias: 'foo'
                             }[attr];
                         })
-                }
-            };
+                ])
+            ]);
 
-            translator = new FieldIdTranslator(providerMock);
+            translator = new FieldIdTranslator(entityStructureDataProviderMock);
 
             fooGetBarAST = new GetAttrNode(
                 new NameNode('foo'),
@@ -135,20 +134,14 @@ define(function(require) {
         });
 
         it('rootEntity has to be defined in entityStructureDataProvider', function() {
-            providerMock.rootEntity = null;
+            entityStructureDataProviderMock.rootEntity = null;
             expect(function() {
                 translator.translate(fooGetBarAST);
             }).toThrowError(Error);
         });
 
         it('rootEntity of entityStructureDataProvider has to have alias', function() {
-            providerMock.rootEntity = {
-                get: jasmine.createSpy('get').and.callFake(function(attr) {
-                    return {
-                        alias: ''
-                    }[attr];
-                })
-            };
+            entityStructureDataProviderMock.rootEntity.get.and.returnValue('');
             expect(function() {
                 translator.translate(fooGetBarAST);
             }).toThrowError(Error);

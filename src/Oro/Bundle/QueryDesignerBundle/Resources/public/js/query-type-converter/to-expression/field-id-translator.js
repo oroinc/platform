@@ -14,12 +14,13 @@ define(function(require) {
      * @constructor
      * @throws TypeError if instance of EntityStructureDataProvider is missing
      */
-    function FieldIdTranslator(entityStructureDataProvider) {
+    var FieldIdTranslator = function FieldIdTranslatorToExpression(entityStructureDataProvider) {
         if (!entityStructureDataProvider) {
-            throw new TypeError('Instance of `EntityStructureDataProvider` is required for `FieldIdTranslator`');
+            throw new TypeError(
+                'Instance of `EntityStructureDataProvider` is required for `FieldIdTranslatorToExpression`');
         }
         this.provider = entityStructureDataProvider;
-    }
+    };
 
     Object.assign(FieldIdTranslator.prototype, {
         constructor: FieldIdTranslator,

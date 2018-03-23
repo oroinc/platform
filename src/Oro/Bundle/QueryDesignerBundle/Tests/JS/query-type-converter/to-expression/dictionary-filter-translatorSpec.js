@@ -3,9 +3,8 @@ define(function(require) {
 
     var _ = require('underscore');
     var DictionaryFilterTranslator =
-        require('oroquerydesigner/js/query-type-converter/condition-to-expression/dictionary-filter-translator');
-    var FieldIdTranslator =
-        require('oroquerydesigner/js/query-type-converter/condition-to-expression/field-id-translator');
+        require('oroquerydesigner/js/query-type-converter/to-expression/dictionary-filter-translator');
+    var FieldIdTranslator = require('oroquerydesigner/js/query-type-converter/to-expression/field-id-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
     var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var ArrayNode = ExpressionLanguageLibrary.ArrayNode;
@@ -14,27 +13,29 @@ define(function(require) {
     var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
     var NameNode = ExpressionLanguageLibrary.NameNode;
 
-    var moduleName = 'oroquerydesigner/js/query-type-converter/condition-to-expression/dictionary-filter-translator';
-    describe(moduleName, function() {
+    describe('oroquerydesigner/js/query-type-converter/to-expression/dictionary-filter-translator', function() {
         var translator;
 
         beforeEach(function() {
-            var providerMock = {
-                getRelativePropertyPathByPath:
-                    jasmine.createSpy('getRelativePropertyPathByPath').and.returnValue('bar'),
-                rootEntity: {
-                    get: jasmine.createSpy('get').and.returnValue('foo')
-                }
-            };
+            var entityStructureDataProviderMock = jasmine.combineSpyObj('entityStructureDataProvider', [
+                jasmine.createSpy('getRelativePropertyPathByPath').and.returnValue('bar'),
+                jasmine.combineSpyObj('rootEntity', [
+                    jasmine.createSpy('get').and.returnValue('foo')
+                ])
+            ]);
 
-            translator = new DictionaryFilterTranslator(
-                new FieldIdTranslator(providerMock),
-                [
+            var filterConfigProviderMock = jasmine.combineSpyObj('filterConfigProvider', [
+                jasmine.createSpy('getFilterConfigsByType').and.returnValue([
                     {type: 'dictionary', name: 'dictionary', choices: [{value: '1'}, {value: '2'}]},
                     {type: 'dictionary', name: 'enum', choices: [{value: '1'}, {value: '2'}]},
                     {type: 'dictionary', name: 'tag', choices: [{value: '1'}, {value: '2'}, {value: '3'}]},
                     {type: 'dictionary', name: 'multicurrency', choices: [{value: '1'}, {value: '2'}]}
-                ]
+                ])
+            ]);
+
+            translator = new DictionaryFilterTranslator(
+                new FieldIdTranslator(entityStructureDataProviderMock),
+                filterConfigProviderMock
             );
         });
 
@@ -94,7 +95,7 @@ define(function(require) {
 
             _.each(cases, function(condition, caseName) {
                 it(caseName, function() {
-                    expect(translator.test(condition)).toBe(true);
+                    expect(translator.tryToTranslate(condition)).not.toBe(null);
                 });
             });
         });
@@ -144,13 +145,13 @@ define(function(require) {
 
             _.each(cases, function(condition, caseName) {
                 it(caseName, function() {
-                    expect(translator.test(condition)).toBe(false);
+                    expect(translator.tryToTranslate(condition)).toBe(null);
                 });
             });
         });
 
         it('translate `is any of` condition', function() {
-            var actual = translator.translate({
+            var actual = translator.tryToTranslate({
                 columnName: 'bar',
                 criterion: {
                     filter: 'multicurrency',
@@ -176,7 +177,7 @@ define(function(require) {
         });
 
         it('translate `is not any of` condition', function() {
-            var actual = translator.translate({
+            var actual = translator.tryToTranslate({
                 columnName: 'bar',
                 criterion: {
                     filter: 'dictionary',
@@ -205,7 +206,7 @@ define(function(require) {
         });
 
         it('translate `equal` condition', function() {
-            var actual = translator.translate({
+            var actual = translator.tryToTranslate({
                 columnName: 'bar',
                 criterion: {
                     filter: 'tag',

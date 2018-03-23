@@ -13,12 +13,13 @@ define(function(require) {
      * @constructor
      * @throws TypeError if instance of EntityStructureDataProvider is missing
      */
-    function FieldIdTranslator(entityStructureDataProvider) {
+    var FieldIdTranslator = function FieldIdTranslatorFromExpression(entityStructureDataProvider) {
         if (!entityStructureDataProvider) {
-            throw new TypeError('Instance of `EntityStructureDataProvider` is required for `FieldIdTranslator`');
+            throw new TypeError(
+                'Instance of `EntityStructureDataProvider` is required for `FieldIdTranslatorFromExpression`');
         }
         this.provider = entityStructureDataProvider;
-    }
+    };
 
     Object.assign(FieldIdTranslator.prototype, {
         constructor: FieldIdTranslator,
@@ -39,7 +40,7 @@ define(function(require) {
             var entityAlias = this.provider.rootEntity && this.provider.rootEntity.get('alias');
 
             if (!entityAlias) {
-                throw new Error('Alias of root entity is required for `FieldIdTranslator`');
+                throw new Error('Alias of root entity is required for `FieldIdTranslatorFromExpression`');
             }
 
             while (node instanceof GetAttrNode) {
