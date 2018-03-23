@@ -1,6 +1,24 @@
 oro:
     query_designer:
         aggregates:
+            identifier_distinct:
+                Count Distinct:
+                    name: Count Distinct
+                    hint: Number of unique items
+            number_distinct:
+                Count Distinct:
+                    name: Count Distinct
+                    hint: Number of unique items
+                Sum Distinct:
+                    name: Sum Distinct
+                    hint: Sum of all unique values
+                Avg Distinct:
+                    name: Average Distinct
+                    hint: Average of unique values
+            other_distinct:
+                Count Distinct:
+                    name: Count Distinct
+                    hint: Number of unique items
             identifier:
                 Count:
                     name: Count
