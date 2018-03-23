@@ -39,7 +39,7 @@ datagrids:
                 ....   # some query configuration
 ```
 
-##### Datasource as service:
+##### Datasource as service
 Other than the `query` yaml-oriented provider, ORM datasource supports an alternative `query_builder` service-oriented provider. 
 Basically it is possible to use any arbitrary method that returns a valid `Doctrine\ORM\QueryBuilder` instance.
 
