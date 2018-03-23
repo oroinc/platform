@@ -1,12 +1,9 @@
-OroEntityConfigBundle
-=====================
+# OroEntityConfigBundle
 
-- Allows to add metadata (configuration) to any entity class
-- Provides functionality to manage this metadata
-- [Gives possibility to assign functionality for entity to create and manipulate attributes](Resources/doc/attributes.md)
+OroEntityConfigBundle enables developers to define and configure the entities metadata in the YAML configuration files and provides the ability for the application users to set values of these metadata properties in the entity management UI.
 
-Getting Started
----------------
+## Getting Started
+
 To show how metadata can be added to an entity lets add the following YAML file (this file must be located in `[BundleName]/Resources/config/oro/entity_config.yml`):
 ``` yaml
 entity_config:
@@ -95,8 +92,8 @@ Now you may go to System > Entities. The 'Demo Attr' column should be displayed 
 
 [Example of YAML config](Resources/doc/configuration.md)
 
-Indexed attributes
-------------------
+## Indexed attributes
+
 All configuration data are stored as a serialized array in `data` column of `oro_entity_config` and `oro_entity_config_field` tables for entities and fields appropriately. But sometime you need to get a value of some configuration attribute in SQL query. For example it is required for attributes visible in grids in System > Entities section and have a filter or allow sorting in this grid. In this case you can mark an attribute as indexed. For example:
 ``` yaml
 entity_config:
@@ -115,8 +112,7 @@ from oro_entity_config c
 where v.scope = 'entity' and v.code = 'label' and v.value like '%test%'
 ```
 
-Implementation
---------------
+## Implementation
 
 ### ConfigId
 Allows to identify each configurable object. The entity id is represented by EntityConfigId class. The field id is represented by FieldConfigId class.
@@ -147,24 +143,28 @@ This class is the central access point to entity configuration functionality. It
  - Events::PRE_FLUSH           - This event occurs before changes of configuration data is flushed into a database.
  - Events::POST_FLUSH          - This event occurs after all changes of configuration data is flushed into a database.
 
-Update configuration data
--------------------------
+## Update configuration data
+
 The following command can be used to update configurable entities:
 ```bash
 php app/console oro:entity-config:update
 ```
 Usually you need to execute this command only in 'dev' mode when new new configuration attribute or whole configuration scope is added.
 
-Clearing up the cache
----------------------
+## Clearing up the cache
+
 The following command removes all data related to configurable entities from the application cache:
 ```bash
 php app/console oro:entity-config:cache:clear --no-warmup
 ```
 
-Debugging configuration data
-----------------------------
+## Debugging configuration data
+
 You can use `oro:entity-config:debug` command to get a different kind of configuration data as well as add/remove/update configuration of entities. To see all available options run this command with `--help` option. As an example the following command shows all configuration data for User entity:
 ```bash
 php app/console oro:entity-config:debug "Oro\Bundle\UserBundle\Entity\User"
 ```
+
+## Special case
+
+- [The bundle gives possibility to assign functionality for entity to create and manipulate attributes](Resources/doc/attributes.md)

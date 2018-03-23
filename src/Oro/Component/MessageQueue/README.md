@@ -1,5 +1,4 @@
-OroMessageQueue Component
-=========================
+# OroMessageQueue Component
 
 *Note:* This article is published in the Oro documentation library.
 
@@ -20,16 +19,15 @@ The Client layer provides an ability to start producing/consuming messages with 
  - [Flow](#flow)
  - [Usage](#usage)
  
-External Links
---------------
+## External Links
 
  - [What is Message Queue](http://www.ibm.com/support/knowledgecenter/SSFKSJ_9.0.0/com.ibm.mq.pro.doc/q002620_.htm)
  - [Message Queue Benefits](https://www.iron.io/top-10-uses-for-message-queue/) (most of them are applicable for Oro Message Queue Component)
  - [Rabbit MQ Introduction](https://www.rabbitmq.com/tutorials/tutorial-one-php.html)
 
 
-What Is a Message Queue
------------------------
+## What Is a Message Queue
+
 Message queues provide an asynchronous communications protocol, meaning that the sender and the receiver of the message 
 do not need to interact with the message queue at the same time. Messages placed onto the queue are stored until the 
 recipient retrieves them. A message does not have information about previous and next messages. 
@@ -49,8 +47,7 @@ message with a specific *topic* and a *consumer* finds a subscriber(s) for the t
 decoupling of the information provider from the consumers of that information. The sending application and the receiving 
 application do not need to know anything about each other for the information to be sent and received.
 
-Dictionary
-----------
+## Dictionary
 
 * **Message** - An information message which contains a *message topic* that indicates which *message processor(s)* will process it and a *message body* - array of parameters required for the processing, for example an entity id or a channel name. Messages are created and sent by a *message producer* and put to the "tail" of the *message queue*. When the message comes up, it is processed by a *consumer* using a *message processor*. Messages also contain a number of additional settings (see [Message settings](#message-settings)).
 * **Message Queue** - A FIFO queue that holds *queue messages* until they are processed. There can be one or more queues. If we use only one queue, it is much easier. If there are several queues, it is much more difficult but more flexible sometimes. 
@@ -68,8 +65,7 @@ Dictionary
 * **Delay** - A number of seconds that the message should be delayed for before it is sent to a queue.
 
 
-Message Processors
-------------------
+## Message Processors
 
 **Message Processors** are classes that process queue messages. They implement `MessageProcessorInterface`. In addition, they usually subscribe to the specific topics and implement `TopicSubscriberInterface`.
 
@@ -174,8 +170,7 @@ Overall, there can be three cases:
 * The processor received a message with an empty entity id. This is unexpected behavior. There are definitely bugs in the code that sent the message. We also reject the message but using critical logging level to inform that user intervention is required. 
 
 
-Jobs
-----
+## Jobs
 
 A message processor can be implemented with or without creating jobs. 
 
@@ -353,8 +348,7 @@ updated for more than one hour, and it hasn't not started child, it get Job::STA
 
 Additionally, if processor tries to finish "staled" job, the job will be removed.
 
-Flow
-----
+## Flow
 
 ### Simple flow
 
@@ -512,8 +506,7 @@ The processor subscribes to the `Topics::DO_SMALL_JOB` and runs the created dela
 
 A root job is created for the big job and a set of its child jobs is created for the small jobs. 
 
-More Examples
--------------
+## More Examples
 
 ### Run Only a Single Job (i.e. Job with One Step with runUnique)
 
@@ -616,8 +609,7 @@ class Step2MessageProcessor implements MessageProcessorInterface
 ```
 
 
-Usage
------
+## Usage
 
 The following is an example of a message producing using only a transport layer:
 

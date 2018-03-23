@@ -1,8 +1,6 @@
-Oro ChainProcessor Component
-============================
+# Oro ChainProcessor Component
 
-Table of Contents
------------------
+## Table of Contents
  - [Overview](#overview)
  - [Getting Started](#getting-started)
  - [Context](#context)
@@ -12,8 +10,7 @@ Table of Contents
  - [Applicable Checkers](#applicable-checkers)
  - [Key Classes](#key-classes)
 
-Overview
---------
+## Overview
 
 The Oro ChainProcessor component implements enhanced [Chain of Responsibility](http://www.oodesign.com/chain-of-responsibility-pattern.html) design pattern and allows efficiently process requests without hard-wiring handler relationships and precedence, or request-to-handler mappings.
 
@@ -29,8 +26,7 @@ The following enhancements of the original design pattern are added to make a co
 ![Data flow diagram](./Resources/doc/data_flow_diagram.png "The data flow diagram of Oro ChainProcessor component")
 
 
-Getting Started
----------------
+## Getting Started
 
 Lets imagine that you need a different types of textual representations of some group of objects, e.g. entities. One of straightforward solution may be using of `__toString()` magic method or some custom `toString($parameters)` method. In some simple cases this solution may be a good approach. But in case if you want to allow external code to change existing representation of your objects or add new types of representations this solution is not seem as a good choice.
 
@@ -341,26 +337,22 @@ class DecorateClassNameIdPair implements ProcessorInterface
 
 This was just an example how the Oro ChainProcessor component may be used. The next section provides a list of key classes that may help you to investigate this component. Also you can find advanced usage of it in Oro Platform.
 
-Context
--------
+## Context
 
 The [context](./Context.php) is abstraction designed to isolate implementations of processors from the environment in which they are executed. Actually the context is just key-value storage for input and output data.
 
-Actions
--------
+## Actions
 
 The action is a set of operations what should be performed over the context to get output data for some input data.
 
-Types of Processors
--------------------
+## Types of Processors
 
 There are three types of processors:
   - **common processors** - These processors are executed for all actions. They may be helpful if you need to do some common things at the beginning or at the ending.
   - **ungrouped processors** - The same as above but in scope of specified action.
   - **grouped processors** - It is most generally used processors. They are defined in scope of specified action and logically grouped.
 
-Processors Priority
--------------------
+## Processors Priority
 
 Each processor and each group of processors can have the `priority` attribute that is used to specify the order of processors execution. The higher the priority, the earlier the processor is executed. The default priority is 0.
 
@@ -381,8 +373,7 @@ The following table shows limitations for values of the priority attribute.
 | final ungrouped processors | less than 0 |  |
 | final common processors | less than 0 |  |
 
-Applicable Checkers
--------------------
+## Applicable Checkers
 
 The applicable checkers are used to filter processors to be executed for the current execution context. All applicable checkers you want to use should be registered in a [processor bag](./ProcessorBag.php) and must implement [ApplicableCheckerInterface](./ApplicableCheckerInterface.php).
 
@@ -392,8 +383,7 @@ There is a list of existing applicable checkers that are registered in the proce
 - [SkipGroupApplicableChecker](./SkipGroupApplicableChecker.php) - It allows to skip processors included in some groups. To manage skipped groups  you can use `skipGroup` and `undoGroupSkipping` methods of the context.
 - [MatchApplicableChecker](./MatchApplicableChecker.php) - It allows to filter processors based on data stored in the context.
 
-Key Classes
------------
+## Key Classes
 
 Here is a list of key classes:
 

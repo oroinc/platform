@@ -1,8 +1,10 @@
-OroInstallerBundle
-==================
+# OroInstallerBundle
 
-Web installer for OroCRM. Inspired by [Sylius](https://github.com/Sylius/SyliusInstallerBundle).
+OroInstallerBundle enables developers to install Oro applications in a prepared environment using the CLI or web UI wizard and to define activities for the installation process on a bundle level.
 
+Inspired by [Sylius](https://github.com/Sylius/SyliusInstallerBundle).
+
+## Forewords
 To run the installer on existing setup, you need to update parameters.yml file:
 ``` yaml
 # ...
@@ -22,12 +24,12 @@ $ php composer.phar install
 $ php app/console oro:install
 ```
 
-## Events ##
+## Events
 To add additional actions to the installation process you may use event listeners.
 Currently, there are three events dispatched:
 
-#### `installer.database_preparation.before`
-#### `installer.database_preparation.after`
+### `installer.database_preparation.before`
+### `installer.database_preparation.after`
 Dispatched right before and after all database manipulation (creating table structure, executing migrations, loading demo-data (if set), etc.).
 This events can be used to modify database or execute some some service commands to prepare database for usage.
 Use next sample code to subscribe on this events:
@@ -55,7 +57,7 @@ class MyListener
 }
 ```
 
-#### `installer.finish`
+### `installer.finish`
 Dispatched when the installation is finished.
 Example:
 

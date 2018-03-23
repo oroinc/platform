@@ -1,8 +1,6 @@
-OroNotificationBundle
-=====================
+# OroNotificationBundle
 
-Email notifications for system entity triggers (like entity update, delete, create).
-
+OroNotificationBundle extends the OroEmailBundle capabilities and enables the email notification feature in Oro applications. It provides the UI and CLI tool to send and manage email notifications.
 
 ## Console commands ##
 

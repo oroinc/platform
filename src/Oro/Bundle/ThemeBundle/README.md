@@ -1,17 +1,15 @@
-OroThemeBundle
-==============
+# OroThemeBundle
 
-This bundle provides basic themes support.
+OroThemeBundle provides the basic theme support with the ability to change the original UI applying the extra CSS / LESS files that are grouped into themes.
 
-Basic statements
-----------------
+## Basic statements
+
 * Bundle can provide CSS and templates that are required for it's UI;
 * UI of bundles (css and templates markup) should be "themable", it means that CSS and UI components of bundle should
   be affectable by theme to change look and feel of application (at least colors and icons);
 * A theme is a set of CSS/LESS files that will be included at the end of all CSS files to cascade styles and change look and feel;
 
-Theme Properties
-----------------
+## Theme Properties
 
 Each theme can have next properties:
 
@@ -39,8 +37,7 @@ Logo that will be displayed in the UI.
 _optional_
 This be displayed in theme management UI.
 
-Adding a theme using app/config.yml
------------------------------------
+## Adding a theme using app/config.yml
 
 To add a theme you can use _app/config.yml_ file.
 
@@ -62,8 +59,7 @@ oro_theme:
 Make sure that your root public sites directory (generally a "web" directory in symfony) contains mytheme directory
 with all used files.
 
-Adding a theme using a bundle
------------------------------
+## Adding a theme using a bundle
 
 Theme could be added in any bundle, place a file in _Resources/public/themes/\<theme_name\>/settings.yml_ path inside of bundle.
 This file contains same configuration like in app/config.yml:
@@ -78,15 +74,13 @@ logo: bundles/mybundle/themes/mytheme/images/logo.png
 screenshot: bundles/mybundle/themes/mytheme/images/screenshot.png
 ```
 
-Overriding a theme
-------------------
+## Overriding a theme
 
 All themes settings are collected and merged at compile time of DI container. Bundle could override others bundle theme
 by placing a file with theme _Resources/public/themes/\<theme_name\>/settings.yml_ in settings.yml path.
 
 
-Loading styles of theme
------------------------
+## Loading styles of theme
 
 When application has active theme it's styles append to the end of the list of all CSS assets of bundles. Theme's styles
 will override existing bundles styles to change look and feel of application.
@@ -107,8 +101,7 @@ app/console assetic:dump
 ```
 
 
-Debugging theme styles:
------------------------
+## Debugging theme styles
 
 Each theme is appended to the list of OroAsseticBundle's CSS assets in group "theme". So, if you want to debug theme's
 styles, you should use next configuration in _app/config.yml_:
@@ -127,8 +120,7 @@ app/console assets:install # if you have changed themes files, you can use --sym
 app/console assetic:dump # if you are not using oro_assetic.css_debug: [theme] or oro_assetic.css_debug_all: true options
 ```
 
-Getting list of all available themes:
--------------------------------------
+## Getting list of all available themes
 
 There is a command _oro:theme:list_ for this purpose. Here is an example output of this command:
 

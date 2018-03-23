@@ -1,7 +1,6 @@
-OroDistributionBundle
-=====================
+# OroDistributionBundle
 
-Implements packages management and bundles load without necessity to update application files.
+OroDistributionBundle enables application bundles registration based on their YAML configuration files without changing the application files and provides CLI to manage Oro packages in the applications.
 
 ## Usage ##
 Add Resources/config/oro/bundles.yml file to every bundle you want to be autoregistered:
