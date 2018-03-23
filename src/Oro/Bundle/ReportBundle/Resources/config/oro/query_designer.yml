@@ -1,5 +1,22 @@
 query_designer:
     aggregates:
+        identifier_distinct:
+            applicable: [{identifier: true}]
+            functions:
+                - { name: Count Distinct, expr: COUNT(DISTINCT $column), return_type: integer }
+            query_type: [report]
+        number_distinct:
+            applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}, {type: money}, {type: percent}]
+            functions:
+                - { name: Count Distinct, expr: COUNT(DISTINCT $column), return_type: integer }
+                - { name: Sum Distinct,   expr: SUM(DISTINCT $column) }
+                - { name: Avg Distinct,   expr: AVG(DISTINCT $column) }
+            query_type: [report]
+        other_distinct:
+            applicable: [{type: string}, {type: text}, {type: date}, {type: datetime}]
+            functions:
+                - { name: Count Distinct, expr: COUNT(DISTINCT $column), return_type: integer }
+            query_type: [report]
         identifier:
             applicable: [{identifier: true}]
             functions:
