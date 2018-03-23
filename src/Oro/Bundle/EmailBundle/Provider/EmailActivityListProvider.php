@@ -474,11 +474,11 @@ class EmailActivityListProvider implements
 
     /**
      * @param EmailOwnerInterface $owner
-     * @param $data
+     * @param array $data
      *
      * @return mixed
      */
-    protected function setOwnerLink($owner, $data)
+    protected function setOwnerLink($owner, array $data)
     {
         $route = null;
         $entityMetadata = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner));
