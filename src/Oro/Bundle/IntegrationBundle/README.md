@@ -1,8 +1,5 @@
-OroIntegrationBundle
-====================
+# OroIntegrationBundle
 
-Integration bundle provides abstraction for integrations, transports and connectors. Those objects are responsible for
-integration between application and third party applications or services (e.g. ECommerce stores, ERP systems etc..).
-General purpose is to allow developers to create integration bundles and provide basic UI for its configuration.
+OroIntegrationBundle introduces a framework that enables developers to create integrations between the OroPlatform-based and third-party applications. It also provides UI for the application users to manage the implemented integrations.
 
 Please see [documentation](./Resources/doc/index.md) for more details.

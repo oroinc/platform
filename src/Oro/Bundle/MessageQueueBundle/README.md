@@ -2,6 +2,8 @@
 
 *Note:* This article is published in the Oro documentation library.
 
+OroMessageQueueBundle incorporates the OroMessageQueue component into OroPlatform and thereby provides message queue processing capabilities for all application components.
+
 ## Table of Contents
 
  - [Overview](#overview)

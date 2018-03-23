@@ -1,10 +1,8 @@
-OroEmailBundle
-==============
+# OroEmailBundle
 
-Email message entity with attachment support, email templates, direct mailer implementation.
+OroEmailBundle enables system and user mailboxes in the application and provides the ability to synchronize mailboxes with mail servers, send emails from the application and use email templates.
 
-Usage:
-------
+## Usage
 
  - [Emails](./Resources/doc/emails.md)
  - [Email templates](./Resources/doc/email_templates.md)
