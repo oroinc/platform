@@ -2,6 +2,7 @@ define(function() {
     'use strict';
 
     /**
+     * @export oroexpressionlanguage/js/ast-node-wrapper
      * @param {Node} node - instance of Node from ExpressionLanguage library
      * @param {ASTNodeWrapper} parent - instance of ASTNodeWrapper that contain parent Node
      */
@@ -26,6 +27,15 @@ define(function() {
         children: null,
 
         /**
+         * Returns original expression language node
+         *
+         * @return {Node}
+         */
+        origin: function() {
+            return this.originNode;
+        },
+
+        /**
          * @param {string} name - name of attribute of original node
          * @return {string|number}
          */
@@ -42,13 +52,15 @@ define(function() {
         },
 
         /**
-         * Checks if its original node is instance of the constructor
+         * Checks if its original node is instance of received constructors
          *
-         * @param {Function} constructor
+         * @param {...Function} constructors
          * @return {boolean}
          */
-        instanceOf: function(constructor) {
-            return this.originNode instanceof constructor;
+        instanceOf: function() {
+            return _.any(arguments, function(constructor) {
+                return this.originNode instanceof constructor;
+            }, this);
         },
 
         /**

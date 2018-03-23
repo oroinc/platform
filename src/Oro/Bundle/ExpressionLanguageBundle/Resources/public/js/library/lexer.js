@@ -9,7 +9,7 @@ define(function(require) {
     function Lexer() {}
 
     Object.defineProperties(Lexer.prototype, {
-        NUMBER_REGEXP: {value: /^[0-9]+(?:.[0-9]+)?/},
+        NUMBER_REGEXP: {value: /^[0-9]+(?:\.[0-9]+)?/},
         STRING_REGEXP: {value: /^"([^"\\]*(?:\\.[^"\\]*)*)"|^'([^'\\]*(?:\\.[^'\\]*)*)'/},
         NAME_REGEXP: {value: /^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/},
         OPERATION_REGEXP: {value: /^(not in(?=[\s(])|!==|not(?=[\s(])|and(?=[\s(])|===|>=|or(?=[\s(])|<=|\*\*|\.\.|in(?=[\s(])|&&|\|\||matches|==|!=|\*|~|%|\/|>|\||!|\^|&|\+|<|-)/}

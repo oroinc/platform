@@ -16,7 +16,7 @@ The ASTNodeWrapper provides the following public methods:
 
 - `attr` - Gets the attribute name and returns the value of the attribute of the origin node.
 - `child` - Gets the index as a parameter and returns the corresponding child of the origin node.
-- `instanceOf` - Gets the function-constructor provided in the parameter and checks if the origin node instance inherits a prototype property of the constructor.
+- `instanceOf` - Gets one or more function-constructors provided in the parameter and checks if the origin node instance inherits a prototype property of constructor(s).
 - `findAll` - Iterates through the tree and returns the array of wrappers that match the condition evaluated by the callback function passed in the parameter. The `findAll` function tests every tree node with a callback function and adds the node wrapper to the array only if the callback function returned true. 
 - `findInstancesOf` - Gets the function-constructor provided in the parameter, iterates through the tree, identifies the nodes that are instances of the provided constructor, and returns the array of their wrappers.
 
