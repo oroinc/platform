@@ -430,7 +430,6 @@ define(function(require) {
                 plugins.push(ToolbarMassActionPlugin);
             }
 
-            console.log(this.themeOptions)
             if (!this.themeOptions.disableStickedScrollbar) {
                 if (this.metadata.responsiveGrids && this.metadata.responsiveGrids.enable) {
                     plugins.push({
@@ -441,7 +440,8 @@ define(function(require) {
                     }, {
                         constructor: ElasticSwipeActionsPlugin,
                         options: {
-                            containerSelector: '.grid-row'
+                            containerSelector: '.grid-row',
+                            viewport: this.metadata.responsiveGrids.viewport || {}
                         }
                     });
                 } else {

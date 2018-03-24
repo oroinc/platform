@@ -72,6 +72,10 @@ define(function(require) {
          * @inheritDoc
          */
         disable: function() {
+            if (!this.enabled) {
+                return;
+            }
+
             this.undelegateEvents();
             this.domCache.$container.mCustomScrollbar('destroy');
 
