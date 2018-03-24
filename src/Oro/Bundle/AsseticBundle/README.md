@@ -1,13 +1,10 @@
 # OroAsseticBundle
 
-OroAsseticBundle is based on AsseticBundle and enables an expandable and optimized way to manage CSS assets that are
-distributed across many bundles.
-
-With OroAsseticBundle, a developer can define CSS file groups in the assets.yml configuration of the bundle. Defined files
-are automatically merged and optimized for web presentation. For development and debug purposes, some files can
-be excluded from the optimization process.
-
-Example of the assets.yml file:
+OroAsseticBundle introduces configuration of CSS files groups via the assets.yml file, which can be configured in any active bundle. Such files are automatically merged and optimized for a web presentation.
+ 
+## Overview
+ 
+Example of an assets.yml file:
 
 ```yaml
 assets:

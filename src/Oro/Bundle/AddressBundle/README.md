@@ -1,7 +1,6 @@
 # OroAddressBundle
 
-OroAddressBundle introduces base entity and interfaces for address and address related entities such as country, region,
-phone, and email. It also provides a reference book with country region codes and names.
+OroAddressBundle introduces a base entity and interfaces for addresses and the address-related entities such as a country, a region, a phone, and an email. It also provides a dictionary with country region codes and names.
 
 ### Table of contents
 
