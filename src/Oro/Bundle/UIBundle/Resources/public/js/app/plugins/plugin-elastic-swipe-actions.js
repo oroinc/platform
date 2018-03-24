@@ -83,6 +83,7 @@ define(function(require) {
             _.extend(this, _.pick(options || {},
                 ['containerSelector', 'breakPointPosition', 'maxLimit', 'swipeDoneClassName', 'elastic', 'viewport']
             ));
+
             this.grid = grid;
             this.listenTo(this.grid, 'shown', this.enable);
             mediator.on('viewport:change', this.onViewportChange, this);
@@ -91,10 +92,19 @@ define(function(require) {
         },
 
         /**
+         * Is applicable viewport
+         *
+         * @param viewport
+         */
+        isApplicable: function(viewport) {
+            return viewport.isApplicable(this.viewport);
+        },
+
+        /**
          * Enable swipe handler
          */
         enable: function() {
-            if (this.enabled || !ViewportManager.isApplicable(ViewportManager.getViewport())) {
+            if (this.enabled || this.isApplicable(ViewportManager.getViewport())) {
                 return;
             }
             this._bindEvents();
@@ -130,7 +140,8 @@ define(function(require) {
          * @param {Object} viewport
          */
         onViewportChange: function(viewport) {
-            if (ViewportManager.isApplicable(viewport)) {
+            console.log(this.isApplicable(viewport))
+            if (this.isApplicable(viewport)) {
                 this.enable();
             } else {
                 this.disable();
@@ -245,6 +256,10 @@ define(function(require) {
          * @private
          */
         _revertState: function() {
+            if (!this.enabled) {
+                return;
+            }
+
             this.currentSwipedContainer.data('offset', 0);
             this.storedPos = 0;
             this.currentSwipedContainer.css({

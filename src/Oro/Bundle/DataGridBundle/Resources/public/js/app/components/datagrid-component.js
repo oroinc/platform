@@ -437,18 +437,22 @@ define(function(require) {
                         options: {
                             viewport: this.metadata.responsiveGrids.viewport || {}
                         }
-                    }, {
-                        constructor: ElasticSwipeActionsPlugin,
-                        options: {
-                            containerSelector: '.grid-row',
-                            viewport: this.metadata.responsiveGrids.viewport || {}
-                        }
                     });
                 } else {
                     if (tools.isMobile() || !this.metadata.enableFullScreenLayout) {
                         plugins.push(StickedScrollbarPlugin);
                     }
                 }
+            }
+
+            if (this.metadata.swipeActionsGrid && this.metadata.swipeActionsGrid.enable) {
+                plugins.push({
+                    constructor: ElasticSwipeActionsPlugin,
+                    options: {
+                        containerSelector: '.grid-row',
+                        viewport: this.metadata.swipeActionsGrid.viewport || {}
+                    }
+                });
             }
 
             var appearances = metadata.options.appearances || [];
