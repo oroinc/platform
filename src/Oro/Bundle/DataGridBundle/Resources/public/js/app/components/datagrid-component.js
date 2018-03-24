@@ -22,6 +22,7 @@ define(function(require) {
     var MetadataModel = require('orodatagrid/js/datagrid/metadata-model');
     var DataGridThemeOptionsManager = require('orodatagrid/js/datagrid-theme-options-manager');
     var StickedScrollbarPlugin = require('orodatagrid/js/app/plugins/grid/sticked-scrollbar-plugin');
+    var ElasticSwipeActionsPlugin = require('oroui/js/app/plugins/plugin-elastic-swipe-actions');
 
     helpers = {
         cellType: function(type) {
@@ -429,12 +430,18 @@ define(function(require) {
                 plugins.push(ToolbarMassActionPlugin);
             }
 
+            console.log(this.themeOptions)
             if (!this.themeOptions.disableStickedScrollbar) {
                 if (this.metadata.responsiveGrids && this.metadata.responsiveGrids.enable) {
                     plugins.push({
                         constructor: StickedScrollbarPlugin,
                         options: {
                             viewport: this.metadata.responsiveGrids.viewport || {}
+                        }
+                    }, {
+                        constructor: ElasticSwipeActionsPlugin,
+                        options: {
+                            containerSelector: '.grid-row'
                         }
                     });
                 } else {

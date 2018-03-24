@@ -214,6 +214,11 @@ config:
         'oroui/blank/js/app/modules/views-module': 'oroui/blank/js/app/modules/views-module.js'
         'oroui/js/app/views/layout-subtree-view': 'bundles/oroui/js/app/views/layout-subtree-view.js'
         'oroui/js/layout-subtree-manager': 'bundles/oroui/js/layout-subtree-manager.js'
+        'oroui/js/app/modules/swipe-actions-module': 'bundles/oroui/js/app/modules/swipe-actions-module.js'
+        'oroui/js/swipe-action-manager': 'bundles/oroui/js/swipe-action-manager.js'
+
+        'oroui/js/app/plugins/plugin-elastic-swipe-actions': 'bundles/oroui/js/app/plugins/plugin-elastic-swipe-actions.js'
+        'oroui/js/app/views/test-swipe-view': 'bundles/oroui/js/app/views/test-swipe-view.js'
     appmodules:
         - oroui/js/app/modules/init-layout
         - oroui/js/app/modules/layout-module
@@ -223,6 +228,7 @@ config:
         - oroui/js/app/modules/input-widgets
         - oroui/js/app/modules/component-shortcuts-module
         - oroui/js/app/modules/viewport-module
+        - oroui/js/app/modules/swipe-actions-module
 
         #layouts only
         - oroui/blank/js/app/modules/views-module
