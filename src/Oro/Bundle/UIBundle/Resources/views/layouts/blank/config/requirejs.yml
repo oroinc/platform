@@ -210,6 +210,8 @@ config:
 
         'oroui/js/extend/polyfill': 'oroui/js/extend/polyfill'
 
+        'oroui/js/app/views/loading-bar-view': 'bundles/oroui/js/app/views/loading-bar-view.js'
+
         #layouts only
         'oroui/blank/js/app/modules/views-module': 'oroui/blank/js/app/modules/views-module.js'
         'oroui/js/app/views/layout-subtree-view': 'bundles/oroui/js/app/views/layout-subtree-view.js'

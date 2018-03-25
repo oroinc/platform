@@ -1,0 +1,49 @@
+// @theme: blank;
+
+.loading-bar {
+    display: $loading-bar-display;
+    position: $loading-bar-position;
+    z-index: $loading-bar-z-index;
+    top: $loading-bar-top;
+    left: $loading-bar-left;
+    height: $loading-bar-height;
+    background: $loading-bar-background;
+    box-shadow: $loading-bar-box-shadow;
+    border-radius: $loading-bar-border-radius;
+    transition: $loading-bar-transition;
+    animation: $loading-bar-animation;
+}
+
+@include keyframe($loading-bar-animation-name) {
+    0% {
+        width: 1%;
+    }
+
+    5% {
+        width: 5%;
+    }
+
+    10% {
+        width: 15%;
+    }
+
+    15% {
+        width: 25%;
+    }
+
+    25% {
+        width: 35%;
+    }
+
+    50% {
+        width: 50%;
+    }
+
+    80% {
+        width: 75%;
+    }
+
+    100% {
+        width: 85%;
+    }
+}
