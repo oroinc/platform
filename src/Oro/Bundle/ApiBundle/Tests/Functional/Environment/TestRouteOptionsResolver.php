@@ -74,5 +74,20 @@ class TestRouteOptionsResolver implements RouteOptionsResolverInterface
                 ]
             )
         );
+
+        $routes->append(
+            'oro_rest_tests_resource_without_identifier',
+            new Route(
+                '/api/testapiresourcewithoutidentifier',
+                [
+                    '_controller' => 'OroApiBundle:RestApi:itemWithoutId',
+                    'entity'      => 'testapiresourcewithoutidentifier'
+                ],
+                [],
+                [
+                    'group' => 'rest_api'
+                ]
+            )
+        );
     }
 }
