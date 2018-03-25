@@ -986,4 +986,39 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             $this->documentBuilder->getDocument()
         );
     }
+
+    public function testSetDataObjectForEntityWithoutIdentifier()
+    {
+        $object = [
+            'name'       => 'Name',
+            'meta1'      => 'Meta1',
+            'category'   => 456,
+            'categories' => [
+                ['id' => 456],
+                ['id' => 457]
+            ]
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', []);
+        $metadata->addField($this->createFieldMetadata('name'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'));
+        $metadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category'));
+        $metadata->addAssociation($this->createAssociationMetadata('categories', 'Test\Category', true));
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                'meta' => [
+                    'name'       => 'Name',
+                    'meta1'      => 'Meta1',
+                    'category'   => ['type' => 'test_category', 'id' => 'Test\Category::456'],
+                    'categories' => [
+                        ['type' => 'test_category', 'id' => 'Test\Category::456'],
+                        ['type' => 'test_category', 'id' => 'Test\Category::457']
+                    ]
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
 }

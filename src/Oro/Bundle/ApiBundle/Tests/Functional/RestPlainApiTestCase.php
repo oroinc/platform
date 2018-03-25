@@ -7,6 +7,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RestPlainApiTestCase extends ApiTestCase
 {
+    const JSON_CONTENT_TYPE = 'application/json';
+
     /**
      * {@inheritdoc}
      */
@@ -37,5 +39,65 @@ class RestPlainApiTestCase extends ApiTestCase
         $this->client->request($method, $uri, $parameters);
 
         return $this->client->getResponse();
+    }
+
+    /**
+     * Asserts the response content contains the the given data.
+     *
+     * @param array|string $expectedContent The file name or full file path to YAML template file or array
+     * @param Response     $response
+     * @param object|null  $entity          If not null, object will set as entity reference
+     */
+    protected function assertResponseContains($expectedContent, Response $response, $entity = null)
+    {
+        if ($entity) {
+            $this->getReferenceRepository()->addReference('entity', $entity);
+        }
+
+        $content = json_decode($response->getContent(), true);
+        $expectedContent = self::processTemplateData($this->loadResponseData($expectedContent));
+
+        self::assertArrayContains($expectedContent, $content);
+    }
+
+    /**
+     * Asserts the response content contains the the given validation error.
+     *
+     * @param array    $expectedError
+     * @param Response $response
+     */
+    protected function assertResponseValidationError($expectedError, Response $response)
+    {
+        $this->assertResponseValidationErrors([$expectedError], $response);
+    }
+
+    /**
+     * Asserts the response content contains the the given validation errors.
+     *
+     * @param array    $expectedErrors
+     * @param Response $response
+     */
+    protected function assertResponseValidationErrors($expectedErrors, Response $response)
+    {
+        static::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
+
+        $content = json_decode($response->getContent(), true);
+        try {
+            $this->assertResponseContains($expectedErrors, $response);
+            self::assertCount(
+                count($expectedErrors),
+                $content,
+                'Unexpected number of validation errors'
+            );
+        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+            throw new \PHPUnit_Framework_ExpectationFailedException(
+                sprintf(
+                    "%s\nResponse:\n%s",
+                    $e->getMessage(),
+                    json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+                ),
+                $e->getComparisonFailure()
+            );
+        }
     }
 }

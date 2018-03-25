@@ -186,6 +186,7 @@ services:
         arguments:
             - '@oro_api.collect_resources.processor'
             - '@oro_api.resources_cache'
+            - '@oro_api.resources_without_identifier_loader'
 
     oro_api.subresources_provider:
         class: Oro\Bundle\ApiBundle\Provider\SubresourcesProvider
@@ -208,6 +209,12 @@ services:
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_api_resources' ] ]
+
+    oro_api.resources_without_identifier_loader:
+        class: Oro\Bundle\ApiBundle\Provider\ResourcesWithoutIdentifierLoader
+        public: false
+        arguments:
+            - '@oro_api.action_processor_bag'
 
     oro_api.listener.update_schema:
         class: Oro\Bundle\ApiBundle\EventListener\ApiSourceListener

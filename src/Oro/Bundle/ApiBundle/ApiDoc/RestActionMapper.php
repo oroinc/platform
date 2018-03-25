@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 
+/**
+ * Provides information about mapping between API actions and HTTP methods and about general API route names.
+ */
 class RestActionMapper
 {
     /** @var string */
@@ -71,6 +74,19 @@ class RestActionMapper
         }
 
         return [];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getActionsForResourcesWithoutIdentifier(): array
+    {
+        return [
+            ApiActions::GET,
+            ApiActions::DELETE,
+            ApiActions::CREATE,
+            ApiActions::UPDATE
+        ];
     }
 
     /**

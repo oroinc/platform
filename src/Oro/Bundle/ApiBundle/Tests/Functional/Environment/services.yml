@@ -58,3 +58,19 @@ services:
             - { name: oro.api.processor, action: update_relationship, group: normalize_input, parentClass: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment, priority: 220 }
             - { name: oro.api.processor, action: add_relationship, group: normalize_input, parentClass: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment, priority: 220 }
             - { name: oro.api.processor, action: delete_relationship, group: normalize_input, parentClass: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment, priority: 220 }
+
+    oro_api.tests.load_test_resource_without_identifier_data:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\LoadTestResourceWithoutIdentifierData
+        tags:
+            - { name: oro.api.processor, action: get, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier }
+
+    oro_api.tests.load_test_resource_without_identifier_entity:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\LoadTestResourceWithoutIdentifierEntity
+        tags:
+            - { name: oro.api.processor, action: update, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier, priority: -20 }
+            - { name: oro.api.processor, action: delete, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier, priority: -20 }
+
+    oro_api.tests.delete_test_resource_without_identifier_entity:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\DeleteTestResourceWithoutIdentifierEntity
+        tags:
+            - { name: oro.api.processor, action: delete, group: delete_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier }

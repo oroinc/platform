@@ -123,9 +123,11 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $entityMetadata = new EntityMetadata();
         $this->assertEmpty($entityMetadata->getIdentifierFieldNames());
+        $this->assertFalse($entityMetadata->hasIdentifierFields());
 
         $entityMetadata->setIdentifierFieldNames(['id']);
         $this->assertEquals(['id'], $entityMetadata->getIdentifierFieldNames());
+        $this->assertTrue($entityMetadata->hasIdentifierFields());
     }
 
     public function testInheritedType()
