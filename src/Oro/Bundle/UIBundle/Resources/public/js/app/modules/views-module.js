@@ -102,6 +102,30 @@ define([
     });
 
     /**
+     * Init PageLoadingBarView
+     */
+    BaseController.loadBeforeAction([
+        'oroui/js/mediator',
+        'oroui/js/app/views/loading-bar-view'
+    ], function(mediator, LoadingBarView) {
+        BaseController.addToReuse('loadingBar', {
+            compose: function() {
+                this.view = new LoadingBarView({
+                    container: '#oroplatform-header',
+                    ajaxLoading: true
+                });
+                mediator.setHandler('showLoadingBar', this.view.show, this.view);
+                mediator.setHandler('hideLoadingBar', this.view.hide, this.view);
+                mediator.on('page:beforeChange', this.view.show, this.view);
+                mediator.on('page:afterChange', this.view.hide, this.view);
+                if (config.showLoadingBarOnStartup) {
+                    this.view.show();
+                }
+            }
+        });
+    });
+
+    /**
      * Init PageMessagesView
      */
     BaseController.loadBeforeAction([

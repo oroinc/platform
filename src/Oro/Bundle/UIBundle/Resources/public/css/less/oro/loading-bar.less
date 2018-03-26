@@ -1,0 +1,81 @@
+.loading-bar {
+  display: none;
+  position: absolute;
+  z-index: 1000;
+  bottom: -2px;
+  left: 0;
+  height: 2px;
+  background: #7aa4e4;
+  box-shadow: 0 0 10px #7aa4e4;
+  border-radius: 3px;
+  transition: width 300ms ease-out, opacity 300ms linear;
+  animation: line-loader 5s forwards;
+}
+
+@-webkit-keyframes line-loader {
+  0% {
+    width: 1%;
+  }
+
+  5% {
+    width: 5%;
+  }
+
+  10% {
+    width: 15%;
+  }
+
+  15% {
+    width: 25%;
+  }
+
+  25% {
+    width: 35%;
+  }
+
+  50% {
+    width: 50%;
+  }
+
+  80% {
+    width: 75%;
+  }
+
+  100% {
+    width: 85%;
+  }
+}
+
+@keyframes line-loader {
+    0% {
+        width: 1%;
+    }
+
+    5% {
+        width: 5%;
+    }
+
+    10% {
+        width: 15%;
+    }
+
+    15% {
+        width: 25%;
+    }
+
+    25% {
+        width: 35%;
+    }
+
+    50% {
+        width: 50%;
+    }
+
+    80% {
+        width: 75%;
+    }
+
+    100% {
+        width: 85%;
+    }
+}
