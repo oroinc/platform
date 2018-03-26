@@ -6,11 +6,15 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Symfony\Component\Asset\Packages as AssetHelper;
+use Symfony\Component\Asset\PathPackage;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Provides WYSIWYG editor functionality. WYSIWYG editor can be disabled from System Configuration.
+ */
 class OroRichTextType extends AbstractType
 {
     const NAME            = 'oro_rich_text';
@@ -91,6 +95,7 @@ class OroRichTextType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+        $assetsBaseUrl          = '';
         $assetsVersionBaseUrl   = '';
         $assetsVersionFormatted = '';
         if ($this->assetHelper) {
@@ -99,14 +104,18 @@ class OroRichTextType extends AbstractType
              * without any formatting - we have to calculate formatted version url's parameter to be used inside
              * WYSIWYG editor.
              */
-            $assetsVersionBaseUrl   = $this->assetHelper->getUrl('/');
+            /** @var PathPackage $routing */
+            $routing = $this->assetHelper->getPackage();
+
+            $assetsBaseUrl = $routing->getBasePath();
+            $assetsVersionBaseUrl = $routing->getUrl('/');
             $assetsVersionFormatted = substr($assetsVersionBaseUrl, strrpos($assetsVersionBaseUrl, '/') + 1);
         }
 
         $defaultWysiwygOptions = [
             'plugins'            => self::$defaultPlugins,
             'toolbar_type'       => self::TOOLBAR_DEFAULT,
-            'skin_url'           => 'bundles/oroform/css/tinymce',
+            'skin_url'           => $assetsBaseUrl . 'bundles/oroform/css/tinymce',
             'valid_elements'     => implode(',', $this->htmlTagProvider->getAllowedElements()),
             'menubar'            => false,
             'statusbar'          => false,
@@ -125,7 +134,7 @@ class OroRichTextType extends AbstractType
                 'module'  => 'oroui/js/app/components/view-component',
                 'options' => [
                     'view'        => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
-                    'content_css' => 'bundles/oroform/css/wysiwyg-editor.css',
+                    'content_css' => $assetsBaseUrl . 'bundles/oroform/css/wysiwyg-editor.css',
                 ]
             ],
         ];
