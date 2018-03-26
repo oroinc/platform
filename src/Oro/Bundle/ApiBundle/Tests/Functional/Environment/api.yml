@@ -15,6 +15,9 @@ api:
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment:
             alias: testapicurrentdepartment
             plural_alias: testapicurrentdepartments
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier:
+            alias: testapiresourcewithoutidentifier
+            plural_alias: testapiresourcewithoutidentifier
 
     entities:
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
@@ -138,3 +141,24 @@ api:
         Extend\Entity\TestApiE1: ~
         Extend\Entity\TestApiE2: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier:
+            fields:
+                name:
+                    data_type: string
+                    description: The name of a resource
+                    form_options:
+                        constraints:
+                            - NotBlank: ~
+            actions:
+                get:
+                    description: Get Resource Without Identifier
+                    documentation: Get resource without identifier
+                create:
+                    description: Create Resource Without Identifier
+                    documentation: Create resource without identifier
+                delete:
+                    description: Delete Resource Without Identifier
+                    documentation: Delete resource without identifier
+                update:
+                    description: Update Resource Without Identifier
+                    documentation: Update resource without identifier

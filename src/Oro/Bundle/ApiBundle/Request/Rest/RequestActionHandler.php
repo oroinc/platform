@@ -15,6 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 
+/**
+ * Handles API actions for REST API.
+ */
 class RequestActionHandler extends BaseRequestActionHandler
 {
     /** @var ViewHandlerInterface */

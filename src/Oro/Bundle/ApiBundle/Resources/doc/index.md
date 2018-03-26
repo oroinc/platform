@@ -71,6 +71,7 @@
    - [Add custom controller](./how_to.md#add-custom-controller)
    - [Add a Custom Route](./how_to.md#add-a-custom-route)
    - [Using a non-primary key to identify entity](./how_to.md#using-a-non-primary-key-to-identify-entity)
+   - [Enable API for an Entity Without Identifier](./how_to.md#enable-api-for-an-entity-without-identifier)
    - [Enable Custom API](./how_to.md#enable-custom-api)
  - [Testing](./testing.md)
    - [Overview](./testing.md#overview)

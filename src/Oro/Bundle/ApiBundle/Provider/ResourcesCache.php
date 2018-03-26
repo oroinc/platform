@@ -15,6 +15,7 @@ class ResourcesCache
     private const RESOURCES_KEY_PREFIX            = 'resources_';
     private const SUBRESOURCE_KEY_PREFIX          = 'subresource_';
     private const ACCESSIBLE_RESOURCES_KEY_PREFIX = 'accessible_';
+    private const RESOURCES_WITHOUT_ID_KEY_PREFIX = 'resources_wid_';
     private const EXCLUDED_ACTIONS_KEY_PREFIX     = 'excluded_actions_';
 
     /** @var CacheProvider */
@@ -122,6 +123,27 @@ class ResourcesCache
     }
 
     /**
+     * Fetches a list of entity classes for API resources that do not have an identifier.
+     *
+     * @param string      $version     The Data API version
+     * @param RequestType $requestType The request type, for example "rest", "soap", etc.
+     *
+     * @return string[] The list of class names or NULL if it is not cached yet
+     */
+    public function getResourcesWithoutIdentifier(string $version, RequestType $requestType): ?array
+    {
+        $resources = $this->cache->fetch(
+            self::RESOURCES_WITHOUT_ID_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType)
+        );
+
+        if (false === $resources) {
+            return null;
+        }
+
+        return $resources;
+    }
+
+    /**
      * Puts Data API resources into the cache.
      *
      * @param string        $version             The Data API version
@@ -154,6 +176,24 @@ class ResourcesCache
         $this->cache->save(self::RESOURCES_KEY_PREFIX . $keyIndex, $allResources);
         $this->cache->save(self::ACCESSIBLE_RESOURCES_KEY_PREFIX . $keyIndex, $accessibleResourcesData);
         $this->cache->save(self::EXCLUDED_ACTIONS_KEY_PREFIX . $keyIndex, $excludedActionsData);
+    }
+
+    /**
+     * Puts Data API resources that do not have an identifier into the cache.
+     *
+     * @param string        $version             The Data API version
+     * @param RequestType   $requestType         The request type, for example "rest", "soap", etc.
+     * @param string[]      $resourcesWithoutId  The list of resources without identifier
+     */
+    public function saveResourcesWithoutIdentifier(
+        string $version,
+        RequestType $requestType,
+        array $resourcesWithoutId
+    ): void {
+        $this->cache->save(
+            self::RESOURCES_WITHOUT_ID_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType),
+            $resourcesWithoutId
+        );
     }
 
     /**

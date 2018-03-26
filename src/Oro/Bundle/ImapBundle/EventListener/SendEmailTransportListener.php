@@ -7,6 +7,9 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
+/**
+ * Configure SMTP transport based on user IMAP settings
+ */
 class SendEmailTransportListener
 {
     /**
@@ -47,7 +50,7 @@ class SendEmailTransportListener
             $security = $emailOrigin->getSmtpEncryption();
 
             $transport = $event->getTransport();
-            if ($transport instanceof \Swift_SmtpTransport) {
+            if ($transport instanceof \Swift_Transport_EsmtpTransport) {
                 $transport->setHost($host);
                 $transport->setPort($port);
                 $transport->setEncryption($security);
@@ -56,13 +59,15 @@ class SendEmailTransportListener
             }
 
             $transport->setUsername($username);
-            $transport->setPassword($password);
 
             $accessToken = $this->imapEmailGoogleOauth2Manager->getAccessTokenWithCheckingExpiration($emailOrigin);
             if ($accessToken !== null) {
                 $transport->setAuthMode('XOAUTH2');
                 $transport->setPassword($accessToken);
+            } else {
+                $transport->setPassword($password);
             }
+
             $event->setTransport($transport);
         }
     }

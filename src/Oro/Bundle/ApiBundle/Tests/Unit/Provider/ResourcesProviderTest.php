@@ -6,26 +6,35 @@ use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
 use Oro\Bundle\ApiBundle\Processor\CollectResourcesProcessor;
 use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
+use Oro\Bundle\ApiBundle\Provider\ResourcesWithoutIdentifierLoader;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|CollectResourcesProcessor */
-    protected $processor;
+    private $processor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesCache */
-    protected $resourcesCache;
+    private $resourcesCache;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesWithoutIdentifierLoader */
+    private $resourcesWithoutIdentifierLoader;
 
     /** @var ResourcesProvider */
-    protected $resourcesProvider;
+    private $resourcesProvider;
 
     protected function setUp()
     {
         $this->processor = $this->createMock(CollectResourcesProcessor::class);
         $this->resourcesCache = $this->createMock(ResourcesCache::class);
+        $this->resourcesWithoutIdentifierLoader = $this->createMock(ResourcesWithoutIdentifierLoader::class);
 
-        $this->resourcesProvider = new ResourcesProvider($this->processor, $this->resourcesCache);
+        $this->resourcesProvider = new ResourcesProvider(
+            $this->processor,
+            $this->resourcesCache,
+            $this->resourcesWithoutIdentifierLoader
+        );
     }
 
     public function testGetResourcesNoCache()
@@ -39,12 +48,12 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
         ];
         $expectedAccessibleResources = ['Test\Entity3'];
 
-        $this->processor->expects($this->once())
+        $this->processor->expects(self::once())
             ->method('process')
             ->willReturnCallback(
                 function (CollectResourcesContext $context) use ($version, $requestType) {
-                    $this->assertEquals($version, $context->getVersion());
-                    $this->assertEquals($requestType, $context->getRequestType());
+                    self::assertEquals($version, $context->getVersion());
+                    self::assertEquals($requestType, $context->getRequestType());
 
                     $context->getResult()->add(new ApiResource('Test\Entity1'));
                     $context->getResult()->add(new ApiResource('Test\Entity3'));
@@ -52,15 +61,15 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
                     $context->setAccessibleResources(['Test\Entity3']);
                 }
             );
-        $this->resourcesCache->expects($this->once())
+        $this->resourcesCache->expects(self::once())
             ->method('getResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn(null);
-        $this->resourcesCache->expects($this->once())
+        $this->resourcesCache->expects(self::once())
             ->method('saveResources')
-            ->with($version, $this->identicalTo($requestType), $expectedResources, $expectedAccessibleResources);
+            ->with($version, self::identicalTo($requestType), $expectedResources, $expectedAccessibleResources);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedResources,
             $this->resourcesProvider->getResources($version, $requestType)
         );
@@ -76,16 +85,16 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
             new ApiResource('Test\Entity3'),
         ];
 
-        $this->processor->expects($this->never())
+        $this->processor->expects(self::never())
             ->method('process');
-        $this->resourcesCache->expects($this->once())
+        $this->resourcesCache->expects(self::once())
             ->method('getResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn($cachedResources);
-        $this->resourcesCache->expects($this->never())
+        $this->resourcesCache->expects(self::never())
             ->method('saveResources');
 
-        $this->assertEquals(
+        self::assertEquals(
             $cachedResources,
             $this->resourcesProvider->getResources($version, $requestType)
         );
@@ -101,16 +110,20 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
             'Test\Entity3' => true
         ];
 
-        $this->processor->expects($this->never())
+        $this->processor->expects(self::never())
             ->method('process');
-        $this->resourcesCache->expects($this->once())
+        $this->resourcesCache->expects(self::once())
             ->method('getAccessibleResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn($cachedData);
-        $this->resourcesCache->expects($this->never())
+        $this->resourcesCache->expects(self::never())
             ->method('saveResources');
+        $this->resourcesCache->expects(self::once())
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn([]);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Entity3'],
             $this->resourcesProvider->getAccessibleResources($version, $requestType)
         );
@@ -131,12 +144,12 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
         ];
         $expectedAccessibleResources = ['Test\Entity3'];
 
-        $this->processor->expects($this->once())
+        $this->processor->expects(self::once())
             ->method('process')
             ->willReturnCallback(
                 function (CollectResourcesContext $context) use ($version, $requestType) {
-                    $this->assertEquals($version, $context->getVersion());
-                    $this->assertEquals($requestType, $context->getRequestType());
+                    self::assertEquals($version, $context->getVersion());
+                    self::assertEquals($requestType, $context->getRequestType());
 
                     $context->getResult()->add(new ApiResource('Test\Entity1'));
                     $context->getResult()->add(new ApiResource('Test\Entity3'));
@@ -144,24 +157,48 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
                     $context->setAccessibleResources(['Test\Entity3']);
                 }
             );
-        $this->resourcesCache->expects($this->at(0))
+        $this->resourcesCache->expects(self::at(0))
             ->method('getAccessibleResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn(null);
-        $this->resourcesCache->expects($this->at(1))
+        $this->resourcesCache->expects(self::at(1))
             ->method('getResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn(null);
-        $this->resourcesCache->expects($this->at(2))
+        $this->resourcesCache->expects(self::at(2))
             ->method('saveResources')
-            ->with($version, $this->identicalTo($requestType), $expectedResources, $expectedAccessibleResources);
-        $this->resourcesCache->expects($this->at(3))
+            ->with($version, self::identicalTo($requestType), $expectedResources, $expectedAccessibleResources);
+        $this->resourcesCache->expects(self::at(3))
             ->method('getAccessibleResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn($cachedData);
+        $this->resourcesCache->expects(self::once())
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn([]);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Entity3'],
+            $this->resourcesProvider->getAccessibleResources($version, $requestType)
+        );
+    }
+
+    public function testGetAccessibleResourcesForNotAccessibleResourceWithoutIdentifier()
+    {
+        $version = '1.2.3';
+        $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
+
+        $this->resourcesCache->expects(self::once())
+            ->method('getAccessibleResources')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn(['Test\Entity1' => false]);
+        $this->resourcesCache->expects(self::once())
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn(['Test\Entity1']);
+
+        self::assertEquals(
+            ['Test\Entity1'],
             $this->resourcesProvider->getAccessibleResources($version, $requestType)
         );
     }
@@ -176,22 +213,26 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
             'Test\Entity3' => true
         ];
 
-        $this->processor->expects($this->never())
+        $this->processor->expects(self::never())
             ->method('process');
-        $this->resourcesCache->expects($this->once())
+        $this->resourcesCache->expects(self::once())
             ->method('getAccessibleResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn($cachedData);
-        $this->resourcesCache->expects($this->never())
+        $this->resourcesCache->expects(self::never())
             ->method('saveResources');
+        $this->resourcesCache->expects(self::once())
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn([]);
 
-        $this->assertFalse(
+        self::assertFalse(
             $this->resourcesProvider->isResourceAccessible('Test\Entity1', $version, $requestType)
         );
-        $this->assertFalse(
+        self::assertFalse(
             $this->resourcesProvider->isResourceAccessible('Test\Entity2', $version, $requestType)
         );
-        $this->assertTrue(
+        self::assertTrue(
             $this->resourcesProvider->isResourceAccessible('Test\Entity3', $version, $requestType)
         );
     }
@@ -211,12 +252,12 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
         ];
         $expectedAccessibleResources = ['Test\Entity3'];
 
-        $this->processor->expects($this->once())
+        $this->processor->expects(self::once())
             ->method('process')
             ->willReturnCallback(
                 function (CollectResourcesContext $context) use ($version, $requestType) {
-                    $this->assertEquals($version, $context->getVersion());
-                    $this->assertEquals($requestType, $context->getRequestType());
+                    self::assertEquals($version, $context->getVersion());
+                    self::assertEquals($requestType, $context->getRequestType());
 
                     $context->getResult()->add(new ApiResource('Test\Entity1'));
                     $context->getResult()->add(new ApiResource('Test\Entity3'));
@@ -224,30 +265,53 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
                     $context->setAccessibleResources(['Test\Entity3']);
                 }
             );
-        $this->resourcesCache->expects($this->at(0))
+        $this->resourcesCache->expects(self::at(0))
             ->method('getAccessibleResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn(null);
-        $this->resourcesCache->expects($this->at(1))
+        $this->resourcesCache->expects(self::at(1))
             ->method('getResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn(null);
-        $this->resourcesCache->expects($this->at(2))
+        $this->resourcesCache->expects(self::at(2))
             ->method('saveResources')
-            ->with($version, $this->identicalTo($requestType), $expectedResources, $expectedAccessibleResources);
-        $this->resourcesCache->expects($this->at(3))
+            ->with($version, self::identicalTo($requestType), $expectedResources, $expectedAccessibleResources);
+        $this->resourcesCache->expects(self::at(3))
             ->method('getAccessibleResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn($cachedData);
+        $this->resourcesCache->expects(self::once())
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn([]);
 
-        $this->assertFalse(
+        self::assertFalse(
             $this->resourcesProvider->isResourceAccessible('Test\Entity1', $version, $requestType)
         );
-        $this->assertFalse(
+        self::assertFalse(
             $this->resourcesProvider->isResourceAccessible('Test\Entity2', $version, $requestType)
         );
-        $this->assertTrue(
+        self::assertTrue(
             $this->resourcesProvider->isResourceAccessible('Test\Entity3', $version, $requestType)
+        );
+    }
+
+    public function testIsResourceAccessibleForNotAccessibleResourceWithoutIdentifier()
+    {
+        $version = '1.2.3';
+        $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
+
+        $this->resourcesCache->expects(self::once())
+            ->method('getAccessibleResources')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn(['Test\Entity1' => false]);
+        $this->resourcesCache->expects(self::once())
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn(['Test\Entity1']);
+
+        self::assertTrue(
+            $this->resourcesProvider->isResourceAccessible('Test\Entity1', $version, $requestType)
         );
     }
 
@@ -261,22 +325,22 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
             'Test\Entity3' => true
         ];
 
-        $this->processor->expects($this->never())
+        $this->processor->expects(self::never())
             ->method('process');
-        $this->resourcesCache->expects($this->once())
+        $this->resourcesCache->expects(self::once())
             ->method('getAccessibleResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn($cachedData);
-        $this->resourcesCache->expects($this->never())
+        $this->resourcesCache->expects(self::never())
             ->method('saveResources');
 
-        $this->assertTrue(
+        self::assertTrue(
             $this->resourcesProvider->isResourceKnown('Test\Entity1', $version, $requestType)
         );
-        $this->assertFalse(
+        self::assertFalse(
             $this->resourcesProvider->isResourceKnown('Test\Entity2', $version, $requestType)
         );
-        $this->assertTrue(
+        self::assertTrue(
             $this->resourcesProvider->isResourceKnown('Test\Entity3', $version, $requestType)
         );
     }
@@ -296,12 +360,12 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
         ];
         $expectedAccessibleResources = ['Test\Entity3'];
 
-        $this->processor->expects($this->once())
+        $this->processor->expects(self::once())
             ->method('process')
             ->willReturnCallback(
                 function (CollectResourcesContext $context) use ($version, $requestType) {
-                    $this->assertEquals($version, $context->getVersion());
-                    $this->assertEquals($requestType, $context->getRequestType());
+                    self::assertEquals($version, $context->getVersion());
+                    self::assertEquals($requestType, $context->getRequestType());
 
                     $context->getResult()->add(new ApiResource('Test\Entity1'));
                     $context->getResult()->add(new ApiResource('Test\Entity3'));
@@ -309,29 +373,29 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
                     $context->setAccessibleResources(['Test\Entity3']);
                 }
             );
-        $this->resourcesCache->expects($this->at(0))
+        $this->resourcesCache->expects(self::at(0))
             ->method('getAccessibleResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn(null);
-        $this->resourcesCache->expects($this->at(1))
+        $this->resourcesCache->expects(self::at(1))
             ->method('getResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn(null);
-        $this->resourcesCache->expects($this->at(2))
+        $this->resourcesCache->expects(self::at(2))
             ->method('saveResources')
-            ->with($version, $this->identicalTo($requestType), $expectedResources, $expectedAccessibleResources);
-        $this->resourcesCache->expects($this->at(3))
+            ->with($version, self::identicalTo($requestType), $expectedResources, $expectedAccessibleResources);
+        $this->resourcesCache->expects(self::at(3))
             ->method('getAccessibleResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn($cachedData);
 
-        $this->assertTrue(
+        self::assertTrue(
             $this->resourcesProvider->isResourceKnown('Test\Entity1', $version, $requestType)
         );
-        $this->assertFalse(
+        self::assertFalse(
             $this->resourcesProvider->isResourceKnown('Test\Entity2', $version, $requestType)
         );
-        $this->assertTrue(
+        self::assertTrue(
             $this->resourcesProvider->isResourceKnown('Test\Entity3', $version, $requestType)
         );
     }
@@ -346,24 +410,24 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
             'Test\Entity3' => ['delete']
         ];
 
-        $this->processor->expects($this->never())
+        $this->processor->expects(self::never())
             ->method('process');
-        $this->resourcesCache->expects($this->once())
+        $this->resourcesCache->expects(self::once())
             ->method('getExcludedActions')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn($cachedData);
-        $this->resourcesCache->expects($this->never())
+        $this->resourcesCache->expects(self::never())
             ->method('saveResources');
 
-        $this->assertSame(
+        self::assertSame(
             [],
             $this->resourcesProvider->getResourceExcludeActions('Test\Entity1', $version, $requestType)
         );
-        $this->assertSame(
+        self::assertSame(
             [],
             $this->resourcesProvider->getResourceExcludeActions('Test\Entity2', $version, $requestType)
         );
-        $this->assertSame(
+        self::assertSame(
             ['delete'],
             $this->resourcesProvider->getResourceExcludeActions('Test\Entity3', $version, $requestType)
         );
@@ -384,12 +448,12 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
         $expectedResources = [$resource1, $resource3];
         $expectedAccessibleResources = ['Test\Entity3'];
 
-        $this->processor->expects($this->once())
+        $this->processor->expects(self::once())
             ->method('process')
             ->willReturnCallback(
                 function (CollectResourcesContext $context) use ($version, $requestType) {
-                    $this->assertEquals($version, $context->getVersion());
-                    $this->assertEquals($requestType, $context->getRequestType());
+                    self::assertEquals($version, $context->getVersion());
+                    self::assertEquals($requestType, $context->getRequestType());
 
                     $resource1 = new ApiResource('Test\Entity1');
                     $context->getResult()->add($resource1);
@@ -400,33 +464,155 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
                     $context->setAccessibleResources(['Test\Entity3']);
                 }
             );
-        $this->resourcesCache->expects($this->at(0))
+        $this->resourcesCache->expects(self::at(0))
             ->method('getExcludedActions')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn(null);
-        $this->resourcesCache->expects($this->at(1))
+        $this->resourcesCache->expects(self::at(1))
             ->method('getResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn(null);
-        $this->resourcesCache->expects($this->at(2))
+        $this->resourcesCache->expects(self::at(2))
             ->method('saveResources')
-            ->with($version, $this->identicalTo($requestType), $expectedResources, $expectedAccessibleResources);
-        $this->resourcesCache->expects($this->at(3))
+            ->with($version, self::identicalTo($requestType), $expectedResources, $expectedAccessibleResources);
+        $this->resourcesCache->expects(self::at(3))
             ->method('getExcludedActions')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn($cachedData);
 
-        $this->assertSame(
+        self::assertSame(
             [],
             $this->resourcesProvider->getResourceExcludeActions('Test\Entity1', $version, $requestType)
         );
-        $this->assertSame(
+        self::assertSame(
             [],
             $this->resourcesProvider->getResourceExcludeActions('Test\Entity2', $version, $requestType)
         );
-        $this->assertSame(
+        self::assertSame(
             ['delete'],
             $this->resourcesProvider->getResourceExcludeActions('Test\Entity3', $version, $requestType)
+        );
+    }
+
+    public function testGetResourcesWithoutIdentifierWhenCacheExists()
+    {
+        $version = '1.2.3';
+        $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
+
+        $resourcesWithoutIdentifier = ['Test\Entity1', 'Test\Entity2'];
+
+        $this->resourcesCache->expects(self::never())
+            ->method('getResources');
+        $this->resourcesWithoutIdentifierLoader->expects(self::never())
+            ->method('load');
+        $this->resourcesCache->expects(self::once())
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn($resourcesWithoutIdentifier);
+        $this->resourcesCache->expects(self::never())
+            ->method('saveResourcesWithoutIdentifier');
+
+        self::assertEquals(
+            $resourcesWithoutIdentifier,
+            $this->resourcesProvider->getResourcesWithoutIdentifier($version, $requestType)
+        );
+        // test local cache
+        self::assertEquals(
+            $resourcesWithoutIdentifier,
+            $this->resourcesProvider->getResourcesWithoutIdentifier($version, $requestType)
+        );
+    }
+
+    public function testGetResourcesWithoutIdentifierWhenCacheDoesNotExist()
+    {
+        $version = '1.2.3';
+        $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
+
+        $resourcesWithoutIdentifier = ['Test\Entity1', 'Test\Entity2'];
+        $resources = [new ApiResource('Test\Entity1'), new ApiResource('Test\Entity2')];
+
+        $this->resourcesCache->expects(self::once())
+            ->method('getResources')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn($resources);
+        $this->resourcesWithoutIdentifierLoader->expects(self::once())
+            ->method('load')
+            ->with($version, self::identicalTo($requestType), $resources)
+            ->willReturn($resourcesWithoutIdentifier);
+        $this->resourcesCache->expects(self::at(0))
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn(null);
+        $this->resourcesCache->expects(self::at(2))
+            ->method('saveResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType), $resourcesWithoutIdentifier);
+
+        self::assertEquals(
+            $resourcesWithoutIdentifier,
+            $this->resourcesProvider->getResourcesWithoutIdentifier($version, $requestType)
+        );
+        // test local cache
+        self::assertEquals(
+            $resourcesWithoutIdentifier,
+            $this->resourcesProvider->getResourcesWithoutIdentifier($version, $requestType)
+        );
+    }
+
+    public function testIsResourceWithoutIdentifierWhenCacheExists()
+    {
+        $version = '1.2.3';
+        $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
+
+        $resourcesWithoutIdentifier = ['Test\Entity1'];
+
+        $this->resourcesCache->expects(self::never())
+            ->method('getResources');
+        $this->resourcesWithoutIdentifierLoader->expects(self::never())
+            ->method('load');
+        $this->resourcesCache->expects(self::once())
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn($resourcesWithoutIdentifier);
+        $this->resourcesCache->expects(self::never())
+            ->method('saveResourcesWithoutIdentifier');
+
+        self::assertTrue(
+            $this->resourcesProvider->isResourceWithoutIdentifier('Test\Entity1', $version, $requestType)
+        );
+        self::assertFalse(
+            $this->resourcesProvider->isResourceWithoutIdentifier('Test\Entity2', $version, $requestType)
+        );
+    }
+
+    public function testIsResourceWithoutIdentifierWhenCacheDoesNotExist()
+    {
+        $version = '1.2.3';
+        $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
+
+        $resourcesWithoutIdentifier = ['Test\Entity1'];
+        $resources = [new ApiResource('Test\Entity1')];
+
+        $this->resourcesCache->expects(self::once())
+            ->method('getResources')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn($resources);
+        $this->resourcesWithoutIdentifierLoader->expects(self::once())
+            ->method('load')
+            ->with($version, self::identicalTo($requestType), $resources)
+            ->willReturn($resourcesWithoutIdentifier);
+        $this->resourcesCache->expects(self::at(0))
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn(null);
+        $this->resourcesCache->expects(self::at(2))
+            ->method('saveResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType), $resourcesWithoutIdentifier);
+
+        self::assertTrue(
+            $this->resourcesProvider->isResourceWithoutIdentifier('Test\Entity1', $version, $requestType)
+        );
+        self::assertFalse(
+            $this->resourcesProvider->isResourceWithoutIdentifier('Test\Entity2', $version, $requestType)
         );
     }
 
@@ -443,6 +629,10 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getExcludedActions')
             ->with($version, self::identicalTo($requestType))
             ->willReturn(['Test\Entity1' => ['update']]);
+        $this->resourcesCache->expects(self::exactly(2))
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn(['Test\Entity2']);
         $this->resourcesCache->expects(self::once())
             ->method('clear');
 
@@ -453,6 +643,9 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
         self::assertEquals(
             ['update'],
             $this->resourcesProvider->getResourceExcludeActions('Test\Entity1', $version, $requestType)
+        );
+        self::assertTrue(
+            $this->resourcesProvider->isResourceWithoutIdentifier('Test\Entity2', $version, $requestType)
         );
 
         // do cache clear, including the local cache
@@ -465,6 +658,9 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
         self::assertEquals(
             ['update'],
             $this->resourcesProvider->getResourceExcludeActions('Test\Entity1', $version, $requestType)
+        );
+        self::assertTrue(
+            $this->resourcesProvider->isResourceWithoutIdentifier('Test\Entity2', $version, $requestType)
         );
     }
 }

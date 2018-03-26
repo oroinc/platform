@@ -26,6 +26,7 @@ class EmailAddress extends BaseEmailAddress
     public function setOwner(EmailOwnerInterface $owner = null)
     {
         $this->owner = $owner;
+        $this->setHasOwner($owner !== null);
 
         return $this;
     }

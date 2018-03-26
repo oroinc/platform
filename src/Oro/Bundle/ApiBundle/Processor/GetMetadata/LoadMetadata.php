@@ -66,7 +66,7 @@ class LoadMetadata implements ProcessorInterface
                 $context->getWithExcludedProperties(),
                 $context->getTargetAction()
             );
-        } elseif ($config->hasFields()) {
+        } else {
             $entityMetadata = $this->objectMetadataLoader->loadObjectMetadata(
                 $context->getClassName(),
                 $config,
@@ -74,9 +74,7 @@ class LoadMetadata implements ProcessorInterface
                 $context->getTargetAction()
             );
         }
-        if (null !== $entityMetadata) {
-            $this->associationMetadataLoader->completeAssociationMetadata($entityMetadata, $config, $context);
-            $context->setResult($entityMetadata);
-        }
+        $this->associationMetadataLoader->completeAssociationMetadata($entityMetadata, $config, $context);
+        $context->setResult($entityMetadata);
     }
 }

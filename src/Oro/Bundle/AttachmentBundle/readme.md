@@ -1,6 +1,6 @@
 # OroAttachmentBundle
 
-OroAttachmentBundle introduces two entity field types, image and file, and enables their usage with Oro extended entities.
+OroAttachmentBundle introduces two entity field types: an image and a file, and enables their usage with the Oro extended entities.
 
 ## System Configuration
 

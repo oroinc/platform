@@ -1,9 +1,6 @@
-OroNavigationBundle
-===================
+# OroNavigationBundle
 
-The `OroNavigationBundle` add ability to define menus in different bundles with builders or YAML files
-to the [KnpMenuBundle](https://github.com/KnpLabs/KnpMenuBundle). It is also has integrated support of
-ACL implementation from Oro UserBundle.
+OroNavigationBundle introduces menu navigation structures in the Oro application UI, enables developers to define menus using YAML configuration files or menu builder services, and provides a possibility for application users to adjust existing menus in the system menu management UI.
 
 **Basic Docs**
 
@@ -12,7 +9,7 @@ ACL implementation from Oro UserBundle.
 
 <a name="first-menu"></a>
 
-### Menu data sources
+## Menu data sources
 
 Menu data can come from different sources:
 

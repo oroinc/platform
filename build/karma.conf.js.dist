@@ -77,11 +77,10 @@ module.exports = function(config) {
     // - Firefox
     // - Opera
     // - Safari (only Mac)
-    // - PhantomJS
     // - IE (only Windows)
     // CLI --browsers Chrome,Firefox,Safari
     // browsers: [process.env.TRAVIS ? 'Firefox' : 'Chrome'],
-    browsers: ['PhantomJS'],
+    browsers: ['ChromeHeadless'],
     // browsers: ['Chrome'],
     // browsers: ['Firefox'],
 
@@ -106,7 +105,6 @@ module.exports = function(config) {
       'karma-jasmine',
       'karma-junit-reporter',
       'karma-coverage',
-      'karma-phantomjs-launcher',
       'karma-chrome-launcher',
       'karma-firefox-launcher',
       'karma-requirejs-exposure'

@@ -1,9 +1,5 @@
-OroReminderBundle
-=================
+# OroReminderBundle
 
-This bundle provides functionality of reminders. Reminder could be connected to some entity and send to user via
-email or triggered in UI as a flash message.
-
-Bundle provides a command "oro:cron:send-reminders" which send all reminders to their recipients.
+OroReminderBundle introduces reminders in Oro applications. The reminder is a message that can be attached to an entity and is periodically sent to users via emails or WebSocket notifications. OroReminderBundle provides the interface for remindable entities and enables developers to set templates for reminder email notifications in the [entity configuration metadata](https://github.com/oroinc/platform/tree/master/src/Oro/Bundle/EntityConfigBundle).
 
 Please see [documentation](./Resources/doc/index.md) for more details.
