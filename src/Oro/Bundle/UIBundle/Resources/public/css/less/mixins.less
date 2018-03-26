@@ -292,3 +292,14 @@
   /* iOS 11.2+ */
   padding-right: env(safe-area-inset-right);
 }
+
+.keyframe(@animation-name, @rules) {
+  @-webkit-keyframes @animation-name {
+    @rules();
+  }
+
+  @keyframes @animation-name {
+    @rules();
+  }
+}
+

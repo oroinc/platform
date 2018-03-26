@@ -87,17 +87,6 @@ define(function(require) {
                     animation: ''
                 });
             }, this));
-        },
-
-        //TODO: Should make functionlity for multiple ajax requests
-        refreshLoader: function() {
-            // var loader = $('#' + this.options.loaderId);
-            //
-            // if (loader.length) {
-            //     var loaderWidth = loader.width();
-            //     loader.remove();
-            //     loader.width(loaderWidth).css({'animation': 'none'});
-            // }
         }
     });
 

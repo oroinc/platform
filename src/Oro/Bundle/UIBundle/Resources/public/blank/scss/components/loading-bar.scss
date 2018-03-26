@@ -12,6 +12,30 @@
     border-radius: $loading-bar-border-radius;
     transition: $loading-bar-transition;
     animation: $loading-bar-animation;
+    overflow: $loading-bar-overflow;
+
+    &:before {
+        content: '';
+        background: $loading-bar-point-background;
+        width: $loading-bar-point-width;
+        height: $loading-bar-point-height;
+        position: $loading-bar-point-position;
+        box-shadow: $loading-bar-point-box-shadow;
+        top: $loading-bar-point-top;
+        animation: $loading-bar-point-animation;
+    }
+}
+
+@include keyframe($loading-bar-point-animation-name) {
+    0% {
+        left: 0%;
+        transform: translateX(-100%);
+    }
+
+    100% {
+        left: 100%;
+        transform: translateX(0);
+    }
 }
 
 @include keyframe($loading-bar-animation-name) {
