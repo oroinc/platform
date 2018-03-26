@@ -38,6 +38,6 @@ class RepeatedTypeExtension extends AbstractTypeExtension
 
     public function getExtendedType()
     {
-        return RepeatedType::class;
+        return 'repeated';
     }
 }
