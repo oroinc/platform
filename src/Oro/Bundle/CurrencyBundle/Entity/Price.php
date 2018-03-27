@@ -14,7 +14,7 @@ class Price implements CurrencyAwareInterface, \JsonSerializable
     use CurrencyAwareTrait;
 
     /**
-     * @var string
+     * @var float
      *
      * @ORM\Column(name="value", type="money", nullable=true)
      */
@@ -36,7 +36,7 @@ class Price implements CurrencyAwareInterface, \JsonSerializable
     }
 
     /**
-     * @return string
+     * @return float
      */
     public function getValue()
     {
