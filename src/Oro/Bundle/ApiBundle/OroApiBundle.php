@@ -37,6 +37,7 @@ class OroApiBundle extends Bundle
         $container->addCompilerPass(new Compiler\SecurityFirewallCompilerPass());
         $container->addCompilerPass(new Compiler\DocumentBuilderCompilerPass());
         $container->addCompilerPass(new Compiler\ErrorCompleterCompilerPass());
+        $container->addCompilerPass(new Compiler\ResourceDocParserCompilerPass());
         $container->addCompilerPass(new Compiler\ResourcesCacheWarmerCompilerPass());
         $container->addCompilerPass(
             new LoadApplicableCheckersCompilerPass('oro_api.processor_bag', 'oro.api.processor.applicable_checker')
