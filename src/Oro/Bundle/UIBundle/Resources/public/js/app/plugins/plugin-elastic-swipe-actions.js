@@ -38,7 +38,7 @@ define(function(require) {
          * Limit of end point
          * @property {Number}
          */
-        maxLimit: 105,
+        maxLimit: 175,
 
         /**
          * On done CSS classname
@@ -65,12 +65,20 @@ define(function(require) {
         storedPos: 0,
 
         /**
+         * Dynamic size for container offset
+         * @property {String}
+         */
+        sizerSelector: null,
+
+        /**
          * Viewport manager options
          * @property {Object}
          */
         viewport: {
             minScreenType: 'any'
         },
+
+        enabled: false,
 
         /**
          * @Initialize
@@ -81,11 +89,13 @@ define(function(require) {
          */
         initialize: function(grid, options) {
             _.extend(this, _.pick(options || {},
-                ['containerSelector', 'breakPointPosition', 'maxLimit', 'swipeDoneClassName', 'elastic', 'viewport']
+                [
+                    'containerSelector', 'breakPointPosition', 'maxLimit',
+                    'swipeDoneClassName', 'elastic', 'viewport', 'sizerSelector'
+                ]
             ));
 
             this.grid = grid;
-            this.listenTo(this.grid, 'shown', this.enable);
             mediator.on('viewport:change', this.onViewportChange, this);
 
             return ElasticSwipeActions.__super__.initialize.apply(this, arguments);
@@ -104,12 +114,12 @@ define(function(require) {
          * Enable swipe handler
          */
         enable: function() {
-            if (this.enabled || this.isApplicable(ViewportManager.getViewport())) {
+            if (this.enabled || !this.isApplicable(ViewportManager.getViewport())) {
                 return;
             }
-            this._bindEvents();
 
-            ElasticSwipeActions.__super__.enable.apply(this, arguments);
+            this._bindEvents();
+            return ElasticSwipeActions.__super__.enable.apply(this, arguments);
         },
         /**
          * Disable swipe handler
@@ -117,6 +127,8 @@ define(function(require) {
         disable: function() {
             this._revertState();
             this._unbindEvents();
+
+            delete this.currentSwipedContainer;
 
             return ElasticSwipeActions.__super__.disable.apply(this, arguments);
         },
@@ -140,7 +152,6 @@ define(function(require) {
          * @param {Object} viewport
          */
         onViewportChange: function(viewport) {
-            console.log(this.isApplicable(viewport))
             if (this.isApplicable(viewport)) {
                 this.enable();
             } else {
@@ -149,14 +160,37 @@ define(function(require) {
         },
 
         /**
+         * Apply dynamic offset for swiping container
+         *
+         * @param {jQuery} container
+         * @private
+         */
+        _applyDynamicOffset: function(container) {
+            var sizer = container.find(this.sizerSelector);
+
+            if (!sizer.length) {
+                return;
+            }
+
+            var size = container.find(this.sizerSelector).outerWidth();
+
+            this.maxLimit = size;
+            this.breakPointPosition = size / 2;
+            container.css({
+                paddingRight: size,
+                marginRight: -size
+            });
+        },
+
+        /**
          * Set touch swipe event handlers
          *
          * @private
          */
         _bindEvents: function() {
-            mediator.on('swipe-action-start', _.bind(this._onStart, this));
-            mediator.on('swipe-action-move', _.bind(this._onMove, this));
-            mediator.on('swipe-action-end', _.bind(this._onEnd, this));
+            mediator.on('swipe-action-start', this._onStart, this);
+            mediator.on('swipe-action-move', this._onMove, this);
+            mediator.on('swipe-action-end', this._onEnd, this);
         },
 
         /**
@@ -165,7 +199,9 @@ define(function(require) {
          * @private
          */
         _unbindEvents: function() {
-            mediator.off(null, null, this);
+            mediator.off('swipe-action-start', this._onStart, this);
+            mediator.off('swipe-action-move', this._onMove, this);
+            mediator.off('swipe-action-end', this._onEnd, this);
         },
 
         /**
@@ -177,6 +213,10 @@ define(function(require) {
          */
         _onStart: function(data, target) {
             var container = $(target).closest(this.containerSelector);
+
+            if (this.sizerSelector) {
+                this._applyDynamicOffset(container);
+            }
 
             if (
                 this.currentSwipedContainer &&
@@ -235,7 +275,10 @@ define(function(require) {
                 return;
             }
 
-            if (data.direction === 'left' && Math.abs(xAxe) > this.breakPointPosition) {
+            if (
+                (data.direction === 'left' && Math.abs(xAxe) > this.breakPointPosition) ||
+                (data.direction === 'right' && Math.abs(xAxe) > this.breakPointPosition && this.storedPos > 0)
+            ) {
                 this.currentSwipedContainer.data('offset', this.maxLimit);
                 this.currentSwipedContainer.css({
                     transform: 'translateX(-' + this.maxLimit + 'px)',

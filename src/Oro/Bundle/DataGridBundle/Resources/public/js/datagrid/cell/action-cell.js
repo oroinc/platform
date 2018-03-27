@@ -118,6 +118,9 @@ define([
                 this.actionsState = opts.themeOptions.launcherOptions.actionsState || this.actionsState;
             }
 
+            if (config.actionsHideCount) {
+                this.actionsHideCount = config.actionsHideCount;
+            }
             ActionCell.__super__.initialize.apply(this, arguments);
             this.actions = this.createActions();
             _.each(this.actions, function(action) {

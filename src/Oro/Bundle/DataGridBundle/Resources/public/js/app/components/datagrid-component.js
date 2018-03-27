@@ -450,6 +450,7 @@ define(function(require) {
                     constructor: ElasticSwipeActionsPlugin,
                     options: {
                         containerSelector: '.grid-row',
+                        sizerSelector: '.action-cell',
                         viewport: this.metadata.swipeActionsGrid.viewport || {}
                     }
                 });
