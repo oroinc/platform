@@ -3,10 +3,14 @@
 namespace Oro\Bundle\EntityExtendBundle\Provider;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Provider for getting enum values
+ */
 class EnumValueProvider
 {
     /**
@@ -15,11 +19,24 @@ class EnumValueProvider
     protected $doctrineHelper;
 
     /**
+     * @var EnumTranslationCache
+     */
+    protected $enumTranslationCache;
+
+    /**
      * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
+    }
+
+    /**
+     * @param EnumTranslationCache $enumTranslationCache
+     */
+    public function setEnumTranslationCache(EnumTranslationCache $enumTranslationCache)
+    {
+        $this->enumTranslationCache = $enumTranslationCache;
     }
 
     /**
@@ -37,13 +54,22 @@ class EnumValueProvider
      */
     public function getEnumChoices($enumClass)
     {
-        /** @var EnumValueRepository $repository */
-        $repository = $this->doctrineHelper->getEntityRepository($enumClass);
-        $values = $repository->getValues();
-        $result = [];
-        /** @var AbstractEnumValue $enum */
-        foreach ($values as $enum) {
-            $result[$enum->getId()] = $enum->getName();
+        if (!$this->enumTranslationCache || !$this->enumTranslationCache->contains($enumClass)) {
+            /** @var EnumValueRepository $repository */
+            $repository = $this->doctrineHelper->getEntityRepository($enumClass);
+            $values = $repository->getValues();
+            $result = [];
+
+            /** @var AbstractEnumValue[] $values */
+            foreach ($values as $enum) {
+                $result[$enum->getId()] = $enum->getName();
+            }
+
+            if ($this->enumTranslationCache) {
+                $this->enumTranslationCache->save($enumClass, $result);
+            }
+        } else {
+            $result = $this->enumTranslationCache->fetch($enumClass);
         }
 
         return $result;
@@ -68,6 +94,8 @@ class EnumValueProvider
     public function getDefaultEnumValuesByCode($enumCode)
     {
         $enumClass = ExtendHelper::buildEnumValueClassName($enumCode);
+
+        /** @var EnumValueRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository($enumClass);
 
         return $repo->getDefaultValues();

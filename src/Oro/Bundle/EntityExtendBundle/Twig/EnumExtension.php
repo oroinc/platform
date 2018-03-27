@@ -3,10 +3,15 @@
 namespace Oro\Bundle\EntityExtendBundle\Twig;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Twig extension for filters:
+ *  1) sort_enum - Sorts the given enum value identifiers according priorities specified for an enum values
+ *  2) trans_enum - Translates the given enum value
+ */
 class EnumExtension extends \Twig_Extension
 {
     /** @var ManagerRegistry */
@@ -22,12 +27,23 @@ class EnumExtension extends \Twig_Extension
      */
     protected $localCache = [];
 
+    /** @var EnumValueProvider */
+    protected $enumValueProvider;
+
     /**
      * @param ManagerRegistry $doctrine
      */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
+    }
+
+    /**
+     * @param EnumValueProvider $enumValueProvider
+     */
+    public function setEnumValueProvider(EnumValueProvider $enumValueProvider)
+    {
+        $this->enumValueProvider = $enumValueProvider;
     }
 
     /**
@@ -89,9 +105,7 @@ class EnumExtension extends \Twig_Extension
     {
         $values = $this->getEnumValues($enumValueEntityClassOrEnumCode);
 
-        return isset($values[$enumValueId])
-            ? $values[$enumValueId]
-            : $enumValueId;
+        return $values[$enumValueId] ?? $enumValueId;
     }
 
     /**
@@ -107,11 +121,15 @@ class EnumExtension extends \Twig_Extension
             $enumValueEntityClassOrEnumCode = ExtendHelper::buildEnumValueClassName($enumValueEntityClassOrEnumCode);
         }
 
+        if ($this->enumValueProvider) {
+            return $this->enumValueProvider->getEnumChoices($enumValueEntityClassOrEnumCode);
+        }
+
         if (!isset($this->localCache[$enumValueEntityClassOrEnumCode])) {
             $items      = [];
             /** @var AbstractEnumValue[] $values */
             $values = $this->doctrine->getRepository($enumValueEntityClassOrEnumCode)->findAll();
-            usort($values, function ($value1, $value2) {
+            usort($values, function (AbstractEnumValue $value1, AbstractEnumValue $value2) {
                 return $value1->getPriority() >= $value2->getPriority();
             });
             foreach ($values as $value) {
