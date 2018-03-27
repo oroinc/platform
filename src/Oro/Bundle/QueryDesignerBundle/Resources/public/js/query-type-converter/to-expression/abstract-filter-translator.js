@@ -1,6 +1,8 @@
-define(function() {
+define(function(require) {
     'use strict';
 
+    var _ = require('underscore');
+    var jsonSchemaValidator = require('oroui/js/tools/json-schema-validator');
     /**
      * Defines interface and implements base functionality of FilterTranslatorToExpression
      *
@@ -26,13 +28,65 @@ define(function() {
 
     Object.assign(AbstractFilterTranslator.prototype, {
         constructor: AbstractFilterTranslator,
+        /**
+         * Character that is used in filter value to input plural values in text field
+         * @type {string}
+         */
+        valuesSeparator: ',',
 
         /**
          * Map object of possible filter criteria value to expression's operation
-         * (has to defined in descendant FilterTranslatorToExpression)
+         * (has to be defined in descendant FilterTranslatorToExpression)
          * @type {Object}
          */
         operatorMap: null,
+
+        /**
+         * The filter type that has to be matched to `filterConfig.type`
+         * (has to be defined in descendant FilterTranslatorToExpression)
+         * @type {string}
+         */
+        filterType: void 0,
+
+        /**
+         * Builds JSON validation schema taking in account filter configuration
+         *
+         * @param {Object} filterConfigs
+         * @return {Object}
+         * @protected
+         */
+        getConditionSchema: function(filterConfigs) {
+            return {
+                type: 'object',
+                required: ['columnName', 'criterion'],
+                properties: {
+                    columnName: {type: 'string'},
+                    criterion: {
+                        type: 'object',
+                        required: ['data', 'filter'],
+                        properties: {
+                            filter: {
+                                'type': 'string',
+                                'enum': _.pluck(filterConfigs, 'name')
+                            },
+                            data: this.getFilterValueSchema(filterConfigs)
+                        }
+                    }
+                }
+            };
+        },
+
+        /**
+         * Builds filter value's part of JSON validation schema
+         *
+         * @return {Object}
+         * @protected
+         * @abstract
+         */
+        getFilterValueSchema: function() {
+            throw new Error(
+                'Method `getFilterValueSchema` has to be defined in descendant FilterTranslatorToExpression');
+        },
 
         /**
          * Takes condition object and checks if it has valid structure and can be translated to AST
@@ -40,10 +94,21 @@ define(function() {
          * @param {Object} condition
          * @return {boolean}
          * @protected
-         * @abstract
          */
         test: function(condition) {
-            throw new Error('Method `test` has to be defined in descendant FilterTranslatorToExpression');
+            if (!(condition.criterion.data.type in this.operatorMap)) {
+                return false;
+            }
+            var result = false;
+            var filterConfigs = this.filterConfigProvider.getFilterConfigsByType(this.filterType);
+            var schema = this.getConditionSchema(filterConfigs);
+
+            if (jsonSchemaValidator.validate(schema, condition)) {
+                var config = _.findWhere(filterConfigs, {name: condition.criterion.filter});
+                result = _.pluck(config.choices, 'value').indexOf(condition.criterion.data.type) !== -1;
+            }
+
+            return result;
         },
 
         /**
@@ -71,6 +136,19 @@ define(function() {
          */
         translate: function(condition) {
             throw new Error('Method `translate` has to be defined in descendant FilterTranslatorToExpression');
+        },
+
+        /**
+         * Splits value to array of string values when filter supports plural values
+         *
+         * @param {string} value
+         * @return {Array.<string>}
+         * @protected
+         */
+        splitValues: function(value) {
+            return value.split(this.valuesSeparator).map(function(item) {
+                return item.trim();
+            });
         }
     });
 

@@ -15,6 +15,7 @@ define(function(require) {
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/dictionary-filter-translator', function() {
         var translator;
+        var filterConfigProviderMock;
 
         beforeEach(function() {
             var entityStructureDataProviderMock = jasmine.combineSpyObj('entityStructureDataProvider', [
@@ -24,7 +25,7 @@ define(function(require) {
                 ])
             ]);
 
-            var filterConfigProviderMock = jasmine.combineSpyObj('filterConfigProvider', [
+            filterConfigProviderMock = jasmine.combineSpyObj('filterConfigProvider', [
                 jasmine.createSpy('getFilterConfigsByType').and.returnValue([
                     {type: 'dictionary', name: 'dictionary', choices: [{value: '1'}, {value: '2'}]},
                     {type: 'dictionary', name: 'enum', choices: [{value: '1'}, {value: '2'}]},
@@ -37,6 +38,20 @@ define(function(require) {
                 new FieldIdTranslator(entityStructureDataProviderMock),
                 filterConfigProviderMock
             );
+        });
+
+        it('calls filter provider\'s method `getFilterConfigsByType` with correct filter type', function() {
+            translator.tryToTranslate({
+                columnName: 'bar',
+                criterion: {
+                    filter: 'multicurrency',
+                    data: {
+                        type: '1',
+                        value: ['UAH', 'EUR']
+                    }
+                }
+            });
+            expect(filterConfigProviderMock.getFilterConfigsByType).toHaveBeenCalledWith('dictionary');
         });
 
         describe('test valid conditions', function() {
