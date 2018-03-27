@@ -67,7 +67,7 @@ class ChannelHandler
             // We must not clear missing values if it is just a form update, i.e ($updateMarker == true),
             // because we will lose default values of underlying entity.
             // Otherwise, if it just a normal submit, we have to submit form in a normal way.
-            $this->form->submit($request, !$updateMarker);
+            $this->form->submit($request->get($this->form->getName(), []), !$updateMarker);
             if (!$updateMarker && $this->form->isValid()) {
                 $this->em->persist($entity);
                 $this->em->flush();

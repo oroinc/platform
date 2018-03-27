@@ -42,7 +42,7 @@ class ConnectionController extends Controller
             ['csrf_protection' => false, 'skip_folders_validation' => true]
         );
         $form->setData($data);
-        $form->submit($request);
+        $form->handleRequest($request);
         /** @var UserEmailOrigin $origin */
         $origin = $form->getData();
 

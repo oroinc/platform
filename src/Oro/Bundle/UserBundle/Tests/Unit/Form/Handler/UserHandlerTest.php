@@ -97,7 +97,7 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(Request::METHOD_POST);
 
         $this->form->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->request);
         $this->form->expects($this->once())
             ->method('isValid')
@@ -174,7 +174,7 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(Request::METHOD_POST);
 
         $this->form->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->request);
         $this->form->expects($this->once())
             ->method('isValid')

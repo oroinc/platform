@@ -273,7 +273,7 @@ class EntitiesController extends Controller
         );
 
         if ($request->getMethod() == 'POST') {
-            $form->submit($request);
+            $form->handleRequest($request);
 
             if ($form->isValid()) {
                 $em->persist($record);

@@ -62,7 +62,7 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($this->model);
 
         $this->form->expects($this->never())
-            ->method('submit');
+            ->method('handleRequest');
 
         $this->assertFalse($this->handler->process($this->model));
     }
@@ -89,7 +89,7 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
 
         if (in_array($method, ['POST', 'PUT'])) {
             $this->form->expects($this->once())
-                ->method('submit')
+                ->method('handleRequest')
                 ->with($this->request);
 
             $this->form->expects($this->once())
@@ -125,7 +125,7 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($this->model);
 
         $this->form->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->request);
 
         $this->form->expects($this->once())

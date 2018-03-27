@@ -87,7 +87,7 @@ class EmailNotificationController extends Controller
     {
         $form = $this->createForm(EmailNotificationType::NAME, $entity);
         if ($request->get(EmailNotificationType::NAME)) {
-            $form->submit($request);
+            $form->handleRequest($request);
             $form = $this->createForm(EmailNotificationType::NAME, $form->getData());
         }
 

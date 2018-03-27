@@ -185,7 +185,7 @@ class DashboardController extends Controller
             ]
         );
 
-        if ($request->isMethod('POST') && $form->submit($request)->isValid()) {
+        if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
             $this->getDashboardManager()->save($dashboardModel, true);
             $this->get('session')->getFlashBag()->add(
                 'success',

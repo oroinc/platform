@@ -59,7 +59,7 @@ class TagHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($this->entity);
 
         $this->form->expects($this->never())
-            ->method('submit');
+            ->method('handleRequest');
 
         $this->assertFalse($this->handler->process($this->entity));
     }
@@ -77,7 +77,7 @@ class TagHandlerTest extends \PHPUnit_Framework_TestCase
         $this->request->setMethod($method);
 
         $this->form->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->request);
 
         $this->assertFalse($this->handler->process($this->entity));
@@ -100,7 +100,7 @@ class TagHandlerTest extends \PHPUnit_Framework_TestCase
         $this->request->setMethod('POST');
 
         $this->form->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->request);
 
         $this->form->expects($this->once())

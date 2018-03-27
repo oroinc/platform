@@ -51,7 +51,7 @@ class ConfigHelperHandler
     public function isFormValidAfterSubmit(Request $request, FormInterface $form)
     {
         if ($request->isMethod('POST')) {
-            $form->submit($request);
+            $form->handleRequest($request);
             if ($form->isValid()) {
                 return true;
             }

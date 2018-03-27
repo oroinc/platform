@@ -50,7 +50,7 @@ class FormHandler implements FormHandlerInterface
                 return false;
             }
 
-            $form->submit($request);
+            $form->handleRequest($request);
 
             if ($form->isValid()) {
                 $manager = $this->doctrineHelper->getEntityManager($data);

@@ -100,7 +100,7 @@ class ConnectionControllerManager
 
         $form = $this->formFactory->create('oro_imap_configuration_gmail', null, ['csrf_protection' => false]);
         $form->setData($data);
-        $form->submit($request);
+        $form->handleRequest($request);
 
         if (!$form->isValid()) {
             throw new Exception("Incorrect setting for IMAP authentication");

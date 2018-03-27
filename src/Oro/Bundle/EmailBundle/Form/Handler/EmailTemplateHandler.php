@@ -73,7 +73,7 @@ class EmailTemplateHandler
                 return false;
             }
 
-            $this->form->submit($request);
+            $this->form->handleRequest($request);
 
             if ($this->form->isValid()) {
                 // mark an email template creating by an user as editable

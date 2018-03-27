@@ -61,7 +61,7 @@ class EmbedFormController extends Controller
             $event = new EmbeddedFormSubmitBeforeEvent($data, $formEntity);
             $eventDispatcher = $this->get('event_dispatcher');
             $eventDispatcher->dispatch(EmbeddedFormSubmitBeforeEvent::EVENT_NAME, $event);
-            $form->submit($request);
+            $form->handleRequest($request);
 
             $event = new EmbeddedFormSubmitAfterEvent($data, $formEntity, $form);
             $eventDispatcher->dispatch(EmbeddedFormSubmitAfterEvent::EVENT_NAME, $event);

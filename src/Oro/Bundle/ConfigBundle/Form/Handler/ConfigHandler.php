@@ -55,7 +55,7 @@ class ConfigHandler
         $form->setData($settingsData);
 
         if (in_array($request->getMethod(), ['POST', 'PUT'])) {
-            $form->submit($request);
+            $form->handleRequest($request);
             if ($form->isValid()) {
                 $changeSet = $this->manager->save($form->getData());
                 $handler = $form->getConfig()->getAttribute('handler');

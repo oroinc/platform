@@ -72,7 +72,7 @@ class CommentApiHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($type));
 
         $this->form->expects($this->exactly($callsCount))
-            ->method('submit');
+            ->method('handleRequest');
 
         $this->form->expects($this->exactly($callsCount))
             ->method('isValid')

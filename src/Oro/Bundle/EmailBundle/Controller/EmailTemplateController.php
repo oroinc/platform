@@ -106,7 +106,7 @@ class EmailTemplateController extends Controller
         $form->setData($emailTemplate);
 
         if (in_array($request->getMethod(), array('POST', 'PUT'))) {
-            $form->submit($request);
+            $form->handleRequest($request);
         }
 
         $templateRendered = $this->get('oro_email.email_renderer')

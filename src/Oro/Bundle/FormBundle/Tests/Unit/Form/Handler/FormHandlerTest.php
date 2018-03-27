@@ -48,7 +48,7 @@ class FormHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getMethod')
             ->will($this->returnValue('POST'));
         $this->form->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->request);
         $this->form->expects($this->once())
             ->method('isValid')
@@ -71,7 +71,7 @@ class FormHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getMethod')
             ->will($this->returnValue('POST'));
         $this->form->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->request);
         $this->form->expects($this->once())
             ->method('isValid')
@@ -116,7 +116,7 @@ class FormHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getMethod')
             ->will($this->returnValue('POST'));
         $this->form->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->request);
         $this->form->expects($this->once())
             ->method('isValid')
@@ -150,7 +150,7 @@ class FormHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getMethod')
             ->will($this->returnValue('POST'));
         $this->form->expects($this->never())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->request);
 
         $this->eventDispatcher->expects($this->once())
@@ -173,7 +173,7 @@ class FormHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('GET'));
 
         $this->form->expects($this->never())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->request);
 
         $this->eventDispatcher->expects($this->once())
@@ -190,7 +190,7 @@ class FormHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getMethod')
             ->will($this->returnValue('POST'));
         $this->form->expects($this->never())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->request);
 
         $this->eventDispatcher->expects($this->at(1))

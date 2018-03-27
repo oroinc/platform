@@ -35,7 +35,7 @@ class AttachmentHandler
     {
         $request = $this->requestStack->getCurrentRequest();
         if (in_array($request->getMethod(), ['POST', 'PUT'])) {
-            $form->submit($request);
+            $form->handleRequest($request);
             if ($form->isValid()) {
                 $this->onSuccess($form->getData());
                 return true;

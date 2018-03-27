@@ -63,7 +63,7 @@ class ConfigHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('POST'));
 
         $this->form->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->equalTo($this->request));
 
         $this->form->expects($this->once())
@@ -104,7 +104,7 @@ class ConfigHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('POST'));
 
         $this->form->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->equalTo($this->request));
 
         $this->form->expects($this->once())
@@ -156,7 +156,7 @@ class ConfigHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('GET'));
 
         $this->form->expects($this->never())
-            ->method('submit');
+            ->method('handleRequest');
         $this->form->expects($this->never())
             ->method('isValid')
             ->will($this->returnValue(true));
@@ -185,7 +185,7 @@ class ConfigHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($settings);
 
         $this->form->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->equalTo($this->request));
 
         $this->form->expects($this->once())

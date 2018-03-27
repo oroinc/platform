@@ -61,7 +61,7 @@ class ConfigEntityGridController extends Controller
         );
 
         if ($request->getMethod() == 'POST') {
-            $form->submit($request);
+            $form->handleRequest($request);
 
             if ($form->isValid()) {
                 $entityConfig->set('unique_key', $form->getData());
@@ -141,7 +141,7 @@ class ConfigEntityGridController extends Controller
         );
 
         if ($request->getMethod() == 'POST') {
-            $form->submit($request);
+            $form->handleRequest($request);
 
             if ($form->isValid()) {
                 //persist data inside the form

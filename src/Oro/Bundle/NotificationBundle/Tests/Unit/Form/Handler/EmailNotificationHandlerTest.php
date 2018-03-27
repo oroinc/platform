@@ -54,7 +54,7 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     public function testProcessUnsupportedRequest()
     {
         $this->form->expects($this->once())->method('setData')->with($this->entity);
-        $this->form->expects($this->never())->method('submit');
+        $this->form->expects($this->never())->method('handleRequest');
 
         $this->assertFalse($this->handler->process($this->entity, $this->form, $this->request));
     }
@@ -69,7 +69,7 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     public function testProcess($method, $marker, $expectedHandleRequest)
     {
         $this->form->expects($this->once())->method('setData')->with($this->entity);
-        $this->form->expects($expectedHandleRequest ? $this->once() : $this->never())->method('submit');
+        $this->form->expects($expectedHandleRequest ? $this->once() : $this->never())->method('handleRequest');
 
         $this->request->setMethod($method);
         $this->request->request->set($marker, true);
@@ -110,7 +110,7 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     public function testProcessValidData()
     {
         $this->form->expects($this->once())->method('setData')->with($this->entity);
-        $this->form->expects($this->once())->method('submit')->with($this->request);
+        $this->form->expects($this->once())->method('handleRequest')->with($this->request);
         $this->form->expects($this->once())->method('isValid')->willReturn(true);
 
         $this->request->setMethod('POST');
