@@ -20,15 +20,15 @@ use Symfony\Component\Routing\Route;
  */
 class DocumentationTest extends RestJsonApiTestCase
 {
-    const VIEW = 'rest_json_api';
+    private const VIEW = 'rest_json_api';
 
-    const RESOURCE_ERROR_COUNT = 3;
+    private const RESOURCE_ERROR_COUNT = 3;
 
     /**
-     * @see \Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider::$templates
+     * @see \Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider::TEMPLATES
      * @var array
      */
-    protected $defaultDocumentation = [
+    private const DEFAULT_DOCUMENTATION = [
         ApiActions::GET                 => 'Get an entity',
         ApiActions::GET_LIST            => 'Get a list of entities',
         ApiActions::DELETE              => 'Delete an entity',
@@ -220,8 +220,8 @@ class DocumentationTest extends RestJsonApiTestCase
         }
         if (empty($definition['documentation'])) {
             $missingDocs[] = 'Empty documentation';
-        } elseif (isset($this->defaultDocumentation[$action])
-            && in_array($definition['documentation'], (array)$this->defaultDocumentation[$action], true)
+        } elseif (isset(self::DEFAULT_DOCUMENTATION[$action])
+            && in_array($definition['documentation'], (array)self::DEFAULT_DOCUMENTATION[$action], true)
             && 'data_channel' !== $association // @todo: remove this after CRM-8214 fix
         ) {
             $missingDocs[] = sprintf(
