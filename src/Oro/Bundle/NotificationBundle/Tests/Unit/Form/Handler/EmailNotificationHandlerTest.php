@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
 {
+    const FORM_DATA = ['field' => 'value'];
+
     /** @var FormInterface |\PHPUnit_Framework_MockObject_MockObject*/
     protected $form;
 
@@ -54,7 +56,7 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     public function testProcessUnsupportedRequest()
     {
         $this->form->expects($this->once())->method('setData')->with($this->entity);
-        $this->form->expects($this->never())->method('handleRequest');
+        $this->form->expects($this->never())->method('submit');
 
         $this->assertFalse($this->handler->process($this->entity, $this->form, $this->request));
     }
@@ -69,7 +71,7 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     public function testProcess($method, $marker, $expectedHandleRequest)
     {
         $this->form->expects($this->once())->method('setData')->with($this->entity);
-        $this->form->expects($expectedHandleRequest ? $this->once() : $this->never())->method('handleRequest');
+        $this->form->expects($expectedHandleRequest ? $this->once() : $this->never())->method('submit');
 
         $this->request->setMethod($method);
         $this->request->request->set($marker, true);
@@ -109,12 +111,16 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessValidData()
     {
+        $this->form->expects($this->any())->method('getName')->willReturn('formName');
         $this->form->expects($this->once())->method('setData')->with($this->entity);
-        $this->form->expects($this->once())->method('handleRequest')->with($this->request);
+        $this->form->expects($this->once())->method('submit')->with(self::FORM_DATA);
         $this->form->expects($this->once())->method('isValid')->willReturn(true);
 
+        $this->request->initialize([], [
+            EmailNotificationHandler::SUBMIT_MARKER => true,
+            'formName' => self::FORM_DATA
+        ]);
         $this->request->setMethod('POST');
-        $this->request->request->set(EmailNotificationHandler::SUBMIT_MARKER, true);
 
         $this->manager->expects($this->once())->method('persist')->with($this->entity);
         $this->manager->expects($this->once())->method('flush');

@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -17,6 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class EmailTemplateController extends Controller
 {
+    use RequestHandlerTrait;
+
     /**
      * @Route(
      *      "/{_format}",
@@ -106,7 +109,7 @@ class EmailTemplateController extends Controller
         $form->setData($emailTemplate);
 
         if (in_array($request->getMethod(), array('POST', 'PUT'))) {
-            $form->handleRequest($request);
+            $this->submitPostPutRequest($form, $request);
         }
 
         $templateRendered = $this->get('oro_email.email_renderer')

@@ -153,41 +153,6 @@ class UpdateHandler
     }
 
     /**
-     * Handles update action using form aware handler.
-     *
-     * @param object $data Data of form
-     * @param string $saveMessage Message added to session flash bag in case if form will be saved successfully
-     *               and if form is not submitted from widget.
-     * @param null|callable $formHandler Callback to handle form, by default method saveForm used.
-     * @param callable|null $resultCallback
-     * @return array|RedirectResponse Returns an array
-     *                                  if form wasn't successfully submitted
-     *                                  or when request method is not PUT and POST,
-     *                                  or if form was submitted from widget dialog,
-     *                                returns RedirectResponse
-     *                                  if form was successfully submitted from create/update page
-     * @throws \InvalidArgumentException
-     */
-    public function updateByFormHandler(
-        $data,
-        $saveMessage,
-        $formHandler,
-        $resultCallback = null
-    ) {
-        if (!method_exists($formHandler, 'process') || !method_exists($formHandler, 'getForm')) {
-            throw new \InvalidArgumentException('Form handler must have `process` and `getForm` methods');
-        }
-
-        $isValid = $formHandler->process($data);
-        $form = $formHandler->getForm();
-        if ($isValid) {
-            return $this->constructResponse($form, $data, $saveMessage, $resultCallback);
-        }
-
-        return $this->getResult($data, $form, $resultCallback);
-    }
-
-    /**
      * @param FormInterface $form
      * @param object $data
      * @return bool

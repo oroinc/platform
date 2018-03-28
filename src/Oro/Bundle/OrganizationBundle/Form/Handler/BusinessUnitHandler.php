@@ -3,6 +3,7 @@
 namespace Oro\Bundle\OrganizationBundle\Form\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Form\FormInterface;
@@ -10,6 +11,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class BusinessUnitHandler
 {
+    use RequestHandlerTrait;
+
     /** @var FormInterface */
     protected $form;
 
@@ -43,10 +46,7 @@ class BusinessUnitHandler
 
         $request = $this->requestStack->getCurrentRequest();
         if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
-            $data = $this->form->getName()
-                ? $request->request->get($this->form->getName())
-                : $request->request->all();
-            $this->form->submit($data);
+            $this->submitPostPutRequest($this->form, $request);
 
             if ($this->form->isValid()) {
                 $appendUsers = $this->form->get('appendUsers')->getData();

@@ -85,7 +85,7 @@ class BusinessUnitHandlerTest extends \PHPUnit_Framework_TestCase
         $appendForm->expects($this->once())
             ->method('getData')
             ->will($this->returnValue(array($appendedUser)));
-        $this->form->expects($this->at(4))
+        $this->form->expects($this->at(5))
             ->method('get')
             ->with('appendUsers')
             ->will($this->returnValue($appendForm));
@@ -96,7 +96,7 @@ class BusinessUnitHandlerTest extends \PHPUnit_Framework_TestCase
         $removeForm->expects($this->once())
             ->method('getData')
             ->will($this->returnValue(array($removedUser)));
-        $this->form->expects($this->at(5))
+        $this->form->expects($this->at(6))
             ->method('get')
             ->with('removeUsers')
             ->will($this->returnValue($removeForm));

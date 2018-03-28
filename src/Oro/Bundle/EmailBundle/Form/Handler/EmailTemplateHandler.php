@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Form\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -11,6 +12,8 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class EmailTemplateHandler
 {
+    use RequestHandlerTrait;
+
     /** @var FormInterface */
     protected $form;
 
@@ -73,7 +76,7 @@ class EmailTemplateHandler
                 return false;
             }
 
-            $this->form->handleRequest($request);
+            $this->submitPostPutRequest($this->form, $request);
 
             if ($this->form->isValid()) {
                 // mark an email template creating by an user as editable
