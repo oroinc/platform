@@ -29,7 +29,7 @@ class ErrorCompleterCompilerPassTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testProcessWhenNoDataTransformers()
+    public function testProcessWhenNoErrorCompleterCompilers()
     {
         $this->compiler->process($this->container);
 

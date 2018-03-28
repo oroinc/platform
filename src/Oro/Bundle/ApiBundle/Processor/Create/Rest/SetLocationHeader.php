@@ -16,7 +16,7 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class SetLocationHeader implements ProcessorInterface
 {
-    const RESPONSE_HEADER_NAME = 'Location';
+    public const RESPONSE_HEADER_NAME = 'Location';
 
     /** @var RouterInterface */
     protected $router;
@@ -54,12 +54,18 @@ class SetLocationHeader implements ProcessorInterface
             return;
         }
 
+        $entityId = $context->getId();
+        if (null === $entityId) {
+            // an entity id does not exist
+            return;
+        }
+
         $entityType = ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,
             $context->getClassName(),
             $context->getRequestType()
         );
-        $entityId = $this->entityIdTransformer->transform($context->getId(), $context->getMetadata());
+        $entityId = $this->entityIdTransformer->transform($entityId, $context->getMetadata());
         $location = $this->router->generate(
             'oro_rest_api_item',
             ['entity' => $entityType, 'id' => $entityId],

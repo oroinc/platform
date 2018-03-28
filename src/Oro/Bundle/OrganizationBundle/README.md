@@ -1,5 +1,8 @@
-OroOrganizationBundle
-=====================
+# OroOrganizationBundle
+
+OroOrganizationBundle extends the OroPlatform ACL system with organization and business unit ownership levels and provides the ability for the application users to reflect the company organizational structure in the application ACL permission scheme.
+
+## Overview
 
 The `OroOrganizationBundle` introduced 2 entities: Organization and Business Units that will help with data
 responsibility and configuration.

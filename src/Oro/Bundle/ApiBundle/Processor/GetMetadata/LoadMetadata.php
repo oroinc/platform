@@ -58,25 +58,24 @@ class LoadMetadata implements ProcessorInterface
         }
 
         $entityMetadata = null;
+        $entityClass = $context->getClassName();
         $config = $context->getConfig();
-        if ($this->doctrineHelper->isManageableEntityClass($context->getClassName())) {
+        if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
             $entityMetadata = $this->entityMetadataLoader->loadEntityMetadata(
-                $context->getClassName(),
+                $entityClass,
                 $config,
                 $context->getWithExcludedProperties(),
                 $context->getTargetAction()
             );
-        } elseif ($config->hasFields()) {
+        } else {
             $entityMetadata = $this->objectMetadataLoader->loadObjectMetadata(
-                $context->getClassName(),
+                $entityClass,
                 $config,
                 $context->getWithExcludedProperties(),
                 $context->getTargetAction()
             );
         }
-        if (null !== $entityMetadata) {
-            $this->associationMetadataLoader->completeAssociationMetadata($entityMetadata, $config, $context);
-            $context->setResult($entityMetadata);
-        }
+        $this->associationMetadataLoader->completeAssociationMetadata($entityMetadata, $config, $context);
+        $context->setResult($entityMetadata);
     }
 }

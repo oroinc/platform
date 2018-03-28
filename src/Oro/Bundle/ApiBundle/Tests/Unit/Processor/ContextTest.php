@@ -25,13 +25,13 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class ContextTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
-    protected $configProvider;
+    private $configProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProvider */
-    protected $metadataProvider;
+    private $metadataProvider;
 
     /** @var Context */
-    protected $context;
+    private $context;
 
     protected function setUp()
     {
@@ -1018,6 +1018,51 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->context->setMetadataExtras($metadataExtras);
 
         $this->context->addMetadataExtra(new TestMetadataExtra('test'));
+    }
+
+    public function testHasIdentifierFieldsShouldCauseMetadataLoading()
+    {
+        $entityClass = 'Test\Class';
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+
+        $this->context->setVersion('1.1');
+        $this->context->getRequestType()->add('rest');
+        $this->context->setClassName($entityClass);
+        $this->context->setConfig(new EntityDefinitionConfig());
+
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with($entityClass)
+            ->willReturn($metadata);
+
+        self::assertTrue($this->context->hasIdentifierFields());
+    }
+
+    public function testHasIdentifierFieldsWithoutMetadata()
+    {
+        $this->context->setMetadata(null);
+
+        self::assertFalse($this->context->hasIdentifierFields());
+    }
+
+    public function testHasIdentifierFieldsWithoutIdInMetadata()
+    {
+        $metadata = new EntityMetadata();
+
+        $this->context->setMetadata($metadata);
+
+        self::assertFalse($this->context->hasIdentifierFields());
+    }
+
+    public function testHasIdentifierFieldsWithIdInMetadata()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+
+        $this->context->setMetadata($metadata);
+
+        self::assertTrue($this->context->hasIdentifierFields());
     }
 
     public function testQuery()

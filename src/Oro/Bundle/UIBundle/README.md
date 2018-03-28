@@ -1,7 +1,6 @@
-OroUIBundle
-===========
+# OroUIBundle
 
-User interface layouts and controls.
+OroUIBundle defines the architecture of the front-end part of Oro application and provides tools that ensure the coordinated work of the architecture parts.
 
 ## Table of Contents
 

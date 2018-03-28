@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -48,7 +49,10 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
             return;
         }
 
-        $allowedHttpMethods = $this->getAllowedHttpMethods($this->getExcludeActions($context));
+        $map = $context->hasIdentifierFields()
+            ? $this->getHttpMethodToActionsMap()
+            : $this->getHttpMethodToActionsMapForResourceWithoutIdentifier();
+        $allowedHttpMethods = $this->getAllowedHttpMethods($map, $this->getExcludeActions($context));
         if ($allowedHttpMethods) {
             $context->getResponseHeaders()->set(self::RESPONSE_HEADER_NAME, $allowedHttpMethods);
         } else {
@@ -60,6 +64,19 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
      * @return array [action => HTTP method, ...]
      */
     abstract protected function getHttpMethodToActionsMap();
+
+    /**
+     * @return array [action => HTTP method, ...]
+     */
+    protected function getHttpMethodToActionsMapForResourceWithoutIdentifier()
+    {
+        return [
+            self::METHOD_GET    => ApiActions::GET,
+            self::METHOD_PATCH  => ApiActions::UPDATE,
+            self::METHOD_POST   => ApiActions::CREATE,
+            self::METHOD_DELETE => ApiActions::DELETE
+        ];
+    }
 
     /**
      * @param Context $context
@@ -88,19 +105,18 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
     }
 
     /**
+     * @param array    $httpMethodToActionsMap
      * @param string[] $excludeActions
      *
      * @return string
      */
-    private function getAllowedHttpMethods(array $excludeActions)
+    private function getAllowedHttpMethods(array $httpMethodToActionsMap, array $excludeActions)
     {
-        $map = $this->getHttpMethodToActionsMap();
-        $allowedActions = array_diff(array_values($map), $excludeActions);
-
-        $map = array_flip($map);
+        $allowedActions = array_diff(array_values($httpMethodToActionsMap), $excludeActions);
+        $httpMethodToActionsMap = array_flip($httpMethodToActionsMap);
         $allowedMethods = [];
         foreach ($allowedActions as $action) {
-            $allowedMethods[] = $map[$action];
+            $allowedMethods[] = $httpMethodToActionsMap[$action];
         }
 
         return implode(', ', $allowedMethods);

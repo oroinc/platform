@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
-use Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser;
-use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProviderInterface;
+use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
+use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserRegistry;
+use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
@@ -35,61 +36,61 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class CompleteDescriptions implements ProcessorInterface
 {
-    const ID_DESCRIPTION           = 'The unique identifier of a resource.';
-    const CREATED_AT_DESCRIPTION   = 'The date and time of resource record creation.';
-    const UPDATED_AT_DESCRIPTION   = 'The date and time of the last update of the resource record.';
-    const OWNER_DESCRIPTION        = 'An owner record represents the ownership capabilities of the record.';
-    const ORGANIZATION_DESCRIPTION = 'An organization record represents a real enterprise, business, firm, '
+    public const ID_DESCRIPTION           = 'The unique identifier of a resource.';
+    public const CREATED_AT_DESCRIPTION   = 'The date and time of resource record creation.';
+    public const UPDATED_AT_DESCRIPTION   = 'The date and time of the last update of the resource record.';
+    public const OWNER_DESCRIPTION        = 'An owner record represents the ownership capabilities of the record.';
+    public const ORGANIZATION_DESCRIPTION = 'An organization record represents a real enterprise, business, firm, '
     . 'company or another organization to which the users belong.';
 
-    const ENUM_NAME_DESCRIPTION     = 'The human readable name of the option.';
-    const ENUM_DEFAULT_DESCRIPTION  = 'Determines if this option is selected by default for new records.';
-    const ENUM_PRIORITY_DESCRIPTION = 'The order in which options are ranked. '
+    public const ENUM_NAME_DESCRIPTION     = 'The human readable name of the option.';
+    public const ENUM_DEFAULT_DESCRIPTION  = 'Determines if this option is selected by default for new records.';
+    public const ENUM_PRIORITY_DESCRIPTION = 'The order in which options are ranked. '
     . 'First appears the option with the higher number of the priority.';
 
-    const FIELD_FILTER_DESCRIPTION       = 'Filter records by \'%s\' field.';
-    const ASSOCIATION_FILTER_DESCRIPTION = 'Filter records by \'%s\' relationship.';
+    public const FIELD_FILTER_DESCRIPTION       = 'Filter records by \'%s\' field.';
+    public const ASSOCIATION_FILTER_DESCRIPTION = 'Filter records by \'%s\' relationship.';
 
     /** @var EntityDescriptionProvider */
-    protected $entityDocProvider;
+    private $entityDocProvider;
 
-    /** @var ResourceDocProviderInterface */
-    protected $resourceDocProvider;
+    /** @var ResourceDocProvider */
+    private $resourceDocProvider;
 
-    /** @var MarkdownApiDocParser */
-    protected $apiDocParser;
+    /** @var ResourceDocParserRegistry */
+    private $resourceDocParserRegistry;
 
     /** @var TranslatorInterface */
-    protected $translator;
+    private $translator;
 
     /** @var ConfigProvider */
-    protected $ownershipConfigProvider;
+    private $ownershipConfigProvider;
 
     /** @var RequestDependedTextProcessor */
-    protected $requestDependedTextProcessor;
+    private $requestDependedTextProcessor;
 
-    /** @var RequestType */
-    private $requestType;
+    /** @var ResourceDocParserInterface[] */
+    private $resourceDocParsers = [];
 
     /**
      * @param EntityDescriptionProvider    $entityDocProvider
-     * @param ResourceDocProviderInterface $resourceDocProvider
-     * @param MarkdownApiDocParser         $apiDocParser
+     * @param ResourceDocProvider          $resourceDocProvider
+     * @param ResourceDocParserRegistry    $resourceDocParserRegistry
      * @param TranslatorInterface          $translator
      * @param ConfigProvider               $ownershipConfigProvider
      * @param RequestDependedTextProcessor $requestDependedTextProcessor
      */
     public function __construct(
         EntityDescriptionProvider $entityDocProvider,
-        ResourceDocProviderInterface $resourceDocProvider,
-        MarkdownApiDocParser $apiDocParser,
+        ResourceDocProvider $resourceDocProvider,
+        ResourceDocParserRegistry $resourceDocParserRegistry,
         TranslatorInterface $translator,
         ConfigProvider $ownershipConfigProvider,
         RequestDependedTextProcessor $requestDependedTextProcessor
     ) {
         $this->entityDocProvider = $entityDocProvider;
         $this->resourceDocProvider = $resourceDocProvider;
-        $this->apiDocParser = $apiDocParser;
+        $this->resourceDocParserRegistry = $resourceDocParserRegistry;
         $this->translator = $translator;
         $this->ownershipConfigProvider = $ownershipConfigProvider;
         $this->requestDependedTextProcessor = $requestDependedTextProcessor;
@@ -108,38 +109,37 @@ class CompleteDescriptions implements ProcessorInterface
             return;
         }
 
+        $requestType = $context->getRequestType();
         $entityClass = $context->getClassName();
         $definition = $context->getResult();
-        $this->requestType = $context->getRequestType();
-        try {
-            $this->setDescriptionForEntity(
-                $definition,
-                $entityClass,
-                $targetAction,
-                $context->isCollection(),
-                $context->getAssociationName(),
-                $context->getParentClassName()
-            );
-            $this->setDescriptionsForFields($definition, $entityClass, $targetAction);
-            $filters = $context->getFilters();
-            if (null !== $filters) {
-                $this->setDescriptionsForFilters($filters, $definition, $entityClass);
-            }
-        } finally {
-            $this->requestType = null;
+        $this->setDescriptionForEntity(
+            $definition,
+            $requestType,
+            $entityClass,
+            $targetAction,
+            $context->isCollection(),
+            $context->getAssociationName(),
+            $context->getParentClassName()
+        );
+        $this->setDescriptionsForFields($definition, $requestType, $entityClass, $targetAction);
+        $filters = $context->getFilters();
+        if (null !== $filters) {
+            $this->setDescriptionsForFilters($filters, $definition, $requestType, $entityClass);
         }
     }
 
     /**
      * @param EntityDefinitionConfig $definition
+     * @param RequestType            $requestType
      * @param string                 $entityClass
      * @param string                 $targetAction
      * @param bool                   $isCollection
-     * @param string                 $associationName
-     * @param string                 $parentEntityClass
+     * @param string|null            $associationName
+     * @param string|null            $parentEntityClass
      */
-    protected function setDescriptionForEntity(
+    private function setDescriptionForEntity(
         EntityDefinitionConfig $definition,
+        RequestType $requestType,
         $entityClass,
         $targetAction,
         $isCollection,
@@ -162,6 +162,7 @@ class CompleteDescriptions implements ProcessorInterface
 
         $this->setDocumentationForEntity(
             $definition,
+            $requestType,
             $entityClass,
             $targetAction,
             $isCollection,
@@ -173,6 +174,7 @@ class CompleteDescriptions implements ProcessorInterface
 
     /**
      * @param EntityDefinitionConfig $definition
+     * @param RequestType            $requestType
      * @param string                 $entityClass
      * @param string                 $targetAction
      * @param bool                   $isCollection
@@ -180,8 +182,9 @@ class CompleteDescriptions implements ProcessorInterface
      * @param string                 $parentEntityClass
      * @param string|bool|null       $entityDescription
      */
-    protected function setDocumentationForEntity(
+    private function setDocumentationForEntity(
         EntityDefinitionConfig $definition,
+        RequestType $requestType,
         $entityClass,
         $targetAction,
         $isCollection,
@@ -189,9 +192,10 @@ class CompleteDescriptions implements ProcessorInterface
         $parentEntityClass,
         $entityDescription
     ) {
-        $this->registerDocumentationResources($definition);
+        $this->registerDocumentationResources($definition, $requestType);
         $this->loadDocumentationForEntity(
             $definition,
+            $requestType,
             $entityClass,
             $targetAction,
             $associationName,
@@ -220,19 +224,21 @@ class CompleteDescriptions implements ProcessorInterface
 
         $documentation = $definition->getDocumentation();
         if ($documentation) {
-            $definition->setDocumentation($this->processRequestDependedContent($documentation));
+            $definition->setDocumentation($this->processRequestDependedContent($documentation, $requestType));
         }
     }
 
     /**
      * @param EntityDefinitionConfig $definition
+     * @param RequestType            $requestType
      */
-    protected function registerDocumentationResources(EntityDefinitionConfig $definition)
+    private function registerDocumentationResources(EntityDefinitionConfig $definition, RequestType $requestType)
     {
+        $resourceDocParser = $this->getResourceDocParser($requestType);
         $documentationResources = $definition->getDocumentationResources();
         foreach ($documentationResources as $resource) {
-            if (is_string($resource) && !empty($resource)) {
-                $this->apiDocParser->parseDocumentationResource($resource);
+            if (\is_string($resource) && !empty($resource)) {
+                $resourceDocParser->registerDocumentationResource($resource);
             }
         }
     }
@@ -241,7 +247,7 @@ class CompleteDescriptions implements ProcessorInterface
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
      */
-    protected function processInheritDocForEntity(EntityDefinitionConfig $definition, $entityClass)
+    private function processInheritDocForEntity(EntityDefinitionConfig $definition, $entityClass)
     {
         $documentation = $definition->getDocumentation();
         if (InheritDocUtil::hasInheritDoc($documentation)) {
@@ -252,27 +258,30 @@ class CompleteDescriptions implements ProcessorInterface
 
     /**
      * @param EntityDefinitionConfig $definition
+     * @param RequestType            $requestType
      * @param string                 $entityClass
      * @param string                 $targetAction
      * @param string                 $associationName
      * @param string                 $parentEntityClass
      */
-    protected function loadDocumentationForEntity(
+    private function loadDocumentationForEntity(
         EntityDefinitionConfig $definition,
+        RequestType $requestType,
         $entityClass,
         $targetAction,
         $associationName,
         $parentEntityClass
     ) {
         if (!$definition->hasDocumentation()) {
+            $resourceDocParser = $this->getResourceDocParser($requestType);
             if ($associationName) {
-                $documentation = $this->apiDocParser->getSubresourceDocumentation(
+                $documentation = $resourceDocParser->getSubresourceDocumentation(
                     $parentEntityClass,
                     $associationName,
                     $targetAction
                 );
             } else {
-                $documentation = $this->apiDocParser->getActionDocumentation($entityClass, $targetAction);
+                $documentation = $resourceDocParser->getActionDocumentation($entityClass, $targetAction);
             }
             if ($documentation) {
                 $definition->setDocumentation($documentation);
@@ -285,7 +294,7 @@ class CompleteDescriptions implements ProcessorInterface
      * @param string                 $targetAction
      * @param string|null            $entityDescription
      */
-    protected function setDescriptionForResource(
+    private function setDescriptionForResource(
         EntityDefinitionConfig $definition,
         $targetAction,
         $entityDescription
@@ -303,7 +312,7 @@ class CompleteDescriptions implements ProcessorInterface
      * @param string                 $targetAction
      * @param string                 $entityDescription
      */
-    protected function setDocumentationForResource(
+    private function setDocumentationForResource(
         EntityDefinitionConfig $definition,
         $targetAction,
         $entityDescription
@@ -320,7 +329,7 @@ class CompleteDescriptions implements ProcessorInterface
      * @param string                 $targetAction
      * @param bool                   $isCollection
      */
-    protected function setDescriptionForSubresource(
+    private function setDescriptionForSubresource(
         EntityDefinitionConfig $definition,
         $associationDescription,
         $targetAction,
@@ -342,7 +351,7 @@ class CompleteDescriptions implements ProcessorInterface
      * @param string                 $targetAction
      * @param bool                   $isCollection
      */
-    protected function setDocumentationForSubresource(
+    private function setDocumentationForSubresource(
         EntityDefinitionConfig $definition,
         $associationDescription,
         $targetAction,
@@ -360,12 +369,14 @@ class CompleteDescriptions implements ProcessorInterface
 
     /**
      * @param EntityDefinitionConfig $definition
+     * @param RequestType            $requestType
      * @param string                 $entityClass
      * @param string                 $targetAction
      * @param string|null            $fieldPrefix
      */
-    protected function setDescriptionsForFields(
+    private function setDescriptionsForFields(
         EntityDefinitionConfig $definition,
+        RequestType $requestType,
         $entityClass,
         $targetAction,
         $fieldPrefix = null
@@ -375,7 +386,14 @@ class CompleteDescriptions implements ProcessorInterface
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             if (!$field->hasDescription()) {
-                $this->loadFieldDescription($field, $entityClass, $targetAction, $fieldName, $fieldPrefix);
+                $this->loadFieldDescription(
+                    $field,
+                    $requestType,
+                    $entityClass,
+                    $targetAction,
+                    $fieldName,
+                    $fieldPrefix
+                );
             } else {
                 $description = $field->getDescription();
                 if ($description instanceof Label) {
@@ -390,7 +408,7 @@ class CompleteDescriptions implements ProcessorInterface
 
             $description = $field->getDescription();
             if ($description) {
-                $field->setDescription($this->processRequestDependedContent($description));
+                $field->setDescription($this->processRequestDependedContent($description, $requestType));
             }
 
             $targetEntity = $field->getTargetEntity();
@@ -400,7 +418,13 @@ class CompleteDescriptions implements ProcessorInterface
                 if (!$targetClass) {
                     $targetFieldPrefix = $field->getPropertyPath($fieldName) . '.';
                 }
-                $this->setDescriptionsForFields($targetEntity, $entityClass, $targetAction, $targetFieldPrefix);
+                $this->setDescriptionsForFields(
+                    $targetEntity,
+                    $requestType,
+                    $entityClass,
+                    $targetAction,
+                    $targetFieldPrefix
+                );
             }
         }
 
@@ -409,22 +433,25 @@ class CompleteDescriptions implements ProcessorInterface
 
     /**
      * @param EntityDefinitionFieldConfig $field
+     * @param RequestType                 $requestType
      * @param string                      $entityClass
      * @param string                      $targetAction
      * @param string                      $fieldName
      * @param string|null                 $fieldPrefix
      */
-    protected function loadFieldDescription(
+    private function loadFieldDescription(
         EntityDefinitionFieldConfig $field,
+        RequestType $requestType,
         $entityClass,
         $targetAction,
         $fieldName,
         $fieldPrefix
     ) {
-        $description = $this->apiDocParser->getFieldDocumentation($entityClass, $fieldName, $targetAction);
+        $resourceDocParser = $this->getResourceDocParser($requestType);
+        $description = $resourceDocParser->getFieldDocumentation($entityClass, $fieldName, $targetAction);
         if ($description) {
             if (InheritDocUtil::hasInheritDoc($description)) {
-                $commonDescription = $this->apiDocParser->getFieldDocumentation($entityClass, $fieldName);
+                $commonDescription = $resourceDocParser->getFieldDocumentation($entityClass, $fieldName);
                 if ($commonDescription) {
                     if (InheritDocUtil::hasInheritDoc($commonDescription)) {
                         $commonDescription = InheritDocUtil::replaceInheritDoc(
@@ -438,7 +465,7 @@ class CompleteDescriptions implements ProcessorInterface
                 $description = InheritDocUtil::replaceInheritDoc($description, $commonDescription);
             }
         } else {
-            $description = $this->apiDocParser->getFieldDocumentation($entityClass, $fieldName);
+            $description = $resourceDocParser->getFieldDocumentation($entityClass, $fieldName);
             if ($description) {
                 if (InheritDocUtil::hasInheritDoc($description)) {
                     $description = InheritDocUtil::replaceInheritDoc(
@@ -463,7 +490,7 @@ class CompleteDescriptions implements ProcessorInterface
      *
      * @return string|null
      */
-    protected function getFieldDescription(
+    private function getFieldDescription(
         $entityClass,
         EntityDefinitionFieldConfig $field,
         $fieldName,
@@ -482,7 +509,7 @@ class CompleteDescriptions implements ProcessorInterface
      *
      * @return string
      */
-    protected function getFieldPropertyPath(
+    private function getFieldPropertyPath(
         EntityDefinitionFieldConfig $field,
         $fieldName,
         $fieldPrefix = null
@@ -498,25 +525,28 @@ class CompleteDescriptions implements ProcessorInterface
     /**
      * @param FiltersConfig          $filters
      * @param EntityDefinitionConfig $definition
+     * @param RequestType            $requestType
      * @param string                 $entityClass
      */
-    protected function setDescriptionsForFilters(
+    private function setDescriptionsForFilters(
         FiltersConfig $filters,
         EntityDefinitionConfig $definition,
+        RequestType $requestType,
         $entityClass
     ) {
+        $resourceDocParser = $this->getResourceDocParser($requestType);
         $fields = $filters->getFields();
         foreach ($fields as $fieldName => $field) {
             if (!$field->hasDescription()) {
-                $description = $this->apiDocParser->getFilterDocumentation($entityClass, $fieldName);
+                $description = $resourceDocParser->getFilterDocumentation($entityClass, $fieldName);
                 if ($description) {
                     $field->setDescription($description);
                 } else {
                     $fieldConfig = $definition->getField($fieldName);
                     if (null !== $fieldConfig && $fieldConfig->hasTargetEntity()) {
-                        $field->setDescription(sprintf(self::ASSOCIATION_FILTER_DESCRIPTION, $fieldName));
+                        $field->setDescription(\sprintf(self::ASSOCIATION_FILTER_DESCRIPTION, $fieldName));
                     } else {
-                        $field->setDescription(sprintf(self::FIELD_FILTER_DESCRIPTION, $fieldName));
+                        $field->setDescription(\sprintf(self::FIELD_FILTER_DESCRIPTION, $fieldName));
                     }
                 }
             } else {
@@ -528,7 +558,7 @@ class CompleteDescriptions implements ProcessorInterface
 
             $description = $field->getDescription();
             if ($description) {
-                $field->setDescription($this->processRequestDependedContent($description));
+                $field->setDescription($this->processRequestDependedContent($description, $requestType));
             }
         }
     }
@@ -539,7 +569,7 @@ class CompleteDescriptions implements ProcessorInterface
      *
      * @return string|null
      */
-    protected function getEntityDescription($entityClass, $isCollection)
+    private function getEntityDescription($entityClass, $isCollection)
     {
         if ($isCollection) {
             return $this->entityDocProvider->getEntityPluralDescription($entityClass);
@@ -553,7 +583,7 @@ class CompleteDescriptions implements ProcessorInterface
      *
      * @return string
      */
-    protected function getAssociationDescription($associationName)
+    private function getAssociationDescription($associationName)
     {
         return $this->entityDocProvider->humanizeAssociationName($associationName);
     }
@@ -563,7 +593,7 @@ class CompleteDescriptions implements ProcessorInterface
      *
      * @return string|null
      */
-    protected function trans(Label $label)
+    private function trans(Label $label)
     {
         return $label->trans($this->translator) ?: null;
     }
@@ -571,17 +601,17 @@ class CompleteDescriptions implements ProcessorInterface
     /**
      * @param EntityDefinitionConfig $definition
      */
-    protected function setDescriptionForIdentifierField(EntityDefinitionConfig $definition)
+    private function setDescriptionForIdentifierField(EntityDefinitionConfig $definition)
     {
         $identifierFieldNames = $definition->getIdentifierFieldNames();
-        if (1 !== count($identifierFieldNames)) {
+        if (1 !== \count($identifierFieldNames)) {
             // keep descriptions for composite identifier as is
             return;
         }
 
         $this->updateFieldDescription(
             $definition,
-            reset($identifierFieldNames),
+            \reset($identifierFieldNames),
             self::ID_DESCRIPTION
         );
     }
@@ -590,12 +620,12 @@ class CompleteDescriptions implements ProcessorInterface
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
      */
-    protected function setDescriptionsForSpecialFields(EntityDefinitionConfig $definition, $entityClass)
+    private function setDescriptionsForSpecialFields(EntityDefinitionConfig $definition, $entityClass)
     {
         $this->setDescriptionForCreatedAtField($definition);
         $this->setDescriptionForUpdatedAtField($definition);
         $this->setDescriptionsForOwnershipFields($definition, $entityClass);
-        if (is_a($entityClass, AbstractEnumValue::class, true)) {
+        if (\is_a($entityClass, AbstractEnumValue::class, true)) {
             $this->setDescriptionsForEnumFields($definition);
         }
     }
@@ -603,7 +633,7 @@ class CompleteDescriptions implements ProcessorInterface
     /**
      * @param EntityDefinitionConfig $definition
      */
-    protected function setDescriptionForCreatedAtField(EntityDefinitionConfig $definition)
+    private function setDescriptionForCreatedAtField(EntityDefinitionConfig $definition)
     {
         $this->updateFieldDescription(
             $definition,
@@ -615,7 +645,7 @@ class CompleteDescriptions implements ProcessorInterface
     /**
      * @param EntityDefinitionConfig $definition
      */
-    protected function setDescriptionForUpdatedAtField(EntityDefinitionConfig $definition)
+    private function setDescriptionForUpdatedAtField(EntityDefinitionConfig $definition)
     {
         $this->updateFieldDescription(
             $definition,
@@ -628,7 +658,7 @@ class CompleteDescriptions implements ProcessorInterface
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
      */
-    protected function setDescriptionsForOwnershipFields(EntityDefinitionConfig $definition, $entityClass)
+    private function setDescriptionsForOwnershipFields(EntityDefinitionConfig $definition, $entityClass)
     {
         if (!$this->ownershipConfigProvider->hasConfig($entityClass)) {
             // ownership fields are available only for configurable entities
@@ -653,7 +683,7 @@ class CompleteDescriptions implements ProcessorInterface
     /**
      * @param EntityDefinitionConfig $definition
      */
-    protected function setDescriptionsForEnumFields(EntityDefinitionConfig $definition)
+    private function setDescriptionsForEnumFields(EntityDefinitionConfig $definition)
     {
         $this->updateFieldDescription(
             $definition,
@@ -677,7 +707,7 @@ class CompleteDescriptions implements ProcessorInterface
      * @param string                 $fieldName
      * @param string                 $description
      */
-    protected function updateFieldDescription(EntityDefinitionConfig $definition, $fieldName, $description)
+    private function updateFieldDescription(EntityDefinitionConfig $definition, $fieldName, $description)
     {
         $field = $definition->getField($fieldName);
         if (null !== $field) {
@@ -694,7 +724,7 @@ class CompleteDescriptions implements ProcessorInterface
      * @param string                 $configKey
      * @param string                 $description
      */
-    protected function updateOwnershipFieldDescription(
+    private function updateOwnershipFieldDescription(
         EntityDefinitionConfig $definition,
         ConfigInterface $entityConfig,
         $configKey,
@@ -713,12 +743,31 @@ class CompleteDescriptions implements ProcessorInterface
     }
 
     /**
-     * @param string $content
+     * @param string      $content
+     * @param RequestType $requestType
      *
      * @return string
      */
-    protected function processRequestDependedContent($content)
+    private function processRequestDependedContent($content, RequestType $requestType)
     {
-        return $this->requestDependedTextProcessor->process($content, $this->requestType);
+        return $this->requestDependedTextProcessor->process($content, $requestType);
+    }
+
+    /**
+     * @param RequestType $requestType
+     *
+     * @return ResourceDocParserInterface
+     */
+    private function getResourceDocParser(RequestType $requestType)
+    {
+        $cacheKey = (string)$requestType;
+        if (isset($this->resourceDocParsers[$cacheKey])) {
+            return $this->resourceDocParsers[$cacheKey];
+        }
+
+        $parser = $this->resourceDocParserRegistry->getParser($requestType);
+        $this->resourceDocParsers[$cacheKey] = $parser;
+
+        return $parser;
     }
 }
