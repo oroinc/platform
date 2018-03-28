@@ -66,10 +66,12 @@ define(function(require) {
                     return value === null;
 
                 default:
-                    if (!schema.type) {
+                    if (_.isArray(schema.type)) {
+                        return this.checkAnyOfType(schema, value);
+                    } else if (!schema.type) {
                         return this.checkEnum(schema, value);
                     }
-                    throw new Error('Can not validate JSON of unknown type');
+                    throw new Error('Can not validate JSON of unknown or incorrect type');
             }
         },
 
@@ -270,6 +272,20 @@ define(function(require) {
                         return this.validate(schema.additionalProperties, value[prop]);
                     }, this)
                 );
+        },
+
+        /**
+         * Checks if the value matches to any of types
+         * (in case type is defined as array)
+         *
+         * @param {Object} schema
+         * @param {*} value
+         * @returns {boolean}
+         */
+        checkAnyOfType: function(schema, value) {
+            return !_.isArray(schema.type) || _.any(schema.type, function(type) {
+                return this.validate({type: type}, value);
+            }, this);
         }
     };
 });

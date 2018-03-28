@@ -339,6 +339,13 @@ define(function(require) {
                 },
                 valid: ['red'],
                 invalid: [null]
+            },
+            'list of types': {
+                schema: {
+                    type: ['integer', 'string']
+                },
+                valid: [42, -1, '42', ''],
+                invalid: [3.1415926, null]
             }
         };
 

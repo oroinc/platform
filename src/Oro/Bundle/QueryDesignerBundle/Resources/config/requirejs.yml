@@ -28,6 +28,7 @@ config:
         'oroquerydesigner/js/query-type-converter/to-expression/dictionary-filter-translator': 'bundles/oroquerydesigner/js/query-type-converter/to-expression/dictionary-filter-translator.js'
         'oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator': 'bundles/oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator.js'
         'oroquerydesigner/js/query-type-converter/to-expression/field-id-translator': 'bundles/oroquerydesigner/js/query-type-converter/to-expression/field-id-translator.js'
+        'oroquerydesigner/js/query-type-converter/to-expression/number-filter-translator': 'bundles/oroquerydesigner/js/query-type-converter/to-expression/number-filter-translator.js'
         'oroquerydesigner/js/query-type-converter/expression-functions-provider': 'bundles/oroquerydesigner/js/query-type-converter/expression-functions-provider.js'
 
     appmodules:
