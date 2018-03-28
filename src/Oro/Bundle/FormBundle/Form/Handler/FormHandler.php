@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class FormHandler implements FormHandlerInterface
 {
+    use RequestHandlerTrait;
+
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
@@ -50,7 +52,7 @@ class FormHandler implements FormHandlerInterface
                 return false;
             }
 
-            $form->handleRequest($request);
+            $this->submitPostPutRequest($form, $request);
 
             if ($form->isValid()) {
                 $manager = $this->doctrineHelper->getEntityManager($data);
