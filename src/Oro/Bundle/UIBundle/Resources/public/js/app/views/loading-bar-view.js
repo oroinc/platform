@@ -33,6 +33,11 @@ define(function(require) {
         pageLoading: false,
 
         /**
+         * @property {Boolean}
+         */
+        active: false,
+
+        /**
          * @inheritDoc
          */
         constructor: function LoadingBarView() {
@@ -74,10 +79,19 @@ define(function(require) {
         },
 
         showLoader: function() {
+            if (this.active) {
+                return;
+            }
+
             this.$el.show();
+            this.active = true;
         },
 
         hideLoader: function() {
+            if (!this.active) {
+                return;
+            }
+
             var loaderWidth = this.$el.width();
 
             this.$el.width(loaderWidth).css({animation: 'none'}).width('100%');
@@ -87,6 +101,7 @@ define(function(require) {
                     animation: ''
                 });
             }, this));
+            this.active = false;
         }
     });
 

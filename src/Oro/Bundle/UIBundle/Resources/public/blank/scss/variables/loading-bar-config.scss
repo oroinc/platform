@@ -5,7 +5,7 @@ $loading-bar-background: #ff5507 !default;
 $loading-bar-box-shadow: 0 0 10px $loading-bar-background !default;
 $loading-bar-border-radius: 3px !default;
 $loading-bar-position: fixed !default;
-$loading-bar-z-index: z('fixed') !default;
+$loading-bar-z-index: z('popup') + 1 !default;
 $loading-bar-top: 0 !default;
 $loading-bar-left: 0 !default;
 $loading-bar-height: 2px !default;

@@ -8,7 +8,8 @@ define(function(require) {
 
     var config = module.config();
     config = _.extend({
-        showLoadingMaskOnStartup: false
+        showLoadingMaskOnStartup: false,
+        showLoadingBarOnStartup: false
     }, config);
 
     /**
@@ -81,12 +82,12 @@ define(function(require) {
                 this.view = new LoadingBarView({
                     ajaxLoading: true
                 });
-                mediator.setHandler('showLoadingBar', this.view.show, this.view);
-                mediator.setHandler('hideLoadingBar', this.view.hide, this.view);
-                mediator.on('page:beforeChange', this.view.show, this.view);
-                mediator.on('page:afterChange', this.view.hide, this.view);
+                mediator.setHandler('showLoadingBar', this.view.showLoader, this.view);
+                mediator.setHandler('hideLoadingBar', this.view.hideLoader, this.view);
+                mediator.on('page:beforeChange', this.view.showLoader, this.view);
+                mediator.on('page:afterChange', this.view.hideLoader, this.view);
                 if (config.showLoadingBarOnStartup) {
-                    this.view.show();
+                    this.view.showLoader();
                 }
             }
         });
