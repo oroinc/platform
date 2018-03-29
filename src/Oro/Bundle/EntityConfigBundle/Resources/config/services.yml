@@ -194,6 +194,8 @@ services:
             - '@session'
             - '@oro_ui.router'
             - '@oro_entity_config.config.config_helper'
+            - '@translator'
+            - '@router'
 
     oro_entity_config.manager.attribute_manager:
         class: 'Oro\Bundle\EntityConfigBundle\Manager\AttributeManager'

@@ -9,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler;
 use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Form\FormFactory;
@@ -18,6 +19,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -58,6 +61,16 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
      */
     private $handler;
 
+    /**
+     * @var UrlGeneratorInterface
+     */
+    private $urlGenerator;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
     protected function setUp()
     {
         $this->formFactory = $this->getMockBuilder(FormFactory::class)
@@ -81,11 +94,16 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+
         $this->handler = new ConfigHelperHandler(
             $this->formFactory,
             $this->session,
             $this->router,
-            $this->configHelper
+            $this->configHelper,
+            $this->translator,
+            $this->urlGenerator
         );
     }
 
@@ -208,6 +226,29 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($fieldConfigModel);
 
         $this->handler->showSuccessMessageAndRedirect($fieldConfigModel, $successMessage);
+    }
+
+    public function testShowClearCacheMessage()
+    {
+        $message = 'Translation cache update is required';
+        $flashBag = $this->createMock(FlashBagInterface::class);
+
+        $this->translator
+            ->expects($this->once())
+            ->method('trans')
+            ->will($this->returnValue($message));
+
+        $flashBag
+            ->expects($this->once())
+            ->method('add')
+            ->with('warning', $message);
+
+        $this->session
+            ->expects($this->once())
+            ->method('getFlashBag')
+            ->willReturn($flashBag);
+
+        $this->handler->showClearCacheMessage();
     }
 
     public function testConstructConfigResponse()

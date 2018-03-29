@@ -12,7 +12,7 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @return MarkdownApiDocParser
      */
-    protected function loadDocument()
+    private function loadDocument()
     {
         $fixturesDir = __DIR__ . '/Fixtures';
 
@@ -28,9 +28,23 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
             });
 
         $apiDocParser = new MarkdownApiDocParser($fileLocator);
-        $apiDocParser->parseDocumentationResource('@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures/apidoc.md');
+        self::assertTrue(
+            $apiDocParser->registerDocumentationResource('@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures/apidoc.md')
+        );
 
         return $apiDocParser;
+    }
+
+    public function testRegisterDocumentationResourceForUnsupportedFile()
+    {
+        $fileLocator = $this->createMock(FileLocator::class);
+        $fileLocator->expects(self::never())
+            ->method('locate');
+
+        $apiDocParser = new MarkdownApiDocParser($fileLocator);
+        self::assertFalse(
+            $apiDocParser->registerDocumentationResource('@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures/apidoc.doc')
+        );
     }
 
     public function testParse()
@@ -45,7 +59,7 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
     public function testInheritDoc()
     {
         $apiDocParser = $this->loadDocument();
-        $apiDocParser->parseDocumentationResource('@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures/inheritdoc.md');
+        $apiDocParser->registerDocumentationResource('@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures/inheritdoc.md');
 
         $expected = Yaml::parse(file_get_contents(__DIR__ . '/Fixtures/inheritdoc.yml'));
 
@@ -55,7 +69,7 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
     public function testReplaceDescriptions()
     {
         $apiDocParser = $this->loadDocument();
-        $apiDocParser->parseDocumentationResource('@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures/replace.md');
+        $apiDocParser->registerDocumentationResource('@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures/replace.md');
 
         $expected = Yaml::parse(file_get_contents(__DIR__ . '/Fixtures/replace.yml'));
 

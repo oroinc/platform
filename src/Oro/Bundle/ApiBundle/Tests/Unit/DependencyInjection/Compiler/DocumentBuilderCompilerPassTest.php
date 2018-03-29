@@ -29,7 +29,7 @@ class DocumentBuilderCompilerPassTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testProcessWhenNoDataTransformers()
+    public function testProcessWhenNoDocumentBuilders()
     {
         $this->compiler->process($this->container);
 

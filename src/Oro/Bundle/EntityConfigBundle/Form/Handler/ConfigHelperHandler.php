@@ -12,7 +12,12 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Encapsulate a logic for config form handlers
+ */
 class ConfigHelperHandler
 {
     /** @var FormFactoryInterface */
@@ -27,6 +32,12 @@ class ConfigHelperHandler
     /** @var ConfigHelper */
     private $configHelper;
 
+    /** @var TranslatorInterface */
+    private $translator;
+
+    /** @var UrlGeneratorInterface */
+    protected $urlGenerator;
+
     /**
      * @param FormFactoryInterface $formFactory
      * @param Session $session
@@ -37,12 +48,16 @@ class ConfigHelperHandler
         FormFactoryInterface $formFactory,
         Session $session,
         Router $router,
-        ConfigHelper $configHelper
+        ConfigHelper $configHelper,
+        TranslatorInterface $translator,
+        UrlGeneratorInterface $urlGenerator
     ) {
         $this->formFactory = $formFactory;
         $this->session = $session;
         $this->router = $router;
         $this->configHelper = $configHelper;
+        $this->translator = $translator;
+        $this->urlGenerator = $urlGenerator;
     }
 
     /**
@@ -103,6 +118,23 @@ class ConfigHelperHandler
     }
 
     /**
+     * @return $this
+     */
+    public function showClearCacheMessage()
+    {
+        $message = $this->translator->trans(
+            'oro.translation.translation.rebuild_cache_required',
+            [
+                '%path%' => $this->generateUrl('oro_translation_translation_index')
+            ]
+        );
+
+        $this->session->getFlashBag()->add('warning', $message);
+
+        return $this;
+    }
+
+    /**
      * @param ConfigModel|string $entityOrUrl
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -128,5 +160,21 @@ class ConfigHelperHandler
             'formAction' => $formAction,
             'require_js' => $this->configHelper->getExtendRequireJsModules()
         ];
+    }
+
+    /**
+     * Generates a URL from the given parameters.
+     *
+     * @param string $route         The name of the route
+     * @param mixed  $parameters    An array of parameters
+     * @param int    $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
+     *
+     * @return string The generated URL
+     *
+     * @see UrlGeneratorInterface
+     */
+    private function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    {
+        return $this->urlGenerator->generate($route, $parameters, $referenceType);
     }
 }

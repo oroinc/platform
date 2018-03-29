@@ -6,6 +6,8 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Symfony\Component\Validator\Constraint;
 
 /**
+ * The trait for form related methods.
+ *
  * @property array $items
  */
 trait FormTrait
@@ -74,9 +76,24 @@ trait FormTrait
      */
     public function setFormOption($name, $value)
     {
-        $entityOptions = $this->getFormOptions();
-        $entityOptions[$name] = $value;
-        $this->setFormOptions($entityOptions);
+        $formOptions = $this->getFormOptions();
+        $formOptions[$name] = $value;
+        $this->setFormOptions($formOptions);
+    }
+
+    /**
+     * Gets existing validation constraints from the form options.
+     *
+     * @return Constraint[]|null
+     */
+    public function getFormConstraints()
+    {
+        $formOptions = $this->getFormOptions();
+        if (empty($formOptions) || !\array_key_exists('constraints', $formOptions)) {
+            return null;
+        }
+
+        return $formOptions['constraints'];
     }
 
     /**
@@ -86,8 +103,8 @@ trait FormTrait
      */
     public function addFormConstraint(Constraint $constraint)
     {
-        $entityOptions = $this->getFormOptions();
-        $entityOptions['constraints'][] = $constraint;
-        $this->setFormOptions($entityOptions);
+        $formOptions = $this->getFormOptions();
+        $formOptions['constraints'][] = $constraint;
+        $this->setFormOptions($formOptions);
     }
 }
