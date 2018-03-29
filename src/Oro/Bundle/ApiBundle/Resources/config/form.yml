@@ -11,7 +11,7 @@ services:
 
     oro_api.form.extension:
         public: false
-        class: '%form.extension.class%'
+        class: Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension
         arguments:
             - '@service_container'
             - [] # All services with tag "oro.api.form.type" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass

@@ -20,7 +20,7 @@ services:
     oro_translation.form.extension.translatable_choice:
         class: '%oro_translation.form.extension.translatable_choice.class%'
         tags:
-            - { name: form.type_extension, alias: choice }
+            - { name: form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\ChoiceType, alias: choice }
 
     oro_translation.form.type.add_language:
         class: 'Oro\Bundle\TranslationBundle\Form\Type\AddLanguageType'

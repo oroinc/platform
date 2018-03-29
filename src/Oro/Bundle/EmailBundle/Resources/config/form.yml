@@ -71,7 +71,7 @@ services:
         arguments:
             - '@doctrine'
         tags:
-            - { name: form.type_extension, alias: oro_email_mailbox }
+            - { name: form.type_extension, alias: oro_email_mailbox, extended_type: Oro\Bundle\EmailBundle\Form\Type\MailboxType }
 
     oro_email.form.emailtemplate:
         class: Symfony\Component\Form\Form
