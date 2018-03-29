@@ -10,6 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use Oro\Bundle\UIBundle\Route\Router;
 
 /**
+ * @group dist
  *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
