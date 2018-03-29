@@ -173,13 +173,15 @@ define(function(require) {
                     relationType: 'manyToMany',
                     field: 'Oro\\Bundle\\UserBundle\\Entity\\Group::roles',
                     entity: 'Oro\\Bundle\\UserBundle\\Entity\\Role',
-                    parent_entity: 'Oro\\Bundle\\UserBundle\\Entity\\User'
+                    parent_entity: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+                    relatedEntityName: 'Oro\\Bundle\\UserBundle\\Entity\\Group'
                 });
 
                 expect(dataProvider.getFieldSignatureSafely(fieldIdParts[0])).toEqual({
                     relationType: 'manyToMany',
                     field: 'roles',
-                    entity: 'Oro\\Bundle\\UserBundle\\Entity\\User'
+                    entity: 'Oro\\Bundle\\UserBundle\\Entity\\User',
+                    relatedEntityName: 'Oro\\Bundle\\UserBundle\\Entity\\Role'
                 });
             });
 

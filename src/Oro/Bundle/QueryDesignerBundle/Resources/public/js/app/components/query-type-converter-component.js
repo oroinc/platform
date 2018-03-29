@@ -6,6 +6,7 @@ define(function(require) {
     var BaseComponent = require('oroui/js/app/components/base/component');
     var BaseModel = require('oroui/js/app/models/base/model');
     var QueryTypeSwitcherView = require('oroquerydesigner/js/app/views/query-type-switcher-view');
+    var FilterConfigProvider =require('oroquerydesigner/js/query-type-converter/filter-config-provider');
 
     QueryTypeConverterComponent = BaseComponent.extend({
         relatedSiblingComponents: {
@@ -32,6 +33,14 @@ define(function(require) {
                 // To converting both of switched components are required
                 return;
             }
+
+            this._deferredInit();
+            var fieldConditionOptions = this.conditionBuilderComponent
+                .view.getCriteriaOrigin('condition-item').data('options');
+            var filterConfigProvider = new FilterConfigProvider(_.pick(fieldConditionOptions, 'filters', 'hierarchy'));
+            filterConfigProvider.loadInitModules()
+                .always(this._resolveDeferredInit.bind(this));
+
             options = _.defaults(options || {}, this.defaultOptions);
             this.queryTypeStateModel = new BaseModel();
             this.listenTo(this.queryTypeStateModel, 'change:mode', this.onModeChange);

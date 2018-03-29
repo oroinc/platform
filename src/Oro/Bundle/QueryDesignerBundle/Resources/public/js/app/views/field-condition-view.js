@@ -42,21 +42,16 @@ define(function(require) {
                 this.$filterContainer.html('<span class="loading-indicator">' + __('Loading...') + '</span>');
             }, this), 100);
 
-            tools.loadModules(requires, _.bind(function(Filter) {
-                var appendFilter = _.bind(function() {
-                    clearTimeout(showLoadingTimeout);
-                    var filter = new (Filter.extend(filterOptions))();
-                    if (!this.disposed) {
-                        this._appendFilter(filter);
-                    }
-                }, this);
-                if (arguments.length > 1) {
-                    var optionResolver = arguments[1];
-                    var promise = optionResolver(filterOptions, this.subview('choice-input').splitFieldId(fieldId));
-                    promise.done(appendFilter);
-                } else {
-                    appendFilter();
+            tools.loadModules(requires, _.bind(function(Filter, optionResolver) {
+                if (this.disposed) {
+                    return;
                 }
+                clearTimeout(showLoadingTimeout);
+                if (optionResolver) {
+                    optionResolver(filterOptions, this.subview('choice-input').getFieldSignature(fieldId));
+                }
+                var filter = new (Filter.extend(filterOptions))();
+                this._appendFilter(filter);
             }, this));
         },
 

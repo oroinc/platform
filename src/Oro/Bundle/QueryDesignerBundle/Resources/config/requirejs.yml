@@ -15,6 +15,7 @@ config:
         'oroquerydesigner/js/app/components/query-type-converter-component': 'bundles/oroquerydesigner/js/app/components/query-type-converter-component.js'
         'oroquerydesigner/js/app/views/date-grouping-view': 'bundles/oroquerydesigner/js/app/views/date-grouping-view.js'
 
+        'oroquerydesigner/js/dictionary-filter-initialized': 'bundles/oroquerydesigner/js/dictionary-filter-initialized.js'
         'oroquerydesigner/js/enum-filter-initialized': 'bundles/oroquerydesigner/js/enum-filter-initialized.js'
 
         'oroquerydesigner/js/app/modules/validator-constraints-module': 'bundles/oroquerydesigner/js/app/modules/validator-constraints-module.js'
@@ -30,6 +31,7 @@ config:
         'oroquerydesigner/js/query-type-converter/to-expression/field-id-translator': 'bundles/oroquerydesigner/js/query-type-converter/to-expression/field-id-translator.js'
         'oroquerydesigner/js/query-type-converter/to-expression/number-filter-translator': 'bundles/oroquerydesigner/js/query-type-converter/to-expression/number-filter-translator.js'
         'oroquerydesigner/js/query-type-converter/expression-functions-provider': 'bundles/oroquerydesigner/js/query-type-converter/expression-functions-provider.js'
+        'oroquerydesigner/js/query-type-converter/filter-config-provider': 'bundles/oroquerydesigner/js/query-type-converter/filter-config-provider.js'
 
     appmodules:
         - oroquerydesigner/js/app/modules/validator-constraints-module

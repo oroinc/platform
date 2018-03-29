@@ -7,6 +7,7 @@ config:
         'oro/select2-multi-autocomplete-component': 'bundles/orotag/js/components/select2-multi-autocomplete-component.js'
         'oro/datagrid/cell/tags-cell': 'bundles/orotag/js/datagrid/cell/tags-cell.js'
 
+        'orotag/js/tags-report-filter-initialized': 'bundles/orotag/js/tags-report-filter-initialized.js'
         'orotag/js/app/views/editor/tags-editor-view': 'bundles/orotag/js/app/views/editor/tags-editor-view.js'
         'orotag/js/app/views/viewer/tags-view': 'bundles/orotag/js/app/views/viewer/tags-view.js'
         'oro/filter/tags-report-filter': 'bundles/orotag/js/filter/tags-report-filter.js'

@@ -740,7 +740,7 @@ define(function(require) {
 
             part = _.last(chain);
             if (part && part.field) {
-                signature = _.pick(part.field, 'type', 'relationType');
+                signature = _.pick(part.field, 'type', 'relationType', 'relatedEntityName');
                 if (_.result(part.field.options, 'identifier')) {
                     signature.identifier = true;
                 }

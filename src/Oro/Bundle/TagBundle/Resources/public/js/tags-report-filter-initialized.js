@@ -1,21 +1,16 @@
-define(function(require) {
+define(function() {
     'use strict';
-
-    var $ = require('jquery');
-    var _ = require('underscore');
 
     /**
      * Resolves filter options
      *
-     * @param {object} filterOptions - object with options which will be enhanced
-     * @param {object} context - information about context where filter will be applied to
-     *
-     * @return {jQuery.Deferred} promise
+     * @param {Object} filterOptions - object with options which will be enhanced
+     * @param {FieldSignature} fieldSignature - information about field that filter will be applied to
      */
-    return function(filterOptions, context) {
-        var className = _.last(context).field.relatedEntityName;
-        var entityClass = _.last(context).field.parentEntity.className;
-        filterOptions.filterParams = {'class': className, 'entityClass': entityClass};
-        return $.when(filterOptions);
+    return function(filterOptions, fieldSignature) {
+        filterOptions.filterParams = {
+            'class': fieldSignature.relatedEntityName,
+            'entityClass': fieldSignature.entity
+        };
     };
 });
