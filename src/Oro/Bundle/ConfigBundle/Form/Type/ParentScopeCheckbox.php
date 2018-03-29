@@ -13,7 +13,7 @@ class ParentScopeCheckbox extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getName()
     {
         return self::NAME;
     }

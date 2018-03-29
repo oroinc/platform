@@ -52,7 +52,7 @@ class RouteChoiceTypeStub extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getName()
     {
         return 'oro_route_choice';
     }

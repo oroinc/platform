@@ -37,7 +37,7 @@ class ChoiceAssociationPropertyTypeTest extends AssociationTypeTestCase
     {
         $this->assertEquals(
             'choice',
-            $type->getFormType()->getParent()
+            $this->getFormType()->getParent()
         );
     }
 

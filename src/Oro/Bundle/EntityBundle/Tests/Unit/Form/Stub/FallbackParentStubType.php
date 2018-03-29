@@ -12,7 +12,7 @@ class FallbackParentStubType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getName()
     {
         return 'fallback_parent_stub';
     }

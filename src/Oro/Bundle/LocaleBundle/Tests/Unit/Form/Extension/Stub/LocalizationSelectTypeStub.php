@@ -12,7 +12,7 @@ class LocalizationSelectTypeStub extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getName()
     {
         return LocalizationSelectType::NAME;
     }

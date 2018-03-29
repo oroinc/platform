@@ -174,7 +174,7 @@ class BusinessUnitType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getName()
     {
         return self::FORM_NAME;
     }

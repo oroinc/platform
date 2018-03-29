@@ -36,7 +36,7 @@ class NameValuePairType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getName()
     {
         return 'test_name_value_pair';
     }

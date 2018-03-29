@@ -54,7 +54,7 @@ class TaxonomyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getName()
     {
         return 'oro_tag_taxonomy';
     }

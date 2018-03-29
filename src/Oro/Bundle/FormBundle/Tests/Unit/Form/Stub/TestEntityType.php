@@ -35,7 +35,7 @@ class TestEntityType extends AbstractType
     /**
      * @return string
      */
-    public function getBlockPrefix()
+    public function getName()
     {
         return 'test_entity';
     }

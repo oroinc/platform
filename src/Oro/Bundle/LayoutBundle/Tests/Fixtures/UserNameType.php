@@ -18,7 +18,7 @@ class UserNameType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getName()
     {
         return 'user_name';
     }
