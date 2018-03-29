@@ -526,15 +526,20 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testAddFormConstraint()
+    public function testFormConstraints()
     {
         $config = new EntityDefinitionConfig();
 
+        $this->assertNull($config->getFormOptions());
+        $this->assertNull($config->getFormConstraints());
+
         $config->addFormConstraint(new NotNull());
         $this->assertEquals(['constraints' => [new NotNull()]], $config->getFormOptions());
+        $this->assertEquals([new NotNull()], $config->getFormConstraints());
 
         $config->addFormConstraint(new NotBlank());
         $this->assertEquals(['constraints' => [new NotNull(), new NotBlank()]], $config->getFormOptions());
+        $this->assertEquals([new NotNull(), new NotBlank()], $config->getFormConstraints());
     }
 
     public function testFormEventSubscribers()
