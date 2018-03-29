@@ -42,6 +42,11 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(NumberRangeFilterType::NAME, $this->type->getName());
+    }
+
     /**
      * @return OptionsResolver|\PHPUnit_Framework_MockObject_MockObject
      */

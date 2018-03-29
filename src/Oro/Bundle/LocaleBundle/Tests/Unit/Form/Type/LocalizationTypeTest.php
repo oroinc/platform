@@ -45,6 +45,11 @@ class LocalizationTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(LocalizationType::NAME, $this->formType->getName());
+    }
+
     /**
      * @dataProvider submitDataProvider
      *

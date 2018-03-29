@@ -61,6 +61,11 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
         $this->assertEquals($workflow->getDefinition(), $form->getData());
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(WorkflowDefinitionNotificationSelectType::NAME, $this->type->getName());
+    }
+
     public function testConfigureOptions()
     {
         $resolver = $this->createMock(OptionsResolver::class);

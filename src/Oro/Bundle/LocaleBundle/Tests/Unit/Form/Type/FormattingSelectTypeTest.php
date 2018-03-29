@@ -35,6 +35,11 @@ class FormattingSelectTypeTest extends FormIntegrationTestCase
         $this->assertEquals(OroChoiceType::class, $this->formType->getParent());
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(FormattingSelectType::NAME, $this->formType->getName());
+    }
+
     public function testBuildForm()
     {
         $data =  [

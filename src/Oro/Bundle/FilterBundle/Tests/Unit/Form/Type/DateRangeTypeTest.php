@@ -43,6 +43,11 @@ class DateRangeTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(DateRangeType::NAME, $this->type->getName());
+    }
+
     /**
      * {@inheritDoc}
      */

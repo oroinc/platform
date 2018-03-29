@@ -8,6 +8,12 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroTimeIntervalTypeTest extends FormIntegrationTestCase
 {
+    public function testGetName()
+    {
+        $type = new OroTimeIntervalType();
+        $this->assertEquals(OroTimeIntervalType::NAME, $type->getName());
+    }
+
     public function testGetParent()
     {
         $type = new OroTimeIntervalType();

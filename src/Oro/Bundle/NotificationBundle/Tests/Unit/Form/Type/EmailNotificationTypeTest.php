@@ -96,6 +96,11 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(EmailNotificationType::NAME, $this->formType->getName());
+    }
+
     /**
      * @dataProvider submitProvider
      *

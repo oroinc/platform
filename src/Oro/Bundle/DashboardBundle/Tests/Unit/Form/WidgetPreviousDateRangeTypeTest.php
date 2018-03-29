@@ -15,6 +15,11 @@ class WidgetPreviousDateRangeTypeTest extends \PHPUnit_Framework_TestCase
         $this->formType = new WidgetPreviousDateRangeType();
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_type_widget_previous_date_range', $this->formType->getName());
+    }
+
     public function testGetParent()
     {
         $this->assertEquals(CheckboxType::class, $this->formType->getParent());

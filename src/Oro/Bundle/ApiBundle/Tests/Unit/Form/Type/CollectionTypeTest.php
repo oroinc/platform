@@ -240,4 +240,10 @@ class CollectionTypeTest extends TypeTestCase
         $form->submit('test');
         $this->assertFalse($form->isSynchronized());
     }
+
+    public function testGetName()
+    {
+        $type = new CollectionType();
+        $this->assertEquals('oro_api_collection', $type->getName());
+    }
 }

@@ -100,6 +100,11 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         ];
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(WorkflowStepSelectType::NAME, $this->type->getName());
+    }
+
     public function testGetParent()
     {
         $this->assertEquals(EntityType::class, $this->type->getParent());

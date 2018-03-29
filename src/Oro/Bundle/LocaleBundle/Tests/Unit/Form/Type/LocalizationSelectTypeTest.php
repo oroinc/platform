@@ -22,6 +22,11 @@ class LocalizationSelectTypeTest extends \PHPUnit_Framework_TestCase
         $this->type = new LocalizationSelectType();
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(LocalizationSelectType::NAME, $this->type->getName());
+    }
+
     public function testGetParent()
     {
         $this->assertEquals(OroEntitySelectOrCreateInlineType::class, $this->type->getParent());

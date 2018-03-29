@@ -129,6 +129,11 @@ class ScopeTypeTest extends \PHPUnit_Framework_TestCase
         $this->scopeType->buildForm($builder, [ScopeType::SCOPE_TYPE_OPTION => $scopeType]);
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(ScopeType::NAME, $this->scopeType->getName());
+    }
+
     public function testGetBlockPrefix()
     {
         $this->assertEquals(ScopeType::NAME, $this->scopeType->getBlockPrefix());

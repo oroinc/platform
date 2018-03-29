@@ -54,4 +54,9 @@ class OrganizationTypeTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
+
+    public function testGetName()
+    {
+        $this->assertEquals('oro_organization', $this->formType->getName());
+    }
 }

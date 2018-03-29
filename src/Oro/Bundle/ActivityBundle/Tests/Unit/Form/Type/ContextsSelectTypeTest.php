@@ -115,4 +115,17 @@ class ContextsSelectTypeTest extends TypeTestCase
         );
         $this->assertEquals(Select2HiddenType::class, $type->getParent());
     }
+
+    public function testGetName()
+    {
+        $type = new ContextsSelectType(
+            $this->em,
+            $this->configManager,
+            $this->translator,
+            $this->dispatcher,
+            $this->entityTitleResolver,
+            $this->createMock(FeatureChecker::class)
+        );
+        $this->assertEquals('oro_activity_contexts_select', $type->getName());
+    }
 }

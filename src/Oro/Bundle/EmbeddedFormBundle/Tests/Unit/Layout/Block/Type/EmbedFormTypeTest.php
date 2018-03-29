@@ -93,6 +93,13 @@ class EmbedFormTypeTest extends BlockTypeTestCase
         $type->buildBlock($builder, new Options($options));
     }
 
+    public function testGetName()
+    {
+        $type = $this->getBlockType(EmbedFormType::NAME);
+
+        $this->assertSame(EmbedFormType::NAME, $type->getName());
+    }
+
     public function testGetParent()
     {
         $type = $this->getBlockType(EmbedFormType::NAME);

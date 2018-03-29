@@ -231,6 +231,14 @@ class EnumNameTypeTest extends TypeTestCase
         $this->assertEquals($configId->getFieldName(), $resolvedOptions['constraints'][4]->fieldName);
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(
+            'oro_entity_extend_enum_name',
+            $this->type->getName()
+        );
+    }
+
     public function testGetParent()
     {
         $this->assertEquals(

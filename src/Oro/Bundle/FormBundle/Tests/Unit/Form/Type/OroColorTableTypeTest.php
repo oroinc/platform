@@ -61,6 +61,12 @@ class OroColorTableTypeTest extends FormIntegrationTestCase
         $this->assertEquals(HiddenType::class, $formType->getParent());
     }
 
+    public function testGetName()
+    {
+        $formType = new OroColorTableType();
+        $this->assertEquals('oro_color_table', $formType->getName());
+    }
+
     public function buildViewDataProvider()
     {
         return [

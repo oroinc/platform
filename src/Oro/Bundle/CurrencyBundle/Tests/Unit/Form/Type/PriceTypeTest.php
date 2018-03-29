@@ -152,4 +152,12 @@ class PriceTypeTest extends FormIntegrationTestCase
             ]
         ];
     }
+
+    /**
+     * Test getName
+     */
+    public function testGetName()
+    {
+        $this->assertEquals(PriceType::NAME, $this->formType->getName());
+    }
 }

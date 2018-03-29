@@ -62,6 +62,11 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
         $this->assertEquals(TextareaType::class, $this->formType->getParent());
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_rich_text', $this->formType->getName());
+    }
+
     /**
      * @dataProvider optionsDataProvider
      * @param array $options

@@ -62,6 +62,12 @@ class EmailAddressTypeTest extends TypeTestCase
         $type->configureOptions($resolver);
     }
 
+    public function testGetName()
+    {
+        $type = new EmailAddressType(array());
+        $this->assertEquals('oro_email_email_address', $type->getName());
+    }
+
     public function testGetParent()
     {
         $type = new EmailAddressType(array());

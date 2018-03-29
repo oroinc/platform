@@ -97,4 +97,9 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(Select2ChoiceType::class, $this->type->getParent());
     }
+
+    public function testGetName()
+    {
+        $this->assertEquals('oro_integration_type_select', $this->type->getName());
+    }
 }

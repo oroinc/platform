@@ -52,4 +52,10 @@ class BooleanTypeTest extends TypeTestCase
             ['test'],
         ];
     }
+
+    public function testGetName()
+    {
+        $type = new BooleanType();
+        $this->assertEquals('oro_api_boolean', $type->getName());
+    }
 }

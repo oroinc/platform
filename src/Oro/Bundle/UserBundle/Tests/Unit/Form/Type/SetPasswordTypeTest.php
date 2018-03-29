@@ -59,6 +59,11 @@ class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
         $this->formType->buildForm($builder, []);
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_set_password', $this->formType->getName());
+    }
+
     public function testGetParent()
     {
         $this->assertEquals(TextType::class, $this->formType->getParent());

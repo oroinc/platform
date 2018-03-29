@@ -158,6 +158,11 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
         $this->assertEquals($parentCode, $formView->vars['attr']['data-parent-localization']);
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(FallbackPropertyType::NAME, $this->formType->getName());
+    }
+
     public function testGetParent()
     {
         $this->assertEquals(ChoiceType::class, $this->formType->getParent());

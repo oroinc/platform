@@ -38,6 +38,11 @@ class AclPrivilegeTypeTest extends \PHPUnit_Framework_TestCase
         $this->formType->buildForm($builder, $options);
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(AclPrivilegeType::NAME, $this->formType->getName());
+    }
+
     public function testConfigureOptions()
     {
         $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')

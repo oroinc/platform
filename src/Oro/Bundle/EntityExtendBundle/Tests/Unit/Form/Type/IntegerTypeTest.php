@@ -52,12 +52,19 @@ class IntegerTypeTest extends AbstractConfigTypeTestCase
         ];
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(
+            'oro_entity_extend_integer',
+            $this->getFormType()->getName()
+        );
+    }
+
     public function testGetParent()
     {
-        $type = $this->getFormType();
         $this->assertEquals(
             SymfonyIntegerType::class,
-            $type->getParent()
+            $this->getFormType()->getParent()
         );
     }
 }

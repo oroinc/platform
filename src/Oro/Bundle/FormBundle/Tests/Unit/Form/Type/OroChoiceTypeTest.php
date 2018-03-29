@@ -16,6 +16,12 @@ class OroChoiceTypeTest extends FormIntegrationTestCase
         $this->assertEquals(Select2ChoiceType::class, $formType->getParent());
     }
 
+    public function testGetName()
+    {
+        $formType = new OroChoiceType();
+        $this->assertEquals('oro_choice', $formType->getName());
+    }
+
     /**
      * @param float $data
      * @param array $viewData

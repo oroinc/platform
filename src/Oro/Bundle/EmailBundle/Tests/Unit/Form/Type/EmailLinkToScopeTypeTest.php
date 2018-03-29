@@ -13,4 +13,10 @@ class EmailLinkToScopeTypeTest extends TypeTestCase
         $type = new EmailLinkToScopeType();
         $this->assertEquals(ChoiceType::class, $type->getParent());
     }
+
+    public function testGetName()
+    {
+        $type = new EmailLinkToScopeType();
+        $this->assertEquals(EmailLinkToScopeType::NAME, $type->getName());
+    }
 }

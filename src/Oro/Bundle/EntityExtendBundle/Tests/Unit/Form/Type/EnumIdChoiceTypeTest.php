@@ -39,6 +39,11 @@ class EnumIdChoiceTypeTest extends TypeTestCase
         $this->assertEquals(EnumChoiceType::class, $this->type->getParent());
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_enum_id_choice', $this->type->getName());
+    }
+
     public function testConfigureOptions()
     {
         /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver **/

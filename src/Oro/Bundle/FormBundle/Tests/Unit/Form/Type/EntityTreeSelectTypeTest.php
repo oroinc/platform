@@ -44,6 +44,11 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
         ];
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(EntityTreeSelectType::NAME, $this->formType->getName());
+    }
+
     public function testGetBlockPrefix()
     {
         $this->assertEquals(EntityTreeSelectType::NAME, $this->formType->getBlockPrefix());

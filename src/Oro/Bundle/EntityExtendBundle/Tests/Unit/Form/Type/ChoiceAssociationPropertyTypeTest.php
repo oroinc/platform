@@ -25,12 +25,19 @@ class ChoiceAssociationPropertyTypeTest extends AssociationTypeTestCase
         );
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(
+            'oro_entity_extend_association_property_choice',
+            $this->getFormType()->getName()
+        );
+    }
+
     public function testGetParent()
     {
-        $type = $this->getFormType();
         $this->assertEquals(
             'choice',
-            $type->getParent()
+            $type->getFormType()->getParent()
         );
     }
 

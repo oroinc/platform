@@ -9,6 +9,23 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class WidgetFilterTypeTest extends TypeTestCase
 {
+    /** @var WidgetFilterType */
+    protected $formType;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setUp()
+    {
+        $this->formType = new WidgetFilterType();
+        parent::setUp();
+    }
+
+    public function testGetName()
+    {
+        $this->assertEquals('oro_dashboard_query_filter', $this->formType->getName());
+    }
+
     public function testSubmitValidData()
     {
         $formData = [

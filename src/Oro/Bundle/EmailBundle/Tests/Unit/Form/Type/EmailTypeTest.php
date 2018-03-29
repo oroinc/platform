@@ -333,6 +333,12 @@ class EmailTypeTest extends TypeTestCase
         $type->configureOptions($resolver);
     }
 
+    public function testGetName()
+    {
+        $type = $this->createEmailType();
+        $this->assertEquals('oro_email_email', $type->getName());
+    }
+
     /**
      * @return array
      */

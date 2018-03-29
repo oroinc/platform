@@ -262,4 +262,10 @@ class EntityTypeTest extends OrmRelatedTestCase
         $form->submit([$value]);
         $this->assertTrue($form->isSynchronized());
     }
+
+    public function testGetName()
+    {
+        $type = new EntityType($this->doctrine, new EntityLoader($this->doctrine));
+        $this->assertEquals('oro_api_entity', $type->getName());
+    }
 }

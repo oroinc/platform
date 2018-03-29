@@ -27,6 +27,11 @@ class AclPrivilegeIdentityTypeTest extends \PHPUnit_Framework_TestCase
         $this->formType->buildForm($builder, array());
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_acl_privilege_identity', $this->formType->getName());
+    }
+
     public function testConfigureOptions()
     {
         $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')

@@ -47,4 +47,10 @@ class NumberTypeTest extends TypeTestCase
             [0, '1.2'],
         ];
     }
+
+    public function testGetName()
+    {
+        $type = new NumberType();
+        $this->assertEquals('oro_api_number', $type->getName());
+    }
 }

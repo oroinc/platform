@@ -62,6 +62,11 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
         $this->assertEquals(OroChoiceType::class, $this->formType->getParent());
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(LanguageSelectType::NAME, $this->formType->getName());
+    }
+
     public function testBuildForm()
     {
         $data =  ['1' => 'English', '2' => 'Spain'];

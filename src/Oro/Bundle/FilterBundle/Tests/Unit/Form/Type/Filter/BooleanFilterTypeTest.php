@@ -48,6 +48,11 @@ class BooleanFilterTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(BooleanFilterType::NAME, $this->type->getName());
+    }
+
     /**
      * {@inheritDoc}
      */

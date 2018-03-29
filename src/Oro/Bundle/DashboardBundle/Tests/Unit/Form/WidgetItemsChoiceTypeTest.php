@@ -15,6 +15,11 @@ class WidgetItemsChoiceTypeTest extends \PHPUnit_Framework_TestCase
         $this->formType = new WidgetItemsChoiceType();
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_type_widget_items_choice', $this->formType->getName());
+    }
+
     public function testGetParent()
     {
         $this->assertEquals(ChoiceType::class, $this->formType->getParent());

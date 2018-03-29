@@ -25,12 +25,19 @@ class TextareaAssociationPropertyTypeTest extends AssociationTypeTestCase
         );
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(
+            'oro_entity_extend_association_property_textarea',
+            $this->getFormType()->getName()
+        );
+    }
+
     public function testGetParent()
     {
-        $type = $this->getFormType();
         $this->assertEquals(
             'textarea',
-            $type->getParent()
+            $this->getFormType()->getParent()
         );
     }
 

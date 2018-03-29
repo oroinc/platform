@@ -70,6 +70,11 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(LocalizationSelectionType::NAME, $this->formType->getName());
+    }
+
     public function testGetParent()
     {
         $this->assertEquals(OroChoiceType::class, $this->formType->getParent());

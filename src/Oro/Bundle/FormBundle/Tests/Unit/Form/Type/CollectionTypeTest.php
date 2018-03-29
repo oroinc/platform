@@ -228,6 +228,11 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(BaseCollectionType::class, $this->type->getParent());
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_collection', $this->type->getName());
+    }
+
     /**
      * @return OptionsResolver
      */

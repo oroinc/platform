@@ -62,6 +62,12 @@ class EntityScalarCollectionTypeTest extends TypeTestCase
         $this->assertTrue($form->isSynchronized());
     }
 
+    public function testGetName()
+    {
+        $type = new EntityScalarCollectionType();
+        $this->assertEquals('oro_api_entity_scalar_collection', $type->getName());
+    }
+
     public function testGetParent()
     {
         $type = new EntityScalarCollectionType();

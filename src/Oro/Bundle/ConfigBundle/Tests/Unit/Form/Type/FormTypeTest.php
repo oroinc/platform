@@ -187,6 +187,11 @@ class FormTypeTest extends TypeTestCase
         $this->assertTrue($form->getConfig()->getAttribute('isConfiguratorApplied'));
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_config_form_type', $this->form->getName());
+    }
+
     public static function staticConfigurator(FormBuilderInterface $builder, array $options)
     {
         $builder->setAttribute('isConfiguratorApplied', true);

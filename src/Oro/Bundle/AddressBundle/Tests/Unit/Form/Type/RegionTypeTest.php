@@ -38,6 +38,11 @@ class RegionTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Select2TranslatableEntityType::class, $this->type->getParent());
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_region', $this->type->getName());
+    }
+
     public function testBuildForm()
     {
         $builderMock = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');

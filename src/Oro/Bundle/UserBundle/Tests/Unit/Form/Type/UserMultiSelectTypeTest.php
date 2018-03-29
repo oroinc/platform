@@ -66,4 +66,9 @@ class UserMultiSelectTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(OroJquerySelect2HiddenType::class, $this->type->getParent());
     }
+
+    public function testGetName()
+    {
+        $this->assertEquals('oro_user_multiselect', $this->type->getName());
+    }
 }

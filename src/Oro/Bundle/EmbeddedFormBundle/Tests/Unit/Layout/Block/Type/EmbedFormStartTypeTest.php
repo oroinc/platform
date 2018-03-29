@@ -324,6 +324,13 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         );
     }
 
+    public function testGetName()
+    {
+        $type = $this->getBlockType(EmbedFormStartType::NAME);
+
+        $this->assertSame(EmbedFormStartType::NAME, $type->getName());
+    }
+
     public function testGetParent()
     {
         $type = $this->getBlockType(EmbedFormStartType::NAME);

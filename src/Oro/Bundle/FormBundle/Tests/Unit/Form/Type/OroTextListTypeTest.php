@@ -8,6 +8,12 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroTextListTypeTest extends FormIntegrationTestCase
 {
+    public function testGetName()
+    {
+        $formType = new OroTextListType();
+        $this->assertEquals('oro_textlist', $formType->getName());
+    }
+
     public function testGetParent()
     {
         $formType = new OroTextListType();

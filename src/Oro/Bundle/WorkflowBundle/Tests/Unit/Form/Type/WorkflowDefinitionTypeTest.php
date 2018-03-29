@@ -110,6 +110,11 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
         $this->formType->configureOptions($resolver);
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(WorkflowDefinitionType::NAME, $this->formType->getName());
+    }
+
     public function testGetBlockPrefix()
     {
         $this->assertEquals(WorkflowDefinitionType::NAME, $this->formType->getBlockPrefix());

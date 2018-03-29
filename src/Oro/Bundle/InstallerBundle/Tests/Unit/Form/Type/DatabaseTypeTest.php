@@ -102,6 +102,11 @@ class DatabaseTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedData, $form->getData());
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_installer_configuration_database', $this->type->getName());
+    }
+
     /**
      * {@inheritdoc}
      */

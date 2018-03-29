@@ -32,6 +32,11 @@ class TagTypeTest extends \PHPUnit_Framework_TestCase
         $this->type->configureOptions($resolver);
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_tag_tag', $this->type->getName());
+    }
+
     public function testBuildForm()
     {
         $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')

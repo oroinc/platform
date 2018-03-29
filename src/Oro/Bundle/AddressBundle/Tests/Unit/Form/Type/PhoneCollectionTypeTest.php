@@ -23,4 +23,9 @@ class PhoneCollectionTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(CollectionType::class, $this->type->getParent());
     }
+
+    public function testGetName()
+    {
+        $this->assertEquals('oro_phone_collection', $this->type->getName());
+    }
 }

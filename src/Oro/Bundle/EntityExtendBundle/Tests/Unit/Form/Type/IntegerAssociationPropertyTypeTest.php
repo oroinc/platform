@@ -25,12 +25,19 @@ class IntegerAssociationPropertyTypeTest extends AssociationTypeTestCase
         );
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(
+            'oro_entity_extend_association_property_integer',
+            $this->getFormType()->getName()
+        );
+    }
+
     public function testGetParent()
     {
-        $type = $this->getFormType();
         $this->assertEquals(
             'integer',
-            $type->getParent()
+            $this->getFormType()->getParent()
         );
     }
 

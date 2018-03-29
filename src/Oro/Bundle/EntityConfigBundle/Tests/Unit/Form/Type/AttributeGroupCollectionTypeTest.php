@@ -91,6 +91,12 @@ class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
         $this->assertEquals([$existingEntity, $entity], $formData);
     }
 
+    public function testGetName()
+    {
+        $formType = new AttributeGroupCollectionType();
+        $this->assertSame(AttributeGroupCollectionType::NAME, $formType->getName());
+    }
+
     public function testGetParent()
     {
         $formType = new AttributeGroupCollectionType();

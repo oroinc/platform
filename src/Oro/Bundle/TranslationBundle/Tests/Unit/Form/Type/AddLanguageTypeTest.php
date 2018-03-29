@@ -67,6 +67,11 @@ class AddLanguageTypeTest extends FormIntegrationTestCase
         );
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_translation_add_language', $this->formType->getName());
+    }
+
     public function testGetBlockPrefix()
     {
         $this->assertEquals('oro_translation_add_language', $this->formType->getBlockPrefix());

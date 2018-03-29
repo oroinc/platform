@@ -90,6 +90,13 @@ class FormTypeTest extends BlockTypeTestCase
             ->addType($formEnd);
     }
 
+    public function testGetName()
+    {
+        $type = $this->getBlockType(FormType::NAME);
+
+        $this->assertSame(FormType::NAME, $type->getName());
+    }
+
     public function testGetParent()
     {
         $type = $this->getBlockType(FormType::NAME);

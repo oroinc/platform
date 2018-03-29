@@ -16,6 +16,11 @@ class PrivilegeCollectionTypeTest extends \PHPUnit_Framework_TestCase
         $this->formType = new PrivilegeCollectionType();
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(PrivilegeCollectionType::NAME, $this->formType->getName());
+    }
+
     public function testGetParent()
     {
         $this->assertEquals(CollectionType::class, $this->formType->getParent());

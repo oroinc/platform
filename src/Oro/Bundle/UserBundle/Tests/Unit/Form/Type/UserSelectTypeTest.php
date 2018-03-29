@@ -34,4 +34,9 @@ class UserSelectTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(OroEntitySelectOrCreateInlineType::class, $this->type->getParent());
     }
+
+    public function testGetName()
+    {
+        $this->assertEquals('oro_user_select', $this->type->getName());
+    }
 }

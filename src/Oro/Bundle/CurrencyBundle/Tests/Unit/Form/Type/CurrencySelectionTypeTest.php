@@ -262,6 +262,11 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
         $this->factory->create(CurrencySelectionType::class, null, ['additional_currencies' => 'string']);
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(CurrencySelectionType::NAME, $this->formType->getName());
+    }
+
     public function testGetParent()
     {
         $this->assertEquals(ChoiceType::class, $this->formType->getParent());

@@ -28,6 +28,11 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit_Framework_TestCa
         $this->type = new LocalizedFallbackValueCollectionType($this->registry);
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(LocalizedFallbackValueCollectionType::NAME, $this->type->getName());
+    }
+
     public function testSetDefaults()
     {
         $expectedOptions = [

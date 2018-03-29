@@ -39,6 +39,13 @@ class InputTypeTest extends BlockTypeTestCase
         $this->assertEquals($placeholder, $view->vars['placeholder']);
     }
 
+    public function testGetName()
+    {
+        $type = $this->getBlockType(InputType::NAME);
+
+        $this->assertSame(InputType::NAME, $type->getName());
+    }
+
     public function testGetParent()
     {
         $type = $this->getBlockType(InputType::NAME);

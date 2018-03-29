@@ -39,4 +39,9 @@ class LocaleTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(BaseLocaleType::class, $this->formType->getParent());
     }
+
+    public function testGetName()
+    {
+        $this->assertEquals('oro_locale', $this->formType->getName());
+    }
 }

@@ -40,6 +40,11 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(SearchStringFilterType::NAME, $this->type->getName());
+    }
+
     public function testGetBlockPrefix()
     {
         $this->assertEquals(SearchStringFilterType::NAME, $this->type->getBlockPrefix());

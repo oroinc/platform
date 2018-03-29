@@ -52,12 +52,19 @@ class TextTypeTest extends AbstractConfigTypeTestCase
         ];
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(
+            'oro_entity_extend_text',
+            $this->getFormType()->getName()
+        );
+    }
+
     public function testGetParent()
     {
-        $type = $this->getFormType();
         $this->assertEquals(
             SymfonyTextType::class,
-            $type->getParent()
+            $this->getFormType()->getParent()
         );
     }
 }

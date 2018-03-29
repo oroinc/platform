@@ -21,6 +21,11 @@ class RecipientListTypeTest extends \PHPUnit_Framework_TestCase
         $this->type = new RecipientListType($this->entityManager);
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(RecipientListType::NAME, $this->type->getName());
+    }
+
     public function testBuildForm()
     {
         /** @var FormBuilder|\PHPUnit_Framework_MockObject_MockObject $builder */

@@ -8,6 +8,12 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroDurationTypeTest extends FormIntegrationTestCase
 {
+    public function testGetName()
+    {
+        $type = new OroDurationType();
+        $this->assertEquals(OroDurationType::NAME, $type->getName());
+    }
+
     public function testGetParent()
     {
         $type = new OroDurationType();

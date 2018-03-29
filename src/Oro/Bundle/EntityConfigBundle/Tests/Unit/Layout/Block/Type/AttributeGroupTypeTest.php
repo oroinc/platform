@@ -195,6 +195,13 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
         $this->assertFalse($this->attributeRenderRegistry->isGroupRendered($attributeFamily, $attributeGroup));
     }
 
+    public function testGetName()
+    {
+        $type = $this->getBlockType(AttributeGroupType::NAME);
+
+        $this->assertSame(AttributeGroupType::NAME, $type->getName());
+    }
+
     public function testGetParent()
     {
         $type = $this->getBlockType(AttributeGroupType::NAME);

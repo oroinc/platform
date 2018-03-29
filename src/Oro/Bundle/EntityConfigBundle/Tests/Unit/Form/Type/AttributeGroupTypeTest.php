@@ -159,4 +159,10 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
         $formData = $form->getData();
         $this->assertEquals($entity, $formData);
     }
+
+    public function testGetName()
+    {
+        $formType = new AttributeGroupType();
+        $this->assertEquals(AttributeGroupType::NAME, $formType->getName());
+    }
 }

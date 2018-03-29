@@ -39,4 +39,9 @@ class CountryTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(BaseCountryType::class, $this->formType->getParent());
     }
+
+    public function testGetName()
+    {
+        $this->assertEquals('oro_locale_country', $this->formType->getName());
+    }
 }

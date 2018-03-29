@@ -39,6 +39,11 @@ class EmailAttachmentTypeTest extends \PHPUnit_Framework_TestCase
         $this->emailAttachmentType = new EmailAttachmentType($this->em, $this->emailAttachmentTransformer);
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_email_attachment', $this->emailAttachmentType->getName());
+    }
+
     public function testConfigureOptions()
     {
         $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');

@@ -31,6 +31,11 @@ class LocalizationParentSelectTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(OroEntitySelectOrCreateInlineType::class, $this->formType->getParent());
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(LocalizationParentSelectType::NAME, $this->formType->getName());
+    }
+
     public function testConfigureOptions()
     {
         /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $optionsResolver */

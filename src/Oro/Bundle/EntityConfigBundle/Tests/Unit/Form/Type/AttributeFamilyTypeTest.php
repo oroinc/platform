@@ -100,4 +100,12 @@ class AttributeFamilyTypeTest extends FormIntegrationTestCase
             $this->type->getBlockPrefix()
         );
     }
+
+    public function testGetName()
+    {
+        $this->assertEquals(
+            'oro_attribute_family',
+            $this->type->getName()
+        );
+    }
 }

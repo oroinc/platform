@@ -29,6 +29,12 @@ class OroPercentTypeTest extends FormIntegrationTestCase
         unset($this->locale);
     }
 
+    public function testGetName()
+    {
+        $formType = new OroPercentType();
+        $this->assertEquals(OroPercentType::NAME, $formType->getName());
+    }
+
     public function testGetParent()
     {
         $formType = new OroPercentType();

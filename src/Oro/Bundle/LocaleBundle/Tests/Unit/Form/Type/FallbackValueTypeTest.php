@@ -157,4 +157,10 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
         $this->assertArrayHasKey('group_fallback_fields', $formView->vars);
         $this->assertEquals($groupFallbackFields, $formView->vars['group_fallback_fields']);
     }
+
+    public function testGetName()
+    {
+        $formType = new FallbackValueType();
+        $this->assertEquals(FallbackValueType::NAME, $formType->getName());
+    }
 }

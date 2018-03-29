@@ -31,6 +31,11 @@ class FilterTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(FilterType::NAME, $this->type->getName());
+    }
+
     /**
      * {@inheritDoc}
      */

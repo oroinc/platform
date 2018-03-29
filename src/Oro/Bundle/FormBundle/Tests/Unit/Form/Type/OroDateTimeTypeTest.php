@@ -15,6 +15,12 @@ class OroDateTimeTypeTest extends TypeTestCase
         $this->assertEquals(DateTimeType::class, $type->getParent());
     }
 
+    public function testGetName()
+    {
+        $type = new OroDateTimeType();
+        $this->assertEquals('oro_datetime', $type->getName());
+    }
+
     public function testConfigureOptions()
     {
         $expectedOptions = array(

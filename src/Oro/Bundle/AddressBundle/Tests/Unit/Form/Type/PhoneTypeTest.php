@@ -45,4 +45,9 @@ class PhoneTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->type->buildForm($builder, array());
     }
+
+    public function testGetName()
+    {
+        $this->assertEquals('oro_phone', $this->type->getName());
+    }
 }

@@ -46,6 +46,11 @@ class LanguageTypeTest extends FormIntegrationTestCase
         unset($this->cmMock, $this->languageProvider, $this->formType);
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_language', $this->formType->getName());
+    }
+
     public function testGetParent()
     {
         $this->assertEquals(OroChoiceType::class, $this->formType->getParent());

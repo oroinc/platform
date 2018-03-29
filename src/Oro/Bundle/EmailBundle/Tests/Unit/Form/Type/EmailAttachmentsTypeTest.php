@@ -21,6 +21,11 @@ class EmailAttachmentsTypeTest extends \PHPUnit_Framework_TestCase
         $this->emailAttachmentsType = new EmailAttachmentsType();
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_email_attachments', $this->emailAttachmentsType->getName());
+    }
+
     public function testGetParent()
     {
         $this->assertEquals(CollectionType::class, $this->emailAttachmentsType->getParent());

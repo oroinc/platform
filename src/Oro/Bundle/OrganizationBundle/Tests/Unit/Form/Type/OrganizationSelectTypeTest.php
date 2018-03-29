@@ -35,4 +35,9 @@ class OrganizationSelectTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(OroJquerySelect2HiddenType::class, $this->type->getParent());
     }
+
+    public function testGetName()
+    {
+        $this->assertEquals('oro_organization_select', $this->type->getName());
+    }
 }

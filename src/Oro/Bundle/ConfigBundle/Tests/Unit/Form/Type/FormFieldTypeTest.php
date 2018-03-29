@@ -70,6 +70,12 @@ class FormFieldTypeTest extends TypeTestCase
         );
     }
 
+    public function testGetName()
+    {
+        $formType = new FormFieldType();
+        $this->assertEquals('oro_config_form_field_type', $formType->getName());
+    }
+
     public function listenersDataProvider()
     {
         return [

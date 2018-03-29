@@ -296,6 +296,14 @@ class EnumValueCollectionTypeTest extends TypeTestCase
         $this->assertFalse($view->vars['show_form_when_empty']);
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(
+            'oro_entity_extend_enum_value_collection',
+            $this->type->getName()
+        );
+    }
+
     public function testGetParent()
     {
         $this->assertEquals(CollectionType::class, $this->type->getParent());

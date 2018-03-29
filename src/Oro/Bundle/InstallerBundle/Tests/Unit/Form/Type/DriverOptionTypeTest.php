@@ -40,6 +40,12 @@ class DriverOptionTypeTest extends FormIntegrationTestCase
         $this->assertEquals($optionValue, $formView->children['option_value']->vars['value']);
     }
 
+    public function testGetName()
+    {
+        $type = new DriverOptionType();
+        $this->assertEquals('oro_installer_configuration_driver_option', $type->getName());
+    }
+
     /**
      * {@inheritdoc}
      */

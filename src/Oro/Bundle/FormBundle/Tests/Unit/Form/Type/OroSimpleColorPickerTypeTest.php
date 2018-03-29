@@ -153,6 +153,11 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
         $this->assertEquals(HiddenType::class, $this->formType->getParent());
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_simple_color_picker', $this->formType->getName());
+    }
+
     public function buildViewDataProvider()
     {
         return [

@@ -116,4 +116,9 @@ class TypedAddressTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(AddressType::class, $this->type->getParent());
     }
+
+    public function testGetName()
+    {
+        $this->assertEquals('oro_typed_address', $this->type->getName());
+    }
 }

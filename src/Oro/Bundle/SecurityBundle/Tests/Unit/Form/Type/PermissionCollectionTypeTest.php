@@ -15,6 +15,11 @@ class PermissionCollectionTypeTest extends \PHPUnit_Framework_TestCase
         $this->formType = new PermissionCollectionType();
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_acl_permission_collection', $this->formType->getName());
+    }
+
     public function testGetParent()
     {
         $this->assertEquals(CollectionType::class, $this->formType->getParent());

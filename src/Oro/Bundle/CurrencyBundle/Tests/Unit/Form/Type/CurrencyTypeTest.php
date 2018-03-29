@@ -38,4 +38,9 @@ class CurrencyTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(BaseCurrencyType::class, $this->formType->getParent());
     }
+
+    public function testGetName()
+    {
+        $this->assertEquals('oro_currency', $this->formType->getName());
+    }
 }

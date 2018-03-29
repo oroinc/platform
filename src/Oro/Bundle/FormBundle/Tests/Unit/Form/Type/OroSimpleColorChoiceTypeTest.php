@@ -118,6 +118,11 @@ class OroSimpleColorChoiceTypeTest extends FormIntegrationTestCase
         $this->assertEquals(ChoiceType::class, $this->formType->getParent());
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_simple_color_choice', $this->formType->getName());
+    }
+
     /**
      * @return array
      */

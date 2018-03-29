@@ -181,4 +181,13 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
             ],
         ];
     }
+
+    /**
+     * Test name of type
+     */
+    public function testGetName()
+    {
+        $type = new ConfigurationGMailType($this->translator, $this->userConfigManager, $this->tokenAccessor);
+        $this->assertEquals(ConfigurationGMailType::NAME, $type->getName());
+    }
 }

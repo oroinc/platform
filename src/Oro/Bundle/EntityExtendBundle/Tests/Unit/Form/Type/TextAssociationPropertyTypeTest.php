@@ -25,12 +25,20 @@ class TextAssociationPropertyTypeTest extends AssociationTypeTestCase
         );
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(
+            'oro_entity_extend_association_property_text',
+            $this->getFormType()->getName()
+        );
+    }
+
     public function testGetParent()
     {
         $type = $this->getFormType();
         $this->assertEquals(
             'text',
-            $type->getParent()
+            $this->getFormType()->getParent()
         );
     }
 

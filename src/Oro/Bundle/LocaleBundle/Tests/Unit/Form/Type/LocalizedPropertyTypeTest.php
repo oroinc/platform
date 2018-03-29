@@ -127,4 +127,10 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
             ],
         ];
     }
+
+    public function testGetName()
+    {
+        $formType = new LocalizedPropertyType();
+        $this->assertEquals(LocalizedPropertyType::NAME, $formType->getName());
+    }
 }

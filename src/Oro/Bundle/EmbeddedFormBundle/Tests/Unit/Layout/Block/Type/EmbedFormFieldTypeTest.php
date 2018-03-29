@@ -159,6 +159,13 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $this->assertFalse($formView->isRendered());
     }
 
+    public function testGetName()
+    {
+        $type = $this->getBlockType(EmbedFormFieldType::NAME);
+
+        $this->assertSame(EmbedFormFieldType::NAME, $type->getName());
+    }
+
     public function testGetParent()
     {
         $type = $this->getBlockType(EmbedFormFieldType::NAME);

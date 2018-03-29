@@ -138,6 +138,14 @@ class EnumValueTypeTest extends TypeTestCase
         $this->assertCount(2, $nameConstraints);
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(
+            'oro_entity_extend_enum_value',
+            $this->type->getName()
+        );
+    }
+
     /**
      * @param array $inputData
      * @param array $expectedData

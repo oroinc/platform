@@ -84,6 +84,11 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         );
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_activity_multiple_association_choice', $this->type->getName());
+    }
+
     public function testGetParent()
     {
         $type = $this->getFormType();

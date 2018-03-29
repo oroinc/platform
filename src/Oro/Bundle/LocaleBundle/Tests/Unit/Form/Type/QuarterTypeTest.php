@@ -8,6 +8,12 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class QuarterTypeTest extends FormIntegrationTestCase
 {
+    public function testGetName()
+    {
+        $formType = new QuarterType();
+        $this->assertEquals('oro_quarter', $formType->getName());
+    }
+
     public function testGetParent()
     {
         $formType = new QuarterType();

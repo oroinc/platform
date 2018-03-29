@@ -63,6 +63,11 @@ class OroMoneyTypeTest extends FormIntegrationTestCase
         ];
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(OroMoneyType::NAME, $this->formType->getName());
+    }
+
     public function testGetParent()
     {
         $this->assertEquals(MoneyType::class, $this->formType->getParent());

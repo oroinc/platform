@@ -49,6 +49,11 @@ class EmailTemplateTranslationTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($options['labels'], $view->vars['labels']);
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_email_emailtemplate_translatation', $this->type->getName());
+    }
+
     public function testGetParent()
     {
         $this->assertEquals('a2lix_translations_gedmo', $this->type->getParent());

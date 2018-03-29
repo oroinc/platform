@@ -237,4 +237,10 @@ class ScalarCollectionTypeTest extends TypeTestCase
         $form->submit('test');
         $this->assertFalse($form->isSynchronized());
     }
+
+    public function testGetName()
+    {
+        $type = new ScalarCollectionType();
+        $this->assertEquals('oro_api_scalar_collection', $type->getName());
+    }
 }

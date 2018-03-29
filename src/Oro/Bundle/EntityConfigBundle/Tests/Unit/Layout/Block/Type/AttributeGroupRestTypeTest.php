@@ -133,6 +133,13 @@ class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
         $this->assertCount(0, $view->children);
     }
 
+    public function testGetName()
+    {
+        $type = $this->getBlockType(AttributeGroupRestType::NAME);
+
+        $this->assertSame(AttributeGroupRestType::NAME, $type->getName());
+    }
+
     public function testGetParent()
     {
         $type = $this->getBlockType(AttributeGroupRestType::NAME);

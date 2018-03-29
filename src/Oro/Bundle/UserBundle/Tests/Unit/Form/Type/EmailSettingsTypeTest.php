@@ -88,4 +88,9 @@ class EmailSettingsTypeTest extends \PHPUnit_Framework_TestCase
         
         $this->type->buildForm($builder, []);
     }
+
+    public function testGetName()
+    {
+        $this->assertEquals('oro_user_emailsettings', $this->type->getName());
+    }
 }

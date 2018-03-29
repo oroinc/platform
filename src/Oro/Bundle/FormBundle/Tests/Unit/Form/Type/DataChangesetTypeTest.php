@@ -15,6 +15,12 @@ class DataChangesetTypeTest extends FormIntegrationTestCase
         $this->assertEquals(HiddenType::class, $type->getParent());
     }
 
+    public function testGetName()
+    {
+        $type = new DataChangesetType();
+        $this->assertEquals(DataChangesetType::NAME, $type->getName());
+    }
+
     /**
      * @dataProvider submitProvider
      *

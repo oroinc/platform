@@ -260,6 +260,13 @@ class DatagridTypeTest extends BlockTypeTestCase
         );
     }
 
+    public function testGetName()
+    {
+        $type = new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker);
+
+        $this->assertSame(DatagridType::NAME, $type->getName());
+    }
+
     /**
      * @dataProvider optionsDataProvider
      * @param array $options

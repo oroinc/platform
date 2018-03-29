@@ -52,12 +52,19 @@ class TextareaTypeTest extends AbstractConfigTypeTestCase
         ];
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(
+            'oro_entity_extend_textarea',
+            $this->getFormType()->getName()
+        );
+    }
+
     public function testGetParent()
     {
-        $type = $this->getFormType();
         $this->assertEquals(
             SymfonyTextareaType::class,
-            $type->getParent()
+            $this->getFormType()->getParent()
         );
     }
 }

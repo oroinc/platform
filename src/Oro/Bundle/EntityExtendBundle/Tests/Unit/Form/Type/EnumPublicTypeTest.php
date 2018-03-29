@@ -196,6 +196,14 @@ class EnumPublicTypeTest extends TypeTestCase
         ];
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(
+            'oro_entity_extend_enum_public',
+            $this->type->getName()
+        );
+    }
+
     public function testGetParent()
     {
         $this->assertEquals(

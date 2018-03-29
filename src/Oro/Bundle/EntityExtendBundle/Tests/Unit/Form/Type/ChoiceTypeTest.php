@@ -52,12 +52,19 @@ class ChoiceTypeTest extends AbstractConfigTypeTestCase
         ];
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(
+            'oro_entity_extend_choice',
+            $this->getFormType()->getName()
+        );
+    }
+
     public function testGetParent()
     {
-        $type = $this->getFormType();
         $this->assertEquals(
             SymfonyChoiceType::class,
-            $type->getParent()
+            $this->getFormType()->getParent()
         );
     }
 }

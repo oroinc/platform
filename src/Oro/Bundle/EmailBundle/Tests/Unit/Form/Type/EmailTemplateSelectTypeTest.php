@@ -40,6 +40,11 @@ class EmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Select2TranslatableEntityType::class, $this->type->getParent());
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_email_template_list', $this->type->getName());
+    }
+
     public function testFinishView()
     {
         $optionKey = 'testKey';
