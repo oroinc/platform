@@ -58,6 +58,6 @@ class BusinessUnitTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->assertEquals(BusinessUnitType::class, $this->form->getName());
+        $this->assertEquals('oro_business_unit', $this->form->getName());
     }
 }
