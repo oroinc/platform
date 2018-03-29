@@ -68,6 +68,11 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
         $this->assertEquals($transition->getName(), $form->getData());
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(WorkflowTransitionSelectType::NAME, $this->type->getName());
+    }
+
     public function testConfigureOptions()
     {
         /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver */

@@ -21,6 +21,11 @@ class TypeTest extends \PHPUnit_Framework_TestCase
         $this->condition->setContextAccessor(new ContextAccessor());
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(Condition\Type::NAME, $this->condition->getName());
+    }
+
     /**
      * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
      * @expectedExceptionMessage Option "left" must be property path

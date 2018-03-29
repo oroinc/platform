@@ -37,6 +37,11 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
         ];
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('oro_workflow_transition', $this->type->getName());
+    }
+
     public function testGetParent()
     {
         $this->assertEquals(WorkflowAttributesType::class, $this->type->getParent());

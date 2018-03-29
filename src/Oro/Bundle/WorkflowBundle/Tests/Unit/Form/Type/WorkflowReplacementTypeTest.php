@@ -33,6 +33,11 @@ class WorkflowReplacementTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(WorkflowReplacementType::NAME, $this->formType->getName());
+    }
+
     public function testConfigureOptions()
     {
         /* @var $optionsResolver OptionsResolver|\PHPUnit_Framework_MockObject_MockObject */
