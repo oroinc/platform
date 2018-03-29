@@ -178,14 +178,4 @@ class BusinessUnitType extends AbstractType
     {
         return self::FORM_NAME;
     }
-
-    /**
-     * Return current organization id
-     *
-     * @return int|null
-     */
-    protected function getOrganizationId()
-    {
-        return $this->tokenAccessor->getOrganizationId();
-    }
 }
