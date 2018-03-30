@@ -5,7 +5,7 @@ define(function(require) {
      * This component display line loader when page is loading and ajax request sending
      */
     var LoadingBarView;
-    var BaseView = require('./base/view');
+    var BaseView = require('oroui/js/app/views/base/view');
     var $ = require('jquery');
     var _ = require('underscore');
 
