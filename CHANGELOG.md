@@ -1,4 +1,5 @@
-## 2.7.0 (Unreleased)
+## 3.0.0-beta (2018-03-30)
+[Show detailed list of changes](incompatibilities-3-0-beta.md)
 
 ### Added
 #### ApiBundle
@@ -45,7 +46,7 @@
 * The `oro_rest_api_get_user_profile` route was removed, use `oro_rest_api_user_profile` route instead.
 * The `Oro\Bundle\UserBundle\Api\Routing\UserProfileRestRouteOptionsResolver` and `Oro\Bundle\UserBundle\Api\ApiDoc\UserProfileRestRouteOptionsResolver` route option resolvers were removed in favor of [routing.yml](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#add-a-custom-route).
 
-## 2.6.0 (Unreleased)
+## 2.6.0 (2018-01-31)
 [Show detailed list of changes](incompatibilities-2-6.md)
 
 ### Added
