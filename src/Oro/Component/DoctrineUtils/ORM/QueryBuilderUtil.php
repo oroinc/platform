@@ -358,6 +358,19 @@ class QueryBuilderUtil
     }
 
     /**
+     * Check that passed identifier is safe for usage in dynamic DQL
+     *
+     * @param string $str
+     * @throws \InvalidArgumentException
+     */
+    public static function checkIdentifier($str)
+    {
+        if (preg_match('/[\W]+/', $str)) {
+            throw new \InvalidArgumentException(sprintf('Unsafe value passed %s', $str));
+        }
+    }
+
+    /**
      * @param QueryBuilder $qb
      * @param string $alias
      *
