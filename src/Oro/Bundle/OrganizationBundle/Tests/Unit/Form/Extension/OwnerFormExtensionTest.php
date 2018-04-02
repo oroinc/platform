@@ -334,7 +334,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             EntityType::class,
             array(
                 'class' => 'OroOrganizationBundle:BusinessUnit',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'choices' => $this->businessUnits,
                 'mapped' => true,
                 'required' => true,

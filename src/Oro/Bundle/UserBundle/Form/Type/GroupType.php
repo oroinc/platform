@@ -38,7 +38,7 @@ class GroupType extends AbstractType
                             ->where('r.role != :anonRole')
                             ->setParameter('anonRole', User::ROLE_ANONYMOUS);
                     },
-                    'property' => 'label',
+                    'choice_label' => 'label',
                     'required' => true,
                     'multiple' => true,
                 )

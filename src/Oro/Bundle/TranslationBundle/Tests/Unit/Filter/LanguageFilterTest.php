@@ -42,7 +42,7 @@ class LanguageFilterTest extends \PHPUnit_Framework_TestCase
                 FilterUtility::FORM_OPTIONS_KEY => [
                     'field_options' => [
                         'class' => Language::class,
-                        'property' => 'code',
+                        'choice_label' => 'code',
                     ],
                 ],
                 FilterUtility::FRONTEND_TYPE_KEY => 'choice',

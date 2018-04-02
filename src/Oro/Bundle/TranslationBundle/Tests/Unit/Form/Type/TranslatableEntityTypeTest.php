@@ -353,7 +353,7 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
             'predefined_choices' => array(
                 'choiceListOptions' => array(
                     'class'    => self::TEST_CLASS,
-                    'property' => self::TEST_PROPERTY,
+                    'choice_label' => self::TEST_PROPERTY,
                     'choices'  => $testChoiceEntities
                  ),
                 'expectedChoices' => $testChoiceEntities
@@ -361,7 +361,7 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
             'all_choices' => array(
                 'choiceListOptions' => array(
                     'class'    => self::TEST_CLASS,
-                    'property' => self::TEST_PROPERTY,
+                    'choice_label' => self::TEST_PROPERTY,
                     'choices'  => null
                 ),
                 'expectedChoices' => $testChoiceEntities,
@@ -370,7 +370,7 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
             'query_builder' => array(
                'choiceListOptions' => array(
                    'class'    => self::TEST_CLASS,
-                   'property' => self::TEST_PROPERTY,
+                   'choice_label' => self::TEST_PROPERTY,
                    'choices'  => null,
                    'query_builder' => 'object'
                 ),
@@ -380,7 +380,7 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
             'query_builder_callback' => array(
                 'choiceListOptions' => array(
                     'class'    => self::TEST_CLASS,
-                    'property' => self::TEST_PROPERTY,
+                    'choice_label' => self::TEST_PROPERTY,
                     'choices'  => null,
                     'query_builder' => 'closure'
                 ),

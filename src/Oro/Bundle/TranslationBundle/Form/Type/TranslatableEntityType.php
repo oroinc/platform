@@ -11,7 +11,6 @@ use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 use Oro\Bundle\TranslationBundle\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -90,8 +89,7 @@ class TranslatableEntityType extends AbstractType
             }
 
             if (null !== $options['choices']) {
-                return new ObjectChoiceList($options['choices'], $options['property'], array(), null, $idField);
-                return new ArrayChoiceList($options['choices'], $options['property'], $idField);
+                return new ObjectChoiceList($options['choices'], $options['choice_label'], array(), null, $idField);
             }
 
             // get query builder
@@ -127,12 +125,12 @@ class TranslatableEntityType extends AbstractType
 
             $entities = $query->execute(null, TranslationWalker::HYDRATE_OBJECT_TRANSLATION);
 
-            return new ObjectChoiceList($entities, $options['property'], array(), null, $idField);
+            return new ObjectChoiceList($entities, $options['choice_label'], array(), null, $idField);
         };
 
         $resolver->setDefaults(
             array(
-                'property'      => null,
+                'choice_label'  => null,
                 'query_builder' => null,
                 'choices'       => null,
                 'choice_list'   => $choiceList,
