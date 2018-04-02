@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Block\Type;
 
-use Symfony\Component\Form\FormView;
-
-use Oro\Component\Layout\Block\Type\BaseType;
-
 use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormStartType;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
 use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\BlockTypeTestCase;
+use Oro\Component\Layout\Block\Type\BaseType;
+use Symfony\Component\Form\FormView;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
@@ -47,7 +45,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
             ->method('getEnctype')
             ->will($this->returnValue($formEnctype));
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(EmbedFormStartType::NAME, ['form_name' => $formName]);
 
@@ -85,7 +83,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
             ->method('getEnctype')
             ->will($this->returnValue($formEnctype));
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(EmbedFormStartType::NAME, ['form_name' => $formName]);
 
@@ -122,7 +120,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
             ->method('getEnctype')
             ->will($this->returnValue($formEnctype));
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(EmbedFormStartType::NAME, ['form_name' => $formName]);
 
@@ -156,7 +154,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
             ->method('getEnctype')
             ->will($this->returnValue(null));
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(EmbedFormStartType::NAME, ['form_name' => $formName]);
 
@@ -190,7 +188,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $formAccessor->expects($this->never())
             ->method('getEnctype');
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             EmbedFormStartType::NAME,
@@ -233,7 +231,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $formAccessor->expects($this->never())
             ->method('getEnctype');
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             EmbedFormStartType::NAME,
@@ -276,7 +274,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $formAccessor->expects($this->never())
             ->method('getEnctype');
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             EmbedFormStartType::NAME,
@@ -318,7 +316,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
     {
         $formName = 'test_form';
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, 123);
         $this->getBlockView(
             EmbedFormStartType::NAME,

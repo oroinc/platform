@@ -49,6 +49,10 @@ class NestedAssociationTest extends RestJsonApiTestCase
             ],
             $response
         );
+        $result = self::jsonToArray($response->getContent());
+        $attributes = $result['data']['attributes'];
+        self::assertArrayNotHasKey('relatedClass', $attributes);
+        self::assertArrayNotHasKey('relatedId', $attributes);
     }
 
     public function testCreate()
@@ -288,27 +292,10 @@ class NestedAssociationTest extends RestJsonApiTestCase
         $relatedEntity2 = $this->getReference('test_related_entity2');
         $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
 
-        $data = [
-            'data' => [
-                'type' => $relatedEntityType,
-                'id'   => (string)$relatedEntity2->id
-            ]
-        ];
-
-        $response = $this->request(
-            'PATCH',
-            $this->getUrl(
-                'oro_rest_api_patch_relationship',
-                [
-                    'entity'      => $entityType,
-                    'id'          => (string)$entity->getId(),
-                    'association' => 'relatedEntity'
-                ]
-            ),
-            $data
+        $this->patchRelationship(
+            ['entity' => $entityType, 'id' => (string)$entity->getId(), 'association' => 'relatedEntity'],
+            ['data' => ['type' => $relatedEntityType, 'id' => (string)$relatedEntity2->id]]
         );
-
-        self::assertResponseStatusCodeEquals($response, 204);
 
         // test that the data was updated
         $entity = $this->getEntityManager()->find(TestEntity::class, $entity->getId());
@@ -322,24 +309,10 @@ class NestedAssociationTest extends RestJsonApiTestCase
         $entity = $this->getReference('test_entity');
         $entityType = $this->getEntityType(TestEntity::class);
 
-        $data = [
-            'data' => null
-        ];
-
-        $response = $this->request(
-            'PATCH',
-            $this->getUrl(
-                'oro_rest_api_patch_relationship',
-                [
-                    'entity'      => $entityType,
-                    'id'          => (string)$entity->getId(),
-                    'association' => 'relatedEntity'
-                ]
-            ),
-            $data
+        $this->patchRelationship(
+            ['entity' => $entityType, 'id' => (string)$entity->getId(), 'association' => 'relatedEntity'],
+            ['data' => null]
         );
-
-        self::assertResponseStatusCodeEquals($response, 204);
 
         // test that the data was updated
         $this->getEntityManager()->clear();

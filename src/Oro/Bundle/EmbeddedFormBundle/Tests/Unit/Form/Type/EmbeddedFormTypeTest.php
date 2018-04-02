@@ -1,9 +1,12 @@
 <?php
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmbeddedFormTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,19 +27,19 @@ class EmbeddedFormTypeTest extends \PHPUnit_Framework_TestCase
         $builder = $this->createMock('\Symfony\Component\Form\FormBuilder');
         $builder->expects($this->at(0))
             ->method('add')
-            ->with('title', 'text')
+            ->with('title', TextType::class)
             ->will($this->returnSelf());
         $builder->expects($this->at(1))
             ->method('add')
-            ->with('formType', 'oro_available_embedded_forms')
+            ->with('formType', AvailableEmbeddedFormType::class)
             ->will($this->returnSelf());
         $builder->expects($this->at(2))
             ->method('add')
-            ->with('css', 'textarea')
+            ->with('css', TextareaType::class)
             ->will($this->returnSelf());
         $builder->expects($this->at(3))
             ->method('add')
-            ->with('successMessage', 'textarea')
+            ->with('successMessage', TextareaType::class)
             ->will($this->returnSelf());
 
         $formType = new EmbeddedFormType();
@@ -46,16 +49,16 @@ class EmbeddedFormTypeTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function shouldSetDefaultOptions()
+    public function shouldConfigureOptions()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject | OptionsResolverInterface $resolver */
-        $resolver = $this->createMock('\Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        /** @var \PHPUnit_Framework_MockObject_MockObject | OptionsResolver $resolver */
+        $resolver = $this->createMock('\Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(['data_class' => 'Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm']);
 
         $formType = new EmbeddedFormType();
-        $formType->setDefaultOptions($resolver);
+        $formType->configureOptions($resolver);
     }
 
     /**

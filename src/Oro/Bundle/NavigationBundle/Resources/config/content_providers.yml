@@ -7,7 +7,7 @@ parameters:
 
 services:
     oro_navigation.content_provider.menu.history_menu:
-        class: %oro_navigation.content_provider.menu.class%
+        class: '%oro_navigation.content_provider.menu.class%'
         arguments:
             - '@oro_menu.twig.extension'
             - "history"
@@ -16,7 +16,7 @@ services:
             - { name: oro_ui.content_provider }
 
     oro_navigation.content_provider.menu.mostviewed_menu:
-        class: %oro_navigation.content_provider.menu.class%
+        class: '%oro_navigation.content_provider.menu.class%'
         arguments:
             - '@oro_menu.twig.extension'
             - "mostviewed"
@@ -25,7 +25,7 @@ services:
             - { name: oro_ui.content_provider }
 
     oro_navigation.content_provider.menu.application_menu:
-        class: %oro_navigation.content_provider.menu.class%
+        class: '%oro_navigation.content_provider.menu.class%'
         arguments:
             - '@oro_menu.twig.extension'
             - "application_menu"
@@ -34,32 +34,30 @@ services:
             - { name: oro_ui.content_provider, enabled: false }
 
     oro_navigation.content_provider.title:
-        class: %oro_navigation.content_provider.title.class%
+        class: '%oro_navigation.content_provider.title.class%'
         arguments:
             - '@oro_navigation.title_service'
         tags:
             - { name: oro_ui.content_provider }
 
     oro_navigation.content_provider.title_short:
-        class: %oro_navigation.content_provider.title_short.class%
+        class: '%oro_navigation.content_provider.title_short.class%'
         arguments:
             - '@oro_navigation.title_service'
         tags:
             - { name: oro_ui.content_provider }
 
     oro_navigation.content_provider.title_serialized:
-        class: %oro_navigation.content_provider.title_serialized.class%
+        class: '%oro_navigation.content_provider.title_serialized.class%'
         arguments:
             - '@oro_navigation.title_service'
         tags:
             - { name: oro_ui.content_provider }
 
     oro_navigation.content_provider.navigation_elements:
-        class: %oro_navigation.content_provider.navigation_elements.class%
+        class: '%oro_navigation.content_provider.navigation_elements.class%'
         arguments:
             - '@oro_navigation.configuration.provider'
-        synchronized: true
-        calls:
-            - [setRequest, ["@?request="]]
+            - '@request_stack'
         tags:
             - { name: oro_ui.content_provider }

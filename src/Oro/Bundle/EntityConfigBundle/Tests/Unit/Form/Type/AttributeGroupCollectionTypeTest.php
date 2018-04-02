@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
-
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupCollectionType;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupType;
@@ -14,25 +12,10 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizedFallbackValueCollectionTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 
 class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var AttributeGroupCollectionType
-     */
-    protected $formType;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->formType = new AttributeGroupCollectionType();
-    }
-
     /**
      * @return array
      */
@@ -46,11 +29,10 @@ class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
 
         return [
             new PreloadedExtension([
-                CollectionType::NAME => new CollectionType(),
-                AttributeGroupType::NAME => new AttributeGroupType(),
-                LocalizedFallbackValueCollectionType::NAME => new LocalizedFallbackValueCollectionTypeStub(),
-                AttributeMultiSelectType::NAME => new AttributeMultiSelectType($attributeManagerMock),
-                'genemu_jqueryselect2_choice' => new Select2Type('choice'),
+                CollectionType::class => new CollectionType(),
+                AttributeGroupType::class => new AttributeGroupType(),
+                LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionTypeStub(),
+                AttributeMultiSelectType::class => new AttributeMultiSelectType($attributeManagerMock)
             ], []),
 
         ];
@@ -73,13 +55,13 @@ class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
     {
         $existingEntity = new AttributeGroup();
         $existingEntity->addLabel($this->createLocalizedValue('Group1 Label 1'));
-        $options = ['options' =>
+        $options = ['entry_options' =>
             [
                 'attributeEntityClass' => 'EnityClass',
                 'data_class' => AttributeGroup::class
             ]
         ];
-        $form = $this->factory->create($this->formType, [$existingEntity], $options);
+        $form = $this->factory->create(AttributeGroupCollectionType::class, [$existingEntity], $options);
 
         $submittedData = [
             [
@@ -111,11 +93,13 @@ class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
 
     public function testGetName()
     {
-        $this->assertSame(AttributeGroupCollectionType::NAME, $this->formType->getName());
+        $formType = new AttributeGroupCollectionType();
+        $this->assertSame(AttributeGroupCollectionType::NAME, $formType->getName());
     }
 
     public function testGetParent()
     {
-        $this->assertSame(CollectionType::NAME, $this->formType->getParent());
+        $formType = new AttributeGroupCollectionType();
+        $this->assertSame(CollectionType::class, $formType->getParent());
     }
 }

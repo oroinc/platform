@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\IntegrationBundle\EventListener;
 
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\LoggerAwareInterface;
-
 use Oro\Bundle\IntegrationBundle\Event\ClientCreatedAfterEvent;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator\LoggerClientDecorator;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
 class LoggerClientDecoratorListener extends AbstractClientDecoratorListener implements LoggerAwareInterface
 {

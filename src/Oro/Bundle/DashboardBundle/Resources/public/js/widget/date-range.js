@@ -38,6 +38,16 @@ define(function(require) {
          */
         autoUpdateRangeFilterType: false,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function WidgetConfigDateRangeFilter() {
+            WidgetConfigDateRangeFilter.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             WidgetConfigDateRangeFilter.__super__.initialize.apply(this, arguments);
             options.$form.on('submit' + this.eventNamespace(), _.bind(this.onSubmit, this));
@@ -112,9 +122,9 @@ define(function(require) {
 
         getDefaultTypeValue: function() {
             var choiceData = _.pluck(this.choices, 'data');
-            return choiceData.indexOf(this.typeDefinedValues.all_time) === -1 ?
-                this.emptyValue.type :
-                this.typeDefinedValues.all_time;
+            return choiceData.indexOf(this.typeDefinedValues.all_time) === -1
+                ? this.emptyValue.type
+                : this.typeDefinedValues.all_time;
         },
 
         _getParts: function() {

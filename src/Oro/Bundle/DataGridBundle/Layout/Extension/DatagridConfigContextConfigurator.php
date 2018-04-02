@@ -3,9 +3,8 @@
 namespace Oro\Bundle\DataGridBundle\Layout\Extension;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
-
-use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
+use Oro\Component\Layout\ContextInterface;
 
 class DatagridConfigContextConfigurator implements ContextConfiguratorInterface
 {
@@ -33,7 +32,7 @@ class DatagridConfigContextConfigurator implements ContextConfiguratorInterface
 
         $context->getResolver()
             ->setDefined(['grid_config'])
-            ->setAllowedTypes(['grid_config' => ['array']]);
+            ->setAllowedTypes('grid_config', ['array']);
 
         $data = $context->getOr('grid_config');
 

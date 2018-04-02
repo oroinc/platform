@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Pager;
 
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;

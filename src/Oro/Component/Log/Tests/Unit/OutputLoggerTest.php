@@ -2,11 +2,9 @@
 
 namespace Oro\Component\Log\Tests\Unit\OutputLoggerTest;
 
-use Psr\Log\LogLevel;
-
-use Symfony\Component\Console\Output\OutputInterface;
-
 use Oro\Component\Log\OutputLogger;
+use Psr\Log\LogLevel;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class OutputLoggerTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
+use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
-use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
-use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
-
+/**
+ * Configures Data API security firewalls to be able to work in two modes, stateless and statefull.
+ * The statefull mode is used when API is called internally from web pages as AJAX request.
+ */
 class SecurityFirewallCompilerPass implements CompilerPassInterface
 {
     /** @var array */
@@ -18,61 +21,17 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $securityConfigs = $container->getExtensionConfig('security');
         if (empty($securityConfigs[0]['firewalls'])) {
             return;
         }
 
-        $sessionOptions = $container->getParameter('session.storage.options');
-        $firewalls = $securityConfigs[0]['firewalls'];
-        foreach ($firewalls as $firewallName => $firewallConfig) {
-            if (!$this->isStatelessFirewallWithContext($firewallConfig)) {
-                continue;
+        foreach ($securityConfigs[0]['firewalls'] as $name => $config) {
+            if ($this->isStatelessFirewallWithContext($config)) {
+                $this->configureStatelessFirewallWithContext($container, $name, $config);
             }
-
-            $contextId = 'security.firewall.map.context.' . $firewallName;
-            if (!$container->hasDefinition($contextId)) {
-                continue;
-            }
-
-            $contextDef = $container->getDefinition($contextId);
-
-            // add the context listener
-            $listeners = $contextDef->getArgument(0);
-            $contextKey = $firewallConfig['context'];
-            // get new context listener reference
-            $listenerRef = new Reference($this->createContextListener($container, $contextKey));
-            // create decorator for the Context serializer listener
-            $apiContextSerializerListenerId = (string)$listenerRef . '.' . $firewallName;
-            $container
-                ->register($apiContextSerializerListenerId, SecurityFirewallContextListener::class)
-                ->setArguments(
-                    [
-                        $listenerRef,
-                        $sessionOptions,
-                        new Reference('security.token_storage')
-                    ]
-                );
-            $apiContextSerializerListener = new Reference($apiContextSerializerListenerId);
-            $contextListeners = [];
-            /** @var Reference $listener */
-            foreach ($listeners as $listener) {
-                // Context serializer listener should does before the access listener
-                if ((string)$listener === 'security.access_listener') {
-                    $contextListeners[] = $apiContextSerializerListener;
-                }
-                $contextListeners[] = $listener;
-            }
-
-            $contextDef->replaceArgument(0, $contextListeners);
-
-            // replace the exception listener class
-            $exceptionListenerRef = $contextDef->getArgument(1);
-            $exceptionDefinition = $container->getDefinition($exceptionListenerRef);
-            $exceptionDefinition->setClass(SecurityFirewallExceptionListener::class);
-            $exceptionDefinition->addMethodCall('setSessionOptions', [$sessionOptions]);
         }
     }
 
@@ -83,7 +42,7 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
      *
      * @return bool
      */
-    private function isStatelessFirewallWithContext(array $firewallConfig)
+    private function isStatelessFirewallWithContext(array $firewallConfig): bool
     {
         return
             array_key_exists('stateless', $firewallConfig)
@@ -94,11 +53,55 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
 
     /**
      * @param ContainerBuilder $container
+     * @param string           $firewallName
+     * @param array            $firewallConfig
+     */
+    private function configureStatelessFirewallWithContext(
+        ContainerBuilder $container,
+        string $firewallName,
+        array $firewallConfig
+    ): void {
+        $contextId = 'security.firewall.map.context.' . $firewallName;
+        if (!$container->hasDefinition($contextId)) {
+            return;
+        }
+
+        $contextDef = $container->getDefinition($contextId);
+        $contextKey = $firewallConfig['context'];
+        $sessionName = $this->getSessionName($container);
+
+        // add the context listener
+        $listenerId = $this->createContextListener($container, $contextKey);
+        $apiContextListenerId = $listenerId . '.' . $firewallName;
+        $container
+            ->register($apiContextListenerId, SecurityFirewallContextListener::class)
+            ->setArguments([new Reference($listenerId), $sessionName, new Reference('security.token_storage')]);
+        $contextListeners = [];
+        /** @var Reference[] $listeners */
+        $listeners = $contextDef->getArgument(0);
+        foreach ($listeners as $listener) {
+            // the context listener should be before the access listener
+            if ('security.access_listener' === (string)$listener) {
+                $contextListeners[] = new Reference($apiContextListenerId);
+            }
+            $contextListeners[] = $listener;
+        }
+
+        $contextDef->replaceArgument(0, $contextListeners);
+
+        // replace the exception listener class
+        $exceptionListenerDef = $container->getDefinition($contextDef->getArgument(1));
+        $exceptionListenerDef->setClass(SecurityFirewallExceptionListener::class);
+        $exceptionListenerDef->addMethodCall('setSessionName', [$sessionName]);
+    }
+
+    /**
+     * @param ContainerBuilder $container
      * @param string           $contextKey
      *
      * @return string
      */
-    private function createContextListener(ContainerBuilder $container, $contextKey)
+    private function createContextListener(ContainerBuilder $container, $contextKey): string
     {
         if (isset($this->contextListeners[$contextKey])) {
             return $this->contextListeners[$contextKey];
@@ -111,5 +114,17 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
         $this->contextListeners[$contextKey] = $listenerId;
 
         return $listenerId;
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @return string
+     */
+    private function getSessionName(ContainerBuilder $container): string
+    {
+        $sessionOptions = $container->getParameter('session.storage.options');
+
+        return $sessionOptions['name'];
     }
 }

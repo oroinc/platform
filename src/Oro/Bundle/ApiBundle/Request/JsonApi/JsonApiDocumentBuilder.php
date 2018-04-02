@@ -13,24 +13,27 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
+/**
+ * The document builder for REST API response conforms JSON.API specification.
+ */
 class JsonApiDocumentBuilder extends AbstractDocumentBuilder
 {
-    const JSONAPI       = 'jsonapi';
-    const LINKS         = 'links';
-    const META          = 'meta';
-    const INCLUDED      = 'included';
-    const ATTRIBUTES    = 'attributes';
-    const RELATIONSHIPS = 'relationships';
-    const ID            = 'id';
-    const TYPE          = 'type';
+    public const JSONAPI       = 'jsonapi';
+    public const LINKS         = 'links';
+    public const META          = 'meta';
+    public const INCLUDED      = 'included';
+    public const ATTRIBUTES    = 'attributes';
+    public const RELATIONSHIPS = 'relationships';
+    public const ID            = 'id';
+    public const TYPE          = 'type';
 
-    const ERROR_STATUS    = 'status';
-    const ERROR_CODE      = 'code';
-    const ERROR_TITLE     = 'title';
-    const ERROR_DETAIL    = 'detail';
-    const ERROR_SOURCE    = 'source';
-    const ERROR_POINTER   = 'pointer';
-    const ERROR_PARAMETER = 'parameter';
+    private const ERROR_STATUS    = 'status';
+    private const ERROR_CODE      = 'code';
+    private const ERROR_TITLE     = 'title';
+    private const ERROR_DETAIL    = 'detail';
+    private const ERROR_SOURCE    = 'source';
+    private const ERROR_POINTER   = 'pointer';
+    private const ERROR_PARAMETER = 'parameter';
 
     /** @var ValueNormalizer */
     protected $valueNormalizer;
@@ -40,9 +43,6 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
 
     /** @var EntityIdAccessor */
     protected $entityIdAccessor;
-
-    /** @var RequestType */
-    protected $requestType;
 
     /**
      * @param ValueNormalizer              $valueNormalizer
@@ -61,27 +61,50 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
             $this->objectAccessor,
             $this->entityIdTransformer
         );
-        $this->requestType = new RequestType([RequestType::JSON_API]);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function convertObjectToArray($object, EntityMetadata $metadata = null)
+    public function getDocument()
+    {
+        $result = $this->result;
+        // check whether the result document data contains only a meta information
+        if (\array_key_exists(self::DATA, $result)) {
+            $data = $result[self::DATA];
+            if (\is_array($data) && \array_key_exists(self::META, $data) && \count($data) === 1) {
+                $result[self::META] = $data[self::META];
+                unset($result[self::DATA]);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function convertObjectToArray($object, RequestType $requestType, EntityMetadata $metadata = null)
     {
         if (null === $metadata) {
             throw new \InvalidArgumentException('The metadata should be provided.');
         }
 
-        $result = $this->getResourceIdObject(
-            $this->getEntityTypeForObject($object, $metadata),
-            $this->entityIdAccessor->getEntityId($object, $metadata)
-        );
-
         $data = $this->objectAccessor->toArray($object);
-        $this->addMeta($result, $data, $metadata);
-        $this->addAttributes($result, $data, $metadata);
-        $this->addRelationships($result, $data, $metadata);
+        if ($metadata->hasIdentifierFields()) {
+            $result = $this->getResourceIdObject(
+                $this->getEntityTypeForObject($object, $requestType, $metadata),
+                $this->entityIdAccessor->getEntityId($object, $metadata)
+            );
+            $this->addMeta($result, $data, $metadata);
+            $this->addAttributes($result, $data, $metadata);
+            $this->addRelationships($result, $data, $requestType, $metadata);
+        } else {
+            $result = [];
+            $this->addMeta($result, $data, $metadata);
+            $this->addAttributesAsMeta($result, $data, $metadata);
+            $this->addRelationshipsAsMeta($result, $data, $requestType, $metadata);
+        }
 
         return $result;
     }
@@ -120,12 +143,12 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function convertToEntityType($entityClass, $throwException = true)
+    protected function convertToEntityType($entityClass, RequestType $requestType, $throwException = true)
     {
         return ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,
             $entityClass,
-            $this->requestType,
+            $requestType,
             $throwException
         );
     }
@@ -157,9 +180,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         $fields = $metadata->getFields();
         foreach ($fields as $name => $field) {
             if (!in_array($name, $idFieldNames, true)) {
-                $result[self::ATTRIBUTES][$name] = array_key_exists($name, $data)
-                    ? $data[$name]
-                    : null;
+                $result[self::ATTRIBUTES][$name] = $data[$name] ?? null;
             }
         }
     }
@@ -167,13 +188,18 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     /**
      * @param array          $result
      * @param array          $data
+     * @param RequestType    $requestType
      * @param EntityMetadata $metadata
      */
-    protected function addRelationships(array &$result, array $data, EntityMetadata $metadata)
-    {
+    protected function addRelationships(
+        array &$result,
+        array $data,
+        RequestType $requestType,
+        EntityMetadata $metadata
+    ) {
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
-            $value = $this->getRelationshipValue($data, $name, $association);
+            $value = $this->getRelationshipValue($data, $requestType, $name, $association);
             if (DataType::isAssociationAsField($association->getDataType())) {
                 $result[self::ATTRIBUTES][$name] = $value;
             } else {
@@ -183,14 +209,49 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     }
 
     /**
+     * @param array          $result
+     * @param array          $data
+     * @param EntityMetadata $metadata
+     */
+    protected function addAttributesAsMeta(array &$result, array $data, EntityMetadata $metadata)
+    {
+        $fields = $metadata->getFields();
+        foreach ($fields as $name => $field) {
+            $result[self::META][$name] = $data[$name] ?? null;
+        }
+    }
+
+    /**
+     * @param array          $result
+     * @param array          $data
+     * @param RequestType    $requestType
+     * @param EntityMetadata $metadata
+     */
+    protected function addRelationshipsAsMeta(
+        array &$result,
+        array $data,
+        RequestType $requestType,
+        EntityMetadata $metadata
+    ) {
+        $associations = $metadata->getAssociations();
+        foreach ($associations as $name => $association) {
+            $result[self::META][$name] = $this->getRelationshipValue($data, $requestType, $name, $association);
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
-    protected function processRelatedObject($object, AssociationMetadata $associationMetadata)
-    {
+    protected function processRelatedObject(
+        $object,
+        RequestType $requestType,
+        AssociationMetadata $associationMetadata
+    ) {
         $targetMetadata = $associationMetadata->getTargetMetadata();
 
         $preparedValue = $this->prepareRelatedValue(
             $object,
+            $requestType,
             $associationMetadata->getTargetClassName(),
             $targetMetadata
         );
@@ -205,7 +266,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                 $preparedValue['entityType'],
                 $this->entityIdAccessor->getEntityId($targetObject, $targetMetadata)
             );
-            $this->addRelatedObject($this->convertObjectToArray($targetObject, $targetMetadata));
+            $this->addRelatedObject($this->convertObjectToArray($targetObject, $requestType, $targetMetadata));
         }
 
         return $resourceId;
@@ -213,13 +274,18 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
 
     /**
      * @param mixed               $object
+     * @param RequestType         $requestType
      * @param string              $targetClassName
      * @param EntityMetadata|null $targetMetadata
      *
      * @return array
      */
-    protected function prepareRelatedValue($object, $targetClassName, EntityMetadata $targetMetadata = null)
-    {
+    protected function prepareRelatedValue(
+        $object,
+        RequestType $requestType,
+        $targetClassName,
+        EntityMetadata $targetMetadata = null
+    ) {
         $idOnly = false;
         $targetEntityType = null;
         if (is_array($object) || is_object($object)) {
@@ -227,6 +293,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                 if ($targetMetadata->isInheritedType()) {
                     $targetEntityType = $this->getEntityType(
                         $this->objectAccessor->getClassName($object),
+                        $requestType,
                         $targetClassName
                     );
                 }
@@ -249,7 +316,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
             $idOnly = true;
         }
         if (!$targetEntityType) {
-            $targetEntityType = $this->getEntityType($targetClassName);
+            $targetEntityType = $this->getEntityType($targetClassName, $requestType);
         }
 
         return [

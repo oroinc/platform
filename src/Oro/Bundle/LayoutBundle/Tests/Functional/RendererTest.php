@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Functional;
 
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormInterface;
-
+use Oro\Bundle\LayoutBundle\Tests\Fixtures\UserNameType;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
-
-use Oro\Bundle\LayoutBundle\Tests\Fixtures\UserNameType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 
 class RendererTest extends LayoutTestCase
 {
@@ -26,13 +25,13 @@ class RendererTest extends LayoutTestCase
         }
 
         $context = new LayoutContext();
-        $context->getResolver()->setOptional(['form', 'body_class']);
+        $context->getResolver()->setDefined(['form', 'body_class']);
         $form = $this->getTestForm();
         $context->data()->set('form', $form->createView());
         $context->set('body_class', 'test-body');
 
         // revert TWIG form renderer to Symfony's default theme
-        $this->getContainer()->get('twig.form.renderer')->setTheme(
+        $this->getContainer()->get('twig.form.renderer.alias')->setTheme(
             $context->data()->get('form'),
             'form_div_layout.html.twig'
         );
@@ -52,7 +51,7 @@ class RendererTest extends LayoutTestCase
         }
 
         $context = new LayoutContext();
-        $context->getResolver()->setOptional(['form', 'body_class']);
+        $context->getResolver()->setDefined(['form', 'body_class']);
         $form = $this->getTestForm();
         $context->data()->set('form', $form->createView());
         $context->set('body_class', 'test-body');
@@ -72,12 +71,12 @@ class RendererTest extends LayoutTestCase
         }
 
         $context = new LayoutContext();
-        $context->getResolver()->setOptional(['form']);
+        $context->getResolver()->setDefined(['form']);
         $form = $this->getTestForm('test.php', 'patch');
         $context->data()->set('form', $form->createView());
 
         // revert TWIG form renderer to Symfony's default theme
-        $this->getContainer()->get('twig.form.renderer')->setTheme(
+        $this->getContainer()->get('twig.form.renderer.alias')->setTheme(
             $context->data()->get('form'),
             'form_div_layout.html.twig'
         );
@@ -101,12 +100,12 @@ class RendererTest extends LayoutTestCase
         }
 
         $context = new LayoutContext();
-        $context->getResolver()->setOptional(['form']);
+        $context->getResolver()->setDefined(['form']);
         $form = $this->getTestForm('test.php', 'patch');
         $context->data()->set('form', $form->createView());
 
         // revert TWIG form renderer to Symfony's default theme
-        $this->getContainer()->get('twig.form.renderer')->setTheme(
+        $this->getContainer()->get('twig.form.renderer.alias')->setTheme(
             $context->data()->get('form'),
             'form_div_layout.html.twig'
         );
@@ -316,11 +315,11 @@ class RendererTest extends LayoutTestCase
 
         $form = $formFactory->createNamedBuilder(
             'form_for_layout_renderer_test',
-            'form',
+            FormType::class,
             null,
             $options
         )
-            ->add('user', new UserNameType())
+            ->add('user', UserNameType::class)
             ->add('jobTitle', 'text', ['label' => 'Job Title', 'required' => false])
             ->add(
                 'gender',

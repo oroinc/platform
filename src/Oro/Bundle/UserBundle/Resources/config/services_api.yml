@@ -1,20 +1,4 @@
 services:
-    oro_user.api.rest.route_options_resolver.user_profile:
-        class: Oro\Bundle\UserBundle\Api\Routing\UserProfileRestRouteOptionsResolver
-        public: false
-        arguments:
-            - '@oro_api.value_normalizer'
-        tags:
-            - { name: routing.options_resolver }
-
-    oro_user.api.rest.api_doc.route_options_resolver.user_profile:
-        class: Oro\Bundle\UserBundle\Api\ApiDoc\UserProfileRestRouteOptionsResolver
-        public: false
-        arguments:
-            - '@oro_api.value_normalizer'
-        tags:
-            - { name: oro_api.routing_options_resolver, priority: -10 }
-
     oro_user.api.get.set_user_profile_entity_id:
         class: Oro\Bundle\UserBundle\Api\Processor\Get\SetUserProfileEntityId
         arguments:

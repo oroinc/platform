@@ -19,7 +19,7 @@ services:
             - [setOwnerDeletionManager, ['@oro_organization.owner_deletion_manager']]
 
     oro_soap.handler.delete:
-        class: %oro_soap.handler.delete.class%
+        class: '%oro_soap.handler.delete.class%'
         parent: oro_soap.handler.delete.abstract
 
     oro_soap.manager.entity_manager.abstract:
@@ -31,7 +31,7 @@ services:
             - [setEntitySerializer, ['@oro_soap.entity_serializer']]
 
     oro_soap.handler.include_delegate:
-        class: %oro_soap.handler.include_delegate.class%
+        class: '%oro_soap.handler.include_delegate.class%'
         arguments:
             - '@service_container'
 
@@ -39,17 +39,17 @@ services:
         alias: oro_soap.handler.include_delegate
 
     oro_soap.handler.include_total_header:
-        class: %oro_soap.handler.include_total_header.class%
+        class: '%oro_soap.handler.include_total_header.class%'
         arguments:
             - '@oro_batch.orm.query_builder.count_query_optimizer'
         tags:
             - { name: oro_soap.include_handler, alias: totalCount }
 
     oro_soap.provider.metadata.chain:
-        class: %oro_soap.provider.metadata.chain.class%
+        class: '%oro_soap.provider.metadata.chain.class%'
 
     oro_soap.provider.metadata.entity:
-        class: %oro_soap.provider.metadata.entity.class%
+        class: '%oro_soap.provider.metadata.entity.class%'
         arguments:
             - '@oro_entity_config.config_manager'
             - '@translator'
@@ -68,7 +68,7 @@ services:
             - '@oro_security.acl_helper'
 
     oro_soap.entity_serializer:
-        class: %oro_soap.entity_serializer.class%
+        class: '%oro_soap.entity_serializer.class%'
         arguments:
             - '@doctrine'
             - '@oro_entity_config.config_manager'
@@ -79,16 +79,16 @@ services:
             - ["setFieldsFilter", ['@oro_security.serializer.filter_chain']]
 
     oro_soap.entity_accessor:
-        class: %oro_soap.entity_accessor.class%
+        class: '%oro_soap.entity_accessor.class%'
 
     oro_soap.entity_data_transformer:
-        class: %oro_soap.entity_data_transformer.class%
+        class: '%oro_soap.entity_data_transformer.class%'
         arguments:
             - '@service_container'
 
     # event listeners
     oro_soap.locale_listener:
-        class: %oro_soap.locale_listener.class%
+        class: '%oro_soap.locale_listener.class%'
         arguments:
             - '@service_container'
         tags:

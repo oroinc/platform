@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Component\PhpUtils\ReflectionUtil;
 
 class EntityInstantiator

@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\TranslationBundle\Translation;
 
-use Symfony\Component\Config\Resource\ResourceInterface;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
 
-class OrmTranslationResource implements ResourceInterface, DynamicResourceInterface
+class OrmTranslationResource implements ResourceInterface, DynamicResourceInterface, SelfCheckingResourceInterface
 {
     /**
      * @var string

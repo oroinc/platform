@@ -5,8 +5,8 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
-use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 
 /**
  * Provides a core functionality to convert a query definition created by the query designer to another format.

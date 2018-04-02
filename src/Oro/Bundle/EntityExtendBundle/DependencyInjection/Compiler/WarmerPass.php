@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler;
 
+use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
  * Registers the cache warmers tagged by "oro_entity_extend.cache_warmer".

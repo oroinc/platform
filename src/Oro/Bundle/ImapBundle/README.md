@@ -1,10 +1,8 @@
-OroImapBundle
-=============
+# OroImapBundle
 
-This bundle provides a functionality to work with the email servers through IMAP protocol.
+OroImapBundle enables the data synchronization between local user mailboxes provided by OroEmailBundle and remote email servers using the capabilities of the IMAP protocol.
 
-Dependencies
-------------
+## Dependencies
 
 "zendframework/zend-mail": "2.1.5"
 
@@ -12,8 +10,7 @@ Notes:
 - We have to use version 2.1.5 due an issue with *binary* content transfer encoding in version 2.1.6.
 
 
-Usage
------
+## Usage
 
 ``` php
 <?php
@@ -52,8 +49,8 @@ Usage
     $folders = $imapFolderManager->getFolders(null, true);
 ```
 
-Synchronization with IMAP servers
----------------------------------
+## Synchronization with IMAP servers
+
 To synchronize personal emails using Oro application, users need to configure their own IMAP mailbox on the user details page. The required information is the host, port, security type and credentials for the IMAP integration.
 
 During the synchronization, Oro application loads emails from the user's inbox and outbox folders using the following algorithm:

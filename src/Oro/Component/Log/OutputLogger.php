@@ -2,10 +2,9 @@
 
 namespace Oro\Component\Log;
 
-use Symfony\Component\Console\Output\OutputInterface;
-
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class OutputLogger

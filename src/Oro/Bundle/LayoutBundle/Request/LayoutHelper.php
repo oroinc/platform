@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Request;
 
+use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-
-use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 
 class LayoutHelper
 {

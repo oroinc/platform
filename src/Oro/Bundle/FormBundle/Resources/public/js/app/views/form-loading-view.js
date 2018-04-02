@@ -11,6 +11,16 @@ define(function(require) {
     FormLoadingView = BaseView.extend({
         autoRender: true,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function FormLoadingView() {
+            FormLoadingView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             var self = this;
             // TODO: uncomment when scrol to section will be fixed

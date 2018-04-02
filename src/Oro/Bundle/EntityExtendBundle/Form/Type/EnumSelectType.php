@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * An enum value selector based on 'select2' form type
@@ -29,9 +30,9 @@ class EnumSelectType extends AbstractEnumType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::setDefaultOptions($resolver);
+        parent::configureOptions($resolver);
 
         $defaultConfigs = [
             'allowClear'  => true,
@@ -40,29 +41,32 @@ class EnumSelectType extends AbstractEnumType
 
         $resolver->setDefaults(
             [
-                'empty_value' => null,
+                'placeholder' => null,
                 'empty_data'  => null,
                 'configs'     => $defaultConfigs,
                 'disabled_values' => [],
                 'excluded_values' => [],
             ]
         );
-        $resolver->setAllowedTypes([
-            'disabled_values' => ['array', 'callable'],
-            'excluded_values' => ['array', 'callable'],
-        ]);
-        $resolver->setNormalizers(
-            [
-                'empty_value' => function (Options $options, $value) {
-                    return !$options['expanded'] && !$options['multiple']
-                        ? ''
-                        : $value;
-                },
-                // this normalizer allows to add/override config options outside
-                'configs' => function (Options $options, $value) use (&$defaultConfigs) {
-                    return array_merge($defaultConfigs, $value);
-                }
-            ]
+
+        $resolver->setAllowedTypes('disabled_values', ['array', 'callable']);
+        $resolver->setAllowedTypes('excluded_values', ['array', 'callable']);
+
+        $resolver->setNormalizer(
+            'placeholder',
+            function (Options $options, $value) {
+                return (null === $value) && !$options['expanded'] && !$options['multiple']
+                    ? ''
+                    : $value;
+            }
+        );
+
+        // this normalizer allows to add/override config options outside
+        $resolver->setNormalizer(
+            'configs',
+            function (Options $options, $value) use (&$defaultConfigs) {
+                return array_merge($defaultConfigs, $value);
+            }
         );
     }
 
@@ -71,7 +75,7 @@ class EnumSelectType extends AbstractEnumType
      */
     public function getParent()
     {
-        return 'genemu_jqueryselect2_translatable_entity';
+        return Select2TranslatableEntityType::class;
     }
 
     /**

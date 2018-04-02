@@ -3,12 +3,12 @@
 namespace Oro\Bundle\EntityExtendBundle\Grid;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\PhpUtils\ArrayUtil;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class FieldsHelper
 {

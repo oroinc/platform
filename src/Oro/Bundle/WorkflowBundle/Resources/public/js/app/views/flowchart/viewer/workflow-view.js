@@ -50,6 +50,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function FlowchartViewerWorkflowView() {
+            FlowchartViewerWorkflowView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             FlowchartViewerWorkflowView.__super__.initialize.apply(this, arguments);
             this.defaultConnectionOptions = _.extend(

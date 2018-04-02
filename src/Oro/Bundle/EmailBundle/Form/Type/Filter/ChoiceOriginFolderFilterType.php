@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type\Filter;
 
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractChoiceType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ChoiceOriginFolderFilterType extends AbstractChoiceType
 {
@@ -36,13 +35,13 @@ class ChoiceOriginFolderFilterType extends AbstractChoiceType
      */
     public function getParent()
     {
-        return FilterType::NAME;
+        return FilterType::class;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $choices = array(
             self::TYPE_CONTAINS     => $this->translator->trans('oro.filter.form.label_type_contains'),

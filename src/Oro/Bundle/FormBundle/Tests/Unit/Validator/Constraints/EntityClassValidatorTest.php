@@ -5,6 +5,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\FormBundle\Validator\Constraints\EntityClass;
 use Oro\Bundle\FormBundle\Validator\Constraints\EntityClassValidator;
+use Symfony\Component\Validator\Context\ExecutionContext;
 
 class EntityClassValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,9 +40,7 @@ class EntityClassValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateValid($value)
     {
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(ExecutionContext::class);
         $context->expects($this->never())
             ->method('addViolation');
 
@@ -76,9 +75,7 @@ class EntityClassValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $value = 'alias';
 
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(ExecutionContext::class);
         $context->expects($this->never())
             ->method('addViolation');
 
@@ -101,9 +98,7 @@ class EntityClassValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $value = 'alias';
 
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(ExecutionContext::class);
         $context->expects($this->once())
             ->method('addViolation');
 
@@ -124,9 +119,7 @@ class EntityClassValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $value = 'Test\Entity';
 
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(ExecutionContext::class);
         $context->expects($this->once())
             ->method('addViolation');
 
@@ -150,9 +143,7 @@ class EntityClassValidatorTest extends \PHPUnit_Framework_TestCase
         $value      = 123;
         $constraint = new EntityClass();
 
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(ExecutionContext::class);
         $context->expects($this->once())
             ->method('addViolation')
             ->with($constraint->message, ['{{ value }}' => '123']);

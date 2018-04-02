@@ -54,6 +54,13 @@ define(function(require) {
         currentDirection: null,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function SortingDropdown() {
+            SortingDropdown.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initializer.
          *
          * @param {Object} options

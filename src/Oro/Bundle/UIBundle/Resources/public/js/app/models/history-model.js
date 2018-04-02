@@ -13,6 +13,16 @@ define(function(require) {
             index: -1
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function HistoryModel() {
+            HistoryModel.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(attrs, options) {
             this.options = _.defaults({}, options, {
                 maxLength: MAX_LENGTH

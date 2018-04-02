@@ -133,6 +133,9 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         // find and cache existing or new entity
         $existingEntity = $this->findExistingEntity($entity, $searchContext);
         if ($existingEntity) {
+            if (!$this->isPermissionGrantedForEntity('EDIT', $existingEntity, $entityClass)) {
+                return null;
+            }
             $existingOid = spl_object_hash($existingEntity);
             if (isset($this->cachedEntities[$existingOid])) {
                 return $existingEntity;
@@ -216,7 +219,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $excludedFields[] = $identifierName;
         $fields           = $this->fieldHelper->getFields($entityName, true);
         $action = $existingEntity ? 'EDIT' : 'CREATE';
-        $checkEntity = $existingEntity ? $entity : new ObjectIdentity('entity', $entityName);
+        $checkEntity = $existingEntity ? $existingEntity : new ObjectIdentity('entity', $entityName);
 
         foreach ($fields as $field) {
             $fieldName = $field['name'];

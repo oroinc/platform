@@ -38,13 +38,22 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function WidgetComponent() {
+            WidgetComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             if (options.initialized) {
                 // widget is initialized from server, there's nothing to do
                 return;
             }
+
             this.options = $.extend(true, {}, this.defaults, options);
             this.$element = options._sourceElement;
+            this.previousWidgetData = {};
 
             if (this.$element) {
                 if (!this.options.options.url) {
@@ -81,6 +90,13 @@ define(function(require) {
                 this.openWidget();
             }, this);
             this.$element.on(eventName + '.' + this.cid, handler);
+
+            mediator.on('widget_dialog:stateChange', _.bind(function(widget, data) {
+                if (this.previousWidgetData && this.previousWidgetData.id === widget.getWid()) {
+                    this.previousWidgetData.open = data.state === 'minimized';
+                    this.previousWidgetData.widget = widget;
+                }
+            }, this));
         },
 
         /**
@@ -126,6 +142,11 @@ define(function(require) {
             var Widget = this.widget;
             var options = $.extend(true, {}, this.options.options);
 
+            if (!this.options.multiple && this.previousWidgetData.open) {
+                this.previousWidgetData.widget.widget.dialog('restore');
+                this.previousWidgetData.open = false;
+            }
+
             if (!this.options.multiple && this.opened) {
                 // single instance is already opened
                 deferredOpen.resolve();
@@ -134,6 +155,7 @@ define(function(require) {
 
             // Create and open widget
             widget = new Widget(options);
+            this.previousWidgetData.id = widget.getWid();
 
             this._bindEnvironmentEvent(widget);
 

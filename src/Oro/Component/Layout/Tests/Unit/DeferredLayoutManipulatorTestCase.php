@@ -2,8 +2,6 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-
 use Oro\Component\Layout\BlockFactory;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
@@ -15,6 +13,7 @@ use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutRegistry;
 use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class DeferredLayoutManipulatorTestCase extends LayoutTestCase
 {

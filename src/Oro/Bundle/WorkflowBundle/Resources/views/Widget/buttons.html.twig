@@ -1,8 +1,5 @@
-{% if entity is defined and entity is not empty %}
-    {% set entity_class = oro_class_name(entity) %}
-{% endif %}
-
-{% if entity_class is defined and has_workflows(entity_class) %}
+{% set entity_class = entity is defined ? oro_class_name(entity) : null %}
+{% if entity_class is not empty and has_workflows(entity_class) %}
     {{
         oro_widget_render({
             'widgetType': 'buttons',

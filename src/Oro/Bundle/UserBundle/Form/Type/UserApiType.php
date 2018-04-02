@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
+use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
+use Oro\Bundle\UserBundle\Form\EventListener\UserApiSubscriber;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\UserBundle\Form\EventListener\UserApiSubscriber;
-use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UserApiType extends UserType
 {
@@ -37,7 +37,7 @@ class UserApiType extends UserType
         if ($this->userConfigManager && !$this->userConfigManager->get('oro_imap.enable_google_imap')) {
             $builder->add(
                 'imapConfiguration',
-                'oro_imap_configuration',
+                ConfigurationType::class,
                 ['add_check_button' => false]
             );
         }
@@ -49,9 +49,9 @@ class UserApiType extends UserType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::setDefaultOptions($resolver);
+        parent::configureOptions($resolver);
 
         $resolver->setDefaults([
             'csrf_protection'   => false,

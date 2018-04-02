@@ -18,7 +18,9 @@ class ModeExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $this->getMode($config) !== self::MODE_SERVER;
+        return
+            parent::isApplicable($config)
+            && $this->getMode($config) !== self::MODE_SERVER;
     }
 
     /**

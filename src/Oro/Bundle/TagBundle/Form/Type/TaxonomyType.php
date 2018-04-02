@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\TagBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\OroSimpleColorPickerType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TaxonomyType extends AbstractType
 {
@@ -15,7 +17,7 @@ class TaxonomyType extends AbstractType
     {
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             array(
                 'label'    => 'oro.taxonomy.name.label',
                 'required' => true,
@@ -23,7 +25,7 @@ class TaxonomyType extends AbstractType
         )
             ->add(
                 'backgroundColor',
-                'oro_simple_color_picker',
+                OroSimpleColorPickerType::class,
                 [
                     'required'           => false,
                     'label'              => 'oro.taxonomy.background_color.label',
@@ -38,12 +40,12 @@ class TaxonomyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(
                 'data_class' => 'Oro\Bundle\TagBundle\Entity\Taxonomy',
-                'intention'  => 'taxonomy',
+                'csrf_token_id' => 'taxonomy',
                 'grid_name' => 'taxonomy-grid',
             )
         );

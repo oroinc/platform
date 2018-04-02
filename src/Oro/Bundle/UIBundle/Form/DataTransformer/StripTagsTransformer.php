@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\UIBundle\Form\DataTransformer;
 
-use Symfony\Component\Form\DataTransformerInterface;
-
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Symfony\Component\Form\DataTransformerInterface;
 
 /**
  * Class that can be used in forms for filtering sensible information by stripping tags

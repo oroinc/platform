@@ -22,6 +22,13 @@ define([
         dataField: 'id',
 
         /**
+         * @inheritDoc
+         */
+        constructor: function AbstractListener() {
+            AbstractListener.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize listener object
          *
          * @param {Object} options

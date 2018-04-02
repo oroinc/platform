@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\SidebarBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\SidebarBundle\DependencyInjection\OroSidebarExtension;
 use Oro\Bundle\SidebarBundle\Tests\Unit\Fixtures;
-
 use Oro\Component\Config\CumulativeResourceManager;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
 {

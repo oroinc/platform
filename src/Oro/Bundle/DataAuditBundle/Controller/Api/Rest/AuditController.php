@@ -2,24 +2,22 @@
 
 namespace Oro\Bundle\DataAuditBundle\Controller\Api\Rest;
 
-use Symfony\Component\HttpFoundation\Response;
-
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Util\Codes;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
+use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\EntityClassParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\IdentifierToReferenceFilter;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @NamePrefix("oro_api_")
@@ -72,11 +70,13 @@ class AuditController extends RestGetController implements ClassResourceInterfac
      * )
      *
      * @AclAncestor("oro_dataaudit_view")
+     * @param Request $request
+     * @return Response
      */
-    public function cgetAction()
+    public function cgetAction(Request $request)
     {
-        $page             = (int)$this->getRequest()->get('page', 1);
-        $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $page = (int)$request->get('page', 1);
+        $limit = (int)$request->get('limit', self::ITEMS_PER_PAGE);
         $filterParameters = [
             'loggedAt'    => new HttpDateTimeParameterFilter(),
             'user'        => new IdentifierToReferenceFilter($this->getDoctrine(), 'OroUserBundle:User'),
@@ -121,19 +121,20 @@ class AuditController extends RestGetController implements ClassResourceInterfac
      *      description="Indicates whether association fields should be returned as well."
      * )
      *
-     * @return Response
      * @ApiDoc(
      *      description="Get auditable entities with auditable fields",
      *      resource=true
      * )
      *
      * @AclAncestor("oro_dataaudit_view")
+     * @param Request $request
+     * @return Response
      */
-    public function getFieldsAction()
+    public function getFieldsAction(Request $request)
     {
         /* @var $provider EntityWithFieldsProvider */
         $provider = $this->get('oro_query_designer.entity_field_list_provider');
-        $withRelations = filter_var($this->getRequest()->get('with-relations', true), FILTER_VALIDATE_BOOLEAN);
+        $withRelations = filter_var($request->get('with-relations', true), FILTER_VALIDATE_BOOLEAN);
         $statusCode = Codes::HTTP_OK;
 
         try {

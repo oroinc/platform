@@ -2,13 +2,10 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\DBAL\Connection;
-
-use Symfony\Component\DependencyInjection\Container;
-
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\DatabaseConnectionsClearer;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Container;
 
 class DatabaseConnectionsClearerTest extends \PHPUnit_Framework_TestCase
 {

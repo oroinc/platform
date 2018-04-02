@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
-
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeMultiSelectType;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
@@ -27,12 +25,12 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
         $this->managerMock = $this->getMockBuilder(AttributeManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->formType = new AttributeMultiSelectType($this->managerMock);
+        parent::setUp();
     }
 
     /**
@@ -43,7 +41,7 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    'genemu_jqueryselect2_choice' => new Select2Type('choice'),
+                    AttributeMultiSelectType::class => $this->formType
                 ],
                 []
             )
@@ -66,7 +64,7 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
 
         $submittedData = [777];
 
-        $form = $this->factory->create($this->formType, [], ['attributeEntityClass' => 'some\class']);
+        $form = $this->factory->create(AttributeMultiSelectType::class, [], ['attributeEntityClass' => 'some\class']);
 
         $form->submit($submittedData);
         $this->assertTrue($form->isValid());
@@ -102,7 +100,7 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
             ->willReturn($isSystem);
 
         $resolver = new OptionsResolver();
-        $this->formType->setDefaultOptions($resolver);
+        $this->formType->configureOptions($resolver);
         $result = $resolver->resolve([]);
 
         $locked = call_user_func($result['choice_attr'], 777);
@@ -116,6 +114,6 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('genemu_jqueryselect2_choice', $this->formType->getParent());
+        $this->assertEquals(Select2ChoiceType::class, $this->formType->getParent());
     }
 }

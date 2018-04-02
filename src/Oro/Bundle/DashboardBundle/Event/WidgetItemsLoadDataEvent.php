@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\DashboardBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
+use Symfony\Component\EventDispatcher\Event;
 
 class WidgetItemsLoadDataEvent extends Event
 {

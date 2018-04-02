@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ExportType extends AbstractType
 {
@@ -34,7 +34,7 @@ class ExportType extends AbstractType
     {
         $builder->add(
             'processorAlias',
-            'choice',
+            ChoiceType::class,
             [
                 'label' => 'oro.importexport.export.popup.options.label',
                 'choices' => $this->getExportProcessorsChoices($options),
@@ -90,19 +90,18 @@ class ExportType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class' => ExportData::class,
             'processorAlias' => null
         ]);
         $resolver->setRequired(['entityName']);
-        $resolver->setAllowedTypes([
-            'entityName' => 'string',
-            'processorAlias' => ['string', 'array', 'null']
-        ]);
+
+        $resolver->setAllowedTypes('entityName', 'string');
+        $resolver->setAllowedTypes('processorAlias', ['string', 'array', 'null']);
     }
 
     /**

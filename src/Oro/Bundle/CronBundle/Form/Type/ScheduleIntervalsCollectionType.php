@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\CronBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 
 /**
  * Form type for schedule intervals collection.
@@ -19,7 +18,7 @@ class ScheduleIntervalsCollectionType extends AbstractType
      */
     public function getParent()
     {
-        return CollectionType::NAME;
+        return CollectionType::class;
     }
 
     /**
@@ -28,7 +27,7 @@ class ScheduleIntervalsCollectionType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'type' => ScheduleIntervalType::NAME,
+            'entry_type' => ScheduleIntervalType::class,
             'required' => false,
             'by_reference' => false
         ]);

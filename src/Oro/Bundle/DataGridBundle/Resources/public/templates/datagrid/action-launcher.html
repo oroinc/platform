@@ -15,16 +15,16 @@
         <% if (links) { %> dropdown-toggle<% } %>
     "
     <% attributesTemplate(attributes) %>
-    title="<%= title %>"
+    title="<%- title %>"
     <% if (links) { %> data-toggle="dropdown"<% } %>>
 
     <% if (launcherMode == 'icon-text') { %>
-        <i class="fa-<%= icon %> hide-text"></i>
+        <i class="fa-<%- icon %> hide-text"></i>
         <%- label %>
     <% } else if (launcherMode == 'icon-only') { %>
-        <i class="fa-<%= icon %> hide-text"></i>
+        <i class="fa-<%- icon %> hide-text"></i>
     <% } else if (launcherMode == 'text-only') { %>
-        <% if (iconClassName) { %><i class="<%= iconClassName %>"></i><% } %>
+        <% if (iconClassName) { %><i class="<%- iconClassName %>"></i><% } %>
         <%- label %>
     <% } %>
 
@@ -34,16 +34,16 @@
 <% if (links) { %>
     <ul class="dropdown-menu">
     <% _.each(links, function(item, index) { %>
-        <li><a href="<%= link %>" data-index="<%= index %>" title="<%= item.label %>"
+        <li><a href="<%= link %>" data-index="<%- index %>" title="<%- item.label %>"
             <% if (item.attributes) { attributesTemplate(item.attributes); } %>
             data-key="<%= item.key %>">
             <% if (launcherMode == 'icon-text') { %>
-                <i class="fa-<%= icon %> hide-text"></i>
+                <i class="fa-<%- icon %> hide-text"></i>
                 <%- item.label %>
             <% } else if (launcherMode == 'icon-only') { %>
-                <i class="fa-<%= icon %> hide-text"></i>
+                <i class="fa-<%- icon %> hide-text"></i>
             <% } else if (launcherMode == 'text-only') { %>
-                <% if (iconClassName) { %><i class="<%= iconClassName %>"></i><% } %>
+                <% if (iconClassName) { %><i class="<%- iconClassName %>"></i><% } %>
                 <%- item.label %>
             <% } %>
         </a></li>

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-
 use Oro\Bundle\EmailBundle\Validator\Constraints\EmailRecipients;
+use Symfony\Component\Validator\Constraint;
 
 class EmailRecipientsTest extends \PHPUnit_Framework_TestCase
 {

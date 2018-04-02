@@ -5,7 +5,9 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\Extension\Configuration;
 
 class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
@@ -16,6 +18,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->extension = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Extension\AbstractExtension');
+        $this->extension->setParameters(new ParameterBag());
     }
 
     public function testParameters()
@@ -40,6 +43,14 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
         $config         = DatagridConfiguration::create([]);
 
         $this->extension->visitDatasource($config, $datasourceMock);
+    }
+
+    public function testIsApplicable()
+    {
+        $config = DatagridConfiguration::create(
+            [ParameterBag::DATAGRID_MODES_PARAMETER => [DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE]]
+        );
+        self::assertTrue($this->extension->isApplicable($config));
     }
 
     /**

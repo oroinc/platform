@@ -5,6 +5,8 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\Form\Type\Composer;
 use Oro\Bundle\DistributionBundle\Form\Type\Composer\RepositoryType;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\ReflectionHelperTrait;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class RepositoryTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,12 +41,12 @@ class RepositoryTypeTest extends \PHPUnit_Framework_TestCase
     {
         $type = new RepositoryType();
 
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(['data_class' => 'Oro\Bundle\DistributionBundle\Entity\Composer\Repository']);
 
-        $type->setDefaultOptions($resolver);
+        $type->configureOptions($resolver);
     }
 
     /**
@@ -57,12 +59,14 @@ class RepositoryTypeTest extends \PHPUnit_Framework_TestCase
         $builder = $this->createConstructorLessMock('Symfony\Component\Form\FormBuilder');
         $builder->expects($this->at(0))
             ->method('add')
-            ->with('type', 'choice', ['choices' => ['composer' => 'composer', 'vcs' => 'vcs', 'pear' => 'pear']])
+            ->with('type', ChoiceType::class, [
+                'choices' => ['composer' => 'composer', 'vcs' => 'vcs', 'pear' => 'pear']
+            ])
             ->will($this->returnValue($builder));
 
         $builder->expects($this->at(1))
             ->method('add')
-            ->with('url', 'text', ['required' => true]);
+            ->with('url', TextType::class, ['required' => true]);
 
         $type->buildForm($builder, []);
     }

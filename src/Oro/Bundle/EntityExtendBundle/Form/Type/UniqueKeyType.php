@@ -3,26 +3,14 @@
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
-
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 class UniqueKeyType extends AbstractType
 {
-    /**
-     * @var FieldConfigId[]
-     */
-    protected $fields;
-
-    /**
-     * @param array $fields
-     */
-    public function __construct(array $fields)
-    {
-        $this->fields = $fields;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -30,7 +18,7 @@ class UniqueKeyType extends AbstractType
     {
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             array(
                 'label' => 'oro.entity_extend.form.name.label',
                 'required' => true,
@@ -40,15 +28,24 @@ class UniqueKeyType extends AbstractType
 
         $builder->add(
             'key',
-            'choice',
+            ChoiceType::class,
             array(
                 'label' => 'oro.entity_extend.form.key.label',
                 'multiple' => true,
-                'choices'  => $this->fields,
+                'choices'  => $options['key_choices'],
                 'required' => true,
                 'constraints' => [new Assert\NotBlank()]
             )
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setRequired('key_choices');
+        $resolver->setAllowedTypes('key_choices', 'array');
     }
 
     /**

@@ -7,10 +7,10 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class WorkflowItemRepository extends EntityRepository
 {
@@ -273,7 +273,7 @@ class WorkflowItemRepository extends EntityRepository
                 $entityClass,
                 'e',
                 Query\Expr\Join::WITH,
-                sprintf('CAST(wi.entityId as string) = CAST(e.%s as string)', $entityIdentifier)
+                QueryBuilderUtil::sprintf('CAST(wi.entityId as string) = CAST(e.%s as string)', $entityIdentifier)
             );
 
         $queryBuilder->where($queryBuilder->expr()->in('ws.name', ':workflowSteps'))

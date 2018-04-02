@@ -2,20 +2,21 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraints as Assert;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class FieldType extends AbstractType
 {
@@ -62,7 +63,7 @@ class FieldType extends AbstractType
     {
         $builder->add(
             'fieldName',
-            'text',
+            TextType::class,
             [
                 'label'       => 'oro.entity_extend.form.field_name.label',
                 'block'       => 'general',
@@ -80,7 +81,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'type',
-            'genemu_jqueryselect2_choice',
+            Select2ChoiceType::class,
             [
                 'choices'     => $this->getFieldTypeChoices($reverseRelationTypes),
                 'choice_attr' => function ($choiceKey) {
@@ -90,7 +91,7 @@ class FieldType extends AbstractType
                         ? ['data-fieldname' => $parts[1]]
                         : [];
                 },
-                'empty_value' => '',
+                'placeholder' => '',
                 'block'       => 'general',
                 'configs'     => [
                     'placeholder'          => self::TYPE_LABEL_PREFIX . 'choose_value',
@@ -104,7 +105,7 @@ class FieldType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
             ->setRequired(['class_name'])

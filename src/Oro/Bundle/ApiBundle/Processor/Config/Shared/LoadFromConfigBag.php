@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
+use Oro\Bundle\ApiBundle\Config\EntityConfigMerger;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeEntityConfigHelper;
 use Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Base processor to load raw configuration.
@@ -27,25 +27,25 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     /** @var ResourceHierarchyProvider */
     protected $resourceHierarchyProvider;
 
-    /** @var MergeEntityConfigHelper */
-    private $mergeEntityConfigHelper;
+    /** @var EntityConfigMerger */
+    private $entityConfigMerger;
 
     /**
      * @param ConfigExtensionRegistry   $configExtensionRegistry
      * @param ConfigLoaderFactory       $configLoaderFactory
      * @param ResourceHierarchyProvider $resourceHierarchyProvider
-     * @param MergeEntityConfigHelper   $mergeEntityConfigHelper
+     * @param EntityConfigMerger        $entityConfigMerger
      */
     public function __construct(
         ConfigExtensionRegistry $configExtensionRegistry,
         ConfigLoaderFactory $configLoaderFactory,
         ResourceHierarchyProvider $resourceHierarchyProvider,
-        MergeEntityConfigHelper $mergeEntityConfigHelper
+        EntityConfigMerger $entityConfigMerger
     ) {
         $this->configExtensionRegistry = $configExtensionRegistry;
         $this->configLoaderFactory = $configLoaderFactory;
         $this->resourceHierarchyProvider = $resourceHierarchyProvider;
-        $this->mergeEntityConfigHelper = $mergeEntityConfigHelper;
+        $this->entityConfigMerger = $entityConfigMerger;
     }
 
     /**
@@ -196,7 +196,7 @@ abstract class LoadFromConfigBag implements ProcessorInterface
      */
     protected function mergeConfigs(array $config, array $parentConfig)
     {
-        return $this->mergeEntityConfigHelper->mergeConfigs($config, $parentConfig);
+        return $this->entityConfigMerger->merge($config, $parentConfig);
     }
 
     /**

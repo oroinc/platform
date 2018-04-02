@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -16,13 +17,17 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
     /** {@inheritdoc} */
     protected function getExtension()
     {
-        return new DynamicFieldsExtension(
+        $extension = new DynamicFieldsExtension(
             $this->configManager,
             $this->entityClassResolver,
             new DatagridGuesserMock(),
             $this->fieldsHelper,
             $this->getFeatureCheckerMock()
         );
+
+        $extension->setParameters(new ParameterBag());
+
+        return $extension;
     }
 
     public function testIsApplicable()

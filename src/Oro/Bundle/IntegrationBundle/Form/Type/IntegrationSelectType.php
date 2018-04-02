@@ -3,20 +3,20 @@
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\Asset\Packages as AssetHelper;
-use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Form\Choice\Loader;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
-use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
+use Symfony\Component\Asset\Packages as AssetHelper;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IntegrationSelectType extends AbstractType
 {
@@ -28,6 +28,9 @@ class IntegrationSelectType extends AbstractType
     /** @var TypesRegistry */
     protected $typesRegistry;
 
+    /** @var ChoiceListFactoryInterface */
+    protected $choiceListFactory;
+
     /**
      * @param EntityManager $em
      * @param TypesRegistry $typesRegistry
@@ -38,18 +41,20 @@ class IntegrationSelectType extends AbstractType
         EntityManager $em,
         TypesRegistry $typesRegistry,
         AssetHelper $assetHelper,
-        AclHelper $aclHelper
+        AclHelper $aclHelper,
+        ChoiceListFactoryInterface $choiceListFactory
     ) {
         $this->em            = $em;
         $this->typesRegistry = $typesRegistry;
         $this->assetHelper   = $assetHelper;
         $this->aclHelper     = $aclHelper;
+        $this->choiceListFactory = $choiceListFactory;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $em             = $this->em;
         $defaultConfigs = [
@@ -61,26 +66,29 @@ class IntegrationSelectType extends AbstractType
         $configsNormalizer = function (Options $options, $configs) use (&$defaultConfigs) {
             return array_merge($defaultConfigs, $configs);
         };
-        $choiceList        = function (Options $options) use ($em) {
-            $types = $options->has('allowed_types') ? $options->get('allowed_types') : null;
+        $choiceLoader = function (Options $options) use ($em) {
+            $types = $options['allowed_types'] ?? null;
 
-            return new EntityChoiceList(
+            return new DoctrineChoiceLoader(
+                $this->choiceListFactory,
                 $em,
                 'OroIntegrationBundle:Channel',
-                'name',
+                null,
                 new Loader($this->aclHelper, $em, $types)
             );
         };
 
         $resolver->setDefaults(
             [
-                'empty_value' => '',
+                'placeholder' => '',
                 'configs'     => $defaultConfigs,
-                'choice_list' => $choiceList
+                'choice_loader' => $choiceLoader,
+                'choice_label' => 'name',
+                'choice_value' => 'id'
             ]
         );
-        $resolver->setOptional(['allowed_types']);
-        $resolver->setNormalizers(['configs' => $configsNormalizer]);
+        $resolver->setDefined(['allowed_types']);
+        $resolver->setNormalizer('configs', $configsNormalizer);
     }
 
     /**
@@ -108,7 +116,7 @@ class IntegrationSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'genemu_jqueryselect2_choice';
+        return Select2ChoiceType::class;
     }
 
     /**

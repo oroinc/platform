@@ -4,9 +4,6 @@ namespace Oro\Bundle\EntityBundle\Fallback;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
@@ -17,8 +14,11 @@ use Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackKeyException;
 use Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackTypeException;
 use Oro\Bundle\EntityBundle\Fallback\Provider\EntityFallbackProviderInterface;
 use Oro\Bundle\EntityBundle\Fallback\Provider\SystemConfigFallbackProvider;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -475,7 +475,7 @@ class EntityFallbackResolver
     {
         $qb = $repo->createQueryBuilder('e');
         $qb->select('1')
-            ->innerJoin(sprintf('e.%s', $objectFieldName), 'fallbackValue')
+            ->innerJoin(QueryBuilderUtil::getField('e', $objectFieldName), 'fallbackValue')
             ->where($qb->expr()->eq('fallbackValue.scalarValue', ':value'))
             ->setParameter('value', $value, Type::STRING)
             ->setMaxResults(1);

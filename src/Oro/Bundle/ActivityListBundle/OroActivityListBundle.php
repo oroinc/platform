@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ActivityListBundle;
 
+use Oro\Bundle\ActivityListBundle\DependencyInjection\Compiler\ActivityListProvidersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-use Oro\Bundle\ActivityListBundle\DependencyInjection\Compiler\ActivityListProvidersPass;
 
 class OroActivityListBundle extends Bundle
 {

@@ -7,11 +7,13 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Component\TestUtils\ORM\OrmTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class QueryBuilderUtilTest extends OrmTestCase
 {
     /** @var EntityManager */
@@ -42,6 +44,10 @@ class QueryBuilderUtilTest extends OrmTestCase
         return new QueryBuilder($this->createMock(EntityManager::class));
     }
 
+    /**
+     * @param string $name
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function getParameterMock($name)
     {
         $parameter = $this->getMockBuilder('\Doctrine\ORM\Query\Parameter')
@@ -59,12 +65,18 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     /**
      * @dataProvider getPageOffsetProvider
+     * @param int $expectedOffset
+     * @param null|int|string $page
+     * @param null|int|string $limit
      */
     public function testGetPageOffset($expectedOffset, $page, $limit)
     {
         $this->assertSame($expectedOffset, QueryBuilderUtil::getPageOffset($page, $limit));
     }
 
+    /**
+     * @return array
+     */
     public function getPageOffsetProvider()
     {
         return [
@@ -127,6 +139,9 @@ class QueryBuilderUtilTest extends OrmTestCase
         $this->assertEquals($expectedExpr, QueryBuilderUtil::getSelectExprByAlias($qb, $alias));
     }
 
+    /**
+     * @return array
+     */
     public function getSelectExprByAliasProvider()
     {
         return [
@@ -340,6 +355,9 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     /**
      * @dataProvider getJoinClassDataProvider
+     * @param callable $qbFactory
+     * @param array $joinPath
+     * @param string $expectedClass
      */
     public function testGetJoinClass(callable $qbFactory, $joinPath, $expectedClass)
     {
@@ -351,6 +369,9 @@ class QueryBuilderUtilTest extends OrmTestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public function getJoinClassDataProvider()
     {
         return [
@@ -448,5 +469,62 @@ class QueryBuilderUtilTest extends OrmTestCase
         $this->assertFalse(QueryBuilderUtil::isToOne($qb, 'bi'));
         $this->assertFalse(QueryBuilderUtil::isToOne($qb, 'persons'));
         $this->assertFalse(QueryBuilderUtil::isToOne($qb, 'nonExistingAlias'));
+    }
+
+    public function testSprintfValid()
+    {
+        $this->assertEquals('tesT.One_1 > :param', QueryBuilderUtil::sprintf('%s.%s > :param', 'tesT', 'One_1'));
+    }
+
+    /**
+     * @dataProvider invalidDataProvider
+     * @param string $invalid
+     */
+    public function testSprintfInvalid($invalid)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        QueryBuilderUtil::sprintf('%s.%s > 0', $invalid, 'id');
+    }
+
+    public function testCheckIdentifierValid()
+    {
+        QueryBuilderUtil::checkIdentifier('tEs_T_01a');
+    }
+
+    /**
+     * @dataProvider invalidDataProvider
+     * @param string $invalid
+     */
+    public function testCheckStringInvalid($invalid)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        QueryBuilderUtil::checkIdentifier($invalid);
+    }
+
+    public function testGetFieldValid()
+    {
+        $this->assertEquals('a0_.Field0', QueryBuilderUtil::getField('a0_', 'Field0'));
+    }
+
+    /**
+     * @dataProvider invalidDataProvider
+     * @param string $invalid
+     */
+    public function testGetFieldInvalid($invalid)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->assertEquals('a0_.Field0', QueryBuilderUtil::getField('a0_', $invalid));
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidDataProvider(): array
+    {
+        return [
+            ['test OR u.id < 0'],
+            ['test" and '],
+            ['0_some//']
+        ];
     }
 }

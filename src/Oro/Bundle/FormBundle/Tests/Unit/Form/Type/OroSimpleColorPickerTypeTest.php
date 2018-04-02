@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\OroSimpleColorPickerType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Form\Type\OroSimpleColorPickerType;
 
 class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
 {
@@ -28,10 +28,10 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
         $this->formType = new OroSimpleColorPickerType($configManager, $translatorInterface);
     }
 
-    public function testSetDefaultOptionsWithCustomColorSchema()
+    public function testConfigureOptionsWithCustomColorSchema()
     {
         $resolver = $this->getOptionsResolver();
-        $this->formType->setDefaultOptions($resolver);
+        $this->formType->configureOptions($resolver);
 
         $options = [
             'color_schema'  => 'custom',
@@ -65,10 +65,10 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
         );
     }
 
-    public function testSetDefaultOptionsWithShortColorSchema()
+    public function testConfigureOptionsWithShortColorSchema()
     {
         $resolver = $this->getOptionsResolver();
-        $this->formType->setDefaultOptions($resolver);
+        $this->formType->configureOptions($resolver);
 
         $options = [
             'color_schema'  => 'short',
@@ -124,10 +124,10 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Unknown color schema: "unknown".
      */
-    public function testSetDefaultOptionsForUnknownColorSchema()
+    public function testConfigureOptionsForUnknownColorSchema()
     {
         $resolver = $this->getOptionsResolver();
-        $this->formType->setDefaultOptions($resolver);
+        $this->formType->configureOptions($resolver);
 
         $options = [
             'color_schema'  => 'unknown',
@@ -150,7 +150,7 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('hidden', $this->formType->getParent());
+        $this->assertEquals(HiddenType::class, $this->formType->getParent());
     }
 
     public function testGetName()

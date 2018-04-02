@@ -3,9 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Form\FormEvent;
-
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentType;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
@@ -47,20 +44,20 @@ class EmailAttachmentTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_email_attachment', $this->emailAttachmentType->getName());
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(
                 [
                     'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\EmailAttachment',
-                    'intention'          => 'email_attachment',
+                    'csrf_token_id'      => 'email_attachment',
                 ]
             );
 
         $type = new EmailAttachmentType($this->em, $this->emailAttachmentTransformer);
-        $type->setDefaultOptions($resolver);
+        $type->configureOptions($resolver);
     }
 
     public function testBuildForm()

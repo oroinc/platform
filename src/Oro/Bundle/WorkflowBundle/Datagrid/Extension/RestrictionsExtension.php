@@ -53,7 +53,8 @@ class RestrictionsExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
-            $config->isOrmDatasource()
+            parent::isApplicable($config)
+            && $config->isOrmDatasource()
             && $this->parameters->get(Manager::REQUIRE_ALL_EXTENSIONS, true)
             && null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH)
             && $this->hasEntityClassRestrictions($config);

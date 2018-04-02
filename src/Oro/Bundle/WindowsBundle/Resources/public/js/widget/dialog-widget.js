@@ -64,6 +64,13 @@ define(function(require) {
         $messengerContainer: null,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function DialogWidget() {
+            DialogWidget.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize dialog
          */
         initialize: function(options) {
@@ -389,6 +396,7 @@ define(function(require) {
                 this._fixScrollableHeight();
             }
         },
+
         _setMaxSize: function() {
             this.widget.off('.set-max-size-events');
             this.widget.on('dialogresizestart.set-max-size-events', _.bind(function() {
@@ -525,7 +533,8 @@ define(function(require) {
                     dialog.css('min-width', containerEl.clientWidth - left);
                 }
             } else {
-                if (!this.widgetIsResizable() && !this.options.dialogOptions.autoResize) {
+                if (this.getState() !== 'maximized' &&
+                    (!this.widgetIsResizable() && !this.options.dialogOptions.autoResize)) {
                     dialog.css('width', this.options.dialogOptions.width);
                 }
             }
@@ -535,7 +544,7 @@ define(function(require) {
             // containerEl.offsetTop will only work if offsetParent is document.body
 
             // Set auto height for dialog before calc
-            if (!this.widgetIsResizable()) {
+            if (this.getState() !== 'maximized' && !this.widgetIsResizable()) {
                 dialog.css('height', 'auto');
             }
 
@@ -604,7 +613,7 @@ define(function(require) {
             });
             this.widget.on('dialogstatechange', function(event, data) {
                 if (data.state !== data.oldState) {
-                    mediator.trigger('widget_dialog:stateChange', self);
+                    mediator.trigger('widget_dialog:stateChange', self, data);
                 }
             });
             this.widget.on({
@@ -633,6 +642,7 @@ define(function(require) {
                 component.trigger('parentResizeStop', event, this);
             });
         },
+
         widgetIsResizable: function() {
             return this.options.dialogOptions.resizable;
         }

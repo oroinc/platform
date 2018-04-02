@@ -1,4 +1,4 @@
-#Strategy events
+# Strategy events
 
 ## Table of Contents
 

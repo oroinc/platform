@@ -2,8 +2,8 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Oro\Component\Action\Action\AssignValue;
 use Oro\Component\Action\Action\ActionInterface;
+use Oro\Component\Action\Action\AssignValue;
 
 class AssignValueTest extends \PHPUnit_Framework_TestCase
 {

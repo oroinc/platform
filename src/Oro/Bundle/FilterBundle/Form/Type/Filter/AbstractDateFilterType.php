@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
-use Symfony\Component\Form\AbstractType;
+use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
+use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
+use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
-use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
-use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
 
 abstract class AbstractDateFilterType extends AbstractType
 {
@@ -102,7 +102,7 @@ abstract class AbstractDateFilterType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
@@ -176,7 +176,7 @@ abstract class AbstractDateFilterType extends AbstractType
             $options['date_parts'] = [];
         }
 
-        $builder->add('part', 'choice', ['choices' => $options['date_parts']]);
+        $builder->add('part', ChoiceType::class, ['choices' => $options['date_parts']]);
         if ($options['compile_date']) {
             $builder->addEventSubscriber($this->subscriber);
         }

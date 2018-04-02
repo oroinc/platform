@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ConfigBundle\Migration;
 
-use Psr\Log\LoggerInterface;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class RenameConfigArrayKeyQuery extends ParametrizedMigrationQuery
 {

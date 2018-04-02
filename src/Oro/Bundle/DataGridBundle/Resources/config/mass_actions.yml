@@ -25,7 +25,7 @@ services:
             - '@oro_datagrid.extension.action.metadata_factory'
 
     oro_datagrid.extension.mass_action.handler.delete:
-        class: %oro_datagrid.extension.mass_action.handler.delete.class%
+        class: '%oro_datagrid.extension.mass_action.handler.delete.class%'
         arguments:
             - '@doctrine'
             - '@translator'
@@ -34,7 +34,7 @@ services:
             - '@request_stack'
 
     oro_datagrid.mass_action.parameters_parser:
-        class: %oro_datagrid.mass_action.parameters_parser.class%
+        class: '%oro_datagrid.mass_action.parameters_parser.class%'
 
     oro_datagrid.mass_action.helper:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHelper
@@ -43,7 +43,7 @@ services:
             - '@service_container'
 
     oro_datagrid.mass_action.dispatcher:
-        class: %oro_datagrid.mass_action.dispatcher.class%
+        class: '%oro_datagrid.mass_action.dispatcher.class%'
         arguments:
             - '@oro_datagrid.datagrid.manager'
             - '@oro_datagrid.mass_action.helper'
@@ -51,45 +51,45 @@ services:
             - '@oro_datagrid.extension.mass_action.iterable_result_factory_registry'
 
     oro_datagrid.extension.mass_action.type.ajax:
-        class: %oro_datagrid.extension.mass_action.type.ajax.class%
-        scope: prototype
+        class: '%oro_datagrid.extension.mass_action.type.ajax.class%'
+        shared: false
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: ajax }
 
     oro_datagrid.extension.mass_action.type.delete:
-        class: %oro_datagrid.extension.mass_action.type.delete.class%
-        scope: prototype
+        class: '%oro_datagrid.extension.mass_action.type.delete.class%'
+        shared: false
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: delete }
 
     oro_datagrid.extension.mass_action.type.redirect:
-        class: %oro_datagrid.extension.mass_action.type.redirect.class%
-        scope: prototype
+        class: '%oro_datagrid.extension.mass_action.type.redirect.class%'
+        shared: false
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: redirect }
 
     oro_datagrid.extension.mass_action.type.widget:
-        class: %oro_datagrid.extension.mass_action.type.widget.class%
-        scope: prototype
+        class: '%oro_datagrid.extension.mass_action.type.widget.class%'
+        shared: false
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: widget }
 
     oro_datagrid.extension.mass_action.type.window:
-        class: %oro_datagrid.extension.mass_action.type.window.class%
-        scope: prototype
+        class: '%oro_datagrid.extension.mass_action.type.window.class%'
+        shared: false
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: window }
 
     oro_datagrid.extension.mass_action.type.massedit:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget\MassEdit\MassEditAction
         parrent: oro_datagrid.extension.mass_action.type.window
-        scope: prototype
+        shared: false
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: massedit }
 
     oro_datagrid.extension.mass_action.type.frontend:
-        class: %oro_datagrid.extension.mass_action.type.frontend.class%
-        scope: prototype
+        class: '%oro_datagrid.extension.mass_action.type.frontend.class%'
+        shared: false
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: frontend }
 

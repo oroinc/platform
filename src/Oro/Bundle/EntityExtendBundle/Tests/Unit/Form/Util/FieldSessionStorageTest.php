@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Util;
 
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityExtendBundle\Form\Util\FieldSessionStorage;
-
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class FieldSessionStorageTest extends \PHPUnit_Framework_TestCase

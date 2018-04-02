@@ -3,9 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_29;
 
 use Doctrine\DBAL\Connection;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper;
@@ -13,6 +10,7 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
 
 class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
 {

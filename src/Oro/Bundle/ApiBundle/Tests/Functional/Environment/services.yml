@@ -1,0 +1,76 @@
+services:
+    oro_api.tests.migration_listener:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestEntitiesMigrationListener
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp }
+
+    oro_api.tests.entity_alias_provider:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestEntitiesAliasProvider
+        public: false
+        tags:
+            - { name: oro_entity.alias_provider }
+
+    oro_api.tests.config_registry:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry
+        arguments:
+            - '@oro_api.config_bag_registry'
+            - '@oro_api.config_provider'
+            - '@oro_api.relation_config_provider'
+            - '@oro_api.metadata_provider'
+            - '@oro_api.resources_provider'
+
+    oro_api.tests.test_route_options_resolver:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestRouteOptionsResolver
+        public: false
+        tags:
+            - { name: routing.options_resolver }
+
+    oro_api.tests.check_request_type:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\CheckRequestType
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: get_list, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: delete, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: delete_list, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: create, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: update, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: get_relationship, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: update_relationship, group: initialize, priority: 250 }
+
+    oro_api.tests.set_test_current_department_entity_id:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\SetTestCurrentDepartmentEntityId
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_input, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment }
+            - { name: oro.api.processor, action: update, group: normalize_input, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment, priority: 95 }
+
+    oro_api.tests.set_test_current_department_entity_id_for_subresource:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\SetTestCurrentDepartmentEntityIdForSubresource
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: normalize_input, parentClass: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment, priority: 220 }
+            - { name: oro.api.processor, action: get_relationship, group: normalize_input, parentClass: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment, priority: 220 }
+            - { name: oro.api.processor, action: update_relationship, group: normalize_input, parentClass: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment, priority: 220 }
+            - { name: oro.api.processor, action: add_relationship, group: normalize_input, parentClass: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment, priority: 220 }
+            - { name: oro.api.processor, action: delete_relationship, group: normalize_input, parentClass: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment, priority: 220 }
+
+    oro_api.tests.load_test_resource_without_identifier_data:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\LoadTestResourceWithoutIdentifierData
+        tags:
+            - { name: oro.api.processor, action: get, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier }
+
+    oro_api.tests.load_test_resource_without_identifier_entity:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\LoadTestResourceWithoutIdentifierEntity
+        tags:
+            - { name: oro.api.processor, action: update, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier, priority: -20 }
+            - { name: oro.api.processor, action: delete, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier, priority: -20 }
+
+    oro_api.tests.delete_test_resource_without_identifier_entity:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\DeleteTestResourceWithoutIdentifierEntity
+        tags:
+            - { name: oro.api.processor, action: delete, group: delete_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier }

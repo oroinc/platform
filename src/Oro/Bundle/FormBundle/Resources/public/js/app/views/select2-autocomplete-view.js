@@ -26,6 +26,13 @@ define([
                     this.$el.data('selected-data', e.added);
                 }
             }
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function Select2AutocompleteView() {
+            Select2AutocompleteView.__super__.constructor.apply(this, arguments);
         }
     });
 

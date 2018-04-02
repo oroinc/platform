@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\DBAL\Types\Type;
-
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
 {

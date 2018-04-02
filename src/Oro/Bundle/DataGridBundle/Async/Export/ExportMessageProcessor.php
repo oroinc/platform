@@ -3,9 +3,9 @@ namespace Oro\Bundle\DataGridBundle\Async\Export;
 
 use Oro\Bundle\DataGridBundle\Async\Topics;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector;
+use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessorAbstract;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
@@ -14,6 +14,9 @@ use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * Process data grid export async message.
+ */
 class ExportMessageProcessor extends ExportMessageProcessorAbstract
 {
     /**
@@ -87,7 +90,10 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
     protected function handleExport(array $body)
     {
         $contextParameters = new ParameterBag($body['parameters']['gridParameters']);
-        $contextParameters->set(ActionExtension::ENABLE_ACTIONS_PARAMETER, false);
+        $contextParameters->set(
+            ParameterBag::DATAGRID_MODES_PARAMETER,
+            [DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE]
+        );
         $body['parameters']['gridParameters'] = $contextParameters;
 
         $exportResult = $this->exportHandler->handle(
@@ -118,6 +124,7 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
                 FormatterProvider::FORMAT_TYPE => 'excel',
             ],
         ], $body);
+        $body['parameters']['pageSize'] = $body['batchSize'];
 
         if (! isset($body['jobId'], $body['parameters']['gridName'], $body['format'])) {
             $this->logger->critical('Got invalid message');

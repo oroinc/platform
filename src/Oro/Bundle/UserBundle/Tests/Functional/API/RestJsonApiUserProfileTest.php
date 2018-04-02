@@ -14,7 +14,7 @@ class RestJsonApiUserProfileTest extends RestJsonApiTestCase
     {
         $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_get_user_profile')
+            $this->getUrl('oro_rest_api_user_profile')
         );
 
         self::assertResponseStatusCodeEquals($response, 200);
@@ -41,14 +41,11 @@ class RestJsonApiUserProfileTest extends RestJsonApiTestCase
     {
         $response = $this->request(
             $method,
-            $this->getUrl('oro_rest_api_get_user_profile')
+            $this->getUrl('oro_rest_api_user_profile')
         );
 
-        // @todo: should be fixed in BAP-16413
-        self::assertResponseStatusCodeEquals($response, [404, 405]);
-        //correct assert should be:
-        //self::assertResponseStatusCodeEquals($response, 405);
-        //self::assertEquals('GET', $response->headers->get('Allow'));
+        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertEquals('GET', $response->headers->get('Allow'));
     }
 
     /**
@@ -57,9 +54,11 @@ class RestJsonApiUserProfileTest extends RestJsonApiTestCase
     public function getNotAllowedMethods()
     {
         return [
+            ['HEAD'],
+            ['OPTIONS'],
             ['POST'],
             ['PATCH'],
-            ['DELETE'],
+            ['DELETE']
         ];
     }
 }

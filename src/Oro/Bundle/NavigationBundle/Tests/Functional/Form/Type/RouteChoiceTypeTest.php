@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Form\Type;
 
-use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormFactoryInterface;
 
 /**
  * @dbIsolationPerTest
@@ -35,7 +34,7 @@ class RouteChoiceTypeTest extends WebTestCase
      */
     public function testCreateView(array $options, array $expectedChoices)
     {
-        $form = $this->formFactory->create(RouteChoiceType::NAME, null, $options);
+        $form = $this->formFactory->create(RouteChoiceType::class, null, $options);
 
         $formView = $form->createView();
         $this->assertEquals($expectedChoices, $formView->vars['choices']);

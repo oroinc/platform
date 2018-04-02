@@ -4,7 +4,6 @@ namespace Oro\Bundle\NoteBundle\Entity\Manager;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityDeleteHandler;
 use Oro\Bundle\ActivityBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;

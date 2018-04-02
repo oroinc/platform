@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 abstract class AbstractLocalizedType extends FormIntegrationTestCase
 {

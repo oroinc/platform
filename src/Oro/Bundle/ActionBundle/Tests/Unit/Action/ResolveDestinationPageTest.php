@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-
 use Oro\Bundle\ActionBundle\Action\ResolveDestinationPage;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class ResolveDestinationPageTest extends \PHPUnit_Framework_TestCase

@@ -2,6 +2,7 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/modal'
 ], function(_, __, Modal) {
     'use strict';
 
+    var EmailApplyTemplateModalView;
     /**
      * Apply template confirmation dialog
      *
@@ -9,9 +10,16 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/modal'
      * @class   oroui.ApplyTemplateConfirmation
      * @extends oroui.Modal
      */
-    return Modal.extend({
+    EmailApplyTemplateModalView = Modal.extend({
         /** @property {String} */
         className: 'modal oro-modal-danger',
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailApplyTemplateModalView() {
+            EmailApplyTemplateModalView.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * @param {Object} options
@@ -24,7 +32,9 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/modal'
             }, options);
 
             arguments[0] = options;
-            Modal.prototype.initialize.apply(this, arguments);
+            EmailApplyTemplateModalView.__super__.initialize.apply(this, arguments);
         }
     });
+
+    return EmailApplyTemplateModalView;
 });

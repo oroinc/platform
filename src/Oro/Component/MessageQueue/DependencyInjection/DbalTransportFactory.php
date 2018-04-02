@@ -2,16 +2,15 @@
 
 namespace Oro\Component\MessageQueue\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalCliProcessManager;
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalPidFileManager;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessagesDbalExtension;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RejectMessageOnExceptionDbalExtension;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class DbalTransportFactory implements TransportFactoryInterface
 {
@@ -40,9 +39,8 @@ class DbalTransportFactory implements TransportFactoryInterface
                 ->scalarNode('pid_file_dir')->defaultValue($pidFileDir)->cannotBeEmpty()->end()
                 ->integerNode('consumer_process_pattern')
                     ->defaultValue(':consume')
-                    ->cannotBeEmpty()
                     ->end()
-                ->integerNode('polling_interval')->min(50)->defaultValue(1000)->cannotBeEmpty()->end()
+                ->integerNode('polling_interval')->min(50)->defaultValue(1000)->end()
         ;
     }
 

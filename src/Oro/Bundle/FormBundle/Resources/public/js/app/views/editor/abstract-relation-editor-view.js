@@ -39,6 +39,17 @@ define(function(require) {
         input_delay: 250,
         currentTerm: '',
         DEFAULT_PER_PAGE: 20,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function AbstractRelationEditorView() {
+            AbstractRelationEditorView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             AbstractRelationEditorView.__super__.initialize.apply(this, arguments);
             this.autocompleteApiAccessor = options.autocomplete_api_accessor.instance;

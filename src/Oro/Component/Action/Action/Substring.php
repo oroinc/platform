@@ -3,7 +3,6 @@
 namespace Oro\Component\Action\Action;
 
 use Oro\Component\Action\Exception\InvalidParameterException;
-
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class Substring extends AbstractAction

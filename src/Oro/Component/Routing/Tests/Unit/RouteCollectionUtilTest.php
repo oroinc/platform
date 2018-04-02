@@ -2,10 +2,10 @@
 
 namespace Oro\Component\Routing\Tests\Unit;
 
+use Oro\Component\Routing\RouteCollectionUtil;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Oro\Component\Routing\RouteCollectionUtil;
 
 class RouteCollectionUtilTest extends \PHPUnit_Framework_TestCase
 {

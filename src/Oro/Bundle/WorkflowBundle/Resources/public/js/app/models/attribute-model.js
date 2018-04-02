@@ -15,6 +15,16 @@ define(function(require) {
             translateLinks: []
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function AttributeModel() {
+            AttributeModel.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             if (this.get('options') === null) {
                 this.set('options', {});

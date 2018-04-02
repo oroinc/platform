@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Engine\Orm;
 
+use Doctrine\ORM\Configuration;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql;
-
-use Doctrine\ORM\Configuration;
 
 /**
  * @group search

@@ -4,11 +4,9 @@ namespace Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 class LoadBusinessUnitData extends AbstractFixture implements ContainerAwareInterface
 {

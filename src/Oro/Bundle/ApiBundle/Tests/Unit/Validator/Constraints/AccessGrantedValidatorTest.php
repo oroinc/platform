@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGranted;
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGrantedValidator;
+use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AccessGrantedValidatorTest extends AbstractConstraintValidatorTest
 {

@@ -26,6 +26,13 @@ define([
         useDirectLauncherLink: true,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function NavigateAction() {
+            NavigateAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize launcher options with url
          *
          * @param {Object} options

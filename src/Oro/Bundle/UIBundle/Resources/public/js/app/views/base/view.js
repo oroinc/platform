@@ -14,6 +14,13 @@ define([
      * @extends Chaplin.View
      */
     BaseView = Chaplin.View.extend(/** @lends BaseView.prototype */{
+        /**
+         * @inheritDoc
+         */
+        constructor: function BaseView() {
+            BaseView.__super__.constructor.apply(this, arguments);
+        },
+
         getTemplateFunction: function(templateKey) {
             templateKey = templateKey || 'template';
             var template = this[templateKey];
@@ -80,6 +87,22 @@ define([
                 } else {
                     $el = instance.$(region.selector);
                 }
+            }
+            return $el;
+        }
+    }, {
+        /**
+         * Resolves element declared in view's options
+         *
+         * @param {string|jQuery} el value of view's element declaration in options
+         * @return {jQuery}
+         */
+        resolveElOption: function(el) {
+            var $el;
+            if (typeof el === 'string' && el.substr(0, 7) === 'region:') {
+                $el = BaseView.prototype._findRegionElem(el.substr(7));
+            } else {
+                $el = $(el);
             }
             return $el;
         }

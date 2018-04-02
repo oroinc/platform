@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\AttachmentBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType as SymfonyFileType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class FileType extends AbstractType
@@ -41,7 +42,7 @@ class FileType extends AbstractType
 
         $builder->add(
             'file',
-            'file',
+            SymfonyFileType::class,
             [
                 'label'       => 'oro.attachment.file.label',
                 'required'    => $options['checkEmptyFile'],
@@ -73,7 +74,7 @@ class FileType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [

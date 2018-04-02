@@ -3,7 +3,6 @@
 namespace Oro\Component\Action\Action;
 
 use Oro\Component\ConfigExpression\ExpressionInterface;
-
 use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
 
 interface ActionFactoryInterface extends FactoryWithTypesInterface

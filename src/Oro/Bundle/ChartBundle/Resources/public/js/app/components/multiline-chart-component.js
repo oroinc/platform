@@ -18,6 +18,13 @@ define(function(require) {
         narrowScreen: false,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function MultilineChartComponent() {
+            MultilineChartComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Draw chart
          *
          * @overrides
@@ -62,8 +69,8 @@ define(function(require) {
                 if (label === null) {
                     var number = parseInt(data);
                     if (rawData.length > number) {
-                        label = rawData[number].label === null ?
-                            'N/A'
+                        label = rawData[number].label === null
+                            ? 'N/A'
                             : rawData[number].label;
                     } else {
                         label = '';
@@ -76,8 +83,8 @@ define(function(require) {
                 if (label === null) {
                     var number = parseInt(data);
                     if (rawData.length > number) {
-                        label = rawData[data].value === null ?
-                            'N/A'
+                        label = rawData[data].value === null
+                            ? 'N/A'
                             : rawData[data].value;
                     } else {
                         label = '';

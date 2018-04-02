@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Context;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-
 use Doctrine\Common\Collections\ArrayCollection;
 
 class StepExecutionProxyContext implements ContextInterface, BatchContextInterface

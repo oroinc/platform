@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\EventListener;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SyncBundle\EventListener\MaintenanceListener;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
+use Psr\Log\LoggerInterface;
 
 class MaintenanceListenerTest extends \PHPUnit_Framework_TestCase
 {

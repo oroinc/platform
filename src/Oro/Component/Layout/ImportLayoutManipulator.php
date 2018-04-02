@@ -3,8 +3,8 @@
 
 namespace Oro\Component\Layout;
 
-use Oro\Component\Layout\Model\LayoutUpdateImport;
 use Oro\Component\Layout\Exception\LogicException;
+use Oro\Component\Layout\Model\LayoutUpdateImport;
 
 class ImportLayoutManipulator implements LayoutManipulatorInterface
 {

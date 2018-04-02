@@ -8,12 +8,10 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\LocaleBundle\Autocomplete\ParentLocalizationSearchHandler;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result;
-
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class ParentLocalizationSearchHandlerTest extends \PHPUnit_Framework_TestCase

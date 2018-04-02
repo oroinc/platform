@@ -1,5 +1,5 @@
-## Config management ##
-### Controller ###
+## Config management
+### Controller
 You can access different Oro settings using different scopes.
 
 **Note:** Currently, only `oro_config.user` scope implemented.
@@ -76,13 +76,13 @@ Array with `settings` - key should be set using `Containerbuilder#prependExtensi
      }
 ```
 
-### View ###
+### View
 
 ```
 {% set format = oro_config_value('oro_anybundle.anysetting') %}
 ```
 
-### Change config value via console command ###
+### Change config value via console command
   
 You can change value of config parameter in global scope via console command `oro:config:update`.
 

@@ -5,8 +5,8 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\EmailBundle\Form\Type\SystemEmailTemplateSelectType;
+use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 
 class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -52,15 +52,7 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
         $this->type = new SystemEmailTemplateSelectType($this->em);
     }
 
-    protected function tearDown()
-    {
-        unset($this->type);
-        unset($this->em);
-        unset($this->queryBuilder);
-        unset($this->entityRepository);
-    }
-
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $this->entityRepository->expects($this->any())
             ->method('getSystemTemplatesQueryBuilder')
@@ -70,7 +62,7 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->will($this->returnValue($this->entityRepository));
 
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
@@ -78,7 +70,7 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
                 'class'         => 'OroEmailBundle:EmailTemplate',
                 'choice_value'  => 'name'
             ]);
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
     }
     
     public function testBuildForm()
@@ -98,7 +90,7 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('genemu_jqueryselect2_translatable_entity', $this->type->getParent());
+        $this->assertEquals(Select2TranslatableEntityType::class, $this->type->getParent());
     }
 
     public function testGetName()

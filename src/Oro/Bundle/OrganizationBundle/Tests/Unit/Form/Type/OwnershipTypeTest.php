@@ -2,6 +2,7 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class OwnershipTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,14 +21,14 @@ class OwnershipTypeTest extends \PHPUnit_Framework_TestCase
         unset($this->type);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        $optionResolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $optionResolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
 
         $optionResolver->expects($this->once())
             ->method('setDefaults')
             ->with(array('choices' => $this->type->getOwnershipsArray()));
-        $this->type->setDefaultOptions($optionResolver);
+        $this->type->configureOptions($optionResolver);
     }
 
     public function testGetName()
@@ -37,6 +38,6 @@ class OwnershipTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('choice', $this->type->getParent());
+        $this->assertEquals(ChoiceType::class, $this->type->getParent());
     }
 }

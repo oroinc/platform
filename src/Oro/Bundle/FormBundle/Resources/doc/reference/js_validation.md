@@ -1,4 +1,4 @@
-#  Client side form validation
+# Client side form validation
 ## Setup validation rules for form fields
 Main aim of development client side validation was to support same validation annotation which is used for server side - [Symfony validation](http://symfony.com/doc/current/book/validation.html). Once `validation.yml` is created, all rules get translated to fields `data-validation` attribute, e.g.:
 ```yml

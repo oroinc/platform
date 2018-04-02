@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Metadata;
 
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ToArrayInterface;
 use Oro\Component\PhpUtils\ReflectionUtil;
-use Oro\Bundle\ApiBundle\Exception\RuntimeException;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
+ * The metadata for an entity.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntityMetadata implements ToArrayInterface
@@ -591,6 +593,16 @@ class EntityMetadata implements ToArrayInterface
         if (null !== $this->attributes) {
             $this->attributes->remove($attributeName);
         }
+    }
+
+    /**
+     * Checks whether the metadata has at least one identifier field.
+     *
+     * @return bool
+     */
+    public function hasIdentifierFields()
+    {
+        return !empty($this->identifiers);
     }
 
     /**

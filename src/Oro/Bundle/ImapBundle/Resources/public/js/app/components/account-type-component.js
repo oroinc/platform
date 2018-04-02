@@ -13,6 +13,13 @@ define(function(require) {
         ViewType: accountTypeView,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function AccountTypeComponent() {
+            AccountTypeComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @constructor
          * @param {Object} options
          */
@@ -22,6 +29,7 @@ define(function(require) {
 
             var viewConfig = this.prepareViewOptions(options);
             this.view = new this.ViewType(viewConfig);
+            this.view.render();
 
             this.listenTo(this.view, 'imapConnectionChangeType', this.onChangeAccountType);
             this.listenTo(mediator, 'imapGmailConnectionSetToken', this.onIMapGotToken);

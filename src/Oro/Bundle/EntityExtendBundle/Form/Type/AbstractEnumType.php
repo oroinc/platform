@@ -4,8 +4,9 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Query;
-
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -13,13 +14,9 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-
-use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * A base class for an enum value selector form types
@@ -55,7 +52,7 @@ abstract class AbstractEnumType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
@@ -70,41 +67,43 @@ abstract class AbstractEnumType extends AbstractType
             ]
         );
 
-        $resolver->setNormalizers(
-            [
-                'class' => function (Options $options, $value) {
-                    if ($value !== null) {
-                        return $value;
-                    }
-
-                    if (empty($options['enum_code'])) {
-                        throw new InvalidOptionsException('Either "class" or "enum_code" must option must be set.');
-                    }
-
-                    $class = ExtendHelper::buildEnumValueClassName($options['enum_code']);
-                    if (!is_a($class, 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', true)) {
-                        throw new InvalidOptionsException(
-                            sprintf(
-                                '"%s" must be a child of "%s"',
-                                $class,
-                                'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
-                            )
-                        );
-                    }
-
-                    return $class;
-                },
-                'multiple' => function (Options $options, $value) {
-                    if ($value === null && !empty($options['class'])) {
-                        $value = $this->configManager
-                            ->getProvider('enum')
-                            ->getConfig($options['class'])
-                            ->is('multiple');
-                    }
-
+        $resolver->setNormalizer(
+            'class',
+            function (Options $options, $value) {
+                if ($value !== null) {
                     return $value;
                 }
-            ]
+
+                if (empty($options['enum_code'])) {
+                    throw new InvalidOptionsException('Either "class" or "enum_code" must option must be set.');
+                }
+
+                $class = ExtendHelper::buildEnumValueClassName($options['enum_code']);
+                if (!is_a($class, 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', true)) {
+                    throw new InvalidOptionsException(
+                        sprintf(
+                            '"%s" must be a child of "%s"',
+                            $class,
+                            'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
+                        )
+                    );
+                }
+
+                return $class;
+            }
+        )
+        ->setNormalizer(
+            'multiple',
+            function (Options $options, $value) {
+                if ($value === null && !empty($options['class'])) {
+                    $value = $this->configManager
+                        ->getProvider('enum')
+                        ->getConfig($options['class'])
+                        ->is('multiple');
+                }
+
+                return $value;
+            }
         );
     }
 

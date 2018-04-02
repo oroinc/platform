@@ -12,6 +12,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function WidgetPickerCollectionView() {
+            WidgetPickerCollectionView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             if (!options.loadWidget) {
                 throw new Error('Missing required "loadWidget" option');

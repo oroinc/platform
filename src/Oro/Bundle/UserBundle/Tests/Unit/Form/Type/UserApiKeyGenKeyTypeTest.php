@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenKeyType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UserApiKeyGenKeyTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,6 +39,6 @@ class UserApiKeyGenKeyTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('hidden', $this->type->getParent());
+        $this->assertEquals(HiddenType::class, $this->type->getParent());
     }
 }

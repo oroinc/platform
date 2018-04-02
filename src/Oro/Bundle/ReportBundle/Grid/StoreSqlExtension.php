@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ReportBundle\Grid;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class StoreSqlExtension extends AbstractExtension
 {
@@ -41,7 +40,8 @@ class StoreSqlExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
-            $config->isOrmDatasource()
+            parent::isApplicable($config)
+            && $config->isOrmDatasource()
             && $this->getParameters()->get(self::DISPLAY_SQL_QUERY, false)
             && $this->tokenAccessor->hasUser()
             && $this->authorizationChecker->isGranted('oro_report_view_sql');

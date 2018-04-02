@@ -2,18 +2,16 @@
 
 namespace Oro\Component\DoctrineUtils\DependencyInjection;
 
+use Doctrine\DBAL\Connection;
+use Oro\Component\DoctrineUtils\DBAL\ChainTransactionWatcher;
+use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherAwareInterface;
+use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherInterface;
+use Oro\Component\Testing\Doctrine\PersistentConnection;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Doctrine\DBAL\Connection;
-
-use Oro\Component\DoctrineUtils\DBAL\ChainTransactionWatcher;
-use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherAwareInterface;
-use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherInterface;
-use Oro\Component\Testing\Doctrine\PersistentConnection;
 
 /**
  * Searches transaction watchers tagger by the specified tag and if at least one watcher found

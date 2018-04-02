@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log;
 
+use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
-
-use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 
 class ConsumerStateTest extends \PHPUnit_Framework_TestCase
 {

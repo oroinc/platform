@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Async;
 
 use Doctrine\DBAL\Connection;
-
 use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherAwareInterface;
 use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherInterface;
 

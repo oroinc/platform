@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Event\BuildAfter;
+use Oro\Bundle\EntityBundle\EventListener\EntityRelationGridListener;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityBundle\EventListener\EntityRelationGridListener;
 
 class EntityRelationGridListenerTest extends \PHPUnit_Framework_TestCase
 {

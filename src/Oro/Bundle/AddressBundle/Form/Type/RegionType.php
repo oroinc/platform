@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
+use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RegionType extends AbstractType
 {
@@ -25,7 +26,7 @@ class RegionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $choices = function (Options $options) {
             // show empty list if country is not selected
@@ -51,7 +52,7 @@ class RegionType extends AbstractType
                         'placeholder' => 'oro.address.form.choose_region',
                         'allowClear' => true
                     ),
-                    'empty_value' => '',
+                    'placeholder' => '',
                     'empty_data'  => null
                 )
             );
@@ -70,7 +71,7 @@ class RegionType extends AbstractType
      */
     public function getParent()
     {
-        return 'genemu_jqueryselect2_translatable_entity';
+        return Select2TranslatableEntityType::class;
     }
 
     /**

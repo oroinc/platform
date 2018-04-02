@@ -4,7 +4,7 @@ namespace Oro\Bundle\ChartBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ChartSettingsCollectionType extends AbstractType
 {
@@ -16,7 +16,7 @@ class ChartSettingsCollectionType extends AbstractType
         foreach ($options['chart_configs'] as $chartName => $chartConfig) {
             $builder->add(
                 $chartName,
-                'oro_chart_setting',
+                ChartSettingsType::class,
                 [
                     'chart_name'   => $chartName,
                     'chart_config' => $chartConfig
@@ -28,15 +28,11 @@ class ChartSettingsCollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['chart_configs']);
 
-        $resolver->setAllowedTypes(
-            [
-                'chart_configs' => 'array'
-            ]
-        );
+        $resolver->setAllowedTypes('chart_configs', 'array');
     }
 
     /**

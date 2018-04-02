@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Mapping;
 
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 
 class ExtendClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase

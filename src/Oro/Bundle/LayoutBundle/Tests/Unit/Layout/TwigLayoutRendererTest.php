@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout;
 
-use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
-
 use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Bundle\LayoutBundle\Layout\TwigLayoutRenderer;
+use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
 
 class TwigLayoutRendererTest extends \PHPUnit_Framework_TestCase
 {

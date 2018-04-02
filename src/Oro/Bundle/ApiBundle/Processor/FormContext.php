@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
-
-use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 
 interface FormContext extends ContextInterface
 {

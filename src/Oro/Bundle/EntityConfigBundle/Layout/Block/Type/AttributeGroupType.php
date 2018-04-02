@@ -6,7 +6,6 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry;
 use Oro\Bundle\EntityConfigBundle\Layout\Mapper\AttributeBlockTypeMapperInterface;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
-
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\AbstractContainerType;
 use Oro\Component\Layout\Block\Type\Options;
@@ -60,7 +59,7 @@ class AttributeGroupType extends AbstractContainerType
     public function buildBlock(BlockBuilderInterface $builder, Options $options)
     {
         /** @var AttributeFamily $attributeFamily */
-        $attributeFamily = $options->get('attribute_family');
+        $attributeFamily = $options['attribute_family'];
         $code = $options['group'];
         $entityValue = $options->get('entity', false);
         $attributeGroup = $attributeFamily->getAttributeGroup($code);
@@ -101,7 +100,7 @@ class AttributeGroupType extends AbstractContainerType
                         'fieldName' => $attribute->getFieldName(),
                         'className' => $attribute->getEntity()->getClassName()
                     ],
-                    $options->get('attribute_options')->toArray()
+                    $options['attribute_options']->toArray()
                 )
             );
         }

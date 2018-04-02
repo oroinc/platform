@@ -53,7 +53,7 @@ class Config
         $this->routerMessageProcessorName = $routerMessageProcessorName;
         $this->routerQueueName = $routerQueueName;
         $this->defaultQueueName = $defaultQueueName;
-        $this->defaultTopicName = $defaultQueueName;
+        $this->defaultTopicName = $defaultTopicName;
     }
 
     /**

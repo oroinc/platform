@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CollectResources;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\ActionsConfig;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
-use Oro\Bundle\ApiBundle\Provider\ConfigBag;
+use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Adds info about actions which must not be available to resources.
@@ -21,19 +22,19 @@ class AddExcludedActions implements ProcessorInterface
     /** @var ConfigLoaderFactory */
     protected $configLoaderFactory;
 
-    /** @var ConfigBag */
-    protected $configBag;
+    /** @var ConfigBagRegistry */
+    protected $configBagRegistry;
 
     /**
      * @param ConfigLoaderFactory $configLoaderFactory
-     * @param ConfigBag           $configBag
+     * @param ConfigBagRegistry   $configBagRegistry
      */
     public function __construct(
         ConfigLoaderFactory $configLoaderFactory,
-        ConfigBag $configBag
+        ConfigBagRegistry $configBagRegistry
     ) {
         $this->configLoaderFactory = $configLoaderFactory;
-        $this->configBag = $configBag;
+        $this->configBagRegistry = $configBagRegistry;
     }
 
     /**
@@ -47,10 +48,11 @@ class AddExcludedActions implements ProcessorInterface
         $version = $context->getVersion();
 
         $resources = $context->getResult();
+        $requestType = $context->getRequestType();
         /** @var ApiResource $resource */
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
-            $actions = $this->getActionsConfig($entityClass, $version);
+            $actions = $this->getActionsConfig($entityClass, $version, $requestType);
             if (null !== $actions) {
                 $actionsConfig[$entityClass] = $actions;
                 $excludedActions = $this->getExcludedActions($actions);
@@ -67,13 +69,14 @@ class AddExcludedActions implements ProcessorInterface
      *
      * @param string $entityClass
      * @param string $version
+     * @param RequestType $requestType
      *
      * @return ActionsConfig|null
      */
-    protected function getActionsConfig($entityClass, $version)
+    protected function getActionsConfig($entityClass, $version, RequestType $requestType)
     {
         $actions = null;
-        $config = $this->configBag->getConfig($entityClass, $version);
+        $config = $this->configBagRegistry->getConfigBag($requestType)->getConfig($entityClass, $version);
         if (null !== $config && !empty($config[ConfigUtil::ACTIONS])) {
             $actionsLoader = $this->configLoaderFactory->getLoader(ConfigUtil::ACTIONS);
             $actions = $actionsLoader->load($config[ConfigUtil::ACTIONS]);

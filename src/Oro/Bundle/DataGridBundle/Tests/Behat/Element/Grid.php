@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader;
 use WebDriver\Exception\ElementNotVisible;
-
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
 
 /**
  * @method GridRow getRowByNumber($rowNumber) @see Table::getRowByNumber($rowNumber)
@@ -243,6 +242,7 @@ class Grid extends Table implements GridInterface
      */
     public function clickActionLink($content, $action)
     {
+        /** @var GridRow $row */
         $row = $this->getRowByContent($content);
         $link = $row->getActionLink($action);
         $link->click();

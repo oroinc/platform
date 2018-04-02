@@ -242,8 +242,8 @@ define([
             var series = this.allSeries[index];
             var $prev = $(options.element).find('.flotr-grid-label').last();
             var distX = options.width - options.marginX * 0.8;
-            var distY = !$prev[0] ? options.marginY :
-                $prev.position().top + $prev.outerHeight(true) + options.fontSize * 1.2;
+            var distY = !$prev[0] ? options.marginY
+                : $prev.position().top + $prev.outerHeight(true) + options.fontSize * 1.2;
             var style = {
                 size: options.fontSize * 1.2,
                 color: options.fontColor,

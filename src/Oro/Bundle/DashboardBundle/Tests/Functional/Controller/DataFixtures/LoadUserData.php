@@ -4,14 +4,11 @@ namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-
+use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
+use Oro\Bundle\UserBundle\Entity\UserApi;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Bundle\UserBundle\Entity\UserManager;
-use Oro\Bundle\UserBundle\Entity\UserApi;
-
-use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
 
 class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 {

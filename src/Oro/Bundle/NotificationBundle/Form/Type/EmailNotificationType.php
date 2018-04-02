@@ -3,18 +3,18 @@
 namespace Oro\Bundle\NotificationBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
-
+use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
+use Oro\Bundle\FormBundle\Form\Type\Select2EntityType;
+use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
+use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
+use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber;
+use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
-
-use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
-use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
-use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber;
 
 class EmailNotificationType extends AbstractType
 {
@@ -61,7 +61,7 @@ class EmailNotificationType extends AbstractType
 
         $builder->add(
             'entityName',
-            EmailNotificationEntityChoiceType::NAME,
+            EmailNotificationEntityChoiceType::class,
             [
                 'label'       => 'oro.notification.emailnotification.entity_name.label',
                 'tooltip'     => 'oro.notification.emailnotification.entity_name.tooltip',
@@ -80,7 +80,7 @@ class EmailNotificationType extends AbstractType
 
         $builder->add(
             'event',
-            'genemu_jqueryselect2_entity',
+            Select2EntityType::class,
             [
                 'label'         => 'oro.notification.emailnotification.event.label',
                 'class'         => 'OroNotificationBundle:Event',
@@ -95,14 +95,14 @@ class EmailNotificationType extends AbstractType
                 'attr' => [
                     'autocomplete' => 'off'
                 ],
-                'empty_value'   => '',
+                'placeholder'   => '',
                 'required'      => true
             ]
         );
 
         $builder->add(
             'template',
-            'genemu_jqueryselect2_translatable_entity',
+            Select2TranslatableEntityType::class,
             [
                 'label' => 'oro.notification.emailnotification.template.label',
                 'class' => 'OroEmailBundle:EmailTemplate',
@@ -110,14 +110,14 @@ class EmailNotificationType extends AbstractType
                     'allowClear' => true,
                     'placeholder' => 'oro.email.form.choose_template',
                 ],
-                'empty_value' => '',
+                'placeholder' => '',
                 'required' => true
             ]
         );
 
         $builder->add(
             'recipientList',
-            RecipientListType::NAME,
+            RecipientListType::class,
             [
                 'label'    => 'oro.notification.emailnotification.recipient_list.label',
                 'required' => true,
@@ -133,7 +133,7 @@ class EmailNotificationType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' => EmailNotification::class,
-                'intention' => self::NAME
+                'csrf_token_id' => self::NAME
             ]
         );
     }

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Appearance;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class AppearanceExtension extends AbstractExtension
 {
@@ -44,14 +43,18 @@ class AppearanceExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
+        if (!parent::isApplicable($config)) {
+            return false;
+        }
+
         $options = $config->offsetGetOr(static::APPEARANCE_CONFIG_PATH, []);
 
         return count($options) > 0;
     }
 
-     /**
-     * @param ParameterBag $parameters
-     */
+    /**
+    * @param ParameterBag $parameters
+    */
     public function setParameters(ParameterBag $parameters)
     {
         if ($parameters->has(ParameterBag::MINIFIED_PARAMETERS)) {
@@ -97,9 +100,9 @@ class AppearanceExtension extends AbstractExtension
         }
     }
 
-     /**
-     * {@inheritDoc}
-     */
+    /**
+    * {@inheritDoc}
+    */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $options = $config->offsetGetOr(static::APPEARANCE_CONFIG_PATH, []);

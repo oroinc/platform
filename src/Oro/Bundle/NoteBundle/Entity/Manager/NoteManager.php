@@ -3,16 +3,15 @@
 namespace Oro\Bundle\NoteBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class NoteManager
 {
@@ -66,7 +65,7 @@ class NoteManager
         /** @var NoteRepository $repo */
         $repo = $this->em->getRepository('OroNoteBundle:Note');
         $qb   = $repo->getAssociatedNotesQueryBuilder($entityClass, $entityId)
-            ->orderBy('note.createdAt', $sorting);
+            ->orderBy('note.createdAt', QueryBuilderUtil::getSortOrder($sorting));
 
         $query = $this->aclHelper->apply($qb, 'VIEW', false);
 

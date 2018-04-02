@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\Routing;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Routing\Route;
-
-use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
-use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
+use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
+use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\Route;
 
 class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterface
 {

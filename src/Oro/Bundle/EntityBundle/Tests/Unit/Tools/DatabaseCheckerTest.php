@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Tools;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
-
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
 
 class DatabaseCheckerTest extends \PHPUnit_Framework_TestCase

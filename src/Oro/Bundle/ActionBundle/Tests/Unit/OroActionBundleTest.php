@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit;
 
+use Oro\Bundle\ActionBundle\OroActionBundle;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-use Oro\Bundle\ActionBundle\OroActionBundle;
 
 class OroActionBundleTest extends \PHPUnit_Framework_TestCase
 {

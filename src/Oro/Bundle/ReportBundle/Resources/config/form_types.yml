@@ -10,54 +10,52 @@ parameters:
     oro_report.report.manager.api.class:                Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 services:
     oro_report.form.type.report:
-        class: %oro_report.form.type.report.class%
+        class: '%oro_report.form.type.report.class%'
         tags:
             - { name: form.type, alias: oro_report }
 
     oro_report.form.report:
-        class:           Symfony\Component\Form\Form
-        factory_method:  createNamed
-        factory_service: form.factory
+        class: Symfony\Component\Form\Form
+        factory: ['@form.factory', createNamed]
         arguments:
             - "oro_report_form"
-            - "oro_report"
+            - Oro\Bundle\ReportBundle\Form\Type\ReportType
 
     oro_report.form.handler.report:
-        class: %oro_report.form.handler.report.class%
-        scope: request
+        class: '%oro_report.form.handler.report.class%'
         arguments:
             - '@oro_report.form.report'
-            - '@request'
+            - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
     oro_report.report.manager.api:
-        class: %oro_report.report.manager.api.class%
+        class: '%oro_report.report.manager.api.class%'
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - %oro_report.report.entity.class%
+            - '%oro_report.report.entity.class%'
             - '@doctrine.orm.entity_manager'
 
     oro_report.form.type.entity_choice:
-        class: %oro_report.form.type.entity_choice.class%
+        class: '%oro_report.form.type.entity_choice.class%'
         arguments:
             - '@oro_report.entity_provider'
         tags:
             - { name: form.type, alias: oro_report_entity_choice }
 
     oro_report.form.type.chart:
-        class: %oro_report.form.type.chart.class%
+        class: '%oro_report.form.type.chart.class%'
         tags:
             - { name: form.type, alias: oro_report_chart }
 
     oro_report.form.type.chart.schema:
-        class: %oro_report.form.type.chart.schema.class%
+        class: '%oro_report.form.type.chart.schema.class%'
         arguments:
             - '@oro_query_designer.query_designer.manager'
         tags:
             - { name: form.type, alias: oro_report_chart_data_schema }
 
     oro_report.form.type.chart.schema.collection:
-        class: %oro_report.form.type.chart.schema.collection.class%
+        class: '%oro_report.form.type.chart.schema.collection.class%'
         arguments:
             - '@oro_chart.config_provider'
         tags:

@@ -3,29 +3,31 @@
 namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\Common\Cache\Cache;
-
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasLoader;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
+use Psr\Log\LoggerInterface;
 
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-
-class EntityAliasResolver implements LoggerAwareInterface
+/**
+ * Provides functionality to get singular and plural aliases for an entity class
+ * and resolve entity class by any of these aliases.
+ */
+class EntityAliasResolver
 {
-    use LoggerAwareTrait;
-
-    const CACHE_KEY = 'entity_aliases';
+    private const CACHE_KEY = 'entity_aliases';
 
     /** @var EntityAliasLoader */
-    protected $loader;
+    private $loader;
 
     /** @var Cache */
-    protected $cache;
+    private $cache;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     /** @var bool */
-    protected $debug;
+    private $debug;
 
     /** @var EntityAliasStorage|null */
     private $storage;
@@ -33,12 +35,14 @@ class EntityAliasResolver implements LoggerAwareInterface
     /**
      * @param EntityAliasLoader $loader
      * @param Cache             $cache
+     * @param LoggerInterface   $logger
      * @param bool              $debug
      */
-    public function __construct(EntityAliasLoader $loader, Cache $cache, $debug)
+    public function __construct(EntityAliasLoader $loader, Cache $cache, LoggerInterface $logger, $debug)
     {
         $this->loader = $loader;
         $this->cache = $cache;
+        $this->logger = $logger;
         $this->debug = $debug;
     }
 
@@ -149,7 +153,7 @@ class EntityAliasResolver implements LoggerAwareInterface
     }
 
     /**
-     * Returns all entity aliases
+     * Returns all entity aliases.
      *
      * @return EntityAlias[]
      */
@@ -179,9 +183,9 @@ class EntityAliasResolver implements LoggerAwareInterface
     }
 
     /**
-     * Makes sure that aliases for all entities are loaded
+     * Makes sure that aliases for all entities are loaded.
      */
-    protected function ensureAllAliasesLoaded()
+    private function ensureAllAliasesLoaded()
     {
         if (null === $this->storage) {
             $cachedData = $this->cache->fetch(self::CACHE_KEY);
@@ -189,14 +193,12 @@ class EntityAliasResolver implements LoggerAwareInterface
                 $this->storage = $cachedData;
                 $this->storage->setDebug($this->debug);
             } else {
-                $this->storage = new EntityAliasStorage();
-                $this->storage->setDebug($this->debug);
+                $this->storage = $this->createStorage();
                 try {
                     $this->loader->load($this->storage);
                 } catch (\Exception $e) {
-                    if ($this->logger) {
-                        $this->logger->error($e->getMessage(), ['exception' => $e]);
-                    }
+                    $this->logger->error('Loading of entity aliases failed', ['exception' => $e]);
+                    $this->storage = $this->createStorage();
 
                     return;
                 }
@@ -204,5 +206,18 @@ class EntityAliasResolver implements LoggerAwareInterface
                 $this->cache->save(self::CACHE_KEY, $this->storage);
             }
         }
+    }
+
+    /**
+     * Creates a new instance of EntityAliasStorage.
+     *
+     * @return EntityAliasStorage
+     */
+    private function createStorage()
+    {
+        $storage = new EntityAliasStorage();
+        $storage->setDebug($this->debug);
+
+        return $storage;
     }
 }

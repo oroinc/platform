@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Extension\Generator;
 
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-
 use Oro\Component\Layout\Exception\SyntaxException;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class ExpressionGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionInterface
 {

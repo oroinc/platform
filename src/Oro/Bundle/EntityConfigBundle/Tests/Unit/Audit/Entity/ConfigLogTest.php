@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Audit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLog;
 use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLogDiff;
 

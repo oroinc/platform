@@ -2,11 +2,10 @@
 
 namespace Oro\Component\ChainProcessor\Tests\Unit\DependencyInjection;
 
+use Oro\Component\ChainProcessor\DependencyInjection\LoadApplicableCheckersCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Component\ChainProcessor\DependencyInjection\LoadApplicableCheckersCompilerPass;
 
 class LoadApplicableCheckersCompilerPassTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\CommentBundle\Form\Type;
 
+use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
+use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\CommentBundle\Form\EventListener\CommentSubscriber;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
+use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
-
-use Oro\Bundle\CommentBundle\Entity\Comment;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
-use Oro\Bundle\CommentBundle\Form\EventListener\CommentSubscriber;
 
 class CommentTypeApi extends AbstractType
 {
@@ -35,7 +36,7 @@ class CommentTypeApi extends AbstractType
         $builder
             ->add(
                 'message',
-                'oro_resizeable_rich_text',
+                OroResizeableRichTextType::class,
                 [
                     'required' => true,
                     'label'    => 'oro.comment.message.label',
@@ -48,7 +49,7 @@ class CommentTypeApi extends AbstractType
             )
             ->add(
                 'attachment',
-                'oro_image',
+                ImageType::class,
                 [
                     'label' => 'oro.comment.attachment.label',
                     'required' => false
@@ -62,21 +63,26 @@ class CommentTypeApi extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
                 'data_class'      => Comment::ENTITY_NAME,
-                'intention'       => 'comment',
+                'csrf_token_id'   => 'comment',
                 'csrf_protection' => false,
             ]
         );
     }
 
+    public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return self::FORM_NAME;
     }

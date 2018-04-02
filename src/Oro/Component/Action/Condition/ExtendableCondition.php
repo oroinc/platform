@@ -2,15 +2,14 @@
 
 namespace Oro\Component\Action\Condition;
 
+use Oro\Component\Action\Event\ExtendableConditionEvent;
+use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
+use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Component\Action\Event\ExtendableConditionEvent;
-use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
-use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 
 class ExtendableCondition extends AbstractCondition implements ContextAccessorAwareInterface
 {

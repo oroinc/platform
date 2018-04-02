@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
 
-use Zend\Mail\Header\HeaderInterface;
-
-use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\ImapBundle\Connector\ImapMessageIterator;
+use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
+use Zend\Mail\Header\HeaderInterface;
 
 class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
 {

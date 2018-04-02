@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OrganizationUserAclMultiSelectType extends UserMultiSelectType
 {
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
@@ -35,7 +36,7 @@ class OrganizationUserAclMultiSelectType extends UserMultiSelectType
      */
     public function getParent()
     {
-        return 'oro_jqueryselect2_hidden';
+        return OroJquerySelect2HiddenType::class;
     }
 
     /**

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActionBundle\Tests\Functional\Command;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
 use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
 
 abstract class AbstractDebugCommandTestCase extends WebTestCase

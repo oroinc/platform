@@ -43,10 +43,11 @@ class FormValidationTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType($entityClass);
 
-        $response = $this->request(
-            'POST',
-            $this->getUrl('oro_rest_api_post', ['entity' => $entityType]),
-            ['data' => ['type' => $entityType, 'attributes' => ['notExistingField' => null]]]
+        $response = $this->post(
+            ['entity' => $entityType],
+            ['data' => ['type' => $entityType, 'attributes' => ['notExistingField' => null]]],
+            [],
+            false
         );
         self::assertApiResponseStatusCodeEquals($response, [400, 403, 405], $entityType, 'post');
 
@@ -93,10 +94,11 @@ class FormValidationTest extends RestJsonApiTestCase
 
         $entityType = $this->getEntityType($entityClass);
 
-        $response = $this->request(
-            'PATCH',
-            $this->getUrl('oro_rest_api_patch', ['entity' => $entityType, 'id' => '1']),
-            ['data' => ['type' => $entityType, 'id' => '1', 'attributes' => ['notExistingField' => null]]]
+        $response = $this->patch(
+            ['entity' => $entityType, 'id' => '1'],
+            ['data' => ['type' => $entityType, 'id' => '1', 'attributes' => ['notExistingField' => null]]],
+            [],
+            false
         );
         self::assertApiResponseStatusCodeEquals($response, [400, 403, 404, 405], $entityType, 'post');
     }

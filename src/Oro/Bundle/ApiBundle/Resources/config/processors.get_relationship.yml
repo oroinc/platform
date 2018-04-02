@@ -56,6 +56,10 @@ services:
             - { name: oro.api.processor, action: get_relationship, group: load_data, collection: false }
 
     #
+    # data_security_check
+    #
+
+    #
     # normalize_data
     #
 

@@ -2,11 +2,10 @@
 
 namespace Oro\Component\DependencyInjection\Compiler;
 
+use Oro\Component\DependencyInjection\ServiceLinkRegistry;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Component\DependencyInjection\ServiceLinkRegistry;
 
 /**
  * Gather all tagged with provided tag name services together as ServiceLinks into ServiceLinkRegistry

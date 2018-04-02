@@ -34,10 +34,10 @@ parameters:
 
 services:
     oro_attachment.manager:
-        class: %oro_attachment.manager.attachment_manager.class%
+        class: '%oro_attachment.manager.attachment_manager.class%'
         arguments:
             - '@router'
-            - %oro_attachment.files%
+            - '%oro_attachment.files%'
             - '@oro_entity_extend.association_manager'
             - '%kernel.debug%'
             - '%oro_attachment.debug_images%'
@@ -83,20 +83,20 @@ services:
             - '@oro_entity_config.config_manager'
 
     oro_attachment.manager.api:
-        class: %oro_attachment.manager.api.class%
+        class: '%oro_attachment.manager.api.class%'
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - %oro_attachment.entity.class%
+            - '%oro_attachment.entity.class%'
             - '@doctrine.orm.entity_manager'
             - '@security.authorization_checker'
             - '@oro_attachment.manager'
             - '@oro_entity.doctrine_helper'
 
     oro_attachment.manager.file.api:
-        class: %oro_attachment.manager.file.api.class%
+        class: '%oro_attachment.manager.file.api.class%'
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - %oro_attachment.file.entity.class%
+            - '%oro_attachment.file.entity.class%'
             - '@doctrine.orm.entity_manager'
             - '@security.authorization_checker'
             - '@oro_attachment.file_manager'
@@ -122,7 +122,7 @@ services:
             - { name: twig.extension }
 
     oro_attachment.entity_config_dumper.extension.file:
-        class: %oro_attachment.entity_config_dumper.extension.file.class%
+        class: '%oro_attachment.entity_config_dumper.extension.file.class%'
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_entity_extend.relation_builder'
@@ -130,24 +130,24 @@ services:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
     oro_attachment.entity_config_dumper.extension:
-        class: %oro_attachment.entity_config_dumper.extension.class%
+        class: '%oro_attachment.entity_config_dumper.extension.class%'
         parent: oro_entity_extend.entity_config_dumper.extension.association
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
     oro_attachment.entity_generator.extension:
-        class: %oro_attachment.entity_generator.extension.class%
+        class: '%oro_attachment.entity_generator.extension.class%'
         tags:
             - { name: oro_entity_extend.entity_generator_extension }
 
 
     oro_attachment.migration.extension.attachment:
-        class: %oro_attachment.migration.extension.attachment.class%
+        class: '%oro_attachment.migration.extension.attachment.class%'
         tags:
             - { name: oro_migration.extension, extension_name: attachment }
 
     oro_attachment.serializer.file_normalizer:
-        class: %oro_attachment.serializer.file_normalizer.class%
+        class: '%oro_attachment.serializer.file_normalizer.class%'
         calls:
             - [setAttachmentManager, ['@oro_attachment.manager']]
             - [setFileManager, ['@oro_attachment.file_manager']]
@@ -156,13 +156,13 @@ services:
             - { name: oro_importexport.normalizer}
 
     oro_attachment.placeholder.filter:
-        class: %oro_attachment.placeholder.filter.class%
+        class: '%oro_attachment.placeholder.filter.class%'
         arguments:
             - '@oro_attachment.association_helper'
             - '@oro_entity.doctrine_helper'
 
     oro_attachment.event_listener.attachment_grid_listener:
-        class: %oro_attachment.attachment_grid_listener%
+        class: '%oro_attachment.attachment_grid_listener%'
         arguments:
             - [entityId]
         tags:
@@ -177,8 +177,8 @@ services:
             - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onBuildMetadata }
 
     oro_attachment.datagrid.action.dialog:
-        class: %oro_attachment.datagrid.action.dialog.class%
-        scope: prototype
+        class: '%oro_attachment.datagrid.action.dialog.class%'
+        shared: false
         tags:
             - { name: oro_datagrid.extension.action.type, type: dialog }
 
@@ -192,7 +192,7 @@ services:
             - { name: oro_ui.update_action_provider, group: activity, priority: -90 }
 
     oro_attachment.provider.attachment:
-        class: %oro_attachment.provider.attachment.class%
+        class: '%oro_attachment.provider.attachment.class%'
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_attachment.association_helper'
@@ -205,12 +205,12 @@ services:
             - { name: oro_entity.exclusion_provider.api }
 
     oro_attachment.config:
-        class: %oro_attachment.config.class%
+        class: '%oro_attachment.config.class%'
         arguments:
             - '@oro_attachment.association_helper'
 
     oro_attachment.formatter.image_encoded:
-        class: %oro_attachment.formatter.image_encoded.class%
+        class: '%oro_attachment.formatter.image_encoded.class%'
         arguments:
           - '@oro_attachment.file_manager'
           - '@file_locator'
@@ -218,7 +218,7 @@ services:
           - { name: oro_formatter, formatter: image_encoded }
 
     oro_attachment.formatter.image_link:
-        class: %oro_attachment.formatter.image_link.class%
+        class: '%oro_attachment.formatter.image_link.class%'
         arguments:
           - '@oro_attachment.manager'
           - '@translator'
@@ -226,7 +226,7 @@ services:
           - { name: oro_formatter, formatter: image_link }
 
     oro_attachment.formatter.image_src:
-        class: %oro_attachment.formatter.image_src.class%
+        class: '%oro_attachment.formatter.image_src.class%'
         arguments:
           - '@oro_attachment.manager'
         tags:

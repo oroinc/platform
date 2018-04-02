@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -12,6 +10,9 @@ use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Makes sure that an entity class name exists in the Context.
@@ -72,7 +73,8 @@ class NormalizeEntityClass implements ProcessorInterface
             $context->addError(
                 Error::createValidationError(
                     Constraint::ENTITY_TYPE,
-                    sprintf('Unknown entity type: %s.', $entityClass)
+                    sprintf('Unknown entity type: %s.', $entityClass),
+                    Response::HTTP_NOT_FOUND
                 )
             );
         }

@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
 {
@@ -28,9 +28,9 @@ class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::setDefaultOptions($resolver);
+        parent::configureOptions($resolver);
 
         $resolver
             ->setDefaults(
@@ -41,14 +41,13 @@ class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
                     'custom_color_control' => null // hue, brightness, saturation, or wheel. defaults wheel
                 ]
             )
-            ->setNormalizers(
-                [
-                    'colors' => function (Options $options, $colors) {
-                        return $options['color_schema'] === 'custom'
-                            ? $colors
-                            : $this->getColors($options['color_schema']);
-                    }
-                ]
+            ->setNormalizer(
+                'colors',
+                function (Options $options, $colors) {
+                    return $options['color_schema'] === 'custom'
+                        ? $colors
+                        : $this->getColors($options['color_schema']);
+                }
             );
     }
 
@@ -100,7 +99,7 @@ class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
      */
     public function getParent()
     {
-        return 'hidden';
+        return HiddenType::class;
     }
 
     /**

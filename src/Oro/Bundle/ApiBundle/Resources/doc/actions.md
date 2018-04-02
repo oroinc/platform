@@ -22,6 +22,7 @@
    - [**normalize_value** Action](#normalize_value-action)
    - [**collect_resources** Action](#collect_resources-action)
    - [**collect_subresources** Action](#collect_subresources-action)
+   - [**not_allowed** Action](#not_allowed-action)
  - [**Context** Class](#context-class)
  - [**SubresourceContext** Class](#subresourcecontext-class)
  - [Creating New Action](#creating-new-action)
@@ -60,6 +61,7 @@ The following table shows all actions provided out of the box:
 | [normalize_value](#normalize_value-action) | Converts a value to the requested data type. |
 | [collect_resources](#collect_resources-action) | Returns a list of all resources accessible via the data API. |
 | [collect_subresources](#collect_subresources-action) | Returns a list of all sub-resources accessible via the data API for a given entity type. |
+| [not_allowed](#not_allowed-action) | Builds a response for case when a request does not match any public action. E.g. when HTTP method is not supported for REST API request. |
 
 Please see [processors](./processors.md) section for more details about how to create a processor.
 
@@ -69,7 +71,7 @@ You can use the [oro:api:debug](./commands.md#oroapidebug) command to display th
 
 This action is intended to retrieve an entity by its identifier. For more details, see the [Fetching Data](http://jsonapi.org/format/#fetching) section of the JSON.API specification.
 
-The route name for REST API: `oro_rest_api_get`.
+The route name for REST API: `oro_rest_api_item`.
 
 The URL template for REST API: `/api/{entity}/{id}`.
 
@@ -88,20 +90,21 @@ This action has the following processor groups:
 | initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
-| security_check | Checking whether access to the requested resource is granted. | To add a new processor to this group, include it to the **security_check** group of actions that execute this action. For example, compare with the **security_check** group of the [create](#create-action) or [update](#update-action) actions. |
+| security_check | Checking whether access to the requested resource type is granted. | To add a new processor to this group, include it to the **security_check** group of actions that execute this action. For example, compare with the **security_check** group of the [create](#create-action) or [update](#update-action) actions. |
 | build_query | Building a query required to load the data. | |
 | load_data | Loading of the data. | |
+| data_security_check | Checking whether access to the loaded data is granted. | Use the same rules as for **security_check** group to add a new processor to this group. |
 | normalize_data | Converting the loaded data into an array. | In most cases the processors from this group are skipped because most of the entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details, see [LoadEntityByEntitySerializer](../../Processor/Shared/LoadEntityByEntitySerializer.php). |
 | finalize | Final validation of loaded data and adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `getAction` method of [RestApiController](../../Controller/RestApiController.php).
+For examples of usage, see the `handleGet` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
 
 ## get_list Action
 
 This action retrieves a list of entities. For more details, see the [Fetching Data](http://jsonapi.org/format/#fetching) section of the JSON.API specification.
 
-The route name for REST API: `oro_rest_api_cget`.
+The route name for REST API: `oro_rest_api_list`.
 
 The URL template for REST API: `/api/{entity}`.
 
@@ -120,20 +123,21 @@ This action has the following processor groups:
 | initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
-| security_check | Checking whether access to the requested resource is granted. | |
+| security_check | Checking whether access to the requested resource type is granted. | |
 | build_query | Building a query required to load the data. | |
 | load_data | Loading of the data. | |
+| data_security_check | Checking whether access to the loaded data is granted. | |
 | normalize_data | Converting the loaded data into an array. | In most cases the processors from this group are skipped because most of the entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details, see [LoadEntitiesByEntitySerializer](../../Processor/Shared/LoadEntitiesByEntitySerializer.php). |
 | finalize | Final validation of the loaded data and adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if a processor of one of the previous groups throws an exception. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `cgetAction` method of [RestApiController](../../Controller/RestApiController.php).
+For examples of usage, see the `handleGetList` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
 
 ## delete Action
 
 This action deletes an entity by its identifier. For more details, see the [Deleting Resources](http://jsonapi.org/format/#crud-deleting) section of the JSON.API specification.
 
-The route name for REST API: `oro_rest_api_delete`.
+The route name for REST API: `oro_rest_api_item`.
 
 The URL template for REST API: `/api/{entity}/{id}`.
 
@@ -152,13 +156,14 @@ This action has the following processor groups:
 | initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
-| security_check | Checking whether access to the requested resource is granted. | |
+| security_check | Checking whether access to the requested resource type is granted. | |
 | load_data | Loading an entity that should be deleted and storing it in the `result` property of the context. | |
+| data_security_check | Checking whether access to the loaded data is granted. | |
 | delete_data | Deleting the entity stored in the `result` property of the context. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `deleteAction` method of [RestApiController](../../Controller/RestApiController.php).
+For examples of usage, see the `handleDelete` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
 
 ## delete_list Action
 
@@ -170,7 +175,7 @@ By default, the maximum number of entities that can be deleted by one request is
 You can change this limit for an entity in `Resources/config/oro/api.yml`. However, please test your limit carefully because a higher limit may make a more significant impact on the server.
 An example of how to change the default limit is available at [how-to](how_to.md#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request).
 
-The route name for REST API: `oro_rest_api_cdelete`.
+The route name for REST API: `oro_rest_api_list`.
 
 The URL template for REST API: `/api/{entity}`.
 
@@ -189,20 +194,21 @@ This action has the following processor groups:
 | initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
-| security_check | Checking whether access to the requested resource is granted. | |
+| security_check | Checking whether access to the requested resource type is granted. | |
 | build_query | Building a query that will be used to load an entities list to be deleted. | |
 | load_data | Loading the list of entities to be deleted and storing it in the `result` property of the context. | |
+| data_security_check | Checking whether access to the loaded data is granted. | |
 | delete_data | Deleting the entities list stored in the `result` property of the context. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `deleteListAction` method of [RestApiController](../../Controller/RestApiController.php).
+For examples of usage, see the `handleDeleteList` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
 
 ## create Action
 
 This action creates a new entity. For more details, see the [Creating Resources](http://jsonapi.org/format/#crud-creating) section of the JSON.API specification.
 
-The route name for REST API: `oro_rest_api_post`.
+The route name for REST API: `oro_rest_api_list`.
 
 The URL template for REST API: `/api/{entity}`.
 
@@ -221,21 +227,22 @@ This action has the following processor groups:
 | initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing input data for use by processors from the next groups. | |
-| security_check | Checking whether access to the requested resource is granted. | When you add a new processor to the **security_check** group of the [get](#get-action) action, add it to this group as well. This is necessary because the **VIEW** permission is checked here: the created entity should be returned in response, and the **security_check** group of the [get](#get-action) action is disabled by the **oro_api.update.load_normalized_entity** processor. |
+| security_check | Checking whether access to the requested resource type is granted. | When you add a new processor to the **security_check** group of the [get](#get-action) action, add it to this group as well. This is necessary because the **VIEW** permission is checked here: the created entity should be returned in response, and the **security_check** group of the [get](#get-action) action is disabled by the **oro_api.update.load_normalized_entity** processor. |
 | load_data | Creating a new entity object. | |
+| data_security_check | Checking whether access to the loaded data is granted. | Use the same rules as for **security_check** group to add a new processor to this group. |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
 | save_data | Validating and persisting an entity. | |
 | normalize_data | Converting created entity into an array. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `postAction` method of [RestApiController](../../Controller/RestApiController.php).
+For examples of usage, see the `handleCreate` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
 
 ## update Action
 
 This action updates an entity. For more details, see the [Updating Resources](http://jsonapi.org/format/#crud-updating) section of JSON.API specification.
 
-The route name for REST API: `oro_rest_api_patch`.
+The route name for REST API: `oro_rest_api_item`.
 
 The URL template for REST API: `/api/{entity}/{id}`.
 
@@ -254,21 +261,22 @@ This action has the following processor groups:
 | initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing input data for use by processors from the next groups. | |
-| security_check | Checking whether access to the requested resource is granted. | When you add a new processor to the **security_check** group of the [get](#get-action) action, add it to this group as well. This is necessary because the **VIEW** permission is checked here: the updated entity should be returned in response, and the **security_check** group of the [get](#get-action) action is disabled by the **oro_api.update.load_normalized_entity** processor. | 
+| security_check | Checking whether access to the requested resource type is granted. | When you add a new processor to the **security_check** group of the [get](#get-action) action, add it to this group as well. This is necessary because the **VIEW** permission is checked here: the updated entity should be returned in response, and the **security_check** group of the [get](#get-action) action is disabled by the **oro_api.update.load_normalized_entity** processor. |
 | load_data | Loading an entity object to be updated. | |
+| data_security_check | Checking whether access to the loaded data is granted. | Use the same rules as for **security_check** group to add a new processor to this group. |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
 | save_data | Validating and persisting the entity. | |
 | normalize_data | Converting the updated entity into an array. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `patchAction` method of [RestApiController](../../Controller/RestApiController.php).
+For examples of usage, see the `handleUpdate` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
 
 ## get_subresource Action
 
 This action retrieves an entity (for "to-one" relationship) or a list of entities (for "to-many" relationship) connected to the entity by a given association. For more details, see the [Fetching Resources](http://jsonapi.org/format/#fetching-resources) section of the JSON.API specification.
 
-The route name for REST API: `oro_rest_api_get_subresource`.
+The route name for REST API: `oro_rest_api_subresource`.
 
 The URL template for REST API: `/api/{entity}/{id}/{association}`.
 
@@ -287,20 +295,21 @@ This action has the following processor groups:
 | initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing input data for use by processors from the next groups. | |
-| security_check | Checking whether access to the requested resource is granted. | |
+| security_check | Checking whether access to the requested resource type is granted. | |
 | build_query | Building a query to use to load data. | |
 | load_data | Loading the data. | |
+| data_security_check | Checking whether access to the loaded data is granted. | |
 | normalize_data | Converting loaded data into an array. | In most cases the processors from this group are skipped because most of the entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadEntityByEntitySerializer](../../Processor/Shared/LoadEntityByEntitySerializer.php) and [LoadEntitiesByEntitySerializer](../../Processor/Shared/LoadEntitiesByEntitySerializer.php). |
 | finalize | Final validation of the loaded data and adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `getAction` method of [RestApiSubresourceController](../../Controller/RestApiSubresourceController.php).
+For examples of usage, see the `handleGetSubresource` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
 
 ## get_relationship Action
 
 This action retrieves an entity identifier (for "to-one" relationship) or a list of entities' identifiers (for "to-many" relationship) connected to the entity by a given association. For more details, see the [Fetching Relationships](http://jsonapi.org/format/#fetching-relationships) section of the JSON.API specification.
 
-The route name for REST API: `oro_rest_api_get_relationship`.
+The route name for REST API: `oro_rest_api_relationship`.
 
 The URL template for REST API: `/api/{entity}/{id}/relationships/{association}`.
 
@@ -319,20 +328,21 @@ This action has the following processor groups:
 | initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing input data for use by processors from the next groups. | |
-| security_check | Checking whether access to the requested resource is granted. | |
+| security_check | Checking whether access to the requested resource type is granted. | |
 | build_query | Building a query to use to load data. | |
 | load_data | Loading the data. | |
+| data_security_check | Checking whether access to the loaded data is granted. | |
 | normalize_data | Converting loaded data into an array. | In most cases the processors from this group are skipped because most of the entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadEntityByEntitySerializer](../../Processor/Shared/LoadEntityByEntitySerializer.php) and [LoadEntitiesByEntitySerializer](../../Processor/Shared/LoadEntitiesByEntitySerializer.php). |
 | finalize | Final validation of the loaded data and adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `getAction` method of [RestApiRelationshipController](../../Controller/RestApiRelationshipController.php).
+For examples of usage, see the `handleGetRelationship` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
 
 ## update_relationship Action
 
 This action changes an entity (for "to-one" relationship) or completely replaces all entities (for "to-many" relationship) connected to a given entity by a given association. For more details, see the [Updating Relationships](http://jsonapi.org/format/#crud-updating-relationships) section of the JSON.API specification.
 
-The route name for REST API: `oro_rest_api_patch_relationship`.
+The route name for REST API: `oro_rest_api_relationship`.
 
 The URL template for REST API: `/api/{entity}/{id}/relationships/{association}`.
 
@@ -351,20 +361,21 @@ This action has the following processor groups:
 | initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
-| security_check | Checking whether access to the requested resource is granted. | |
+| security_check | Checking whether access to the requested resource type is granted. | |
 | load_data | Loading an entity object to be updated. | |
+| data_security_check | Checking whether access to the loaded data is granted. | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
 | save_data | Validating and persisting the entity. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `patchAction` method of [RestApiRelationshipController](../../Controller/RestApiRelationshipController.php).
+For examples of usage, see the `handleUpdateRelationship` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
 
 ## add_relationship Action
 
 This action adds one or several entities to a "to-many" relationship. For more details, see the [Updating Relationships](http://jsonapi.org/format/#crud-updating-relationships) section of the JSON.API specification.
 
-The route name for REST API: `oro_rest_api_post_relationship`.
+The route name for REST API: `oro_rest_api_relationship`.
 
 The URL template for REST API: `/api/{entity}/{id}/relationships/{association}`.
 
@@ -383,20 +394,21 @@ This action has the following processor groups:
 | initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for to use by processors from the next groups. | |
-| security_check | Checking whether access to the requested resource is granted. | |
+| security_check | Checking whether access to the requested resource type is granted. | |
 | load_data | Loading an entity object to be updated. | |
+| data_security_check | Checking whether access to the loaded data is granted. | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
 | save_data | Validating and persisting the entity. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `postAction` method of [RestApiRelationshipController](../../Controller/RestApiRelationshipController.php).
+For examples of usage, see the `handleAddRelationship` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
 
 ## delete_relationship Action
 
 This action removes one or several entities from a "to-many" relationship. For more details, see the [Updating Relationships](http://jsonapi.org/format/#crud-updating-relationships) section of the JSON.API specification.
 
-The route name for REST API: `oro_rest_api_delete_relationship`.
+The route name for REST API: `oro_rest_api_relationship`.
 
 The URL template for REST API: `/api/{entity}/{id}/relationships/{association}`.
 
@@ -415,14 +427,15 @@ This action has the following processor groups:
 | initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing input data for use by processors from the next groups. | |
-| security_check | Checking whether access to the requested resource is granted. | |
+| security_check | Checking whether access to the requested resource type is granted. | |
 | load_data | Loading an entity object to be updated. | |
+| data_security_check | Checking whether access to the loaded data is granted. | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
 | save_data | Validating and persisting the entity. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `deleteAction` method of [RestApiRelationshipController](../../Controller/RestApiRelationshipController.php).
+For examples of usage, see the `handleDeleteRelationship` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
 
 ## customize_loaded_data Action
 
@@ -434,7 +447,7 @@ The main processor class: [CustomizeLoadedDataProcessor](../../Processor/Customi
 
 As example of a processor used to modify the loaded data: [ComputePrimaryField](../../Processor/CustomizeLoadedData/ComputePrimaryField.php). Run `php app/console oro:api:debug customize_loaded_data` to display other processors registered in this action.
 
-##  customize_form_data Action
+## customize_form_data Action
 
 This action makes modifications of the submitted form data for the [create](#create-action) and [update](#update-action) actions.
 
@@ -570,6 +583,24 @@ $subresourcesProvider = $container->get('oro_api.subresources_provider');
 // get all sub-resources for a given entity
 $entitySubresources = $subresourcesProvider->getSubresources($entityClass, $version, $requestType);
 ```
+
+## not_allowed Action
+
+This action builds a response for case when a request does not match any public action. An example of such case can be for REST API request with not supported HTTP method.
+
+This action does not have own context class and own processor class. It can work with any context class based on [Context](#context-class) class and it can be processed by any public action processor. Which processor will be used depends on the request attributes.
+
+Run `php app/console oro:api:debug not_allowed` to list the processors.
+
+This action has the following processor groups:
+
+| Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
+| --- | --- | --- |
+| initialize | The context initialization. | |
+| build_response | Building the action response body, if the current request type requires it. | |
+| normalize_result | Building the action result. | The processors from this group are executed even if a processor of one of the previous groups throws an exception. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
+
+For examples of usage, see the `handleNotAllowedItem`, `handleNotAllowedList`, `handleNotAllowedSubresource` and `handleNotAllowedRelationship` methods of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
 
 ## Context class
 

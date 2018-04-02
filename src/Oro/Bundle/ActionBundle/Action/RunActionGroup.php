@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\ActionBundle\Action;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
-use Oro\Component\Action\Action\AbstractAction;
-use Oro\Component\Action\OptionsResolverTrait;
-use Oro\Component\ConfigExpression\ContextAccessor;
-
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
+use Oro\Component\Action\Action\AbstractAction;
+use Oro\Component\Action\OptionsResolverTrait;
+use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class RunActionGroup extends AbstractAction
 {

@@ -2,29 +2,30 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
-
-use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Validator\ConstraintValidatorFactory;
-use Symfony\Component\Validator\DefaultTranslator;
-use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
-use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
-use Symfony\Component\Validator\Validator;
-use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\Translation\IdentityTranslator;
+use Symfony\Component\Validator\ConstraintValidatorFactory;
+use Symfony\Component\Validator\Context\ExecutionContextFactory;
+use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
+use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
+use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 class FieldTypeTest extends TypeTestCase
 {
@@ -74,8 +75,6 @@ class FieldTypeTest extends TypeTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->expectedChoicesView = $this->prepareExpectedChoicesView($this->defaultFieldTypeChoices);
 
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
@@ -114,6 +113,7 @@ class FieldTypeTest extends TypeTestCase
             new ExtendDbIdentifierNameGenerator(),
             $this->fieldTypeProvider
         );
+        parent::setUp();
     }
 
     /**
@@ -157,25 +157,29 @@ class FieldTypeTest extends TypeTestCase
 
     protected function getExtensions()
     {
-        $validator = new Validator(
-            new ClassMetadataFactory(new LoaderChain([])),
-            new ConstraintValidatorFactory(),
-            new DefaultTranslator()
+        $validator = new RecursiveValidator(
+            new ExecutionContextFactory(new IdentityTranslator()),
+            new LazyLoadingMetadataFactory(new LoaderChain([])),
+            new ConstraintValidatorFactory()
         );
 
-        $select2ChoiceType = new Select2Type('choice');
+        $select2ChoiceType = new Select2Type(
+            'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+            'oro_select2_choice'
+        );
 
         return [
             new PreloadedExtension(
                 [
-                    $select2ChoiceType->getName() => $select2ChoiceType,
+                    FieldType::class => $this->type,
+                    Select2Type::class => $select2ChoiceType,
                 ],
                 [
-                    'form'   => [
+                    FormType::class => [
                         new DataBlockExtension(),
                         new FormTypeValidatorExtension($validator)
                     ],
-                    'choice' => [
+                    ChoiceType::class => [
                         new TranslatableChoiceTypeExtension()
                     ]
                 ]
@@ -203,7 +207,7 @@ class FieldTypeTest extends TypeTestCase
 
         $extendConfigProvider->addEntityConfig('Test\SourceEntity');
 
-        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\SourceEntity']);
+        $form = $this->factory->create(FieldType::class, null, ['class_name' => 'Test\SourceEntity']);
 
         $this->assertEquals(
             $this->expectedChoicesView,
@@ -218,7 +222,7 @@ class FieldTypeTest extends TypeTestCase
     {
         $this->prepareRelations();
 
-        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\SourceEntity']);
+        $form = $this->factory->create(FieldType::class, null, ['class_name' => 'Test\SourceEntity']);
 
         $this->assertEquals(
             $this->expectedChoicesView,
@@ -233,7 +237,7 @@ class FieldTypeTest extends TypeTestCase
     {
         $this->prepareRelations();
 
-        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\TargetEntity']);
+        $form = $this->factory->create(FieldType::class, null, ['class_name' => 'Test\TargetEntity']);
 
         $expectedChoices = $this->defaultFieldTypeChoices;
 
@@ -427,7 +431,7 @@ class FieldTypeTest extends TypeTestCase
     {
         $this->prepareRelationsWithReverseRelations();
 
-        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\SourceEntity']);
+        $form = $this->factory->create(FieldType::class, null, ['class_name' => 'Test\SourceEntity']);
 
         $this->assertEquals(
             $this->expectedChoicesView,
@@ -442,7 +446,7 @@ class FieldTypeTest extends TypeTestCase
     {
         $this->prepareRelationsWithReverseRelations();
 
-        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\TargetEntity']);
+        $form = $this->factory->create(FieldType::class, null, ['class_name' => 'Test\TargetEntity']);
 
         $this->assertEquals(
             $this->expectedChoicesView,
@@ -654,7 +658,7 @@ class FieldTypeTest extends TypeTestCase
     {
         $this->prepareRelationsWithReverseRelationsMarkedAsToBeDeleted();
 
-        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\SourceEntity']);
+        $form = $this->factory->create(FieldType::class, null, ['class_name' => 'Test\SourceEntity']);
 
         $this->assertEquals(
             $this->expectedChoicesView,
@@ -669,7 +673,7 @@ class FieldTypeTest extends TypeTestCase
     {
         $this->prepareRelationsWithReverseRelationsMarkedAsToBeDeleted();
 
-        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\TargetEntity']);
+        $form = $this->factory->create(FieldType::class, null, ['class_name' => 'Test\TargetEntity']);
 
         $expectedChoices = $this->defaultFieldTypeChoices;
 

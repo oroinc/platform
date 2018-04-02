@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
  * This event could be used in order to customize configuration of sync jobs in third party bundles.

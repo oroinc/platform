@@ -1,4 +1,4 @@
-## Resolving of ORM query hints ##
+## Resolving of ORM query hints
 
 The [Query Hint Resolver](./../../../../Component/DoctrineUtils/ORM/QueryHintResolver.php) service has been introduced to make the building of a configuration based queries (like grids, API, etc) easier and more flexible.
 

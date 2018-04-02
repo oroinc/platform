@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\EmailBundle\EventListener\EmailAssociationsDemoDataFixturesListener;
 use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
+use Oro\Bundle\EmailBundle\EventListener\EmailAssociationsDemoDataFixturesListener;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 

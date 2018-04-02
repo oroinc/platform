@@ -4,10 +4,10 @@ parameters:
 
 services:
     oro_importexport.file.file_system_operator:
-        class: %oro_importexport.file.file_system_operator.class%
+        class: '%oro_importexport.file.file_system_operator.class%'
         arguments:
-            - %kernel.cache_dir%
+            - '%kernel.cache_dir%'
             - "import_export"
 
     oro_importexport.file.mime_type_guesser:
-        class: %oro_importexport.file.mime_type_guesser.class%
+        class: '%oro_importexport.file.mime_type_guesser.class%'

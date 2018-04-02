@@ -42,7 +42,7 @@ class OroChoiceType extends AbstractType
      */
     public function getParent()
     {
-        return 'genemu_jqueryselect2_choice';
+        return Select2ChoiceType::class;
     }
 
     /**

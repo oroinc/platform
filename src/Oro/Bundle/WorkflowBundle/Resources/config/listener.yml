@@ -129,8 +129,7 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\RolePageListener'
         arguments:
             - '@translator'
-        calls:
-            - [setRequest, ['@?request=']]
+            - '@request_stack'
         tags:
             - { name: kernel.event_listener, event: entity_form.render.before, method: onUpdatePageRender }
             - { name: kernel.event_listener, event: entity_view.render.before, method: onViewPageRender }

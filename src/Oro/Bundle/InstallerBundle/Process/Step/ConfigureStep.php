@@ -26,7 +26,7 @@ class ConfigureStep extends AbstractStep
 
         $form = $this->createConfigurationForm();
 
-        $form->handleRequest($this->getRequest());
+        $form->handleRequest($this->get('request_stack')->getCurrentRequest());
 
         if ($form->isValid()) {
             $data = $form->getData();

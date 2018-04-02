@@ -17,9 +17,19 @@ define(function(require) {
             'remove collection': 'collectionRemove'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailAttachmentCollectionView() {
+            EmailAttachmentCollectionView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             BaseCollectionView.__super__.initialize.apply(this, arguments);
-            this.itemView = this.itemView.extend({
+            this.itemView = this.itemView.extend({// eslint-disable-line oro/named-constructor
                 inputName: options.inputName,
                 fileIcons: options.fileIcons,
                 collectionView: this

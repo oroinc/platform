@@ -2,12 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Symfony\Component\Routing\Route;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
-
-use Oro\Component\PhpUtils\ReflectionUtil;
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadata;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -18,27 +14,36 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
+use Oro\Component\PhpUtils\ReflectionUtil;
+use Symfony\Component\Routing\Route;
 
+/**
+ * Populates ApiDoc annotation based on the confoguration of Data API resource.
+ */
 class RestDocHandler implements HandlerInterface
 {
-    const ID_PLACEHOLDER = '{id}';
+    private const ID_PLACEHOLDER = '{id}';
+
+    /** @var string The group of routes that should be processed by this handler */
+    private $routeGroup;
 
     /** @var RestDocViewDetector */
-    protected $docViewDetector;
+    private $docViewDetector;
 
     /** @var ActionProcessorBagInterface */
-    protected $processorBag;
+    private $processorBag;
 
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /** @var RestDocIdentifierHandler */
-    protected $identifierHandler;
+    private $identifierHandler;
 
     /** @var RestDocFiltersHandler */
-    protected $filtersHandler;
+    private $filtersHandler;
 
     /**
+     * @param string                      $routeGroup
      * @param RestDocViewDetector         $docViewDetector
      * @param ActionProcessorBagInterface $processorBag
      * @param ValueNormalizer             $valueNormalizer
@@ -46,12 +51,14 @@ class RestDocHandler implements HandlerInterface
      * @param RestDocFiltersHandler       $filtersHandler
      */
     public function __construct(
+        string $routeGroup,
         RestDocViewDetector $docViewDetector,
         ActionProcessorBagInterface $processorBag,
         ValueNormalizer $valueNormalizer,
         RestDocIdentifierHandler $identifierHandler,
         RestDocFiltersHandler $filtersHandler
     ) {
+        $this->routeGroup = $routeGroup;
         $this->docViewDetector = $docViewDetector;
         $this->processorBag = $processorBag;
         $this->valueNormalizer = $valueNormalizer;
@@ -64,16 +71,16 @@ class RestDocHandler implements HandlerInterface
      */
     public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method)
     {
-        if ($route->getOption('group') !== RestRouteOptionsResolver::ROUTE_GROUP
+        if ($route->getOption(RestRouteOptionsResolver::GROUP_OPTION) !== $this->routeGroup
             || $this->docViewDetector->getRequestType()->isEmpty()
         ) {
             return;
         }
-        $action = $route->getDefault('_action');
+        $action = $route->getDefault(RestRouteOptionsResolver::ACTION_ATTRIBUTE);
         if (!$action) {
             return;
         }
-        $entityType = $this->extractEntityTypeFromRoute($route);
+        $entityType = $route->getDefault(RestRouteOptionsResolver::ENTITY_ATTRIBUTE);
         if (!$entityType) {
             return;
         }
@@ -81,8 +88,8 @@ class RestDocHandler implements HandlerInterface
         $entityClass = $this->getEntityClass($entityType);
         $associationName = $route->getDefault(RestRouteOptionsResolver::ASSOCIATION_ATTRIBUTE);
         $context = $this->getContext($action, $entityClass, $associationName);
-        $config = $context->getConfig();
-        $metadata = $context->getMetadata();
+        $config = $this->getConfig($context);
+        $metadata = $this->getMetadata($context);
 
         $annotation->setSection($entityType);
         $this->setDescription($annotation, $config);
@@ -101,16 +108,6 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
-     * @param Route $route
-     *
-     * @return string|null
-     */
-    protected function extractEntityTypeFromRoute(Route $route)
-    {
-        return $route->getDefault(RestRouteOptionsResolver::ENTITY_ATTRIBUTE);
-    }
-
-    /**
      * Checks if a route has the given placeholder in a path.
      *
      * @param Route  $route
@@ -118,7 +115,7 @@ class RestDocHandler implements HandlerInterface
      *
      * @return bool
      */
-    protected function hasAttribute(Route $route, $placeholder)
+    private function hasAttribute(Route $route, $placeholder)
     {
         return false !== strpos($route->getPath(), $placeholder);
     }
@@ -128,7 +125,7 @@ class RestDocHandler implements HandlerInterface
      *
      * @return string
      */
-    protected function getEntityClass($entityType)
+    private function getEntityClass($entityType)
     {
         return ValueNormalizerUtil::convertToEntityClass(
             $this->valueNormalizer,
@@ -144,20 +141,21 @@ class RestDocHandler implements HandlerInterface
      *
      * @return Context|SubresourceContext
      */
-    protected function getContext($action, $entityClass, $associationName = null)
+    private function getContext($action, $entityClass, $associationName = null)
     {
         $processor = $this->processorBag->getProcessor($action);
         /** @var Context $context */
         $context = $processor->createContext();
-        $context->addConfigExtra(new DescriptionsConfigExtra($action));
+        $context->addConfigExtra(new DescriptionsConfigExtra());
         $context->getRequestType()->set($this->docViewDetector->getRequestType());
+        $context->setVersion($this->docViewDetector->getVersion());
         $context->setLastGroup('initialize');
         if ($associationName) {
             /** @var SubresourceContext $context */
             $context->setParentClassName($entityClass);
             $context->setAssociationName($associationName);
             $parentConfigExtras = $context->getParentConfigExtras();
-            $parentConfigExtras[] = new DescriptionsConfigExtra($action);
+            $parentConfigExtras[] = new DescriptionsConfigExtra();
             $context->setParentConfigExtras($parentConfigExtras);
         } else {
             $context->setClassName($entityClass);
@@ -169,10 +167,56 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
+     * @param Context $context
+     *
+     * @return EntityDefinitionConfig
+     */
+    private function getConfig(Context $context): EntityDefinitionConfig
+    {
+        $config = $context->getConfig();
+        if (null === $config) {
+            $message = sprintf(
+                'The configuration for "%s" cannot be loaded. Action: %s',
+                $context->getClassName(),
+                $context->getAction()
+            );
+            if ($context instanceof SubresourceContext) {
+                $message .= sprintf(' Association: %s.', $context->getAssociationName());
+            }
+            throw new \LogicException($message);
+        }
+
+        return $config;
+    }
+
+    /**
+     * @param Context $context
+     *
+     * @return EntityMetadata
+     */
+    private function getMetadata(Context $context): EntityMetadata
+    {
+        $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            $message = sprintf(
+                'The metadata for "%s" cannot be loaded. Action: %s',
+                $context->getClassName(),
+                $context->getAction()
+            );
+            if ($context instanceof SubresourceContext) {
+                $message .= sprintf(' Association: %s.', $context->getAssociationName());
+            }
+            throw new \LogicException($message);
+        }
+
+        return $metadata;
+    }
+
+    /**
      * @param ApiDoc                 $annotation
      * @param EntityDefinitionConfig $config
      */
-    protected function setDescription(ApiDoc $annotation, EntityDefinitionConfig $config)
+    private function setDescription(ApiDoc $annotation, EntityDefinitionConfig $config)
     {
         $description = $config->getDescription();
         if ($description) {
@@ -184,7 +228,7 @@ class RestDocHandler implements HandlerInterface
      * @param ApiDoc                 $annotation
      * @param EntityDefinitionConfig $config
      */
-    protected function setDocumentation(ApiDoc $annotation, EntityDefinitionConfig $config)
+    private function setDocumentation(ApiDoc $annotation, EntityDefinitionConfig $config)
     {
         $documentation = $config->getDocumentation();
         if ($documentation) {
@@ -198,7 +242,7 @@ class RestDocHandler implements HandlerInterface
      * @param EntityDefinitionConfig $config
      * @param EntityMetadata         $metadata
      */
-    protected function setInputMetadata(
+    private function setInputMetadata(
         ApiDoc $annotation,
         $action,
         EntityDefinitionConfig $config,
@@ -217,7 +261,7 @@ class RestDocHandler implements HandlerInterface
      * @param EntityMetadata         $metadata
      * @param string|null            $associationName
      */
-    protected function setOutputMetadata(
+    private function setOutputMetadata(
         ApiDoc $annotation,
         $entityClass,
         $action,
@@ -231,8 +275,8 @@ class RestDocHandler implements HandlerInterface
             $substituteAction = $this->getOutputAction($action);
             if ($action !== $substituteAction) {
                 $substituteContext = $this->getContext($substituteAction, $entityClass, $associationName);
-                $config = $substituteContext->getConfig();
-                $metadata = $substituteContext->getMetadata();
+                $config = $this->getConfig($substituteContext);
+                $metadata = $this->getMetadata($substituteContext);
             }
 
             $this->setDirectionValue($annotation, 'output', $this->getDirectionValue($action, $config, $metadata));
@@ -246,7 +290,7 @@ class RestDocHandler implements HandlerInterface
      *
      * @return array
      */
-    protected function getDirectionValue($action, EntityDefinitionConfig $config, EntityMetadata $metadata)
+    private function getDirectionValue($action, EntityDefinitionConfig $config, EntityMetadata $metadata)
     {
         return [
             'class'   => null,
@@ -266,7 +310,7 @@ class RestDocHandler implements HandlerInterface
      * @param string $direction
      * @param array  $value
      */
-    protected function setDirectionValue(ApiDoc $annotation, $direction, array $value)
+    private function setDirectionValue(ApiDoc $annotation, $direction, array $value)
     {
         // unfortunately there is no other way to update "input" and "output" parameters
         // except to use the reflection
@@ -279,7 +323,7 @@ class RestDocHandler implements HandlerInterface
      * @param ApiDoc                 $annotation
      * @param EntityDefinitionConfig $config
      */
-    public function setStatusCodes(ApiDoc $annotation, EntityDefinitionConfig $config)
+    private function setStatusCodes(ApiDoc $annotation, EntityDefinitionConfig $config)
     {
         $statusCodes = $config->getStatusCodes();
         if (null !== $statusCodes) {
@@ -293,7 +337,6 @@ class RestDocHandler implements HandlerInterface
         }
     }
 
-
     /**
      * Returns true in case if the given action receives resource data.
      *
@@ -301,7 +344,7 @@ class RestDocHandler implements HandlerInterface
      *
      * @return bool
      */
-    protected function isActionWithInput($action)
+    private function isActionWithInput($action)
     {
         return in_array(
             $action,
@@ -317,7 +360,7 @@ class RestDocHandler implements HandlerInterface
      *
      * @return bool
      */
-    protected function isActionWithOutput($action)
+    private function isActionWithOutput($action)
     {
         return !in_array(
             $action,
@@ -333,7 +376,7 @@ class RestDocHandler implements HandlerInterface
      *
      * @return string
      */
-    protected function getOutputAction($action)
+    private function getOutputAction($action)
     {
         if (in_array($action, [ApiActions::CREATE, ApiActions::UPDATE], true)) {
             return ApiActions::GET;

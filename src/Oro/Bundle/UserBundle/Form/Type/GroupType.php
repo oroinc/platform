@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class GroupType extends AbstractType
 {
@@ -21,7 +21,7 @@ class GroupType extends AbstractType
         $builder
             ->add(
                 'name',
-                'text',
+                TextType::class,
                 array(
                     'label' => 'oro.user.group.name.label',
                     'required' => true,
@@ -45,7 +45,7 @@ class GroupType extends AbstractType
             )*/
             ->add(
                 'appendUsers',
-                'oro_entity_identifier',
+                EntityIdentifierType::class,
                 array(
                     'class'    => 'OroUserBundle:User',
                     'required' => false,
@@ -55,7 +55,7 @@ class GroupType extends AbstractType
             )
             ->add(
                 'removeUsers',
-                'oro_entity_identifier',
+                EntityIdentifierType::class,
                 array(
                     'class'    => 'OroUserBundle:User',
                     'required' => false,
@@ -68,12 +68,12 @@ class GroupType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(
                 'data_class' => 'Oro\Bundle\UserBundle\Entity\Group',
-                'intention'  => 'group',
+                'csrf_token_id' => 'group',
             )
         );
     }

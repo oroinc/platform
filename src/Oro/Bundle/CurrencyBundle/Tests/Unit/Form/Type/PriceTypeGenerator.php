@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Form\Type;
 
-use Oro\DBAL\Types\MoneyType;
 use Oro\Bundle\CurrencyBundle\Form\Type\PriceType;
 use Oro\Bundle\CurrencyBundle\Rounding\RoundingServiceInterface;
+use Oro\DBAL\Types\MoneyType;
 
 class PriceTypeGenerator
 {

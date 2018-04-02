@@ -3,8 +3,8 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Placeholder;
 
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Oro\Bundle\UserBundle\Placeholder\PlaceholderFilter;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 
 class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,9 +3,6 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
@@ -13,6 +10,8 @@ use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Oro\Bundle\FormBundle\Tests\Unit\MockHelper;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
 {
@@ -58,7 +57,6 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
         $this->type = $this->getMockBuilder('Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType')
             ->setMethods(['createDefaultTransformer'])
             ->setConstructorArgs(
@@ -69,11 +67,23 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
                 ]
             )
             ->getMock();
+        parent::setUp();
     }
 
+    /**
+     * @return array
+     */
     protected function getExtensions()
     {
-        return array_merge(parent::getExtensions(), [new TestFormExtension()]);
+        return array_merge(parent::getExtensions(), [
+            new PreloadedExtension(
+                [
+                    OroJquerySelect2HiddenType::class => $this->type
+                ],
+                []
+            ),
+            new TestFormExtension()
+        ]);
     }
 
     /**
@@ -106,7 +116,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
             MockHelper::addMockExpectedCalls($mock, $calls, $this);
         }
 
-        $form = $this->factory->create($this->type, null, $options);
+        $form = $this->factory->create(OroJquerySelect2HiddenType::class, null, $options);
 
         $form->submit($bindData);
 
@@ -252,7 +262,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
 
         $this->expectException($expectedException);
         $this->expectExceptionMessage($expectedExceptionMessage);
-        $this->factory->create($this->type, null, $options);
+        $this->factory->create(OroJquerySelect2HiddenType::class, null, $options);
     }
 
     /**
@@ -345,7 +355,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
         $this->type->expects($this->once())->method('createDefaultTransformer')
             ->will($this->returnValue($this->getMockEntityToIdTransformer()));
 
-        $form = $this->factory->create($this->type, null, $options);
+        $form = $this->factory->create(OroJquerySelect2HiddenType::class, null, $options);
 
         $expectedOptions = [
             'error_bubbling' => false

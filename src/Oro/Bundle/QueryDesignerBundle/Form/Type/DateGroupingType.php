@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Form\Type;
 
+use Oro\Bundle\EntityBundle\Form\Type\EntityFieldSelectType;
+use Oro\Bundle\QueryDesignerBundle\Model\DateGrouping;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\QueryDesignerBundle\Model\DateGrouping;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateGroupingType extends AbstractType
 {
@@ -53,14 +53,14 @@ class DateGroupingType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
                 'entity' => null,
                 'data_class' => DateGrouping::class,
-                'intention' => 'query_designer_date_grouping',
-                'column_choice_type' => 'oro_entity_field_select',
+                'csrf_token_id' => 'query_designer_date_grouping',
+                'column_choice_type' => EntityFieldSelectType::class,
             ]
         );
     }

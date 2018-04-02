@@ -12,7 +12,14 @@ define([
      * @class   oro.datagrid.action.AjaxAction
      * @extends oro.datagrid.action.ModelAction
      */
-    AjaxAction = ModelAction.extend();
+    AjaxAction = ModelAction.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function AjaxAction() {
+            AjaxAction.__super__.constructor.apply(this, arguments);
+        }
+    });
 
     return AjaxAction;
 });

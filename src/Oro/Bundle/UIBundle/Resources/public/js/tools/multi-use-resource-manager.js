@@ -58,7 +58,7 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function(options) {
+        constructor: function MultiUseResourceManager(options) {
             this.holders = [];
             MultiUseResourceManager.__super__.constructor.call(this, options);
         },

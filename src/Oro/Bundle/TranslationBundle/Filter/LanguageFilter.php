@@ -4,7 +4,6 @@ namespace Oro\Bundle\TranslationBundle\Filter;
 
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Form\Type\Filter\LanguageFilterType;
 

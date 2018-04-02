@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroIconType;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroIconTypeTest extends FormIntegrationTestCase
@@ -19,7 +20,7 @@ class OroIconTypeTest extends FormIntegrationTestCase
 
     public function testParameters()
     {
-        $this->assertEquals('genemu_jqueryselect2_choice', $this->type->getParent());
+        $this->assertEquals(Select2ChoiceType::class, $this->type->getParent());
         $this->assertEquals('oro_icon_select', $this->type->getName());
     }
 }

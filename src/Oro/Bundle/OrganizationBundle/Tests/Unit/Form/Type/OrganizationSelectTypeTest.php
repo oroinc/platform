@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
+use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OrganizationSelectTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,19 +21,19 @@ class OrganizationSelectTypeTest extends \PHPUnit_Framework_TestCase
         $this->type = new OrganizationSelectType();
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        /** @var OptionsResolverInterface $resolver */
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        /** @var OptionsResolver $resolver */
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
     }
 
     public function testGetParent()
     {
-        $this->assertEquals('oro_jqueryselect2_hidden', $this->type->getParent());
+        $this->assertEquals(OroJquerySelect2HiddenType::class, $this->type->getParent());
     }
 
     public function testGetName()

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ConfigBundle\Provider;
 
-use Symfony\Component\Form\FormInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
-use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\DataTransformerInterface;
+use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
+use Symfony\Component\Form\FormInterface;
 
 interface ProviderInterface
 {

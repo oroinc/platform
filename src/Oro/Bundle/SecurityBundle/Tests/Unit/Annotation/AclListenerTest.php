@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Annotation;
 
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-
 use Oro\Bundle\SecurityBundle\Annotation\AclListener;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider;
 use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 class AclListenerTest extends \PHPUnit_Framework_TestCase
 {

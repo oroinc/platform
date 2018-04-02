@@ -2,19 +2,18 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToStringTransformer;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\FormBundle\Form\EventListener\FixArrayToStringListener;
 use Oro\Bundle\FormBundle\Form\Exception\FormException;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EntityIdentifierType extends AbstractType
 {
@@ -70,7 +69,7 @@ class EntityIdentifierType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(
@@ -81,11 +80,7 @@ class EntityIdentifierType extends AbstractType
                 'values_delimiter' => ','
             )
         )
-        ->setAllowedValues(
-            array(
-                'multiple' => array(true, false),
-            )
-        );
+        ->setAllowedValues('multiple', [true, false]);
         $resolver->setRequired(array('class'));
 
         $registry = $this->registry;
@@ -132,12 +127,8 @@ class EntityIdentifierType extends AbstractType
             return $queryBuilder;
         };
 
-        $resolver->setNormalizers(
-            array(
-                'em' => $emNormalizer,
-                'queryBuilder' => $queryBuilderNormalizer,
-            )
-        );
+        $resolver->setNormalizer('em', $emNormalizer)
+            ->setNormalizer('queryBuilder', $queryBuilderNormalizer);
     }
 
     /**
@@ -161,6 +152,6 @@ class EntityIdentifierType extends AbstractType
      */
     public function getParent()
     {
-        return 'hidden';
+        return HiddenType::class;
     }
 }

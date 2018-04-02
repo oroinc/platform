@@ -2,18 +2,17 @@
 
 namespace Oro\Bundle\FilterBundle\Grid\Extension;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider;
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\Translation\TranslatorInterface;
 
 abstract class AbstractFilterExtension extends AbstractExtension
 {
@@ -41,12 +40,6 @@ abstract class AbstractFilterExtension extends AbstractExtension
         $this->configurationProvider = $configurationProvider;
         $this->translator = $translator;
     }
-
-    /**
-     * @param DatagridConfiguration $config
-     * @return bool
-     */
-    abstract public function isApplicable(DatagridConfiguration $config);
 
     /**
      * {@inheritDoc}

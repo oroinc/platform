@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AttachmentBundle\Form\Type\FileConfigType;
+use Symfony\Component\Form\FormEvents;
 
 class FileConfigTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,15 +28,15 @@ class FileConfigTypeTest extends \PHPUnit_Framework_TestCase
         $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
         $builder->expects($this->once())
             ->method('addEventListener')
-            ->with('form.post_bind');
+            ->with(FormEvents::POST_SUBMIT);
 
         $options = [];
         $this->type->buildForm($builder, $options);
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(
@@ -45,6 +46,6 @@ class FileConfigTypeTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
     }
 }

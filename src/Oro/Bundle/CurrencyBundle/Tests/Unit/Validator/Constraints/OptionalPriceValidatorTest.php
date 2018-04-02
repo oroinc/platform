@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ExecutionContextInterface;
-
-use Oro\Bundle\CurrencyBundle\Validator\Constraints;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
+use Oro\Bundle\CurrencyBundle\Validator\Constraints;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 class OptionalPriceValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,7 +30,7 @@ class OptionalPriceValidatorTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->context      = $this->createMock('Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context      = $this->createMock(ExecutionContextInterface::class);
         $this->constraint   = new Constraints\OptionalPrice();
         $this->validator    = new Constraints\OptionalPriceValidator();
         $this->validator->initialize($this->context);
@@ -48,11 +48,17 @@ class OptionalPriceValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidate($isValid, $inputData)
     {
-        $this->context
-            ->expects($isValid ? $this->never() : $this->once())
-            ->method('addViolationAt')
-            ->with('currency', $this->constraint->message)
-        ;
+        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
+        $this->context->expects($isValid ? $this->never() : $this->once())
+            ->method('buildViolation')
+            ->with($this->constraint->message)
+            ->willReturn($builder);
+        $builder->expects($isValid ? $this->never() : $this->once())
+            ->method('atPath')
+            ->with('currency')
+            ->willReturnSelf();
+        $builder->expects($isValid ? $this->never() : $this->once())
+            ->method('addViolation');
 
         $this->validator->validate($inputData, $this->constraint);
     }

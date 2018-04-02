@@ -3,11 +3,9 @@
 namespace Oro\Bundle\SoapBundle\Routing;
 
 use Doctrine\Common\Inflector\Inflector;
-
-use Symfony\Component\Routing\Route;
-
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+use Symfony\Component\Routing\Route;
 
 /**
  * As FOSRestBundle v1.7.1 generates a plural path for OPTIONS routes,

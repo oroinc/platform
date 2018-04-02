@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Storage;
 
-use Symfony\Component\HttpFoundation\Request;
-
 use Doctrine\Common\Util\ClassUtils;
-
-use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class EntityPaginationStorage
 {
@@ -17,9 +16,9 @@ class EntityPaginationStorage
     const INFO_MESSAGE = 'info_message';
 
     /**
-     * @var Request
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * @var DoctrineHelper
@@ -29,19 +28,16 @@ class EntityPaginationStorage
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param EntityPaginationManager $paginationManager
+     * @param RequestStack $requestStack
      */
-    public function __construct(DoctrineHelper $doctrineHelper, EntityPaginationManager $paginationManager)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        EntityPaginationManager $paginationManager,
+        RequestStack $requestStack
+    ) {
         $this->doctrineHelper  = $doctrineHelper;
         $this->paginationManager = $paginationManager;
-    }
-
-    /**
-     * @param Request $request
-     */
-    public function setRequest(Request $request = null)
-    {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -159,8 +155,9 @@ class EntityPaginationStorage
      */
     protected function getStorage()
     {
-        if ($this->request) {
-            return $this->request->getSession()->get(self::STORAGE_NAME, []);
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request && $request->getSession()) {
+            return $request->getSession()->get(self::STORAGE_NAME, []);
         } else {
             return null;
         }
@@ -171,8 +168,9 @@ class EntityPaginationStorage
      */
     protected function setStorage(array $storage)
     {
-        if ($this->request) {
-            $this->request->getSession()->set(self::STORAGE_NAME, $storage);
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request && $request->getSession()) {
+            $request->getSession()->set(self::STORAGE_NAME, $storage);
         }
     }
 

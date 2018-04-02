@@ -1,4 +1,4 @@
-## Doctrine field types ##
+## Doctrine field types
 
 Some entities have fields which data is money or percents.
 

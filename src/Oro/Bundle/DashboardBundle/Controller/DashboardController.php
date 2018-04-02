@@ -3,21 +3,10 @@
 namespace Oro\Bundle\DashboardBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-
-use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
+use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
+use Oro\Bundle\DashboardBundle\Form\Type\DashboardType;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\StateManager;
@@ -27,6 +16,15 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Route("/dashboard")
@@ -57,6 +55,7 @@ class DashboardController extends Controller
     }
 
     /**
+     * @param Request $request
      * @param Dashboard $dashboard
      *
      * @Route(
@@ -67,7 +66,7 @@ class DashboardController extends Controller
      * )
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction(Dashboard $dashboard = null)
+    public function viewAction(Request $request, Dashboard $dashboard = null)
     {
         $currentDashboard = $this->findAllowedDashboard($dashboard);
 
@@ -79,7 +78,7 @@ class DashboardController extends Controller
             return $this->quickLaunchpadAction();
         }
 
-        $changeActive = $this->get('request')->get('change_dashboard', false);
+        $changeActive = $request->get('change_dashboard', false);
         if ($changeActive && $dashboard) {
             $this->getDashboardManager()->setUserActiveDashboard(
                 $currentDashboard,
@@ -142,15 +141,15 @@ class DashboardController extends Controller
      * )
      *
      * @Template()
-     *
+     * @param Request $request
      * @param Dashboard $dashboard
      * @return array
      */
-    public function updateAction(Dashboard $dashboard)
+    public function updateAction(Request $request, Dashboard $dashboard)
     {
         $dashboardModel = $this->getDashboardManager()->getDashboardModel($dashboard);
 
-        return $this->update($dashboardModel);
+        return $this->update($request, $dashboardModel);
     }
 
     /**
@@ -162,39 +161,39 @@ class DashboardController extends Controller
      *      permission="CREATE"
      * )
      * @Template("OroDashboardBundle:Dashboard:update.html.twig")
+     * @param Request $request
+     * @return array|RedirectResponse
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
         $dashboardModel = $this->getDashboardManager()->createDashboardModel();
 
-        return $this->update($dashboardModel);
+        return $this->update($request, $dashboardModel);
     }
 
     /**
+     * @param Request $request
      * @param DashboardModel $dashboardModel
      * @return array
      */
-    protected function update(DashboardModel $dashboardModel)
+    protected function update(Request $request, DashboardModel $dashboardModel)
     {
         $form = $this->createForm(
-            $this->container->get('oro_dashboard.form.type.edit'),
+            DashboardType::class,
             $dashboardModel->getEntity(),
             [
                 'create_new' => !$dashboardModel->getId()
             ]
         );
 
-        $request = $this->getRequest();
-        if ($request->isMethod('POST')) {
-            if ($form->submit($request)->isValid()) {
-                $this->getDashboardManager()->save($dashboardModel, true);
-                $this->get('session')->getFlashBag()->add(
-                    'success',
-                    $this->get('translator')->trans('oro.dashboard.saved_message')
-                );
+        if ($request->isMethod('POST') && $form->submit($request)->isValid()) {
+            $this->getDashboardManager()->save($dashboardModel, true);
+            $this->get('session')->getFlashBag()->add(
+                'success',
+                $this->get('translator')->trans('oro.dashboard.saved_message')
+            );
 
-                return $this->get('oro_ui.router')->redirect($dashboardModel->getEntity());
-            }
+            return $this->get('oro_ui.router')->redirect($dashboardModel->getEntity());
         }
 
         return ['entity' => $dashboardModel, 'form' => $form->createView()];
@@ -256,20 +255,20 @@ class DashboardController extends Controller
      *      name="oro_dashboard_itemized_data_widget",
      *      requirements={"widget"="[\w-]+", "bundle"="\w+", "name"="[\w-]+"}
      * )
-     *
+     * @param Request $request
      * @param string $widget
      * @param string $bundle
      * @param string $name
      * @return Response
      */
-    public function itemizedDataWidgetAction($widget, $bundle, $name)
+    public function itemizedDataWidgetAction(Request $request, $widget, $bundle, $name)
     {
         /** @var WidgetConfigs $manager */
         $manager = $this->get('oro_dashboard.widget_configs');
 
         $params = array_merge(
             [
-                'items' => $manager->getWidgetItemsData($widget, $this->getRequest()->query->get('_widgetId', null))
+                'items' => $manager->getWidgetItemsData($widget, $request->query->get('_widgetId', null))
             ],
             $manager->getWidgetAttributesForTwig($widget)
         );

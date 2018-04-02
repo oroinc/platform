@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ConfigCheckboxTest extends FormIntegrationTestCase
 {
@@ -27,12 +27,12 @@ class ConfigCheckboxTest extends FormIntegrationTestCase
 
     public function testGetName()
     {
-        $this->assertEquals(ConfigCheckbox::NAME, $this->formType->getName());
+        $this->assertEquals('oro_config_checkbox', $this->formType->getName());
     }
 
     public function testGetParent()
     {
-        $this->assertEquals('checkbox', $this->formType->getParent());
+        $this->assertEquals(CheckboxType::class, $this->formType->getParent());
     }
 
     /**
@@ -42,7 +42,7 @@ class ConfigCheckboxTest extends FormIntegrationTestCase
      */
     public function testBuildForm($source, $expected)
     {
-        $form = $this->factory->create($this->formType);
+        $form = $this->factory->create(ConfigCheckbox::class);
         $form->setData($source);
         $this->assertEquals($expected, $form->getData());
     }

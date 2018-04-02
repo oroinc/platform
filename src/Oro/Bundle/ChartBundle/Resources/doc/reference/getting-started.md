@@ -6,7 +6,7 @@
 - [Configuration](./chart-configuration.md)
 - [Basic usage](./usage.md)
 
-## What is chart bundle ##
+## What is chart bundle
 Chart bundle provide functionality for display different types of chart.
 It is solution that allows user to view data in useful chart format.
 Bundle support such chart types as:
@@ -15,7 +15,7 @@ Bundle support such chart types as:
 - pie chart
 - flow chart
 
-## Main classes ##
+## Main classes
 
 **Oro\Bundle\ChartBundle\Model\Data\DataInterface**
 - Interface that can be passed to chart builder as source data.
@@ -29,7 +29,7 @@ Bundle support such chart types as:
 **Oro\Bundle\ChartBundle\Model\ConfigProvider**
 - Provide access to oro_chart configuration.
 
-## How it works ##
+## How it works
 
 Developer use chart view builder to create instance of chart view that can be used to render chart in template.
 [See more](./usage.md)

@@ -3,13 +3,13 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
 use Doctrine\ORM\UnitOfWork;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\LockObject;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ReflectionUtil;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -54,9 +54,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
             ->with('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
             ->will($this->returnValue($this->repo));
 
-        $emLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emLink = $this->createMock(ServiceLink::class);
         $emLink->expects($this->any())
             ->method('getService')
             ->will($this->returnValue($this->em));

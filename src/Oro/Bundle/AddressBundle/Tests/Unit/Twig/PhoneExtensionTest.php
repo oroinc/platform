@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\AddressBundle\Twig\PhoneExtension;
 use Oro\Bundle\AddressBundle\Provider\PhoneProvider;
+use Oro\Bundle\AddressBundle\Twig\PhoneExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class PhoneExtensionTest extends \PHPUnit_Framework_TestCase

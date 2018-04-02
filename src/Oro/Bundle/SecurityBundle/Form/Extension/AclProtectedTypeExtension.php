@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\Form\Extension;
 
+use Oro\Bundle\SecurityBundle\Form\ChoiceList\AclProtectedQueryBuilderLoader;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\SecurityBundle\Form\ChoiceList\AclProtectedQueryBuilderLoader;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AclProtectedTypeExtension extends AbstractTypeExtension
 {
@@ -27,13 +27,13 @@ class AclProtectedTypeExtension extends AbstractTypeExtension
      */
     public function getExtendedType()
     {
-        return 'entity';
+        return EntityType::class;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $aclHelper = $this->aclHelper;
         $loader = function (Options $options) use ($aclHelper) {

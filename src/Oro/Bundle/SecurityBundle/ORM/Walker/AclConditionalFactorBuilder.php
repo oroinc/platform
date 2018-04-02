@@ -9,11 +9,9 @@ use Doctrine\ORM\Query\AST\ConditionalPrimary;
 use Doctrine\ORM\Query\AST\InExpression;
 use Doctrine\ORM\Query\AST\Literal;
 use Doctrine\ORM\Query\AST\PathExpression;
-
-use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * Class to build ACL conditions for AclWalker. Point to extend conditions.

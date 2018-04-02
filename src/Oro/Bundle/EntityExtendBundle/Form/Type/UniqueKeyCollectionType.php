@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeys;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
+use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeys;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UniqueKeyCollectionType extends AbstractType
 {
@@ -51,10 +51,13 @@ class UniqueKeyCollectionType extends AbstractType
 
         $builder->add(
             'keys',
-            'collection',
+            CollectionType::class,
             array(
                 'required'       => true,
-                'type'           => new UniqueKeyType($fields),
+                'entry_type'           => UniqueKeyType::class,
+                'entry_options'        => [
+                    'key_choices' => $fields
+                ],
                 'allow_add'      => true,
                 'allow_delete'   => true,
                 'prototype'      => true,
@@ -68,11 +71,11 @@ class UniqueKeyCollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
             ->setRequired(['className'])
-            ->setAllowedTypes(['className' => 'string']);
+            ->setAllowedTypes('className', 'string');
     }
 
     /**

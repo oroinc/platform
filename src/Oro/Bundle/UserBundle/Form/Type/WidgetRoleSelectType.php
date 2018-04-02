@@ -2,16 +2,20 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
+use Oro\Bundle\DashboardBundle\Form\Type\WidgetEntityJquerySelect2HiddenType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WidgetRoleSelectType extends AbstractType
 {
     const NAME = 'oro_type_widget_role_select';
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::setDefaultOptions($resolver);
+        parent::configureOptions($resolver);
 
         $resolver->setDefaults(
             [
@@ -31,7 +35,7 @@ class WidgetRoleSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_widget_entity_jqueryselect2_hidden';
+        return WidgetEntityJquerySelect2HiddenType::class;
     }
 
     /**

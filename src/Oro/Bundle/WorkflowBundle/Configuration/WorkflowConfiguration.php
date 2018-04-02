@@ -3,22 +3,19 @@
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Cron\CronExpression;
-
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
+use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
+use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
-
-use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
-use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
-
-use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
-use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
-use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
 class WorkflowConfiguration extends AbstractConfiguration implements ConfigurationInterface
 {

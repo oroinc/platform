@@ -6,8 +6,8 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
-use Oro\Bundle\EntityExtendBundle\EventListener\EntityConfigListener;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\EventListener\EntityConfigListener;
 
 class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
 {
@@ -74,6 +74,8 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
 
         $listener = new EntityConfigListener();
         $listener->preFlush($event);
+
+        $this->configManager->calculateConfigChangeSet($entityConfig);
 
         $this->assertEquals(
             ['state' => [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]],

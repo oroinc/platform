@@ -102,7 +102,7 @@ And the described operation will be performed for each import directive.
 
 The search of workflow configuration by default will be performed across all registered bundles. 
 
-######Resource option with workflow import:
+###### Resource option with workflow import:
  In case you need to load your part of configuration directly from file, you may use `resource` option for load.
 This approach might be helpful in several situations:
 

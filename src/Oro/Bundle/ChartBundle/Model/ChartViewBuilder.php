@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\ChartBundle\Model;
 
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-
 use Oro\Bundle\ChartBundle\Exception\BadMethodCallException;
 use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
-
-use Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory;
-use Oro\Bundle\ChartBundle\Model\Data\MappedData;
 use Oro\Bundle\ChartBundle\Model\Data\ArrayData;
 use Oro\Bundle\ChartBundle\Model\Data\DataGridData;
 use Oro\Bundle\ChartBundle\Model\Data\DataInterface;
+use Oro\Bundle\ChartBundle\Model\Data\MappedData;
+use Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 
 class ChartViewBuilder
 {

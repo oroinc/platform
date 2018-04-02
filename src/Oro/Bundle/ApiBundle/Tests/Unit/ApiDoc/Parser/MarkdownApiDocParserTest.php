@@ -2,33 +2,49 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
 
-use Symfony\Component\HttpKernel\Config\FileLocator;
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
+use Symfony\Component\HttpKernel\Config\FileLocator;
+use Symfony\Component\Yaml\Yaml;
 
 class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @return MarkdownApiDocParser
      */
-    protected function loadDocument()
+    private function loadDocument()
     {
-        $inputPath = __DIR__ . '/Fixtures/apidoc.md';
+        $fixturesDir = __DIR__ . '/Fixtures';
 
-        $fileLocator = $this->getMockBuilder(FileLocator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $fileLocator->expects($this->once())
+        $fileLocator = $this->createMock(FileLocator::class);
+        $fileLocator->expects(self::any())
             ->method('locate')
-            ->with('@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures/apidoc.md')
-            ->willReturn($inputPath);
+            ->willReturnCallback(function ($resource) use ($fixturesDir) {
+                return str_replace(
+                    '@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures',
+                    $fixturesDir,
+                    $resource
+                );
+            });
 
         $apiDocParser = new MarkdownApiDocParser($fileLocator);
-        $apiDocParser->parseDocumentationResource('@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures/apidoc.md');
+        self::assertTrue(
+            $apiDocParser->registerDocumentationResource('@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures/apidoc.md')
+        );
 
         return $apiDocParser;
+    }
+
+    public function testRegisterDocumentationResourceForUnsupportedFile()
+    {
+        $fileLocator = $this->createMock(FileLocator::class);
+        $fileLocator->expects(self::never())
+            ->method('locate');
+
+        $apiDocParser = new MarkdownApiDocParser($fileLocator);
+        self::assertFalse(
+            $apiDocParser->registerDocumentationResource('@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures/apidoc.doc')
+        );
     }
 
     public function testParse()
@@ -37,11 +53,27 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
 
         $expected = Yaml::parse(file_get_contents(__DIR__ . '/Fixtures/apidoc.yml'));
 
-        $this->assertAttributeEquals(
-            $expected,
-            'loadedData',
-            $apiDocParser
-        );
+        self::assertAttributeEquals($expected, 'loadedData', $apiDocParser);
+    }
+
+    public function testInheritDoc()
+    {
+        $apiDocParser = $this->loadDocument();
+        $apiDocParser->registerDocumentationResource('@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures/inheritdoc.md');
+
+        $expected = Yaml::parse(file_get_contents(__DIR__ . '/Fixtures/inheritdoc.yml'));
+
+        self::assertAttributeEquals($expected, 'loadedData', $apiDocParser);
+    }
+
+    public function testReplaceDescriptions()
+    {
+        $apiDocParser = $this->loadDocument();
+        $apiDocParser->registerDocumentationResource('@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures/replace.md');
+
+        $expected = Yaml::parse(file_get_contents(__DIR__ . '/Fixtures/replace.yml'));
+
+        self::assertAttributeEquals($expected, 'loadedData', $apiDocParser);
     }
 
     /**
@@ -51,7 +83,7 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
     {
         $apiDocParser = $this->loadDocument();
 
-        $this->assertSame(
+        self::assertSame(
             $expected,
             $apiDocParser->getActionDocumentation($className, $actionName)
         );
@@ -84,7 +116,7 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
                 null,
                 'Test\UnknownClass',
                 'get'
-            ],
+            ]
         ];
     }
 
@@ -95,7 +127,7 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
     {
         $apiDocParser = $this->loadDocument();
 
-        $this->assertSame(
+        self::assertSame(
             $expected,
             $apiDocParser->getFieldDocumentation($className, $fieldName, $actionName)
         );
@@ -167,7 +199,7 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
                 'Test\UnknownClass',
                 'name',
                 'get'
-            ],
+            ]
         ];
     }
 
@@ -178,7 +210,7 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
     {
         $apiDocParser = $this->loadDocument();
 
-        $this->assertSame(
+        self::assertSame(
             $expected,
             $apiDocParser->getFilterDocumentation($className, $filterName)
         );
@@ -211,7 +243,7 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
                 null,
                 'Test\UnknownClass',
                 'name'
-            ],
+            ]
         ];
     }
 
@@ -222,7 +254,7 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
     {
         $apiDocParser = $this->loadDocument();
 
-        $this->assertSame(
+        self::assertSame(
             $expected,
             $apiDocParser->getSubresourceDocumentation($className, $subresourceName, $actionName)
         );
@@ -260,7 +292,7 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
                 'Test\UnknownClass',
                 'contacts',
                 'get_subresource'
-            ],
+            ]
         ];
     }
 }

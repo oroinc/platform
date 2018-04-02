@@ -3,11 +3,9 @@
 namespace Oro\Bundle\DashboardBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
-
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-
 use Oro\Component\PhpUtils\ArrayUtil;
 
 class DashboardModel implements EntityModelInterface

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Event;
 
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
-
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormInterface;
 

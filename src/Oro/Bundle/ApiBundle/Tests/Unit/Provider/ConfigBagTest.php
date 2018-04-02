@@ -4,12 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
 use Oro\Bundle\ApiBundle\Request\Version;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ConfigBagTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ConfigBag */
-    protected $configBag;
+    private $configBag;
 
     protected function setUp()
     {
@@ -18,21 +17,21 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
             $config[$section] = [
                 /* @todo: API version is not supported for now
                 'Test\Class1' => [
-                    '0' => ['fields' => ['class1_v0' => []]],
+                    '0' => ['fields' => ['class1_v0' => []]]
                 ],
                 'Test\Class2' => [
                     '0'   => ['fields' => ['class2_v0' => []]],
                     '1.0' => ['fields' => ['class2_v1.0' => []]],
                     '1.5' => ['fields' => ['class2_v1.5' => []]],
-                    '2.0' => ['fields' => ['class2_v2.0' => []]],
+                    '2.0' => ['fields' => ['class2_v2.0' => []]]
                 ],
                 */
                 'Test\Class1' => [
-                    'fields' => ['class1_v0' => []],
+                    'fields' => ['class1_v0' => []]
                 ],
                 'Test\Class2' => [
-                    'fields' => ['class2_v2.0' => []],
-                ],
+                    'fields' => ['class2_v2.0' => []]
+                ]
             ];
         }
 
@@ -40,34 +39,28 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getConfigsProvider
+     * @dataProvider getClassNamesProvider
      */
-    public function testGetConfigs($version, $expectedConfig)
+    public function testGetClassNames($version, $expectedEntityClasses)
     {
-        $this->assertEquals(
-            $expectedConfig,
-            $this->configBag->getConfigs($version)
+        self::assertEquals(
+            $expectedEntityClasses,
+            $this->configBag->getClassNames($version)
         );
     }
 
-    public function getConfigsProvider()
+    public function getClassNamesProvider()
     {
         return [
             /* @todo: API version is not supported for now. Add data to test versioning here */
             [
                 '1.0',
-                [
-                    'Test\Class1' => ['fields' => ['class1_v0' => []]],
-                    'Test\Class2' => ['fields' => ['class2_v2.0' => []]],
-                ]
+                ['Test\Class1', 'Test\Class2']
             ],
             [
                 Version::LATEST,
-                [
-                    'Test\Class1' => ['fields' => ['class1_v0' => []]],
-                    'Test\Class2' => ['fields' => ['class2_v2.0' => []]],
-                ]
-            ],
+                ['Test\Class1', 'Test\Class2']
+            ]
         ];
     }
 
@@ -76,7 +69,7 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
      */
     public function testNoConfig($className, $version)
     {
-        $this->assertNull(
+        self::assertNull(
             $this->configBag->getConfig($className, $version)
         );
     }
@@ -86,7 +79,7 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
      */
     public function testNoRelationConfig($className, $version)
     {
-        $this->assertNull(
+        self::assertNull(
             $this->configBag->getRelationConfig($className, $version)
         );
     }
@@ -103,7 +96,7 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetConfig($className, $version, $expectedConfig)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expectedConfig,
             $this->configBag->getConfig($className, $version)
         );
@@ -114,7 +107,7 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetRelationConfig($className, $version, $expectedConfig)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expectedConfig,
             $this->configBag->getRelationConfig($className, $version)
         );
@@ -138,7 +131,7 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
             ['Test\Class2', Version::LATEST, ['fields' => ['class2_v2.0' => []]]],
             */
             ['Test\Class1', '1.0', ['fields' => ['class1_v0' => []]]],
-            ['Test\Class2', Version::LATEST, ['fields' => ['class2_v2.0' => []]]],
+            ['Test\Class2', Version::LATEST, ['fields' => ['class2_v2.0' => []]]]
         ];
     }
 }

@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
+use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
 class FallbackPropertyType extends AbstractType
 {
@@ -49,7 +49,7 @@ class FallbackPropertyType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**
@@ -60,7 +60,7 @@ class FallbackPropertyType extends AbstractType
         $resolver->setDefaults(
             [
                 'required'           => false,
-                'empty_value'        => false,
+                'placeholder'        => false,
                 'enabled_fallbacks'  => [],
                 'existing_fallbacks' => [
                     FallbackType::SYSTEM        => 'oro.locale.fallback.type.default',

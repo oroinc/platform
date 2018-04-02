@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\EventListener\MultipleEntitySubscriber;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class MultipleEntityType extends AbstractType
 {
@@ -39,7 +38,7 @@ class MultipleEntityType extends AbstractType
     {
         $builder->add(
             'added',
-            'oro_entity_identifier',
+            EntityIdentifierType::class,
             [
                 'class'    => $options['class'],
                 'multiple' => true,
@@ -48,7 +47,7 @@ class MultipleEntityType extends AbstractType
         );
         $builder->add(
             'removed',
-            'oro_entity_identifier',
+            EntityIdentifierType::class,
             [
                 'class'    => $options['class'],
                 'multiple' => true,
@@ -62,7 +61,7 @@ class MultipleEntityType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['class']);
         $resolver->setDefaults(

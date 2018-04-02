@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
 
 class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
 {
@@ -20,8 +20,6 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
@@ -77,6 +75,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
         $this->formType->expects($this->any())
             ->method('createDefaultTransformer')
             ->willReturn($entityToIdTransformer);
+        parent::setUp();
     }
 
     /**
@@ -129,6 +128,12 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             ->will($this->returnValue('value'));
 
         return [
+            new PreloadedExtension(
+                [
+                    OroEntitySelectOrCreateInlineType::class => $this->formType
+                ],
+                []
+            ),
             new EntitySelectOrCreateInlineFormExtension(
                 $entityManager,
                 $searchRegistry,
@@ -185,7 +190,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
                 ->method('isGranted');
         }
 
-        $form = $this->factory->create($this->formType, null, $inputOptions);
+        $form = $this->factory->create(OroEntitySelectOrCreateInlineType::class, null, $inputOptions);
         foreach ($expectedOptions as $name => $expectedValue) {
             $this->assertTrue($form->getConfig()->hasOption($name), sprintf('Expected option %s not found', $name));
             $this->assertEquals(

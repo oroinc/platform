@@ -3,11 +3,10 @@
 namespace Oro\Bundle\ApiBundle\Form\Type;
 
 use Oro\Bundle\ApiBundle\Form\EventListener\CollectionEntryFactory;
+use Oro\Bundle\ApiBundle\Form\EventListener\CollectionListener;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\ApiBundle\Form\EventListener\CollectionListener;
 
 class CollectionType extends AbstractType
 {

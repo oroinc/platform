@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Tools;
 
+use Oro\Bundle\AddressBundle\Provider\PhoneProvider;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\SomeEntity;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestCustomEntity;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestPhoneHolder;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestUser;
-use Oro\Bundle\AddressBundle\Provider\PhoneProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;

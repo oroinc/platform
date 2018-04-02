@@ -14,9 +14,9 @@ services:
         class: '%form.extension.class%'
         arguments:
             - '@service_container'
-            - [] # All services with tag "oro.api.form.type" are inserted here by ConfigurationCompilerPass
-            - [] # All services with tag "oro.api.form.type_extension" are inserted here by ConfigurationCompilerPass
-            - [] # All services with tag "oro.api.form.type_guesser" are inserted here by ConfigurationCompilerPass
+            - [] # All services with tag "oro.api.form.type" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
+            - [] # All services with tag "oro.api.form.type_extension" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
+            - [] # All services with tag "oro.api.form.type_guesser" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
 
     oro_api.form.extension.empty_data:
         class: Oro\Bundle\ApiBundle\Form\Extension\EmptyDataExtension
@@ -42,7 +42,7 @@ services:
     oro_api.form.guesser.metadata:
         class: Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser
         arguments:
-            - [] # Data type mappings are inserted here by ConfigurationCompilerPass
+            - [] # Data type mappings are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
             - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.form.type_guesser, priority: 10 }

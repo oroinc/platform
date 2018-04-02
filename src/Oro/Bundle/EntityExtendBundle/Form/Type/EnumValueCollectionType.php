@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EnumValueCollectionType extends AbstractType
 {
@@ -30,36 +30,47 @@ class EnumValueCollectionType extends AbstractType
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
                 'handle_primary' => false,
-                'type'           => 'oro_entity_extend_enum_value'
+                'type'           => EnumValueType::class
             ]
         );
 
-        $resolver->setNormalizers(
-            [
-                'disabled'          => function (Options $options, $value) {
-                    return $this->isDisabled($options) ? true : $value;
-                },
-                'options'           => function (Options $options, $value) {
-                    return array_replace(
-                        ['allow_multiple_selection' => ($this->isMultipleSelectEnable($options['config_id']))],
-                        (array) $value
-                    );
-                },
-                'allow_add'         => function (Options $options, $value) {
-                    return $options['disabled'] || $this->isDisabled($options, 'add') ? false : $value;
-                },
-                'allow_delete'      => function (Options $options, $value) {
-                    return $options['disabled'] || $this->isDisabled($options, 'delete') ? false : $value;
-                },
-                'validation_groups' => function (Options $options, $value) {
-                    return $options['disabled'] ? false : $value;
-                },
-            ]
+        $resolver->setNormalizer(
+            'disabled',
+            function (Options $options, $value) {
+                return $this->isDisabled($options) ? true : $value;
+            }
+        )
+        ->setNormalizer(
+            'options',
+            function (Options $options, $value) {
+                return array_replace(
+                    ['allow_multiple_selection' => ($this->isMultipleSelectEnable($options['config_id']))],
+                    (array) $value
+                );
+            }
+        )
+        ->setNormalizer(
+            'allow_add',
+            function (Options $options, $value) {
+                return $options['disabled'] || $this->isDisabled($options, 'add') ? false : $value;
+            }
+        )
+        ->setNormalizer(
+            'allow_delete',
+            function (Options $options, $value) {
+                return $options['disabled'] || $this->isDisabled($options, 'delete') ? false : $value;
+            }
+        )
+        ->setNormalizer(
+            'validation_groups',
+            function (Options $options, $value) {
+                return $options['disabled'] ? false : $value;
+            }
         );
     }
 
@@ -127,7 +138,7 @@ class EnumValueCollectionType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_collection';
+        return CollectionType::class;
     }
 
     /**

@@ -3,13 +3,11 @@
 namespace Oro\Bundle\ActivityBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ActivityBundle\Migrations\Schema\v1_0\UpdateActivityButtonConfigQuery;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class OroActivityBundleInstaller implements Installation, ContainerAwareInterface
 {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 use Doctrine\Common\Collections\Criteria;
-
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**

@@ -82,9 +82,10 @@ interface ActivityListProviderInterface
      *      'itemDelete => 'item_delete_route'
      * ]
      *
+     * @param object $activityEntity
      * @return array
      */
-    public function getRoutes();
+    public function getRoutes($activityEntity);
 
     /**
      * returns a class name of entity for which we monitor changes

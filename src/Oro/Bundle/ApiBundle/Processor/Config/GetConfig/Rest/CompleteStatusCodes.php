@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest;
 
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Adds possible status codes for the following actions executed in scope of REST API:

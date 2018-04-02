@@ -47,6 +47,6 @@ class AddExcludedActionsForNotAccessibleResourcesTest extends \PHPUnit_Framework
         $this->processor->process($context);
 
         self::assertSame([], $resource1->getExcludedActions());
-        self::assertSame($allActions, $resource2->getExcludedActions());
+        self::assertSame(['action2'], $resource2->getExcludedActions());
     }
 }

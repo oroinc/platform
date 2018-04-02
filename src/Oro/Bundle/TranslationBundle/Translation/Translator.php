@@ -4,14 +4,12 @@ namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\ClearableCache;
-
+use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\MessageSelector;
-
-use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

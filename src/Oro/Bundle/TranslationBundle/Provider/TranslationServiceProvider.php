@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
+use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-
+use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
-
-use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
 
 class TranslationServiceProvider
 {

@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 
 class WidgetSortByType extends AbstractType
 {
@@ -27,20 +28,20 @@ class WidgetSortByType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('property', 'choice', [
+            ->add('property', ChoiceType::class, [
                 'label' => false,
                 'choices' => $this->createPropertyChoices($options['class_name']),
                 'required' => false,
                 'placeholder' => 'oro.dashboard.widget.sort_by.property.placeholder',
             ])
-            ->add('order', 'choice', [
+            ->add('order', ChoiceType::class, [
                 'label' => false,
                 'choices' => [
                     'ASC' => 'oro.dashboard.widget.sort_by.order.asc.label',
                     'DESC' => 'oro.dashboard.widget.sort_by.order.desc.label',
                 ],
             ])
-            ->add('className', 'hidden', ['data' => $options['class_name']]);
+            ->add('className', HiddenType::class, ['data' => $options['class_name']]);
     }
 
     /**

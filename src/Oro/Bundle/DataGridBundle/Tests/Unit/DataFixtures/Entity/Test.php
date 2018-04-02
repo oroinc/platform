@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DatagridBundle\Tests\Unit\DataFixtures\Entity;
+namespace Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 

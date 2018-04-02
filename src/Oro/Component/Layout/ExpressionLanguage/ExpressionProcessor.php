@@ -2,16 +2,15 @@
 
 namespace Oro\Component\Layout\ExpressionLanguage;
 
+use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\DataAccessorInterface;
+use Oro\Component\Layout\Exception\CircularReferenceException;
+use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry;
+use Oro\Component\Layout\OptionValueBag;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Node\NameNode;
 use Symfony\Component\ExpressionLanguage\Node\Node;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
-
-use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\DataAccessorInterface;
-use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry;
-use Oro\Component\Layout\Exception\CircularReferenceException;
-use Oro\Component\Layout\OptionValueBag;
 
 class ExpressionProcessor
 {

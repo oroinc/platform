@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\Metadata;
 
-use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\DefaultLabelListener;
+use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 
 class DefaultLabelListenerTest extends \PHPUnit_Framework_TestCase
 {

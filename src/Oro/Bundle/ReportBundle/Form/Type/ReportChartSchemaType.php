@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\ReportBundle\Form\Type;
 
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ReportChartSchemaType extends AbstractType
 {
@@ -55,7 +55,7 @@ class ReportChartSchemaType extends AbstractType
 
             $builder->add(
                 $schemaOptions['name'],
-                $schemaOptions['default_type'] !== 'boolean' ? 'text' : 'checkbox',
+                $schemaOptions['default_type'] !== 'boolean' ? TextType::class : CheckboxType::class,
                 $fieldOptions
             );
         }
@@ -72,10 +72,10 @@ class ReportChartSchemaType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['data_schema']);
-        $resolver->setAllowedTypes(['data_schema' => 'array']);
+        $resolver->setAllowedTypes('data_schema', 'array');
     }
 
     /**

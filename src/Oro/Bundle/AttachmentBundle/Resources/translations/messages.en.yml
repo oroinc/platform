@@ -49,7 +49,7 @@ oro:
                 label:               Mime type
                 description:         A media type and subtype of the file. Allowed MIME types are "image/*", "application/pdf", "application/zip", "application/x-gzip", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation".
             content:
-                lebel:               Content
+                label:               Content
                 description:         The content of the file as a string.
 
         config:

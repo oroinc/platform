@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\ActivityListBundle\Controller\Api\Rest;
 
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Util\Codes;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("activitylist")
@@ -23,9 +21,6 @@ class ActivityListController extends RestController
 {
     /**
      * Get filtered activity lists for given entity
-     *
-     * @param string  $entityClass Entity class name
-     * @param integer $entityId    Entity id
      *
      * @QueryParam(
      *     name="pageFilter", nullable=true,
@@ -43,13 +38,16 @@ class ActivityListController extends RestController
      *          200="Returned when successful",
      *      }
      * )
+     * @param Request $request
+     * @param string  $entityClass Entity class name
+     * @param integer $entityId    Entity id
      * @return JsonResponse
      */
-    public function cgetAction($entityClass, $entityId)
+    public function cgetAction(Request $request, $entityClass, $entityId)
     {
         $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
-        $filter      = $this->getRequest()->get('filter');
-        $pageFilter  = $this->getRequest()->get('pageFilter');
+        $filter      = $request->get('filter');
+        $pageFilter  = $request->get('pageFilter');
 
         $results = $this->getManager()->getListData(
             $entityClass,

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\ConstantsPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ConstantsPassTest extends \PHPUnit_Framework_TestCase
 {

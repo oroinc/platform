@@ -5,22 +5,21 @@ namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\ImportExportBundle\Context\BatchContextInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+// TODO: change to Symfony\Component\Validator\Validator\ValidatorInterface in scope of BAP-15236
 use Symfony\Component\Validator\ValidatorInterface;
-
-use Oro\Bundle\EntityBundle\Helper\FieldHelper;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\ImportExportBundle\Context\BatchContextInterface;
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\ImportExportBundle\Exception\LogicException;
-use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class ImportStrategyHelper
 {
@@ -142,14 +141,9 @@ class ImportStrategyHelper
             throw new InvalidArgumentException('Basic and imported entities must be instances of the same class');
         }
 
-        $entityMetadata = $this->getEntityManager($basicEntityClass)->getClassMetadata($basicEntityClass);
-        $importedEntityProperties = array_diff(
-            array_merge(
-                $entityMetadata->getFieldNames(),
-                $entityMetadata->getAssociationNames()
-            ),
-            $excludedProperties
-        );
+        $entityProperties = $this->getEntityPropertiesByClassName($basicEntityClass);
+        $importedEntityProperties = array_diff($entityProperties, $excludedProperties);
+
         foreach ($importedEntityProperties as $propertyName) {
             // we should not overwrite deleted fields
             if ($this->isDeletedField($basicEntityClass, $propertyName)) {
@@ -171,6 +165,7 @@ class ImportStrategyHelper
      */
     public function validateEntity($entity, $groups = null)
     {
+        // TODO: change to $violations = $this->validator->validate($entity, null, $groups); in scope of BAP-15236
         $violations = $this->validator->validate($entity, $groups);
         if (count($violations)) {
             $errors = [];
@@ -247,5 +242,36 @@ class ImportStrategyHelper
         }
 
         return false;
+    }
+
+    /**
+     * @param string $entityClassName
+     *
+     * @return array
+     */
+    private function getEntityPropertiesByClassName($entityClassName)
+    {
+        /**
+         * In case if we work with configured entities then we should use fieldHelper
+         * to getting fields because it won't returns any hidden fields (f.e snapshot fields)
+         * that mustn't be changed by import/export
+         */
+        if ($this->extendConfigProvider->hasConfig($entityClassName)) {
+            $properties = $this->fieldHelper->getFields(
+                $entityClassName,
+                true
+            );
+
+            return array_column($properties, 'name');
+        }
+
+        $entityMetadata = $this
+            ->getEntityManager($entityClassName)
+            ->getClassMetadata($entityClassName);
+
+        return array_merge(
+            $entityMetadata->getFieldNames(),
+            $entityMetadata->getAssociationNames()
+        );
     }
 }

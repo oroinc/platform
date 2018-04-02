@@ -3,8 +3,8 @@
 namespace Oro\Bundle\InstallerBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\ConstraintValidator;
 
 class ExtensionLoadedValidator extends ConstraintValidator
 {

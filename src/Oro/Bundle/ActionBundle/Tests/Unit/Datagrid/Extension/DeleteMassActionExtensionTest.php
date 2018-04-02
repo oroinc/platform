@@ -10,6 +10,7 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -44,6 +45,7 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
             $this->registry,
             $this->contextHelper
         );
+        $this->extension->setParameters(new ParameterBag());
     }
 
     protected function tearDown()

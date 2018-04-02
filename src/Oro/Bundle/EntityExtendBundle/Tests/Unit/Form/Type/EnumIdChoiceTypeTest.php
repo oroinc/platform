@@ -5,12 +5,11 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
+use Oro\Bundle\EntityExtendBundle\Form\Type\EnumChoiceType;
+use Oro\Bundle\EntityExtendBundle\Form\Type\EnumIdChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\EntityExtendBundle\Form\Type\EnumIdChoiceType;
 
 class EnumIdChoiceTypeTest extends TypeTestCase
 {
@@ -37,7 +36,7 @@ class EnumIdChoiceTypeTest extends TypeTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('oro_enum_choice', $this->type->getParent());
+        $this->assertEquals(EnumChoiceType::class, $this->type->getParent());
     }
 
     public function testGetName()

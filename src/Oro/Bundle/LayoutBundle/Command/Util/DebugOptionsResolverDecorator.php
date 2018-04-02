@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Command\Util;
 
-use Symfony\Component\OptionsResolver\OptionsResolver as BaseOptionResolver;
-
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\PhpUtils\ReflectionUtil;
+use Symfony\Component\OptionsResolver\OptionsResolver as BaseOptionResolver;
 
 class DebugOptionsResolverDecorator
 {

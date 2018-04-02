@@ -48,6 +48,13 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function ContentSidebarView() {
+            ContentSidebarView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * {@inheritDoc}
          */
         initialize: function(options) {
@@ -55,8 +62,10 @@ define(function(require) {
                 this.initResizableSidebar();
             }
             ContentSidebarView.__super__.initialize.call(this, arguments);
-        },
 
+            mediator.on('swipe-action-left', this.minimize, this);
+            mediator.on('swipe-action-right', this.maximize, this);
+        },
 
         /**
          * {@inheritDoc}
@@ -74,7 +83,11 @@ define(function(require) {
         initResizableSidebar: function() {
             this.pluginManager = new PluginManager(this);
             this.pluginManager.create(ResizableAreaPlugin, {
-                $resizableEl: this.sidebar
+                $resizableEl: this.sidebar,
+                resizableOptions: {
+                    resize: _.bind(this._resize, this),
+                    create: _.bind(this._create, this)
+                }
             });
         },
 
@@ -90,6 +103,18 @@ define(function(require) {
             this._toggle('on');
         },
 
+        _create: function() {
+            this.$(this.content).css({
+                width: 'calc(100% - ' + this.$(this.sidebar).outerWidth() + 'px)'
+            });
+        },
+
+        _resize: function(event, ui) {
+            this.$(this.content).css({
+                width: 'calc(100% - ' + ui.size.width + 'px)'
+            });
+        },
+
         /**
          * @private
          * @param {String} state
@@ -100,9 +125,19 @@ define(function(require) {
             if (this.resizableSidebar) {
                 if (!show) {
                     this.pluginManager.getInstance(ResizableAreaPlugin).removePreviousState();
+                    this.$(this.content).css({
+                        width: ''
+                    });
                 }
                 this.pluginManager[show ? 'enable' : 'disable'](ResizableAreaPlugin);
             }
+
+            if (!this.resizableSidebar && !show) {
+                this.$(this.sidebar).css({
+                    width: ''
+                });
+            }
+
             this.$(this.sidebar).toggleClass('content-sidebar-minimized', !show);
             mediator.execute('changeUrlParam', 'sidebar', show ? null : state);
         },

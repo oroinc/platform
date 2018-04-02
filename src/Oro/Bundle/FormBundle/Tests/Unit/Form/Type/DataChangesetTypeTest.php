@@ -2,34 +2,23 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\FormBundle\Form\Type\DataChangesetType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class DataChangesetTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var DataChangesetType
-     */
-    protected $type;
-
-    protected function setUp()
+    public function testGetParent()
     {
-        parent::setUp();
-
-        $this->type = new DataChangesetType();
+        $type = new DataChangesetType();
+        $this->assertEquals(HiddenType::class, $type->getParent());
     }
 
     public function testGetName()
     {
-        $this->assertEquals(DataChangesetType::NAME, $this->type->getName());
-    }
-
-    public function testGetParent()
-    {
-        $this->assertEquals('hidden', $this->type->getParent());
+        $type = new DataChangesetType();
+        $this->assertEquals(DataChangesetType::NAME, $type->getName());
     }
 
     /**
@@ -42,7 +31,7 @@ class DataChangesetTypeTest extends FormIntegrationTestCase
      */
     public function testSubmit($defaultData, $viewData, $submittedData, ArrayCollection $expected)
     {
-        $form = $this->factory->create($this->type, $defaultData);
+        $form = $this->factory->create(DataChangesetType::class, $defaultData);
 
         $this->assertFalse($form->getConfig()->getOption('mapped'));
 

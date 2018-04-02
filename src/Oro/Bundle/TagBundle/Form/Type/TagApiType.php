@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\TagBundle\Form\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TagApiType extends TagType
 {
@@ -21,12 +20,12 @@ class TagApiType extends TagType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(
                 'data_class'      => 'Oro\Bundle\TagBundle\Entity\Tag',
-                'intention'       => 'tag',
+                'csrf_token_id'   => 'tag',
                 'csrf_protection' => false
             )
         );

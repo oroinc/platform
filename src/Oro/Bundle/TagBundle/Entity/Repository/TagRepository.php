@@ -4,14 +4,14 @@ namespace Oro\Bundle\TagBundle\Entity\Repository;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class TagRepository extends EntityRepository
 {
@@ -46,7 +46,7 @@ class TagRepository extends EntityRepository
                 Join::WITH,
                 't.taxonomy  = tx.id'
             )
-            ->orderBy('t.name', $direction)
+            ->orderBy('t.name', QueryBuilderUtil::getSortOrder($direction))
             ->setParameter('entityIds', $entityIds)
             ->setParameter('entityClassName', $entityClassName)
             ->setParameter('owner', $owner);

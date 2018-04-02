@@ -29,7 +29,7 @@ class GetAndDeleteTest extends RestPlainApiTestCase
         // test "get list" request
         $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType, 'limit' => 1])
+            $this->getUrl('oro_rest_api_list', ['entity' => $entityType, 'limit' => 1])
         );
         self::assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
 
@@ -64,7 +64,7 @@ class GetAndDeleteTest extends RestPlainApiTestCase
 
         $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType, 'limit' => 1])
+            $this->getUrl('oro_rest_api_list', ['entity' => $entityType, 'limit' => 1])
         );
         if ($response->getStatusCode() === 200) {
             $id = [];
@@ -78,7 +78,7 @@ class GetAndDeleteTest extends RestPlainApiTestCase
                 $response = $this->request(
                     'DELETE',
                     $this->getUrl(
-                        'oro_rest_api_cdelete',
+                        'oro_rest_api_list',
                         ['entity' => $entityType, 'id' => implode(',', $id)]
                     )
                 );
@@ -97,13 +97,13 @@ class GetAndDeleteTest extends RestPlainApiTestCase
     {
         $response = $this->request(
             'DELETE',
-            $this->getUrl('oro_rest_api_delete', ['entity' => $entityType, 'id' => $id])
+            $this->getUrl('oro_rest_api_item', ['entity' => $entityType, 'id' => $id])
         );
         if ($response->getStatusCode() == 204 && !in_array('get', $excludedActions, true)) {
             // check if entity was really deleted
             $response = $this->request(
                 'GET',
-                $this->getUrl('oro_rest_api_get', ['entity' => $entityType, 'id' => $id])
+                $this->getUrl('oro_rest_api_item', ['entity' => $entityType, 'id' => $id])
             );
             self::assertApiResponseStatusCodeEquals($response, 404, $entityType, 'get');
         }
@@ -118,7 +118,7 @@ class GetAndDeleteTest extends RestPlainApiTestCase
     {
         $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_get', ['entity' => $entityType, 'id' => $id])
+            $this->getUrl('oro_rest_api_item', ['entity' => $entityType, 'id' => $id])
         );
         self::assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get');
     }

@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\ReminderBundle\Form\Type;
 
+use Oro\Bundle\ReminderBundle\Form\Type\ReminderInterval\UnitType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ReminderIntervalType extends AbstractType
 {
@@ -15,7 +17,7 @@ class ReminderIntervalType extends AbstractType
     {
         $builder->add(
             'number',
-            'integer',
+            IntegerType::class,
             array(
                 'required' => true,
                 'attr'     => array('class' => 'number'),
@@ -24,7 +26,7 @@ class ReminderIntervalType extends AbstractType
 
         $builder->add(
             'unit',
-            'oro_reminder_interval_unit',
+            UnitType::class,
             array(
                 'required' => true,
                 'attr'     => array('class' => 'unit'),
@@ -35,7 +37,7 @@ class ReminderIntervalType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(

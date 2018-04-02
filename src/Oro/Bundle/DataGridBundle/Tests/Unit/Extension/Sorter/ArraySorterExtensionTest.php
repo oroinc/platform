@@ -3,11 +3,11 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Sorter;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\ArrayDatasource\ArrayDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\ArraySorterExtension;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration;
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 
 class ArraySorterExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -48,6 +48,7 @@ class ArraySorterExtensionTest extends \PHPUnit_Framework_TestCase
         $this->arrayDatasource = new ArrayDatasource();
         $this->arrayDatasource->setArraySource($this->arraySource);
         $this->arraySorterExtension = new ArraySorterExtension();
+        $this->arraySorterExtension->setParameters(new ParameterBag());
     }
 
     public function testIsApplicableWithArrayDatasource()

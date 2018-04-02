@@ -27,7 +27,8 @@ class DateGroupingActionRemoverExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return (
-            $config->offsetExists('source')
+            parent::isApplicable($config)
+            && $config->offsetExists('source')
             && isset($config->offsetGet('source')['query']['from'][0]['table'])
             && $this->calendarEntityClass === $config->offsetGet('source')['query']['from'][0]['table']
         );

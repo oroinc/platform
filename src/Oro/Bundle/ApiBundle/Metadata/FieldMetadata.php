@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Metadata;
 
 use Oro\Component\ChainProcessor\ToArrayInterface;
 
+/**
+ * The metadata for an entity field.
+ */
 class FieldMetadata extends PropertyMetadata implements ToArrayInterface
 {
     /** @var bool */

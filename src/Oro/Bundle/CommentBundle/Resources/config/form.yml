@@ -4,7 +4,7 @@ parameters:
 
 services:
     oro_comment.form.type.comment_api:
-        class: %oro_comment.api.form.type.comment.class%
+        class: '%oro_comment.api.form.type.comment.class%'
         arguments:
             - '@oro_entity_config.config_manager'
         tags:
@@ -12,17 +12,15 @@ services:
 
     oro_comment.form.comment.api:
         class: Symfony\Component\Form\Form
-        factory_method: createNamed
-        factory_service: form.factory
+        factory: ['@form.factory', createNamed]
         arguments:
             - ~
-            - 'oro_comment_api'
+            - Oro\Bundle\CommentBundle\Form\Type\CommentTypeApi
 
     oro_comment.api.form.handler:
-        class: %oro_comment.api.form.handler.class%
-        scope: request
+        class: '%oro_comment.api.form.handler.class%'
         arguments:
             - '@oro_comment.form.comment.api'
-            - '@request'
+            - '@request_stack'
             - '@doctrine.orm.entity_manager'
             - '@oro_entity_config.config_manager'

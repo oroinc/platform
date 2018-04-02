@@ -2,15 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Exception\InvalidConfigurationException;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\SecurityBundle\Util\PropertyPathSecurityHelper;
@@ -23,9 +14,16 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
-
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class WorkflowAttributesType extends AbstractType
 {
@@ -402,15 +400,10 @@ class WorkflowAttributesType extends AbstractType
             ]
         );
 
-        $resolver->setAllowedTypes(
-            [
-                'workflow_item' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
-                'workflow' => 'Oro\Bundle\WorkflowBundle\Model\Workflow',
-                'attribute_fields' => 'array',
-                'attribute_default_values' => 'array',
-                'form_init' => 'Oro\Component\Action\Action\ActionInterface',
-            ]
-        );
+        $resolver->setAllowedTypes('workflow_item', 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem');
+        $resolver->setAllowedTypes('attribute_fields', 'array');
+        $resolver->setAllowedTypes('attribute_default_values', 'array');
+        $resolver->setAllowedTypes('form_init', 'Oro\Component\Action\Action\ActionInterface');
     }
 
     /**

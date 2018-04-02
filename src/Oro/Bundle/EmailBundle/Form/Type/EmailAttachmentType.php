@@ -3,17 +3,16 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ObjectManager;
-
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
 use Oro\Bundle\FormBundle\Form\Exception\FormException;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailAttachmentType extends AbstractType
 {
@@ -56,11 +55,11 @@ class EmailAttachmentType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\EmailAttachment',
-            'intention'          => 'email_attachment',
+            'csrf_token_id'      => 'email_attachment',
         ]);
     }
 
@@ -69,9 +68,9 @@ class EmailAttachmentType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('id', 'text');
-        $builder->add('type', 'text', ['required' => true]);
-        $builder->add('file', 'file');
+        $builder->add('id', TextType::class);
+        $builder->add('type', TextType::class, ['required' => true]);
+        $builder->add('file', FileType::class);
 
         $builder->addEventListener(FormEvents::SUBMIT, [$this, 'initAttachmentEntity']);
     }

@@ -10,8 +10,8 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
@@ -1713,6 +1713,28 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $toBePersistedConfigs = $this->configManager->getUpdateConfig();
 
         $this->assertEquals([$expectedConfig], $toBePersistedConfigs);
+    }
+
+    public function testCreateFieldConfigByModel()
+    {
+        $scope = 'someScope';
+        $entityClass = 'entityClass';
+        $fieldName = 'someField';
+        $fieldType = 'someType';
+        $data = ['some' => 'data'];
+
+        $entityConfigModel = new EntityConfigModel();
+        $entityConfigModel->setClassName($entityClass);
+
+        $fieldConfigModel = new FieldConfigModel($fieldName, $fieldType);
+        $fieldConfigModel->setEntity($entityConfigModel);
+        $fieldConfigModel->fromArray($scope, $data);
+
+        $fieldConfig = $this->configManager->createFieldConfigByModel($fieldConfigModel, $scope);
+        $expectedFieldConfig = new FieldConfigId($scope, $entityClass, $fieldName, $fieldType);
+
+        $this->assertEquals($expectedFieldConfig, $fieldConfig->getId());
+        $this->assertEquals($data, $fieldConfig->getValues());
     }
 
     protected function createEntityConfigModel(

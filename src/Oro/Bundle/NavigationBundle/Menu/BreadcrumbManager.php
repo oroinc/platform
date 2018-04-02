@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\NavigationBundle\Menu;
 
-use Symfony\Component\Routing\Router;
-
 use Knp\Menu\ItemInterface;
+use Knp\Menu\Matcher\Matcher;
 use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Util\MenuManipulator;
-use Knp\Menu\Matcher\Matcher;
+use Symfony\Component\Routing\Router;
 
 class BreadcrumbManager implements BreadcrumbManagerInterface
 {

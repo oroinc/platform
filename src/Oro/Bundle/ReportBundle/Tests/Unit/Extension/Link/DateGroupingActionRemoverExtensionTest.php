@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Link;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\ReportBundle\Extension\Link\DateGroupingActionRemoverExtension;
 
 class DateGroupingActionRemoverExtensionTest extends \PHPUnit_Framework_TestCase
@@ -26,6 +27,7 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('offsetExists')
             ->willReturn(false);
         $extension = new DateGroupingActionRemoverExtension('');
+        $extension->setParameters(new ParameterBag());
 
         $this->assertFalse($extension->isApplicable($this->config));
     }
@@ -43,6 +45,7 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit_Framework_TestCase
                 ]
             );
         $extension = new DateGroupingActionRemoverExtension('');
+        $extension->setParameters(new ParameterBag());
 
         $this->assertFalse($extension->isApplicable($this->config));
     }
@@ -61,6 +64,7 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit_Framework_TestCase
                 ]
             );
         $extension = new DateGroupingActionRemoverExtension('correctTable');
+        $extension->setParameters(new ParameterBag());
 
         $this->assertTrue($extension->isApplicable($this->config));
     }
@@ -90,6 +94,7 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit_Framework_TestCase
             );
 
         $extension = new DateGroupingActionRemoverExtension('');
+        $extension->setParameters(new ParameterBag());
 
         $extension->visitResult($this->config, $result);
     }

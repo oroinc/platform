@@ -1,5 +1,7 @@
 # Oro Layout Component
 
+Oro Layout component defines the object-oriented presentation of a page structure and provides tools to build, manage, and render the page.
+
 **IMPORTANT**: This component is not finished yet.
 
 `Oro Layout Component` provides tools for:

@@ -11,6 +11,7 @@ define(function(require) {
         dataInputSelector: null,
 
         checkAllSelector: null,
+
         relatedCheckboxesSelector: null,
 
         requiredOptions: [
@@ -19,6 +20,16 @@ define(function(require) {
             'relatedCheckboxesSelector'
         ],
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailFolderTreeView() {
+            EmailFolderTreeView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.each(this.requiredOptions, function(optionName) {
                 if (!_.has(options, optionName)) {
@@ -44,13 +55,15 @@ define(function(require) {
             EmailFolderTreeView.__super__.dispose.apply(this, arguments);
         },
 
-        _inputData: function($input) {
+        _inputData: function($root) {
             var data = {};
-            $input.find('> input[data-name]:not(input[type=checkbox]:not(:checked))').each(function() {
+            var inputs = $root.find('> input[data-name]').add($root.find('> label > input[data-name]:checked'));
+
+            inputs.each(function() {
                 var $input = $(this);
                 data[$input.attr('data-name')] = $input.val();
             });
-            data.subFolders = this._inputCollectionData($input.find('> .folder-sub-folders').children());
+            data.subFolders = this._inputCollectionData($root.find('> .folder-sub-folders').children());
 
             return data;
         },

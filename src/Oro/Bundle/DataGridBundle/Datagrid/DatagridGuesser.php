@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DatagridGuesser
 {

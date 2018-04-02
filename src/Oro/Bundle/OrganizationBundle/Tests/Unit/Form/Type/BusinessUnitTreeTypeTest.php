@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class BusinessUnitTreeTypeTest extends \PHPUnit_Framework_TestCase
@@ -12,6 +14,9 @@ class BusinessUnitTreeTypeTest extends \PHPUnit_Framework_TestCase
      */
     protected $formType;
 
+    /**
+     * @var BusinessUnitManager
+     */
     protected $buManager;
 
     protected function setUp()
@@ -24,7 +29,7 @@ class BusinessUnitTreeTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testParent()
     {
-        $this->assertEquals('choice', $this->formType->getParent());
+        $this->assertEquals(ChoiceType::class, $this->formType->getParent());
     }
 
     public function testName()
@@ -54,8 +59,8 @@ class BusinessUnitTreeTypeTest extends \PHPUnit_Framework_TestCase
             );
 
         $resolver = new OptionsResolver();
-        $this->formType->setDefaultOptions($resolver);
+        $this->formType->configureOptions($resolver);
         $resolver->resolve();
-        $this->assertTrue($resolver->isKnown('choices'));
+        $this->assertTrue($resolver->isDefined('choices'));
     }
 }

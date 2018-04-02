@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\LoggerBundle\Bundle\Tests\Unit\Async\Extension;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
+use Oro\Bundle\LoggerBundle\Async\Extension\InterruptionDetailConsumptionExtension;
+use Oro\Bundle\MessageQueueBundle\Log\MessageProcessorClassProvider;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Bundle\LoggerBundle\Async\Extension\InterruptionDetailConsumptionExtension;
-use Oro\Bundle\MessageQueueBundle\Log\MessageProcessorClassProvider;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class InterruptionDetailConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
 {

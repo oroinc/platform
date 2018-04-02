@@ -4,7 +4,6 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
-
 use Oro\Bundle\ActivityListBundle\Migration\ActivityListMigrationQuery;
 use Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;

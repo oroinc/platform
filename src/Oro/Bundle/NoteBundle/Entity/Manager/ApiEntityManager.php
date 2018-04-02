@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NoteBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityNotFoundException;
-
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager as BaseApiEntityManager;
 

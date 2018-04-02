@@ -11,8 +11,8 @@ namespace Oro\Component\PropertyAccess;
 use Symfony\Component\PropertyAccess\Exception;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\PropertyAccess\StringUtil;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
+use Symfony\Component\PropertyAccess\StringUtil;
 
 /**
  * Writes and reads values to/from an object/array graph.

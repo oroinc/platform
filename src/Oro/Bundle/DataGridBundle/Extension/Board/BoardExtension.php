@@ -2,20 +2,20 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Board;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Exception\NotFoundBoardException;
 use Oro\Bundle\DataGridBundle\Exception\NotFoundBoardProcessorException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
 use Oro\Bundle\DataGridBundle\Extension\Board\Processor\BoardProcessorInterface;
+use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class BoardExtension extends AbstractExtension
 {
@@ -41,7 +41,7 @@ class BoardExtension extends AbstractExtension
     /** @var BoardProcessorInterface[] */
     protected $processors;
 
-     /** @var AuthorizationCheckerInterface */
+    /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
     /** @var TranslatorInterface */
@@ -58,6 +58,11 @@ class BoardExtension extends AbstractExtension
 
     /** @var EntityClassResolver */
     protected $entityClassResolver;
+
+    /** {@inheritdoc} */
+    protected $excludedModes = [
+        DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
+    ];
 
     /**
      * @param AuthorizationCheckerInterface $authorizationChecker
@@ -107,6 +112,10 @@ class BoardExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
+        if (!parent::isApplicable($config)) {
+            return false;
+        }
+
         if (!$config->isOrmDatasource()) {
             return false;
         }

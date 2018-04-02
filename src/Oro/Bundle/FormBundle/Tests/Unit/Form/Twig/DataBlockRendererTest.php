@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Twig;
 
-use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\Forms;
-
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Bundle\FormBundle\Form\Twig\DataBlockRenderer;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\Forms;
 
 class DataBlockRendererTest extends \PHPUnit_Framework_TestCase
 {
@@ -133,7 +133,7 @@ class DataBlockRendererTest extends \PHPUnit_Framework_TestCase
                     )
                 )
         );
-        $builder = $this->factory->createNamedBuilder('test', 'form', null, $options);
+        $builder = $this->factory->createNamedBuilder('test', FormType::class, null, $options);
         $builder->add('text_1', null, array('block' => 'first', 'subblock' => 'second'));
         $builder->add('text_2', null, array('block' => 'first'));
         $builder->add('text_3', null, array('block' => 'second'));

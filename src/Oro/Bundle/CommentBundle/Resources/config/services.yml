@@ -13,17 +13,17 @@ services:
             - '@oro_entity_config.config_manager'
 
     oro_comment.migration.extension.comment:
-        class: %oro_comment.migration.extension.comment.class%
+        class: '%oro_comment.migration.extension.comment.class%'
         tags:
             - { name: oro_migration.extension, extension_name: comment }
 
     oro_comment.entity_generator.extension:
-        class: %oro_comment.entity_generator.extension.class%
+        class: '%oro_comment.entity_generator.extension.class%'
         tags:
             - { name: oro_entity_extend.entity_generator_extension }
 
     oro_comment.entity_config_dumper.extension:
-        class: %oro_comment.entity_config_dumper.extension.class%
+        class: '%oro_comment.entity_config_dumper.extension.class%'
         parent: oro_entity_extend.entity_config_dumper.extension.association
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
@@ -35,7 +35,7 @@ services:
             - { name: oro_entity.exclusion_provider.api }
 
     oro_comment.comment.api_manager:
-        class: %oro_comment.comment.api_manager.class%
+        class: '%oro_comment.comment.api_manager.class%'
         arguments:
             - '@doctrine'
             - '@security.authorization_checker'
@@ -47,6 +47,7 @@ services:
             - '@oro_entity_config.config_manager'
         calls:
             - [setAttachmentManager, ['@oro_attachment.manager']]
+            - [setHtmlTagHelper, ['@oro_ui.html_tag_helper']]
 
     oro_comment.comment_lifecycle_listener:
         class: Oro\Bundle\CommentBundle\EventListener\CommentLifecycleListener
@@ -56,7 +57,7 @@ services:
             - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\CommentBundle\Entity\Comment, event: preUpdate }
     
     oro_comment.placeholder.filter:
-        class: %oro_comment.placeholder.filter.class%
+        class: '%oro_comment.placeholder.filter.class%'
         arguments:
             - '@oro_comment.association_helper'
             - '@oro_entity.doctrine_helper'

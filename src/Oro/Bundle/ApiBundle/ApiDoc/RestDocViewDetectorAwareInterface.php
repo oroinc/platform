@@ -8,7 +8,7 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 interface RestDocViewDetectorAwareInterface
 {
     /**
-     * Sets the RestDocViewDetector.
+     * Sets the API view detector.
      *
      * @param RestDocViewDetector $docViewDetector
      */

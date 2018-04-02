@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
 use Oro\Bundle\UserBundle\Validator\UserWithoutRoleValidator;
+use Symfony\Component\Validator\Constraint;
 
 class UserWithoutRole extends Constraint
 {

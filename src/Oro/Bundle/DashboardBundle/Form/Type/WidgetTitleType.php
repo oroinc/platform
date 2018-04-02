@@ -3,6 +3,8 @@
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -34,14 +36,14 @@ class WidgetTitleType extends AbstractType
     {
         $builder->add(
             'title',
-            'text',
+            TextType::class,
             [
                 'required' => false
             ]
         );
         $builder->add(
             'useDefault',
-            'checkbox',
+            CheckboxType::class,
             [
                 'label'      => 'oro.dashboard.title.use_default.label',
                 'required'   => false

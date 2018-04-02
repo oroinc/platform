@@ -2,9 +2,9 @@
 
 namespace Oro\Component\Layout;
 
-use Oro\Component\Layout\Extension\ExtensionInterface;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\Options;
+use Oro\Component\Layout\Extension\ExtensionInterface;
 
 class LayoutRegistry implements LayoutRegistryInterface
 {

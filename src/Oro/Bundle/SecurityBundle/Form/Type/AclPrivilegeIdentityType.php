@@ -3,8 +3,9 @@
 namespace Oro\Bundle\SecurityBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AclPrivilegeIdentityType extends AbstractType
 {
@@ -15,14 +16,14 @@ class AclPrivilegeIdentityType extends AbstractType
     {
         $builder->add(
             'id',
-            'hidden',
+            HiddenType::class,
             array(
                 'required' => true,
             )
         );
         $builder->add(
             'name',
-            'oro_acl_label',
+            ObjectLabelType::class,
             array(
                 'required' => false,
             )
@@ -48,7 +49,7 @@ class AclPrivilegeIdentityType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(

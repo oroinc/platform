@@ -3,8 +3,9 @@
 namespace Oro\Bundle\SecurityBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AclPermissionType extends AbstractType
 {
@@ -22,7 +23,7 @@ class AclPermissionType extends AbstractType
         );
         $builder->add(
             'name',
-            'hidden',
+            HiddenType::class,
             array(
                 'required' => false,
             )
@@ -48,7 +49,7 @@ class AclPermissionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(

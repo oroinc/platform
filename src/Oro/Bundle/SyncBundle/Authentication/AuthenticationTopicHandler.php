@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\SyncBundle\Authentication;
 
-use Psr\Log\LoggerInterface;
-
-use Ratchet\ConnectionInterface as Conn;
-use Ratchet\Wamp\Topic;
-
 use JDare\ClankBundle\Server\App\Handler\TopicHandler;
 use JDare\ClankBundle\Server\App\Handler\TopicHandlerInterface;
+use Psr\Log\LoggerInterface;
+use Ratchet\ConnectionInterface as Conn;
+use Ratchet\Wamp\Topic;
 
 /**
  * Clank topic handler decorator that adds authentication for the topics via Sync authentication tickets.

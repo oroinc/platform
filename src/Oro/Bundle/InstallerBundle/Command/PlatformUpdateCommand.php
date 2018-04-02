@@ -2,24 +2,31 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Component\PhpUtils\PhpIniUtil;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
+use Oro\Bundle\InstallerBundle\InstallerEvent;
+use Oro\Bundle\InstallerBundle\InstallerEvents;
 use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand;
+use Oro\Component\PhpUtils\PhpIniUtil;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Updates application to actual state that the corresponding to local code base
+ */
 class PlatformUpdateCommand extends AbstractCommand
 {
+    const NAME = 'oro:platform:update';
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName('oro:platform:update')
+        $this->setName(self::NAME)
             ->setDescription('Execute platform application update commands and init platform assets.')
             ->addOption(
                 'force',
@@ -67,55 +74,17 @@ class PlatformUpdateCommand extends AbstractCommand
         $force = $input->getOption('force');
 
         if ($force) {
-            $assetsOptions = [
-                '--exclude' => ['OroInstallerBundle']
-            ];
-            if ($input->hasOption('symlink') && $input->getOption('symlink')) {
-                $assetsOptions['--symlink'] = true;
-            }
+            $eventDispatcher = $this->getEventDispatcher();
+            $event = new InstallerEvent($this, $input, $output, $commandExecutor);
 
             try {
-                $commandExecutor
-                    ->runCommand(
-                        'oro:migration:load',
-                        [
-                            '--process-isolation' => true,
-                            '--force'             => true,
-                            '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
-                        ]
-                    )
-                    ->runCommand(LoadPermissionConfigurationCommand::NAME, ['--process-isolation' => true])
-                    ->runCommand(LoadConfigurablePermissionCommand::NAME, ['--process-isolation' => true])
-                    ->runCommand(
-                        'oro:cron:definitions:load',
-                        [
-                            '--process-isolation' => true
-                        ]
-                    )
-                    ->runCommand(
-                        'oro:workflow:definitions:load',
-                        ['--process-isolation' => true]
-                    )
-                    ->runCommand('oro:process:configuration:load', ['--process-isolation' => true])
-                    ->runCommand('oro:migration:data:load', ['--process-isolation' => true])
-                    ->runCommand('router:cache:clear', ['--process-isolation' => true])
-                    ->runCommand('oro:message-queue:create-queues', ['--process-isolation' => true])
-                ;
+                $eventDispatcher->dispatch(InstallerEvents::INSTALLER_BEFORE_DATABASE_PREPARATION, $event);
+                $this->loadDataStep($commandExecutor, $output);
+                $eventDispatcher->dispatch(InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION, $event);
 
-                $this->processTranslations($input, $commandExecutor);
+                $skipAssets = $input->getOption('skip-assets');
 
-                if (!$input->getOption('skip-assets')) {
-                    $commandExecutor
-                        ->runCommand('oro:assets:install', $assetsOptions)
-                        ->runCommand('assetic:dump')
-                        ->runCommand('fos:js-routing:dump', ['--process-isolation' => true])
-                        ->runCommand('oro:localization:dump', ['--process-isolation' => true])
-                        ->runCommand('oro:translation:dump', ['--process-isolation' => true])
-                        ->runCommand(
-                            'oro:requirejs:build',
-                            ['--ignore-errors' => true, '--process-isolation' => true]
-                        );
-                }
+                $this->finalStep($commandExecutor, $output, $input, $skipAssets);
 
                 return 0;
             } catch (\Exception $exception) {
@@ -132,6 +101,83 @@ class PlatformUpdateCommand extends AbstractCommand
 
             return 0;
         }
+    }
+
+    /**
+     * @param CommandExecutor $commandExecutor
+     * @param OutputInterface $output
+     *
+     * @return $this
+     */
+    protected function loadDataStep(CommandExecutor $commandExecutor, OutputInterface $output)
+    {
+        $commandExecutor
+            ->runCommand(
+                'oro:migration:load',
+                [
+                    '--process-isolation' => true,
+                    '--force'             => true,
+                    '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
+                ]
+            )
+            ->runCommand(LoadPermissionConfigurationCommand::NAME, ['--process-isolation' => true])
+            ->runCommand(LoadConfigurablePermissionCommand::NAME, ['--process-isolation' => true])
+            ->runCommand(
+                'oro:cron:definitions:load',
+                [
+                    '--process-isolation' => true
+                ]
+            )
+            ->runCommand(
+                'oro:workflow:definitions:load',
+                ['--process-isolation' => true]
+            )
+            ->runCommand('oro:process:configuration:load', ['--process-isolation' => true])
+            ->runCommand('oro:migration:data:load', ['--process-isolation' => true])
+            ->runCommand('router:cache:clear', ['--process-isolation' => true])
+            ->runCommand('oro:message-queue:create-queues', ['--process-isolation' => true])
+        ;
+
+        return $this;
+    }
+
+    /**
+     * @param CommandExecutor $commandExecutor
+     * @param OutputInterface $output
+     * @param InputInterface $input
+     * @param boolean $skipAssets
+     *
+     * @return $this
+     */
+    protected function finalStep(
+        CommandExecutor $commandExecutor,
+        OutputInterface $output,
+        InputInterface $input,
+        $skipAssets
+    ) {
+        $this->processTranslations($input, $commandExecutor);
+
+        if (!$skipAssets) {
+            $assetsOptions = [
+                '--exclude' => ['OroInstallerBundle']
+            ];
+            if ($input->hasOption('symlink') && $input->getOption('symlink')) {
+                $assetsOptions['--symlink'] = true;
+            }
+
+            $commandExecutor
+                ->runCommand('oro:assets:install', $assetsOptions)
+                ->runCommand('assetic:dump')
+                ->runCommand('fos:js-routing:dump', ['--process-isolation' => true])
+                ->runCommand('oro:localization:dump', ['--process-isolation' => true])
+                ->runCommand('oro:translation:dump', ['--process-isolation' => true])
+                ->runCommand(
+                    'oro:requirejs:build',
+                    ['--ignore-errors' => true, '--process-isolation' => true]
+                );
+        }
+
+        return $this;
     }
 
     /**
@@ -175,5 +221,13 @@ class PlatformUpdateCommand extends AbstractCommand
             $commandExecutor
                 ->runCommand('oro:translation:load', ['--process-isolation' => true, '--rebuild-cache' => true]);
         }
+    }
+
+    /**
+     * @return EventDispatcherInterface
+     */
+    private function getEventDispatcher()
+    {
+        return $this->getContainer()->get('event_dispatcher');
     }
 }

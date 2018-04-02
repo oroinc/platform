@@ -4,7 +4,6 @@ namespace Oro\Bundle\WindowsBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\WindowsBundle\Entity\WindowsState;
 
 class LoadWindowsStateData extends AbstractFixture

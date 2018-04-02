@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Helper;
 
+use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
-
-use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
 
 class DestinationPageHelper
 {

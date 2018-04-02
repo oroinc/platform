@@ -4,9 +4,9 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig;
 
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
-use Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\MergeConfig\MergeRelationConfigHelper;
+use Oro\Bundle\ApiBundle\Config\RelationConfigMerger;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\LoadFromConfigBag as BaseLoadFromConfigBag;
-use Oro\Bundle\ApiBundle\Provider\ConfigBag;
+use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
 use Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
@@ -15,30 +15,30 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
  */
 class LoadFromConfigBag extends BaseLoadFromConfigBag
 {
-    /** @var ConfigBag */
-    private $configBag;
+    /** @var ConfigBagRegistry */
+    private $configBagRegistry;
 
     /**
      * @param ConfigExtensionRegistry   $configExtensionRegistry
      * @param ConfigLoaderFactory       $configLoaderFactory
      * @param ResourceHierarchyProvider $resourceHierarchyProvider
-     * @param ConfigBag                 $configBag
-     * @param MergeRelationConfigHelper $mergeRelationConfigHelper
+     * @param ConfigBagRegistry         $configBagRegistry
+     * @param RelationConfigMerger      $relationConfigMerger
      */
     public function __construct(
         ConfigExtensionRegistry $configExtensionRegistry,
         ConfigLoaderFactory $configLoaderFactory,
         ResourceHierarchyProvider $resourceHierarchyProvider,
-        ConfigBag $configBag,
-        MergeRelationConfigHelper $mergeRelationConfigHelper
+        ConfigBagRegistry $configBagRegistry,
+        RelationConfigMerger $relationConfigMerger
     ) {
         parent::__construct(
             $configExtensionRegistry,
             $configLoaderFactory,
             $resourceHierarchyProvider,
-            $mergeRelationConfigHelper
+            $relationConfigMerger
         );
-        $this->configBag = $configBag;
+        $this->configBagRegistry = $configBagRegistry;
     }
 
     /**
@@ -46,6 +46,6 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
      */
     protected function getConfig($entityClass, $version, RequestType $requestType)
     {
-        return $this->configBag->getRelationConfig($entityClass, $version);
+        return $this->configBagRegistry->getConfigBag($requestType)->getRelationConfig($entityClass, $version);
     }
 }

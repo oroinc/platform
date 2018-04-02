@@ -3,9 +3,10 @@
 namespace Oro\Bundle\SecurityBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PrivilegeCollectionType extends AbstractType
 {
@@ -16,7 +17,7 @@ class PrivilegeCollectionType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['privileges_config'] = $options['options']['privileges_config'];
+        $view->vars['privileges_config'] = $options['entry_options']['privileges_config'];
         $view->vars['page_component_module'] = $options['page_component_module'];
         $view->vars['page_component_options'] = $options['page_component_options'];
     }
@@ -24,7 +25,7 @@ class PrivilegeCollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'page_component_module' => 'orosecurity/js/app/components/security-access-levels-component',
@@ -53,6 +54,6 @@ class PrivilegeCollectionType extends AbstractType
      */
     public function getParent()
     {
-        return 'collection';
+        return CollectionType::class;
     }
 }

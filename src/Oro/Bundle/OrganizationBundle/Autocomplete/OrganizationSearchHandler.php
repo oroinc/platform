@@ -3,13 +3,11 @@
 namespace Oro\Bundle\OrganizationBundle\Autocomplete;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
+use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
+use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-
-use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 
 class OrganizationSearchHandler implements SearchHandlerInterface
 {

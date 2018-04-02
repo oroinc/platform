@@ -3,11 +3,9 @@
 namespace Oro\Bundle\CommentBundle\Placeholder;
 
 use Doctrine\Common\Util\ClassUtils;
-
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class CommentPlaceholderFilter
 {

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Constraint;
-
 use Oro\Bundle\LocaleBundle\Entity;
 use Oro\Bundle\LocaleBundle\Validator\Constraints;
 use Oro\Bundle\LocaleBundle\Validator\Constraints\LocalizationValidator;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class LocalizationValidatorTest extends \PHPUnit_Framework_TestCase
 {

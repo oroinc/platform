@@ -1,5 +1,5 @@
 oro_translation_jstranslation:
-    path:      /js/translation/{_locale}.js
+    path:      /media/js/translation/{_locale}.json
     defaults:  { _controller:  oro_translation.controller:indexAction }
     options:
         expose: true

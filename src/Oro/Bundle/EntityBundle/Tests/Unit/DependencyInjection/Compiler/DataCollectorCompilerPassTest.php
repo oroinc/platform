@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\EntityBundle\DataCollector\DuplicateQueriesDataCollector;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DataCollectorCompilerPass;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-
-use Oro\Bundle\EntityBundle\DataCollector\DuplicateQueriesDataCollector;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DataCollectorCompilerPass;
 
 class DataCollectorCompilerPassTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,8 +3,9 @@
 namespace Oro\Bundle\AttachmentBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AttachmentType extends AbstractType
 {
@@ -19,7 +20,7 @@ class AttachmentType extends AbstractType
 
         $builder->add(
             'file',
-            'oro_file',
+            FileType::class,
             [
                 'label' => 'oro.attachment.file.label',
                 'required' => true,
@@ -30,7 +31,7 @@ class AttachmentType extends AbstractType
 
         $builder->add(
             'comment',
-            'textarea',
+            TextareaType::class,
             [
                 'label'    => 'oro.attachment.comment.label',
                 'required' => false,
@@ -57,7 +58,7 @@ class AttachmentType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [

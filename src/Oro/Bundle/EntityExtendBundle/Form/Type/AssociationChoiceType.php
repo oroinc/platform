@@ -2,20 +2,21 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType as SymfonyChoiceType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AssociationChoiceType extends AbstractAssociationType
 {
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::setDefaultOptions($resolver);
+        parent::configureOptions($resolver);
 
         $resolver->setDefaults(
             [
-                'empty_value' => false,
+                'placeholder' => false,
                 'choices'     => ['No', 'Yes'],
                 'schema_update_required' => function ($newVal, $oldVal) {
                     return true == $newVal && false == $oldVal;
@@ -45,6 +46,6 @@ class AssociationChoiceType extends AbstractAssociationType
      */
     public function getParent()
     {
-        return 'choice';
+        return SymfonyChoiceType::class;
     }
 }

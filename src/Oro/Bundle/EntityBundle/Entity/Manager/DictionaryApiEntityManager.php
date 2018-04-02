@@ -3,16 +3,15 @@
 namespace Oro\Bundle\EntityBundle\Entity\Manager;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
-
-use Symfony\Component\PropertyAccess\PropertyAccessor;
-
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Helper\DictionaryHelper;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class DictionaryApiEntityManager extends ApiEntityManager
 {
@@ -86,6 +85,7 @@ class DictionaryApiEntityManager extends ApiEntityManager
                 $qb->setFirstResult($this->getOffset($page, $limit));
             }
             if ($orderBy) {
+                QueryBuilderUtil::checkField($orderBy);
                 $qb->orderBy($orderBy);
             }
         } elseif (null !== $qb) {

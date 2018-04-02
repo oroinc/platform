@@ -2,20 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Validation;
-
-use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
@@ -27,6 +13,20 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\NameContainerType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\RenamedNameContainerType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\RestrictedNameContainerType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormContextStub;
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Validation;
 
 class MapPrimaryFieldTest extends TypeTestCase
 {
@@ -135,7 +135,7 @@ class MapPrimaryFieldTest extends TypeTestCase
         $formBuilder->add('enabledRole', null, array_merge(['mapped' => false], $itemOptions));
         $formBuilder->add(
             'roles',
-            'collection',
+            CollectionType::class,
             [
                 'by_reference'  => false,
                 'allow_add'     => true,
@@ -453,7 +453,7 @@ class MapPrimaryFieldTest extends TypeTestCase
         $formBuilder->add('enabledRole', null, ['mapped' => false]);
         $formBuilder->add(
             'renamedRoles',
-            'collection',
+            CollectionType::class,
             [
                 'property_path' => 'roles',
                 'by_reference'  => false,

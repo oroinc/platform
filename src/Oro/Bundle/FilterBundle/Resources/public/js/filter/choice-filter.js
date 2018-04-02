@@ -49,10 +49,16 @@ define(function(require) {
         events: {
             'keyup input': '_onReadCriteriaInputKey',
             'keydown [type="text"]': '_preventEnterProcessing',
-            'click .filter-update': '_onClickUpdateCriteria',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter',
             'click .choice-value': '_onClickChoiceValue'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ChoiceFilter() {
+            ChoiceFilter.__super__.constructor.apply(this, arguments);
         },
 
         /**

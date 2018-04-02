@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\AttachmentBundle\Form\EventSubscriber;
 
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
-use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 
 class FileSubscriber implements EventSubscriberInterface
 {
@@ -119,6 +118,7 @@ class FileSubscriber implements EventSubscriberInterface
                 $error = new FormError(
                     $violation->getMessage(),
                     $violation->getMessageTemplate(),
+                    // TODO: change to ::getParameters() method in scope of BAP-15236
                     $violation->getMessageParameters()
                 );
                 $fileField->addError($error);

@@ -2,31 +2,29 @@
 
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormView;
-
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\ActivityBundle\Form\Type\MultipleAssociationChoiceType;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType as BaseMultipleAssociationChoiceType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type\AssociationTypeTestCase;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormView;
 
 class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityConfigProvider;
 
-    /** @var MultipleAssociationChoiceType */
-    protected $type;
-
-    protected function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFormType()
     {
-        parent::setUp();
-
         $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->type = new MultipleAssociationChoiceType(
+        return new MultipleAssociationChoiceType(
             new AssociationTypeHelper($this->configManager, $entityClassResolver),
             $this->configManager
         );
@@ -66,7 +64,8 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         $view->children[0]->vars['value'] = 'Test\Entity1';
         $view->children[1]->vars['value'] = 'Test\Entity2';
 
-        $this->type->finishView($view, $form, $options);
+        $type = $this->getFormType();
+        $type->finishView($view, $form, $options);
 
         $this->assertEquals(
             [
@@ -87,11 +86,13 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
 
     public function testGetName()
     {
-        $this->assertEquals('oro_activity_multiple_association_choice', $this->type->getName());
+        $type = $this->getFormType();
+        $this->assertEquals('oro_activity_multiple_association_choice', $type->getName());
     }
 
     public function testGetParent()
     {
-        $this->assertEquals('oro_entity_extend_multiple_association_choice', $this->type->getParent());
+        $type = $this->getFormType();
+        $this->assertEquals(BaseMultipleAssociationChoiceType::class, $type->getParent());
     }
 }

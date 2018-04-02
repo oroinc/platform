@@ -10,15 +10,11 @@ class RestJsonApiConfigurationTest extends RestJsonApiTestCase
     {
         $entityType = 'configuration';
 
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType])
-        );
-        $requestInfo = 'get_list';
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, $requestInfo);
+        $response = $this->cget(['entity' => $entityType]);
 
         // check that the result is a list of configuration section identity objects
         // check that each returned section is accessible
+        $requestInfo = 'get_list';
         $content = $this->jsonToArray($response->getContent());
         $this->assertArrayHasKey('data', $content, $requestInfo);
         $this->assertArrayNotHasKey('included', $content, $requestInfo);
@@ -43,12 +39,9 @@ class RestJsonApiConfigurationTest extends RestJsonApiTestCase
     {
         $entityType = 'configuration';
 
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_get', ['entity' => $entityType, 'id' => $sectionId])
-        );
+        $response = $this->get(['entity' => $entityType, 'id' => $sectionId]);
+
         $requestInfo = sprintf('get->%s', $sectionId);
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, $requestInfo);
         $content = $this->jsonToArray($response->getContent());
         $this->assertArrayHasKey('data', $content, $requestInfo);
         $this->assertArrayNotHasKey('included', $content, $requestInfo);
@@ -61,22 +54,15 @@ class RestJsonApiConfigurationTest extends RestJsonApiTestCase
     {
         $entityType = 'configuration';
 
-        $response = $this->request(
-            'GET',
-            $this->getUrl(
-                'oro_rest_api_cget',
-                [
-                    'entity'                => $entityType,
-                    'fields[configuration]' => 'options',
-                    'include'               => 'options'
-                ]
-            )
-        );
-        $requestInfo = 'get_list';
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, $requestInfo);
+        $response = $this->cget([
+            'entity'                => $entityType,
+            'fields[configuration]' => 'options',
+            'include'               => 'options'
+        ]);
 
         // check that the result contains full info about configuration section and its options
         // check that each returned section is accessible and contains full info including options
+        $requestInfo = 'get_list';
         $content = $this->jsonToArray($response->getContent());
         $this->assertArrayHasKey('data', $content, $requestInfo);
         $this->assertArrayHasKey('included', $content, $requestInfo);
@@ -134,20 +120,14 @@ class RestJsonApiConfigurationTest extends RestJsonApiTestCase
     {
         $entityType = 'configuration';
 
-        $response = $this->request(
-            'GET',
-            $this->getUrl(
-                'oro_rest_api_get',
-                [
-                    'entity'                => $entityType,
-                    'id'                    => $sectionId,
-                    'fields[configuration]' => 'options',
-                    'include'               => 'options'
-                ]
-            )
-        );
+        $response = $this->get([
+            'entity'                => $entityType,
+            'id'                    => $sectionId,
+            'fields[configuration]' => 'options',
+            'include'               => 'options'
+        ]);
+
         $requestInfo = sprintf('get->%s', $sectionId);
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, $requestInfo);
         $content = $this->jsonToArray($response->getContent());
         $this->assertArrayHasKey('data', $content, $requestInfo);
         $this->assertArrayHasKey('included', $content, $requestInfo);

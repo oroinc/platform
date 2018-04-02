@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Validator\Constraints as OroAssert;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
-
-use Oro\Bundle\FormBundle\Validator\Constraints as OroAssert;
 
 class RelatedEntityApiType extends AbstractType
 {
@@ -31,7 +31,7 @@ class RelatedEntityApiType extends AbstractType
         $builder
             ->add(
                 'id',
-                'text',
+                TextType::class,
                 [
                     'required'    => true,
                     'constraints' => [new Assert\NotBlank()]
@@ -39,7 +39,7 @@ class RelatedEntityApiType extends AbstractType
             )
             ->add(
                 'entity',
-                'text',
+                TextType::class,
                 [
                     'required'    => true,
                     'constraints' => [new Assert\NotBlank(), new OroAssert\EntityClass()]
@@ -51,7 +51,7 @@ class RelatedEntityApiType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [

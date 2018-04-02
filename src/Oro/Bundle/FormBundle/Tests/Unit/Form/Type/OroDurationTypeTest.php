@@ -3,38 +3,31 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroDurationType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroDurationTypeTest extends FormIntegrationTestCase
 {
-    /** @var OroDurationType */
-    protected $type;
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->type = new OroDurationType();
-    }
-
     public function testGetName()
     {
-        $this->assertEquals(OroDurationType::NAME, $this->type->getName());
+        $type = new OroDurationType();
+        $this->assertEquals(OroDurationType::NAME, $type->getName());
     }
 
     public function testGetParent()
     {
-        $this->assertEquals('text', $this->type->getParent());
+        $type = new OroDurationType();
+        $this->assertEquals(TextType::class, $type->getParent());
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
         $expectedOptions = [
             'tooltip' => 'oro.form.oro_duration.tooltip',
             'type' => 'text',
         ];
 
-        $form = $this->factory->create($this->type);
+        $form = $this->factory->create(OroDurationType::class);
 
         $options = $form->getConfig()->getOptions();
         foreach ($expectedOptions as $name => $expectedValue) {
@@ -51,13 +44,16 @@ class OroDurationTypeTest extends FormIntegrationTestCase
      */
     public function testSubmit($value, $expected)
     {
-        $form = $this->factory->create($this->type);
+        $form = $this->factory->create(OroDurationType::class);
         $form->submit($value);
         $data = $form->getData();
 
         $this->assertEquals($expected, $data);
     }
 
+    /**
+     * @return array
+     */
     public function submitDataProvider()
     {
         return [
@@ -78,25 +74,10 @@ class OroDurationTypeTest extends FormIntegrationTestCase
 
     public function testSubmitInvalidDataThrowsError()
     {
-        $form = $this->factory->create($this->type);
+        $form = $this->factory->create(OroDurationType::class);
         $form->submit('invalid');
         $errors = $form->getErrors();
 
         $this->assertCount(1, $errors);
-    }
-
-    public function testConfigureOptions()
-    {
-        $expectedOptions = [
-            'tooltip' => 'test',
-        ];
-
-        $form = $this->factory->create($this->type, null, $expectedOptions);
-
-        $options = $form->getConfig()->getOptions();
-        foreach ($expectedOptions as $name => $expectedValue) {
-            $this->assertArrayHasKey($name, $options);
-            $this->assertEquals($expectedValue, $options[$name]);
-        }
     }
 }

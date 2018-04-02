@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Validator;
 
+use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\Validator\Constraints\File as FileConstraint;
-
-use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Symfony\Component\Validator\ConstraintViolationList;
 
 class ConfigFileValidatorTest extends \PHPUnit_Framework_TestCase

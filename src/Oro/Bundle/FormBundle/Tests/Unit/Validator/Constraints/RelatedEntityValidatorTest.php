@@ -5,6 +5,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\FormBundle\Validator\Constraints\RelatedEntity;
 use Oro\Bundle\FormBundle\Validator\Constraints\RelatedEntityValidator;
+use Symfony\Component\Validator\Context\ExecutionContext;
 
 class RelatedEntityValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,9 +40,7 @@ class RelatedEntityValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateValid($value)
     {
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(ExecutionContext::class);
         $context->expects($this->never())
             ->method('addViolation');
 
@@ -77,9 +76,7 @@ class RelatedEntityValidatorTest extends \PHPUnit_Framework_TestCase
 
         $constraint = new RelatedEntity();
 
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(ExecutionContext::class);
         $context->expects($this->once())
             ->method('addViolation')
             ->with($constraint->message, ['{{ value }}' => '[id => 123, entity => "alias"]']);
@@ -104,9 +101,7 @@ class RelatedEntityValidatorTest extends \PHPUnit_Framework_TestCase
 
         $constraint = new RelatedEntity();
 
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(ExecutionContext::class);
         $context->expects($this->once())
             ->method('addViolation')
             ->with($constraint->message, ['{{ value }}' => '[id => 123, entity => "Test\Entity"]']);
@@ -129,9 +124,7 @@ class RelatedEntityValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $value = ['id' => 123, 'entity' => 'alias'];
 
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(ExecutionContext::class);
         $context->expects($this->never())
             ->method('addViolation');
 
@@ -152,9 +145,7 @@ class RelatedEntityValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $value = ['id' => 123, 'entity' => 'Test\Entity'];
 
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(ExecutionContext::class);
         $context->expects($this->never())
             ->method('addViolation');
 

@@ -15,6 +15,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function SidebarModel() {
+            SidebarModel.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(data, options) {
             _.extend(this, _.pick(options, ['urlRoot']));
             SidebarModel.__super__.initialize.apply(this, arguments);

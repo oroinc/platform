@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Tools;
 
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
+use Symfony\Component\Routing\RouterInterface;
 
 class DatagridRouteHelperTest extends \PHPUnit_Framework_TestCase
 {

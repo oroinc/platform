@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
@@ -26,14 +25,15 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -162,8 +162,14 @@ class EmailTypeTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $select2ChoiceType = new Select2Type(TranslatableEntityType::NAME);
-        $genemuChoiceType  = new Select2Type('choice');
+        $select2TranslatableEntityType = new Select2Type(
+            TranslatableEntityType::class,
+            'oro_select2_translatable_entity'
+        );
+        $select2ChoiceType  = new Select2Type(
+            'choice',
+            'oro_select2_choice'
+        );
         $emailTemplateList = new EmailTemplateSelectType();
         $attachmentsType   = new EmailAttachmentsType();
 
@@ -248,16 +254,16 @@ class EmailTypeTest extends TypeTestCase
         return [
             new PreloadedExtension(
                 [
-                    TranslatableEntityType::NAME      => $translatableType,
-                    $select2ChoiceType->getName()     => $select2ChoiceType,
+                    EmailType::class => $this->createEmailType(),
+                    TranslatableEntityType::class      => $translatableType,
+                    $select2TranslatableEntityType->getName() => $select2TranslatableEntityType,
                     $emailTemplateList->getName()     => $emailTemplateList,
                     $emailAddressType->getName()      => $emailAddressType,
                     $richTextType->getName()          => $richTextType,
                     $resizableRichTextType->getName() => $resizableRichTextType,
                     $attachmentsType->getName()       => $attachmentsType,
-                    ContextsSelectType::NAME          => $contextsSelectType,
-                    'genemu_jqueryselect2_hidden'     => new Select2Type('hidden'),
-                     $genemuChoiceType->getName()     => $genemuChoiceType,
+                    ContextsSelectType::class          => $contextsSelectType,
+                    $select2ChoiceType->getName()     => $select2ChoiceType,
                     $emailAddressFromType->getName()       => $emailAddressFromType,
                     $emailAddressRecipientsType->getName() => $emailAddressRecipientsType,
                     $emailOriginFromType->getName() => $emailOriginFromType
@@ -294,8 +300,7 @@ class EmailTypeTest extends TypeTestCase
         $this->mailboxManager->expects(self::once())->method('findAvailableMailboxes')->willReturn($response);
         $this->registry->expects(self::once())->method('getManager')->willReturn($this->em);
 
-        $type = $this->createEmailType();
-        $form = $this->factory->create($type);
+        $form = $this->factory->create(EmailType::class);
 
         $form->submit($formData);
         $this->assertTrue($form->isSynchronized());
@@ -311,21 +316,21 @@ class EmailTypeTest extends TypeTestCase
         $this->assertEquals($body, $result->getBody());
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(
                 [
                     'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\Email',
-                    'intention'          => 'email',
+                    'csrf_token_id'      => 'email',
                     'csrf_protection'    => true,
                 ]
             );
 
         $type = $this->createEmailType();
-        $type->setDefaultOptions($resolver);
+        $type->configureOptions($resolver);
     }
 
     public function testGetName()

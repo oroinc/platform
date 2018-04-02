@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Handle User forms
@@ -43,7 +41,7 @@ class UserHandler extends AbstractUserHandler
 
     /**
      * @param FormInterface $form
-     * @param Request $request
+     * @param RequestStack $requestStack
      * @param UserManager $manager
      * @param ConfigManager $userConfigManager
      * @param DelegatingEngine $templating
@@ -54,7 +52,7 @@ class UserHandler extends AbstractUserHandler
      */
     public function __construct(
         FormInterface $form,
-        Request $request,
+        RequestStack $requestStack,
         UserManager $manager,
         ConfigManager $userConfigManager = null,
         DelegatingEngine $templating = null,
@@ -63,7 +61,7 @@ class UserHandler extends AbstractUserHandler
         TranslatorInterface $translator = null,
         LoggerInterface $logger = null
     ) {
-        parent::__construct($form, $request, $manager);
+        parent::__construct($form, $requestStack, $manager);
 
         $this->userConfigManager = $userConfigManager;
         $this->templating = $templating;
@@ -81,8 +79,9 @@ class UserHandler extends AbstractUserHandler
         $isUpdated = false;
         $this->form->setData($user);
 
-        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
-            $this->form->submit($this->request);
+        $request = $this->requestStack->getCurrentRequest();
+        if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
+            $this->form->submit($request);
 
             if ($this->form->isValid()) {
                 $this->onSuccess($user);

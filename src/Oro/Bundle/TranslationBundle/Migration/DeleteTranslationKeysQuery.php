@@ -5,10 +5,8 @@ namespace Oro\Bundle\TranslationBundle\Migration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Types\Type;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class DeleteTranslationKeysQuery extends ParametrizedMigrationQuery
 {

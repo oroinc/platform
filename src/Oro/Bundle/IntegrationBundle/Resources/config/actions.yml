@@ -3,7 +3,7 @@ parameters:
 
 services:
     oro_integration.action.schedule_sync:
-        class: %oro_integration.action.schedule_sync.class%
-        scope: prototype
+        class: '%oro_integration.action.schedule_sync.class%'
+        shared: false
         tags:
             - { name:  oro_datagrid.extension.action.type, type: schedule-sync }

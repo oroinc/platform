@@ -18,7 +18,7 @@ services:
         alias: oro_entity.entity_provider
 
     oro_report.datagrid.configuration.provider:
-        class: %oro_report.datagrid.configuration.provider.class%
+        class: '%oro_report.datagrid.configuration.provider.class%'
         arguments:
             - '@oro_report.grid.datagrid_configuration_builder'
             - '@doctrine'
@@ -35,7 +35,7 @@ services:
               - [setNamespace, [ 'oro_report' ] ]
 
     oro_report.listener.navigation_listener:
-        class: %oro_report.listener.navigation_listener.class%
+        class: '%oro_report.listener.navigation_listener.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity_config.provider.entity'
@@ -55,18 +55,18 @@ services:
             - { name: doctrine.orm.entity_listener, entity: '%oro_report.report.entity.class%', event: postUpdate }
 
     oro_report.report_manager:
-        class: %oro_report.report_manager.class%
+        class: '%oro_report.report_manager.class%'
         arguments:
             - '@doctrine.orm.entity_manager'
 
     oro_report.grid.base_configuration_builder:
-        class: %oro_report.grid.base_configuration_builder.class%
+        class: '%oro_report.grid.base_configuration_builder.class%'
         parent: oro_query_designer.grid.datagrid_configuration_builder
         calls:
             - [setConfigManager, ['@oro_entity_config.config_manager']]
 
     oro_report.grid.datagrid_configuration_builder:
-        class: %oro_report.grid.datagrid_configuration_builder.class%
+        class: '%oro_report.grid.datagrid_configuration_builder.class%'
         parent: oro_report.grid.base_configuration_builder
         calls:
             - [setDateGroupingBuilder, ['@oro_report.grid.date_grouping_builder']]
@@ -77,7 +77,7 @@ services:
             - '%oro_report.calendar_date.entity.class%'
 
     oro_report.listener.segment_subscriber:
-        class: %oro_report.listener.segment_subscriber.class%
+        class: '%oro_report.listener.segment_subscriber.class%'
         tags:
             - { name: kernel.event_subscriber }
 
@@ -101,7 +101,7 @@ services:
             - { name: oro_entity.name_provider, priority: 0 }
 
     oro_report.calendar_date_manager:
-        class: %oro_report.calendar_date_manager.class%
+        class: '%oro_report.calendar_date_manager.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
 

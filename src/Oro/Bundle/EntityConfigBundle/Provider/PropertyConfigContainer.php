@@ -12,6 +12,7 @@ class PropertyConfigContainer
 {
     const TYPE_ENTITY = 'entity';
     const TYPE_FIELD = 'field';
+    const ALL_CACHE_KEY = '__all__';
 
     /** @var array */
     protected $config;
@@ -259,14 +260,10 @@ class PropertyConfigContainer
             return [];
         }
 
-        if ($fieldType) {
-            if (isset($this->cache['formItems'][$type][$fieldType])) {
-                return $this->cache['formItems'][$type][$fieldType];
-            }
-        } else {
-            if (isset($this->cache['formItems'][$type])) {
-                return $this->cache['formItems'][$type];
-            }
+        $cacheKey = $fieldType ? $fieldType : self::ALL_CACHE_KEY;
+
+        if (isset($this->cache['formItems'][$type][$cacheKey])) {
+            return $this->cache['formItems'][$type][$cacheKey];
         }
 
         $result = [];
@@ -281,15 +278,15 @@ class PropertyConfigContainer
                     $result[$code] = $item;
                 }
             }
-            $this->cache['formItems'][$type][$fieldType] = $result;
         } else {
             foreach ($this->config[$type]['items'] as $code => $item) {
                 if (isset($item['form']['type'])) {
                     $result[$code] = $item;
                 }
             }
-            $this->cache['formItems'][$type] = $result;
         }
+
+        $this->cache['formItems'][$type][$cacheKey] = $result;
 
         return $result;
     }

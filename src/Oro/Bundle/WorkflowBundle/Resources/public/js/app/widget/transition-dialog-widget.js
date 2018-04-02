@@ -15,6 +15,13 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function TransitionDialogWidget() {
+            TransitionDialogWidget.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @param {Object} response
          */
         onTransitionSuccess: function(response) {

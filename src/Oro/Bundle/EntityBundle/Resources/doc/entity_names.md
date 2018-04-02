@@ -1,4 +1,4 @@
-## Entity name resolver and providers ##
+## Entity name resolver and providers
 
 **Entity name resolver**
 

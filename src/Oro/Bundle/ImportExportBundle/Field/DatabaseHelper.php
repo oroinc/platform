@@ -7,10 +7,10 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class DatabaseHelper
 {
@@ -107,6 +107,7 @@ class DatabaseHelper
                 ->setMaxResults(1);
 
             if ($this->shouldBeAddedOrganizationLimits($entityName)) {
+                /** @var OwnershipMetadataProvider $ownershipMetadataProvider */
                 $ownershipMetadataProvider = $this->ownershipMetadataProviderLink->getService();
                 $organizationField = $ownershipMetadataProvider->getMetadata($entityName)->getOrganizationFieldName();
                 $queryBuilder->andWhere('e.' . $organizationField . ' = :organization')

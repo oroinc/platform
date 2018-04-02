@@ -4,18 +4,16 @@ namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\Common\Util\ClassUtils;
-
-use Symfony\Component\HttpFoundation\Response;
-
-use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\Repository\NavigationRepositoryInterface;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("navigationitems")
@@ -52,6 +50,7 @@ class NavigationItemController extends FOSRestController
     /**
      * REST POST
      *
+     * @param Request $request
      * @param string $type
      *
      * @ApiDoc(
@@ -60,9 +59,9 @@ class NavigationItemController extends FOSRestController
      * )
      * @return Response
      */
-    public function postAction($type)
+    public function postAction(Request $request, $type)
     {
-        $params = $this->getRequest()->request->all();
+        $params = $request->request->all();
 
         if (empty($params) || empty($params['type'])) {
             return $this->handleView(
@@ -97,6 +96,7 @@ class NavigationItemController extends FOSRestController
     /**
      * REST PUT
      *
+     * @param Request $request
      * @param string $type
      * @param int    $itemId Navigation item id
      *
@@ -106,9 +106,9 @@ class NavigationItemController extends FOSRestController
      * )
      * @return Response
      */
-    public function putIdAction($type, $itemId)
+    public function putIdAction(Request $request, $type, $itemId)
     {
-        $params = $this->getRequest()->request->all();
+        $params = $request->request->all();
 
         if (empty($params)) {
             return $this->handleView(

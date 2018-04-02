@@ -216,7 +216,7 @@ class EmailNotificationTypeListenerTest extends \PHPUnit_Framework_TestCase
             'options' => [
                 'label' => 'workflow',
                 'required' => true,
-                'empty_value' => '',
+                'placeholder' => '',
                 'constraints' => [new NotBlank()],
                 'configs' => ['allowClear' => true, 'placeholder' => 'oro.workflow.form.choose_workflow'],
                 'attr' => ['autocomplete' => 'off'],
@@ -230,7 +230,7 @@ class EmailNotificationTypeListenerTest extends \PHPUnit_Framework_TestCase
             'options' => [
                 'label' => 'transition',
                 'required' => true,
-                'empty_value' => '',
+                'placeholder' => '',
                 'constraints' => [new NotBlank()],
                 'configs' => ['allowClear' => true, 'placeholder' => 'oro.workflow.form.choose_transition'],
                 'workflowName' => 'test_workflow'

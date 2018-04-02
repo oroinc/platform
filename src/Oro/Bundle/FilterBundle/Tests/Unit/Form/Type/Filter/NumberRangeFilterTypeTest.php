@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NumberRangeFilterTypeTest extends AbstractTypeTestCase
 {
@@ -24,14 +24,14 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
     protected function setUp()
     {
         $translator = $this->createMockTranslator();
+        $this->type = new NumberRangeFilterType($translator);
         $this->formExtensions[] = new CustomFormExtension([
             new FilterType($translator),
             new NumberFilterType($translator),
         ]);
+        $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
         parent::setUp();
-
-        $this->type = new NumberRangeFilterType($translator);
     }
 
     /**
@@ -48,14 +48,6 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function setDefaultOptionsDataProvider()
-    {
-        $this->markTestSkipped('setDefaultOptions is deprecated.');
-    }
-
-    /**
      * @return OptionsResolver|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function createMockOptionsResolver()
@@ -64,24 +56,9 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
     }
 
     /**
-     * @dataProvider configureOptionsProvider
-     * @param array $defaultOptions
-     */
-    public function testConfigureOptions(array $defaultOptions)
-    {
-        $resolver = $this->createMockOptionsResolver();
-
-        if ($defaultOptions) {
-            $resolver->expects($this->once())->method('setDefaults')->with($defaultOptions)->will($this->returnSelf());
-        }
-
-        $this->getTestFormType()->configureOptions($resolver);
-    }
-
-    /**
      * @return array
      */
-    public function configureOptionsProvider()
+    public function configureOptionsDataProvider()
     {
         return [
             [

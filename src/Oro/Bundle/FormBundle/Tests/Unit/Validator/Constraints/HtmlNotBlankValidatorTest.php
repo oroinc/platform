@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\Validator\ExecutionContext;
-
 use Oro\Bundle\FormBundle\Validator\Constraints\HtmlNotBlank;
 use Oro\Bundle\FormBundle\Validator\Constraints\HtmlNotBlankValidator;
+use Symfony\Component\Validator\Context\ExecutionContext;
+use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 class HtmlNotBlankValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +16,7 @@ class HtmlNotBlankValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateValid($value)
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContext $context */
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
+        $context = $this->getMockBuilder(ExecutionContext::class)
             ->disableOriginalConstructor()
             ->getMock();
         $context->expects($this->never())
@@ -47,15 +47,24 @@ class HtmlNotBlankValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateInvalid($value)
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContext $context */
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
+        $context = $this->getMockBuilder(ExecutionContext::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $constraint = new HtmlNotBlank();
+        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
         $context->expects($this->once())
-            ->method('addViolation')
-            ->with($constraint->message);
-
+            ->method('buildViolation')
+            ->with($constraint->message)
+            ->willReturn($builder);
+        $builder->expects($this->once())
+            ->method('setParameter')
+            ->willReturnSelf();
+        $builder->expects($this->once())
+            ->method('setCode')
+            ->willReturnSelf();
+        $builder->expects($this->once())
+            ->method('addViolation');
         $validator = new HtmlNotBlankValidator();
         $validator->initialize($context);
 

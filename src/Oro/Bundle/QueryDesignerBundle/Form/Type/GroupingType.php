@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Form\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Form\AbstractType;
+use Oro\Bundle\EntityBundle\Form\Type\EntityFieldSelectType;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class GroupingType extends AbstractType
 {
@@ -41,20 +42,20 @@ class GroupingType extends AbstractType
         }
 
         $builder
-            ->add('columnNames', 'oro_field_choice', $options);
+            ->add('columnNames', FieldChoiceType::class, $options);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(
                 'entity'             => null,
                 'data_class'         => 'Oro\Bundle\QueryDesignerBundle\Model\Grouping',
-                'intention'          => 'query_designer_grouping',
-                'column_choice_type' => 'oro_entity_field_select'
+                'csrf_token_id'      => 'query_designer_grouping',
+                'column_choice_type' => EntityFieldSelectType::class
             )
         );
     }

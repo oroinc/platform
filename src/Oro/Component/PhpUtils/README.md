@@ -1,10 +1,9 @@
-Oro PHP Utils Component
-=======================
+# Oro PHP Utils Component
 
 `Oro PHP Utils Component` provides some useful PHP libraries.
 
-ArrayUtil class
----------------
+## ArrayUtil class
+
 **Description:**
 Provides a set of useful functions to work with PHP arrays.
 
@@ -13,8 +12,8 @@ Provides a set of useful functions to work with PHP arrays.
 - **isAssoc** - Checks whether the array is associative or sequential.
 - **sortBy** - Sorts an array by specified property using the stable sorting algorithm. See http://en.wikipedia.org/wiki/Sorting_algorithm#Stability.
 
-ReflectionClassHelper class
----------------------------
+## ReflectionClassHelper class
+
 **Description:**
 Provides a set of useful extensions of PHP class reflection API.
 

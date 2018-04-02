@@ -5,8 +5,11 @@ namespace Oro\Bundle\LocaleBundle\Form\Type;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\LocalizedFallbackValueCollectionTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LocalizedFallbackValueCollectionType extends AbstractType
 {
@@ -51,12 +54,12 @@ class LocalizedFallbackValueCollectionType extends AbstractType
     {
         $builder->add(
             self::FIELD_VALUES,
-            LocalizedPropertyType::NAME,
-            ['type' => $options['type'], 'options' => $options['options']]
+            LocalizedPropertyType::class,
+            ['entry_type' => $options['entry_type'], 'entry_options' => $options['entry_options']]
         )->add(
             self::FIELD_IDS,
-            'collection',
-            ['type' => 'hidden']
+            CollectionType::class,
+            ['entry_type' => HiddenType::class]
         );
 
         $builder->addViewTransformer(
@@ -67,12 +70,12 @@ class LocalizedFallbackValueCollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'field'   => 'string', // field used to store data - string or text
-            'type'    => 'text',   // value form type
-            'options' => [],       // value form options
+            'field' => 'string', // field used to store data - string or text
+            'entry_type' => TextType::class,   // value form type
+            'entry_options' => [],       // value form options
         ]);
     }
 }

@@ -19,78 +19,76 @@ parameters:
 services:
     # Addresses form listeners
     oro_address.form.listener.address:
-        class: %oro_address.form.listener.address.class%
+        class: '%oro_address.form.listener.address.class%'
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@form.factory'
 
     # Addresses form types
     oro_address.form.type.address:
-        class: %oro_address.form.type.address.class%
+        class: '%oro_address.form.type.address.class%'
         arguments:
             - '@oro_address.form.listener.address'
         tags:
              - { name: form.type, alias: oro_address }
 
     oro_address.type.address_collection:
-        class: %oro_address.form.type.address_collection.class%
+        class: '%oro_address.form.type.address_collection.class%'
         tags:
              - { name: form.type, alias: oro_address_collection }
 
     oro_address.form.type.typed_address:
-        class: %oro_address.form.type.typed_address.class%
+        class: '%oro_address.form.type.typed_address.class%'
         tags:
              - { name: form.type, alias: oro_typed_address }
 
     # Emails form types
     oro_address.form.type.email:
-        class: %oro_address.form.type.email.class%
+        class: '%oro_address.form.type.email.class%'
         tags:
              - { name: form.type, alias: oro_email }
 
     oro_address.type.email_collection:
-        class: %oro_address.form.type.email_collection.class%
+        class: '%oro_address.form.type.email_collection.class%'
         tags:
              - { name: form.type, alias: oro_email_collection }
 
     # Phones form types
     oro_address.form.type.phone:
-        class: %oro_address.form.type.phone.class%
+        class: '%oro_address.form.type.phone.class%'
         tags:
              - { name: form.type, alias: oro_phone }
 
     oro_address.type.phone_collection:
-        class: %oro_address.form.type.phone_collection.class%
+        class: '%oro_address.form.type.phone_collection.class%'
         tags:
              - { name: form.type, alias: oro_phone_collection }
 
     # Countries form types
     oro_address.form.type.country:
-        class: %oro_address.form.type.country.class%
+        class: '%oro_address.form.type.country.class%'
         tags:
             - { name: form.type, alias: oro_country }
 
     # Regions form types
     oro_address.form.type.region:
-        class: %oro_address.form.type.region.class%
+        class: '%oro_address.form.type.region.class%'
         tags:
             - { name: form.type, alias: oro_region }
 
     # Addresses forms
     oro_address.form.address:
-        class:           Symfony\Component\Form\Form
-        factory_method:  createNamed
-        factory_service: form.factory
+        class: Symfony\Component\Form\Form
+        factory: ['@form.factory', createNamed]
         arguments:
             - "oro_address_form"
-            - "oro_address"
+            - Oro\Bundle\AddressBundle\Form\Type\AddressType
             - ~
 
     # Addresses form handlers
     oro_address.form.handler.address:
-        class: %oro_address.form.handler.address.class%
-        scope: request
+        class: '%oro_address.form.handler.address.class%'
         arguments:
             - '@oro_address.form.address'
-            - '@request'
+            - '@request_stack'
             - '@doctrine.orm.entity_manager'

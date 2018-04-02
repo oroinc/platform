@@ -14,7 +14,7 @@ datagrids:
                     - l.createdAt
                     - l.updatedAt
                 from:
-                    - { table: %oro_locale.entity.localization.class%, alias: l }
+                    - { table: '%oro_locale.entity.localization.class%', alias: l }
                 join:
                     inner:
                         - { join: l.language, alias: lng }
@@ -81,8 +81,8 @@ datagrids:
                 frontend_type: datetime
         sorters:
             default:
-                name: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
-                parentName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+                name: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                parentName: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
             columns:
                 name:
                     data_name: name
@@ -170,7 +170,7 @@ datagrids:
                 frontend_type: datetime
         sorters:
             default:
-                name: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+                name: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
 
     oro-locale-localizations-select-grid:
         extends: oro-locale-localizations-grid

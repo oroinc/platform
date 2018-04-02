@@ -3,25 +3,23 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
-
 use Knp\Menu\ItemInterface;
-
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
-
-use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Bundle\FormBundle\Form\Type\OroIconType;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Type\Stub\OroIconTypeStub;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizationCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationCollectionTypeStub;
-use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
+use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator;
+use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 
 class MenuUpdateTypeTest extends FormIntegrationTestCase
 {
@@ -44,9 +42,12 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
                 [
                     new LocalizedFallbackValueCollectionType($registry),
                     new LocalizedPropertyType(),
-                    new LocalizationCollectionTypeStub(),
-                    new OroIconTypeStub($kernel),
-                    new Select2Type('choice'),
+                    LocalizationCollectionType::class => new LocalizationCollectionTypeStub(),
+                    OroIconType::class => new OroIconTypeStub($kernel),
+                    new Select2Type(
+                        'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+                        'oro_select2_choice'
+                    ),
                 ],
                 []
             ),
@@ -57,7 +58,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
     public function testSubmitValid()
     {
         $menuUpdate = new MenuUpdate();
-        $form = $this->factory->create(new MenuUpdateType(), $menuUpdate);
+        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate);
 
         $form->submit(
             [
@@ -95,7 +96,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         $menuUpdate = new MenuUpdate();
         $menuUpdate->setCustom(true);
 
-        $form = $this->factory->create(new MenuUpdateType(), $menuUpdate);
+        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate);
 
         $form->submit(
             [
@@ -123,7 +124,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
     public function testSubmitEmptyTitle()
     {
         $menuUpdate = new MenuUpdate();
-        $form = $this->factory->create(new MenuUpdateType(), $menuUpdate);
+        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate);
 
         $form->submit([]);
 
@@ -140,7 +141,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
     {
         $menuUpdate = new MenuUpdate();
         $menuUpdate->setCustom(true);
-        $form = $this->factory->create(new MenuUpdateType(), $menuUpdate);
+        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate);
 
         $form->submit(
             [
@@ -172,7 +173,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
             ->with('acl_resource_id')
             ->willReturn(self::TEST_ACL_RESOURCE_ID);
 
-        $form = $this->factory->create(new MenuUpdateType(), $menuUpdate, ['menu_item' => $menuItem]);
+        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate, ['menu_item' => $menuItem]);
 
         $expected = new MenuUpdate();
         $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);

@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\AbstractType;
-
-use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ChoiceTreeFilterType extends AbstractType
 {
@@ -34,13 +32,13 @@ class ChoiceTreeFilterType extends AbstractType
      */
     public function getParent()
     {
-        return TextFilterType::NAME;
+        return TextFilterType::class;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $choices = array(
             self::TYPE_CONTAINS           => 1,

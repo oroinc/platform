@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
+use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
-use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 
 abstract class AbstractAclExtension implements AclExtensionInterface
 {

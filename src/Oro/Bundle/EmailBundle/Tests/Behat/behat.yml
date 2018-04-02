@@ -58,3 +58,7 @@ oro_behat_extension:
     Email View:
       class: Oro\Bundle\EmailBundle\Tests\Behat\Page\EmailView
       route: 'oro_email_thread_view'
+
+  optional_listeners:
+    required_for_fixtures:
+      - 'oro_email.listener.entity_listener'

@@ -4,10 +4,11 @@ namespace Oro\Bundle\AddressBundle\Form\Type;
 
 use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimarySubscriber;
 use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesTypesSubscriber;
-
+use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TypedAddressType extends AbstractType
 {
@@ -28,7 +29,7 @@ class TypedAddressType extends AbstractType
         $builder
             ->add(
                 'types',
-                'translatable_entity',
+                TranslatableEntityType::class,
                 array(
                     'class'    => 'OroAddressBundle:AddressType',
                     'property' => 'label',
@@ -39,7 +40,7 @@ class TypedAddressType extends AbstractType
             )
             ->add(
                 'primary',
-                'checkbox',
+                CheckboxType::class,
                 array(
                     'required' => false
                 )
@@ -49,7 +50,7 @@ class TypedAddressType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(
@@ -64,7 +65,7 @@ class TypedAddressType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_address';
+        return AddressType::class;
     }
 
     /**

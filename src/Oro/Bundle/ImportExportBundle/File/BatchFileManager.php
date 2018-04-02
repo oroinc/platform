@@ -13,6 +13,7 @@ class BatchFileManager
      * @var int
      */
     protected $sizeOfBatch;
+
     /**
      * @var AbstractFileReader
      */
@@ -150,6 +151,9 @@ class BatchFileManager
         foreach ($files as $file) {
             $contextReader = new Context(['filePath' => $file]);
             $this->reader->initializeByContext($contextReader);
+
+            $items = [];
+            $i = 0;
             while ($item = $this->reader->read($contextReader)) {
                 if (! $contextWriter) {
                     $contextWriter = new Context(
@@ -161,7 +165,17 @@ class BatchFileManager
                     );
                     $this->writer->setImportExportContext($contextWriter);
                 }
-                $this->writer->write([$item]);
+                $items[] = $item;
+
+                if (++$i === $this->sizeOfBatch) {
+                    $this->writer->write($items);
+                    $i = 0;
+                    $items = [];
+                }
+            }
+
+            if (count($items) > 0) {
+                $this->writer->write($items);
             }
         }
         $this->writer->close();

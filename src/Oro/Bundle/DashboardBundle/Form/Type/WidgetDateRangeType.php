@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
+use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -9,11 +11,8 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 
 class WidgetDateRangeType extends AbstractType
 {
@@ -51,7 +50,7 @@ class WidgetDateRangeType extends AbstractType
      */
     public function getParent()
     {
-        return DateRangeFilterType::NAME;
+        return DateRangeFilterType::class;
     }
 
     /**
@@ -86,16 +85,16 @@ class WidgetDateRangeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::setDefaultOptions($resolver);
+        parent::configureOptions($resolver);
 
         $resolver->setDefaults(
             [
                 'tooltip'          => 'oro.filter.date.info',
                 'required'         => false,
                 'compile_date'     => false,
-                'field_type'       => WidgetDateRangeValueType::NAME,
+                'field_type'       => WidgetDateRangeValueType::class,
                 'operator_choices' => [],
                 'value_types'      => false,
                 'all_time_value'   => true,
@@ -106,12 +105,12 @@ class WidgetDateRangeType extends AbstractType
             ]
         );
 
-        $resolver->setNormalizers([
-            'operator_choices' =>
-                function (Options $options) {
-                    return $this->getOperatorChoices($options);
-                }
-        ]);
+        $resolver->setNormalizer(
+            'operator_choices',
+            function (Options $options) {
+                return $this->getOperatorChoices($options);
+            }
+        );
     }
 
     /**

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\UIBundle\EventListener\TemplateListener;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-
-use Oro\Bundle\UIBundle\EventListener\TemplateListener;
 
 class TemplateListenerTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,9 +3,9 @@
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Api\Processor;
 
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use Oro\Bundle\CurrencyBundle\Api\Processor\SetPriceByValueAndCurrency;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Entity\SettablePriceAwareInterface;
-use Oro\Bundle\CurrencyBundle\Api\Processor\SetPriceByValueAndCurrency;
 
 class SetPriceByValueAndCurrencyTest extends FormProcessorTestCase
 {

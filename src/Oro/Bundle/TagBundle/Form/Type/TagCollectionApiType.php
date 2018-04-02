@@ -3,19 +3,20 @@
 namespace Oro\Bundle\TagBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TagCollectionApiType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
                 'allow_add'            => true,
-                'type'                 => 'oro_tag_tag_api',
+                'type'                 => TagEntityApiType::class,
             ]
         );
     }
@@ -25,7 +26,7 @@ class TagCollectionApiType extends AbstractType
      */
     public function getParent()
     {
-        return 'collection';
+        return CollectionType::class;
     }
 
     /**

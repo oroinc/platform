@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\InstallerBundle\Tests\Unit\Composer;
 
-use Symfony\Component\Validator\ExecutionContextInterface;
-
 use Oro\Bundle\InstallerBundle\Validator\Constraints\ExtensionLoaded;
 use Oro\Bundle\InstallerBundle\Validator\Constraints\ExtensionLoadedValidator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class ExtensionLoadedValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,7 +33,7 @@ class ExtensionLoadedValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = new ExtensionLoaded();
 
-        $this->context = $this->createMock('Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context = $this->createMock(ExecutionContextInterface::class);
 
         if ($expected) {
             $this->validator->initialize($this->context);

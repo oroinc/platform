@@ -5,14 +5,11 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\MenuFactory;
 use Knp\Menu\MenuItem;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
-
 use Oro\Component\Config\Resolver\SystemAwareResolver;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {

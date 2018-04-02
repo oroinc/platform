@@ -12,7 +12,7 @@ class RestPlainConfigurationTest extends RestPlainApiTestCase
 
         $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType])
+            $this->getUrl('oro_rest_api_list', ['entity' => $entityType])
         );
         $requestInfo = 'get_list';
         $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, $requestInfo);
@@ -43,7 +43,7 @@ class RestPlainConfigurationTest extends RestPlainApiTestCase
 
         $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_get', ['entity' => $entityType, 'id' => $sectionId])
+            $this->getUrl('oro_rest_api_item', ['entity' => $entityType, 'id' => $sectionId])
         );
         $requestInfo = sprintf('get->%s', $sectionId);
         $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, $requestInfo);

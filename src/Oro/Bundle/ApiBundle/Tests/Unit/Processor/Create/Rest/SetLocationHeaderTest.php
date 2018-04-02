@@ -2,38 +2,36 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create\Rest;
 
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Create\Rest\SetLocationHeader;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class SetLocationHeaderTest extends FormProcessorTestCase
 {
-    const RESPONSE_LOCATION_HEADER_NAME = 'Location';
+    /** @var \PHPUnit_Framework_MockObject_MockObject|RouterInterface */
+    private $router;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $router;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    private $valueNormalizer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $valueNormalizer;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityIdTransformer;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerInterface */
+    private $entityIdTransformer;
 
     /** @var SetLocationHeader */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->router = $this->createMock('Symfony\Component\Routing\RouterInterface');
-        $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityIdTransformer = $this->createMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
+        $this->router = $this->createMock(RouterInterface::class);
+        $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
+        $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
 
         $this->processor = new SetLocationHeader(
             $this->router,
@@ -42,17 +40,25 @@ class SetLocationHeaderTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessOnExistingHeader()
+    public function testProcessWhenHeaderAlreadExist()
     {
         $existingLocation = 'existing location';
 
-        $this->context->getResponseHeaders()->set(self::RESPONSE_LOCATION_HEADER_NAME, $existingLocation);
+        $this->context->getResponseHeaders()->set(SetLocationHeader::RESPONSE_HEADER_NAME, $existingLocation);
+        $this->context->setId(123);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             $existingLocation,
-            $this->context->getResponseHeaders()->get(self::RESPONSE_LOCATION_HEADER_NAME)
+            $this->context->getResponseHeaders()->get(SetLocationHeader::RESPONSE_HEADER_NAME)
         );
+    }
+
+    public function testProcessWhenNoId()
+    {
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->getResponseHeaders()->has(SetLocationHeader::RESPONSE_HEADER_NAME));
     }
 
     public function testProcess()
@@ -64,18 +70,18 @@ class SetLocationHeaderTest extends FormProcessorTestCase
         $transformedEntityId = 'transformed_123';
         $metadata = new EntityMetadata();
 
-        $this->valueNormalizer->expects($this->once())
+        $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with($entityClass, DataType::ENTITY_TYPE, $this->context->getRequestType())
             ->willReturn($entityType);
-        $this->entityIdTransformer->expects($this->once())
+        $this->entityIdTransformer->expects(self::once())
             ->method('transform')
             ->with($entityId, self::identicalTo($metadata))
             ->willReturn($transformedEntityId);
-        $this->router->expects($this->once())
+        $this->router->expects(self::once())
             ->method('generate')
             ->with(
-                'oro_rest_api_get',
+                'oro_rest_api_item',
                 ['entity' => $entityType, 'id' => $transformedEntityId],
                 UrlGeneratorInterface::ABSOLUTE_URL
             )
@@ -86,9 +92,9 @@ class SetLocationHeaderTest extends FormProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             $location,
-            $this->context->getResponseHeaders()->get(self::RESPONSE_LOCATION_HEADER_NAME)
+            $this->context->getResponseHeaders()->get(SetLocationHeader::RESPONSE_HEADER_NAME)
         );
     }
 }

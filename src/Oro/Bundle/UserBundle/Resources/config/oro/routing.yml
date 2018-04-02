@@ -84,3 +84,12 @@ oro_api_post_group_deprecated:
     requirements:
         _format:     json|html
         version:     latest|v1
+
+oro_rest_api_user_profile:
+    path: /api/userprofile
+    defaults:
+        _controller: OroApiBundle:RestApi:item
+        entity: userprofile
+    options:
+        group: rest_api
+        override_path: /api/userprofile/{id}

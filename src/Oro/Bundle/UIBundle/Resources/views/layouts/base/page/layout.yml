@@ -1,0 +1,14 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: 'OroUIBundle:layouts:base/page/layout.html.twig'
+        - '@add':
+            id: scripts_before
+            blockType: container
+            parentId: body
+            prepend: true
+        - '@add':
+            id: requirejs_scripts_after
+            blockType: container
+            parentId: body
+

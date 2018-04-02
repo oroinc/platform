@@ -5,7 +5,6 @@ namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
-
 use Oro\Component\DoctrineUtils\ORM\Walker\PreciseOrderByWalker;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;

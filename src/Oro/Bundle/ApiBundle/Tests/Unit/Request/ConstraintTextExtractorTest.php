@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\Blank;
-
 use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
 use Oro\Bundle\ApiBundle\Validator\Constraints\HasAdderAndRemover;
 use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Blank;
 
 class ConstraintTextExtractorTest extends \PHPUnit_Framework_TestCase
 {

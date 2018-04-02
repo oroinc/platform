@@ -1,19 +1,15 @@
-Oro\Bundle\CurrencyBundle\OroCurrencyBundle
-===================================================
+# Oro\Bundle\CurrencyBundle\OroCurrencyBundle
 
-Description:
-------------
+## Description
 
-This bundle provides a way to handle prices and currencies.
+OroCurrencyBundle supports the system currency configuration and introduces currency and price field types to the application.
 
-Bundle responsibilities:
-------------------------
+## Bundle responsibilities
 
 Bundle provides forms for setting price with currency to another objects (for example product).
 Also it includes available currencies management from System configuration.
 
-Expected dependencies:
-----------------------
+## Expected dependencies
 
 Oro\Bundle\ConfigBundle\Config\ConfigManager
 Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder
@@ -30,7 +26,7 @@ Symfony\Component\HttpKernel\Bundle\Bundle
 Symfony\Component\HttpKernel\DependencyInjection\Extension
 Symfony\Component\Intl\Intl
 Symfony\Component\OptionsResolver\Options
-Symfony\Component\OptionsResolver\OptionsResolverInterface
+Symfony\Component\OptionsResolver\OptionsResolver
 Symfony\Component\PropertyAccess\PropertyAccess
 Symfony\Component\Validator\Validation
 Twig_SimpleFilter

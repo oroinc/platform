@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\DashboardBundle\Form\EventListener;
 
+use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 
 class WidgetItemsFormSubscriber implements EventSubscriberInterface
 {

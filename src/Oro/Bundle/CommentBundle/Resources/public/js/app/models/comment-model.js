@@ -30,6 +30,13 @@ define(function(require) {
             removable: true
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function CommentModel() {
+            CommentModel.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(attrs, options) {
             CommentModel.__super__.initialize.apply(this, arguments);
             this.on('request', this.beginSync);

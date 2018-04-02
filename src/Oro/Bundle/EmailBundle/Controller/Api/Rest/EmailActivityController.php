@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Util\Codes;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Symfony\Component\HttpFoundation\Response;
-
-use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
-use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityApiEntityManager;
+use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("email_activity_relation")
@@ -80,10 +78,10 @@ class EmailActivityController extends RestGetController
      *      description="Get entities where an email found by specified filters is an activity",
      *      resource=true
      * )
-     *
+     * @param Request $request
      * @return Response
      */
-    public function cgetByFiltersAction()
+    public function cgetByFiltersAction(Request $request)
     {
         $manager = $this->getManager();
 
@@ -133,8 +131,8 @@ class EmailActivityController extends RestGetController
             return $this->buildResponse('', self::ACTION_READ, ['result' => null], Codes::HTTP_NOT_FOUND);
         }
 
-        $page     = (int)$this->getRequest()->get('page', 1);
-        $limit    = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $page     = (int)$request->get('page', 1);
+        $limit    = (int)$request->get('limit', self::ITEMS_PER_PAGE);
         $criteria = $this->buildFilterCriteria(['id' => ['=', $emailId]]);
 
         return $this->handleGetListRequest($page, $limit, $criteria);

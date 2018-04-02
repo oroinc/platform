@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\NotificationBundle\Provider\ContactInformationEmailsProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ContactInformationEmailsProviderTest extends \PHPUnit_Framework_TestCase
 {

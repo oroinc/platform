@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
+use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\AbstractPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-
-use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\AbstractPass;
 
 abstract class AbstractPassTest extends \PHPUnit_Framework_TestCase
 {

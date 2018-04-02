@@ -65,6 +65,16 @@ define([
             addressDeleteUrl: null
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function AddressView() {
+            AddressView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.mapping = _.extend({}, this.defaultMapping, this.options.map || {});

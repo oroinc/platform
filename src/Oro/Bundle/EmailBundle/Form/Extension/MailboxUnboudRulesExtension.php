@@ -5,14 +5,13 @@ namespace Oro\Bundle\EmailBundle\Form\Extension;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\EmailBundle\Form\Type\MailboxType;
+use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToStringTransformer;
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-
-use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToStringTransformer;
-use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 
 class MailboxUnboudRulesExtension extends AbstractTypeExtension
 {
@@ -71,6 +70,6 @@ class MailboxUnboudRulesExtension extends AbstractTypeExtension
      */
     public function getExtendedType()
     {
-        return 'oro_email_mailbox';
+        return MailboxType::class;
     }
 }

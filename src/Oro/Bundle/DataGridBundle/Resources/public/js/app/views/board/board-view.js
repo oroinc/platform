@@ -47,6 +47,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function BoardView() {
+            BoardView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.readonly = options.readonly;
             this.columns = options.columns;
@@ -161,8 +168,8 @@ define(function(require) {
                 var placeholders = {
                     entityHint: (this.boardPlugin.main.grid.entityHint || __('oro.datagrid.entityHint')).toLowerCase()
                 };
-                var message = _.isEmpty(this.serverCollection.state.filters) ?
-                    'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
+                var message = _.isEmpty(this.serverCollection.state.filters)
+                    ? 'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
 
                 this.$('.no-data').html(this.boardPlugin.main.grid.noDataTemplate({
                     hint: __(message, placeholders).replace('\n', '<br />')

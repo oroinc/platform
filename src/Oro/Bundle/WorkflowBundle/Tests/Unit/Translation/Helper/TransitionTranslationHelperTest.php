@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation\Helper;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class TransitionTranslationHelperTest extends \PHPUnit_Framework_TestCase
 {

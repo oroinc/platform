@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
+use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
+use Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber;
 use Symfony\Component\Validator\Constraints\Valid;
 
 class EmailSettingsType extends AbstractType
@@ -52,7 +53,7 @@ class EmailSettingsType extends AbstractType
         if ($this->userConfigManager->get('oro_imap.enable_google_imap')) {
             $builder->add(
                 'imapAccountType',
-                'oro_imap_choice_account_type',
+                ChoiceAccountType::class,
                 [
                     'label' => false,
                     'constraints' => [new Valid()]
@@ -61,7 +62,7 @@ class EmailSettingsType extends AbstractType
         } else {
             $builder->add(
                 'imapConfiguration',
-                'oro_imap_configuration',
+                ConfigurationType::class,
                 [
                     'label' => false,
                     'constraints' => [new Valid()]

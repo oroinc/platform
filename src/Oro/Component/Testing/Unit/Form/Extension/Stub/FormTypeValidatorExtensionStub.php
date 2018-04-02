@@ -36,7 +36,6 @@ class FormTypeValidatorExtensionStub extends BaseValidatorExtension
             [
                 'error_mapping' => [],
                 'constraints' => [],
-                'cascade_validation' => false,
                 'invalid_message' => 'This value is not valid.',
                 'invalid_message_parameters' => [],
                 'allow_extra_fields' => false,

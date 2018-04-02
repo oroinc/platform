@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\FormBundle\Form\Type\OroPercentType;
+use Symfony\Component\Form\Extension\Core\Type\PercentType;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroPercentTypeTest extends FormIntegrationTestCase
 {
@@ -13,18 +13,12 @@ class OroPercentTypeTest extends FormIntegrationTestCase
      */
     protected $locale;
 
-    /**
-     * @var OroPercentType
-     */
-    protected $formType;
-
     protected function setUp()
     {
         parent::setUp();
 
         $this->locale = \Locale::getDefault();
         \Locale::setDefault('en');
-        $this->formType = new OroPercentType();
     }
 
     protected function tearDown()
@@ -33,17 +27,18 @@ class OroPercentTypeTest extends FormIntegrationTestCase
 
         \Locale::setDefault($this->locale);
         unset($this->locale);
-        unset($this->formType);
     }
 
     public function testGetName()
     {
-        $this->assertEquals(OroPercentType::NAME, $this->formType->getName());
+        $formType = new OroPercentType();
+        $this->assertEquals(OroPercentType::NAME, $formType->getName());
     }
 
     public function testGetParent()
     {
-        $this->assertEquals('percent', $this->formType->getParent());
+        $formType = new OroPercentType();
+        $this->assertEquals(PercentType::class, $formType->getParent());
     }
 
     /**
@@ -57,7 +52,7 @@ class OroPercentTypeTest extends FormIntegrationTestCase
         array $viewData,
         array $options = array()
     ) {
-        $form = $this->factory->create($this->formType, $data, $options);
+        $form = $this->factory->create(OroPercentType::class, $data, $options);
         $view = $form->createView();
 
         foreach ($viewData as $key => $value) {
@@ -84,7 +79,7 @@ class OroPercentTypeTest extends FormIntegrationTestCase
                     'value' => '11'
                 ),
                 'options' => array(
-                    'precision' => 0
+                    'scale' => 0
                 ),
             ),
         );
@@ -101,7 +96,7 @@ class OroPercentTypeTest extends FormIntegrationTestCase
         $expectedData,
         array $options = array()
     ) {
-        $form = $this->factory->create($this->formType, null, $options);
+        $form = $this->factory->create(OroPercentType::class, null, $options);
         $form->submit($data);
         self::assertTrue($form->isSynchronized());
         self::assertSame($expectedData, $form->getData());
@@ -128,32 +123,32 @@ class OroPercentTypeTest extends FormIntegrationTestCase
             'zero precision, with numbers after decimal point'                                              => [
                 'data'         => (string)123.45,
                 'expectedData' => 1.2345,
-                'options'      => ['precision' => 0]
+                'options'      => ['scale' => 0]
             ],
             'zero precision, without numbers after decimal point'                                           => [
                 'data'         => (string)123,
                 'expectedData' => 1.23,
-                'options'      => ['precision' => 0]
+                'options'      => ['scale' => 0]
             ],
             'zero precision, without numbers after decimal point, value can be converted to integer'        => [
                 'data'         => 100,
                 'expectedData' => (float)1,
-                'options'      => ['precision' => 0]
+                'options'      => ['scale' => 0]
             ],
             'custom precision, with numbers after decimal point'                                            => [
                 'data'         => (string)123.45,
                 'expectedData' => 1.2345,
-                'options'      => ['precision' => 1]
+                'options'      => ['scale' => 1]
             ],
             'custom precision, without numbers after decimal point'                                         => [
                 'data'         => (string)123,
                 'expectedData' => 1.23,
-                'options'      => ['precision' => 1]
+                'options'      => ['scale' => 1]
             ],
             'custom precision, without numbers after decimal point, value can be converted to integer'      => [
                 'data'         => (string)100,
                 'expectedData' => (float)1,
-                'options'      => ['precision' => 1]
+                'options'      => ['scale' => 1]
             ],
         ];
     }

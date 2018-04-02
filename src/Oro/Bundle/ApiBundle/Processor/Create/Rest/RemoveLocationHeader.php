@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Create\Rest;
 
+use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\Context;
 
 /**
  * Removes the "Location" response header if any error occurs.

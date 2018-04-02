@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface as Property;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface as Property;
 
 class DefaultColumnOptionsGuesser extends AbstractColumnOptionsGuesser
 {

@@ -2,9 +2,9 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption;
 
+use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\Testing\ClassExtensionTrait;
 
 class ChainExtensionTest extends \PHPUnit_Framework_TestCase

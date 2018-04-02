@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\UserBundle\Validator\Constraints\UserAuthenticationFieldsConstraint;
+use Oro\Bundle\WorkflowBundle\Model\Variable;
+use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
-
-use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\UserBundle\Validator\Constraints\UserAuthenticationFieldsConstraint;
-use Oro\Bundle\WorkflowBundle\Model\Variable;
-use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
 
 class VariableGuesserTest extends \PHPUnit_Framework_TestCase
 {

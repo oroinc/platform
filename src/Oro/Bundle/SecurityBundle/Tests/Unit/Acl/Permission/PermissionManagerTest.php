@@ -5,10 +5,6 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Permission;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
@@ -20,6 +16,8 @@ use Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Configuration\Stub\TestBundle1\TestBundle1;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Configuration\Stub\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class PermissionManagerTest extends \PHPUnit_Framework_TestCase
 {

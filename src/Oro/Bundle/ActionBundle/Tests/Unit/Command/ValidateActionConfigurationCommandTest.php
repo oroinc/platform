@@ -3,13 +3,11 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Command;
 
 use Doctrine\Common\Collections\Collection;
-
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ActionBundle\Command\ValidateActionConfigurationCommand;
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ValidateActionConfigurationCommandTest extends \PHPUnit_Framework_TestCase
 {

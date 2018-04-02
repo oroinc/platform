@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumChoiceType;
+use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 
 class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
 {
@@ -19,7 +20,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
     public function testGetParent()
     {
         $this->assertEquals(
-            'translatable_entity',
+            TranslatableEntityType::class,
             $this->type->getParent()
         );
     }
@@ -68,16 +69,16 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
     }
 
     /**
-     * @dataProvider setDefaultOptionsProvider
+     * @dataProvider configureOptionsProvider
      *
      * @param array $options
      * @param array $expectedOptions
      */
-    public function testSetDefaultOptions($multiple, array $options, array $expectedOptions)
+    public function testConfigureOptions($multiple, array $options, array $expectedOptions)
     {
         $resolver = $this->getOptionsResolver();
 
-        $resolvedOptions = $this->doTestSetDefaultOptions(
+        $resolvedOptions = $this->doTestConfigureOptions(
             $this->type,
             $resolver,
             'test_enum',
@@ -96,7 +97,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
     public function testClassNormalizerOptionsException()
     {
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
         $resolver->resolve([
             'enum_code' => null,
             'class' => null
@@ -110,7 +111,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
     public function testClassNormalizerUnexpectedEnumException()
     {
         $resolver = $this->getOptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
         $resolver->resolve([
             'enum_code' => 'unknown'
         ]);
@@ -119,22 +120,22 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
     /**
      * @return array
      */
-    public function setDefaultOptionsProvider()
+    public function configureOptionsProvider()
     {
         return [
             'not multiple, not expanded' => [
                 'multiple' => false,
                 'options' => ['expanded' => false],
                 'expectedOptions' => [
-                    'empty_value' => 'oro.form.choose_value',
+                    'placeholder' => 'oro.form.choose_value',
                     'empty_data' => null,
                 ]
             ],
-            'not multiple, not expanded, not null "empty_value"' => [
+            'not multiple, not expanded, not null "placeholder"' => [
                 'multiple' => false,
-                'options' => ['expanded' => false, 'empty_value' => false],
+                'options' => ['expanded' => false, 'placeholder' => false],
                 'expectedOptions' => [
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'empty_data' => null,
                 ]
             ],
@@ -142,7 +143,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
                 'multiple' => true,
                 'options' => ['expanded' => false],
                 'expectedOptions' => [
-                    'empty_value' => null,
+                    'placeholder' => null,
                     'empty_data' => null,
                 ]
             ],
@@ -150,7 +151,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
                 'multiple' => false,
                 'options' => ['expanded' => true],
                 'expectedOptions' => [
-                    'empty_value' => null,
+                    'placeholder' => null,
                     'empty_data' => null,
                 ]
             ],
@@ -158,7 +159,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
                 'multiple' => true,
                 'options' => ['expanded' => true],
                 'expectedOptions' => [
-                    'empty_value' => null,
+                    'placeholder' => null,
                     'empty_data' => null,
                 ]
             ],
@@ -166,11 +167,11 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
                 'multiple' => true,
                 'options' => [
                     'expanded' => true,
-                    'empty_value' => 'test',
+                    'placeholder' => 'test',
                     'empty_data' => '123',
                 ],
                 'expectedOptions' => [
-                    'empty_value' => 'test',
+                    'placeholder' => 'test',
                     'empty_data' => '123',
                 ]
             ],

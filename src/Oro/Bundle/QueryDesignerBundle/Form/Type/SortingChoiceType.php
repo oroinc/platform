@@ -3,7 +3,8 @@
 namespace Oro\Bundle\QueryDesignerBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SortingChoiceType extends AbstractType
 {
@@ -12,7 +13,7 @@ class SortingChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(
@@ -20,7 +21,7 @@ class SortingChoiceType extends AbstractType
                     'ASC'  => 'oro.query_designer.form.sorting_asc',
                     'DESC' => 'oro.query_designer.form.sorting_desc'
                 ),
-                'empty_value' => 'oro.query_designer.form.choose_sorting',
+                'placeholder' => 'oro.query_designer.form.choose_sorting',
                 'empty_data'  => ''
             )
         );
@@ -31,7 +32,7 @@ class SortingChoiceType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**

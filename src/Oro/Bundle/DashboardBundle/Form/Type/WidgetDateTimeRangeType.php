@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WidgetDateTimeRangeType extends AbstractType
 {
@@ -54,12 +53,12 @@ class WidgetDateTimeRangeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
                 'compile_date' => false,
-                'field_type'   => WidgetDateRangeValueType::NAME,
+                'field_type'   => WidgetDateRangeValueType::class,
             ]
         );
     }
@@ -69,7 +68,7 @@ class WidgetDateTimeRangeType extends AbstractType
      */
     public function getParent()
     {
-        return DateTimeRangeFilterType::NAME;
+        return DateTimeRangeFilterType::class;
     }
 
     /**

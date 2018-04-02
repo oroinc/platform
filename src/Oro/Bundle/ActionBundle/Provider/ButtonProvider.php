@@ -3,17 +3,14 @@
 namespace Oro\Bundle\ActionBundle\Provider;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Provider\Event\OnButtonsMatched;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ButtonProvider
 {

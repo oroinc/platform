@@ -3,12 +3,10 @@
 namespace Oro\Bundle\EntityConfigBundle\Tools;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-
-use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class ConfigLoader
 {

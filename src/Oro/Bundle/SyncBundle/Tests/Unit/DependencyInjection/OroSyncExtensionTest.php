@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\SyncBundle\DependencyInjection\OroSyncExtension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroSyncExtensionTest extends \PHPUnit_Framework_TestCase
 {

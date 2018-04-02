@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreateOrSelectTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreateOrSelectTransformer;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroEntityCreateOrSelectChoiceType extends AbstractType
 {
@@ -75,7 +75,7 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
             $this->getNewEntityFormOptions($options)
         );
 
-        $builder->add('mode', 'hidden', [
+        $builder->add('mode', HiddenType::class, [
             'data' => $options['mode'],
         ]);
     }
@@ -83,7 +83,7 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired([
             'class',
@@ -100,16 +100,15 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
             'editable' => false,
         ]);
 
-        $resolver->setNormalizers(
-            [
-                'editable' => function (Options $options, $value) {
-                    if (!$options['edit_route']) {
-                        return false;
-                    }
+        $resolver->setNormalizer(
+            'editable',
+            function (Options $options, $value) {
+                if (!$options['edit_route']) {
+                    return false;
+                }
 
-                    return $value;
-                },
-            ]
+                return $value;
+            }
         );
     }
 

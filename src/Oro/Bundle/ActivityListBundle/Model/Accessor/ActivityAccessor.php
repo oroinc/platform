@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model\Accessor;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Bundle\DoctrineBundle\Registry;
-
+use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;

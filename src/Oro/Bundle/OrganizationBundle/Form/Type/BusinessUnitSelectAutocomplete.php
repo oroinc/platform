@@ -3,18 +3,16 @@
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
+use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
+use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTreeTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
-use Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTreeTransformer;
-use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
-
 /**
- * Class BusinessUnitSelectAutocomplete
- * @package Oro\Bundle\OrganizationBundle\Form\Type
+ * Select business unit with autocomplete form type.
  */
 class BusinessUnitSelectAutocomplete extends AbstractType
 {
@@ -59,7 +57,7 @@ class BusinessUnitSelectAutocomplete extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (isset($options['config']['multiple']) &&  $options['config']['multiple'] === true) {
+        if (isset($options['configs']['multiple']) &&  $options['configs']['multiple'] === true) {
             $builder->addModelTransformer(
                 new EntitiesToIdsTransformer($this->entityManager, $this->entityClass)
             );
@@ -84,6 +82,7 @@ class BusinessUnitSelectAutocomplete extends AbstractType
                     'component'   => 'tree-autocomplete',
                     'placeholder' => 'oro.dashboard.form.choose_business_unit',
                     'allowClear'  => true,
+                    'entity_id'   => null
                 ]
             ]
         );
@@ -94,6 +93,6 @@ class BusinessUnitSelectAutocomplete extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_jqueryselect2_hidden';
+        return OroJquerySelect2HiddenType::class;
     }
 }

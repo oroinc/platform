@@ -3,18 +3,16 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType;
 
 class WorkflowSelectTypeTest extends FormIntegrationTestCase
 {
@@ -33,13 +31,12 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->registry = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
 
         $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         $this->type = new WorkflowSelectType($this->registry, $this->translator);
+        parent::setUp();
     }
 
     protected function tearDown()
@@ -50,11 +47,26 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [
+                    $this->type
+                ],
+                []
+            ),
+        ];
+    }
+
+    /**
      * @param array $inputOptions
      * @param array $expectedOptions
-     * @dataProvider setDefaultOptionsDataProvider
+     * @dataProvider configureOptionsDataProvider
      */
-    public function testSetDefaultOptions(array $inputOptions, array $expectedOptions)
+    public function testConfigureOptions(array $inputOptions, array $expectedOptions)
     {
         $testWorkflowDefinition = new WorkflowDefinition();
         $testWorkflowDefinition->setName(self::TEST_WORKFLOW_NAME)
@@ -73,7 +85,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
             ->with(WorkflowDefinition::class)
             ->will($this->returnValue($repository));
 
-        $form = $this->factory->create($this->type, null, $inputOptions);
+        $form = $this->factory->create(WorkflowSelectType::class, null, $inputOptions);
 
         $actualOptions = $form->getConfig()->getOptions();
         foreach ($expectedOptions as $name => $expectedValue) {
@@ -85,7 +97,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     /**
      * @return array
      */
-    public function setDefaultOptionsDataProvider()
+    public function configureOptionsDataProvider()
     {
         return [
             'no additional data' => [

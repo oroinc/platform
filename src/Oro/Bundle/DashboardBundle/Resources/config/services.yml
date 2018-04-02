@@ -42,12 +42,12 @@ parameters:
 
 services:
     oro_datagrid.datagrid.name_strategy:
-        class: %oro_datagrid.datagrid.name_strategy.class%
-        calls:
-            - [setRequest, ["@?request="]]
+        class: '%oro_datagrid.datagrid.name_strategy.class%'
+        arguments:
+            - '@request_stack'
 
     oro_dashboard.config_resolver:
-        class: %oro_dashboard.config_resolver.class%
+        class: '%oro_dashboard.config_resolver.class%'
         arguments:
             - '@service_container'
 
@@ -60,7 +60,7 @@ services:
         public: false
 
     oro_dashboard.widget_configs:
-        class: %oro_dashboard.widget_configs.class%
+        class: '%oro_dashboard.widget_configs.class%'
         arguments:
             - '@oro_dashboard.config_provider'
             - '@oro_dashboard.config_resolver'
@@ -69,11 +69,10 @@ services:
             - '@translator'
             - '@event_dispatcher'
             - '@oro_dashboard.widget_config_visibility_filter'
-        calls:
-            - [setRequest, ["@?request="]]
+            - '@request_stack'
 
     oro_dashboard.manager:
-        class: %oro_dashboard.manager.class%
+        class: '%oro_dashboard.manager.class%'
         arguments:
             - '@oro_dashboard.factory'
             - '@doctrine.orm.entity_manager'
@@ -81,26 +80,26 @@ services:
             - '@security.token_storage'
 
     oro_dashboard.factory:
-        class: %oro_dashboard.factory.class%
+        class: '%oro_dashboard.factory.class%'
         arguments:
             - '@oro_dashboard.config_provider'
             - '@oro_dashboard.manager.state'
             - '@oro_dashboard.widget_configs'
 
     oro_dashboard.manager.state:
-        class: %oro_dashboard.manager.state.class%
+        class: '%oro_dashboard.manager.state.class%'
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_security.token_accessor'
 
     oro_dashboard.config_provider:
-        class: %oro_dashboard.config_provider.class%
+        class: '%oro_dashboard.config_provider.class%'
         arguments:
             - []
             - '@event_dispatcher'
 
     oro_dashboard.navigation_listener:
-        class: %oro_dashboard.navigation_listener.class%
+        class: '%oro_dashboard.navigation_listener.class%'
         arguments:
             - '@oro_security.token_accessor'
             - '@oro_dashboard.manager'
@@ -108,32 +107,32 @@ services:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
 
     oro_dashboard.form.type.edit:
-        class: %oro_dashboard.form.type.edit.class%
+        class: '%oro_dashboard.form.type.edit.class%'
         tags:
             - { name: form.type, alias: "oro_dashboard" }
 
     oro_dashboard.form.type.select:
-        class: %oro_dashboard.form.type.select.class%
+        class: '%oro_dashboard.form.type.select.class%'
         arguments:
             - '@oro_dashboard.manager'
         tags:
             - { name: form.type, alias: "oro_dashboard_select" }
 
     oro_dashboard.provider.widget_configuration_form_provider:
-        class: %oro_dashboard.provider.widget_configuration_form_provider.class%
+        class: '%oro_dashboard.provider.widget_configuration_form_provider.class%'
         arguments:
             - '@oro_dashboard.config_provider'
             - '@form.factory'
 
     oro_dashboard.datetime.helper:
-        class: %oro_dashboard.datetime.helper.class%
+        class: '%oro_dashboard.datetime.helper.class%'
         arguments:
             - '@oro_locale.settings'
             - '@doctrine'
             - '@oro_security.acl_helper'
 
     oro_dashboard.event_listener.widget_configuration_load:
-        class: %oro_dashboard.event_listener.widget_configuration_load.class%
+        class: '%oro_dashboard.event_listener.widget_configuration_load.class%'
         arguments:
             - '@oro_datagrid.datagrid.manager.link'
             - '@oro_datagrid.datagrid.builder'
@@ -141,13 +140,13 @@ services:
             - { name: kernel.event_listener, event: oro_dashboard.widget_configuration_load, method: onWidgetConfigurationLoad, priority: 100 }
 
     oro_dashboard.event_listener.widget_items_load_data:
-        class: %oro_dashboard.event_listener.widget_items_load_data.class%
+        class: '%oro_dashboard.event_listener.widget_items_load_data.class%'
         tags:
             - { name: kernel.event_listener, event: oro_dashboard.widget_items_load_data, method: filterItemsByItemsChoice }
             - { name: kernel.event_listener, event: oro_dashboard.widget_items_load_data, method: filterItems }
 
     oro_dashboard.event_listener.widget_sort_by:
-        class: %oro_dashboard.event_listener.widget_sort_by.class%
+        class: '%oro_dashboard.event_listener.widget_sort_by.class%'
         arguments:
             - '@oro_dashboard.widget_configs'
         abstract: true
@@ -163,7 +162,7 @@ services:
             - { name: form.type, alias: oro_widget_entity_jqueryselect2_hidden }
 
     oro_dashboard.form.type.widget_date_range:
-        class: %oro_dashboard.form.type.widget_date_range.class%
+        class: '%oro_dashboard.form.type.widget_date_range.class%'
         arguments:
             - '@translator'
         tags:
@@ -175,22 +174,22 @@ services:
             - { name: form.type, alias: "oro_type_widget_datetime_range" }
 
     oro_dashboard.form.type.widget_date_range_value:
-        class: %oro_dashboard.form.type.date_range_value.class%
+        class: '%oro_dashboard.form.type.date_range_value.class%'
         tags:
             - { name: form.type, alias: "oro_type_widget_date_range_value" }
 
     oro_dashboard.form.type.widget_previous_date_range:
-        class: %oro_dashboard.form.type.widget_previous_date_rang.class%
+        class: '%oro_dashboard.form.type.widget_previous_date_rang.class%'
         tags:
             - { name: form.type, alias: "oro_type_widget_previous_date_range" }
 
     oro_dashboard.form.type.widget_widget_title:
-        class: %oro_dashboard.form.type.widget_widget_title.class%
+        class: '%oro_dashboard.form.type.widget_widget_title.class%'
         tags:
             - { name: form.type, alias: "oro_type_widget_title" }
 
     oro_dashboard.form.type.widget_items_choice:
-        class: %oro_dashboard.form.type.widget_items_choice.class%
+        class: '%oro_dashboard.form.type.widget_items_choice.class%'
         tags:
             - { name: form.type, alias: "oro_type_widget_items_choice" }
 
@@ -200,25 +199,25 @@ services:
             - { name: form.type, alias: "oro_type_widget_choice" }
 
     oro_dashboard.form.type.widget_item:
-        class: %oro_dashboard.form.type.widget_item.class%
+        class: '%oro_dashboard.form.type.widget_item.class%'
         tags:
             - { name: form.type, alias: oro_type_widget_item }
 
     oro_dashboard.form.type.widget_items:
-        class: %oro_dashboard.form.type.widget_items.class%
+        class: '%oro_dashboard.form.type.widget_items.class%'
         arguments:
             - '@oro_dashboard.event_listener.widget_items_form_subscriber'
         tags:
             - { name: form.type, alias: oro_type_widget_items }
 
     oro_dashboard.event_listener.widget_items_form_subscriber:
-        class: %oro_dashboard.event_listener.widget_items_form_subscriber.class%
+        class: '%oro_dashboard.event_listener.widget_items_form_subscriber.class%'
         arguments:
             - '@oro_dashboard.widget_configs'
             - '@translator'
 
     oro_dashboard.widget_config_value.provider:
-        class: %oro_dashboard.widget_config_value.provider.class%
+        class: '%oro_dashboard.widget_config_value.provider.class%'
 
     oro_dashboard.widget_config_value.date_range.converter:
         class: Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter
@@ -240,18 +239,18 @@ services:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_datetime_range" }
 
     oro_dashboard.widget_config_value.previous_date_range.converter:
-          class: %oro_dashboard.widget_config_value.previous_date_range.converter.class%
+          class: '%oro_dashboard.widget_config_value.previous_date_range.converter.class%'
           parent: oro_dashboard.widget_config_value.date_range.converter
           tags:
               - { name: oro_dashboard.value.converter, alias: "oro_type_widget_previous_date_range" }
 
     oro_dashboard.widget_config_value.widget_title.converter:
-        class: %oro_dashboard.widget_config_value.widget_title.converter.class%
+        class: '%oro_dashboard.widget_config_value.widget_title.converter.class%'
         tags:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_title" }
 
     oro_dashboard.widget_config_value.widget_items_choice.converter:
-        class: %oro_dashboard.widget_config_value.widget_items_choice.converter.class%
+        class: '%oro_dashboard.widget_config_value.widget_items_choice.converter.class%'
         tags:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_items_choice" }
 
@@ -261,7 +260,7 @@ services:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_choice" }
 
     oro_dashboard.widget_config_value.widget_sort_by.converter:
-        class: %oro_dashboard.widget_config_value.widget_sort_by.converter.class%
+        class: '%oro_dashboard.widget_config_value.widget_sort_by.converter.class%'
         arguments:
             - '@oro_entity_config.provider.entity'
             - '@translator'
@@ -283,12 +282,12 @@ services:
         abstract: true
 
     oro_dashboard.form.type.widget_date:
-        class: %oro_dashboard.form.type.widget_date.class%
+        class: '%oro_dashboard.form.type.widget_date.class%'
         tags:
             - { name: form.type, alias: "oro_type_widget_date" }
 
     oro_dashboard.form.type.widget_sort_by:
-        class: %oro_dashboard.form.type.widget_sort_by.class%
+        class: '%oro_dashboard.form.type.widget_sort_by.class%'
         arguments:
             - '@oro_entity.entity_field_provider'
         tags:
@@ -296,18 +295,18 @@ services:
 
     # BigNumber
     oro_dashboard.provider.big_number.processor:
-        class: %oro_dashboard.provider.big_number.processor.class%
+        class: '%oro_dashboard.provider.big_number.processor.class%'
         arguments:
             - '@oro_dashboard.provider.big_number.formatter'
             - '@oro_dashboard.provider.big_number.date_helper'
 
     oro_dashboard.provider.big_number.formatter:
-        class: %oro_dashboard.provider.big_number.formatter.class%
+        class: '%oro_dashboard.provider.big_number.formatter.class%'
         arguments:
             - '@oro_locale.formatter.number'
 
     oro_dashboard.provider.big_number.date_helper:
-        class: %oro_dashboard.provider.big_number.date_helper.class%
+        class: '%oro_dashboard.provider.big_number.date_helper.class%'
         arguments:
             - '@doctrine'
             - '@oro_security.acl_helper'

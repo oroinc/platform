@@ -5,7 +5,6 @@ namespace Oro\Bundle\SearchBundle\EventListener\ORM;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 
 class FulltextIndexListener

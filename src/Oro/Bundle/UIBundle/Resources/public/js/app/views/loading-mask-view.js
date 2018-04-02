@@ -4,6 +4,7 @@ define(function(require) {
     var LoadingMaskView;
     var BaseView = require('./base/view');
     var template = require('tpl!oroui/templates/loading-mask-view.html');
+    var $ = require('jquery');
     var _ = require('underscore');
 
     LoadingMaskView = BaseView.extend({
@@ -43,8 +44,21 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function LoadingMaskView() {
+            LoadingMaskView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['loadingHint', 'hideDelay']));
+            $(window).on(
+                'pagehide' + this.eventNamespace(),
+                _.bind(function() {
+                    this.hide();
+                }, this)
+            );
             LoadingMaskView.__super__.initialize.apply(this, arguments);
         },
 
@@ -159,6 +173,7 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
+            $(window).off('pagehide' + this.eventNamespace());
             this.hide(true);
             LoadingMaskView.__super__.dispose.apply(this, arguments);
         }

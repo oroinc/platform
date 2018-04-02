@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\LocaleBundle\Model\Calendar;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Twig\CalendarExtension;
-use Oro\Bundle\LocaleBundle\Model\Calendar;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class CalendarExtensionTest extends \PHPUnit_Framework_TestCase

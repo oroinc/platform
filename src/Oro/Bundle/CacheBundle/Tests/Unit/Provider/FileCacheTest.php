@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\CacheBundle\Tests\Unit\Provider;
 
-use Symfony\Component\Filesystem\Filesystem;
-
 use Oro\Bundle\CacheBundle\Provider\SyncCacheInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 class FileCacheTest extends \PHPUnit_Framework_TestCase
 {

@@ -5,31 +5,30 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor;
 use Nelmio\ApiDocBundle\Formatter\FormatterInterface;
-
-use Symfony\Component\Routing\Route;
-
 use Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
+use Symfony\Component\Routing\Route;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class DocumentationTest extends RestJsonApiTestCase
 {
-    const VIEW = 'rest_json_api';
+    private const VIEW = 'rest_json_api';
 
-    const RESOURCE_ERROR_COUNT = 3;
+    private const RESOURCE_ERROR_COUNT = 3;
 
     /**
-     * @see \Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider::$templates
+     * @see \Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider::TEMPLATES
      * @var array
      */
-    protected $defaultDocumentation = [
+    private const DEFAULT_DOCUMENTATION = [
         ApiActions::GET                 => 'Get an entity',
         ApiActions::GET_LIST            => 'Get a list of entities',
         ApiActions::DELETE              => 'Delete an entity',
@@ -154,6 +153,38 @@ class DocumentationTest extends RestJsonApiTestCase
     }
 
     /**
+     * @depends testWarmUpCache
+     */
+    public function testResourceWithoutIdentifier()
+    {
+        $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
+        $docs = $this->getEntityDocsForAction($entityType, ApiActions::CREATE);
+
+        $data = $this->getSimpleFormatter()->format($docs);
+        $resourceData = reset($data);
+        $resourceData = reset($resourceData);
+        self::assertArrayContains(
+            [
+                'description'   => 'Create Resource Without Identifier',
+                'documentation' => 'Create resource without identifier',
+                'parameters'    => [
+                    'name' => [
+                        'dataType'    => 'string',
+                        'description' => 'The name of a resource'
+                    ]
+                ],
+                'response'      => [
+                    'name' => [
+                        'dataType'    => 'string',
+                        'description' => 'The name of a resource'
+                    ]
+                ]
+            ],
+            $resourceData
+        );
+    }
+
+    /**
      * @param string $entityClass
      * @param string $entityType
      *
@@ -189,8 +220,8 @@ class DocumentationTest extends RestJsonApiTestCase
         }
         if (empty($definition['documentation'])) {
             $missingDocs[] = 'Empty documentation';
-        } elseif (isset($this->defaultDocumentation[$action])
-            && in_array($definition['documentation'], (array)$this->defaultDocumentation[$action], true)
+        } elseif (isset(self::DEFAULT_DOCUMENTATION[$action])
+            && in_array($definition['documentation'], (array)self::DEFAULT_DOCUMENTATION[$action], true)
             && 'data_channel' !== $association // @todo: remove this after CRM-8214 fix
         ) {
             $missingDocs[] = sprintf(

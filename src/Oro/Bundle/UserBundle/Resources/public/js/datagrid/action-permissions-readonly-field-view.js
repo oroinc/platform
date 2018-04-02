@@ -8,10 +8,21 @@ define(function(require) {
 
     ActionPermissionsReadonlyFieldView = BaseView.extend({
         autoRender: false,
+
         animationDuration: 0,
+
         className: 'field-permission-container clearfix',
+
         template: require('tpl!orouser/templates/datagrid/action-permissions-field-view.html'),
+
         permissionView: PermissionReadOnlyView,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActionPermissionsReadonlyFieldView() {
+            ActionPermissionsReadonlyFieldView.__super__.constructor.apply(this, arguments);
+        },
 
         render: function() {
             ActionPermissionsReadonlyFieldView.__super__.render.call(this);

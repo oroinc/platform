@@ -11,7 +11,7 @@ entity_config:
                         type:               choice
                         options:
                             choices:        ['No', 'Yes']
-                            empty_value:    false
+                            placeholder:    false
                             block:          other
                             label:          oro.email.entity_config.email.field.items.available_in_template
     attachment:
@@ -27,6 +27,6 @@ entity_config:
                         options:
                             block:              attachments
                             choices:            ['oro.email.system_configuration.attachment_configuration.link_to_scope.choices.manual.label', 'oro.email.system_configuration.attachment_configuration.link_to_scope.choices.auto.label']
-                            empty_value:        false
+                            placeholder:        false
                             required:           true
                             label:              oro.email.system_configuration.attachment_configuration.link_to_scope.label

@@ -4,15 +4,14 @@ namespace Oro\Bundle\OrganizationBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class BusinessUnitManager
 {
@@ -169,9 +168,9 @@ class BusinessUnitManager
         if (AccessLevel::SYSTEM_LEVEL === $accessLevel) {
             return true;
         } elseif (AccessLevel::LOCAL_LEVEL === $accessLevel) {
-            $businessUnits =  $treeProvider->getTree()->getUserBusinessUnitIds(
-                $this->$currentUser->getId(),
-                $organization
+            $businessUnits = $treeProvider->getTree()->getUserBusinessUnitIds(
+                $currentUser->getId(),
+                $organization->getId()
             );
         } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
             $businessUnits = $treeProvider->getTree()->getUserSubordinateBusinessUnitIds(

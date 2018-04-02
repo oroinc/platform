@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityExtendBundle\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\AbstractColumnOptionsGuesser;
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface as Property;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface as Property;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 

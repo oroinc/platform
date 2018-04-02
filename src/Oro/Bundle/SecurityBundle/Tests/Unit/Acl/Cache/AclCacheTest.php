@@ -1,9 +1,8 @@
 <?php
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Cache;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\SecurityBundle\Acl\Cache\AclCache;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class AclCacheTest extends \PHPUnit_Framework_TestCase
 {

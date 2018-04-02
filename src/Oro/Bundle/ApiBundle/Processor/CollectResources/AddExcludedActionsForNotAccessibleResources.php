@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CollectResources;
 
+use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 
 /**
  * Disables all actions for resources which are not accessible through Data API.
@@ -34,7 +34,10 @@ class AddExcludedActionsForNotAccessibleResources implements ProcessorInterface
         $resources = $context->getResult();
         foreach ($resources as $resource) {
             if (!isset($accessibleResources[$resource->getEntityClass()])) {
-                $resource->setExcludedActions($allActions);
+                $excludedActions = $resource->getExcludedActions();
+                if (empty($excludedActions)) {
+                    $resource->setExcludedActions($allActions);
+                }
             }
         }
     }

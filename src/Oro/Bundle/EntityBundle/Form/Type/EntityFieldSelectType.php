@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityProvider;
+use Oro\Bundle\FormBundle\Form\Type\Select2HiddenType;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class EntityFieldSelectType extends AbstractType
 {
@@ -49,7 +49,7 @@ class EntityFieldSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $that = $this;
 
@@ -73,19 +73,16 @@ class EntityFieldSelectType extends AbstractType
                 'with_relations'            => false,
                 'with_unidirectional'       => false,
                 'with_virtual_fields'       => false,
-                'empty_value'               => '',
+                'placeholder'               => '',
                 'skip_load_entities'        => false,
                 'skip_load_data'            => false,
                 'multiple'                  => false,
                 'configs'                   => $defaultConfigs,
             ]
         );
-        $resolver->setNormalizers(
-            [
-                'configs' => $configsNormalizer,
-                'attr'    => $attrNormalizer,
-            ]
-        );
+
+        $resolver->setNormalizer('configs', $configsNormalizer)
+            ->setNormalizer('attr', $attrNormalizer);
     }
 
     /**
@@ -209,7 +206,7 @@ class EntityFieldSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'genemu_jqueryselect2_hidden';
+        return Select2HiddenType::class;
     }
 
     /**

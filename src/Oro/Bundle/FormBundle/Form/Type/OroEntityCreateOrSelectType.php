@@ -2,20 +2,20 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreateOrSelectTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreateOrSelectTransformer;
 
 class OroEntityCreateOrSelectType extends AbstractType
 {
@@ -87,7 +87,7 @@ class OroEntityCreateOrSelectType extends AbstractType
         // existing entity field
         $builder->add(
             'existing_entity',
-            'oro_entity_identifier',
+            EntityIdentifierType::class,
             array(
                 'required' => $options['required'],
                 'class' => $options['class'],
@@ -96,7 +96,7 @@ class OroEntityCreateOrSelectType extends AbstractType
         );
 
         // rendering mode
-        $builder->add('mode', 'hidden');
+        $builder->add('mode', HiddenType::class);
     }
 
     /**
@@ -156,7 +156,7 @@ class OroEntityCreateOrSelectType extends AbstractType
      *
      * {@inheritDoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(
             array(
@@ -176,30 +176,29 @@ class OroEntityCreateOrSelectType extends AbstractType
             )
         );
 
-        $resolver->setNormalizers(
-            array(
-                'view_widgets' => function (Options $options, array $viewWidgets) {
-                    foreach ($viewWidgets as $key => $widgetData) {
-                        if (empty($widgetData['route_name'])) {
-                            throw new InvalidConfigurationException(
-                                'Widget route name is not defined'
-                            );
-                        }
-
-                        if (!array_key_exists('route_parameters', $widgetData)) {
-                            $widgetData['route_parameters'] = array('id' => new PropertyPath('id'));
-                        }
-
-                        if (!array_key_exists('grid_row_to_route', $widgetData)) {
-                            $widgetData['grid_row_to_route'] = array('id' => 'id');
-                        }
-
-                        $viewWidgets[$key] = $widgetData;
+        $resolver->setNormalizer(
+            'view_widgets',
+            function (Options $options, array $viewWidgets) {
+                foreach ($viewWidgets as $key => $widgetData) {
+                    if (empty($widgetData['route_name'])) {
+                        throw new InvalidConfigurationException(
+                            'Widget route name is not defined'
+                        );
                     }
 
-                    return $viewWidgets;
+                    if (!array_key_exists('route_parameters', $widgetData)) {
+                        $widgetData['route_parameters'] = ['id' => new PropertyPath('id')];
+                    }
+
+                    if (!array_key_exists('grid_row_to_route', $widgetData)) {
+                        $widgetData['grid_row_to_route'] = ['id' => 'id'];
+                    }
+
+                    $viewWidgets[$key] = $widgetData;
                 }
-            )
+
+                return $viewWidgets;
+            }
         );
     }
 

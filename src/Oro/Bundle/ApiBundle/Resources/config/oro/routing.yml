@@ -1,146 +1,56 @@
-# returns an entity of the given type by its identifier
-oro_rest_api_get:
+# * GET method: returns an entity of the given type by its identifier
+# * DELETE method: deletes an entity of the given type by its identifier
+# * PATCH method: updates the specified fields of the given entity
+oro_rest_api_item:
     path: /api/{entity}/{id}
-    methods: [GET]
     requirements:
         entity: (?:(?!(soap|rest)(/|$))[^/]+)
     defaults:
-        _controller: OroApiBundle:RestApi:get
-        _action: get
+        _controller: OroApiBundle:RestApi:item
     options:
         group: rest_api
         priority: -10
 
-# returns a list of entities of the given type
-oro_rest_api_cget:
+# * GET method: returns a list of entities of the given type
+# * DELETE method: deletes a list of entities of the given type by the given filters
+# * POST method: creates an entity of the given type
+oro_rest_api_list:
     path: /api/{entity}
-    methods: [GET]
     requirements:
         entity: (?:(?!(soap|rest)(/|$))[^/]+)
     defaults:
-        _controller: OroApiBundle:RestApi:cget
-        _action: get_list
+        _controller: OroApiBundle:RestApi:list
     options:
         group: rest_api
         priority: -10
 
-# deletes an entity of the given type by its identifier
-oro_rest_api_delete:
-    path: /api/{entity}/{id}
-    methods: [DELETE]
-    requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
-    defaults:
-        _controller: OroApiBundle:RestApi:delete
-        _action: delete
-    options:
-        group: rest_api
-        priority: -10
-
-# deletes a list of entities of the given type by the given filters
-oro_rest_api_cdelete:
-    path: /api/{entity}
-    methods: [DELETE]
-    requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
-    defaults:
-        _controller: OroApiBundle:RestApi:cdelete
-        _action: delete_list
-    options:
-        group: rest_api
-        priority: -10
-
-# creates an entity of the given type
-oro_rest_api_post:
-    path: /api/{entity}
-    methods: [POST]
-    requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
-    defaults:
-        _controller: OroApiBundle:RestApi:post
-        _action: create
-    options:
-        group: rest_api
-        priority: -10
-
-# updates the specified fields of the given entity
-oro_rest_api_patch:
-    path: /api/{entity}/{id}
-    methods: [PATCH]
-    requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
-    defaults:
-        _controller: OroApiBundle:RestApi:patch
-        _action: update
-    options:
-        group: rest_api
-        priority: -10
-
-# returns an entity (for to-one association) or a list of entities (for to-many association)
-# connected to the given entity by the given association
-oro_rest_api_get_subresource:
+# * GET method: returns an entity (for to-one association)
+#   or a list of entities (for to-many association)
+#   connected to the given entity by the given association
+oro_rest_api_subresource:
     path: /api/{entity}/{id}/{association}
-    methods: [GET]
     requirements:
         entity: (?:(?!(soap|rest)(/|$))[^/]+)
     defaults:
-        _controller: OroApiBundle:RestApiSubresource:get
-        _action: get_subresource
+        _controller: OroApiBundle:RestApi:subresource
     options:
         group: rest_api
         priority: -10
 
-# returns an entity identifier (for to-one association) or a list of entity identifiers (for to-many association)
-# connected to the given entity by the given association
-oro_rest_api_get_relationship:
+# * GET method: returns an entity identifier (for to-one association)
+#   or a list of entity identifiers (for to-many association)
+#   connected to the given entity by the given association
+# * PATCH method: updates a relationship between entities represented by the given association
+#   for to-one association the target entity can be NULL to clear the association
+#   for to-many association the existing relationships will be completely replaced with the specified list
+# * POST method: adds the specified entities to the relationship represented by the given to-many association
+# * DELETE method: deletes the specified entities from the relationship represented by the given to-many association
+oro_rest_api_relationship:
     path: /api/{entity}/{id}/relationships/{association}
-    methods: [GET]
     requirements:
         entity: (?:(?!(soap|rest)(/|$))[^/]+)
     defaults:
-        _controller: OroApiBundle:RestApiRelationship:get
-        _action: get_relationship
-    options:
-        group: rest_api
-        priority: -10
-
-# updates a relationship between entities represented by the given association
-# for to-one association the target entity can be NULL to clear the association
-# for to-many association the existing relationships will be completely replaced with the specified list
-oro_rest_api_patch_relationship:
-    path: /api/{entity}/{id}/relationships/{association}
-    methods: [PATCH]
-    requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
-    defaults:
-        _controller: OroApiBundle:RestApiRelationship:patch
-        _action: update_relationship
-    options:
-        group: rest_api
-        priority: -10
-
-# adds the specified entities to the relationship represented by the given to-many association
-oro_rest_api_post_relationship:
-    path: /api/{entity}/{id}/relationships/{association}
-    methods: [POST]
-    requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
-    defaults:
-        _controller: OroApiBundle:RestApiRelationship:post
-        _action: add_relationship
-    options:
-        group: rest_api
-        priority: -10
-
-# deletes the specified entities from the relationship represented by the given to-many association
-oro_rest_api_delete_relationship:
-    path: /api/{entity}/{id}/relationships/{association}
-    methods: [DELETE]
-    requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
-    defaults:
-        _controller: OroApiBundle:RestApiRelationship:delete
-        _action: delete_relationship
+        _controller: OroApiBundle:RestApi:relationship
     options:
         group: rest_api
         priority: -10
@@ -159,7 +69,7 @@ oro_rest_api_get_deprecated:
         entity: (?:(?!(soap|rest)(/|$))[^/\.]+)
         _format: json
     defaults:
-        _controller: OroApiBundle:RestApi:get
+        _controller: OroApiBundle:RestApi:item
         _format: json
         _action: get
     options:
@@ -173,7 +83,7 @@ oro_rest_api_cget_deprecated:
         entity: (?:(?!(soap|rest)(/|$))[^/\.]+)
         _format: json
     defaults:
-        _controller: OroApiBundle:RestApi:cget
+        _controller: OroApiBundle:RestApi:list
         _format: json
         _action: get_list
     options:
@@ -186,7 +96,7 @@ oro_rest_api_delete_deprecated:
     requirements:
         entity: (?:(?!(soap|rest)(/|$))[^/]+)
     defaults:
-        _controller: OroApiBundle:RestApi:delete
+        _controller: OroApiBundle:RestApi:item
         _format: json
         _action: delete
     options:
@@ -199,7 +109,7 @@ oro_rest_api_cdelete_deprecated:
     requirements:
         entity: (?:(?!(soap|rest)(/|$))[^/]+)
     defaults:
-        _controller: OroApiBundle:RestApi:cdelete
+        _controller: OroApiBundle:RestApi:list
         _format: json
         _action: delete_list
     options:
@@ -212,7 +122,7 @@ oro_rest_api_post_deprecated:
     requirements:
         entity: (?:(?!(soap|rest)(/|$))[^/]+)
     defaults:
-        _controller: OroApiBundle:RestApi:post
+        _controller: OroApiBundle:RestApi:list
         _format: json
         _action: create
     options:
@@ -225,7 +135,7 @@ oro_rest_api_patch_deprecated:
     requirements:
         entity: (?:(?!(soap|rest)(/|$))[^/]+)
     defaults:
-        _controller: OroApiBundle:RestApi:patch
+        _controller: OroApiBundle:RestApi:item
         _format: json
         _action: update
     options:
@@ -238,7 +148,7 @@ oro_rest_api_get_subresource_deprecated:
     requirements:
         entity: (?:(?!(soap|rest)(/|$))[^/]+)
     defaults:
-        _controller: OroApiBundle:RestApiSubresource:get
+        _controller: OroApiBundle:RestApi:subresource
         _format: json
         _action: get_subresource
     options:

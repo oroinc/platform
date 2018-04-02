@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Exception\CredentialsResetException;
+use Oro\Bundle\UserBundle\Exception\OrganizationException;
+use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserChecker as BaseUserChecker;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\UserManager;
-use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
-use Oro\Bundle\UserBundle\Exception\CredentialsResetException;
-use Oro\Bundle\UserBundle\Exception\OrganizationException;
 
 class UserChecker extends BaseUserChecker
 {

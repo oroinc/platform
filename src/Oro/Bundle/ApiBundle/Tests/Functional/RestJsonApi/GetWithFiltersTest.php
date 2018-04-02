@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
@@ -226,6 +227,110 @@ class GetWithFiltersTest extends RestJsonApiTestCase
             ],
             $response
         );
+    }
+
+    public function testDefaultPagination()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->cget(
+            ['entity' => $entityType]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment1->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment2->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment3->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment4->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment5->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment6->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment7->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment8->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment9->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment10->id)>']
+                ]
+            ],
+            $response
+        );
+        self::assertResponseCount(10, $response);
+    }
+
+    public function testDefaultPaginationWithSpecifiedPageNumber()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['number' => 1]]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment1->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment2->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment3->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment4->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment5->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment6->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment7->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment8->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment9->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment10->id)>']
+                ]
+            ],
+            $response
+        );
+        self::assertResponseCount(10, $response);
+    }
+
+    public function testDefaultPaginationWithSpecifiedPageNumberThatIsNotFirstPage()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['number' => 2]]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment11->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment12->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment13->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment14->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment15->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment16->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment17->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment18->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment19->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment20->id)>']
+                ]
+            ],
+            $response
+        );
+        self::assertResponseCount(10, $response);
+    }
+
+    public function testDefaultPageNumberWithSpecifiedPageSize()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['size' => 3]]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment1->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment2->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment3->id)>']
+                ]
+            ],
+            $response
+        );
+        self::assertResponseCount(3, $response);
     }
 
     public function testSorting()

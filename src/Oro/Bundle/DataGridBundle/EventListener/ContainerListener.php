@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\EventListener;
 
+use Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider;
+use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-
-use Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider;
-use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 
 class ContainerListener
 {

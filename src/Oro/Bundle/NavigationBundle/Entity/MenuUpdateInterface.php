@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
-
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\ScopeBundle\Entity\Scope;

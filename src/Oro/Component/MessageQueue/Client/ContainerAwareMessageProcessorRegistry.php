@@ -2,9 +2,8 @@
 
 namespace Oro\Component\MessageQueue\Client;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ContainerAwareMessageProcessorRegistry implements MessageProcessorRegistryInterface
 {

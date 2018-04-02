@@ -4,6 +4,7 @@ namespace Oro\Bundle\CommentBundle\Tests\Unit\Form\Handler;
 
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Form\Handler\CommentApiHandler;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CommentApiHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,13 +42,15 @@ class CommentApiHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $this->form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $this->request = $this->createMock('Symfony\Component\HttpFoundation\Request');
+        $requestStack = new RequestStack();
+        $requestStack->push($this->request);
         $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->comment = new Comment();
 
-        $this->handler = new CommentApiHandler($this->form, $this->request, $this->om, $this->configManager);
+        $this->handler = new CommentApiHandler($this->form, $requestStack, $this->om, $this->configManager);
     }
 
     /**

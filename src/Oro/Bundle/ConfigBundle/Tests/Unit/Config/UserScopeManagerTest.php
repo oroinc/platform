@@ -4,14 +4,12 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ManagerRegistry;
-
+use Oro\Bundle\ConfigBundle\Config\UserScopeManager;
+use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\ConfigBundle\Config\UserScopeManager;
-use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
 
 class UserScopeManagerTest extends AbstractScopeManagerTestCase
 {

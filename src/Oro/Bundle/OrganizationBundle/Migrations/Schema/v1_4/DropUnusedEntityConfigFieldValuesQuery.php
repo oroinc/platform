@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\OrganizationBundle\Migrations\Schema\v1_4;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class DropUnusedEntityConfigFieldValuesQuery extends ParametrizedMigrationQuery
 {

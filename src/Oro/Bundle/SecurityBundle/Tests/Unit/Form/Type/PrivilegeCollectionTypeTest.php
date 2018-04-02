@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\SecurityBundle\Form\Type\PrivilegeCollectionType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\FormView;
 
 class PrivilegeCollectionTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,7 +23,7 @@ class PrivilegeCollectionTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('collection', $this->formType->getParent());
+        $this->assertEquals(CollectionType::class, $this->formType->getParent());
     }
 
     public function testBuildView()
@@ -34,7 +34,7 @@ class PrivilegeCollectionTypeTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $privilegesConfig = array('permissions' => array('VIEW', 'CREATE'));
         $options = array(
-            'options' => array(
+            'entry_options' => array(
                 'privileges_config' => $privilegesConfig
             ),
             'page_component_module' => 'component_name',

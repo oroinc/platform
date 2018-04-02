@@ -17,10 +17,9 @@ Options:
 * **property** - class property that should be used as label, by default string representation of entity will be used;
 * **query\_builder** - custom query builder or callback to extract entities.
 
-#### genemu\_jqueryselect2\_translatable\_entity
+#### oro\_select2\_translatable\_entity
 
-This form type is extended from translatable\_entity and renders using Select2 JS widget with autocomplete
-from Genemu FormBundle.
+This form type is extended from translatable\_entity and renders using Select2 JS widget with autocomplete.
 
 
 ### Classes Description
@@ -45,8 +44,8 @@ services:
             - { name: form.type, alias: translatable_entity }
 
     oro_form.type.jqueryselect2_translatable_entity:
-        parent: genemu.form.jquery.type.select2
+        parent: oro_form.type.select2
         arguments: ["translatable_entity"]
         tags:
-            - { name: form.type, alias: genemu_jqueryselect2_translatable_entity }
+            - { name: form.type, alias: oro_select2_translatable_entity }
 ```

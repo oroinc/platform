@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\EventListener;
 
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 
 /**
  * This listener registers the "view" option for "api:doc:dump" and "api:swagger:dump" commands

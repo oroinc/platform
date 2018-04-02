@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Form\DataTransformer;
 
-use Symfony\Component\Form\DataTransformerInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
+use Symfony\Component\Form\DataTransformerInterface;
 
 /**
  * Transforms form value between array of full email addresses and string of base64 encoded full email addresses.

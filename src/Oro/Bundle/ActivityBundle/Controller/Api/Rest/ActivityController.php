@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\ActivityBundle\Controller\Api\Rest;
 
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\Annotations\Get;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("activity")

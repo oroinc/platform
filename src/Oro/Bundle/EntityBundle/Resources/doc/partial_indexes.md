@@ -1,4 +1,4 @@
-## Partial indexes ##
+## Partial indexes
 
 To use a partial index for the entity field, add the following condition as additional option to the index defenition:
 

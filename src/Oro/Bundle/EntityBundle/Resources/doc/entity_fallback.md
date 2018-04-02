@@ -1,4 +1,4 @@
-## Entity fallback values ##
+## Entity fallback values
 
 You can set up an entity field to fallback to a different entity's field value.
 To set up such a field, add it to the entity as a property (or create a migration for adding it),
@@ -117,10 +117,10 @@ and which will map to the fallback field of [EntityFieldFallbackValue](../../Ent
 The options and types of those 3 fields can be overridden with `value_options`, `fallback_options`, `use_fallback_options`, `value_type` and `fallback_type`.
 Internally, the submitted own value will be saved in `scalarValue`, if it is scalar, or `arrayValue`, if it's an array. 
 
-#### Example of fallback widget ####
+#### Example of fallback widget
 ![alt text](./images/fallback_example.png "Example of fallback widget")
 
-#### EntityFieldFallbackValue table content ####
+#### EntityFieldFallbackValue table content
 ![alt text](./images/fallback_table.png "Fallback table content")
 
 If the `fallback` column contains a value, it means entity uses the fallback value
