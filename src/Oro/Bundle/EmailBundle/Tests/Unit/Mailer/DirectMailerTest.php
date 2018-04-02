@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -202,5 +203,92 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         return $this->getMockBuilder('\Swift_Mailer')
             ->disableOriginalConstructor()
             ->getMock();
+    }
+
+    /**
+     * Check that SMTP transport initialized correctly and not overridden
+     */
+    public function testAfterPrepareSmtpTransportForEsmtpTransport()
+    {
+        /** @var \Swift_Transport_EsmtpTransport|\PHPUnit_Framework_MockObject_MockObject $smtpTransportMock */
+        $smtpTransportMock = $this->getMockBuilder(\Swift_Transport_EsmtpTransport::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['setHost', 'setPort', 'setEncryption', 'setUsername', 'setPassword'])
+            ->getMock();
+        $streamOptions = ['ssl' => ['verify_peer' => false]];
+        $smtpTransportMock->setStreamOptions($streamOptions);
+
+        $this->baseMailer->expects($this->once())
+            ->method('getTransport')
+            ->willReturn($smtpTransportMock);
+
+        $settings = new SmtpSettings();
+        $settings->setHost('test.host');
+        $settings->setPort(442);
+        $settings->setUsername('username');
+        $settings->setPassword('pass');
+        $settings->setEncryption('tls');
+
+        $smtpTransportMock->expects($this->once())
+            ->method('setHost')
+            ->with($settings->getHost())
+            ->willReturnSelf();
+        $smtpTransportMock->expects($this->once())
+            ->method('setPort')
+            ->with($settings->getPort())
+            ->willReturnSelf();
+        $smtpTransportMock->expects($this->once())
+            ->method('setEncryption')
+            ->with($settings->getEncryption())
+            ->willReturnSelf();
+        $smtpTransportMock->expects($this->once())
+            ->method('setUsername')
+            ->with($settings->getUsername())
+            ->willReturnSelf();
+        $smtpTransportMock->expects($this->once())
+            ->method('setPassword')
+            ->with($settings->getPassword())
+            ->willReturnSelf();
+
+        $mailer = new DirectMailer($this->baseMailer, $this->container);
+        $mailer->afterPrepareSmtpTransport($settings);
+
+        $this->assertSame($streamOptions, $smtpTransportMock->getStreamOptions());
+    }
+
+    /**
+     * Check that SMTP transport initialized correctly new instance created
+     */
+    public function testAfterPrepareSmtpTransportForNonEsmtpTransport()
+    {
+        /** @var \Swift_Transport_AbstractSmtpTransport|\PHPUnit_Framework_MockObject_MockObject $smtpTransportMock */
+        $smtpTransportMock = $this->getMockBuilder(\Swift_Transport_AbstractSmtpTransport::class)
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+
+        $this->baseMailer->expects($this->once())
+            ->method('getTransport')
+            ->willReturn($smtpTransportMock);
+
+        $settings = new SmtpSettings();
+        $settings->setHost('test.host');
+        $settings->setPort(442);
+        $settings->setUsername('username');
+        $settings->setPassword('pass');
+        $settings->setEncryption('tls');
+
+        $smtpTransportMock->expects($this->never())
+            ->method($this->anything());
+
+        $mailer = new DirectMailer($this->baseMailer, $this->container);
+        $mailer->afterPrepareSmtpTransport($settings);
+        $this->assertAttributeInstanceOf(\Swift_SmtpTransport::class, 'smtpTransport', $mailer);
+        $transport = $mailer->getTransport();
+
+        $this->assertEquals($settings->getHost(), $transport->getHost());
+        $this->assertEquals($settings->getPort(), $transport->getPort());
+        $this->assertEquals($settings->getEncryption(), $transport->getEncryption());
+        $this->assertEquals($settings->getUsername(), $transport->getUsername());
+        $this->assertEquals($settings->getPassword(), $transport->getPassword());
     }
 }

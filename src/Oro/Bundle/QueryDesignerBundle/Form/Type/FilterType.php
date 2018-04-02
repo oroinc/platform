@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Form\Type;
 
+use Oro\Bundle\EntityBundle\Form\Type\EntityFieldSelectType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -18,7 +20,7 @@ class FilterType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('criterion', 'text', array('required' => true));
+            ->add('criterion', TextType::class, array('required' => true));
 
         $factory = $builder->getFormFactory();
         if ($options['column_choice_type']) {
@@ -57,7 +59,7 @@ class FilterType extends AbstractType
                 'entity'             => null,
                 'data_class'         => 'Oro\Bundle\QueryDesignerBundle\Model\Filter',
                 'csrf_token_id'      => 'query_designer_filter',
-                'column_choice_type' => 'oro_entity_field_select',
+                'column_choice_type' => EntityFieldSelectType::class
             )
         );
     }

@@ -7,31 +7,11 @@ use Oro\Bundle\UIBundle\Form\Type\TreeMoveType;
 use Oro\Bundle\UIBundle\Model\TreeCollection;
 use Oro\Bundle\UIBundle\Model\TreeItem;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 
 class TreeMoveTypeTest extends FormIntegrationTestCase
 {
-    /** @var TreeMoveType */
-    protected $type;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        $this->type = new TreeMoveType();
-
-        parent::setUp();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->type);
-    }
-
     /**
      * @dataProvider submitProvider
      *
@@ -52,7 +32,7 @@ class TreeMoveTypeTest extends FormIntegrationTestCase
             ['id' => 'parent', 'text' => 'Parent'],
         ];
 
-        $form = $this->factory->create($this->type, $defaultData, [
+        $form = $this->factory->create(TreeMoveType::class, $defaultData, [
             'tree_items' => $treeItems,
             'tree_data' => $treeData,
         ]);
@@ -100,7 +80,7 @@ class TreeMoveTypeTest extends FormIntegrationTestCase
     protected function getExtensions()
     {
         return [
-            new PreloadedExtension([], ['form' => [new AdditionalAttrExtension()]])
+            new PreloadedExtension([], [FormType::class => [new AdditionalAttrExtension()]])
         ];
     }
 }

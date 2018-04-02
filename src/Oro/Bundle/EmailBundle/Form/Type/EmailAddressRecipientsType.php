@@ -6,6 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Form\DataTransformer\EmailAddressRecipientsTransformer;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
+use Oro\Bundle\FormBundle\Form\Type\Select2HiddenType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -90,7 +91,7 @@ class EmailAddressRecipientsType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_hidden';
+        return Select2HiddenType::class;
     }
 
     /**

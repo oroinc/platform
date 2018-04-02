@@ -3,6 +3,8 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Form;
 
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetTitleType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class WidgetTitleTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,10 +31,10 @@ class WidgetTitleTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
         $builder->expects($this->at(0))
             ->method('add')
-            ->with('title', 'text');
+            ->with('title', TextType::class);
         $builder->expects($this->at(1))
             ->method('add')
-            ->with('useDefault', 'checkbox');
+            ->with('useDefault', CheckboxType::class);
         $this->formType->buildForm($builder, []);
     }
 }

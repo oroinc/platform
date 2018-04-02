@@ -481,41 +481,6 @@ class RestJsonApiTestCase extends ApiTestCase
     }
 
     /**
-     * Loads the response content.
-     *
-     * @param string $fileName
-     * @param string $folderName
-     *
-     * @return array
-     */
-    protected function loadYamlData($fileName, $folderName = null)
-    {
-        if ($this->isRelativePath($fileName)) {
-            $fileName = $this->getTestResourcePath($folderName, $fileName);
-        }
-        $file = $this->getContainer()->get('file_locator')->locate($fileName);
-        self::assertTrue(is_file($file), sprintf('File "%s" with expected content not found', $fileName));
-
-        return Yaml::parse(file_get_contents($file));
-    }
-
-    /**
-     * Loads the response content.
-     *
-     * @param array|string $expectedContent The file name or full file path to YAML template file or array
-     *
-     * @return array
-     */
-    protected function loadResponseData($expectedContent)
-    {
-        if (is_string($expectedContent)) {
-            $expectedContent = $this->loadYamlData($expectedContent, 'responses');
-        }
-
-        return self::processTemplateData($expectedContent);
-    }
-
-    /**
      * Asserts the response content contains the the given data.
      *
      * @param array|string $expectedContent The file name or full file path to YAML template file or array
@@ -557,7 +522,10 @@ class RestJsonApiTestCase extends ApiTestCase
     {
         $result = [];
         foreach ($data as $item) {
-            $result[] = ['type' => $item[JsonApiDoc::TYPE], 'id' => $item[JsonApiDoc::ID]];
+            $result[] = [
+                JsonApiDoc::TYPE => $item[JsonApiDoc::TYPE],
+                JsonApiDoc::ID   => $item[JsonApiDoc::ID]
+            ];
         }
 
         return $result;
@@ -571,7 +539,7 @@ class RestJsonApiTestCase extends ApiTestCase
     protected static function assertResponseCount($expectedCount, Response $response)
     {
         $content = json_decode($response->getContent(), true);
-        self::assertCount($expectedCount, $content['data']);
+        self::assertCount($expectedCount, $content[JsonApiDoc::DATA]);
     }
 
     /**
@@ -582,7 +550,7 @@ class RestJsonApiTestCase extends ApiTestCase
     protected static function assertResponseNotEmpty(Response $response)
     {
         $content = json_decode($response->getContent(), true);
-        self::assertNotEmpty($content['data']);
+        self::assertNotEmpty($content[JsonApiDoc::DATA]);
     }
 
     /**
@@ -608,10 +576,10 @@ class RestJsonApiTestCase extends ApiTestCase
 
         $content = json_decode($response->getContent(), true);
         try {
-            $this->assertResponseContains(['errors' => $expectedErrors], $response);
+            $this->assertResponseContains([JsonApiDoc::ERRORS => $expectedErrors], $response);
             self::assertCount(
                 count($expectedErrors),
-                $content['errors'],
+                $content[JsonApiDoc::ERRORS],
                 'Unexpected number of validation errors'
             );
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
@@ -685,17 +653,17 @@ class RestJsonApiTestCase extends ApiTestCase
      */
     protected function normalizeYmlTemplate(array &$data, array $idReferences)
     {
-        if (isset($data['type']) && isset($data['id'])) {
-            $key = $data['type'] . '::' . $data['id'];
+        if (isset($data[JsonApiDoc::TYPE], $data[JsonApiDoc::ID])) {
+            $key = $data[JsonApiDoc::TYPE] . '::' . $data[JsonApiDoc::ID];
             if (isset($idReferences[$key])) {
                 list($referenceId, $entityIdFieldName) = $idReferences[$key];
-                $data['id'] = sprintf('<toString(@%s->%s)>', $referenceId, $entityIdFieldName);
-                if (isset($data['attributes'])) {
-                    $attributes = $data['attributes'];
+                $data[JsonApiDoc::ID] = sprintf('<toString(@%s->%s)>', $referenceId, $entityIdFieldName);
+                if (isset($data[JsonApiDoc::ATTRIBUTES])) {
+                    $attributes = $data[JsonApiDoc::ATTRIBUTES];
                     $dateFields = ['createdAt', 'updatedAt', 'created', 'updated'];
                     foreach ($dateFields as $field) {
                         if (isset($attributes[$field])) {
-                            $data['attributes'][$field] = sprintf(
+                            $data[JsonApiDoc::ATTRIBUTES][$field] = sprintf(
                                 '@%s->%s->format("Y-m-d\TH:i:s\Z")',
                                 $referenceId,
                                 $field
@@ -723,22 +691,6 @@ class RestJsonApiTestCase extends ApiTestCase
     }
 
     /**
-     * Converts the given request to an array that can be sent to the server.
-     *
-     * @param array|string $request
-     *
-     * @return array
-     */
-    protected function getRequestData($request)
-    {
-        if (is_string($request) && $this->isRelativePath($request)) {
-            $request = $this->getTestResourcePath('requests', $request);
-        }
-
-        return self::processTemplateData($request);
-    }
-
-    /**
      * Extracts JSON.API resource identifier from the response.
      *
      * @param Response $response
@@ -749,11 +701,11 @@ class RestJsonApiTestCase extends ApiTestCase
     {
         $content = json_decode($response->getContent(), true);
         self::assertInternalType('array', $content);
-        self::assertArrayHasKey('data', $content);
-        self::assertInternalType('array', $content['data']);
-        self::assertArrayHasKey('id', $content['data']);
+        self::assertArrayHasKey(JsonApiDoc::DATA, $content);
+        self::assertInternalType('array', $content[JsonApiDoc::DATA]);
+        self::assertArrayHasKey(JsonApiDoc::ID, $content[JsonApiDoc::DATA]);
 
-        return $content['data']['id'];
+        return $content[JsonApiDoc::DATA][JsonApiDoc::ID];
     }
 
     /**
@@ -767,10 +719,10 @@ class RestJsonApiTestCase extends ApiTestCase
     {
         $content = json_decode($response->getContent(), true);
         self::assertInternalType('array', $content);
-        self::assertArrayHasKey('errors', $content);
-        self::assertInternalType('array', $content['errors']);
+        self::assertArrayHasKey(JsonApiDoc::ERRORS, $content);
+        self::assertInternalType('array', $content[JsonApiDoc::ERRORS]);
 
-        return $content['errors'];
+        return $content[JsonApiDoc::ERRORS];
     }
 
     /**

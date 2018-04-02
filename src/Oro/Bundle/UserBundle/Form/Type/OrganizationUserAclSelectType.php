@@ -34,7 +34,7 @@ class OrganizationUserAclSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_user_acl_select';
+        return UserAclSelectType::class;
     }
 
     /**

@@ -4,7 +4,9 @@ namespace Oro\Bundle\EntityMergeBundle\Form\Type;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -22,7 +24,7 @@ class MergeType extends AbstractType
 
         $builder->add(
             'masterEntity',
-            'entity',
+            EntityType::class,
             array(
                 'label'                   => 'oro.entity_merge.form.master_record',
                 'class'                   => $metadata->getClassName(),
@@ -36,14 +38,14 @@ class MergeType extends AbstractType
                 'dynamic_fields_disabled' => true,
             )
         );
-        $builder->add('fields', 'form');
+        $builder->add('fields', FormType::class);
         $fields = $builder->get('fields');
 
         foreach ($metadata->getFieldsMetadata() as $fieldMetadata) {
             if ($fieldMetadata->is('display')) {
                 $fields->add(
                     $fieldMetadata->getFieldName(),
-                    'oro_entity_merge_field',
+                    MergeFieldType::class,
                     array(
                         'metadata' => $fieldMetadata,
                         'entities' => $options['entities'],

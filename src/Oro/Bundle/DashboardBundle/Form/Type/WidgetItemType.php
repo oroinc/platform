@@ -3,6 +3,8 @@
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class WidgetItemType extends AbstractType
@@ -15,9 +17,9 @@ class WidgetItemType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('id', 'hidden')
-            ->add('order', 'hidden')
-            ->add('show', 'checkbox', [
+            ->add('id', HiddenType::class)
+            ->add('order', HiddenType::class)
+            ->add('show', CheckboxType::class, [
                 'data' => false,
             ]);
     }

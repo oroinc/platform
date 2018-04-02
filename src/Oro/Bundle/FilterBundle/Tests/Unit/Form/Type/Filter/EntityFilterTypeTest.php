@@ -50,7 +50,7 @@ class EntityFilterTypeTest extends AbstractTypeTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals(ChoiceFilterType::NAME, $this->type->getParent());
+        $this->assertEquals(ChoiceFilterType::class, $this->type->getParent());
     }
 
     /**
@@ -61,7 +61,7 @@ class EntityFilterTypeTest extends AbstractTypeTestCase
         return array(
             array(
                 'defaultOptions' => array(
-                    'field_type' => 'entity',
+                    'field_type' => EntityType::class,
                     'field_options' => array(),
                     'translatable'  => false,
                 )

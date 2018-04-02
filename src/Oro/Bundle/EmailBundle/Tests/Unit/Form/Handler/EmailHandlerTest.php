@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class EmailHandlerTest extends \PHPUnit_Framework_TestCase
 {
+    const FORM_DATA = ['field' => 'value'];
+
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $form;
 
@@ -76,6 +78,7 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessData($method, $valid, $assert)
     {
+        $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod($method);
         $this->model
             ->setFrom('from@example.com')
@@ -90,7 +93,7 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
         if (in_array($method, ['POST', 'PUT'])) {
             $this->form->expects($this->once())
                 ->method('submit')
-                ->with($this->request);
+                ->with(self::FORM_DATA);
 
             $this->form->expects($this->once())
                 ->method('isValid')
@@ -113,6 +116,7 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessException($method)
     {
+        $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod($method);
         $this->model
             ->setFrom('from@example.com')
@@ -126,7 +130,7 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->form->expects($this->once())
             ->method('submit')
-            ->with($this->request);
+            ->with(self::FORM_DATA);
 
         $this->form->expects($this->once())
             ->method('isValid')

@@ -37,6 +37,6 @@ class EntityCollectionType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_api_collection';
+        return CollectionType::class;
     }
 }

@@ -15,8 +15,13 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * A base processor to validate that the request data contains valid JSON.API object.
+ */
 abstract class ValidateRequestData implements ProcessorInterface
 {
+    private const ROOT_POINTER = '';
+
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
@@ -40,13 +45,18 @@ abstract class ValidateRequestData implements ProcessorInterface
 
         $this->context = $context;
         try {
-            $dataPointer = $this->buildPointer('', JsonApiDoc::DATA);
             $requestData = $context->getRequestData();
-            if ($this->validateRequestData($requestData, $dataPointer)) {
-                $data = $requestData[JsonApiDoc::DATA];
-                $this->validatePrimaryDataObject($data, $dataPointer);
-                $this->validateAttributesAndRelationships($data, $dataPointer);
-                $this->validateIncludedEntities($requestData, '');
+            if ($context->hasIdentifierFields()) {
+                if ($this->validateRequestData($requestData, JsonApiDoc::DATA)) {
+                    $data = $requestData[JsonApiDoc::DATA];
+                    $dataPointer = $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::DATA);
+                    $this->validatePrimaryDataObject($data, $dataPointer);
+                    $this->validateAttributesAndRelationships($data, $dataPointer);
+                    $this->validateIncludedEntities($requestData);
+                }
+            } elseif ($this->validateRequestData($requestData, JsonApiDoc::META)) {
+                $this->validateSectionNotExist($requestData, JsonApiDoc::DATA);
+                $this->validateSectionNotExist($requestData, JsonApiDoc::INCLUDED);
             }
         } finally {
             $this->context = null;
@@ -55,28 +65,42 @@ abstract class ValidateRequestData implements ProcessorInterface
 
     /**
      * @param array  $data
-     * @param string $pointer
+     * @param string $rootSection
      *
      * @return bool
      */
-    protected function validateRequestData(array $data, $pointer)
+    protected function validateRequestData(array $data, $rootSection)
     {
         $isValid = true;
-        if (!array_key_exists(JsonApiDoc::DATA, $data)) {
+        if (!array_key_exists($rootSection, $data)) {
             $this->addError(
-                $pointer,
-                'The primary data object should exist'
+                $this->buildPointer(self::ROOT_POINTER, $rootSection),
+                sprintf('The primary %s object should exist', strtolower($rootSection))
             );
             $isValid = false;
-        } elseif (empty($data[JsonApiDoc::DATA])) {
+        } elseif (empty($data[$rootSection])) {
             $this->addError(
-                $pointer,
-                'The primary data object should not be empty'
+                $this->buildPointer(self::ROOT_POINTER, $rootSection),
+                sprintf('The primary %s object should not be empty', strtolower($rootSection))
             );
             $isValid = false;
         }
 
         return $isValid;
+    }
+
+    /**
+     * @param array  $data
+     * @param string $section
+     */
+    protected function validateSectionNotExist(array $data, $section)
+    {
+        if (array_key_exists($section, $data)) {
+            $this->addError(
+                $this->buildPointer(self::ROOT_POINTER, $section),
+                sprintf('The \'%s\' section should not exist', $section)
+            );
+        }
     }
 
     /**
@@ -179,15 +203,14 @@ abstract class ValidateRequestData implements ProcessorInterface
     }
 
     /**
-     * @param array  $data
-     * @param string $pointer
+     * @param array $data
      */
-    protected function validateIncludedEntities(array $data, $pointer)
+    protected function validateIncludedEntities(array $data)
     {
         if (array_key_exists(JsonApiDoc::INCLUDED, $data)
-            && $this->validateArray($data, JsonApiDoc::INCLUDED, $pointer, true)
+            && $this->validateArray($data, JsonApiDoc::INCLUDED, self::ROOT_POINTER, true)
         ) {
-            $includedPointer = $this->buildPointer($pointer, JsonApiDoc::INCLUDED);
+            $includedPointer = $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::INCLUDED);
             foreach ($data[JsonApiDoc::INCLUDED] as $key => $item) {
                 $this->validateResourceObject($item, $this->buildPointer($includedPointer, $key));
             }

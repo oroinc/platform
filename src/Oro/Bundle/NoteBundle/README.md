@@ -1,10 +1,8 @@
-OroNoteBundle
-===================
+# OroNoteBundle
 
-The `OroNoteBundle` provide ability to add notes to other entities. The system administrator can manage this functionality on *System / Entities / Entity Management* page.
+OroNoteBundle provides the ability for the application users to add notes on an entity record page and enable or disable this feature for every entity type in the entity management UI.
 
-How to enable notes using migrations
-------------------------------------
+## How to enable notes using migrations
 
 Notes could be enabled for the entity in the same way as for any other Activity entity. See following example:
 

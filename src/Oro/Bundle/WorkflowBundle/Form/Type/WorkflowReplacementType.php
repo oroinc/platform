@@ -33,7 +33,7 @@ class WorkflowReplacementType extends AbstractType
     {
         $builder->add(
             'workflowsToDeactivation',
-            OroChoiceType::NAME,
+            OroChoiceType::class,
             [
                 'label' => 'oro.workflow.workflowdefinition.entity_plural_label',
                 'configs' => [

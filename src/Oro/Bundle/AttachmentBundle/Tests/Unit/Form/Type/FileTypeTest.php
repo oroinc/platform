@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestSubscriber;
+use Symfony\Component\Form\Extension\Core\Type\FileType as SymfonyFileType;
 
 class FileTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,7 +32,7 @@ class FileTypeTest extends \PHPUnit_Framework_TestCase
 
         $builder->expects($this->once())
             ->method('add')
-            ->with('file', 'file');
+            ->with('file', SymfonyFileType::class);
 
         $options = [
             'checkEmptyFile' => true,
@@ -46,7 +47,7 @@ class FileTypeTest extends \PHPUnit_Framework_TestCase
 
         $builder->expects($this->once())
             ->method('add')
-            ->with('file', 'file');
+            ->with('file', SymfonyFileType::class);
 
         $options = [
             'checkEmptyFile' => true,

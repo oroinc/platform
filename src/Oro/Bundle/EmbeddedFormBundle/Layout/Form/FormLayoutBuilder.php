@@ -217,7 +217,7 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
         }
         $resolvedFormType = $formConfig->getType();
         while ($resolvedFormType) {
-            if (isset($this->simpleFormTypes[$resolvedFormType->getInnerType()->getName()])) {
+            if (isset($this->simpleFormTypes[$resolvedFormType->getName()])) {
                 return false;
             }
             $resolvedFormType = $resolvedFormType->getParent();

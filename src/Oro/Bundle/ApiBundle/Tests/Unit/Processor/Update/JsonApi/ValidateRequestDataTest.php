@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Update\JsonApi;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Update\JsonApi\ValidateRequestData;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 /**
@@ -11,19 +14,17 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
  */
 class ValidateRequestDataTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $valueNormalizer;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    private $valueNormalizer;
 
     /** @var ValidateRequestData */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
         $this->processor = new ValidateRequestData($this->valueNormalizer);
     }
@@ -33,17 +34,21 @@ class ValidateRequestDataTest extends FormProcessorTestCase
      */
     public function testProcessWithValidRequestData($requestData)
     {
-        $this->valueNormalizer->expects($this->once())
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+
+        $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with('products')
-            ->willReturn('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
+            ->willReturn(Product::class);
 
         $this->context->setId('1');
-        $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
+        $this->context->setClassName(Product::class);
+        $this->context->setMetadata($metadata);
         $this->context->setRequestData($requestData);
-
         $this->processor->process($this->context);
-        $this->assertFalse($this->context->hasErrors());
+
+        self::assertFalse($this->context->hasErrors());
     }
 
     public function validRequestDataProvider()
@@ -56,8 +61,8 @@ class ValidateRequestDataTest extends FormProcessorTestCase
                 ['data' => ['id' => '1', 'type' => 'products', 'relationships' => ['test' => ['data' => null]]]]
             ],
             [
-                ['data' => ['id' => '1', 'type' => 'products', 'relationships' => ['test' => ['data' => []]]]],
-            ],
+                ['data' => ['id' => '1', 'type' => 'products', 'relationships' => ['test' => ['data' => []]]]]
+            ]
         ];
     }
 
@@ -71,27 +76,30 @@ class ValidateRequestDataTest extends FormProcessorTestCase
         $title = 'request data constraint',
         $statusCode = 400
     ) {
-        $this->context->setId('1');
-        $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
-        $this->context->setRequestData($requestData);
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
 
         $this->valueNormalizer->expects($this->any())
             ->method('normalizeValue')
             ->with('products')
-            ->willReturn('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
+            ->willReturn(Product::class);
 
+        $this->context->setId('1');
+        $this->context->setClassName(Product::class);
+        $this->context->setMetadata($metadata);
+        $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
 
         $errors = $this->context->getErrors();
 
         $expectedError = (array)$expectedError;
         $pointer = (array)$pointer;
-        $this->assertCount(count($expectedError), $errors);
+        self::assertCount(count($expectedError), $errors);
         foreach ($errors as $key => $error) {
-            $this->assertEquals($title, $error->getTitle());
-            $this->assertEquals($expectedError[$key], $error->getDetail());
-            $this->assertEquals($pointer[$key], $error->getSource()->getPointer());
-            $this->assertEquals($statusCode, $error->getStatusCode());
+            self::assertEquals($title, $error->getTitle());
+            self::assertEquals($expectedError[$key], $error->getDetail());
+            self::assertEquals($pointer[$key], $error->getSource()->getPointer());
+            self::assertEquals($statusCode, $error->getStatusCode());
         }
     }
 
@@ -136,7 +144,7 @@ class ValidateRequestDataTest extends FormProcessorTestCase
             [
                 ['data' => ['id' => '1', 'attributes' => ['foo' => 'bar']]],
                 'The \'type\' property is required',
-                '/data/type',
+                '/data/type'
             ],
             [
                 ['data' => ['id' => '1', 'type' => 'test', 'attributes' => ['foo' => 'bar']]],
@@ -148,8 +156,8 @@ class ValidateRequestDataTest extends FormProcessorTestCase
             [
                 ['data' => ['id' => '1', 'type' => 'products']],
                 'The primary data object should contain \'attributes\' or \'relationships\' block',
-                '/data',
-            ],
+                '/data'
+            ]
         ];
     }
 
@@ -158,16 +166,20 @@ class ValidateRequestDataTest extends FormProcessorTestCase
         $requestData = ['data' => ['id' => '1', 'type' => 'products', 'attributes' => ['test' => null]]];
         $normalizedId = 1;
 
-        $this->valueNormalizer->expects($this->once())
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+
+        $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with('products')
-            ->willReturn('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
+            ->willReturn(Product::class);
 
         $this->context->setId($normalizedId);
-        $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
+        $this->context->setClassName(Product::class);
+        $this->context->setMetadata($metadata);
         $this->context->setRequestData($requestData);
-
         $this->processor->process($this->context);
-        $this->assertFalse($this->context->hasErrors());
+
+        self::assertFalse($this->context->hasErrors());
     }
 }

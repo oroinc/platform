@@ -27,7 +27,7 @@ class AclPrivilegeType extends AbstractType
 
         $builder->add(
             'permissions',
-            PermissionCollectionType::NAME,
+            PermissionCollectionType::class,
             array(
                 'entry_type' => new AclPermissionType(),
                 'allow_add' => true,

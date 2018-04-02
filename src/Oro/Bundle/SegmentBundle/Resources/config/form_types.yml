@@ -30,7 +30,7 @@ services:
         factory: ['@form.factory', createNamed]
         arguments:
             - "oro_segment_form"
-            - "oro_segment"
+            - Oro\Bundle\SegmentBundle\Form\Type\SegmentType
 
     oro_segment.form.handler.segment:
         class: '%oro_segment.form.handler.segment.class%'

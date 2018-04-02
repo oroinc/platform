@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 use Doctrine\ORM\EntityManager;
 use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
+use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -133,7 +134,7 @@ class EmbeddedFormController extends Controller
             $entity = new EmbeddedForm();
         }
 
-        $form = $this->createForm('embedded_form', $entity);
+        $form = $this->createForm(EmbeddedFormType::class, $entity);
         $form->handleRequest($this->get('request_stack')->getCurrentRequest());
         /** @var EntityManager $em */
         $em = $this->get('doctrine.orm.entity_manager');

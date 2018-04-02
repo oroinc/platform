@@ -29,6 +29,11 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
             // there are no included data in the request
             return;
         }
+        if (!array_key_exists(JsonApiDoc::DATA, $requestData)) {
+            throw new \LogicException(
+                sprintf('The "%s" section must exist in the request data.', JsonApiDoc::DATA)
+            );
+        }
 
         $primaryObject = $requestData[JsonApiDoc::DATA];
         $includedData = $requestData[JsonApiDoc::INCLUDED];

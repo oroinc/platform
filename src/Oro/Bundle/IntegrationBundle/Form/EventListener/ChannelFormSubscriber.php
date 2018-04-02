@@ -279,7 +279,11 @@ class ChannelFormSubscriber implements EventSubscriberInterface
 
             $fields = $settingsProvider->getFormSettings($formName, $type);
             if ($fields) {
-                $form->add(Inflector::camelize($formName), new IntegrationSettingsDynamicFormType($fields));
+                $form->add(
+                    Inflector::camelize($formName),
+                    IntegrationSettingsDynamicFormType::class,
+                    ['fields' => $fields]
+                );
             }
         };
     }

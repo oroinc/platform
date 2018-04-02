@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Request\Rest;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Handles REST API requests.
+ */
 class RequestHandler
 {
     /** @var RequestActionHandler */
@@ -105,5 +108,31 @@ class RequestHandler
         }
 
         return $this->actionHandler->handleNotAllowedRelationship($request);
+    }
+
+    /**
+     * Handles "/api/{entity}" requests for single item API resources that do not have an identifier.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function handleItemWithoutId(Request $request): Response
+    {
+        $method = $request->getMethod();
+        if ('GET' === $method) {
+            return $this->actionHandler->handleGet($request);
+        }
+        if ('POST' === $method) {
+            return $this->actionHandler->handleCreate($request);
+        }
+        if ('PATCH' === $method) {
+            return $this->actionHandler->handleUpdate($request);
+        }
+        if ('DELETE' === $method) {
+            return $this->actionHandler->handleDelete($request);
+        }
+
+        return $this->actionHandler->handleNotAllowedItem($request);
     }
 }

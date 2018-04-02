@@ -168,9 +168,9 @@ class BusinessUnitManager
         if (AccessLevel::SYSTEM_LEVEL === $accessLevel) {
             return true;
         } elseif (AccessLevel::LOCAL_LEVEL === $accessLevel) {
-            $businessUnits =  $treeProvider->getTree()->getUserBusinessUnitIds(
-                $this->$currentUser->getId(),
-                $organization
+            $businessUnits = $treeProvider->getTree()->getUserBusinessUnitIds(
+                $currentUser->getId(),
+                $organization->getId()
             );
         } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
             $businessUnits = $treeProvider->getTree()->getUserSubordinateBusinessUnitIds(

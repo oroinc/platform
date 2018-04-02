@@ -7,6 +7,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 
 class BooleanFilterTypeTest extends AbstractTypeTestCase
 {
@@ -32,10 +33,11 @@ class BooleanFilterTypeTest extends AbstractTypeTestCase
             new ChoiceFilterType($translator)
         );
 
+        $this->type = new BooleanFilterType($translator);
         $this->formExtensions[] = new CustomFormExtension($types);
+        $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
         parent::setUp();
-        $this->type = new BooleanFilterType($translator);
     }
 
     /**

@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Form\Type;
 
+use Oro\Bundle\EntityBundle\Form\Type\EntityFieldSelectType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -18,23 +20,23 @@ class ColumnType extends AbstractType
         $builder
             ->add(
                 'name',
-                'oro_field_choice',
+                FieldChoiceType::class,
                 [
                     'required'            => true,
                     'page_component_name' => 'column-field-choice',
                 ] + $options['field_choice_options']
             )
-            ->add('label', 'text', array('required' => true))
+            ->add('label', TextType::class, array('required' => true))
             ->add(
                 'func',
-                'oro_function_choice',
+                FunctionChoiceType::class,
                 [
                     'required' => false,
                     'page_component_name' => 'column-function-choice',
                     'query_type' =>  $options['query_type'],
                 ]
             )
-            ->add('sorting', 'oro_sorting_choice', array('required' => false));
+            ->add('sorting', SortingChoiceType::class, array('required' => false));
     }
 
     /**
@@ -49,7 +51,7 @@ class ColumnType extends AbstractType
                 'entity'               => null,
                 'data_class'           => 'Oro\Bundle\QueryDesignerBundle\Model\Column',
                 'csrf_token_id'        => 'query_designer_column',
-                'column_choice_type'   => 'oro_entity_field_select',
+                'column_choice_type'   => EntityFieldSelectType::class,
                 'field_choice_options' => [],
             )
         );

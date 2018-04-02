@@ -1,14 +1,13 @@
-OroDataAuditBundle
-==================
+# OroDataAuditBundle
+
+OroDataAuditBundle enables tracking of entity fields changes history. The bundle supports the entity fields audit configuration on the code level and in the entity management UI.
 
 * [Entity configuration](#entity-configuration)
     * [Example](#example-of-annotation-configuration)
 * [Additional fields](#additional-fields)
 * [User documentation](#user-documentation)
-    
-The OroDataAuditBundle provides changelogs for your entities that are configurable on an entity and in the GUI. 
 
-### Entity Configuration
+## Entity Configuration
 
 DataAudit can only be enabled for Configurable entities. To add a property of an entity to the changelog,
 you simply have to enable the audit for the entity itself and specify some fields you want to be logged.
@@ -17,7 +16,7 @@ To achieve this, you should use the `@Config` and `@ConfigField` annotations for
 Audit can be enabled/disabled per an entire entity or for separate fields in UI `System->Entities->EntityManagement`
 (attribute `Auditable`).
 
-#### Example of annotation configuration
+### Example of annotation configuration
 
 ```php
 // src/Acme/DemoBundle/Entity/Product.php
@@ -74,7 +73,7 @@ class Product
 }
 ```
 
-### Additional fields
+## Additional fields
 
 In every entry of audit log you can store additional fields. There are no requirements to type of a data.
 If object is passed to an array, it will be properly sanitized and converted to supported format.
@@ -106,6 +105,6 @@ class Product implements AuditAdditionalFieldsInterface
 }
 ```
 
-### User documentation
+## User documentation
 
 For full documentation visit http://www.oroinc.com/doc/orocrm/current/book/data-audits

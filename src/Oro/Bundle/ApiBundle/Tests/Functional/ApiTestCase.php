@@ -16,6 +16,7 @@ use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Yaml\Yaml;
 
 abstract class ApiTestCase extends WebTestCase
 {
@@ -193,6 +194,57 @@ abstract class ApiTestCase extends WebTestCase
 
         return $this->getContainer()->get('oro_api.rest.entity_id_transformer')
             ->transform($entityId, $metadata);
+    }
+
+    /**
+     * Loads the response content.
+     *
+     * @param string $fileName
+     * @param string $folderName
+     *
+     * @return array
+     */
+    protected function loadYamlData($fileName, $folderName = null)
+    {
+        if ($this->isRelativePath($fileName)) {
+            $fileName = $this->getTestResourcePath($folderName, $fileName);
+        }
+        $file = $this->getContainer()->get('file_locator')->locate($fileName);
+        self::assertTrue(is_file($file), sprintf('File "%s" with expected content not found', $fileName));
+
+        return Yaml::parse(file_get_contents($file));
+    }
+
+    /**
+     * Loads the response content.
+     *
+     * @param array|string $expectedContent The file name or full file path to YAML template file or array
+     *
+     * @return array
+     */
+    protected function loadResponseData($expectedContent)
+    {
+        if (is_string($expectedContent)) {
+            $expectedContent = $this->loadYamlData($expectedContent, 'responses');
+        }
+
+        return self::processTemplateData($expectedContent);
+    }
+
+    /**
+     * Converts the given request to an array that can be sent to the server.
+     *
+     * @param array|string $request
+     *
+     * @return array
+     */
+    protected function getRequestData($request)
+    {
+        if (is_string($request) && $this->isRelativePath($request)) {
+            $request = $this->getTestResourcePath('requests', $request);
+        }
+
+        return self::processTemplateData($request);
     }
 
     /**

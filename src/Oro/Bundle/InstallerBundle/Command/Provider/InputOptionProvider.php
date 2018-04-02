@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\InstallerBundle\Command\Provider;
 
-use Symfony\Component\Console\Helper\HelperInterface;
+use Composer\Question\StrictConfirmationQuestion;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Question\Question;
 
 class InputOptionProvider
 {
@@ -14,40 +17,39 @@ class InputOptionProvider
     /** @var InputInterface */
     protected $input;
 
-    /** @var HelperInterface */
-    protected $dialog;
+    /** @var QuestionHelper */
+    protected $questionHelper;
 
     /**
      * @param OutputInterface $output
-     * @param InputInterface  $input
-     * @param HelperInterface $dialog
+     * @param InputInterface $input
+     * @param QuestionHelper $questionHelper
      */
-    public function __construct(OutputInterface $output, InputInterface $input, HelperInterface $dialog)
+    public function __construct(OutputInterface $output, InputInterface $input, QuestionHelper $questionHelper)
     {
         $this->output = $output;
         $this->input  = $input;
-        $this->dialog = $dialog;
+        $this->questionHelper = $questionHelper;
     }
 
     /**
      * Gets a value of the specified option. If needed an user can be asked to enter the value
      *
      * @param string      $name              The option name
-     * @param string      $question          The ask question message
+     * @param string      $questionMessage   The ask question message
      * @param string|null $default           The default option value
-     * @param string      $askMethod         The name of method in DialogHelper class is used to ask user
      *                                       to enter option value
-     * @param array       $additionalAskArgs The additional arguments for the $askMethod
+     * @param array       $options           Options which identify question class, args and options
      *
-     * @return mixed boolean for askConfirmation, string for others
+     * @return mixed boolean for ConfirmationQuestion, string for others
      */
-    public function get($name, $question, $default = null, $askMethod = 'ask', $additionalAskArgs = [])
+    public function get($name, $questionMessage, $default = null, $options = [])
     {
         $value          = $this->input->getOption($name);
         $hasOptionValue = !empty($value);
 
         // special case for askConfirmation
-        if ($hasOptionValue && $askMethod === 'askConfirmation') {
+        if ($hasOptionValue && $this->isConfirmationQuestion($options)) {
             if (in_array(strtolower($value[0]), ['y', 'n'])) {
                 $value = strtolower($value[0]) === 'y';
             } else {
@@ -57,13 +59,12 @@ class InputOptionProvider
         }
 
         if (false === $hasOptionValue && $this->input->isInteractive()) {
-            $value = call_user_func_array(
-                [$this->dialog, $askMethod],
-                array_merge(
-                    [$this->output, $this->buildQuestion($question, $default)],
-                    $additionalAskArgs
-                )
+            $question = $this->createQuestion(
+                $this->buildQuestion($questionMessage, $default),
+                $options
             );
+
+            $value = $this->questionHelper->ask($this->input, $this->output, $question);
 
             if (empty($value)) {
                 $value = $default;
@@ -73,6 +74,40 @@ class InputOptionProvider
         }
 
         return $value;
+    }
+
+    /**
+     * @param array $options
+     * @return bool
+     */
+    private function isConfirmationQuestion(array $options)
+    {
+        if (!isset($options['class'])) {
+            return false;
+        }
+
+        return is_a($options['class'], ConfirmationQuestion::class, true)
+            || is_a($options['class'], StrictConfirmationQuestion::class, true);
+    }
+
+    /**
+     * @param string $message
+     * @param array $options
+     * @return mixed
+     */
+    private function createQuestion(string $message, array $options)
+    {
+        $questionClass = $options['class'] ?? Question::class;
+        $constructorArgs = array_merge([$message], $options['constructorArgs'] ?? []);
+
+        $question = new $questionClass(...$constructorArgs);
+
+        $settings = $options['settings'] ?? [];
+        foreach ($settings as $setterName => $parameters) {
+            $question->{'set'. ucfirst($setterName)}(...$parameters);
+        }
+
+        return $question;
     }
 
     /**

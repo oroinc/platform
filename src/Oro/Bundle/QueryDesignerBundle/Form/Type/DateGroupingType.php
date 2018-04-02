@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Form\Type;
 
+use Oro\Bundle\EntityBundle\Form\Type\EntityFieldSelectType;
 use Oro\Bundle\QueryDesignerBundle\Model\DateGrouping;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -59,7 +60,7 @@ class DateGroupingType extends AbstractType
                 'entity' => null,
                 'data_class' => DateGrouping::class,
                 'csrf_token_id' => 'query_designer_date_grouping',
-                'column_choice_type' => 'oro_entity_field_select',
+                'column_choice_type' => EntityFieldSelectType::class,
             ]
         );
     }

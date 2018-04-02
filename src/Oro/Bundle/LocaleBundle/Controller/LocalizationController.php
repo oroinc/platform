@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Controller;
 
 use Oro\Bundle\FormBundle\Model\UpdateHandler;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizationType;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -101,7 +102,7 @@ class LocalizationController extends Controller
      */
     protected function update(Localization $localization)
     {
-        $form = $this->createForm('oro_localization', $localization);
+        $form = $this->createForm(LocalizationType::class, $localization);
 
         /** @var $handler UpdateHandler */
         $handler = $this->get('oro_form.model.update_handler');

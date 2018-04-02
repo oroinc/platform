@@ -1,5 +1,9 @@
 # OroSoapBundle
 
+OroSoapBundle **is deprecated**. Please, use [OroApiBundle](https://github.com/oroinc/platform/tree/master/src/Oro/Bundle/ApiBundle) instead.
+
+OroSoapBundle extends FOSRestBundle and provides developers with a way to create REST and SOAP API in their bundles by extending abstract API controller classes.
+
 ## Soap
 
 Bundle adds support of SOAP controller classes and builds a single WSDL file for SOAP API definition.

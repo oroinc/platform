@@ -596,6 +596,16 @@ class EntityMetadata implements ToArrayInterface
     }
 
     /**
+     * Checks whether the metadata has at least one identifier field.
+     *
+     * @return bool
+     */
+    public function hasIdentifierFields()
+    {
+        return !empty($this->identifiers);
+    }
+
+    /**
      * Checks whether the metadata contains only identifier fields(s).
      *
      * @return bool

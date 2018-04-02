@@ -5,12 +5,15 @@ namespace Oro\Bundle\NoteBundle\Form\Handler;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class NoteHandler
 {
+    use RequestHandlerTrait;
+
     /**
      * @var FormInterface
      */
@@ -62,7 +65,7 @@ class NoteHandler
 
         $request = $this->requestStack->getCurrentRequest();
         if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
-            $this->form->submit($request);
+            $this->submitPostPutRequest($this->form, $request);
 
             if ($this->form->isValid()) {
                 $this->onSuccess($entity);

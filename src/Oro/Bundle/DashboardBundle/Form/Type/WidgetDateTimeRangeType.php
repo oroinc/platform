@@ -58,7 +58,7 @@ class WidgetDateTimeRangeType extends AbstractType
         $resolver->setDefaults(
             [
                 'compile_date' => false,
-                'field_type'   => WidgetDateRangeValueType::NAME,
+                'field_type'   => WidgetDateRangeValueType::class,
             ]
         );
     }
@@ -68,7 +68,7 @@ class WidgetDateTimeRangeType extends AbstractType
      */
     public function getParent()
     {
-        return DateTimeRangeFilterType::NAME;
+        return DateTimeRangeFilterType::class;
     }
 
     /**

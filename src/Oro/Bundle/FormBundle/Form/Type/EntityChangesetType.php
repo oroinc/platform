@@ -63,6 +63,6 @@ class EntityChangesetType extends AbstractType
      */
     public function getParent()
     {
-        return DataChangesetType::NAME;
+        return DataChangesetType::class;
     }
 }

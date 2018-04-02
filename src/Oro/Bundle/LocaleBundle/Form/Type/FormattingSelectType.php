@@ -44,7 +44,7 @@ class FormattingSelectType extends AbstractType
      */
     public function getParent()
     {
-        return OroChoiceType::NAME;
+        return OroChoiceType::class;
     }
 
     /**

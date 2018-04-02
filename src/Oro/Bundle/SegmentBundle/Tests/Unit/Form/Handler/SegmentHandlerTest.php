@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class SegmentHandlerTest extends \PHPUnit_Framework_TestCase
 {
+    const FORM_DATA = ['field' => 'value'];
+
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
@@ -93,11 +95,12 @@ class SegmentHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('setData')
             ->with($this->entity);
 
+        $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod('POST');
 
         $this->form->expects($this->once())
             ->method('submit')
-            ->with($this->request);
+            ->with(self::FORM_DATA);
 
         $this->form->expects($this->once())
             ->method('isValid')
@@ -134,10 +137,11 @@ class SegmentHandlerTest extends \PHPUnit_Framework_TestCase
         $this->form->expects($this->once())->method('setData')
             ->with($this->entity);
 
+        $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod($method);
 
         $this->form->expects($this->once())->method('submit')
-            ->with($this->request);
+            ->with(self::FORM_DATA);
 
         $this->assertFalse($this->handler->process($this->entity));
     }

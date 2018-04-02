@@ -82,7 +82,7 @@ services:
         factory: ['@form.factory', createNamed]
         arguments:
             - "oro_address_form"
-            - "oro_address"
+            - Oro\Bundle\AddressBundle\Form\Type\AddressType
             - ~
 
     # Addresses form handlers

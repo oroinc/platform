@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer;
+use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -40,6 +41,6 @@ class EmailTemplateRichTextType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_rich_text';
+        return OroRichTextType::class;
     }
 }

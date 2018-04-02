@@ -2,6 +2,7 @@
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AddressBundle\Form\Type\CountryType;
+use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CountryTypeTest extends \PHPUnit_Framework_TestCase
@@ -34,7 +35,7 @@ class CountryTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('oro_select2_translatable_entity', $this->type->getParent());
+        $this->assertEquals(Select2TranslatableEntityType::class, $this->type->getParent());
     }
 
     public function testGetName()

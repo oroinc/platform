@@ -10,6 +10,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Makes sure that the identifier of an entity exists in the Context.
+ * This validation is skipped if an entity does not have an identifier.
  */
 class ValidateEntityIdExists implements ProcessorInterface
 {
@@ -21,7 +22,7 @@ class ValidateEntityIdExists implements ProcessorInterface
         /** @var SingleItemContext $context */
 
         $entityId = $context->getId();
-        if (empty($entityId)) {
+        if (empty($entityId) && $context->hasIdentifierFields()) {
             $context->addError(
                 Error::createValidationError(
                     Constraint::ENTITY_ID,
