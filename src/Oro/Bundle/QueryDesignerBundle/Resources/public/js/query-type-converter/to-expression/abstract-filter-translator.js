@@ -36,7 +36,7 @@ define(function(require) {
 
         /**
          * Map object of possible filter criteria value to expression's operation
-         * (has to be defined in descendant FilterTranslatorToExpression)
+         * (can to be defined in descendant FilterTranslatorToExpression)
          * @type {Object}
          */
         operatorMap: null,
