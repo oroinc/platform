@@ -21,7 +21,7 @@ class CreateListenerTest extends TypeTestCase
         );
         $formBuilder->addEventSubscriber(new CreateListener());
         $formBuilder->add('name');
-        $formBuilder->add('enabled', new BooleanType());
+        $formBuilder->add('enabled', BooleanType::class);
 
         $form = $formBuilder->getForm();
         $form->submit([]);
@@ -45,7 +45,7 @@ class CreateListenerTest extends TypeTestCase
         );
         $formBuilder->addEventSubscriber(new CreateListener());
         $formBuilder->add('name');
-        $formBuilder->add('enabled', new BooleanType());
+        $formBuilder->add('enabled', BooleanType::class);
 
         $form = $formBuilder->getForm();
         $form->submit([]);
@@ -69,7 +69,7 @@ class CreateListenerTest extends TypeTestCase
         );
         $formBuilder->addEventSubscriber(new CreateListener());
         $formBuilder->add('name');
-        $formBuilder->add('enabled', new BooleanType());
+        $formBuilder->add('enabled', BooleanType::class);
 
         $form = $formBuilder->getForm();
         $form->submit(['name' => 'test', 'enabled' => true]);
@@ -93,7 +93,7 @@ class CreateListenerTest extends TypeTestCase
         );
         $formBuilder->addEventSubscriber(new CreateListener());
         $formBuilder->add('name');
-        $formBuilder->add('enabled', new BooleanType());
+        $formBuilder->add('enabled', BooleanType::class);
 
         $form = $formBuilder->getForm();
         $form->submit(['name' => null, 'enabled' => null]);

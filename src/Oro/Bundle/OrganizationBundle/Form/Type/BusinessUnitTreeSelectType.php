@@ -13,7 +13,7 @@ class BusinessUnitTreeSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_business_unit_tree';
+        return BusinessUnitTreeType::class;
     }
 
     /**

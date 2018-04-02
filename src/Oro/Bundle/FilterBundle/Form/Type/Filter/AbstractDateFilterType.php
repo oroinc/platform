@@ -7,6 +7,7 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -175,7 +176,7 @@ abstract class AbstractDateFilterType extends AbstractType
             $options['date_parts'] = [];
         }
 
-        $builder->add('part', 'choice', ['choices' => $options['date_parts']]);
+        $builder->add('part', ChoiceType::class, ['choices' => $options['date_parts']]);
         if ($options['compile_date']) {
             $builder->addEventSubscriber($this->subscriber);
         }

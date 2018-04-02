@@ -37,6 +37,6 @@ class EntityScalarCollectionType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_api_scalar_collection';
+        return ScalarCollectionType::class;
     }
 }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FormBundle\Form\Extension\JsValidation;
 
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 

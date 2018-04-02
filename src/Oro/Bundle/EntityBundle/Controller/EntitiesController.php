@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Controller;
 
 use FOS\RestBundle\Util\Codes;
+use Oro\Bundle\EntityBundle\Form\Type\CustomEntityType;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -260,7 +261,7 @@ class EntitiesController extends Controller
         $record = !$id ? new $entityClass : $entityRepository->find($id);
 
         $form = $this->createForm(
-            'custom_entity_type',
+            CustomEntityType::class,
             $record,
             array(
                 'data_class'   => $entityClass,

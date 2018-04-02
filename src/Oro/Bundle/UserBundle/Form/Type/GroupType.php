@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -19,7 +21,7 @@ class GroupType extends AbstractType
         $builder
             ->add(
                 'name',
-                'text',
+                TextType::class,
                 array(
                     'label' => 'oro.user.group.name.label',
                     'required' => true,
@@ -43,7 +45,7 @@ class GroupType extends AbstractType
             )*/
             ->add(
                 'appendUsers',
-                'oro_entity_identifier',
+                EntityIdentifierType::class,
                 array(
                     'class'    => 'OroUserBundle:User',
                     'required' => false,
@@ -53,7 +55,7 @@ class GroupType extends AbstractType
             )
             ->add(
                 'removeUsers',
-                'oro_entity_identifier',
+                EntityIdentifierType::class,
                 array(
                     'class'    => 'OroUserBundle:User',
                     'required' => false,

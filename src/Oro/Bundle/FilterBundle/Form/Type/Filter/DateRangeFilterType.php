@@ -32,7 +32,7 @@ class DateRangeFilterType extends AbstractDateFilterType
      */
     public function getParent()
     {
-        return FilterType::NAME;
+        return FilterType::class;
     }
 
     /**
@@ -44,7 +44,7 @@ class DateRangeFilterType extends AbstractDateFilterType
 
         $resolver->setDefaults(
             array(
-                'field_type'       => DateRangeType::NAME,
+                'field_type'       => DateRangeType::class,
                 'widget_options'   => [
                     'showDatevariables' => true,
                     'showTime'          => false,

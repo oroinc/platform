@@ -238,7 +238,7 @@ class OroJquerySelect2HiddenType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_hidden';
+        return Select2HiddenType::class;
     }
 
     /**

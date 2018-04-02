@@ -18,6 +18,7 @@ use Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider;
 use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -25,7 +26,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Forms;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -404,9 +404,9 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    $formType->getName()       => $formType,
-                    $formFieldType->getName()  => $formFieldType,
-                    $useParentScope->getName() => $useParentScope
+                    FormType::class => $formType,
+                    FormFieldType::class => $formFieldType,
+                    ParentScopeCheckbox::class => $useParentScope
                 ],
                 []
             ),

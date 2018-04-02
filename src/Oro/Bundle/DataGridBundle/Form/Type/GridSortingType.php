@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Form\Type;
 
+use Oro\Bundle\QueryDesignerBundle\Form\Type\SortingChoiceType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class GridSortingType extends AbstractType
@@ -13,8 +15,8 @@ class GridSortingType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('field', 'text')
-            ->add('direction', 'oro_sorting_choice');
+            ->add('field', TextType::class)
+            ->add('direction', SortingChoiceType::class);
     }
 
     /**

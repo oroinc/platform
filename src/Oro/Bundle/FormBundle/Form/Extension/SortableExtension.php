@@ -4,6 +4,7 @@ namespace Oro\Bundle\FormBundle\Form\Extension;
 
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -23,7 +24,7 @@ class SortableExtension extends AbstractTypeExtension
             return;
         }
 
-        $builder->add(self::POSITION_FIELD_NAME, 'hidden', [
+        $builder->add(self::POSITION_FIELD_NAME, HiddenType::class, [
             'property_path' => $options['sortable_property_path'],
             'block_name' => 'hidden',
             'empty_data' => '0',

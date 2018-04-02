@@ -5,8 +5,10 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Asset\PathPackage;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroRichTextTypeTest extends FormIntegrationTestCase
@@ -25,14 +27,13 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->assetsHelper = $this->createMock(Packages::class);
         $this->htmlTagProvider = $this->createMock(HtmlTagProvider::class);
 
         $this->formType = new OroRichTextType($this->configManager, $this->htmlTagProvider);
         $this->formType->setAssetHelper($this->assetsHelper);
+        parent::setUp();
     }
 
     protected function tearDown()
@@ -41,9 +42,24 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
         unset($this->formType, $this->configManager);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [
+                    OroRichTextType::class => $this->formType
+                ],
+                []
+            ),
+        ];
+    }
+
     public function testGetParent()
     {
-        $this->assertEquals('textarea', $this->formType->getParent());
+        $this->assertEquals(TextareaType::class, $this->formType->getParent());
     }
 
     public function testGetName()
@@ -102,7 +118,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             $viewData['attr']['data-page-component-options']
         );
 
-        $form = $this->factory->create($this->formType, $data, $options);
+        $form = $this->factory->create(OroRichTextType::class, $data, $options);
         $view = $form->createView();
 
         foreach ($viewData as $key => $value) {

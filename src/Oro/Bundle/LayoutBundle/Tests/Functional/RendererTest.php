@@ -7,6 +7,7 @@ use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
@@ -314,11 +315,11 @@ class RendererTest extends LayoutTestCase
 
         $form = $formFactory->createNamedBuilder(
             'form_for_layout_renderer_test',
-            'form',
+            FormType::class,
             null,
             $options
         )
-            ->add('user', new UserNameType())
+            ->add('user', UserNameType::class)
             ->add('jobTitle', 'text', ['label' => 'Job Title', 'required' => false])
             ->add(
                 'gender',

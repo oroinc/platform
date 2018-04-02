@@ -29,6 +29,6 @@ class OroResizeableRichTextType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_rich_text';
+        return OroRichTextType::class;
     }
 }

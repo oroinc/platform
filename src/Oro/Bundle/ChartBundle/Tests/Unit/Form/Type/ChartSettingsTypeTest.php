@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ChartBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ChartSettingsTypeTest extends FormIntegrationTestCase
@@ -30,6 +32,21 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [
+                    ChartSettingsType::class => $this->type
+                ],
+                []
+            ),
+        ];
+    }
+
+    /**
      * @param array  $options
      * @param string $exception
      * @param string $message
@@ -41,7 +58,7 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
 
-        $this->factory->create($this->type, null, $options);
+        $this->factory->create(ChartSettingsType::class, null, $options);
     }
 
     public function invalidOptionsProvider()
@@ -76,11 +93,6 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
      */
     public function testFieldAdded(array $fieldsData, $chartName, $useParentOptions)
     {
-        $configProvider = $this
-            ->getMockBuilder('\Oro\Bundle\ChartBundle\Model\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $chartOptions = array_merge(
             ['chart_name' => $chartName],
             ['settings_schema' => $fieldsData]
@@ -91,14 +103,13 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
             $formOptions['chart_config'] = $chartOptions;
         }
 
-        $configProvider
+        $this->configProvider
             ->expects($this->any())
             ->method('getChartConfig')
             ->with($chartName)
             ->will($this->returnValue($chartOptions));
 
-        $type = new ChartSettingsType($configProvider);
-        $form = $this->factory->create($type, null, $formOptions);
+        $form = $this->factory->create(ChartSettingsType::class, null, $formOptions);
 
         foreach (array_keys($fieldsData) as $fieldName) {
             $this->assertTrue($form->has($fieldName . 'Name'));
@@ -139,7 +150,7 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
         return [
             'name'    => $fieldName . 'Name',
             'label'   => $fieldName . 'Label',
-            'type'    => 'text',
+            'type'    => TextType::class,
             'options' => [
                 'label'    => $fieldName . 'NewLabel',
                 'required' => false

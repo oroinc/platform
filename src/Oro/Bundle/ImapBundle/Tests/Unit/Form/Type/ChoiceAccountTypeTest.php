@@ -12,8 +12,9 @@ use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
-use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ChoiceAccountTypeTest extends FormIntegrationTestCase
@@ -80,26 +81,29 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
 
     protected function getExtensions()
     {
+        $type = new ChoiceAccountType($this->translator);
+
         return array_merge(
             parent::getExtensions(),
             [
                 new PreloadedExtension(
                     [
-                        'oro_imap_configuration_check' => new CheckButtonType(),
-                        'oro_imap_configuration_gmail' => new ConfigurationGmailType(
+                        ChoiceAccountType::class => $type,
+                        CheckButtonType::class => new CheckButtonType(),
+                        ConfigurationGmailType::class => new ConfigurationGmailType(
                             $this->translator,
                             $this->userConfigManager,
                             $this->tokenAccessor
                         ),
-                        'oro_imap_configuration' => new ConfigurationType(
+                        ConfigurationType::class => new ConfigurationType(
                             $this->encryptor,
                             $this->tokenAccessor,
                             $this->translator
                         ),
-                        'oro_email_email_folder_tree' => new EmailFolderTreeType(),
+                        EmailFolderTreeType::class => new EmailFolderTreeType(),
                     ],
                     [
-                        'form' => [new TooltipFormExtension($this->configProvider, $this->translator)],
+                        FormType::class => [new TooltipFormExtension($this->configProvider, $this->translator)],
                     ]
                 ),
             ]
@@ -121,8 +125,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
      */
     public function testBindValidData($formData, $expectedViewData, $expectedModelData)
     {
-        $type = new ChoiceAccountType($this->translator);
-        $form = $this->factory->create($type);
+        $form = $this->factory->create(ChoiceAccountType::class);
         if ($expectedViewData) {
             $form->submit($formData);
             foreach ($expectedViewData as $name => $value) {

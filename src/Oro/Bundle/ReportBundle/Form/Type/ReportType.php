@@ -4,6 +4,7 @@ namespace Oro\Bundle\ReportBundle\Form\Type;
 
 use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
 use Oro\Bundle\ReportBundle\Form\EventListener\DateGroupingFormSubscriber;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -16,13 +17,13 @@ class ReportType extends AbstractQueryDesignerType
     {
         $builder
             ->add('name', 'text', array('required' => true))
-            ->add('entity', 'oro_report_entity_choice', array('required' => true))
+            ->add('entity', ReportEntityChoiceType::class, array('required' => true))
             ->add(
                 'type',
-                'entity',
+                EntityType::class,
                 array(
                     'class'       => 'OroReportBundle:ReportType',
-                    'property'    => 'label',
+                    'choice_label'    => 'label',
                     'required'    => true,
                     'placeholder' => 'oro.report.form.choose_report_type'
                 )
@@ -37,7 +38,7 @@ class ReportType extends AbstractQueryDesignerType
             )
             ->add(
                 'chartOptions',
-                'oro_report_chart',
+                ReportChartType::class,
                 array('required' => true)
             )
             ->add('description', 'textarea', array('required' => false));

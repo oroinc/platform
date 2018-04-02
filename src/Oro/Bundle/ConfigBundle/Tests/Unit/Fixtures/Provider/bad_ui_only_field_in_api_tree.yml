@@ -2,7 +2,7 @@ system_configuration:
     fields:
         some_field:
             ui_only: true
-            type: text
+            type: Symfony\Component\Form\Extension\Core\Type\TextType
 
     api_tree:
         section1:

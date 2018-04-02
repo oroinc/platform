@@ -19,7 +19,7 @@ services:
         factory: ['@form.factory', createNamed]
         arguments:
             - "oro_report_form"
-            - "oro_report"
+            - Oro\Bundle\ReportBundle\Form\Type\ReportType
 
     oro_report.form.handler.report:
         class: '%oro_report.form.handler.report.class%'
