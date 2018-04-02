@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Form\EventListener;
 
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
@@ -38,7 +39,7 @@ class ChangePasswordSubscriber extends UserSubscriber
             $form->add(
                 $this->factory->createNamed(
                     'currentPassword',
-                    'password',
+                    PasswordType::class,
                     null,
                     array(
                         'auto_initialize' => false,

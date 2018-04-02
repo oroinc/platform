@@ -22,6 +22,9 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * A base class for handling Data API actions.
+ */
 abstract class RequestActionHandler
 {
     /** @var string[] */

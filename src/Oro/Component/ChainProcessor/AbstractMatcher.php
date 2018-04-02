@@ -117,7 +117,7 @@ abstract class AbstractMatcher
             return $this->isMatchScalars($value, $contextValue, $name);
         }
 
-        switch (key($value)) {
+        switch (\key($value)) {
             case self::OPERATOR_NOT:
                 return !$this->isMatchScalars(\current($value), $contextValue, $name);
             case self::OPERATOR_AND:

@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create\JsonApi;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Create\JsonApi\ValidateRequestData;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 /**
@@ -11,19 +14,17 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
  */
 class ValidateRequestDataTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $valueNormalizer;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    private $valueNormalizer;
 
     /** @var ValidateRequestData */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
         $this->processor = new ValidateRequestData($this->valueNormalizer);
     }
@@ -33,16 +34,20 @@ class ValidateRequestDataTest extends FormProcessorTestCase
      */
     public function testProcessWithValidRequestData($requestData)
     {
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+
         $this->valueNormalizer->expects($this->any())
             ->method('normalizeValue')
             ->with('products')
-            ->willReturn('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
+            ->willReturn(Product::class);
 
-        $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
+        $this->context->setClassName(Product::class);
+        $this->context->setMetadata($metadata);
         $this->context->setRequestData($requestData);
-
         $this->processor->process($this->context);
-        $this->assertFalse($this->context->hasErrors());
+
+        self::assertFalse($this->context->hasErrors());
     }
 
     public function validRequestDataProvider()
@@ -62,7 +67,7 @@ class ValidateRequestDataTest extends FormProcessorTestCase
             ],
             [
                 ['data' => ['type' => 'products']]
-            ],
+            ]
         ];
     }
 
@@ -76,26 +81,29 @@ class ValidateRequestDataTest extends FormProcessorTestCase
         $title = 'request data constraint',
         $statusCode = 400
     ) {
-        $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
-        $this->context->setRequestData($requestData);
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
 
-        $this->valueNormalizer->expects($this->any())
+        $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
             ->with('products')
-            ->willReturn('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
+            ->willReturn(Product::class);
 
+        $this->context->setClassName(Product::class);
+        $this->context->setMetadata($metadata);
+        $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
 
         $errors = $this->context->getErrors();
 
         $expectedError = (array)$expectedError;
         $pointer = (array)$pointer;
-        $this->assertCount(count($expectedError), $errors);
+        self::assertCount(count($expectedError), $errors);
         foreach ($errors as $key => $error) {
-            $this->assertEquals($title, $error->getTitle());
-            $this->assertEquals($expectedError[$key], $error->getDetail());
-            $this->assertEquals($pointer[$key], $error->getSource()->getPointer());
-            $this->assertEquals($statusCode, $error->getStatusCode());
+            self::assertEquals($title, $error->getTitle());
+            self::assertEquals($expectedError[$key], $error->getDetail());
+            self::assertEquals($pointer[$key], $error->getSource()->getPointer());
+            self::assertEquals($statusCode, $error->getStatusCode());
         }
     }
 
@@ -132,7 +140,7 @@ class ValidateRequestDataTest extends FormProcessorTestCase
                 '/data/type',
                 'conflict constraint',
                 409
-            ],
+            ]
         ];
     }
 }

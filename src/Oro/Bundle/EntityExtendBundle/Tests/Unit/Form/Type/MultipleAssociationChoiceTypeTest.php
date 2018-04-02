@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
 
@@ -15,13 +16,11 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityConfigProvider;
 
-    /** @var MultipleAssociationChoiceType */
-    protected $type;
-
-    protected function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFormType()
     {
-        parent::setUp();
-
         $config1 = new Config(new EntityConfigId('grouping', 'Test\Entity1'));
         $config2 = new Config(new EntityConfigId('grouping', 'Test\Entity2'));
         $config2->set('groups', []);
@@ -66,7 +65,7 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
             ->method('getEntityClass')
             ->will($this->returnArgument(0));
 
-        $this->type = new MultipleAssociationChoiceType(
+        return new MultipleAssociationChoiceType(
             new AssociationTypeHelper($this->configManager, $entityClassResolver),
             $this->configManager
         );
@@ -92,7 +91,7 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
 
         $data = $this->doTestSubmit(
             'items',
-            $this->type,
+            MultipleAssociationChoiceType::class,
             [
                 'config_id'         => new EntityConfigId('test', 'Test\Entity'),
                 'association_class' => 'test'
@@ -247,7 +246,8 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         $view->children[0]->vars['value'] = 'Test\Entity1';
         $view->children[1]->vars['value'] = 'Test\Entity2';
 
-        $this->type->finishView($view, $form, $options);
+        $type = $this->getFormType();
+        $type->finishView($view, $form, $options);
 
         $this->assertEquals(
             [
@@ -292,7 +292,8 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         $view->children[0]->vars['value'] = 'Test\Entity1';
         $view->children[1]->vars['value'] = 'Test\Entity2';
 
-        $this->type->finishView($view, $form, $options);
+        $type = $this->getFormType();
+        $type->finishView($view, $form, $options);
 
         $this->assertEquals(
             [
@@ -338,7 +339,8 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         $view->children[0]->vars['value'] = 'Test\Entity1';
         $view->children[1]->vars['value'] = 'Test\Entity2';
 
-        $this->type->finishView($view, $form, $options);
+        $type = $this->getFormType();
+        $type->finishView($view, $form, $options);
 
         $this->assertEquals(
             [
@@ -383,7 +385,8 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         $view->children[0]->vars['value'] = 'Test\Entity1';
         $view->children[1]->vars['value'] = 'Test\Entity2';
 
-        $this->type->finishView($view, $form, $options);
+        $type = $this->getFormType();
+        $type->finishView($view, $form, $options);
 
         $this->assertEquals(
             [
@@ -405,12 +408,12 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
 
     public function testGetName()
     {
-        $this->assertEquals('oro_entity_extend_multiple_association_choice', $this->type->getName());
+        $this->assertEquals('oro_entity_extend_multiple_association_choice', $this->getFormType()->getName());
     }
 
     public function testGetParent()
     {
-        $this->assertEquals('choice', $this->type->getParent());
+        $this->assertEquals(ChoiceType::class, $this->getFormType()->getParent());
     }
 
     /**

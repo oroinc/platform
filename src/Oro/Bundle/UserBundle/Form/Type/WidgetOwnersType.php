@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
+use Oro\Bundle\OrganizationBundle\Form\Type\WidgetBusinessUnitSelectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -16,7 +17,7 @@ class WidgetOwnersType extends AbstractType
     {
         $builder->add(
             'businessUnits',
-            'oro_type_widget_business_unit_select',
+            WidgetBusinessUnitSelectType::class,
             [
                 'label'    => 'oro.sales.dashboard.forecast_of_opportunities.business_unit',
                 'required' => false,
@@ -24,7 +25,7 @@ class WidgetOwnersType extends AbstractType
         );
         $builder->add(
             'roles',
-            'oro_type_widget_role_select',
+            WidgetRoleSelectType::class,
             [
                 'label'    => 'oro.sales.dashboard.forecast_of_opportunities.role',
                 'required' => false
@@ -32,7 +33,7 @@ class WidgetOwnersType extends AbstractType
         );
         $builder->add(
             'users',
-            'oro_type_widget_user_select',
+            WidgetUserSelectType::class,
             [
                 'label'    => 'oro.sales.dashboard.forecast_of_opportunities.owner',
                 'required' => false

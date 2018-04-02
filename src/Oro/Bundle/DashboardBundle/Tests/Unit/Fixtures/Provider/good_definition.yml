@@ -8,11 +8,11 @@ dashboards:
             icon:       bundles/orodashboard/img/quick_launchpad.png
             configuration:
                 some_field:
-                    type: text
+                    type: Symfony\Component\Form\Extension\Core\Type\TextType
                     options: []
 
                 some_another_field:
-                    type: choice
+                    type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
         quick_launchpad_without_form:
             label:      oro.dashboard.title.quick_launchpad
             route:      oro_dashboard_itemized_widget

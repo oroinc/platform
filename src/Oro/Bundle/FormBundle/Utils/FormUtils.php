@@ -44,7 +44,7 @@ class FormUtils
 
         $options = array_merge($options, $modifyOptions);
         $options = array_diff_key($options, array_flip($unsetOptions));
-        $form->add($fieldName, $config->getType()->getName(), $options);
+        $form->add($fieldName, get_class($config->getType()->getInnerType()), $options);
     }
 
     /**
@@ -61,7 +61,7 @@ class FormUtils
         $options = $config->getOptions();
 
         $options = array_replace_recursive($options, $mergeOptions);
-        $form->add($fieldName, $config->getType()->getName(), $options);
+        $form->add($fieldName, get_class($config->getType()->getInnerType()), $options);
     }
 
     /**

@@ -1,11 +1,8 @@
-OroUserBundle
-=============
+# OroUserBundle
 
-Provides user management functionality (authentication, authorization, etc).
+OroUserBundle enables user management in the Oro applications and provides the ability to manage user-related data using the application UI, CLI tools, and web API requests.
 
-
-Areas of Responsibilities
-----------------------------------
+## Areas of Responsibilities
 
 - user management
     - edit user information

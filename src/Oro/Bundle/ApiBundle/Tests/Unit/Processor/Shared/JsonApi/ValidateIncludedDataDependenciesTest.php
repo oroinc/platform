@@ -34,6 +34,25 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage The "data" section must exist in the request data.
+     */
+    public function testProcessIncludedDataWithoutPrimatyData()
+    {
+        $requestData = [
+            'included' => [
+                [
+                    'type' => 'groups',
+                    'id'   => 'included_group_1'
+                ]
+            ]
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+    }
+
     public function testProcessDirectToOneRelationship()
     {
         $requestData = [

@@ -1,10 +1,8 @@
-OroDataGridBundle
-=================
+# OroDataGridBundle
 
-Data grid UI control implementation.
+OroDataGridBundle allows to define YAML configuration of data collection presentation in a grid form.
 
-Table of content
-----------------
+## Table of content
 
 - Backend
     - [Datagrid](./Resources/doc/backend/datagrid.md)

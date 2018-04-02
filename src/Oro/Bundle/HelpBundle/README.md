@@ -1,7 +1,5 @@
-OroHelpBundle
-=============
+# OroHelpBundle
 
-This bundle adds possibility to manage associations application pages with help pages on external web site.
-Also there is an extension that adds possibility to manage help tooltips for forms.
+OroHelpBundle enables developers to manage help links for the Oro application pages using YAML configuration files and provides DocBlock annotations for setting the tooltips for entity form fields.
 
 Please see [documentation](./Resources/doc/index.md) for more details.

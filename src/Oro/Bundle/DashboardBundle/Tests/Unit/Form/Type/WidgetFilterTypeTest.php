@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetFilterType;
 use Oro\Bundle\QueryDesignerBundle\Form\Type\FilterType;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 
 class WidgetFilterTypeTest extends TypeTestCase
@@ -32,7 +32,7 @@ class WidgetFilterTypeTest extends TypeTestCase
             'entity'     => 'TestClass',
             'definition' => '{"filters":[]}'
         ];
-        $form     = $this->factory->create(new WidgetFilterType(), null, ['entity' => 'TestClass']);
+        $form     = $this->factory->create(WidgetFilterType::class, null, ['entity' => 'TestClass']);
         $form->submit($formData);
 
         $this->assertTrue($form->isValid());
@@ -52,7 +52,7 @@ class WidgetFilterTypeTest extends TypeTestCase
     public function testView(array $options, array $expectedData, $value = [])
     {
         $form    = $this->factory->create(
-            new WidgetFilterType(),
+            WidgetFilterType::class,
             $value,
             array_merge(['entity' => 'TestClass', 'widgetType' => 'test_widget'], $options)
         );
@@ -87,7 +87,7 @@ class WidgetFilterTypeTest extends TypeTestCase
     protected function getExtensions()
     {
         $preLoadedExtension = new PreloadedExtension(
-            ['oro_query_designer_filter' => new FilterType()],
+            [FilterType::class => new FilterType()],
             []
         );
 

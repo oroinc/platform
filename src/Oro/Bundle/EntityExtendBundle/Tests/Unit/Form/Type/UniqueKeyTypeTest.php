@@ -8,16 +8,19 @@ use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Validator\Constraints;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\Validator\Validation;
 
 class UniqueKeyTypeTest extends TypeTestCase
 {
     /**
-     * @var UniqueKeyType
+     * @var array
      */
-    protected $type;
+    private $fields = [
+        'firstName' => 'First Name',
+        'lastName'  => 'Last Name',
+        'email'     => 'Email',
+    ];
 
     protected function setUp()
     {
@@ -32,14 +35,13 @@ class UniqueKeyTypeTest extends TypeTestCase
 
         $this->dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
+    }
 
-        $fields = [
-            'firstName' => 'First Name',
-            'lastName'  => 'Last Name',
-            'email'     => 'Email',
-        ];
-
-        $this->type = new UniqueKeyType($fields);
+    public function testRequiredKeyChoiceOption()
+    {
+        $this->expectException(MissingOptionsException::class);
+        $this->expectExceptionMessage('The required option "key_choices" is missing.');
+        $this->factory->create(UniqueKeyType::class);
     }
 
     public function testType()
@@ -49,7 +51,7 @@ class UniqueKeyTypeTest extends TypeTestCase
             'key'  => array('firstName', 'lastName', 'email')
         );
 
-        $form = $this->factory->create($this->type);
+        $form = $this->factory->create(UniqueKeyType::class, null, ['key_choices' => $this->fields]);
         $form->submit($formData);
 
         $this->assertTrue($form->isSynchronized());
@@ -58,7 +60,7 @@ class UniqueKeyTypeTest extends TypeTestCase
 
     public function testSubmitNotValidData()
     {
-        $form = $this->factory->create($this->type);
+        $form = $this->factory->create(UniqueKeyType::class, null, ['key_choices' => $this->fields]);
 
         $formData = array(
             'name' => '',
@@ -71,6 +73,7 @@ class UniqueKeyTypeTest extends TypeTestCase
 
     public function testNames()
     {
-        $this->assertEquals('oro_entity_extend_unique_key_type', $this->type->getName());
+        $type = new UniqueKeyType();
+        $this->assertEquals('oro_entity_extend_unique_key_type', $type->getName());
     }
 }

@@ -3,6 +3,10 @@
 namespace Oro\Bundle\InstallerBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -28,7 +32,7 @@ class SetupType extends AbstractType
         $builder
             ->add(
                 'application_url',
-                'text',
+                TextType::class,
                 [
                     'label'    => 'form.setup.application_url',
                     'mapped'   => false,
@@ -37,7 +41,7 @@ class SetupType extends AbstractType
             )
             ->add(
                 'organization_name',
-                'text',
+                TextType::class,
                 [
                     'label'       => 'form.setup.organization_name',
                     'mapped'      => false,
@@ -48,14 +52,14 @@ class SetupType extends AbstractType
             )
             ->add(
                 'username',
-                'text',
+                TextType::class,
                 [
                     'label' => 'form.setup.username',
                 ]
             )
             ->add(
                 'plainPassword',
-                'repeated',
+                RepeatedType::class,
                 [
                     'type'            => 'password',
                     'invalid_message' => 'The password fields must match.',
@@ -65,28 +69,28 @@ class SetupType extends AbstractType
             )
             ->add(
                 'email',
-                'email',
+                EmailType::class,
                 [
                     'label' => 'form.setup.email',
                 ]
             )
             ->add(
                 'firstName',
-                'text',
+                TextType::class,
                 [
                     'label' => 'form.setup.firstname',
                 ]
             )
             ->add(
                 'lastName',
-                'text',
+                TextType::class,
                 [
                     'label' => 'form.setup.lastname',
                 ]
             )
             ->add(
                 'loadFixtures',
-                'checkbox',
+                CheckboxType::class,
                 [
                     'label'    => 'form.setup.load_fixtures',
                     'required' => false,

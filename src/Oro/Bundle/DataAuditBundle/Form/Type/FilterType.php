@@ -59,7 +59,7 @@ class FilterType extends AbstractType
      */
     public function getParent()
     {
-        return BaseFilterType::NAME;
+        return BaseFilterType::class;
     }
 
     /**

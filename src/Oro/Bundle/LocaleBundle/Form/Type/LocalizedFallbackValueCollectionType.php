@@ -5,6 +5,9 @@ namespace Oro\Bundle\LocaleBundle\Form\Type;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\LocalizedFallbackValueCollectionTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -51,12 +54,12 @@ class LocalizedFallbackValueCollectionType extends AbstractType
     {
         $builder->add(
             self::FIELD_VALUES,
-            LocalizedPropertyType::NAME,
+            LocalizedPropertyType::class,
             ['entry_type' => $options['entry_type'], 'entry_options' => $options['entry_options']]
         )->add(
             self::FIELD_IDS,
-            'collection',
-            ['entry_type' => 'hidden']
+            CollectionType::class,
+            ['entry_type' => HiddenType::class]
         );
 
         $builder->addViewTransformer(
@@ -71,7 +74,7 @@ class LocalizedFallbackValueCollectionType extends AbstractType
     {
         $resolver->setDefaults([
             'field' => 'string', // field used to store data - string or text
-            'entry_type' => 'text',   // value form type
+            'entry_type' => TextType::class,   // value form type
             'entry_options' => [],       // value form options
         ]);
     }

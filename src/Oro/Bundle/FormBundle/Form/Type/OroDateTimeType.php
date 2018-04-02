@@ -24,7 +24,7 @@ class OroDateTimeType extends OroDateType
      */
     public function getParent()
     {
-        return 'datetime';
+        return DateTimeType::class;
     }
 
     /**

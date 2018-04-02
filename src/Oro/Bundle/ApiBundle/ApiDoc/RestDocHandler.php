@@ -88,8 +88,8 @@ class RestDocHandler implements HandlerInterface
         $entityClass = $this->getEntityClass($entityType);
         $associationName = $route->getDefault(RestRouteOptionsResolver::ASSOCIATION_ATTRIBUTE);
         $context = $this->getContext($action, $entityClass, $associationName);
-        $config = $context->getConfig();
-        $metadata = $context->getMetadata();
+        $config = $this->getConfig($context);
+        $metadata = $this->getMetadata($context);
 
         $annotation->setSection($entityType);
         $this->setDescription($annotation, $config);
@@ -148,6 +148,7 @@ class RestDocHandler implements HandlerInterface
         $context = $processor->createContext();
         $context->addConfigExtra(new DescriptionsConfigExtra());
         $context->getRequestType()->set($this->docViewDetector->getRequestType());
+        $context->setVersion($this->docViewDetector->getVersion());
         $context->setLastGroup('initialize');
         if ($associationName) {
             /** @var SubresourceContext $context */
@@ -163,6 +164,52 @@ class RestDocHandler implements HandlerInterface
         $processor->process($context);
 
         return $context;
+    }
+
+    /**
+     * @param Context $context
+     *
+     * @return EntityDefinitionConfig
+     */
+    private function getConfig(Context $context): EntityDefinitionConfig
+    {
+        $config = $context->getConfig();
+        if (null === $config) {
+            $message = sprintf(
+                'The configuration for "%s" cannot be loaded. Action: %s',
+                $context->getClassName(),
+                $context->getAction()
+            );
+            if ($context instanceof SubresourceContext) {
+                $message .= sprintf(' Association: %s.', $context->getAssociationName());
+            }
+            throw new \LogicException($message);
+        }
+
+        return $config;
+    }
+
+    /**
+     * @param Context $context
+     *
+     * @return EntityMetadata
+     */
+    private function getMetadata(Context $context): EntityMetadata
+    {
+        $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            $message = sprintf(
+                'The metadata for "%s" cannot be loaded. Action: %s',
+                $context->getClassName(),
+                $context->getAction()
+            );
+            if ($context instanceof SubresourceContext) {
+                $message .= sprintf(' Association: %s.', $context->getAssociationName());
+            }
+            throw new \LogicException($message);
+        }
+
+        return $metadata;
     }
 
     /**
@@ -228,8 +275,8 @@ class RestDocHandler implements HandlerInterface
             $substituteAction = $this->getOutputAction($action);
             if ($action !== $substituteAction) {
                 $substituteContext = $this->getContext($substituteAction, $entityClass, $associationName);
-                $config = $substituteContext->getConfig();
-                $metadata = $substituteContext->getMetadata();
+                $config = $this->getConfig($substituteContext);
+                $metadata = $this->getMetadata($substituteContext);
             }
 
             $this->setDirectionValue($annotation, 'output', $this->getDirectionValue($action, $config, $metadata));

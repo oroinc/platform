@@ -4,6 +4,7 @@ namespace Oro\Bundle\CommentBundle\Tests\Unit\Form\Handler;
 
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Form\Handler\CommentApiHandler;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class CommentApiHandlerTest extends \PHPUnit_Framework_TestCase
@@ -14,7 +15,7 @@ class CommentApiHandlerTest extends \PHPUnit_Framework_TestCase
     protected $form;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var Request
      */
     protected $request;
 
@@ -41,7 +42,7 @@ class CommentApiHandlerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $this->request = $this->createMock('Symfony\Component\HttpFoundation\Request');
+        $this->request = new Request();
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
         $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
@@ -67,9 +68,7 @@ class CommentApiHandlerTest extends \PHPUnit_Framework_TestCase
         if ($valid && $callsCount) {
             $persistCallsCount = 1;
         }
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue($type));
+        $this->request->setMethod($type);
 
         $this->form->expects($this->exactly($callsCount))
             ->method('submit');

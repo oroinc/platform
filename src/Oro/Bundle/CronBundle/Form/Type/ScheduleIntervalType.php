@@ -21,10 +21,10 @@ class ScheduleIntervalType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add(self::ACTIVE_AT_FIELD, OroDateTimeType::NAME, [
+            ->add(self::ACTIVE_AT_FIELD, OroDateTimeType::class, [
                 'required' => false
             ])
-            ->add(self::DEACTIVATE_AT_FIELD, OroDateTimeType::NAME, [
+            ->add(self::DEACTIVATE_AT_FIELD, OroDateTimeType::class, [
                 'required' => false
             ]);
     }

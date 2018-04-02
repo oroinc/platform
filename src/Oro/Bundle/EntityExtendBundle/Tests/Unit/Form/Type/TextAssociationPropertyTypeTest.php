@@ -7,13 +7,11 @@ use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
 
 class TextAssociationPropertyTypeTest extends AssociationTypeTestCase
 {
-    /** @var TextAssociationPropertyType */
-    protected $type;
-
-    protected function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFormType()
     {
-        parent::setUp();
-
         $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
@@ -21,7 +19,7 @@ class TextAssociationPropertyTypeTest extends AssociationTypeTestCase
             ->method('getEntityClass')
             ->will($this->returnArgument(0));
 
-        $this->type = new TextAssociationPropertyType(
+        return new TextAssociationPropertyType(
             new AssociationTypeHelper($this->configManager, $entityClassResolver),
             $this->configManager
         );
@@ -31,15 +29,16 @@ class TextAssociationPropertyTypeTest extends AssociationTypeTestCase
     {
         $this->assertEquals(
             'oro_entity_extend_association_property_text',
-            $this->type->getName()
+            $this->getFormType()->getName()
         );
     }
 
     public function testGetParent()
     {
+        $type = $this->getFormType();
         $this->assertEquals(
             'text',
-            $this->type->getParent()
+            $this->getFormType()->getParent()
         );
     }
 

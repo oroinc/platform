@@ -40,7 +40,7 @@ class ManyToManyFilterType extends AbstractType
      */
     public function getParent()
     {
-        return ChoiceFilterType::NAME;
+        return ChoiceFilterType::class;
     }
 
     /**

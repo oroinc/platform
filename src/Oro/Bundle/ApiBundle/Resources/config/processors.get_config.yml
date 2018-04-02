@@ -161,7 +161,7 @@ services:
         arguments:
             - '@oro_api.entity_description_provider'
             - '@oro_api.resource_doc_provider'
-            - '@oro_api.api_doc.parser'
+            - '@oro_api.resource_doc_parser_registry'
             - '@translator'
             - '@oro_entity_config.provider.ownership'
             - '@oro_api.request_depended_text_processor'

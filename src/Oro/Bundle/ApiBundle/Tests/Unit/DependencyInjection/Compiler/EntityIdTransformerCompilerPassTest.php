@@ -30,7 +30,7 @@ class EntityIdTransformerCompilerPassTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testProcessWhenNoDataTransformers()
+    public function testProcessWhenNoEntityIdTransformers()
     {
         $this->compiler->process($this->container);
 

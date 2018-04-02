@@ -3,9 +3,13 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -40,7 +44,7 @@ class EmailTemplateType extends AbstractType
     {
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             array(
                 'label'    => 'oro.email.emailtemplate.name.label',
                 'required' => true
@@ -48,7 +52,7 @@ class EmailTemplateType extends AbstractType
         );
         $builder->add(
             'type',
-            'choice',
+            ChoiceType::class,
             array(
                 'label'    => 'oro.email.emailtemplate.type.label',
                 'multiple' => false,
@@ -62,7 +66,7 @@ class EmailTemplateType extends AbstractType
         );
         $builder->add(
             'entityName',
-            'oro_entity_choice',
+            EntityChoiceType::class,
             array(
                 'label'    => 'oro.email.emailtemplate.entity_name.label',
                 'tooltip'  => 'oro.email.emailtemplate.entity_name.tooltip',
@@ -73,7 +77,7 @@ class EmailTemplateType extends AbstractType
 
         $builder->add(
             'translations',
-            'oro_email_emailtemplate_translatation',
+            EmailTemplateTranslationType::class,
             array(
                 'label'    => 'oro.email.emailtemplate.translations.label',
                 'required' => false,
@@ -84,7 +88,7 @@ class EmailTemplateType extends AbstractType
         );
         $builder->add(
             'translation',
-            'hidden',
+            HiddenType::class,
             [
                 'mapped' => false,
                 'attr' => ['class' => 'translation']
@@ -93,7 +97,7 @@ class EmailTemplateType extends AbstractType
 
         $builder->add(
             'parentTemplate',
-            'hidden',
+            HiddenType::class,
             array(
                 'label'         => 'oro.email.emailtemplate.parent.label',
                 'property_path' => 'parent'
@@ -117,7 +121,7 @@ class EmailTemplateType extends AbstractType
                     // entityName field
                     $options = $form->get('entityName')->getConfig()->getOptions();
                     $setDisabled($options);
-                    $form->add($factory->createNamed('entityName', 'oro_entity_choice', null, $options));
+                    $form->add($factory->createNamed('entityName', EntityChoiceType::class, null, $options));
                     // name field
                     $options = $form->get('name')->getConfig()->getOptions();
                     $setDisabled($options);

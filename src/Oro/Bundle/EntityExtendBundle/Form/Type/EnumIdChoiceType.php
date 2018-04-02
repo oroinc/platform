@@ -57,7 +57,7 @@ class EnumIdChoiceType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_enum_choice';
+        return EnumChoiceType::class;
     }
 
     /**
